@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "1063741670571",
+    "project_id": "myfinance-fadef",
+    "storage_bucket": "myfinance-fadef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1063741670571:android:2a5d4a8c89d6aa1a62a3ee",
+        "android_client_info": {
+          "package_name": "com.frafio.lamiafinanza"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1063741670571-8414gdgksppspg2d1l6ribelsd648lek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjJ36DPsMcRZMYpskMKVyKQpuj1QWw5nI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1063741670571-8414gdgksppspg2d1l6ribelsd648lek.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1063741670571:android:dbcf4f884222d92c62a3ee",
+        "android_client_info": {
+          "package_name": "com.frafio.myfinance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1063741670571-7psu6i3boleeh469sit343slpmvode0q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.frafio.myfinance",
+            "certificate_hash": "2657d226a3ed96139662dfcea9ee60e12f0d4931"
+          }
+        },
+        {
+          "client_id": "1063741670571-8414gdgksppspg2d1l6ribelsd648lek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjJ36DPsMcRZMYpskMKVyKQpuj1QWw5nI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1063741670571-8414gdgksppspg2d1l6ribelsd648lek.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

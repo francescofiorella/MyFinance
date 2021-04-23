@@ -1,0 +1,6 @@
+<resources>
+    <dimen name="field_corner_radius">30dp</dimen>
+
+    <dimen name="card_elevation">1dp</dimen>
+    <dimen name="card_corner_radius">10dp</dimen>
+</resources>

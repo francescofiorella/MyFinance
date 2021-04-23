@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/dashboard"
+        android:icon="@drawable/ic_home"
+        android:title="Dashboard"
+        android:contentDescription="Dashboard"/>
+
+    <item
+        android:id="@+id/list"
+        android:icon="@drawable/ic_list_alt"
+        android:title="Lista"
+        android:contentDescription="List" />
+
+    <item
+        android:id="@+id/placeholder"
+        android:title=""
+        android:enabled="false" />
+
+    <item
+        android:id="@+id/profile"
+        android:icon="@drawable/ic_account_circle"
+        android:title="Profilo"
+        android:contentDescription="Profile" />
+
+    <item
+        android:id="@+id/menu"
+        android:icon="@drawable/ic_menu"
+        android:title="Menu"
+        android:contentDescription="Menu" />
+
+</menu>

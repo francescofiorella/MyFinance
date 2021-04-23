@@ -1,16 +1,83 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.LaMiaFinanza" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.MyFinance" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/primary</item>
         <!-- Customize your theme here. -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorAccent">@color/accent</item>
+
+        <!--Custom widgets theme. -->
+        <item name="textInputStyle">@style/Widget.MyFinance.TextInputLayout.OutlinedBox</item>
     </style>
+
+    <!--Toolbar theme. -->
+    <style name="TextAppearance.MyFinance.Toolbar.MainTitle" parent="TextAppearance.AppCompat.Large">
+        <item name="fontFamily">casual</item>
+        <item name="android:textSize">26sp</item>
+    </style>
+    <style name="TextAppearance.MyFinance.Toolbar.Title" parent="TextAppearance.AppCompat.Large">
+        <item name="fontFamily">@font/nunito</item>
+    </style>
+
+    <!--BottomNavigationView theme. -->
+    <style name="Widget.MyFinance.BottomNavigationView" parent="Widget.Design.BottomNavigationView">
+        <item name="fontFamily">@font/nunito</item>
+    </style>
+
+    <!--Dialog theme. -->
+    <style name="ThemeOverlay.MyFinance.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:backgroundTint">@color/edit_text</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/TextAppearance.MyFinance.AlertDialog.Title</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/TextAppearance.MyFinance.AlertDialog.Body</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
+    </style>
+    <style name="TextAppearance.MyFinance.AlertDialog.Title" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="fontFamily">@font/nunito_semibold</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="TextAppearance.MyFinance.AlertDialog.Body" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="fontFamily">@font/nunito</item>
+    </style>
+    <style name="Widget.MyFinance.AlertDialog.Button" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/nav_items</item>
+        <item name="fontFamily">@font/nunito_semibold</item>
+    </style>
+
+    <!--Material Fields theme. -->
+    <style name="Widget.MyFinance.TextInputLayout.OutlinedBox"
+        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.NoWaste.TextInputLayout.OutlinedBox</item>
+    </style>
+    <style name="Widget.NoWaste.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.NoWaste.TextInputLayout.OutlinedBox</item>
+    </style>
+    <style name="ThemeOverlay.NoWaste.TextInputLayout.OutlinedBox" parent="">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="editTextStyle">@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox</item>
+        <item name="autoCompleteTextViewStyle">@style/Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox</item>
+    </style>
+
+    <!--Material DatePicker theme. -->
+    <style name="ThemeOverlay.MyFinance.DatePicker" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.MyFinance.DatePicker.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.MyFinance.DatePicker.Button</item>
+    </style>
+    <style name="Widget.MyFinance.DatePicker.Button" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/accent</item>
+        <item name="fontFamily">@font/nunito_bold</item>
+    </style>
+
 </resources>

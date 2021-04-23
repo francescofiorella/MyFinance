@@ -5,6 +5,24 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+    <color name="quantum_grey_600">#757575</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!--Custom colors-->
+    <color name="carmine">#B00020</color>
+    <color name="cinnamon_satin">#cf6679</color>
+
+    <!--Theme colors-->
+    <color name="primary">#2C3240</color> <!-- #1976d2 -->
+    <color name="background">@color/white</color>
+    <color name="accent">#01579b</color>
+    <color name="error">@color/carmine</color>
+    <color name="primary_text">@color/black</color>
+    <color name="inverted_primary_text">@color/white</color>
+    <color name="disabled_text">#D4D4D4</color>
+    <color name="snackbar">#101D25</color>
+
+    <color name="edit_text">#EBEEF5</color>
+    <color name="nav_items">#3278F2</color>
 </resources>

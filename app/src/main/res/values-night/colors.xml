@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Theme colors-->
+    <color name="primary">#2C3240</color>
+    <color name="background">@color/black</color>
+    <color name="accent">#01579b</color>
+    <color name="error">@color/cinnamon_satin</color>
+    <color name="primary_text">@color/white</color>
+    <color name="inverted_primary_text">@color/black</color>
+    <color name="disabled_text">#3F4952</color>
+    <color name="snackbar">#F4F4F4</color>
+
+    <color name="edit_text">#191C25</color>
+    <color name="nav_items">#3278F2</color>
+</resources>
