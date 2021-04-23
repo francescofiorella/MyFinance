@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MyFinance</string>
+
+    <string name="nav_1">Dashboard</string>
+    <string name="nav_2">Lista</string>
+    <string name="nav_2_extended">Lista Acquisti</string>
+    <string name="nav_3">Profilo</string>
+    <string name="nav_4">Menu</string>
+
+    <string name="addBtnContentDescription">Aggiungi un acquisto</string>
 </resources>

@@ -31,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
 
     // definizione variabili
     lateinit var layout: RelativeLayout
-    val nunito: Typeface? = ResourcesCompat.getFont(applicationContext, R.font.nunito)
+    var nunito: Typeface? = null
 
     lateinit var mToolbar: MaterialToolbar
     lateinit var mEmailLayout: TextInputLayout
@@ -59,22 +59,21 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        nunito = ResourcesCompat.getFont(applicationContext, R.font.nunito)
+
         fAuth = FirebaseAuth.getInstance()
-        fAuth.currentUser.let {
+        if (fAuth.currentUser != null) {
             val intent = Intent(applicationContext, MainActivity::class.java)
             startActivity(intent)
             finish()
         }
-
-        layout = findViewById(R.id.login_layout)
 
         // toolbar
         mToolbar = findViewById(R.id.login_toolbar)
         setSupportActionBar(mToolbar)
 
         // collegamento view
-
-        // collegamento view
+        layout = findViewById(R.id.login_layout)
         mEmail = findViewById(R.id.login_nameInputText)
         mPassword = findViewById(R.id.login_passwordInputText)
 
@@ -121,7 +120,7 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! " + e.localizedMessage)
+                Log.e(TAG, "Error! ${e.localizedMessage}")
                 when (e) {
                     is FirebaseAuthInvalidCredentialsException -> {
                         val errorCode = e.errorCode
@@ -138,7 +137,7 @@ class LoginActivity : AppCompatActivity() {
                         } else if (errorCode == "ERROR_USER_DISABLED") {
                             mEmailLayout.error = "Il tuo account è stato disabilitato."
                         } else {
-                            showSnackbar(e.getLocalizedMessage())
+                            showSnackbar(e.getLocalizedMessage() ?: "Accesso fallito.")
                         }
                     }
                     else -> {
@@ -169,7 +168,7 @@ class LoginActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     showSnackbar("Email inviata. Controlla la tua posta!") }
                 .addOnFailureListener { e ->
-                    Log.e(TAG, "Error! " + e.localizedMessage)
+                    Log.e(TAG, "Error! ${e.localizedMessage}")
                     if (e is FirebaseTooManyRequestsException) {
                         showSnackbar("Email non inviata! Sono state effettuate troppe richieste.")
                     } else {
@@ -209,7 +208,7 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 // If sign in fails, display a message to the user.
                 showSnackbar("Accesso con Google fallito.")
-                Log.e(TAG, "Error! " + task.exception!!.localizedMessage)
+                Log.e(TAG, "Error! ${task.exception?.localizedMessage}")
                 mProgressIndicator.hide()
             }
         }
@@ -223,8 +222,8 @@ class LoginActivity : AppCompatActivity() {
             .addOnSuccessListener { queryDocumentSnapshots ->
                 if (queryDocumentSnapshots.isEmpty) {
                     val user = User(fUser?.displayName, fUser?.email, fUser?.photoUrl.toString())
-                    val fStore = FirebaseFirestore.getInstance()
-                    fStore.collection("users").document(fUser!!.uid).set(user).addOnSuccessListener {
+                    val fStore1 = FirebaseFirestore.getInstance()
+                    fStore1.collection("users").document(fUser!!.uid).set(user).addOnSuccessListener {
                         CURRENT_USER = user
                         val intent = Intent(applicationContext, MainActivity::class.java)
                         intent.putExtra("com.frafio.myfinance.userRequest", true)
@@ -244,7 +243,7 @@ class LoginActivity : AppCompatActivity() {
                 }
             }.addOnFailureListener { e ->
                 showSnackbar("Accesso con Google non effettuato correttamente.")
-                Log.e(TAG, "Error! " + e.localizedMessage)
+                Log.e(TAG, "Error! ${e.localizedMessage}")
                 mProgressIndicator.hide()
                 fAuth.signOut()
             }
@@ -262,7 +261,7 @@ class LoginActivity : AppCompatActivity() {
                 firebaseAuthWithGoogle(account!!.idToken!!)
             } catch (e: ApiException) {
                 // Google Sign In failed, update UI appropriately
-                Log.e(TAG, "Error! " + e.localizedMessage)
+                Log.e(TAG, "Error! ${e.localizedMessage}")
                 showSnackbar("Accesso con Google fallito.")
                 mProgressIndicator.hide()
             }

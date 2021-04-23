@@ -27,7 +27,7 @@ class SignupActivity : AppCompatActivity() {
 
     // definizione variabili
     lateinit var layout: RelativeLayout
-    val nunito: Typeface? = ResourcesCompat.getFont(applicationContext, R.font.nunito)
+    var nunito: Typeface? = null
 
     lateinit var mToolbar: MaterialToolbar
     lateinit var mFullNameLayout: TextInputLayout
@@ -54,7 +54,7 @@ class SignupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
 
-        layout = findViewById(R.id.signup_layout)
+        nunito = ResourcesCompat.getFont(applicationContext, R.font.nunito)
 
         // toolbar
         mToolbar = findViewById(R.id.signup_toolbar)
@@ -65,6 +65,7 @@ class SignupActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // collegamento view
+        layout = findViewById(R.id.signup_layout)
         mFullName = findViewById(R.id.signup_nameInputText)
         mEmail = findViewById(R.id.signup_emailInputText)
         mPassword = findViewById(R.id.signup_passwordInputText)
@@ -144,18 +145,19 @@ class SignupActivity : AppCompatActivity() {
     // signup method
     private fun signUp(fullName: String, email: String, password: String) {
         fAuth.createUserWithEmailAndPassword(email, password)
-            .addOnSuccessListener { // verify the email
+            .addOnSuccessListener {
+                // verify the email
                 fUser = fAuth.currentUser
                 fUser?.sendEmailVerification()?.addOnSuccessListener {
                     Log.d(TAG, "Email di verifica inviata!")
                 }?.addOnFailureListener { e ->
-                    Log.e(TAG, "Error! " + e.localizedMessage)
+                    Log.e(TAG, "Error! ${e.localizedMessage}")
                 }
 
                 // store data in firestore
                 createFirestoreUser(fullName)
             }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! " + e.localizedMessage)
+                Log.e(TAG, "Error! ${e.localizedMessage}")
                 when (e) {
                     is FirebaseAuthWeakPasswordException ->
                         mPasswordLayout.error = "La password inserita non è abbastanza sicura."
@@ -181,7 +183,7 @@ class SignupActivity : AppCompatActivity() {
             val user = User(fullName, fUser?.email, "")
             fStore.collection("users").document(fUser!!.uid).set(user)
                 .addOnSuccessListener {
-                    Log.d(TAG, "onSuccess: user Profile is created for " + fUser!!.uid)
+                    Log.d(TAG, "onSuccess: user Profile is created for ${fUser?.uid}")
                     CURRENT_USER = user
                     val returnIntent = Intent()
                     setResult(RESULT_OK, returnIntent)

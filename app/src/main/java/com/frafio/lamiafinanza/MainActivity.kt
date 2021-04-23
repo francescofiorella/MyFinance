@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     // definizione variabili
     lateinit var layout: CoordinatorLayout
-    val nunito: Typeface? = ResourcesCompat.getFont(applicationContext, R.font.nunito)
+    var nunito: Typeface? = null
 
     lateinit var mToolbar: MaterialToolbar
     lateinit var mFragmentTitle: TextView
@@ -45,9 +45,9 @@ class MainActivity : AppCompatActivity() {
     var currentFragment = 0
 
     companion object {
-        lateinit var CURRENT_USER: User
-        lateinit var PURCHASE_LIST: MutableList<Purchase>
-        lateinit var PURCHASE_ID_LIST: MutableList<String>
+        var CURRENT_USER: User? = null
+        var PURCHASE_LIST = mutableListOf<Purchase>()
+        var PURCHASE_ID_LIST = mutableListOf<String>()
         private val KEY_FRAGMENT = "com.frafio.myfinance.SAVE_FRAGMENT"
         private val TAG = MainActivity::class.java.simpleName
     }
@@ -56,13 +56,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        layout = findViewById(R.id.main_layout)
+        nunito = ResourcesCompat.getFont(applicationContext, R.font.nunito)
 
         // toolbar
         mToolbar = findViewById(R.id.main_toolbar)
         setSupportActionBar(mToolbar)
 
         // collegamento view
+        layout = findViewById(R.id.main_layout)
         mFragmentTitle = findViewById(R.id.main_fragmentTitle)
         mBottomNavigationView = findViewById(R.id.main_bottomNavView)
         mAddBtn = findViewById(R.id.main_addBtn)
@@ -73,8 +74,7 @@ class MainActivity : AppCompatActivity() {
             // controlla se si è appena fatto l'accesso
             fAuth = FirebaseAuth.getInstance()
             if (intent.hasExtra("com.frafio.myfinance.userRequest")) {
-                val userRequest = intent.extras!!
-                    .getBoolean("com.frafio.myfinance.userRequest", false)
+                val userRequest = intent.extras?.getBoolean("com.frafio.myfinance.userRequest", false) ?: false
                 if (userRequest) {
                     showSnackbar("Hai effettuato l'accesso come " + fAuth.currentUser?.displayName)
                 }
@@ -83,8 +83,6 @@ class MainActivity : AppCompatActivity() {
             // aggiorna i dati dell'utente
             updateCurrentUser()
         }
-
-        // imposta la bottomNavView
 
         // imposta la bottomNavView
         mBottomNavigationView.setOnNavigationItemSelectedListener { item ->
@@ -114,24 +112,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     // metodo per cambiare fragment (senza influenzare la bottomNavView)
-    fun setFragment(num: Int) {
+    private fun setFragment(num: Int) {
         if (currentFragment != num) {
             var mFragmentToSet: Fragment? = null
             when (num) {
                 1 -> {
-                    mFragmentTitle.text = "Dashboard"
+                    mFragmentTitle.text = getString(R.string.nav_1)
                     mFragmentToSet = DashboardFragment()
                 }
                 2 -> {
-                    mFragmentTitle.text = "Lista acquisti"
+                    mFragmentTitle.text = getString(R.string.nav_2_extended)
                     mFragmentToSet = ListFragment()
                 }
                 3 -> {
-                    mFragmentTitle.text = "Profilo"
+                    mFragmentTitle.text = getString(R.string.nav_3)
                     mFragmentToSet = ProfileFragment()
                 }
                 4 -> {
-                    mFragmentTitle.text = "Menu"
+                    mFragmentTitle.text = getString(R.string.nav_4)
                     mFragmentToSet = MenuFragment()
                 }
             }
@@ -142,7 +140,7 @@ class MainActivity : AppCompatActivity() {
         } else if (currentFragment == 2) {
             val fragment: ListFragment? =
                 supportFragmentManager.findFragmentById(R.id.main_frameLayout) as ListFragment?
-            fragment.scrollListToTop()
+            fragment?.scrollListToTop()
         }
     }
 
@@ -151,13 +149,15 @@ class MainActivity : AppCompatActivity() {
         fAuth = FirebaseAuth.getInstance()
         val fUser = fAuth.currentUser
         if (fUser != null) {
-            val fStore = FirebaseFirestore.getInstance()
-            fStore.collection("users").document(fUser.uid).get()
-                .addOnSuccessListener { documentSnapshot ->
-                    CURRENT_USER = documentSnapshot.toObject(User::class.java)!!
-                }.addOnFailureListener { e ->
-                    Log.e(TAG, "Error! " + e.localizedMessage)
-                }
+            if (CURRENT_USER == null) {
+                val fStore = FirebaseFirestore.getInstance()
+                fStore.collection("users").document(fUser.uid).get()
+                    .addOnSuccessListener { documentSnapshot ->
+                        CURRENT_USER = documentSnapshot.toObject(User::class.java)!!
+                    }.addOnFailureListener { e ->
+                        Log.e(TAG, "Error! " + e.localizedMessage)
+                    }
+            }
             updateList()
         }
     }
@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity() {
                 if (currentFragment == 2) {
                     val fragment =
                         supportFragmentManager.findFragmentById(R.id.main_frameLayout) as ListFragment?
-                    fragment.loadPurchasesList()
+                    fragment?.loadPurchasesList()
                 } else {
                     mBottomNavigationView.selectedItemId = R.id.list
                 }
@@ -204,9 +204,8 @@ class MainActivity : AppCompatActivity() {
         } else if (requestCode == 2 && resultCode == RESULT_OK) {
             val editRequest = data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
             if (editRequest) {
-                val fragment =
-                    supportFragmentManager.findFragmentById(R.id.main_frameLayout) as ListFragment?
-                fragment.loadPurchasesList()
+                val fragment = supportFragmentManager.findFragmentById(R.id.main_frameLayout) as ListFragment?
+                fragment?.loadPurchasesList()
                 showSnackbar("Acquisto modificato!")
             }
         }
