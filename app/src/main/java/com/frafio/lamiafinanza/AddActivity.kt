@@ -177,14 +177,12 @@ class AddActivity : AppCompatActivity() {
     }
 
     private fun setDatePicker() {
-        val dayString: String
-        val monthString: String
-        dayString = if (day < 10) {
+        val dayString: String = if (day < 10) {
             "0$day"
         } else {
             day.toString() + ""
         }
-        monthString = if (month < 10) {
+        val monthString: String = if (month < 10) {
             "0$month"
         } else {
             month.toString() + ""
@@ -390,8 +388,9 @@ class AddActivity : AppCompatActivity() {
 
         if (mTotSwitch.isChecked) {
             val purchase = Purchase(CURRENT_USER?.email, name, 0.0, year, month, day, 0)
+
             val fStore = FirebaseFirestore.getInstance()
-            val totID = "${year.toString()}${month.toString()}${day.toString()}"
+            val totID = "$year$month$day"
             fStore.collection("purchases").document(totID).set(purchase)
                 .addOnSuccessListener {
                     updateAndGoToList()
@@ -418,6 +417,7 @@ class AddActivity : AppCompatActivity() {
                 }
 
                 val purchase = Purchase(CURRENT_USER?.email, name, price, year, month, day, type)
+
                 val fStore = FirebaseFirestore.getInstance()
                 fStore.collection("purchases").add(purchase)
                     .addOnSuccessListener {

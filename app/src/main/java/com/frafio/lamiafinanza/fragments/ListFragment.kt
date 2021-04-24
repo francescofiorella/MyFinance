@@ -85,6 +85,7 @@ class ListFragment : Fragment() {
             formatter.applyPattern("###,###,##0.00")
             val priceString = "€ " + formatter.format(MainActivity.PURCHASE_LIST[position].price)
             holder.prezzoTV?.text = priceString
+
             if (PURCHASE_LIST[position].type == 0) {
                 holder.itemLayout?.setOnClickListener(null)
                 holder.nomeTV?.text = PURCHASE_LIST[position].name
@@ -101,11 +102,13 @@ class ListFragment : Fragment() {
                 } else {
                     PURCHASE_LIST[position].month.toString()
                 }
+
                 holder.dataTV?.text = "$dayString/$monthString/${PURCHASE_LIST[position].year}"
             } else if (PURCHASE_LIST[position].type == 1) {
                 holder.nomeTV?.text = "   ${PURCHASE_LIST[position].name}"
                 holder.nomeTV?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                 holder.dataLayout?.visibility = View.GONE
+
                 holder.itemLayout?.setOnClickListener {
                     val intent = Intent(context, ReceiptActivity::class.java)
                     intent.putExtra("com.frafio.myfinance.purchaseID", PURCHASE_ID_LIST[position])
@@ -119,12 +122,13 @@ class ListFragment : Fragment() {
                 holder.nomeTV?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                 holder.dataLayout?.visibility = View.GONE
             }
-            if (PURCHASE_LIST[position].name != "Totale" && PURCHASE_LIST[position].price == 0.0) {
+
+            if (!(PURCHASE_LIST[position].name == "Totale" && PURCHASE_LIST[position].price != 0.0)) {
                 holder.itemLayout?.isEnabled = true
                 holder.itemLayout?.setOnLongClickListener {
                     val builder = MaterialAlertDialogBuilder(context!!, R.style.ThemeOverlay_MyFinance_AlertDialog)
                     builder.setTitle(PURCHASE_LIST[position].name)
-                    if (PURCHASE_LIST[position].name != "Totale" && PURCHASE_LIST[position].price != 0.0) {
+                    if (!(PURCHASE_LIST[position].name == "Totale" && PURCHASE_LIST[position].price == 0.0)) {
                         builder.setMessage("Vuoi modificare o eliminare l'acquisto selezionato?")
                         builder.setNegativeButton("Modifica") { dialog, which ->
                             val intent = Intent(context, AddActivity::class.java)
