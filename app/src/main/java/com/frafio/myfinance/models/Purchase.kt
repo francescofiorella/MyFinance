@@ -1,8 +1,8 @@
-package com.frafio.lamiafinanza.models
+package com.frafio.myfinance.models
 
 data class Purchase(
-    val name: String? = null,
     val email: String? = null,
+    val name: String? = null,
     var price: Double? = null,
     val year: Int? = null,
     val month: Int? = null,

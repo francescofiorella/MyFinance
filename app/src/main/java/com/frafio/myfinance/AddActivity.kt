@@ -1,4 +1,4 @@
-package com.frafio.lamiafinanza
+package com.frafio.myfinance
 
 import android.content.Intent
 import android.graphics.Typeface
@@ -16,10 +16,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.frafio.lamiafinanza.MainActivity.Companion.CURRENT_USER
-import com.frafio.lamiafinanza.MainActivity.Companion.PURCHASE_ID_LIST
-import com.frafio.lamiafinanza.MainActivity.Companion.PURCHASE_LIST
-import com.frafio.lamiafinanza.models.Purchase
+import com.frafio.myfinance.MainActivity.Companion.CURRENT_USER
+import com.frafio.myfinance.MainActivity.Companion.PURCHASE_ID_LIST
+import com.frafio.myfinance.MainActivity.Companion.PURCHASE_LIST
+import com.frafio.myfinance.models.Purchase
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -114,12 +114,16 @@ class AddActivity : AppCompatActivity() {
             year = LocalDate.now().year
             month = LocalDate.now().monthValue
             day = LocalDate.now().dayOfMonth
+
             mGenBtn.isSelected = true
+
             setTypeButton()
             setTotSwitch()
+
             setDatePicker()
         } else if (requestCode == 2) {
             mTotSwitch.visibility = View.GONE
+
             purchaseId = intent.getStringExtra("com.frafio.myfinance.PURCHASE_ID")!!
             purchaseName = intent.getStringExtra("com.frafio.myfinance.PURCHASE_NAME")!!
             purchasePrice = intent.getDoubleExtra("com.frafio.myfinance.PURCHASE_PRICE", 0.0)
@@ -128,12 +132,15 @@ class AddActivity : AppCompatActivity() {
             year = intent.getIntExtra("com.frafio.myfinance.PURCHASE_YEAR", 0)
             month = intent.getIntExtra("com.frafio.myfinance.PURCHASE_MONTH", 0)
             day = intent.getIntExtra("com.frafio.myfinance.PURCHASE_DAY", 0)
+
             mNameET.setText(purchaseName)
+
             val locale = Locale("en", "UK")
             val nf = NumberFormat.getInstance(locale)
             val formatter = nf as DecimalFormat
             formatter.applyPattern("###,###,##0.00")
             mPriceET.setText("€ ${formatter.format(purchasePrice)}")
+
             when (purchaseType) {
                 1 -> {
                     mGenBtn.isEnabled = false
@@ -152,11 +159,13 @@ class AddActivity : AppCompatActivity() {
                     setBigliettoLayout()
                 }
             }
+
             val dayString: String = if (day < 10) {
                 "0$day"
             } else {
                 day.toString()
             }
+
             val monthString: String = if (month < 10) {
                 "0$month"
             } else {
@@ -167,6 +176,7 @@ class AddActivity : AppCompatActivity() {
             mDateET.setTextColor(ContextCompat.getColor(applicationContext, R.color.disabled_text))
             mDateBtn.isClickable = false
             mDateArrowImg.visibility = View.GONE
+
             mAddBtn.text = "Modifica"
             mAddBtn.setIcon(ContextCompat.getDrawable(applicationContext, R.drawable.ic_create))
         }
@@ -182,11 +192,13 @@ class AddActivity : AppCompatActivity() {
         } else {
             day.toString() + ""
         }
+
         val monthString: String = if (month < 10) {
             "0$month"
         } else {
             month.toString() + ""
         }
+
         val dateString = "$dayString/$monthString/$year"
         mDateET.text = dateString
 
@@ -199,6 +211,7 @@ class AddActivity : AppCompatActivity() {
         builder.setSelection(today)
         builder.setTheme(R.style.ThemeOverlay_MyFinance_DatePicker)
         val materialDatePicker = builder.build()
+
         mDateBtn.setOnClickListener {
             showDatePicker(materialDatePicker)
         }
@@ -238,10 +251,12 @@ class AddActivity : AppCompatActivity() {
         mGenBtn.setOnClickListener {
             if (!mGenBtn.isSelected) {
                 closeTicketBtn()
+
                 if (mBigBtn.isSelected) {
                     mNameET.setText("")
                 }
                 mNameET.isEnabled = true
+
                 mGenBtn.isSelected = true
                 mSpeBtn.isSelected = false
                 mBigBtn.isSelected = false
@@ -251,10 +266,12 @@ class AddActivity : AppCompatActivity() {
         mSpeBtn.setOnClickListener {
             if (!mSpeBtn.isSelected) {
                 closeTicketBtn()
+
                 if (mBigBtn.isSelected) {
                     mNameET.setText("")
                 }
                 mNameET.isEnabled = true
+
                 mGenBtn.isSelected = false
                 mSpeBtn.isSelected = true
                 mBigBtn.isSelected = false
@@ -266,6 +283,7 @@ class AddActivity : AppCompatActivity() {
                 mGenBtn.isSelected = false
                 mSpeBtn.isSelected = false
                 mBigBtn.isSelected = true
+
                 setBigliettoLayout()
             }
         }
@@ -274,11 +292,13 @@ class AddActivity : AppCompatActivity() {
     private fun setBigliettoLayout() {
         if (mBigBtn.isSelected) {
             openTicketBtn()
+
             mTIBtn.setOnClickListener {
                 if (!mTIBtn.isSelected) {
                     mTIBtn.isSelected = true
                     mAmBtn.isSelected = false
                     mAltroBtn.isSelected = false
+
                     mNameET.setText("Biglietto TrenItalia")
                     mNameET.isEnabled = false
                 }
@@ -289,6 +309,7 @@ class AddActivity : AppCompatActivity() {
                     mTIBtn.isSelected = false
                     mAmBtn.isSelected = true
                     mAltroBtn.isSelected = false
+
                     mNameET.setText("Biglietto Amtab")
                     mNameET.isEnabled = false
                 }
@@ -299,6 +320,7 @@ class AddActivity : AppCompatActivity() {
                     mTIBtn.isSelected = false
                     mAmBtn.isSelected = false
                     mAltroBtn.isSelected = true
+
                     mNameET.setText("")
                     mNameET.isEnabled = true
                 }
@@ -322,9 +344,9 @@ class AddActivity : AppCompatActivity() {
 
     private fun openTicketBtn() {
         if (mBigliettoLayout.visibility == View.GONE) {
-            mBigliettoLayout.animate().setInterpolator(interpolator).alpha(1f).setDuration(1500)
-                .start()
+            mBigliettoLayout.animate().setInterpolator(interpolator).alpha(1f).setDuration(1500).start()
             mBigliettoLayout.visibility = View.VISIBLE
+
             val root = layout as ViewGroup
             TransitionManager.beginDelayedTransition(root)
             val transition = AutoTransition()
@@ -335,9 +357,9 @@ class AddActivity : AppCompatActivity() {
 
     private fun closeTicketBtn() {
         if (mBigliettoLayout.visibility == View.VISIBLE) {
-            mBigliettoLayout.animate().setInterpolator(interpolator).alpha(0f).setDuration(1500)
-                .start()
+            mBigliettoLayout.animate().setInterpolator(interpolator).alpha(0f).setDuration(1500).start()
             mBigliettoLayout.visibility = View.GONE
+
             val root = layout as ViewGroup
             TransitionManager.beginDelayedTransition(root)
             val transition = AutoTransition()
@@ -351,22 +373,29 @@ class AddActivity : AppCompatActivity() {
             if (isChecked) {
                 mNameET.setText("Totale")
                 mNameET.isEnabled = false
+
                 mPriceET.setText("0.00")
                 mPriceET.isEnabled = false
+
                 mNameET.error = null
                 mPriceET.error = null
+
                 mGenBtn.isEnabled = false
                 mSpeBtn.isEnabled = false
                 mBigBtn.isEnabled = false
+
                 closeTicketBtn()
             } else {
                 mNameET.setText("")
                 mNameET.isEnabled = true
+
                 mPriceET.setText("")
                 mPriceET.isEnabled = true
+
                 mGenBtn.isEnabled = true
                 mSpeBtn.isEnabled = true
                 mBigBtn.isEnabled = true
+
                 setBigliettoLayout()
             }
         }
@@ -400,6 +429,7 @@ class AddActivity : AppCompatActivity() {
                 }
         } else {
             val priceString = mPriceET.text.toString().trim()
+
             if (TextUtils.isEmpty(priceString)) {
                 mPriceET.error = "Inserisci il costo dell'acquisto."
                 return

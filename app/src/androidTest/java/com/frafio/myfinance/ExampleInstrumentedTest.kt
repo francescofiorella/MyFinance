@@ -1,4 +1,4 @@
-package com.frafio.lamiafinanza
+package com.frafio.myfinance
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

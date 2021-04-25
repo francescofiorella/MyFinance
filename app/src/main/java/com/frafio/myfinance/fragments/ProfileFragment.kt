@@ -1,4 +1,4 @@
-package com.frafio.lamiafinanza.fragments
+package com.frafio.myfinance.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,9 +9,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.frafio.lamiafinanza.MainActivity
-import com.frafio.lamiafinanza.MainActivity.Companion.CURRENT_USER
-import com.frafio.lamiafinanza.R
+import com.frafio.myfinance.MainActivity.Companion.CURRENT_USER
+import com.frafio.myfinance.R
 
 class ProfileFragment : Fragment() {
 

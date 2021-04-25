@@ -1,4 +1,4 @@
-package com.frafio.lamiafinanza
+package com.frafio.myfinance
 
 import android.graphics.Typeface
 import android.os.Bundle
@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.frafio.lamiafinanza.models.ReceiptItem
+import com.frafio.myfinance.models.ReceiptItem
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

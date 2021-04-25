@@ -1,4 +1,4 @@
-package com.frafio.lamiafinanza
+package com.frafio.myfinance
 
 import android.content.Intent
 import android.graphics.Typeface
@@ -11,8 +11,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.frafio.lamiafinanza.MainActivity.Companion.CURRENT_USER
-import com.frafio.lamiafinanza.models.User
+import com.frafio.myfinance.MainActivity.Companion.CURRENT_USER
+import com.frafio.myfinance.models.User
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.LinearProgressIndicator

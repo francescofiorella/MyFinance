@@ -1,4 +1,4 @@
-package com.frafio.lamiafinanza.fragments
+package com.frafio.myfinance.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.frafio.lamiafinanza.LoginActivity
-import com.frafio.lamiafinanza.MainActivity.Companion.CURRENT_USER
-import com.frafio.lamiafinanza.R
+import com.frafio.myfinance.LoginActivity
+import com.frafio.myfinance.MainActivity.Companion.CURRENT_USER
+import com.frafio.myfinance.R
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import io.grpc.android.BuildConfig

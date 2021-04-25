@@ -1,4 +1,4 @@
-package com.frafio.lamiafinanza.fragments
+package com.frafio.myfinance.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import com.frafio.lamiafinanza.MainActivity
-import com.frafio.lamiafinanza.R
+import com.frafio.myfinance.MainActivity
+import com.frafio.myfinance.R
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.LocalDate

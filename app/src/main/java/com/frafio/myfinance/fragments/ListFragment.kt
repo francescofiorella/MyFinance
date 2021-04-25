@@ -1,4 +1,4 @@
-package com.frafio.lamiafinanza.fragments
+package com.frafio.myfinance.fragments
 
 import android.app.Activity
 import android.content.Context
@@ -14,12 +14,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.frafio.lamiafinanza.AddActivity
-import com.frafio.lamiafinanza.MainActivity
-import com.frafio.lamiafinanza.MainActivity.Companion.PURCHASE_ID_LIST
-import com.frafio.lamiafinanza.MainActivity.Companion.PURCHASE_LIST
-import com.frafio.lamiafinanza.R
-import com.frafio.lamiafinanza.ReceiptActivity
+import com.frafio.myfinance.AddActivity
+import com.frafio.myfinance.MainActivity
+import com.frafio.myfinance.MainActivity.Companion.PURCHASE_ID_LIST
+import com.frafio.myfinance.MainActivity.Companion.PURCHASE_LIST
+import com.frafio.myfinance.R
+import com.frafio.myfinance.ReceiptActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.DecimalFormat

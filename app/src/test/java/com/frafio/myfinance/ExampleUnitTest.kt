@@ -1,4 +1,4 @@
-package com.frafio.lamiafinanza
+package com.frafio.myfinance
 
 import org.junit.Test
 

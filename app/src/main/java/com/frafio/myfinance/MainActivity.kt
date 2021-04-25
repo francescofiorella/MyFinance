@@ -1,4 +1,4 @@
-package com.frafio.lamiafinanza
+package com.frafio.myfinance
 
 import android.content.Intent
 import android.graphics.Typeface
@@ -12,12 +12,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import com.frafio.lamiafinanza.fragments.DashboardFragment
-import com.frafio.lamiafinanza.fragments.ListFragment
-import com.frafio.lamiafinanza.fragments.MenuFragment
-import com.frafio.lamiafinanza.fragments.ProfileFragment
-import com.frafio.lamiafinanza.models.Purchase
-import com.frafio.lamiafinanza.models.User
+import com.frafio.myfinance.fragments.DashboardFragment
+import com.frafio.myfinance.fragments.ListFragment
+import com.frafio.myfinance.fragments.MenuFragment
+import com.frafio.myfinance.fragments.ProfileFragment
+import com.frafio.myfinance.models.Purchase
+import com.frafio.myfinance.models.User
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -26,7 +26,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
