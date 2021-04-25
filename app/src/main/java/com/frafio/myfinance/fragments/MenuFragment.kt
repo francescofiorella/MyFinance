@@ -7,12 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.frafio.myfinance.BuildConfig
 import com.frafio.myfinance.LoginActivity
 import com.frafio.myfinance.MainActivity.Companion.CURRENT_USER
 import com.frafio.myfinance.R
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
-import io.grpc.android.BuildConfig
 
 class MenuFragment : Fragment() {
 
