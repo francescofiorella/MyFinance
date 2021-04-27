@@ -139,7 +139,7 @@ class AddActivity : AppCompatActivity() {
             val nf = NumberFormat.getInstance(locale)
             val formatter = nf as DecimalFormat
             formatter.applyPattern("###,###,##0.00")
-            mPriceET.setText("€ ${formatter.format(purchasePrice)}")
+            mPriceET.setText(formatter.format(purchasePrice))
 
             when (purchaseType) {
                 1 -> {
