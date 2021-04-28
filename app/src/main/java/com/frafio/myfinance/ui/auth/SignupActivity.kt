@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui
+package com.frafio.myfinance.ui.auth
 
 import android.content.Intent
 import android.graphics.Typeface
@@ -12,8 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.frafio.myfinance.R
-import com.frafio.myfinance.ui.MainActivity.Companion.CURRENT_USER
+import com.frafio.myfinance.ui.home.MainActivity.Companion.CURRENT_USER
 import com.frafio.myfinance.data.User
+import com.frafio.myfinance.ui.home.MainActivity
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.LinearProgressIndicator

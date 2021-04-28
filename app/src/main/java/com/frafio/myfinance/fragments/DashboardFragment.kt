@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import com.frafio.myfinance.ui.MainActivity
+import com.frafio.myfinance.ui.home.MainActivity
 import com.frafio.myfinance.R
 import java.text.DecimalFormat
 import java.text.NumberFormat

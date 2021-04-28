@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui
+package com.frafio.myfinance.ui.home
 
 import android.content.Intent
 import android.graphics.Typeface

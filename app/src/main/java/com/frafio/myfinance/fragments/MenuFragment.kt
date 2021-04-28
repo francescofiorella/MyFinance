@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.frafio.myfinance.BuildConfig
-import com.frafio.myfinance.ui.LoginActivity
-import com.frafio.myfinance.ui.MainActivity.Companion.CURRENT_USER
+import com.frafio.myfinance.ui.auth.LoginActivity
+import com.frafio.myfinance.ui.home.MainActivity.Companion.CURRENT_USER
 import com.frafio.myfinance.R
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth

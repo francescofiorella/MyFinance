@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui
+package com.frafio.myfinance.ui.auth
 
 import android.content.Intent
 import android.graphics.Typeface
@@ -10,9 +10,14 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.frafio.myfinance.ui.MainActivity.Companion.CURRENT_USER
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import com.frafio.myfinance.ui.home.MainActivity.Companion.CURRENT_USER
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.User
+import com.frafio.myfinance.databinding.ActivityLoginBinding
+import com.frafio.myfinance.ui.home.MainActivity
+import com.frafio.myfinance.util.snackbar
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -28,11 +33,10 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(), AuthListener {
 
     // definizione variabili
     lateinit var layout: RelativeLayout
-    var nunito: Typeface? = null
 
     lateinit var mToolbar: MaterialToolbar
     lateinit var mEmailLayout: TextInputLayout
@@ -58,11 +62,14 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
 
-        nunito = ResourcesCompat.getFont(applicationContext, R.font.nunito)
+        val binding: ActivityLoginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login)
+        val viewModel = ViewModelProvider(this).get(AuthViewModel::class.java)
+        binding.viewmodel = viewModel
 
-        fAuth = FirebaseAuth.getInstance()
+        viewModel.authListener = this
+
+        /*fAuth = FirebaseAuth.getInstance()
         if (fAuth.currentUser != null) {
             val intent = Intent(applicationContext, MainActivity::class.java)
             startActivity(intent)
@@ -85,9 +92,9 @@ class LoginActivity : AppCompatActivity() {
         mResetBtn = findViewById(R.id.resetPassTextView)
         mGoogleBtn = findViewById(R.id.googleButton)
         mProgressIndicator = findViewById(R.id.login_progressIindicator)
-        mSignupBtn = findViewById(R.id.lRegisterTextView)
+        mSignupBtn = findViewById(R.id.lRegisterTextView)*/
 
-        mLoginBtn.setOnClickListener {
+        /*mLoginBtn.setOnClickListener {
             val email = mEmail.text.toString().trim()
             val password = mPassword.text.toString().trim()
 
@@ -180,10 +187,22 @@ class LoginActivity : AppCompatActivity() {
 
         mSignupBtn.setOnClickListener {
             startActivityForResult(Intent(applicationContext, SignupActivity::class.java), 1)
-        }
+        }*/
     }
 
-    // Configure Google Sign In
+    override fun onStarted() {
+        snackbar(layout, "Login Started")
+    }
+
+    override fun onSuccess() {
+        snackbar(layout, "Login Success")
+    }
+
+    override fun onFailure(message: String) {
+        snackbar(layout, message)
+    }
+
+    /*// Configure Google Sign In
     private fun signIn() {
         val signInIntent = mGoogleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
@@ -285,5 +304,5 @@ class LoginActivity : AppCompatActivity() {
         val tv = snackbar.view.findViewById<TextView>(R.id.snackbar_text)
         tv.typeface = nunito
         snackbar.show()
-    }
+    }*/
 }

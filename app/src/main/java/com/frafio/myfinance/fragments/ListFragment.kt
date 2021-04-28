@@ -14,12 +14,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.frafio.myfinance.ui.AddActivity
-import com.frafio.myfinance.ui.MainActivity
-import com.frafio.myfinance.ui.MainActivity.Companion.PURCHASE_ID_LIST
-import com.frafio.myfinance.ui.MainActivity.Companion.PURCHASE_LIST
+import com.frafio.myfinance.ui.home.AddActivity
+import com.frafio.myfinance.ui.home.MainActivity
+import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_ID_LIST
+import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_LIST
 import com.frafio.myfinance.R
-import com.frafio.myfinance.ui.ReceiptActivity
+import com.frafio.myfinance.ui.home.ReceiptActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.DecimalFormat
