@@ -1,4 +1,4 @@
-package com.frafio.myfinance
+package com.frafio.myfinance.ui
 
 import android.content.Intent
 import android.graphics.Typeface
@@ -12,12 +12,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.frafio.myfinance.R
 import com.frafio.myfinance.fragments.DashboardFragment
 import com.frafio.myfinance.fragments.ListFragment
 import com.frafio.myfinance.fragments.MenuFragment
 import com.frafio.myfinance.fragments.ProfileFragment
-import com.frafio.myfinance.models.Purchase
-import com.frafio.myfinance.models.User
+import com.frafio.myfinance.data.Purchase
+import com.frafio.myfinance.data.User
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton

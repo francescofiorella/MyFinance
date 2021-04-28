@@ -1,4 +1,4 @@
-package com.frafio.myfinance
+package com.frafio.myfinance.ui
 
 import android.content.Intent
 import android.graphics.Typeface
@@ -10,8 +10,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.frafio.myfinance.MainActivity.Companion.CURRENT_USER
-import com.frafio.myfinance.models.User
+import com.frafio.myfinance.ui.MainActivity.Companion.CURRENT_USER
+import com.frafio.myfinance.R
+import com.frafio.myfinance.data.User
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

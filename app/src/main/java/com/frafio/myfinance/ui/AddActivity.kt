@@ -1,4 +1,4 @@
-package com.frafio.myfinance
+package com.frafio.myfinance.ui
 
 import android.content.Intent
 import android.graphics.Typeface
@@ -16,10 +16,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.frafio.myfinance.MainActivity.Companion.CURRENT_USER
-import com.frafio.myfinance.MainActivity.Companion.PURCHASE_ID_LIST
-import com.frafio.myfinance.MainActivity.Companion.PURCHASE_LIST
-import com.frafio.myfinance.models.Purchase
+import com.frafio.myfinance.ui.MainActivity.Companion.CURRENT_USER
+import com.frafio.myfinance.ui.MainActivity.Companion.PURCHASE_ID_LIST
+import com.frafio.myfinance.ui.MainActivity.Companion.PURCHASE_LIST
+import com.frafio.myfinance.R
+import com.frafio.myfinance.data.Purchase
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
