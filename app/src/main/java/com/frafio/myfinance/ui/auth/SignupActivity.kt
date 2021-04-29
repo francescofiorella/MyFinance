@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.frafio.myfinance.R
 import com.frafio.myfinance.ui.home.MainActivity.Companion.CURRENT_USER
-import com.frafio.myfinance.data.db.entities.User
+import com.frafio.myfinance.data.models.User
 import com.frafio.myfinance.ui.home.MainActivity
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton

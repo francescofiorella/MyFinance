@@ -20,7 +20,7 @@ import com.frafio.myfinance.ui.home.MainActivity.Companion.CURRENT_USER
 import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_ID_LIST
 import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_LIST
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.db.entities.Purchase
+import com.frafio.myfinance.data.models.Purchase
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

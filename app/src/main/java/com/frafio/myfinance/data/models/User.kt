@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.db.entities
+package com.frafio.myfinance.data.models
 
 data class User (
     val fullName: String? = null,

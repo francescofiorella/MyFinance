@@ -198,6 +198,7 @@ class LoginActivity : AppCompatActivity(), AuthListener {
     override fun onSuccess(loginResponse: LiveData<Int>) {
         loginResponse.observe(this, Observer { responseCode ->
             mProgressIndicator.hide()
+
             when (responseCode) {
                 1 -> {
                     val intent = Intent(applicationContext, MainActivity::class.java)

@@ -1,4 +1,4 @@
-package com.frafio.myfinance.fragments
+package com.frafio.myfinance.ui.fragments
 
 import android.content.Intent
 import android.os.Bundle

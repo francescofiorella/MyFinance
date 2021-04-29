@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data
+package com.frafio.myfinance.data.models
 
 data class ReceiptItem (
     val name: String? = null,

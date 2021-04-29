@@ -1,4 +1,4 @@
-package com.frafio.myfinance.fragments
+package com.frafio.myfinance.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
