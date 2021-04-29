@@ -215,13 +215,13 @@ class LoginActivity : AppCompatActivity(), AuthListener {
     }
 
     override fun onFailure(errorCode: Int) {
+        mProgressIndicator.hide()
+
         when (errorCode) {
             1 -> mEmailLayout.error = "Inserisci la tua email."
             2 -> mPasswordLayout.error = "Inserisci la password."
             3 -> mPasswordLayout.error = "La password deve essere lunga almeno 8 caratteri!"
         }
-
-        mProgressIndicator.hide()
     }
 
     /*// Configure Google Sign In
