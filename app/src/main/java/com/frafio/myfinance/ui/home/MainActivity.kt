@@ -17,8 +17,8 @@ import com.frafio.myfinance.fragments.DashboardFragment
 import com.frafio.myfinance.fragments.ListFragment
 import com.frafio.myfinance.fragments.MenuFragment
 import com.frafio.myfinance.fragments.ProfileFragment
-import com.frafio.myfinance.data.Purchase
-import com.frafio.myfinance.data.User
+import com.frafio.myfinance.data.db.entities.Purchase
+import com.frafio.myfinance.data.db.entities.User
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton

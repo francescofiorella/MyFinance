@@ -1,5 +1,7 @@
 package com.frafio.myfinance.data
 
+import com.frafio.myfinance.data.db.entities.Purchase
+
 class PurchaseRepository private constructor(private val purchaseDao: PurchaseDao) : PurchaseInterfaceRepository{
     override fun add(purchase: Purchase) {
         purchaseDao.add(purchase)

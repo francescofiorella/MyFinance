@@ -1,37 +1,25 @@
 package com.frafio.myfinance.ui.auth
 
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.TextUtils
-import android.util.Log
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.frafio.myfinance.ui.home.MainActivity.Companion.CURRENT_USER
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.User
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.home.MainActivity
-import com.frafio.myfinance.util.snackbar
-import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.frafio.myfinance.utils.snackbar
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
-import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginActivity : AppCompatActivity(), AuthListener {
 
@@ -68,6 +56,16 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         binding.viewmodel = viewModel
 
         viewModel.authListener = this
+
+        // toolbar
+        mToolbar = findViewById(R.id.login_toolbar)
+        setSupportActionBar(mToolbar)
+
+        // collegamento view
+        layout = findViewById(R.id.login_layout)
+        mProgressIndicator = findViewById(R.id.login_progressIindicator)
+        mEmailLayout = findViewById(R.id.login_emailInputLayout)
+        mPasswordLayout = findViewById(R.id.login_passwordInputLayout)
 
         /*fAuth = FirebaseAuth.getInstance()
         if (fAuth.currentUser != null) {
@@ -191,15 +189,39 @@ class LoginActivity : AppCompatActivity(), AuthListener {
     }
 
     override fun onStarted() {
-        snackbar(layout, "Login Started")
+        mProgressIndicator.show()
+
+        mEmailLayout.isErrorEnabled = false
+        mPasswordLayout.isErrorEnabled = false
     }
 
-    override fun onSuccess() {
-        snackbar(layout, "Login Success")
+    override fun onSuccess(loginResponse: LiveData<Int>) {
+        loginResponse.observe(this, Observer { responseCode ->
+            mProgressIndicator.hide()
+            when (responseCode) {
+                1 -> {
+                    val intent = Intent(applicationContext, MainActivity::class.java)
+                    intent.putExtra("com.frafio.myfinance.userRequest", true)
+                    startActivity(intent)
+                    finish()
+                }
+                2 -> mEmailLayout.error = "L'email inserita non è ben formata."
+                3 -> mPasswordLayout.error = "La password inserita non è corretta."
+                4 -> mEmailLayout.error = "L'email inserita non ha un account associato."
+                5 -> snackbar(layout, "Il tuo account è stato disabilitato!")
+                6 -> snackbar(layout, "Accesso fallito!")
+            }
+        })
     }
 
-    override fun onFailure(message: String) {
-        snackbar(layout, message)
+    override fun onFailure(errorCode: Int) {
+        when (errorCode) {
+            1 -> mEmailLayout.error = "Inserisci la tua email."
+            2 -> mPasswordLayout.error = "Inserisci la password."
+            3 -> mPasswordLayout.error = "La password deve essere lunga almeno 8 caratteri!"
+        }
+
+        mProgressIndicator.hide()
     }
 
     /*// Configure Google Sign In

@@ -2,6 +2,7 @@ package com.frafio.myfinance.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.frafio.myfinance.data.db.entities.Purchase
 
 class PurchaseDao : PurchaseInterfaceDao {
     private val purchaseList = mutableListOf<Purchase>()

@@ -1,6 +1,7 @@
 package com.frafio.myfinance.data
 
 import androidx.lifecycle.LiveData
+import com.frafio.myfinance.data.db.entities.Purchase
 
 interface PurchaseInterfaceRepository {
     fun add(purchase: Purchase)
