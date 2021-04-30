@@ -143,6 +143,7 @@
 
                 <TextView
                     android:id="@+id/resetPassTextView"
+                    android:onClick="@{viewmodel::onResetButtotClick}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -154,6 +155,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/googleButton"
+                    android:onClick="onGoogleButtonClick"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Accedi con Google"
@@ -195,6 +197,7 @@
 
                     <TextView
                         android:id="@+id/lRegisterTextView"
+                        android:onClick="goToSignupActivity"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"

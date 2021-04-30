@@ -12,8 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.frafio.myfinance.R
-import com.frafio.myfinance.ui.home.MainActivity.Companion.CURRENT_USER
-import com.frafio.myfinance.data.models.User
 import com.frafio.myfinance.ui.home.MainActivity
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
@@ -23,7 +21,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.*
-import com.google.firebase.firestore.FirebaseFirestore
 
 class SignupActivity : AppCompatActivity() {
 
@@ -156,8 +153,17 @@ class SignupActivity : AppCompatActivity() {
                     Log.e(TAG, "Error! ${e.localizedMessage}")
                 }
 
-                // store data in firestore
-                createFirestoreUser(fullName)
+                val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(fullName).build()
+                fUser?.updateProfile(profileUpdates)?.addOnSuccessListener {
+                    val returnIntent = Intent()
+                    setResult(RESULT_OK, returnIntent)
+                    finish()
+                }?.addOnFailureListener { e ->
+                    Log.e(TAG, "Error! ${e.localizedMessage}")
+                    showSnackbar("Registrazione non avvenuta correttamente!")
+                    mProgressIndicator.hide()
+                }
+
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
                 when (e) {
@@ -172,33 +178,6 @@ class SignupActivity : AppCompatActivity() {
 
                 mProgressIndicator.hide()
             }
-    }
-
-    // crea l'utente in firebase
-    private fun createFirestoreUser(fullName: String) {
-        val fStore = FirebaseFirestore.getInstance()
-
-        // insert name into fUser
-        val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(fullName).build()
-        fUser?.updateProfile(profileUpdates)?.addOnSuccessListener {
-            // store data in firestore
-            val user = User(fullName, fUser?.email, "")
-            fStore.collection("users").document(fUser!!.uid).set(user)
-                .addOnSuccessListener {
-                    Log.d(TAG, "onSuccess: user Profile is created for ${fUser?.uid}")
-                    CURRENT_USER = user
-                    val returnIntent = Intent()
-                    setResult(RESULT_OK, returnIntent)
-                    finish()
-                }.addOnFailureListener { e ->
-                    Log.e(TAG, "Error! " + e.localizedMessage)
-                    mProgressIndicator.hide()
-                    showSnackbar("Account non creato correttamente!")
-                }
-        }?.addOnFailureListener {
-            showSnackbar("Account non creato correttamente!")
-            mProgressIndicator.hide()
-        }
     }
 
     // ends this activity (back arrow)

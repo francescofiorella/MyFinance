@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.auth
 
+import android.content.Intent
 import android.view.View
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.repositories.UserRepository
@@ -31,5 +32,24 @@ class AuthViewModel : ViewModel() {
 
         val loginResponse = UserRepository().userLogin(email!!, password!!)
         authListener?.onSuccess(loginResponse)
+    }
+
+    fun onResetButtotClick(view: View) {
+        authListener?.onStarted()
+
+        if (email.isNullOrEmpty()) {
+            authListener?.onFailure(1)
+            return
+        }
+
+        val resetResponse = UserRepository().resetPassword(email!!)
+        authListener?.onSuccess(resetResponse)
+    }
+
+    fun onGoogleRequest(data: Intent?) {
+        authListener?.onStarted()
+
+        val googleResponse = UserRepository().userLogin(data)
+        authListener?.onSuccess(googleResponse)
     }
 }

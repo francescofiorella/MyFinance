@@ -14,7 +14,7 @@
     <color name="cinnamon_satin">#cf6679</color>
 
     <!--Theme colors-->
-    <color name="primary">#2C3240</color> <!-- #1976d2 -->
+    <color name="primary">#2C3240</color>
     <color name="background">@color/white</color>
     <color name="accent">#01579b</color>
     <color name="error">@color/carmine</color>
@@ -25,4 +25,6 @@
 
     <color name="edit_text">#EBEEF5</color>
     <color name="nav_items">#3278F2</color>
+
+    <color name="icon_bg">#3D5576</color>
 </resources>

@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.frafio.myfinance.ui.home.MainActivity.Companion.CURRENT_USER
 import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_ID_LIST
 import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_LIST
 import com.frafio.myfinance.R
@@ -27,6 +26,7 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import java.text.DecimalFormat
@@ -68,6 +68,9 @@ class AddActivity : AppCompatActivity() {
     var day = 0
 
     val interpolator = OvershootInterpolator()
+
+    // firebase
+    private lateinit var fAuth: FirebaseAuth
 
     companion object {
         private val TAG = AddActivity::class.java.simpleName
@@ -403,6 +406,8 @@ class AddActivity : AppCompatActivity() {
     }
 
     private fun addPurchase() {
+        fAuth = FirebaseAuth.getInstance()
+        val userEmail = fAuth.currentUser?.email ?: "invalid"
         val name = mNameET.text.toString().trim()
 
         // controlla le info aggiunte
@@ -417,13 +422,13 @@ class AddActivity : AppCompatActivity() {
         }
 
         if (mTotSwitch.isChecked) {
-            val purchase = Purchase(CURRENT_USER?.email, name, 0.0, year, month, day, 0)
+            val purchase = Purchase(userEmail, name, 0.0, year, month, day, 0)
 
             val fStore = FirebaseFirestore.getInstance()
             val totID = "$year$month$day"
             fStore.collection("purchases").document(totID).set(purchase)
                 .addOnSuccessListener {
-                    updateAndGoToList()
+                    updateAndGoToList(userEmail)
                 }.addOnFailureListener { e ->
                     Log.e(TAG, "Error! ${e.localizedMessage}")
                     showSnackbar("Totale non aggiunto!")
@@ -447,7 +452,7 @@ class AddActivity : AppCompatActivity() {
                     3
                 }
 
-                val purchase = Purchase(CURRENT_USER?.email, name, price, year, month, day, type)
+                val purchase = Purchase(userEmail, name, price, year, month, day, type)
 
                 val fStore = FirebaseFirestore.getInstance()
                 fStore.collection("purchases").add(purchase)
@@ -458,18 +463,18 @@ class AddActivity : AppCompatActivity() {
                             0.0
                         }
                         for (item in PURCHASE_LIST) {
-                            if (item.email == CURRENT_USER?.email && item.type != 0
+                            if (item.email == userEmail && item.type != 0
                                 && item.type != 3 && item.year == purchase.year
                                 && item.month == purchase.month && item.day == purchase.day) {
                                 sum += item.price ?: 0.0
                             }
                         }
-                        val totalP = Purchase(CURRENT_USER?.email, "Totale", sum, year, month, day, 0)
+                        val totalP = Purchase(userEmail, "Totale", sum, year, month, day, 0)
                         val fStore1 = FirebaseFirestore.getInstance()
                         val totID = "$year$month$day"
                         fStore1.collection("purchases").document(totID).set(totalP)
                             .addOnSuccessListener {
-                                updateAndGoToList()
+                                updateAndGoToList(userEmail)
                             }
                             .addOnFailureListener { e ->
                                 Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -480,7 +485,7 @@ class AddActivity : AppCompatActivity() {
                         showSnackbar("Acquisto non aggiunto!")
                     }
             } else if (requestCode == 2) {
-                val purchase = Purchase(CURRENT_USER?.email, name, price, year, month, day, purchaseType)
+                val purchase = Purchase(userEmail, name, price, year, month, day, purchaseType)
                 val fStore = FirebaseFirestore.getInstance()
                 fStore.collection("purchases").document(purchaseId).set(purchase)
                     .addOnSuccessListener {
@@ -488,18 +493,18 @@ class AddActivity : AppCompatActivity() {
                         if (price != purchasePrice) {
                             var sum = 0.0
                             for (item in PURCHASE_LIST) {
-                                if (item.email == CURRENT_USER?.email && item.type != 0
+                                if (item.email == userEmail && item.type != 0
                                     && item.type != 3 && item.year == purchase.year
                                     && item.month == purchase.month && item.day == purchase.day) {
                                     sum += item.price ?: 0.0
                                 }
                             }
-                            val totalP = Purchase(CURRENT_USER?.email, "Totale", sum, year, month, day, 0)
+                            val totalP = Purchase(userEmail, "Totale", sum, year, month, day, 0)
                             val fStore1 = FirebaseFirestore.getInstance()
                             val totID = "$year$month$day"
                             fStore1.collection("purchases").document(totID).set(totalP)
                                 .addOnSuccessListener {
-                                    updateAndGoToList()
+                                    updateAndGoToList(userEmail)
                                 }
                                 .addOnFailureListener { e ->
                                     Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -521,11 +526,11 @@ class AddActivity : AppCompatActivity() {
     }
 
     // metodo per aggiornare i progressi dell'utente
-    fun updateAndGoToList() {
+    fun updateAndGoToList(userEmail: String) {
         PURCHASE_LIST = mutableListOf()
         PURCHASE_ID_LIST = mutableListOf()
         val fStore = FirebaseFirestore.getInstance()
-        fStore.collection("purchases").whereEqualTo("email", CURRENT_USER?.email)
+        fStore.collection("purchases").whereEqualTo("email", userEmail)
             .orderBy("year", Query.Direction.DESCENDING)
             .orderBy("month", Query.Direction.DESCENDING)
             .orderBy("day", Query.Direction.DESCENDING).orderBy("type")

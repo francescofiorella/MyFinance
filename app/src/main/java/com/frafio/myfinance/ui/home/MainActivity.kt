@@ -18,7 +18,6 @@ import com.frafio.myfinance.ui.fragments.ListFragment
 import com.frafio.myfinance.ui.fragments.MenuFragment
 import com.frafio.myfinance.ui.fragments.ProfileFragment
 import com.frafio.myfinance.data.models.Purchase
-import com.frafio.myfinance.data.models.User
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -45,7 +44,6 @@ class MainActivity : AppCompatActivity() {
     var currentFragment = 0
 
     companion object {
-        var CURRENT_USER: User? = null
         var PURCHASE_LIST = mutableListOf<Purchase>()
         var PURCHASE_ID_LIST = mutableListOf<String>()
         private val KEY_FRAGMENT = "com.frafio.myfinance.SAVE_FRAGMENT"
@@ -81,7 +79,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             // aggiorna i dati dell'utente
-            updateCurrentUser()
+            updateList()
         }
 
         // imposta la bottomNavView
@@ -141,24 +139,6 @@ class MainActivity : AppCompatActivity() {
             val fragment: ListFragment? =
                 supportFragmentManager.findFragmentById(R.id.main_frameLayout) as ListFragment?
             fragment?.scrollListToTop()
-        }
-    }
-
-    // metodo per aggiornare i dati dell'utente
-    private fun updateCurrentUser() {
-        fAuth = FirebaseAuth.getInstance()
-        val fUser = fAuth.currentUser
-        if (fUser != null) {
-            if (CURRENT_USER == null) {
-                val fStore = FirebaseFirestore.getInstance()
-                fStore.collection("users").document(fUser.uid).get()
-                    .addOnSuccessListener { documentSnapshot ->
-                        CURRENT_USER = documentSnapshot.toObject(User::class.java)!!
-                    }.addOnFailureListener { e ->
-                        Log.e(TAG, "Error! " + e.localizedMessage)
-                    }
-            }
-            updateList()
         }
     }
 
