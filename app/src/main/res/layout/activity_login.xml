@@ -91,11 +91,11 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/login_nameInputText"
+                        android:text="@={viewmodel.email}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
-                        android:inputType="textEmailAddress"
-                        android:text="@={viewmodel.email}"/>
+                        android:inputType="textEmailAddress" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -118,11 +118,11 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/login_passwordInputText"
+                        android:text="@={viewmodel.password}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
-                        android:inputType="textPassword"
-                        android:text="@={viewmodel.password}"/>
+                        android:inputType="textPassword" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 

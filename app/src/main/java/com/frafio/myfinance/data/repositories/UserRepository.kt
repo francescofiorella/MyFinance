@@ -4,14 +4,10 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.ui.auth.LoginActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.*
 
 class UserRepository {
 
@@ -96,6 +92,45 @@ class UserRepository {
             Log.e(TAG, "Error! ${e.localizedMessage}")
             response.value = "Accesso con Google fallito!"
         }
+
+        return response
+    }
+
+    fun userSignup(fullName: String, email: String, password: String) : LiveData<Any> {
+        val response = MutableLiveData<Any>()
+
+        val fAuth = FirebaseAuth.getInstance()
+
+        fAuth.createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener {
+                // verify the email
+                val fUser = fAuth.currentUser
+                fUser?.sendEmailVerification()?.addOnSuccessListener {
+                    Log.d(TAG, "Email di verifica inviata!")
+                }?.addOnFailureListener { e ->
+                    Log.e(TAG, "Error! ${e.localizedMessage}")
+                }
+
+                val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(fullName).build()
+                fUser?.updateProfile(profileUpdates)?.addOnSuccessListener {
+                    response.value = 1
+                }?.addOnFailureListener { e ->
+                    Log.e(TAG, "Error! ${e.localizedMessage}")
+                    response.value = "Registrazione non avvenuta correttamente!"
+                }
+
+            }.addOnFailureListener { e ->
+                Log.e(TAG, "Error! ${e.localizedMessage}")
+                when (e) {
+                    is FirebaseAuthWeakPasswordException ->
+                        response.value = 2
+                    is FirebaseAuthInvalidCredentialsException ->
+                        response.value = 3
+                    is FirebaseAuthUserCollisionException ->
+                        response.value = 4
+                    else -> response.value = "Registrazione fallita."
+                }
+            }
 
         return response
     }
