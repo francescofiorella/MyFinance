@@ -17,7 +17,6 @@
 
         <!--Custom widgets theme. -->
         <item name="textInputStyle">@style/Widget.MyFinance.TextInputLayout.OutlinedBox</item>
-        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <!--Toolbar theme. -->

@@ -63,7 +63,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
         mProgressIndicator = findViewById(R.id.signup_progressIndicator)
     }
 
-    override fun onStarted() {
+    override fun onAuthStarted() {
         mProgressIndicator.show()
 
         mFullNameLayout.isErrorEnabled = false
@@ -72,7 +72,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
         mPasswordAgainLayout.isErrorEnabled = false
     }
 
-    override fun onSuccess(response: LiveData<Any>) {
+    override fun onAuthSuccess(response: LiveData<Any>) {
         response.observe(this, Observer { responseData ->
             mProgressIndicator.hide()
 
@@ -90,7 +90,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
         })
     }
 
-    override fun onFailure(errorCode: Int) {
+    override fun onAuthFailure(errorCode: Int) {
         mProgressIndicator.hide()
 
         when (errorCode) {

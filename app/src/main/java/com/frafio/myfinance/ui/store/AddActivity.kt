@@ -1,7 +1,6 @@
-package com.frafio.myfinance.ui.home
+package com.frafio.myfinance.ui.store
 
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Bundle
 import android.text.TextUtils
 import android.transition.AutoTransition
@@ -15,16 +14,18 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_ID_LIST
 import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_LIST
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.databinding.ActivityAddBinding
+import com.frafio.myfinance.utils.snackbar
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -34,10 +35,9 @@ import java.text.NumberFormat
 import java.time.LocalDate
 import java.util.*
 
-class AddActivity : AppCompatActivity() {
+class AddActivity : AppCompatActivity(), StoreListener {
 
     lateinit var layout: RelativeLayout
-    var nunito: Typeface? = null
 
     lateinit var mToolbar: MaterialToolbar
     lateinit var mNameET: EditText
@@ -67,10 +67,12 @@ class AddActivity : AppCompatActivity() {
     var month = 0
     var day = 0
 
-    val interpolator = OvershootInterpolator()
+    private val interpolator = OvershootInterpolator()
 
     // firebase
     private lateinit var fAuth: FirebaseAuth
+
+    private lateinit var viewModel: StoreViewModel
 
     companion object {
         private val TAG = AddActivity::class.java.simpleName
@@ -78,9 +80,12 @@ class AddActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add)
 
-        nunito = ResourcesCompat.getFont(applicationContext, R.font.nunito)
+        val binding: ActivityAddBinding = DataBindingUtil.setContentView(this, R.layout.activity_add)
+        viewModel = ViewModelProvider(this).get(StoreViewModel::class.java)
+        binding.viewmodel = viewModel
+
+        viewModel.storeListener = this
 
         // toolbar
         mToolbar = findViewById(R.id.add_toolbar)
@@ -108,82 +113,11 @@ class AddActivity : AppCompatActivity() {
         mAltroBtn = findViewById(R.id.add_altro_tv)
         mAddBtn = findViewById(R.id.add_addButton)
 
-        mBigliettoLayout.alpha = 0f
-
         // stabilisci se bisogna creare un nuovo evento (1) o modificarne uno esistente (2)
         requestCode = intent.getIntExtra("com.frafio.myfinance.REQUESTCODE", 0)
 
-        if (requestCode == 1) {
-            // set data odierna
-            year = LocalDate.now().year
-            month = LocalDate.now().monthValue
-            day = LocalDate.now().dayOfMonth
-
-            mGenBtn.isSelected = true
-
-            setTypeButton()
-            setTotSwitch()
-
-            setDatePicker()
-        } else if (requestCode == 2) {
-            mTotSwitch.visibility = View.GONE
-
-            purchaseId = intent.getStringExtra("com.frafio.myfinance.PURCHASE_ID")!!
-            purchaseName = intent.getStringExtra("com.frafio.myfinance.PURCHASE_NAME")!!
-            purchasePrice = intent.getDoubleExtra("com.frafio.myfinance.PURCHASE_PRICE", 0.0)
-            purchaseType = intent.getIntExtra("com.frafio.myfinance.PURCHASE_TYPE", 0)
-            purchasePosition = intent.getIntExtra("com.frafio.myfinance.PURCHASE_POSITION", 0)
-            year = intent.getIntExtra("com.frafio.myfinance.PURCHASE_YEAR", 0)
-            month = intent.getIntExtra("com.frafio.myfinance.PURCHASE_MONTH", 0)
-            day = intent.getIntExtra("com.frafio.myfinance.PURCHASE_DAY", 0)
-
-            mNameET.setText(purchaseName)
-
-            val locale = Locale("en", "UK")
-            val nf = NumberFormat.getInstance(locale)
-            val formatter = nf as DecimalFormat
-            formatter.applyPattern("###,###,##0.00")
-            mPriceET.setText(formatter.format(purchasePrice))
-
-            when (purchaseType) {
-                1 -> {
-                    mGenBtn.isEnabled = false
-                    mSpeBtn.isSelected = true
-                    mBigBtn.isEnabled = false
-                }
-                2 -> {
-                    mGenBtn.isSelected = true
-                    mSpeBtn.isEnabled = false
-                    mBigBtn.isEnabled = false
-                }
-                3 -> {
-                    mGenBtn.isEnabled = false
-                    mSpeBtn.isEnabled = false
-                    mBigBtn.isSelected = true
-                    setBigliettoLayout()
-                }
-            }
-
-            val dayString: String = if (day < 10) {
-                "0$day"
-            } else {
-                day.toString()
-            }
-
-            val monthString: String = if (month < 10) {
-                "0$month"
-            } else {
-                month.toString()
-            }
-            val dateString = "$dayString/$monthString/$year"
-            mDateET.text = dateString
-            mDateET.setTextColor(ContextCompat.getColor(applicationContext, R.color.disabled_text))
-            mDateBtn.isClickable = false
-            mDateArrowImg.visibility = View.GONE
-
-            mAddBtn.text = "Modifica"
-            mAddBtn.setIcon(ContextCompat.getDrawable(applicationContext, R.drawable.ic_create))
-        }
+        mBigliettoLayout.alpha = 0f
+        viewModel.initLayout(requestCode)
 
         mAddBtn.setOnClickListener {
             addPurchase()
@@ -224,7 +158,8 @@ class AddActivity : AppCompatActivity() {
     private fun showDatePicker(materialDatePicker: MaterialDatePicker<*>) {
         if (!materialDatePicker.isAdded) {
             materialDatePicker.show(supportFragmentManager, "DATE_PICKER")
-            materialDatePicker.addOnPositiveButtonClickListener { selection -> // get selected date
+            materialDatePicker.addOnPositiveButtonClickListener { selection ->
+                // get selected date
                 val date = Date(selection.toString().toLong())
                 val calendar = Calendar.getInstance()
 
@@ -431,7 +366,7 @@ class AddActivity : AppCompatActivity() {
                     updateAndGoToList(userEmail)
                 }.addOnFailureListener { e ->
                     Log.e(TAG, "Error! ${e.localizedMessage}")
-                    showSnackbar("Totale non aggiunto!")
+                    snackbar(layout, "Totale non aggiunto!")
                 }
         } else {
             val priceString = mPriceET.text.toString().trim()
@@ -478,11 +413,11 @@ class AddActivity : AppCompatActivity() {
                             }
                             .addOnFailureListener { e ->
                                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                                showSnackbar("Acquisto non aggiunto correttamente!")
+                                snackbar(layout, "Acquisto non aggiunto correttamente!")
                             }
                     }.addOnFailureListener { e ->
                         Log.e(TAG, "Error! ${e.localizedMessage}")
-                        showSnackbar("Acquisto non aggiunto!")
+                        snackbar(layout, "Acquisto non aggiunto!")
                     }
             } else if (requestCode == 2) {
                 val purchase = Purchase(userEmail, name, price, year, month, day, purchaseType)
@@ -508,7 +443,7 @@ class AddActivity : AppCompatActivity() {
                                 }
                                 .addOnFailureListener { e ->
                                     Log.e(TAG, "Error! ${e.localizedMessage}")
-                                    showSnackbar("Acquisto non aggiunto correttamente!")
+                                    snackbar(layout, "Acquisto non aggiunto correttamente!")
                                 }
                         } else {
                             // torna alla home
@@ -519,7 +454,7 @@ class AddActivity : AppCompatActivity() {
                         }
                     }.addOnFailureListener { e ->
                         Log.e(TAG, "Error! ${e.localizedMessage}")
-                        showSnackbar("Acquisto non modificato!")
+                        snackbar(layout, "Acquisto non modificato!")
                     }
             }
         }
@@ -552,6 +487,18 @@ class AddActivity : AppCompatActivity() {
             }
     }
 
+    override fun onStoreStarted() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onStoreSuccess(response: LiveData<Any>) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onStoreFailure(errorCode: Int) {
+        TODO("Not yet implemented")
+    }
+
     // ends this activity (back arrow)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
@@ -559,16 +506,5 @@ class AddActivity : AppCompatActivity() {
             finish()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    // snackbar
-    fun showSnackbar(string: String) {
-        val snackbar = Snackbar.make(layout, string, BaseTransientBottomBar.LENGTH_SHORT)
-            .setAnchorView(mAddBtn)
-            .setBackgroundTint(ContextCompat.getColor(applicationContext, R.color.snackbar))
-            .setTextColor(ContextCompat.getColor(applicationContext, R.color.inverted_primary_text))
-        val tv = snackbar.view.findViewById<TextView>(R.id.snackbar_text)
-        tv.typeface = nunito
-        snackbar.show()
     }
 }

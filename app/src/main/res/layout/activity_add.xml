@@ -1,294 +1,312 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.home.AddActivity"
-    android:id="@+id/add_layout">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <!--Toolbar-->
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/add_appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <data>
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/add_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:title="@string/app_name"
-            app:titleTextColor="@color/white"
-            app:titleTextAppearance="@style/TextAppearance.MyFinance.Toolbar.MainTitle"
-            style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
+        <variable
+            name="viewmodel"
+            type="com.frafio.myfinance.ui.store.StoreViewModel" />
 
-    </com.google.android.material.appbar.AppBarLayout>
+    </data>
 
-    <TextView
-        android:id="@+id/add_purchaseTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Acquisto"
-        android:fontFamily="@font/nunito"
-        android:textSize="21sp"
-        android:padding="10dp"
-        android:textColor="@color/primary_text"
-        android:layout_below="@id/add_appBarLayout"/>
-
-    <View
-        android:id="@+id/add_divider"
-        android:layout_width="match_parent"
-        android:layout_height="0.1dp"
-        android:layout_below="@id/add_purchaseTitle"
-        android:background="@color/primary_text" />
-
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:layout_below="@id/add_divider">
+        tools:context=".ui.store.AddActivity"
+        android:id="@+id/add_layout">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!--Toolbar-->
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/add_appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <EditText
-                android:id="@+id/add_name_EditText"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/add_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:padding="15dp"
-                android:hint="Nome"
-                android:background="@drawable/bg_edit_text"
-                android:fontFamily="@font/nunito"
-                android:inputType="text|textCapSentences|textNoSuggestions"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:title="@string/app_name"
+                app:titleTextColor="@color/white"
+                app:titleTextAppearance="@style/TextAppearance.MyFinance.Toolbar.MainTitle"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
 
-            <EditText
-                android:id="@+id/add_price_EditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:padding="15dp"
-                android:background="@drawable/bg_edit_text"
-                android:hint="Costo"
-                android:fontFamily="@font/nunito"
-                android:drawableEnd="@drawable/ic_euro"
-                android:inputType="numberDecimal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/add_name_EditText" />
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <TextView
+            android:id="@+id/add_purchaseTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Acquisto"
+            android:fontFamily="@font/nunito"
+            android:textSize="21sp"
+            android:padding="10dp"
+            android:textColor="@color/primary_text"
+            android:layout_below="@id/add_appBarLayout"/>
+
+        <View
+            android:id="@+id/add_divider"
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:layout_below="@id/add_purchaseTitle"
+            android:background="@color/primary_text" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:layout_below="@id/add_divider">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/add_dateLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_date_picker"
-                android:clickable="true"
-                android:focusable="true"
-                app:layout_constraintCircleRadius="10dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/add_price_EditText">
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/add_name_EditText"
+                    android:text="@={viewmodel.nome}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:padding="15dp"
+                    android:hint="Nome"
+                    android:background="@drawable/bg_edit_text"
+                    android:fontFamily="@font/nunito"
+                    android:inputType="text|textCapSentences|textNoSuggestions"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <EditText
+                    android:id="@+id/add_price_EditText"
+                    android:text="@={viewmodel.costoString}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:padding="15dp"
+                    android:background="@drawable/bg_edit_text"
+                    android:hint="Costo"
+                    android:fontFamily="@font/nunito"
+                    android:drawableEnd="@drawable/ic_euro"
+                    android:inputType="numberDecimal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/add_name_EditText" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/add_dateLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="15dp">
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_date_picker"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintCircleRadius="10dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/add_price_EditText">
 
-                    <TextView
-                        android:id="@+id/add_dateTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/nunito"
-                        android:textColor="@color/primary_text"
-                        android:textSize="18sp"
-                        android:text="Data"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="15dp">
 
-                    <ImageView
-                        android:id="@+id/add_dateArrowImageView"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_arrow_drop_down"
-                        app:layout_constraintBottom_toBottomOf="@id/add_dateTextView"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/add_dateTextView" />
+                        <TextView
+                            android:id="@+id/add_dateTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:textColor="@color/primary_text"
+                            android:textSize="18sp"
+                            android:text="@={viewmodel.dataString}"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/add_dateArrowImageView"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_arrow_drop_down"
+                            app:layout_constraintBottom_toBottomOf="@id/add_dateTextView"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/add_dateTextView" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <GridLayout
+                    android:id="@+id/add_typeLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:rowCount="1"
+                    android:columnCount="3"
+                    android:background="@drawable/bg_edit_text"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    app:layout_constraintTop_toBottomOf="@id/add_dateLayout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <TextView
+                        android:id="@+id/add_generico_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Generico"
+                        android:textSize="16sp"
+                        android:textAlignment="center"
+                        android:textColor="@color/type_button_color"
+                        android:fontFamily="@font/nunito"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:paddingVertical="15dp"
+                        android:layout_row="0"
+                        android:layout_column="0"
+                        android:layout_columnWeight="1" />
+
+                    <TextView
+                        android:id="@+id/add_spesa_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Spesa"
+                        android:textSize="16sp"
+                        android:textAlignment="center"
+                        android:textColor="@color/type_button_color"
+                        android:fontFamily="@font/nunito"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:paddingVertical="15dp"
+                        android:paddingHorizontal="2dp"
+                        android:layout_row="0"
+                        android:layout_column="1"
+                        android:layout_columnWeight="1" />
+
+                    <TextView
+                        android:id="@+id/add_biglietto_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Biglietto"
+                        android:textSize="16sp"
+                        android:textAlignment="center"
+                        android:textColor="@color/type_button_color"
+                        android:fontFamily="@font/nunito"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:paddingVertical="15dp"
+                        android:layout_row="0"
+                        android:layout_column="2"
+                        android:layout_columnWeight="1" />
+
+                </GridLayout>
+
+                <GridLayout
+                    android:id="@+id/add_bigliettoLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:rowCount="1"
+                    android:columnCount="3"
+                    android:background="@drawable/bg_edit_text"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/add_typeLayout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <TextView
+                        android:id="@+id/add_trenitalia_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TrenItalia"
+                        android:textSize="16sp"
+                        android:textAlignment="center"
+                        android:textColor="@color/type_button_color"
+                        android:fontFamily="@font/nunito"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:paddingVertical="15dp"
+                        android:layout_row="0"
+                        android:layout_column="0"
+                        android:layout_columnWeight="1" />
+
+                    <TextView
+                        android:id="@+id/add_amtab_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Amtab"
+                        android:textSize="16sp"
+                        android:textAlignment="center"
+                        android:textColor="@color/type_button_color"
+                        android:fontFamily="@font/nunito"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:paddingVertical="15dp"
+                        android:layout_row="0"
+                        android:layout_column="1"
+                        android:layout_columnWeight="1" />
+
+                    <TextView
+                        android:id="@+id/add_altro_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Altro"
+                        android:textSize="16sp"
+                        android:textAlignment="center"
+                        android:textColor="@color/type_button_color"
+                        android:fontFamily="@font/nunito"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="15dp"
+                        android:layout_row="0"
+                        android:layout_column="2"
+                        android:layout_columnWeight="1" />
+
+                </GridLayout>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/add_totale_switch"
+                    android:checked="@={viewmodel.checked}"
+                    android:onCheckedChanged="@{viewmodel::onNoPurchaseCheckedChanged}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nessun acquisto"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:padding="15dp"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/nunito"
+                    android:background="@drawable/bg_edit_text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/add_bigliettoLayout" />
+
+
+                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                    android:id="@+id/add_addButton"
+                    android:onClick="@{viewmodel::onAddButtonClick}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="@font/nunito_semibold"
+                    android:text="Aggiungi"
+                    app:backgroundTint="@color/accent"
+                    app:elevation="2dp"
+                    app:icon="@drawable/ic_add"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <GridLayout
-                android:id="@+id/add_typeLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:rowCount="1"
-                android:columnCount="3"
-                android:background="@drawable/bg_edit_text"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                app:layout_constraintTop_toBottomOf="@id/add_dateLayout"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+        </ScrollView>
 
-                <TextView
-                    android:id="@+id/add_generico_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Generico"
-                    android:textSize="16sp"
-                    android:textAlignment="center"
-                    android:textColor="@color/type_button_color"
-                    android:fontFamily="@font/nunito"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:paddingVertical="15dp"
-                    android:layout_row="0"
-                    android:layout_column="0"
-                    android:layout_columnWeight="1" />
+    </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/add_spesa_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Spesa"
-                    android:textSize="16sp"
-                    android:textAlignment="center"
-                    android:textColor="@color/type_button_color"
-                    android:fontFamily="@font/nunito"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:paddingVertical="15dp"
-                    android:paddingHorizontal="2dp"
-                    android:layout_row="0"
-                    android:layout_column="1"
-                    android:layout_columnWeight="1" />
+</layout>
 
-                <TextView
-                    android:id="@+id/add_biglietto_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Biglietto"
-                    android:textSize="16sp"
-                    android:textAlignment="center"
-                    android:textColor="@color/type_button_color"
-                    android:fontFamily="@font/nunito"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:paddingVertical="15dp"
-                    android:layout_row="0"
-                    android:layout_column="2"
-                    android:layout_columnWeight="1" />
-
-            </GridLayout>
-
-            <GridLayout
-                android:id="@+id/add_bigliettoLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:rowCount="1"
-                android:columnCount="3"
-                android:background="@drawable/bg_edit_text"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/add_typeLayout"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <TextView
-                    android:id="@+id/add_trenitalia_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TrenItalia"
-                    android:textSize="16sp"
-                    android:textAlignment="center"
-                    android:textColor="@color/type_button_color"
-                    android:fontFamily="@font/nunito"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:paddingVertical="15dp"
-                    android:layout_row="0"
-                    android:layout_column="0"
-                    android:layout_columnWeight="1" />
-
-                <TextView
-                    android:id="@+id/add_amtab_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Amtab"
-                    android:textSize="16sp"
-                    android:textAlignment="center"
-                    android:textColor="@color/type_button_color"
-                    android:fontFamily="@font/nunito"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:paddingVertical="15dp"
-                    android:layout_row="0"
-                    android:layout_column="1"
-                    android:layout_columnWeight="1" />
-
-                <TextView
-                    android:id="@+id/add_altro_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Altro"
-                    android:textSize="16sp"
-                    android:textAlignment="center"
-                    android:textColor="@color/type_button_color"
-                    android:fontFamily="@font/nunito"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="15dp"
-                    android:layout_row="0"
-                    android:layout_column="2"
-                    android:layout_columnWeight="1" />
-
-            </GridLayout>
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/add_totale_switch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Nessun acquisto"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:padding="15dp"
-                android:textSize="18sp"
-                android:fontFamily="@font/nunito"
-                android:background="@drawable/bg_edit_text"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/add_bigliettoLayout" />
-
-
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/add_addButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:fontFamily="@font/nunito_semibold"
-                android:text="Aggiungi"
-                app:backgroundTint="@color/accent"
-                app:elevation="2dp"
-                app:icon="@drawable/ic_add"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </ScrollView>
-
-</RelativeLayout>

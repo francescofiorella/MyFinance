@@ -16,81 +16,81 @@ class AuthViewModel : ViewModel() {
     var authListener: AuthListener? = null
 
     fun onLoginButtonClick(view: View) {
-        authListener?.onStarted()
+        authListener?.onAuthStarted()
 
         if (email.isNullOrEmpty()) {
-            authListener?.onFailure(1)
+            authListener?.onAuthFailure(1)
             return
         }
 
         if (password.isNullOrEmpty()) {
-            authListener?.onFailure(2)
+            authListener?.onAuthFailure(2)
             return
         }
 
         if (password!!.length < 8) {
-            authListener?.onFailure(3)
+            authListener?.onAuthFailure(3)
             return
         }
 
         val loginResponse = UserRepository().userLogin(email!!, password!!)
-        authListener?.onSuccess(loginResponse)
+        authListener?.onAuthSuccess(loginResponse)
     }
 
     fun onResetButtotClick(view: View) {
-        authListener?.onStarted()
+        authListener?.onAuthStarted()
 
         if (email.isNullOrEmpty()) {
-            authListener?.onFailure(1)
+            authListener?.onAuthFailure(1)
             return
         }
 
         val resetResponse = UserRepository().resetPassword(email!!)
-        authListener?.onSuccess(resetResponse)
+        authListener?.onAuthSuccess(resetResponse)
     }
 
     fun onGoogleRequest(data: Intent?) {
-        authListener?.onStarted()
+        authListener?.onAuthStarted()
 
         val googleResponse = UserRepository().userLogin(data)
-        authListener?.onSuccess(googleResponse)
+        authListener?.onAuthSuccess(googleResponse)
     }
 
     fun onSignupButtonClick(view: View) {
-        authListener?.onStarted()
+        authListener?.onAuthStarted()
 
         // controlla la info aggiunte
         if (fullName.isNullOrEmpty()) {
-            authListener?.onFailure(1)
+            authListener?.onAuthFailure(1)
             return
         }
 
         if (email.isNullOrEmpty()) {
-            authListener?.onFailure(2)
+            authListener?.onAuthFailure(2)
             return
         }
 
         if (password.isNullOrEmpty()) {
-            authListener?.onFailure(3)
+            authListener?.onAuthFailure(3)
             return
         }
 
         if (password!!.length < 8) {
-            authListener?.onFailure(4)
+            authListener?.onAuthFailure(4)
             return
         }
 
         if (passwordAgain.isNullOrEmpty()) {
-            authListener?.onFailure(5)
+            authListener?.onAuthFailure(5)
             return
         }
 
         if (passwordAgain != password) {
-            authListener?.onFailure(6)
+            authListener?.onAuthFailure(6)
             return
         }
 
         val signupResponse = UserRepository().userSignup(fullName!!, email!!, password!!)
-        authListener?.onSuccess(signupResponse)
+        authListener?.onAuthSuccess(signupResponse)
     }
 }

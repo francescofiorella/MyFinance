@@ -14,7 +14,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.frafio.myfinance.ui.home.AddActivity
+import com.frafio.myfinance.ui.store.AddActivity
 import com.frafio.myfinance.ui.home.MainActivity
 import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_ID_LIST
 import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_LIST

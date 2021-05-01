@@ -82,14 +82,14 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         startActivityForResult(Intent(applicationContext, SignupActivity::class.java), 1)
     }
 
-    override fun onStarted() {
+    override fun onAuthStarted() {
         mProgressIndicator.show()
 
         mEmailLayout.isErrorEnabled = false
         mPasswordLayout.isErrorEnabled = false
     }
 
-    override fun onSuccess(response: LiveData<Any>) {
+    override fun onAuthSuccess(response: LiveData<Any>) {
         response.observe(this, Observer { responseData ->
             mProgressIndicator.hide()
 
@@ -108,7 +108,7 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         })
     }
 
-    override fun onFailure(errorCode: Int) {
+    override fun onAuthFailure(errorCode: Int) {
         mProgressIndicator.hide()
 
         when (errorCode) {

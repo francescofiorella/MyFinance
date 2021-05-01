@@ -16,7 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.home.AddActivity" />
+        <activity android:name=".ui.store.AddActivity" />
         <activity android:name=".ui.home.ReceiptActivity" />
         <activity android:name=".ui.auth.SignupActivity" />
         <activity android:name=".ui.auth.LoginActivity" />
