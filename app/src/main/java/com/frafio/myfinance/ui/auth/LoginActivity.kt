@@ -71,20 +71,24 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
     fun  onGoogleButtonClick(view: View){
         mProgressIndicator.show()
 
-        // Create request
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-
-        // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+        mGoogleSignInClient = getGoogleClient()
 
         // SignIn Intent
         mGoogleSignInClient.signInIntent.also {
             startActivityForResult(it, RC_SIGN_IN)
         }
 
+    }
+
+    private fun getGoogleClient() : GoogleSignInClient {
+        // Create request
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+
+        // Build a GoogleSignInClient with the options specified by gso.
+        return GoogleSignIn.getClient(this, gso)
     }
 
     fun goToSignupActivity(view: View) {
