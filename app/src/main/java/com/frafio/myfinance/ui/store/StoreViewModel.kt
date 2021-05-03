@@ -2,13 +2,7 @@ package com.frafio.myfinance.ui.store
 
 import android.view.View
 import android.widget.CompoundButton
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
-import com.frafio.myfinance.R
-import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.time.LocalDate
-import java.util.*
 
 class StoreViewModel : ViewModel() {
 

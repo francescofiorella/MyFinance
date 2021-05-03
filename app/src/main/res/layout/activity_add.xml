@@ -66,7 +66,6 @@
 
                 <EditText
                     android:id="@+id/add_name_EditText"
-                    android:text="@={viewmodel.nome}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -83,7 +82,6 @@
 
                 <EditText
                     android:id="@+id/add_price_EditText"
-                    android:text="@={viewmodel.costoString}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -125,7 +123,6 @@
                             android:fontFamily="@font/nunito"
                             android:textColor="@color/primary_text"
                             android:textSize="18sp"
-                            android:text="@={viewmodel.dataString}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -268,8 +265,6 @@
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/add_totale_switch"
-                    android:checked="@={viewmodel.checked}"
-                    android:onCheckedChanged="@{viewmodel::onNoPurchaseCheckedChanged}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Nessun acquisto"
@@ -287,7 +282,6 @@
 
                 <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                     android:id="@+id/add_addButton"
-                    android:onClick="@{viewmodel::onAddButtonClick}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
