@@ -10,9 +10,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.databinding.ActivityLoginBinding
-import com.frafio.myfinance.ui.home.MainActivity
+import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.snackbar
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -20,8 +19,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputLayout
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.kodein
+import org.kodein.di.generic.instance
 
-class LoginActivity : AppCompatActivity(), AuthListener {
+class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
 
     // definizione variabili
     lateinit var layout: RelativeLayout
@@ -42,11 +44,12 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         private val TAG = LoginActivity::class.java.simpleName
     }
 
+    override val kodein by kodein()
+
+    private val factory: AuthViewModelFactory by instance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val repository = UserRepository()
-        val factory = AuthViewModelFactory(repository)
 
         val binding: ActivityLoginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login)
         viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
@@ -103,7 +106,7 @@ class LoginActivity : AppCompatActivity(), AuthListener {
 
             when (responseData) {
                 1 -> {
-                    Intent(applicationContext, MainActivity::class.java).also {
+                    Intent(applicationContext, HomeActivity::class.java).also {
                         it.putExtra("com.frafio.myfinance.userRequest", true)
                         it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(it)
@@ -134,7 +137,7 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         if (requestCode == RC_SIGN_IN) {
             viewModel.onGoogleRequest(data)
         } else if (requestCode == 1 && resultCode == RESULT_OK) {
-            Intent(applicationContext, MainActivity::class.java).also {
+            Intent(applicationContext, HomeActivity::class.java).also {
                 it.putExtra("com.frafio.myfinance.userRequest", true)
                 it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(it)

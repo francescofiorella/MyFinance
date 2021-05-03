@@ -25,7 +25,7 @@ class SplashScreenActivity : AppCompatActivity() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             val firstActivity = if (fAuth.currentUser != null) {
-                MainActivity::class.java
+                HomeActivity::class.java
 
             } else {
                 LoginActivity::class.java

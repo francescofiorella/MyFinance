@@ -218,7 +218,7 @@ class ReceiptActivity : AppCompatActivity() {
     private fun showSnackbar(string: String) {
         val snackbar = Snackbar.make(layout, string, BaseTransientBottomBar.LENGTH_SHORT)
             .setAnchorView(mNameET)
-            .setBackgroundTint(ContextCompat.getColor(applicationContext, R.color.snackbar))
+            .setBackgroundTint(ContextCompat.getColor(applicationContext, R.color.snackbar_bg))
             .setTextColor(ContextCompat.getColor(applicationContext, R.color.inverted_primary_text))
         val tv = snackbar.view.findViewById<TextView>(R.id.snackbar_text)
         tv.typeface = nunito

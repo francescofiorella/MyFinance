@@ -13,7 +13,7 @@ class AuthViewModel(
     var password: String? = null
 
     var fullName: String? = null
-    var passwordAgain: String? = null
+    var passwordConfirm: String? = null
 
     var authListener: AuthListener? = null
 
@@ -82,12 +82,12 @@ class AuthViewModel(
             return
         }
 
-        if (passwordAgain.isNullOrEmpty()) {
+        if (passwordConfirm.isNullOrEmpty()) {
             authListener?.onAuthFailure(5)
             return
         }
 
-        if (passwordAgain != password) {
+        if (passwordConfirm != password) {
             authListener?.onAuthFailure(6)
             return
         }

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import com.frafio.myfinance.ui.home.MainActivity
+import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.R
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -58,7 +58,7 @@ class DashboardFragment : Fragment() {
         mTrenTotTV = view.findViewById(R.id.trenTot_TV)
         mAmTotTV = view.findViewById(R.id.amTot_TV)
 
-        if (MainActivity.PURCHASE_LIST.isEmpty()) {
+        if (HomeActivity.PURCHASE_LIST.isEmpty()) {
             mWarningTV.visibility = View.VISIBLE
             mStatsLayout.visibility = View.GONE
         } else {
@@ -78,7 +78,7 @@ class DashboardFragment : Fragment() {
         var nMonth = 0
         var lastMonth = 0
         var lastYear = 0
-        for (purchase in MainActivity.PURCHASE_LIST) {
+        for (purchase in HomeActivity.PURCHASE_LIST) {
             // totale biglietti Amtab
             if (purchase.name == "Biglietto Amtab") {
                 amTot++

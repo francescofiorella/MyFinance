@@ -154,7 +154,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/signup_passwordAgainInputLayout"
+                    android:id="@+id/signup_passwordConfirmInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="30dp"
@@ -173,7 +173,7 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/signup_passwordAgainInputText"
-                        android:text="@={viewmodel.passwordAgain}"
+                        android:text="@={viewmodel.passwordConfirm}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
@@ -194,7 +194,7 @@
                     app:cornerRadius="@dimen/field_corner_radius"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/signup_passwordAgainInputLayout" />
+                    app:layout_constraintTop_toBottomOf="@+id/signup_passwordConfirmInputLayout" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"

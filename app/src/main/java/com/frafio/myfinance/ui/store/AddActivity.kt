@@ -17,8 +17,8 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
-import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_ID_LIST
-import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_LIST
+import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_ID_LIST
+import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_LIST
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.ActivityAddBinding

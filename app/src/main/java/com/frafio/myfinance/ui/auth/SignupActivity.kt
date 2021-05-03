@@ -11,15 +11,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.databinding.ActivitySignupBinding
-import com.frafio.myfinance.ui.home.MainActivity
+import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.snackbar
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputLayout
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.kodein
+import org.kodein.di.generic.instance
 
-class SignupActivity : AppCompatActivity(), AuthListener {
+class SignupActivity : AppCompatActivity(), AuthListener, KodeinAware {
 
     // definizione variabili
     lateinit var layout: RelativeLayout
@@ -28,18 +30,19 @@ class SignupActivity : AppCompatActivity(), AuthListener {
     lateinit var mFullNameLayout: TextInputLayout
     lateinit var mEmailLayout:TextInputLayout
     lateinit var mPasswordLayout:TextInputLayout
-    lateinit var mPasswordAgainLayout:TextInputLayout
+    lateinit var mPasswordConfirmLayout:TextInputLayout
     lateinit var mProgressIndicator: LinearProgressIndicator
 
     companion object {
-        private val TAG = MainActivity::class.java.simpleName
+        private val TAG = HomeActivity::class.java.simpleName
     }
+
+    override val kodein by kodein()
+
+    private val factory: AuthViewModelFactory by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val repository = UserRepository()
-        val factory = AuthViewModelFactory(repository)
 
         val binding: ActivitySignupBinding = DataBindingUtil.setContentView(this, R.layout.activity_signup)
         val viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
@@ -61,7 +64,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
         mFullNameLayout = findViewById(R.id.signup_nameInputLayout)
         mEmailLayout = findViewById(R.id.signup_emailInputLayout)
         mPasswordLayout = findViewById(R.id.signup_passwordInputLayout)
-        mPasswordAgainLayout = findViewById(R.id.signup_passwordAgainInputLayout)
+        mPasswordConfirmLayout = findViewById(R.id.signup_passwordConfirmInputLayout)
 
         mProgressIndicator = findViewById(R.id.signup_progressIndicator)
     }
@@ -72,7 +75,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
         mFullNameLayout.isErrorEnabled = false
         mEmailLayout.isErrorEnabled = false
         mPasswordLayout.isErrorEnabled = false
-        mPasswordAgainLayout.isErrorEnabled = false
+        mPasswordConfirmLayout.isErrorEnabled = false
     }
 
     override fun onAuthSuccess(response: LiveData<Any>) {
@@ -85,7 +88,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
                     setResult(RESULT_OK, returnIntent)
                     finish()
                 }
-                2 -> mPasswordAgainLayout.error = "Le password inserite non corrispondono!"
+                2 -> mPasswordConfirmLayout.error = "Le password inserite non corrispondono!"
                 3 -> mEmailLayout.error = "L'email inserita non è ben formata."
                 4 -> mEmailLayout.error = "L'email inserita ha già un account associato."
                 is String -> layout.snackbar(responseData)
@@ -101,8 +104,8 @@ class SignupActivity : AppCompatActivity(), AuthListener {
             2 -> mEmailLayout.error = "Inserisci la tua email."
             3 -> mPasswordLayout.error = "Inserisci la password."
             4 -> mPasswordLayout.error = "La password deve essere lunga almeno 8 caratteri!"
-            5 -> mPasswordAgainLayout.error = "Inserisci nuovamente la password."
-            6 -> mPasswordAgainLayout.error = "Le password inserite non corrispondono!"
+            5 -> mPasswordConfirmLayout.error = "Inserisci nuovamente la password."
+            6 -> mPasswordConfirmLayout.error = "Le password inserite non corrispondono!"
         }
     }
 

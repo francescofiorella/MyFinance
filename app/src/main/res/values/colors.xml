@@ -21,7 +21,7 @@
     <color name="primary_text">@color/black</color>
     <color name="inverted_primary_text">@color/white</color>
     <color name="disabled_text">#D4D4D4</color>
-    <color name="snackbar">#101D25</color>
+    <color name="snackbar_bg">#101D25</color>
 
     <color name="edit_text">#EBEEF5</color>
     <color name="nav_items">#3278F2</color>

@@ -15,9 +15,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.ui.store.AddActivity
-import com.frafio.myfinance.ui.home.MainActivity
-import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_ID_LIST
-import com.frafio.myfinance.ui.home.MainActivity.Companion.PURCHASE_LIST
+import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_ID_LIST
+import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_LIST
 import com.frafio.myfinance.R
 import com.frafio.myfinance.ui.home.ReceiptActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -83,7 +83,7 @@ class ListFragment : Fragment() {
             val nf = NumberFormat.getInstance(locale)
             val formatter = nf as DecimalFormat
             formatter.applyPattern("###,###,##0.00")
-            val priceString = "€ " + formatter.format(MainActivity.PURCHASE_LIST[position].price)
+            val priceString = "€ " + formatter.format(HomeActivity.PURCHASE_LIST[position].price)
             holder.prezzoTV?.text = priceString
 
             if (PURCHASE_LIST[position].type == 0) {
@@ -155,7 +155,7 @@ class ListFragment : Fragment() {
                                     mRecyclerView.removeViewAt(position)
                                     mRecyclerView.adapter?.notifyItemRemoved(position)
                                     mRecyclerView.adapter?.notifyItemRangeChanged(position, PURCHASE_LIST.size)
-                                    (activity as MainActivity).showSnackbar("Totale eliminato!")
+                                    (activity as HomeActivity).showSnackbar("Totale eliminato!")
                                     if (PURCHASE_LIST.isEmpty()) {
                                         mWarningTV.visibility = View.VISIBLE
                                         mRecyclerView.visibility = View.GONE
@@ -172,12 +172,12 @@ class ListFragment : Fragment() {
                                                 .set(PURCHASE_LIST[i]).addOnSuccessListener {
                                                     mRecyclerView.removeViewAt(position)
                                                     mRecyclerView.adapter?.notifyItemRemoved(position)
-                                                    mRecyclerView.adapter?.notifyItemRangeChanged(position, MainActivity.PURCHASE_LIST.size)
+                                                    mRecyclerView.adapter?.notifyItemRangeChanged(position, HomeActivity.PURCHASE_LIST.size)
                                                     mRecyclerView.adapter?.notifyItemChanged(totPosition)
-                                                    (activity as MainActivity).showSnackbar("Acquisto eliminato!")
+                                                    (activity as HomeActivity).showSnackbar("Acquisto eliminato!")
                                                 }.addOnFailureListener { e ->
                                                     Log.e(TAG, "Error! ${e.localizedMessage}")
-                                                    (activity as MainActivity).showSnackbar("Acquisto non eliminato correttamente!")
+                                                    (activity as HomeActivity).showSnackbar("Acquisto non eliminato correttamente!")
                                                 }
                                             break
                                         }
@@ -188,11 +188,11 @@ class ListFragment : Fragment() {
                                     mRecyclerView.removeViewAt(position)
                                     mRecyclerView.adapter?.notifyItemRemoved(position)
                                     mRecyclerView.adapter?.notifyItemRangeChanged(position, PURCHASE_LIST.size)
-                                    (activity as MainActivity).showSnackbar("Acquisto eliminato!")
+                                    (activity as HomeActivity).showSnackbar("Acquisto eliminato!")
                                 }
                             }.addOnFailureListener { e ->
                                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                                (activity as MainActivity).showSnackbar("Acquisto non eliminato correttamente!")
+                                (activity as HomeActivity).showSnackbar("Acquisto non eliminato correttamente!")
                             }
                     }
                     builder.show()

@@ -28,7 +28,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-class MainActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity() {
 
     // definizione variabili
     lateinit var layout: CoordinatorLayout
@@ -48,24 +48,24 @@ class MainActivity : AppCompatActivity() {
         var PURCHASE_LIST = mutableListOf<Purchase>()
         var PURCHASE_ID_LIST = mutableListOf<String>()
         private val KEY_FRAGMENT = "com.frafio.myfinance.SAVE_FRAGMENT"
-        private val TAG = MainActivity::class.java.simpleName
+        private val TAG = HomeActivity::class.java.simpleName
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_home)
 
         nunito = ResourcesCompat.getFont(applicationContext, R.font.nunito)
 
         // toolbar
-        mToolbar = findViewById(R.id.main_toolbar)
+        mToolbar = findViewById(R.id.home_toolbar)
         setSupportActionBar(mToolbar)
 
         // collegamento view
         layout = findViewById(R.id.main_layout)
-        mFragmentTitle = findViewById(R.id.main_fragmentTitle)
-        mBottomNavigationView = findViewById(R.id.main_bottomNavView)
-        mAddBtn = findViewById(R.id.main_addBtn)
+        mFragmentTitle = findViewById(R.id.home_fragmentTitle)
+        mBottomNavigationView = findViewById(R.id.home_bottomNavView)
+        mAddBtn = findViewById(R.id.home_addBtn)
 
         if (savedInstanceState != null) {
             currentFragment = savedInstanceState.getInt(KEY_FRAGMENT)
@@ -134,11 +134,11 @@ class MainActivity : AppCompatActivity() {
             }
             supportFragmentManager.beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                .replace(R.id.main_frameLayout, mFragmentToSet!!).commit()
+                .replace(R.id.home_fragmentContainerView, mFragmentToSet!!).commit()
             currentFragment = num
         } else if (currentFragment == 2) {
             val fragment: ListFragment? =
-                supportFragmentManager.findFragmentById(R.id.main_frameLayout) as ListFragment?
+                supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as ListFragment?
             fragment?.scrollListToTop()
         }
     }
@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity() {
             if (purchaseRequest) {
                 if (currentFragment == 2) {
                     val fragment =
-                        supportFragmentManager.findFragmentById(R.id.main_frameLayout) as ListFragment?
+                        supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as ListFragment?
                     fragment?.loadPurchasesList()
                 } else {
                     mBottomNavigationView.selectedItemId = R.id.list
@@ -185,7 +185,7 @@ class MainActivity : AppCompatActivity() {
         } else if (requestCode == 2 && resultCode == RESULT_OK) {
             val editRequest = data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
             if (editRequest) {
-                val fragment = supportFragmentManager.findFragmentById(R.id.main_frameLayout) as ListFragment?
+                val fragment = supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as ListFragment?
                 fragment?.loadPurchasesList()
                 showSnackbar("Acquisto modificato!")
             }
@@ -205,7 +205,7 @@ class MainActivity : AppCompatActivity() {
     fun showSnackbar(string: String) {
         val snackbar = Snackbar.make(layout, string, BaseTransientBottomBar.LENGTH_SHORT)
             .setAnchorView(mAddBtn)
-            .setBackgroundTint(ContextCompat.getColor(applicationContext, R.color.snackbar))
+            .setBackgroundTint(ContextCompat.getColor(applicationContext, R.color.snackbar_bg))
             .setTextColor(ContextCompat.getColor(applicationContext, R.color.inverted_primary_text))
         val tv = snackbar.view.findViewById<TextView>(R.id.snackbar_text)
         tv.typeface = nunito
