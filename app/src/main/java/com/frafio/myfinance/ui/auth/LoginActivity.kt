@@ -108,7 +108,6 @@ class LoginActivity : AppCompatActivity(), AuthListener {
                         it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(it)
                     }
-
                 }
                 2 -> mEmailLayout.error = "L'email inserita non è ben formata."
                 3 -> mPasswordLayout.error = "La password inserita non è corretta."

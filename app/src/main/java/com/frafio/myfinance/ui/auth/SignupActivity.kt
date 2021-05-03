@@ -12,7 +12,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.repositories.UserRepository
-import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.databinding.ActivitySignupBinding
 import com.frafio.myfinance.ui.home.MainActivity
 import com.frafio.myfinance.utils.snackbar
