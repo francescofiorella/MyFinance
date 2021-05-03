@@ -20,8 +20,6 @@ class ProfileFragment : Fragment() {
     lateinit var mUserNameTv: TextView
     lateinit var mEmailTv: TextView
 
-    private var fUser: FirebaseUser? = null
-
     companion object {
         private val TAG = ProfileFragment::class.java.simpleName
     }
@@ -34,18 +32,19 @@ class ProfileFragment : Fragment() {
         mUserNameTv = view.findViewById(R.id.profile_username_tv)
         mEmailTv = view.findViewById(R.id.profile_email_tv)
 
-        fUser = FirebaseAuth.getInstance().currentUser
-
         setUserData()
 
         return view
     }
 
     private fun setUserData() {
-        mUserNameTv.text = fUser?.displayName
-        mEmailTv.text = fUser?.email
-        fUser?.photoUrl?.let { uri ->
-            Glide.with(context!!).load(uri.toString()).apply(RequestOptions.circleCropTransform()).into(mUserImage)
+        FirebaseAuth.getInstance().currentUser?.let { fUser ->
+            mUserNameTv.text = fUser.displayName
+            mEmailTv.text = fUser.email
+            fUser.photoUrl?.let { uri ->
+                context?.let { Glide.with(it).load(uri.toString()).apply(RequestOptions.circleCropTransform()).into(mUserImage) }
+            }
         }
+
     }
 }
