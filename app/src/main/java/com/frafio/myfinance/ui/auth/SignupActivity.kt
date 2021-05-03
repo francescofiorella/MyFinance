@@ -11,6 +11,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.databinding.ActivitySignupBinding
 import com.frafio.myfinance.ui.home.MainActivity
@@ -38,8 +39,11 @@ class SignupActivity : AppCompatActivity(), AuthListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val repository = UserRepository()
+        val factory = AuthViewModelFactory(repository)
+
         val binding: ActivitySignupBinding = DataBindingUtil.setContentView(this, R.layout.activity_signup)
-        val viewModel = ViewModelProvider(this).get(AuthViewModel::class.java)
+        val viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
         binding.viewmodel = viewModel
 
         viewModel.authListener = this
@@ -85,7 +89,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
                 2 -> mPasswordAgainLayout.error = "Le password inserite non corrispondono!"
                 3 -> mEmailLayout.error = "L'email inserita non è ben formata."
                 4 -> mEmailLayout.error = "L'email inserita ha già un account associato."
-                is String -> snackbar(layout, responseData)
+                is String -> layout.snackbar(responseData)
             }
         })
     }

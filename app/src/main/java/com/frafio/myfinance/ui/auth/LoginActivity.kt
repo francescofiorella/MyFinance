@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.home.MainActivity
 import com.frafio.myfinance.utils.snackbar
@@ -44,8 +45,11 @@ class LoginActivity : AppCompatActivity(), AuthListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val repository = UserRepository()
+        val factory = AuthViewModelFactory(repository)
+
         val binding: ActivityLoginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login)
-        viewModel = ViewModelProvider(this).get(AuthViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
         binding.viewmodel = viewModel
 
         viewModel.authListener = this
@@ -74,12 +78,16 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
         // SignIn Intent
-        val signInIntent = mGoogleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
+        mGoogleSignInClient.signInIntent.also {
+            startActivityForResult(it, RC_SIGN_IN)
+        }
+
     }
 
     fun goToSignupActivity(view: View) {
-        startActivityForResult(Intent(applicationContext, SignupActivity::class.java), 1)
+        Intent(applicationContext, SignupActivity::class.java).also {
+            startActivityForResult(it, 1)
+        }
     }
 
     override fun onAuthStarted() {
@@ -95,15 +103,17 @@ class LoginActivity : AppCompatActivity(), AuthListener {
 
             when (responseData) {
                 1 -> {
-                    val intent = Intent(applicationContext, MainActivity::class.java)
-                    intent.putExtra("com.frafio.myfinance.userRequest", true)
-                    startActivity(intent)
-                    finish()
+                    Intent(applicationContext, MainActivity::class.java).also {
+                        it.putExtra("com.frafio.myfinance.userRequest", true)
+                        it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(it)
+                    }
+
                 }
                 2 -> mEmailLayout.error = "L'email inserita non è ben formata."
                 3 -> mPasswordLayout.error = "La password inserita non è corretta."
                 4 -> mEmailLayout.error = "L'email inserita non ha un account associato."
-                is String -> snackbar(layout, responseData)
+                is String -> layout.snackbar(responseData)
             }
         })
     }
@@ -125,10 +135,11 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         if (requestCode == RC_SIGN_IN) {
             viewModel.onGoogleRequest(data)
         } else if (requestCode == 1 && resultCode == RESULT_OK) {
-            val intent = Intent(applicationContext, MainActivity::class.java)
-            intent.putExtra("com.frafio.myfinance.userRequest", true)
-            startActivity(intent)
-            finish()
+            Intent(applicationContext, MainActivity::class.java).also {
+                it.putExtra("com.frafio.myfinance.userRequest", true)
+                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(it)
+            }
         }
     }
 }

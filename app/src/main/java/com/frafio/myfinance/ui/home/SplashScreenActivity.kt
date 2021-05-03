@@ -33,9 +33,10 @@ class SplashScreenActivity : AppCompatActivity() {
 
             val activityOptionsCompat = ActivityOptionsCompat
                     .makeCustomAnimation(applicationContext, android.R.anim.fade_in, android.R.anim.fade_out)
-            val intent = Intent(applicationContext, firstActivity)
-            startActivity(intent, activityOptionsCompat.toBundle())
-            finish()
+            Intent(applicationContext, firstActivity).also {
+                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(it, activityOptionsCompat.toBundle())
+            }
         }, 500)
     }
 }

@@ -77,13 +77,13 @@ class UserRepository {
             // Google Sign In was successful, authenticate with Firebase
             val account = task.getResult(ApiException::class.java)
             val credential = GoogleAuthProvider.getCredential(account?.idToken, null)
-            FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener { task ->
-                response.value = if (task.isSuccessful) {
+            FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener { authTask ->
+                response.value = if (authTask.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     1
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.e(TAG, "Error! ${task.exception?.localizedMessage}")
+                    Log.e(TAG, "Error! ${authTask.exception?.localizedMessage}")
                     "Accesso con Google fallito."
                 }
             }
@@ -99,12 +99,10 @@ class UserRepository {
     fun userSignup(fullName: String, email: String, password: String) : LiveData<Any> {
         val response = MutableLiveData<Any>()
 
-        val fAuth = FirebaseAuth.getInstance()
-
-        fAuth.createUserWithEmailAndPassword(email, password)
-            .addOnSuccessListener {
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener { authResult ->
                 // verify the email
-                val fUser = fAuth.currentUser
+                val fUser = authResult.user
                 fUser?.sendEmailVerification()?.addOnSuccessListener {
                     Log.d(TAG, "Email di verifica inviata!")
                 }?.addOnFailureListener { e ->
