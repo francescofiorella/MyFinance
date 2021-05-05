@@ -5,36 +5,47 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.frafio.myfinance.BuildConfig
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.R
-import com.google.android.material.button.MaterialButton
-import com.google.firebase.auth.FirebaseAuth
+import com.frafio.myfinance.databinding.FragmentMenuBinding
+import com.frafio.myfinance.ui.auth.AuthListener
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.x.kodein
+import org.kodein.di.generic.instance
 
-class MenuFragment : Fragment() {
 
-    lateinit var mLogoutBtn: MaterialButton
-    lateinit var mAppVersionTV: TextView
+class MenuFragment : Fragment(), AuthListener, KodeinAware {
+
+    private lateinit var viewModel: MenuViewModel
 
     companion object {
         private val TAG = MenuFragment::class.java.simpleName
     }
 
+    override val kodein by kodein()
+    private val factory: MenuViewModelFactory by instance()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val view: View = inflater.inflate(R.layout.fragment_menu, container, false)
 
-        mLogoutBtn = view.findViewById(R.id.menu_logoutBtn)
-        mAppVersionTV = view.findViewById(R.id.menu_appVersion_TV)
+        val binding: FragmentMenuBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_menu, container, false)
+        viewModel = ViewModelProvider(this, factory).get(MenuViewModel::class.java)
+        viewModel.authListener = this
+        binding.viewmodel = viewModel
+        binding.lifecycleOwner = this
 
-        mLogoutBtn.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            startActivity(Intent(context, LoginActivity::class.java))
-            requireActivity().finish()
-        }
-
-        mAppVersionTV.text = "MyFinance ${BuildConfig.VERSION_NAME}"
-        return view
+        return binding.root
     }
+
+    override fun onAuthStarted() {}
+    override fun onAuthSuccess(response: LiveData<Any>) {
+        if (response.value == 1) {
+            startActivity(Intent(context, LoginActivity::class.java))
+            activity?.finish()
+        }
+    }
+    override fun onAuthFailure(errorCode: Int) {}
 }

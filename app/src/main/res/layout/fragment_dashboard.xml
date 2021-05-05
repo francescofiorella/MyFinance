@@ -11,6 +11,25 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:id="@+id/dashboard_fragmentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nav_1"
+            android:fontFamily="@font/nunito"
+            android:textSize="21sp"
+            android:padding="10dp"
+            android:textColor="@color/primary_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <View
+            android:id="@+id/dashboard_divider"
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:background="@color/primary_text"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_fragmentTitle"/>
+
+        <TextView
             android:id="@+id/dashboard_warningTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,12 +42,16 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/dashboard_divider" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/stats_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_divider">
 
             <TextView
                 android:id="@+id/textViewMedia"

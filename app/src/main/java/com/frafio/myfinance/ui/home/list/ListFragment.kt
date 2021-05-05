@@ -19,7 +19,7 @@ import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_ID_LIST
 import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_LIST
 import com.frafio.myfinance.R
-import com.frafio.myfinance.ui.home.ReceiptActivity
+import com.frafio.myfinance.ui.home.list.receipt.ReceiptActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.DecimalFormat

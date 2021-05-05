@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home
+package com.frafio.myfinance.ui.home.list.receipt
 
 import android.graphics.Typeface
 import android.os.Bundle

@@ -30,30 +30,13 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <TextView
-            android:id="@+id/home_fragmentTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/nunito"
-            android:textSize="21sp"
-            android:padding="10dp"
-            android:textColor="@color/primary_text"
-            android:layout_below="@id/home_appBarLayout"/>
-
-        <View
-            android:id="@+id/home_divider"
-            android:layout_width="match_parent"
-            android:layout_height="0.1dp"
-            android:layout_below="@id/home_fragmentTitle"
-            android:background="@color/primary_text" />
-
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/home_fragmentContainerView"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="56dp"
-            android:layout_below="@id/home_divider"
+            android:layout_below="@id/home_appBarLayout"
             app:defaultNavHost="true"
             app:navGraph="@navigation/nav_graph" />
 

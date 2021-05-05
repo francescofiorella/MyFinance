@@ -6,6 +6,25 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/list_fragmentTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nav_2_extended"
+        android:fontFamily="@font/nunito"
+        android:textSize="21sp"
+        android:padding="10dp"
+        android:textColor="@color/primary_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <View
+        android:id="@+id/list_divider"
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:background="@color/primary_text"
+        app:layout_constraintTop_toBottomOf="@id/list_fragmentTitle"/>
+
+    <TextView
         android:id="@+id/list_warningTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,12 +37,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/list_divider" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:background="@color/background"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
@@ -31,6 +50,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/list_divider" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

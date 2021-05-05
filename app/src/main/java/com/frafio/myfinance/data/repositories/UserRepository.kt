@@ -142,4 +142,11 @@ class UserRepository {
             null
         }
     }
+
+    fun userLogout() : LiveData<Any> {
+        FirebaseAuth.getInstance().signOut()
+        val response = MutableLiveData<Any>()
+        response.value = 1
+        return (response)
+    }
 }

@@ -33,7 +33,6 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var layout: CoordinatorLayout
 
     private lateinit var mToolbar: MaterialToolbar
-    private lateinit var mFragmentTitle: TextView
     private lateinit var mBottomNavigationView: BottomNavigationView
     private lateinit var mAddBtn: FloatingActionButton
 
@@ -55,17 +54,13 @@ class HomeActivity : AppCompatActivity() {
 
         // collegamento view
         layout = findViewById(R.id.main_layout)
-        mFragmentTitle = findViewById(R.id.home_fragmentTitle)
         mBottomNavigationView = findViewById(R.id.home_bottomNavView)
         mAddBtn = findViewById(R.id.home_addBtn)
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
         val navController = navHostFragment.navController
-        val appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.dashboardFragment, R.id.listFragment, R.id.profileFragment, R.id.menuFragment))
 
         mBottomNavigationView.setupWithNavController(navController)
-        setupActionBarWithNavController(navController, appBarConfiguration)
 
         if (savedInstanceState == null) {
             // controlla se si è appena fatto l'accesso
@@ -76,9 +71,6 @@ class HomeActivity : AppCompatActivity() {
                     layout.snackbar("Hai effettuato l'accesso come " + fAuth.currentUser?.displayName, mAddBtn)
                 }
             }
-
-            // aggiorna i dati dell'utente
-            updateList()
         }
     }
 
@@ -97,27 +89,6 @@ class HomeActivity : AppCompatActivity() {
         val intent = Intent(applicationContext, AddActivity::class.java)
         intent.putExtra("com.frafio.myfinance.REQUESTCODE", 1)
         startActivityForResult(intent, 1, activityOptionsCompat.toBundle())
-    }
-
-    // metodo per aggiornare i progressi dell'utente
-    private fun updateList() {
-        PURCHASE_LIST = mutableListOf()
-        PURCHASE_ID_LIST = mutableListOf()
-        val fStore = FirebaseFirestore.getInstance()
-        fStore.collection("purchases").whereEqualTo("email", fAuth.currentUser!!.email)
-            .orderBy("year", Query.Direction.DESCENDING)
-            .orderBy("month", Query.Direction.DESCENDING)
-            .orderBy("day", Query.Direction.DESCENDING).orderBy("type")
-            .orderBy("price", Query.Direction.DESCENDING)
-            .get().addOnSuccessListener { queryDocumentSnapshots ->
-                for ((position, document) in queryDocumentSnapshots.withIndex()) {
-                    val purchase = document.toObject(Purchase::class.java)
-                    PURCHASE_ID_LIST.add(position, document.id)
-                    PURCHASE_LIST.add(position, purchase)
-                }
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! " + e.localizedMessage)
-            }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

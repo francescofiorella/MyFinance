@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/receipt_layout"
-    tools:context=".ui.home.ReceiptActivity">
+    tools:context=".ui.home.list.receipt.ReceiptActivity">
 
     <!--Toolbar-->
     <com.google.android.material.appbar.AppBarLayout
