@@ -17,14 +17,9 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.kodein
 import org.kodein.di.generic.instance
 
-
 class MenuFragment : Fragment(), AuthListener, KodeinAware {
 
     private lateinit var viewModel: MenuViewModel
-
-    companion object {
-        private val TAG = MenuFragment::class.java.simpleName
-    }
 
     override val kodein by kodein()
     private val factory: MenuViewModelFactory by instance()

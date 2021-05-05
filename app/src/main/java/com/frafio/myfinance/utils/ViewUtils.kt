@@ -1,5 +1,6 @@
 package com.frafio.myfinance.utils
 
+import android.annotation.SuppressLint
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat

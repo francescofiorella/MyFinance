@@ -41,7 +41,6 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
 
     companion object {
         private const val RC_SIGN_IN = 101
-        private val TAG = LoginActivity::class.java.simpleName
     }
 
     override val kodein by kodein()

@@ -12,7 +12,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.ActivitySignupBinding
-import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.snackbar
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -32,10 +31,6 @@ class SignupActivity : AppCompatActivity(), AuthListener, KodeinAware {
     private lateinit var mPasswordLayout:TextInputLayout
     private lateinit var mPasswordConfirmLayout:TextInputLayout
     private lateinit var mProgressIndicator: LinearProgressIndicator
-
-    companion object {
-        private val TAG = HomeActivity::class.java.simpleName
-    }
 
     override val kodein by kodein()
     private val factory: AuthViewModelFactory by instance()

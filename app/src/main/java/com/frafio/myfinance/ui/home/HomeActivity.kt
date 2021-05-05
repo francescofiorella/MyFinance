@@ -2,18 +2,13 @@ package com.frafio.myfinance.ui.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.Purchase
@@ -24,8 +19,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 
 class HomeActivity : AppCompatActivity() {
 
@@ -41,7 +34,6 @@ class HomeActivity : AppCompatActivity() {
     companion object {
         var PURCHASE_LIST = mutableListOf<Purchase>()
         var PURCHASE_ID_LIST = mutableListOf<String>()
-        private val TAG = HomeActivity::class.java.simpleName
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

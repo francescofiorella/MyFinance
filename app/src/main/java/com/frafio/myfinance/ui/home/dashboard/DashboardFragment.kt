@@ -36,10 +36,6 @@ class DashboardFragment : Fragment() {
     var trenTot = 0
     var amTot = 0
 
-    companion object {
-        private val TAG = DashboardFragment::class.java.simpleName
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
