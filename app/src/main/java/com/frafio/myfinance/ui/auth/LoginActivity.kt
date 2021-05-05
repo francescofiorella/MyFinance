@@ -26,7 +26,7 @@ import org.kodein.di.generic.instance
 class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
 
     // definizione variabili
-    lateinit var layout: RelativeLayout
+    private lateinit var layout: RelativeLayout
 
     private lateinit var mToolbar: MaterialToolbar
     private lateinit var mEmailLayout: TextInputLayout
@@ -45,7 +45,6 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
     }
 
     override val kodein by kodein()
-
     private val factory: AuthViewModelFactory by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {

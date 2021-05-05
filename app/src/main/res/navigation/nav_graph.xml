@@ -2,6 +2,27 @@
 <navigation
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph">
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/dashboardFragment">
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.frafio.myfinance.ui.home.dashboard.DashboardFragment"
+        android:label="@string/nav_1" />
+
+    <fragment
+        android:id="@+id/listFragment"
+        android:name="com.frafio.myfinance.ui.home.list.ListFragment"
+        android:label="@string/nav_2_extended" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.frafio.myfinance.ui.home.profile.ProfileFragment"
+        android:label="@string/nav_3" />
+
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="com.frafio.myfinance.ui.home.menu.MenuFragment"
+        android:label="@string/nav_4" />
 
 </navigation>

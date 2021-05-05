@@ -4,6 +4,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.frafio.myfinance.data.models.User
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -131,5 +132,14 @@ class UserRepository {
             }
 
         return response
+    }
+
+    fun getUser() : User? {
+        val fUser = FirebaseAuth.getInstance().currentUser
+        return if (fUser != null) {
+            User(fUser.displayName, fUser.email, fUser.photoUrl?.toString())
+        } else {
+            null
+        }
     }
 }

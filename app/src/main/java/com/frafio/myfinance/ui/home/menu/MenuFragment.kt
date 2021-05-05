@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.fragments
+package com.frafio.myfinance.ui.home.menu
 
 import android.content.Intent
 import android.os.Bundle
@@ -31,7 +31,7 @@ class MenuFragment : Fragment() {
         mLogoutBtn.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
             startActivity(Intent(context, LoginActivity::class.java))
-            activity!!.finish()
+            requireActivity().finish()
         }
 
         mAppVersionTV.text = "MyFinance ${BuildConfig.VERSION_NAME}"

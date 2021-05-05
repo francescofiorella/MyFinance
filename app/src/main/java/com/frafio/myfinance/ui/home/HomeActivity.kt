@@ -1,29 +1,28 @@
 package com.frafio.myfinance.ui.home
 
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
-import com.frafio.myfinance.ui.fragments.DashboardFragment
-import com.frafio.myfinance.ui.fragments.ListFragment
-import com.frafio.myfinance.ui.fragments.MenuFragment
-import com.frafio.myfinance.ui.fragments.ProfileFragment
 import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.ui.store.AddActivity
+import com.frafio.myfinance.utils.snackbar
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -31,31 +30,24 @@ import com.google.firebase.firestore.Query
 class HomeActivity : AppCompatActivity() {
 
     // definizione variabili
-    lateinit var layout: CoordinatorLayout
-    var nunito: Typeface? = null
+    private lateinit var layout: CoordinatorLayout
 
-    lateinit var mToolbar: MaterialToolbar
-    lateinit var mFragmentTitle: TextView
-    lateinit var mBottomNavigationView: BottomNavigationView
-    lateinit var mAddBtn: FloatingActionButton
+    private lateinit var mToolbar: MaterialToolbar
+    private lateinit var mFragmentTitle: TextView
+    private lateinit var mBottomNavigationView: BottomNavigationView
+    private lateinit var mAddBtn: FloatingActionButton
 
     private lateinit var fAuth: FirebaseAuth
-
-    // 1 home, 2 list, 3 profile, 4 settings
-    var currentFragment = 0
 
     companion object {
         var PURCHASE_LIST = mutableListOf<Purchase>()
         var PURCHASE_ID_LIST = mutableListOf<String>()
-        private val KEY_FRAGMENT = "com.frafio.myfinance.SAVE_FRAGMENT"
         private val TAG = HomeActivity::class.java.simpleName
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-
-        nunito = ResourcesCompat.getFont(applicationContext, R.font.nunito)
 
         // toolbar
         mToolbar = findViewById(R.id.home_toolbar)
@@ -67,84 +59,48 @@ class HomeActivity : AppCompatActivity() {
         mBottomNavigationView = findViewById(R.id.home_bottomNavView)
         mAddBtn = findViewById(R.id.home_addBtn)
 
-        if (savedInstanceState != null) {
-            currentFragment = savedInstanceState.getInt(KEY_FRAGMENT)
-        } else {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
+        val navController = navHostFragment.navController
+        val appBarConfiguration = AppBarConfiguration(setOf(
+            R.id.dashboardFragment, R.id.listFragment, R.id.profileFragment, R.id.menuFragment))
+
+        mBottomNavigationView.setupWithNavController(navController)
+        setupActionBarWithNavController(navController, appBarConfiguration)
+
+        if (savedInstanceState == null) {
             // controlla se si è appena fatto l'accesso
             fAuth = FirebaseAuth.getInstance()
             if (intent.hasExtra("com.frafio.myfinance.userRequest")) {
                 val userRequest = intent.extras?.getBoolean("com.frafio.myfinance.userRequest", false) ?: false
                 if (userRequest) {
-                    showSnackbar("Hai effettuato l'accesso come " + fAuth.currentUser?.displayName)
+                    layout.snackbar("Hai effettuato l'accesso come " + fAuth.currentUser?.displayName, mAddBtn)
                 }
             }
 
             // aggiorna i dati dell'utente
             updateList()
         }
-
-        // imposta la bottomNavView
-        mBottomNavigationView.setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.dashboard -> setFragment(1)
-                R.id.list -> setFragment(2)
-                R.id.profile -> setFragment(3)
-                R.id.menu -> setFragment(4)
-            }
-            true
-        }
-
-        mAddBtn.setOnClickListener {
-            val activityOptionsCompat = ActivityOptionsCompat.makeClipRevealAnimation(
-                mAddBtn, 0, 0,
-                mAddBtn.measuredWidth, mAddBtn.measuredHeight
-            )
-            val intent = Intent(applicationContext, AddActivity::class.java)
-            intent.putExtra("com.frafio.myfinance.REQUESTCODE", 1)
-            startActivityForResult(intent, 1, activityOptionsCompat.toBundle())
-        }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt(KEY_FRAGMENT, currentFragment)
+    override fun onSupportNavigateUp(): Boolean {
+        return NavigationUI.navigateUp(
+            (supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment).navController,
+            AppBarConfiguration(setOf(R.id.dashboardFragment, R.id.listFragment, R.id.profileFragment, R.id.menuFragment))
+        )
     }
 
-    // metodo per cambiare fragment (senza influenzare la bottomNavView)
-    private fun setFragment(num: Int) {
-        if (currentFragment != num) {
-            var mFragmentToSet: Fragment? = null
-            when (num) {
-                1 -> {
-                    mFragmentTitle.text = getString(R.string.nav_1)
-                    mFragmentToSet = DashboardFragment()
-                }
-                2 -> {
-                    mFragmentTitle.text = getString(R.string.nav_2_extended)
-                    mFragmentToSet = ListFragment()
-                }
-                3 -> {
-                    mFragmentTitle.text = getString(R.string.nav_3)
-                    mFragmentToSet = ProfileFragment()
-                }
-                4 -> {
-                    mFragmentTitle.text = getString(R.string.nav_4)
-                    mFragmentToSet = MenuFragment()
-                }
-            }
-            supportFragmentManager.beginTransaction()
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                .replace(R.id.home_fragmentContainerView, mFragmentToSet!!).commit()
-            currentFragment = num
-        } else if (currentFragment == 2) {
-            val fragment: ListFragment? =
-                supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as ListFragment?
-            fragment?.scrollListToTop()
-        }
+    fun onAddButtonClick(view: View) {
+        val activityOptionsCompat = ActivityOptionsCompat.makeClipRevealAnimation(
+            mAddBtn, 0, 0,
+            mAddBtn.measuredWidth, mAddBtn.measuredHeight
+        )
+        val intent = Intent(applicationContext, AddActivity::class.java)
+        intent.putExtra("com.frafio.myfinance.REQUESTCODE", 1)
+        startActivityForResult(intent, 1, activityOptionsCompat.toBundle())
     }
 
     // metodo per aggiornare i progressi dell'utente
-    fun updateList() {
+    private fun updateList() {
         PURCHASE_LIST = mutableListOf()
         PURCHASE_ID_LIST = mutableListOf()
         val fStore = FirebaseFirestore.getInstance()
@@ -159,9 +115,6 @@ class HomeActivity : AppCompatActivity() {
                     PURCHASE_ID_LIST.add(position, document.id)
                     PURCHASE_LIST.add(position, purchase)
                 }
-                if (currentFragment == 0) {
-                    setFragment(1)
-                }
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! " + e.localizedMessage)
             }
@@ -173,42 +126,20 @@ class HomeActivity : AppCompatActivity() {
             val purchaseRequest =
                 data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
             if (purchaseRequest) {
-                if (currentFragment == 2) {
-                    val fragment =
-                        supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as ListFragment?
-                    fragment?.loadPurchasesList()
-                } else {
-                    mBottomNavigationView.selectedItemId = R.id.list
-                }
-                showSnackbar("Acquisto aggiunto!")
+                mBottomNavigationView.selectedItemId = R.id.listFragment
+                layout.snackbar("Acquisto aggiunto!", mAddBtn)
             }
         } else if (requestCode == 2 && resultCode == RESULT_OK) {
             val editRequest = data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
             if (editRequest) {
                 val fragment = supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as ListFragment?
                 fragment?.loadPurchasesList()
-                showSnackbar("Acquisto modificato!")
+                layout.snackbar("Acquisto modificato!", mAddBtn)
             }
         }
     }
 
-    // onBackPressed
-    override fun onBackPressed() {
-        if (currentFragment != 1) {
-            mBottomNavigationView.selectedItemId = R.id.dashboard
-        } else {
-            super.onBackPressed()
-        }
-    }
-
-    // snackbar
-    fun showSnackbar(string: String) {
-        val snackbar = Snackbar.make(layout, string, BaseTransientBottomBar.LENGTH_SHORT)
-            .setAnchorView(mAddBtn)
-            .setBackgroundTint(ContextCompat.getColor(applicationContext, R.color.snackbar_bg))
-            .setTextColor(ContextCompat.getColor(applicationContext, R.color.inverted_primary_text))
-        val tv = snackbar.view.findViewById<TextView>(R.id.snackbar_text)
-        tv.typeface = nunito
-        snackbar.show()
+    fun showSnackbar(message: String) {
+        layout.snackbar(message, mAddBtn)
     }
 }

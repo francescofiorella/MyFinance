@@ -24,21 +24,20 @@ import org.kodein.di.generic.instance
 class SignupActivity : AppCompatActivity(), AuthListener, KodeinAware {
 
     // definizione variabili
-    lateinit var layout: RelativeLayout
+    private lateinit var layout: RelativeLayout
 
-    lateinit var mToolbar: MaterialToolbar
-    lateinit var mFullNameLayout: TextInputLayout
-    lateinit var mEmailLayout:TextInputLayout
-    lateinit var mPasswordLayout:TextInputLayout
-    lateinit var mPasswordConfirmLayout:TextInputLayout
-    lateinit var mProgressIndicator: LinearProgressIndicator
+    private lateinit var mToolbar: MaterialToolbar
+    private lateinit var mFullNameLayout: TextInputLayout
+    private lateinit var mEmailLayout:TextInputLayout
+    private lateinit var mPasswordLayout:TextInputLayout
+    private lateinit var mPasswordConfirmLayout:TextInputLayout
+    private lateinit var mProgressIndicator: LinearProgressIndicator
 
     companion object {
         private val TAG = HomeActivity::class.java.simpleName
     }
 
     override val kodein by kodein()
-
     private val factory: AuthViewModelFactory by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -54,8 +54,8 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="56dp"
             android:layout_below="@id/home_divider"
-            app:navGraph="@navigation/nav_graph"
-            app:defaultNavHost="true"/>
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/nav_graph" />
 
     </RelativeLayout>
 
@@ -84,6 +84,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/home_addBtn"
+        android:onClick="onAddButtonClick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:tint="@color/white"
