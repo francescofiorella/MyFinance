@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.models.User
+import com.frafio.myfinance.ui.home.HomeActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -26,23 +27,17 @@ class UserRepository {
             Log.e(TAG, "Error! ${e.localizedMessage}")
             when (e) {
                 is FirebaseAuthInvalidCredentialsException -> {
-                    val errorCode = e.errorCode
-                    if (errorCode == "ERROR_INVALID_EMAIL") {
-                        response.value = 2
-                    } else if (errorCode == "ERROR_WRONG_PASSWORD") {
-                        response.value = 3
-                    } else {
-                        response.value = "Accesso fallito!"
+                    when (e.errorCode) {
+                        "ERROR_INVALID_EMAIL" -> response.value = 2
+                        "ERROR_WRONG_PASSWORD" -> response.value = 3
+                        else -> response.value = "Accesso fallito!"
                     }
                 }
                 is FirebaseAuthInvalidUserException -> {
-                    val errorCode = e.errorCode
-                    if (errorCode == "ERROR_USER_NOT_FOUND") {
-                        response.value = 4
-                    } else if (errorCode == "ERROR_USER_DISABLED") {
-                        response.value = "Il tuo account è stato disabilitato!"
-                    } else {
-                        response.value = "Accesso fallito!"
+                    when (e.errorCode) {
+                        "ERROR_USER_NOT_FOUND" -> response.value = 4
+                        "ERROR_USER_DISABLED" -> response.value = "Il tuo account è stato disabilitato!"
+                        else -> response.value = "Accesso fallito!"
                     }
                 }
                 else -> {
@@ -145,6 +140,10 @@ class UserRepository {
 
     fun userLogout() : LiveData<Any> {
         FirebaseAuth.getInstance().signOut()
+
+        HomeActivity.PURCHASE_LIST = mutableListOf()
+        HomeActivity.PURCHASE_ID_LIST = mutableListOf()
+
         val response = MutableLiveData<Any>()
         response.value = 1
         return (response)

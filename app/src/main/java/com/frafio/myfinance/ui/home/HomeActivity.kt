@@ -56,10 +56,10 @@ class HomeActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             // controlla se si è appena fatto l'accesso
-            fAuth = FirebaseAuth.getInstance()
             if (intent.hasExtra("com.frafio.myfinance.userRequest")) {
                 val userRequest = intent.extras?.getBoolean("com.frafio.myfinance.userRequest", false) ?: false
                 if (userRequest) {
+                    fAuth = FirebaseAuth.getInstance()
                     layout.snackbar("Hai effettuato l'accesso come " + fAuth.currentUser?.displayName, mAddBtn)
                 }
             }

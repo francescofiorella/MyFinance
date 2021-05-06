@@ -1,8 +1,10 @@
 package com.frafio.myfinance
 
 import android.app.Application
+import com.frafio.myfinance.data.repositories.DataRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.ui.auth.AuthViewModelFactory
+import com.frafio.myfinance.ui.home.dashboard.DashboardViewModelFactory
 import com.frafio.myfinance.ui.home.menu.MenuViewModelFactory
 import com.frafio.myfinance.ui.home.profile.ProfileViewModelFactory
 import org.kodein.di.Kodein
@@ -19,7 +21,9 @@ class MyFinanceApplication : Application(), KodeinAware {
         import(androidXModule(this@MyFinanceApplication))
 
         bind() from singleton { UserRepository() }
+        bind() from singleton { DataRepository() }
         bind() from provider { AuthViewModelFactory(instance()) }
+        bind() from provider { DashboardViewModelFactory(instance()) }
         bind() from provider { ProfileViewModelFactory(instance()) }
         bind() from provider { MenuViewModelFactory(instance()) }
     }

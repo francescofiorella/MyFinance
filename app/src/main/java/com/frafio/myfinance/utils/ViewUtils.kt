@@ -20,6 +20,7 @@ fun View.snackbar(message: String) {
     snackbar.show()
 }
 
+@SuppressLint("ShowToast")
 fun View.snackbar(message: String, anchor: View) {
     val nunito = ResourcesCompat.getFont(context, R.font.nunito)
 

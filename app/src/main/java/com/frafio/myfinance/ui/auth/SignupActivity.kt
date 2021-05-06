@@ -8,7 +8,6 @@ import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.ActivitySignupBinding
@@ -73,7 +72,7 @@ class SignupActivity : AppCompatActivity(), AuthListener, KodeinAware {
     }
 
     override fun onAuthSuccess(response: LiveData<Any>) {
-        response.observe(this, Observer { responseData ->
+        response.observe(this, { responseData ->
             mProgressIndicator.hide()
 
             when (responseData) {
