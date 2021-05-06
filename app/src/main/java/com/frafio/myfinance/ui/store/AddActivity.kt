@@ -35,7 +35,7 @@ import java.text.NumberFormat
 import java.time.LocalDate
 import java.util.*
 
-class AddActivity : AppCompatActivity(), StoreListener {
+class AddActivity : AppCompatActivity() {
 
     lateinit var layout: RelativeLayout
 
@@ -84,8 +84,6 @@ class AddActivity : AppCompatActivity(), StoreListener {
         val binding: ActivityAddBinding = DataBindingUtil.setContentView(this, R.layout.activity_add)
         viewModel = ViewModelProvider(this).get(StoreViewModel::class.java)
         binding.viewmodel = viewModel
-
-        viewModel.storeListener = this
 
         // toolbar
         mToolbar = findViewById(R.id.add_toolbar)
@@ -485,18 +483,6 @@ class AddActivity : AppCompatActivity(), StoreListener {
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
             }
-    }
-
-    override fun onStoreStarted() {
-        TODO("Not yet implemented")
-    }
-
-    override fun onStoreSuccess(response: LiveData<Any>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onStoreFailure(errorCode: Int) {
-        TODO("Not yet implemented")
     }
 
     // ends this activity (back arrow)
