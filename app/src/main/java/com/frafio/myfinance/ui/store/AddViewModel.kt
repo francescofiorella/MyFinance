@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.CompoundButton
 import androidx.lifecycle.ViewModel
 
-class StoreViewModel : ViewModel() {
+class AddViewModel : ViewModel() {
 
     var nome: String? = null
     var costoString: String? = null

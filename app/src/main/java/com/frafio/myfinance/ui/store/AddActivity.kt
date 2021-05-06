@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_ID_LIST
 import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_LIST
@@ -72,7 +71,7 @@ class AddActivity : AppCompatActivity() {
     // firebase
     private lateinit var fAuth: FirebaseAuth
 
-    private lateinit var viewModel: StoreViewModel
+    private lateinit var viewModel: AddViewModel
 
     companion object {
         private val TAG = AddActivity::class.java.simpleName
@@ -82,7 +81,7 @@ class AddActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val binding: ActivityAddBinding = DataBindingUtil.setContentView(this, R.layout.activity_add)
-        viewModel = ViewModelProvider(this).get(StoreViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
         binding.viewmodel = viewModel
 
         // toolbar

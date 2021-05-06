@@ -8,7 +8,7 @@
 
         <variable
             name="viewmodel"
-            type="com.frafio.myfinance.ui.store.StoreViewModel" />
+            type="com.frafio.myfinance.ui.store.AddViewModel" />
 
     </data>
 
