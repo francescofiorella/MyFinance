@@ -33,7 +33,6 @@ class SplashScreenActivity : AppCompatActivity() {
         val fAuth = FirebaseAuth.getInstance()
 
         if (fAuth.currentUser != null) {
-            HomeActivity::class.java
             // metodo per aggiornare i progressi dell'utente
             HomeActivity.PURCHASE_LIST = mutableListOf()
             HomeActivity.PURCHASE_ID_LIST = mutableListOf()
