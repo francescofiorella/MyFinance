@@ -4,8 +4,8 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.models.User
-import com.frafio.myfinance.ui.home.HomeActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -141,8 +141,7 @@ class UserRepository {
     fun userLogout() : LiveData<Any> {
         FirebaseAuth.getInstance().signOut()
 
-        HomeActivity.PURCHASE_LIST = mutableListOf()
-        HomeActivity.PURCHASE_ID_LIST = mutableListOf()
+        PurchaseManager.resetPurchaseList()
 
         val response = MutableLiveData<Any>()
         response.value = 1

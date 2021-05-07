@@ -11,7 +11,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.ui.store.AddActivity
 import com.frafio.myfinance.utils.snackbar
@@ -30,11 +29,6 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var mAddBtn: FloatingActionButton
 
     private lateinit var fAuth: FirebaseAuth
-
-    companion object {
-        var PURCHASE_LIST = mutableListOf<Purchase>()
-        var PURCHASE_ID_LIST = mutableListOf<String>()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

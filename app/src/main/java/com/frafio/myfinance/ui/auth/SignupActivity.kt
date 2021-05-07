@@ -10,6 +10,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.manager.ManagerListener
+import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.databinding.ActivitySignupBinding
 import com.frafio.myfinance.utils.snackbar
 import com.google.android.material.appbar.MaterialToolbar
@@ -19,7 +21,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-class SignupActivity : AppCompatActivity(), AuthListener, KodeinAware {
+class SignupActivity : AppCompatActivity(), AuthListener, ManagerListener, KodeinAware {
 
     // definizione variabili
     private lateinit var layout: RelativeLayout
@@ -42,6 +44,7 @@ class SignupActivity : AppCompatActivity(), AuthListener, KodeinAware {
         binding.viewmodel = viewModel
 
         viewModel.authListener = this
+        PurchaseManager.managerListener = this
 
         // toolbar
         mToolbar = findViewById(R.id.signup_toolbar)
@@ -73,14 +76,12 @@ class SignupActivity : AppCompatActivity(), AuthListener, KodeinAware {
 
     override fun onAuthSuccess(response: LiveData<Any>) {
         response.observe(this, { responseData ->
-            mProgressIndicator.hide()
+            if (responseData != 1) {
+                mProgressIndicator.hide()
+            }
 
             when (responseData) {
-                1 -> {
-                    val returnIntent = Intent()
-                    setResult(RESULT_OK, returnIntent)
-                    finish()
-                }
+                1 -> PurchaseManager.updatePurchaseList()
                 2 -> mPasswordConfirmLayout.error = "Le password inserite non corrispondono!"
                 3 -> mEmailLayout.error = "L'email inserita non è ben formata."
                 4 -> mEmailLayout.error = "L'email inserita ha già un account associato."
@@ -100,6 +101,18 @@ class SignupActivity : AppCompatActivity(), AuthListener, KodeinAware {
             5 -> mPasswordConfirmLayout.error = "Inserisci nuovamente la password."
             6 -> mPasswordConfirmLayout.error = "Le password inserite non corrispondono!"
         }
+    }
+
+    override fun onManagerSuccess() {
+        mProgressIndicator.hide()
+        val returnIntent = Intent()
+        setResult(RESULT_OK, returnIntent)
+        finish()
+    }
+
+    override fun onManagerFailure(message: String) {
+        mProgressIndicator.hide()
+        layout.snackbar(message)
     }
 
     fun goToLoginActivity(view: View) {

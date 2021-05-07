@@ -1,7 +1,7 @@
 package com.frafio.myfinance.data.repositories
 
 import android.view.View
-import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.data.manager.PurchaseManager
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.LocalDate
@@ -24,7 +24,8 @@ class DataRepository {
         var lastMonth = 0
         var lastYear = 0
 
-        HomeActivity.PURCHASE_LIST.forEach { purchase ->
+        PurchaseManager.getPurchaseList().forEach { purchasePair ->
+            val purchase = purchasePair.second
             // totale biglietti Amtab
             if (purchase.name == "Biglietto Amtab") {
                 amTot++
@@ -89,7 +90,7 @@ class DataRepository {
     }
 
     fun dashboardWarningVisibility() : Int {
-        return if (HomeActivity.PURCHASE_LIST.isEmpty()) {
+        return if (PurchaseManager.getPurchaseList().isEmpty()) {
             View.VISIBLE
         } else {
             View.GONE
@@ -97,7 +98,8 @@ class DataRepository {
     }
 
     fun dashboardStatsVisibility() : Int {
-        return if (HomeActivity.PURCHASE_LIST.isEmpty()) {View.GONE
+        return if (PurchaseManager.getPurchaseList().isEmpty()) {
+            View.GONE
         } else {
             View.VISIBLE
         }

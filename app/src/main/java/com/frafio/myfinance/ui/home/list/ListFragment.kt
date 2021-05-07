@@ -15,10 +15,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.ui.store.AddActivity
-import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_ID_LIST
-import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_LIST
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.manager.PurchaseManager
+import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore
@@ -42,7 +41,7 @@ class ListFragment : Fragment() {
         mRecyclerView = view.findViewById(R.id.list_recyclerView)
         mWarningTV = view.findViewById(R.id.list_warningTV)
 
-        if (PURCHASE_LIST.isEmpty()) {
+        if (PurchaseManager.getPurchaseList().isEmpty()) {
             mWarningTV.visibility = View.VISIBLE
             mRecyclerView.visibility = View.GONE
         } else {
@@ -56,7 +55,7 @@ class ListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (PURCHASE_LIST.isEmpty()) {
+        if (PurchaseManager.getPurchaseList().isEmpty()) {
             mWarningTV.visibility = View.VISIBLE
             mRecyclerView.visibility = View.GONE
         } else {
@@ -79,68 +78,70 @@ class ListFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: PurchaseViewHolder, position: Int) {
+            val currentPurchase = PurchaseManager.getPurchaseList()[position].second
+            val currentPurchaseID = PurchaseManager.getPurchaseList()[position].first
             val locale = Locale("en", "UK")
             val nf = NumberFormat.getInstance(locale)
             val formatter = nf as DecimalFormat
             formatter.applyPattern("###,###,##0.00")
-            val priceString = "€ " + formatter.format(HomeActivity.PURCHASE_LIST[position].price)
+            val priceString = "€ " + formatter.format(currentPurchase.price)
             holder.prezzoTV?.text = priceString
 
-            if (PURCHASE_LIST[position].type == 0) {
+            if (currentPurchase.type == 0) {
                 holder.itemLayout?.setOnClickListener(null)
-                holder.nomeTV?.text = PURCHASE_LIST[position].name
+                holder.nomeTV?.text = currentPurchase.name
                 holder.nomeTV?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
                 holder.dataLayout?.visibility = View.VISIBLE
 
-                val dayString: String = if (PURCHASE_LIST[position].day!! < 10) {
-                    "0${PURCHASE_LIST[position].day}"
+                val dayString: String = if (currentPurchase.day!! < 10) {
+                    "0${currentPurchase.day}"
                 } else {
-                    PURCHASE_LIST[position].day.toString()
+                    currentPurchase.day.toString()
                 }
-                val monthString: String = if (PURCHASE_LIST[position].month!! < 10) {
-                    "0${PURCHASE_LIST[position].month}"
+                val monthString: String = if (currentPurchase.month!! < 10) {
+                    "0${currentPurchase.month}"
                 } else {
-                    PURCHASE_LIST[position].month.toString()
+                    currentPurchase.month.toString()
                 }
 
-                holder.dataTV?.text = "$dayString/$monthString/${PURCHASE_LIST[position].year}"
-            } else if (PURCHASE_LIST[position].type == 1) {
-                holder.nomeTV?.text = "   ${PURCHASE_LIST[position].name}"
+                holder.dataTV?.text = "$dayString/$monthString/${currentPurchase.year}"
+            } else if (currentPurchase.type == 1) {
+                holder.nomeTV?.text = "   ${currentPurchase.name}"
                 holder.nomeTV?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                 holder.dataLayout?.visibility = View.GONE
 
                 holder.itemLayout?.setOnClickListener {
                     val intent = Intent(context, ReceiptActivity::class.java)
-                    intent.putExtra("com.frafio.myfinance.purchaseID", PURCHASE_ID_LIST[position])
-                    intent.putExtra("com.frafio.myfinance.purchaseName", PURCHASE_LIST[position].name)
+                    intent.putExtra("com.frafio.myfinance.purchaseID", currentPurchaseID)
+                    intent.putExtra("com.frafio.myfinance.purchaseName", currentPurchase.name)
                     intent.putExtra("com.frafio.myfinance.purchasePrice", priceString)
                     activity?.startActivity(intent)
                 }
             } else {
                 holder.itemLayout?.setOnClickListener(null)
-                holder.nomeTV?.text = "   ${PURCHASE_LIST[position].name}"
+                holder.nomeTV?.text = "   ${currentPurchase.name}"
                 holder.nomeTV?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                 holder.dataLayout?.visibility = View.GONE
             }
 
-            if (!(PURCHASE_LIST[position].name == "Totale" && PURCHASE_LIST[position].price != 0.0)) {
+            if (!(currentPurchase.name == "Totale" && currentPurchase.price != 0.0)) {
                 holder.itemLayout?.isEnabled = true
                 holder.itemLayout?.setOnLongClickListener {
                     val builder = MaterialAlertDialogBuilder(context!!, R.style.ThemeOverlay_MyFinance_AlertDialog)
-                    builder.setTitle(PURCHASE_LIST[position].name)
-                    if (!(PURCHASE_LIST[position].name == "Totale" && PURCHASE_LIST[position].price == 0.0)) {
+                    builder.setTitle(currentPurchase.name)
+                    if (!(currentPurchase.name == "Totale" && currentPurchase.price == 0.0)) {
                         builder.setMessage("Vuoi modificare o eliminare l'acquisto selezionato?")
                         builder.setNegativeButton("Modifica") { dialog, which ->
                             val intent = Intent(context, AddActivity::class.java)
                             intent.putExtra("com.frafio.myfinance.REQUESTCODE", 2)
-                            intent.putExtra("com.frafio.myfinance.PURCHASE_ID", PURCHASE_ID_LIST[position])
-                            intent.putExtra("com.frafio.myfinance.PURCHASE_NAME", PURCHASE_LIST[position].name)
-                            intent.putExtra("com.frafio.myfinance.PURCHASE_PRICE", PURCHASE_LIST[position].price)
-                            intent.putExtra("com.frafio.myfinance.PURCHASE_TYPE", PURCHASE_LIST[position].type)
+                            intent.putExtra("com.frafio.myfinance.PURCHASE_ID", currentPurchaseID)
+                            intent.putExtra("com.frafio.myfinance.PURCHASE_NAME", currentPurchase.name)
+                            intent.putExtra("com.frafio.myfinance.PURCHASE_PRICE", currentPurchase.price)
+                            intent.putExtra("com.frafio.myfinance.PURCHASE_TYPE", currentPurchase.type)
                             intent.putExtra("com.frafio.myfinance.PURCHASE_POSITION", position)
-                            intent.putExtra("com.frafio.myfinance.PURCHASE_YEAR", PURCHASE_LIST[position].year)
-                            intent.putExtra("com.frafio.myfinance.PURCHASE_MONTH", PURCHASE_LIST[position].month)
-                            intent.putExtra("com.frafio.myfinance.PURCHASE_DAY", PURCHASE_LIST[position].day)
+                            intent.putExtra("com.frafio.myfinance.PURCHASE_YEAR", currentPurchase.year)
+                            intent.putExtra("com.frafio.myfinance.PURCHASE_MONTH", currentPurchase.month)
+                            intent.putExtra("com.frafio.myfinance.PURCHASE_DAY", currentPurchase.day)
                             activity?.startActivityForResult(intent, 2)
                         }
                     } else {
@@ -148,31 +149,36 @@ class ListFragment : Fragment() {
                     }
                     builder.setPositiveButton("Elimina") { dialog, which ->
                         val fStore = FirebaseFirestore.getInstance()
-                        fStore.collection("purchases").document(PURCHASE_ID_LIST[position]).delete().addOnSuccessListener {
-                                if (PURCHASE_LIST[position].name == "Totale") {
-                                    PURCHASE_ID_LIST.removeAt(position)
-                                    PURCHASE_LIST.removeAt(position)
+                        fStore.collection("purchases").document(currentPurchaseID).delete().addOnSuccessListener {
+                                if (currentPurchase.name == "Totale") {
+                                    PurchaseManager.removePurchaseAt(position)
+
                                     mRecyclerView.removeViewAt(position)
                                     mRecyclerView.adapter?.notifyItemRemoved(position)
-                                    mRecyclerView.adapter?.notifyItemRangeChanged(position, PURCHASE_LIST.size)
+                                    mRecyclerView.adapter?.notifyItemRangeChanged(position, PurchaseManager.getPurchaseList().size)
+
                                     (activity as HomeActivity).showSnackbar("Totale eliminato!")
-                                    if (PURCHASE_LIST.isEmpty()) {
+
+                                    if (PurchaseManager.getPurchaseList().isEmpty()) {
                                         mWarningTV.visibility = View.VISIBLE
                                         mRecyclerView.visibility = View.GONE
                                     }
-                                } else if (PURCHASE_LIST[position].type != 3) {
+                                } else if (currentPurchase.type != 3) {
                                     for (i in position - 1 downTo 0) {
-                                        if (PURCHASE_LIST[i].type == 0) {
+                                        if (PurchaseManager.getPurchaseAt(i)?.second?.type == 0) {
                                             totPosition = i
-                                            PURCHASE_LIST[totPosition].price = PURCHASE_LIST[totPosition].price!! - PURCHASE_LIST[position].price!!
-                                            PURCHASE_ID_LIST.removeAt(position)
-                                            PURCHASE_LIST.removeAt(position)
+                                            val newPurchase = PurchaseManager.getPurchaseAt(totPosition)!!.second
+                                            newPurchase.price = newPurchase.price?.minus(
+                                                PurchaseManager.getPurchaseAt(position)?.second?.price!!
+                                            )
+                                            PurchaseManager.updatePurchaseAt(totPosition, newPurchase)
+                                            PurchaseManager.removePurchaseAt(position)
                                             val fStore1 = FirebaseFirestore.getInstance()
-                                            fStore1.collection("purchases").document(PURCHASE_ID_LIST[i])
-                                                .set(PURCHASE_LIST[i]).addOnSuccessListener {
+                                            fStore1.collection("purchases").document(PurchaseManager.getPurchaseAt(i)!!.first)
+                                                .set(PurchaseManager.getPurchaseAt(i)!!.second).addOnSuccessListener {
                                                     mRecyclerView.removeViewAt(position)
                                                     mRecyclerView.adapter?.notifyItemRemoved(position)
-                                                    mRecyclerView.adapter?.notifyItemRangeChanged(position, HomeActivity.PURCHASE_LIST.size)
+                                                    mRecyclerView.adapter?.notifyItemRangeChanged(position, PurchaseManager.getPurchaseList().size)
                                                     mRecyclerView.adapter?.notifyItemChanged(totPosition)
                                                     (activity as HomeActivity).showSnackbar("Acquisto eliminato!")
                                                 }.addOnFailureListener { e ->
@@ -183,11 +189,10 @@ class ListFragment : Fragment() {
                                         }
                                     }
                                 } else {
-                                    PURCHASE_ID_LIST.removeAt(position)
-                                    PURCHASE_LIST.removeAt(position)
+                                    PurchaseManager.removePurchaseAt(position)
                                     mRecyclerView.removeViewAt(position)
                                     mRecyclerView.adapter?.notifyItemRemoved(position)
-                                    mRecyclerView.adapter?.notifyItemRangeChanged(position, PURCHASE_LIST.size)
+                                    mRecyclerView.adapter?.notifyItemRangeChanged(position, PurchaseManager.getPurchaseList().size)
                                     (activity as HomeActivity).showSnackbar("Acquisto eliminato!")
                                 }
                             }.addOnFailureListener { e ->
@@ -205,7 +210,7 @@ class ListFragment : Fragment() {
         }
 
         override fun getItemCount(): Int {
-            return PURCHASE_LIST.size
+            return PurchaseManager.getPurchaseList().size
         }
 
         class PurchaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

@@ -9,6 +9,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.manager.ManagerListener
+import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.snackbar
@@ -22,7 +24,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
+class LoginActivity : AppCompatActivity(), AuthListener, ManagerListener, KodeinAware {
 
     // definizione variabili
     private lateinit var layout: RelativeLayout
@@ -53,6 +55,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
         binding.viewmodel = viewModel
 
         viewModel.authListener = this
+        PurchaseManager.managerListener = this
 
         // toolbar
         mToolbar = findViewById(R.id.login_toolbar)
@@ -103,16 +106,12 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
 
     override fun onAuthSuccess(response: LiveData<Any>) {
         response.observe(this, { responseData ->
-            mProgressIndicator.hide()
+            if (responseData != 1) {
+                mProgressIndicator.hide()
+            }
 
             when (responseData) {
-                1 -> {
-                    Intent(applicationContext, HomeActivity::class.java).also {
-                        it.putExtra("com.frafio.myfinance.userRequest", true)
-                        it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(it)
-                    }
-                }
+                1 -> PurchaseManager.updatePurchaseList()
                 2 -> mEmailLayout.error = "L'email inserita non è ben formata."
                 3 -> mPasswordLayout.error = "La password inserita non è corretta."
                 4 -> mEmailLayout.error = "L'email inserita non ha un account associato."
@@ -129,6 +128,20 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
             2 -> mPasswordLayout.error = "Inserisci la password."
             3 -> mPasswordLayout.error = "La password deve essere lunga almeno 8 caratteri!"
         }
+    }
+
+    override fun onManagerSuccess() {
+        mProgressIndicator.hide()
+        Intent(applicationContext, HomeActivity::class.java).also {
+            it.putExtra("com.frafio.myfinance.userRequest", true)
+            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(it)
+        }
+    }
+
+    override fun onManagerFailure(message: String) {
+        mProgressIndicator.hide()
+        layout.snackbar(message)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

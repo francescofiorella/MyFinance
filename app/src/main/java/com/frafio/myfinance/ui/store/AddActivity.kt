@@ -16,9 +16,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_ID_LIST
-import com.frafio.myfinance.ui.home.HomeActivity.Companion.PURCHASE_LIST
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.manager.ManagerListener
+import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.utils.snackbar
@@ -34,7 +34,7 @@ import java.text.NumberFormat
 import java.time.LocalDate
 import java.util.*
 
-class AddActivity : AppCompatActivity() {
+class AddActivity : AppCompatActivity(), ManagerListener {
 
     lateinit var layout: RelativeLayout
 
@@ -83,6 +83,8 @@ class AddActivity : AppCompatActivity() {
         val binding: ActivityAddBinding = DataBindingUtil.setContentView(this, R.layout.activity_add)
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
         binding.viewmodel = viewModel
+
+        PurchaseManager.managerListener = this
 
         // toolbar
         mToolbar = findViewById(R.id.add_toolbar)
@@ -360,7 +362,7 @@ class AddActivity : AppCompatActivity() {
             val totID = "$year$month$day"
             fStore.collection("purchases").document(totID).set(purchase)
                 .addOnSuccessListener {
-                    updateAndGoToList(userEmail)
+                    PurchaseManager.updatePurchaseList()
                 }.addOnFailureListener { e ->
                     Log.e(TAG, "Error! ${e.localizedMessage}")
                     layout.snackbar("Totale non aggiunto!")
@@ -394,7 +396,8 @@ class AddActivity : AppCompatActivity() {
                         } else {
                             0.0
                         }
-                        for (item in PURCHASE_LIST) {
+                        for (pair in PurchaseManager.getPurchaseList()) {
+                            val item = pair.second
                             if (item.email == userEmail && item.type != 0
                                 && item.type != 3 && item.year == purchase.year
                                 && item.month == purchase.month && item.day == purchase.day) {
@@ -406,7 +409,7 @@ class AddActivity : AppCompatActivity() {
                         val totID = "$year$month$day"
                         fStore1.collection("purchases").document(totID).set(totalP)
                             .addOnSuccessListener {
-                                updateAndGoToList(userEmail)
+                                PurchaseManager.updatePurchaseList()
                             }
                             .addOnFailureListener { e ->
                                 Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -421,10 +424,11 @@ class AddActivity : AppCompatActivity() {
                 val fStore = FirebaseFirestore.getInstance()
                 fStore.collection("purchases").document(purchaseId).set(purchase)
                     .addOnSuccessListener {
-                        PURCHASE_LIST[purchasePosition] = purchase
+                        PurchaseManager.updatePurchaseAt(purchasePosition, purchase)
                         if (price != purchasePrice) {
                             var sum = 0.0
-                            for (item in PURCHASE_LIST) {
+                            for (pair in PurchaseManager.getPurchaseList()) {
+                                val item = pair.second
                                 if (item.email == userEmail && item.type != 0
                                     && item.type != 3 && item.year == purchase.year
                                     && item.month == purchase.month && item.day == purchase.day) {
@@ -436,7 +440,7 @@ class AddActivity : AppCompatActivity() {
                             val totID = "$year$month$day"
                             fStore1.collection("purchases").document(totID).set(totalP)
                                 .addOnSuccessListener {
-                                    updateAndGoToList(userEmail)
+                                    PurchaseManager.updatePurchaseList()
                                 }
                                 .addOnFailureListener { e ->
                                     Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -455,33 +459,6 @@ class AddActivity : AppCompatActivity() {
                     }
             }
         }
-    }
-
-    // metodo per aggiornare i progressi dell'utente
-    fun updateAndGoToList(userEmail: String) {
-        PURCHASE_LIST = mutableListOf()
-        PURCHASE_ID_LIST = mutableListOf()
-        val fStore = FirebaseFirestore.getInstance()
-        fStore.collection("purchases").whereEqualTo("email", userEmail)
-            .orderBy("year", Query.Direction.DESCENDING)
-            .orderBy("month", Query.Direction.DESCENDING)
-            .orderBy("day", Query.Direction.DESCENDING).orderBy("type")
-            .orderBy("price", Query.Direction.DESCENDING).get()
-            .addOnSuccessListener { queryDocumentSnapshots ->
-                for ((position, document) in queryDocumentSnapshots.withIndex()) {
-                    val purchase = document.toObject(Purchase::class.java)
-                    PURCHASE_ID_LIST.add(position, document.id)
-                    PURCHASE_LIST.add(position, purchase)
-                }
-
-                // torna alla home
-                val returnIntent = Intent()
-                returnIntent.putExtra("com.frafio.myfinance.purchaseRequest", true)
-                setResult(RESULT_OK, returnIntent)
-                finish()
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-            }
     }
 
     // ends this activity (back arrow)
@@ -565,5 +542,17 @@ class AddActivity : AppCompatActivity() {
             mAddBtn.text = "Modifica"
             mAddBtn.icon = ContextCompat.getDrawable(applicationContext, R.drawable.ic_create)
         }
+    }
+
+    override fun onManagerSuccess() {
+        // torna alla home
+        val returnIntent = Intent()
+        returnIntent.putExtra("com.frafio.myfinance.purchaseRequest", true)
+        setResult(RESULT_OK, returnIntent)
+        finish()
+    }
+
+    override fun onManagerFailure(message: String) {
+        layout.snackbar(message)
     }
 }
