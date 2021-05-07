@@ -1,7 +1,7 @@
 package com.frafio.myfinance
 
 import android.app.Application
-import com.frafio.myfinance.data.repositories.DataRepository
+import com.frafio.myfinance.data.repositories.StatsRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.ui.auth.AuthViewModelFactory
 import com.frafio.myfinance.ui.home.dashboard.DashboardViewModelFactory
@@ -21,7 +21,7 @@ class MyFinanceApplication : Application(), KodeinAware {
         import(androidXModule(this@MyFinanceApplication))
 
         bind() from singleton { UserRepository() }
-        bind() from singleton { DataRepository() }
+        bind() from singleton { StatsRepository() }
         bind() from provider { AuthViewModelFactory(instance()) }
         bind() from provider { DashboardViewModelFactory(instance()) }
         bind() from provider { MenuViewModelFactory(instance()) }

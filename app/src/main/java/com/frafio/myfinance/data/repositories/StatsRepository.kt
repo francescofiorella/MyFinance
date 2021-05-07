@@ -7,7 +7,7 @@ import java.text.NumberFormat
 import java.time.LocalDate
 import java.util.*
 
-class DataRepository {
+class StatsRepository {
 
     fun calculateStats() : List<String> {
         val dayAvg: Double

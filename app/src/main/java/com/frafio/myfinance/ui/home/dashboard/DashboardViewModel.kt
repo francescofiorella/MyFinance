@@ -1,12 +1,13 @@
 package com.frafio.myfinance.ui.home.dashboard
 
 import androidx.lifecycle.ViewModel
-import com.frafio.myfinance.data.repositories.DataRepository
+import com.frafio.myfinance.data.repositories.StatsRepository
 
 class DashboardViewModel(
-    repository: DataRepository
+    repository: StatsRepository
 ) : ViewModel() {
-    val stats = repository.calculateStats()
+    private val stats = repository.calculateStats()
+
     val dayAvgString = stats[0]
     val monthAvgString = stats[1]
     val todayTotString = stats[2]
