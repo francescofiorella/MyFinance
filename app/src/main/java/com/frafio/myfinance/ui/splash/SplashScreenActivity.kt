@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home
+package com.frafio.myfinance.ui.splash
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,18 +12,22 @@ import androidx.core.content.ContextCompat
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.manager.ManagerListener
 import com.frafio.myfinance.data.manager.PurchaseManager
+import com.frafio.myfinance.data.manager.UserManager
 import com.frafio.myfinance.ui.auth.LoginActivity
+import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.snackbar
 import com.google.firebase.auth.FirebaseAuth
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.kodein
+import org.kodein.di.generic.instance
 
 
-class SplashScreenActivity : AppCompatActivity(), ManagerListener {
+class SplashScreenActivity : AppCompatActivity(), ManagerListener, KodeinAware {
 
     lateinit var layout: ConstraintLayout
 
-    companion object {
-        private val TAG = SplashScreenActivity::class.java.simpleName
-    }
+    override val kodein by kodein()
+    private val fAuth: FirebaseAuth by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +40,8 @@ class SplashScreenActivity : AppCompatActivity(), ManagerListener {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = ContextCompat.getColor(applicationContext, R.color.icon_bg)
 
-        val fAuth = FirebaseAuth.getInstance()
-
         if (fAuth.currentUser != null) {
+            UserManager.updateUser(fAuth.currentUser!!)
             PurchaseManager.updatePurchaseList()
         } else {
             Handler(Looper.getMainLooper()).postDelayed({

@@ -39,7 +39,7 @@ class AuthViewModel(
         authListener?.onAuthSuccess(loginResponse)
     }
 
-    fun onResetButtotClick(view: View) {
+    fun onResetButtonClick(view: View) {
         authListener?.onAuthStarted()
 
         if (email.isNullOrEmpty()) {

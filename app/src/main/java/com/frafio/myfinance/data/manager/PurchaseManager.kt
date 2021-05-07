@@ -31,9 +31,11 @@ object PurchaseManager {
                     purchaseList.add(position, Pair(document.id, purchase))
                 }
                 managerListener?.onManagerSuccess()
+                fStore.terminate()
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
                 managerListener?.onManagerFailure("Error! ${e.localizedMessage}")
+                fStore.terminate()
             }
     }
 

@@ -6,7 +6,7 @@ import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.ui.auth.AuthViewModelFactory
 import com.frafio.myfinance.ui.home.dashboard.DashboardViewModelFactory
 import com.frafio.myfinance.ui.home.menu.MenuViewModelFactory
-import com.frafio.myfinance.ui.home.profile.ProfileViewModelFactory
+import com.google.firebase.auth.FirebaseAuth
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.androidXModule
@@ -24,7 +24,7 @@ class MyFinanceApplication : Application(), KodeinAware {
         bind() from singleton { DataRepository() }
         bind() from provider { AuthViewModelFactory(instance()) }
         bind() from provider { DashboardViewModelFactory(instance()) }
-        bind() from provider { ProfileViewModelFactory(instance()) }
         bind() from provider { MenuViewModelFactory(instance()) }
+        bind() from provider { FirebaseAuth.getInstance() }
     }
 }

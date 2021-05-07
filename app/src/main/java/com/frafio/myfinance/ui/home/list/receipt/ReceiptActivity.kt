@@ -13,7 +13,6 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,11 +20,10 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.ReceiptItem
+import com.frafio.myfinance.utils.snackbar
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -136,10 +134,10 @@ class ReceiptActivity : AppCompatActivity() {
                         fStore1.collection("purchases").document(purchaseID!!)
                             .collection("receipt").document(voceID).delete()
                             .addOnSuccessListener {
-                                showSnackbar("Voce eliminata!")
+                                layout.snackbar("Voce eliminata!", mNameET)
                             }.addOnFailureListener { e ->
                                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                                showSnackbar("Voce non eliminata!")
+                                layout.snackbar("Voce non eliminata!", mNameET)
                             }
                     }
                     builder.show()
@@ -186,12 +184,12 @@ class ReceiptActivity : AppCompatActivity() {
         val fStore = FirebaseFirestore.getInstance()
         fStore.collection("purchases").document(purchaseID!!).collection("receipt").add(item)
             .addOnSuccessListener {
-                showSnackbar("Voce aggiunta!")
+                layout.snackbar("Voce aggiunta!", mNameET)
                 mNameET.setText("")
                 mPriceET.setText("")
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                showSnackbar("Voce non aggiunta!")
+                layout.snackbar("Voce non aggiunta!", mNameET)
             }
     }
 
@@ -213,15 +211,5 @@ class ReceiptActivity : AppCompatActivity() {
             finish()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun showSnackbar(string: String) {
-        val snackbar = Snackbar.make(layout, string, BaseTransientBottomBar.LENGTH_SHORT)
-            .setAnchorView(mNameET)
-            .setBackgroundTint(ContextCompat.getColor(applicationContext, R.color.snackbar_bg))
-            .setTextColor(ContextCompat.getColor(applicationContext, R.color.inverted_primary_text))
-        val tv = snackbar.view.findViewById<TextView>(R.id.snackbar_text)
-        tv.typeface = nunito
-        snackbar.show()
     }
 }

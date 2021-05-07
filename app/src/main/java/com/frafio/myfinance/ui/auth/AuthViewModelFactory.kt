@@ -7,7 +7,7 @@ import com.frafio.myfinance.data.repositories.UserRepository
 @Suppress("UNCHECKED_CAST")
 class AuthViewModelFactory(
         private val repository: UserRepository
-) :ViewModelProvider.NewInstanceFactory() {
+) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return AuthViewModel(repository) as T
