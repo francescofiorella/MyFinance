@@ -9,7 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.manager.ManagerListener
+import com.frafio.myfinance.data.manager.FetchListener
 import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.home.HomeActivity
@@ -24,7 +24,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-class LoginActivity : AppCompatActivity(), AuthListener, ManagerListener, KodeinAware {
+class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAware {
 
     // definizione variabili
     private lateinit var layout: RelativeLayout
@@ -55,7 +55,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, ManagerListener, Kodein
         binding.viewmodel = viewModel
 
         viewModel.authListener = this
-        PurchaseManager.managerListener = this
+        PurchaseManager.fetchListener = this
 
         // toolbar
         mToolbar = findViewById(R.id.login_toolbar)
@@ -130,7 +130,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, ManagerListener, Kodein
         }
     }
 
-    override fun onManagerSuccess() {
+    override fun onFetchSuccess() {
         mProgressIndicator.hide()
         Intent(applicationContext, HomeActivity::class.java).also {
             it.putExtra("com.frafio.myfinance.userRequest", true)
@@ -139,7 +139,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, ManagerListener, Kodein
         }
     }
 
-    override fun onManagerFailure(message: String) {
+    override fun onFetchFailure(message: String) {
         mProgressIndicator.hide()
         layout.snackbar(message)
     }

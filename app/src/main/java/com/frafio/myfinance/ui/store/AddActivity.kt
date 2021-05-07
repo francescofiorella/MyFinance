@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.manager.ManagerListener
+import com.frafio.myfinance.data.manager.FetchListener
 import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.ActivityAddBinding
@@ -33,7 +33,7 @@ import java.text.NumberFormat
 import java.time.LocalDate
 import java.util.*
 
-class AddActivity : AppCompatActivity(), ManagerListener {
+class AddActivity : AppCompatActivity(), FetchListener {
 
     lateinit var layout: RelativeLayout
 
@@ -83,7 +83,7 @@ class AddActivity : AppCompatActivity(), ManagerListener {
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
         binding.viewmodel = viewModel
 
-        PurchaseManager.managerListener = this
+        PurchaseManager.fetchListener = this
 
         // toolbar
         mToolbar = findViewById(R.id.add_toolbar)
@@ -543,7 +543,7 @@ class AddActivity : AppCompatActivity(), ManagerListener {
         }
     }
 
-    override fun onManagerSuccess() {
+    override fun onFetchSuccess() {
         // torna alla home
         val returnIntent = Intent()
         returnIntent.putExtra("com.frafio.myfinance.purchaseRequest", true)
@@ -551,7 +551,7 @@ class AddActivity : AppCompatActivity(), ManagerListener {
         finish()
     }
 
-    override fun onManagerFailure(message: String) {
+    override fun onFetchFailure(message: String) {
         layout.snackbar(message)
     }
 }

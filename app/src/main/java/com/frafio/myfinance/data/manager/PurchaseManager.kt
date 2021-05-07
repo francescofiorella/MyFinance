@@ -8,7 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
 object PurchaseManager {
-    var managerListener: ManagerListener? = null
+    var fetchListener: FetchListener? = null
 
     private var purchaseList: MutableList<Pair<String, Purchase>> = mutableListOf()
 
@@ -30,11 +30,11 @@ object PurchaseManager {
                     val purchase = document.toObject(Purchase::class.java)
                     purchaseList.add(position, Pair(document.id, purchase))
                 }
-                managerListener?.onManagerSuccess()
+                fetchListener?.onFetchSuccess()
                 fStore.terminate()
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                managerListener?.onManagerFailure("Error! ${e.localizedMessage}")
+                fetchListener?.onFetchFailure("Error! ${e.localizedMessage}")
                 fStore.terminate()
             }
     }

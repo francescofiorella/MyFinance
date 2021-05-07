@@ -1,16 +1,16 @@
 package com.frafio.myfinance.ui.splash
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.WindowManager
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityOptionsCompat
-import androidx.core.content.ContextCompat
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.manager.ManagerListener
+import com.frafio.myfinance.data.manager.FetchListener
 import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.manager.UserManager
 import com.frafio.myfinance.ui.auth.LoginActivity
@@ -21,8 +21,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-
-class SplashScreenActivity : AppCompatActivity(), ManagerListener, KodeinAware {
+class SplashScreenActivity : AppCompatActivity(), FetchListener, KodeinAware {
 
     lateinit var layout: ConstraintLayout
 
@@ -33,12 +32,17 @@ class SplashScreenActivity : AppCompatActivity(), ManagerListener, KodeinAware {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
 
-        PurchaseManager.managerListener = this
+        PurchaseManager.fetchListener = this
 
         layout = findViewById(R.id.splashScreen_layout)
 
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = ContextCompat.getColor(applicationContext, R.color.icon_bg)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.decorView.windowInsetsController!!.hide(
+                android.view.WindowInsets.Type.statusBars()
+            )
+        } else {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        }
 
         if (fAuth.currentUser != null) {
             UserManager.updateUser(fAuth.currentUser!!)
@@ -55,7 +59,7 @@ class SplashScreenActivity : AppCompatActivity(), ManagerListener, KodeinAware {
         }
     }
 
-    override fun onManagerSuccess() {
+    override fun onFetchSuccess() {
         val activityOptionsCompat = ActivityOptionsCompat
             .makeCustomAnimation(applicationContext, android.R.anim.fade_in, android.R.anim.fade_out)
         Intent(applicationContext, HomeActivity::class.java).also {
@@ -64,7 +68,7 @@ class SplashScreenActivity : AppCompatActivity(), ManagerListener, KodeinAware {
         }
     }
 
-    override fun onManagerFailure(message: String) {
+    override fun onFetchFailure(message: String) {
         layout.snackbar(message)
     }
 }
