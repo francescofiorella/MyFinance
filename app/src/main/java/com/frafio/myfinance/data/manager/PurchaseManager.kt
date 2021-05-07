@@ -37,6 +37,11 @@ object PurchaseManager {
             }
     }
 
+    fun updatePurchaseAt(index: Int, purchase: Purchase) {
+        val purchaseID = purchaseList.get(index).first
+        purchaseList[index] = Pair(purchaseID, purchase)
+    }
+
     fun getPurchaseAt(index: Int) : Pair<String, Purchase>? {
         return if (!purchaseList.isNullOrEmpty()) {
             purchaseList[index]
@@ -47,11 +52,6 @@ object PurchaseManager {
 
     fun getPurchaseList() : List<Pair<String, Purchase>>{
         return purchaseList
-    }
-
-    fun updatePurchaseAt(index: Int, purchase: Purchase) {
-        val purchaseID = purchaseList.get(index).first
-        purchaseList[index] = Pair(purchaseID, purchase)
     }
 
     fun removePurchaseAt(index: Int) {
