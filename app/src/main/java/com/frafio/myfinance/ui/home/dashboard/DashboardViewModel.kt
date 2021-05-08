@@ -1,10 +1,10 @@
 package com.frafio.myfinance.ui.home.dashboard
 
 import androidx.lifecycle.ViewModel
-import com.frafio.myfinance.data.repositories.StatsRepository
+import com.frafio.myfinance.data.repositories.PurchaseRepository
 
 class DashboardViewModel(
-    repository: StatsRepository
+    repository: PurchaseRepository
 ) : ViewModel() {
     private val stats = repository.calculateStats()
 
@@ -17,6 +17,6 @@ class DashboardViewModel(
     val trenTotString: String = stats[6]
     val amTotString: String = stats[7]
 
-    val warningVisibility = repository.dashboardWarningVisibility()
-    val statsVisibility = repository.dashboardStatsVisibility()
+    val warningVisibility = repository.warningVisibility()
+    val statsVisibility = repository.purchaseVisibility()
 }

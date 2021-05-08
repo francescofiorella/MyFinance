@@ -102,7 +102,7 @@ class ReceiptActivity : AppCompatActivity() {
             FirestoreRecyclerAdapter<ReceiptItem, ReceiptItemViewHolder>(options) {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReceiptItemViewHolder {
                 val view = LayoutInflater.from(parent.context).inflate(
-                    R.layout.layout_recycler_view_receipt_item,
+                    R.layout.recycler_view_receipt_item,
                     parent,
                     false
                 )

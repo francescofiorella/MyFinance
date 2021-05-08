@@ -1,55 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/list_fragmentTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/nav_2_extended"
-        android:fontFamily="@font/nunito"
-        android:textSize="21sp"
-        android:padding="10dp"
-        android:textColor="@color/primary_text"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+    <data>
 
-    <View
-        android:id="@+id/list_divider"
+        <variable
+            name="viewmodel"
+            type="com.frafio.myfinance.ui.home.list.ListViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0.1dp"
-        android:background="@color/primary_text"
-        app:layout_constraintTop_toBottomOf="@id/list_fragmentTitle"/>
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/list_warningTV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/nunito"
-        android:padding="10dp"
-        android:text="Aggiungi il tuo primo acquisto!"
-        android:textColor="@color/error"
-        android:textSize="21sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/list_divider" />
+        <TextView
+            android:id="@+id/list_fragmentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nav_2_extended"
+            android:fontFamily="@font/nunito"
+            android:textSize="21sp"
+            android:padding="10dp"
+            android:textColor="@color/primary_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/background"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/list_divider" />
+        <View
+            android:id="@+id/list_divider"
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:background="@color/primary_text"
+            app:layout_constraintTop_toBottomOf="@id/list_fragmentTitle"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/list_warningTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito"
+            android:padding="10dp"
+            android:text="Aggiungi il tuo primo acquisto!"
+            android:textColor="@color/error"
+            android:textSize="21sp"
+            android:visibility="@{viewmodel.warningVisibility}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/list_divider" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/background"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:scrollbars="vertical"
+            android:visibility="@{viewmodel.listVisibility}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/recycler_view_purchase_item"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/list_divider" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

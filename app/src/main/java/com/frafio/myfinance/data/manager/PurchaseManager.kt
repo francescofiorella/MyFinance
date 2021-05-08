@@ -1,7 +1,6 @@
 package com.frafio.myfinance.data.manager
 
 import android.util.Log
-import android.util.Pair
 import com.frafio.myfinance.data.models.Purchase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -40,7 +39,7 @@ object PurchaseManager {
     }
 
     fun updatePurchaseAt(index: Int, purchase: Purchase) {
-        val purchaseID = purchaseList.get(index).first
+        val purchaseID = purchaseList[index].first
         purchaseList[index] = Pair(purchaseID, purchase)
     }
 

@@ -7,7 +7,23 @@ import java.text.NumberFormat
 import java.time.LocalDate
 import java.util.*
 
-class StatsRepository {
+class PurchaseRepository {
+
+    fun warningVisibility() : Int {
+        return if (PurchaseManager.getPurchaseList().isEmpty()) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+    }
+
+    fun purchaseVisibility() : Int {
+        return if (PurchaseManager.getPurchaseList().isEmpty()) {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
+    }
 
     fun calculateStats() : List<String> {
         val dayAvg: Double
@@ -87,21 +103,5 @@ class StatsRepository {
         stats.add(amTot.toString())
 
         return stats
-    }
-
-    fun dashboardWarningVisibility() : Int {
-        return if (PurchaseManager.getPurchaseList().isEmpty()) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
-    }
-
-    fun dashboardStatsVisibility() : Int {
-        return if (PurchaseManager.getPurchaseList().isEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
     }
 }

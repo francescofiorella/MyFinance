@@ -1,10 +1,11 @@
 package com.frafio.myfinance
 
 import android.app.Application
-import com.frafio.myfinance.data.repositories.StatsRepository
+import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.ui.auth.AuthViewModelFactory
 import com.frafio.myfinance.ui.home.dashboard.DashboardViewModelFactory
+import com.frafio.myfinance.ui.home.list.ListViewModelFactory
 import com.frafio.myfinance.ui.home.menu.MenuViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 import org.kodein.di.Kodein
@@ -21,9 +22,10 @@ class MyFinanceApplication : Application(), KodeinAware {
         import(androidXModule(this@MyFinanceApplication))
 
         bind() from singleton { UserRepository() }
-        bind() from singleton { StatsRepository() }
+        bind() from singleton { PurchaseRepository() }
         bind() from provider { AuthViewModelFactory(instance()) }
         bind() from provider { DashboardViewModelFactory(instance()) }
+        bind() from provider { ListViewModelFactory(instance()) }
         bind() from provider { MenuViewModelFactory(instance()) }
         bind() from provider { FirebaseAuth.getInstance() }
     }
