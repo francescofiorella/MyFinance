@@ -11,9 +11,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
-import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.ui.store.AddActivity
-import com.frafio.myfinance.utils.snackbar
+import com.frafio.myfinance.util.snackbar
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -72,9 +71,10 @@ class HomeActivity : AppCompatActivity() {
             mAddBtn, 0, 0,
             mAddBtn.measuredWidth, mAddBtn.measuredHeight
         )
-        val intent = Intent(applicationContext, AddActivity::class.java)
-        intent.putExtra("com.frafio.myfinance.REQUESTCODE", 1)
-        startActivityForResult(intent, 1, activityOptionsCompat.toBundle())
+        Intent(applicationContext, AddActivity::class.java).also {
+            it.putExtra("com.frafio.myfinance.REQUESTCODE", 1)
+            startActivityForResult(it, 1, activityOptionsCompat.toBundle())
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -89,8 +89,8 @@ class HomeActivity : AppCompatActivity() {
         } else if (requestCode == 2 && resultCode == RESULT_OK) {
             val editRequest = data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
             if (editRequest) {
-                val fragment = supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as ListFragment?
-                fragment?.loadPurchasesList()
+                /*val fragment = supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as ListFragment?
+                fragment?.loadPurchasesList()*/
                 layout.snackbar("Acquisto modificato!", mAddBtn)
             }
         }

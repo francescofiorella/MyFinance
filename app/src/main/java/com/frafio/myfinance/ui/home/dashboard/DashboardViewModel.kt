@@ -8,6 +8,8 @@ class DashboardViewModel(
 ) : ViewModel() {
     private val stats = repository.calculateStats()
 
+    val purchaseListSize = repository.purchaseListSize()
+
     val dayAvgString = stats[0]
     val monthAvgString = stats[1]
     val todayTotString = stats[2]
@@ -16,7 +18,4 @@ class DashboardViewModel(
     val ticketTotString: String = stats[5]
     val trenTotString: String = stats[6]
     val amTotString: String = stats[7]
-
-    val warningVisibility = repository.warningVisibility()
-    val statsVisibility = repository.purchaseVisibility()
 }

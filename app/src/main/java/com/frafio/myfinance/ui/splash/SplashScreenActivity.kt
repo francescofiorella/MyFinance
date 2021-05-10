@@ -9,13 +9,14 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityOptionsCompat
+import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.manager.FetchListener
 import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.manager.UserManager
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.utils.snackbar
+import com.frafio.myfinance.util.snackbar
 import com.google.firebase.auth.FirebaseAuth
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -59,7 +60,7 @@ class SplashScreenActivity : AppCompatActivity(), FetchListener, KodeinAware {
         }
     }
 
-    override fun onFetchSuccess() {
+    override fun onFetchSuccess(message: String?) {
         val activityOptionsCompat = ActivityOptionsCompat
             .makeCustomAnimation(applicationContext, android.R.anim.fade_in, android.R.anim.fade_out)
         Intent(applicationContext, HomeActivity::class.java).also {

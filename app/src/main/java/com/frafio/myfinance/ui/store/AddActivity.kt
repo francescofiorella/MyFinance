@@ -15,13 +15,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.manager.FetchListener
 import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.ActivityAddBinding
-import com.frafio.myfinance.utils.snackbar
+import com.frafio.myfinance.util.snackbar
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -395,8 +396,7 @@ class AddActivity : AppCompatActivity(), FetchListener {
                         } else {
                             0.0
                         }
-                        for (pair in PurchaseManager.getPurchaseList()) {
-                            val item = pair.second
+                        for (item in PurchaseManager.getPurchaseList()) {
                             if (item.email == userEmail && item.type != 0
                                 && item.type != 3 && item.year == purchase.year
                                 && item.month == purchase.month && item.day == purchase.day) {
@@ -426,8 +426,7 @@ class AddActivity : AppCompatActivity(), FetchListener {
                         PurchaseManager.updatePurchaseAt(purchasePosition, purchase)
                         if (price != purchasePrice) {
                             var sum = 0.0
-                            for (pair in PurchaseManager.getPurchaseList()) {
-                                val item = pair.second
+                            for (item in PurchaseManager.getPurchaseList()) {
                                 if (item.email == userEmail && item.type != 0
                                     && item.type != 3 && item.year == purchase.year
                                     && item.month == purchase.month && item.day == purchase.day) {
@@ -543,7 +542,7 @@ class AddActivity : AppCompatActivity(), FetchListener {
         }
     }
 
-    override fun onFetchSuccess() {
+    override fun onFetchSuccess(message: String?) {
         // torna alla home
         val returnIntent = Intent()
         returnIntent.putExtra("com.frafio.myfinance.purchaseRequest", true)

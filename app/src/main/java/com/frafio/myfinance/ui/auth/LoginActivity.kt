@@ -13,7 +13,7 @@ import com.frafio.myfinance.data.manager.FetchListener
 import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.utils.snackbar
+import com.frafio.myfinance.util.snackbar
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -130,7 +130,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAw
         }
     }
 
-    override fun onFetchSuccess() {
+    override fun onFetchSuccess(message: String?) {
         mProgressIndicator.hide()
         Intent(applicationContext, HomeActivity::class.java).also {
             it.putExtra("com.frafio.myfinance.userRequest", true)

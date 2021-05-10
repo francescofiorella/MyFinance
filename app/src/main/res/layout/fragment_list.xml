@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewmodel"
             type="com.frafio.myfinance.ui.home.list.ListViewModel" />
@@ -43,7 +45,7 @@
             android:text="Aggiungi il tuo primo acquisto!"
             android:textColor="@color/error"
             android:textSize="21sp"
-            android:visibility="@{viewmodel.warningVisibility}"
+            android:visibility="@{viewmodel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -57,7 +59,7 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:scrollbars="vertical"
-            android:visibility="@{viewmodel.listVisibility}"
+            android:visibility="@{viewmodel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/recycler_view_purchase_item"
             app:layout_constraintBottom_toBottomOf="parent"

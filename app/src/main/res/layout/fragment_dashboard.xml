@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewmodel"
             type="com.frafio.myfinance.ui.home.dashboard.DashboardViewModel" />
@@ -48,7 +50,7 @@
                 android:text="Aggiungi il tuo primo acquisto!"
                 android:textColor="@color/error"
                 android:textSize="21sp"
-                android:visibility="@{viewmodel.warningVisibility}"
+                android:visibility="@{viewmodel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -58,7 +60,7 @@
                 android:id="@+id/stats_layout"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:visibility="@{viewmodel.statsVisibility}"
+                android:visibility="@{viewmodel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"

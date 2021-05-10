@@ -1,6 +1,5 @@
 package com.frafio.myfinance.data.repositories
 
-import android.view.View
 import com.frafio.myfinance.data.manager.PurchaseManager
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -9,20 +8,8 @@ import java.util.*
 
 class PurchaseRepository {
 
-    fun warningVisibility() : Int {
-        return if (PurchaseManager.getPurchaseList().isEmpty()) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
-    }
-
-    fun purchaseVisibility() : Int {
-        return if (PurchaseManager.getPurchaseList().isEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
+    fun purchaseListSize() : Int {
+        return PurchaseManager.getPurchaseList().size
     }
 
     fun calculateStats() : List<String> {
@@ -40,8 +27,7 @@ class PurchaseRepository {
         var lastMonth = 0
         var lastYear = 0
 
-        PurchaseManager.getPurchaseList().forEach { purchasePair ->
-            val purchase = purchasePair.second
+        PurchaseManager.getPurchaseList().forEach { purchase ->
             // totale biglietti Amtab
             if (purchase.name == "Biglietto Amtab") {
                 amTot++

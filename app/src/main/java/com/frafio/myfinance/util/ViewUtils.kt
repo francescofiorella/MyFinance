@@ -1,4 +1,4 @@
-package com.frafio.myfinance.utils
+package com.frafio.myfinance.util
 
 import android.annotation.SuppressLint
 import android.view.View

@@ -20,7 +20,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.ReceiptItem
-import com.frafio.myfinance.utils.snackbar
+import com.frafio.myfinance.util.snackbar
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

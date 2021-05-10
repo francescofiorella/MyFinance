@@ -4,23 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.manager.UserManager
 import com.frafio.myfinance.databinding.FragmentProfileBinding
-import com.google.firebase.auth.FirebaseAuth
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.x.kodein
-import org.kodein.di.generic.instance
 
 class ProfileFragment : Fragment() {
-
-    private lateinit var mUserImage: ImageView
 
     private lateinit var viewModel: ProfileViewModel
 
@@ -30,11 +20,6 @@ class ProfileFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
-
-        // collegamento view
-        mUserImage = binding.root.findViewById(R.id.profile_propic_iv)
-
-        context?.let { Glide.with(it).load(UserManager.getUser()!!.photoUrl.toString()).apply(RequestOptions.circleCropTransform()).into(mUserImage) }
 
         return binding.root
     }

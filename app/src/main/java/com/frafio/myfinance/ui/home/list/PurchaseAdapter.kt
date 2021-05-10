@@ -1,46 +1,52 @@
 package com.frafio.myfinance.ui.home.list
 
-import android.app.Activity
-import android.content.Context
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.frafio.myfinance.data.manager.PurchaseManager
-import com.frafio.myfinance.databinding.FragmentListBinding
+import com.frafio.myfinance.R
+import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.RecyclerViewPurchaseItemBinding
-import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.*
 
-class PurchaseAdapter : RecyclerView.Adapter<PurchaseAdapter.PurchaseViewHolder>() {
-
-    // utile quando si elimina un acquisto
-    private var totPosition = 0
+class PurchaseAdapter(
+    private val purchases: List<Purchase>,
+    private val listener: RecyclerViewInteractionListener
+) : RecyclerView.Adapter<PurchaseAdapter.PurchaseViewHolder>() {
 
     inner class PurchaseViewHolder(
-        val viewDataBinding: RecyclerViewPurchaseItemBinding
-        ) : RecyclerView.ViewHolder(viewDataBinding.root)
+        val recyclerViewPurchaseItemBinding: RecyclerViewPurchaseItemBinding
+        ) : RecyclerView.ViewHolder(recyclerViewPurchaseItemBinding.root)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PurchaseViewHolder {
-        val binding = RecyclerViewPurchaseItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PurchaseViewHolder(binding)
-        /*val inflater = LayoutInflater.from(context)
-        val view = inflater.inflate(R.layout.recycler_view_purchase_item, parent, false)
-        return PurchaseViewHolder(view)*/
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        PurchaseViewHolder(
+            DataBindingUtil.inflate(
+                LayoutInflater.from(parent.context),
+                R.layout.recycler_view_purchase_item,
+                parent,
+                false
+            )
+        )
 
     override fun onBindViewHolder(holder: PurchaseViewHolder, position: Int) {
-        val currentPurchaseID = PurchaseManager.getPurchaseList()[position].first
-        val currentPurchase = PurchaseManager.getPurchaseList()[position].second
+        val currentPurchase = purchases[position]
+        holder.recyclerViewPurchaseItemBinding.purchase = currentPurchase
 
-        val locale = Locale("en", "UK")
-        val nf = NumberFormat.getInstance(locale)
-        val formatter = nf as DecimalFormat
-        formatter.applyPattern("###,###,##0.00")
-        val priceString = "€ " + formatter.format(currentPurchase.price)
+        holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener {
+            listener.onRecyclerViewItemInteraction(1, currentPurchase, position)
+        }
+        holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnLongClickListener {
+            listener.onRecyclerViewItemInteraction(2, currentPurchase, position)
+            true
+        }
 
-        holder.viewDataBinding.recViewPurchaseItemPriceTextView.text = priceString
+        if (currentPurchase.type == 0) {
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemNomeTextView
+                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
+        } else {
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemNomeTextView
+                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+        }
         /*
         if (currentPurchase.type == 0) {
             holder.itemLayout?.setOnClickListener(null)
@@ -165,6 +171,6 @@ class PurchaseAdapter : RecyclerView.Adapter<PurchaseAdapter.PurchaseViewHolder>
     }
 
     override fun getItemCount(): Int {
-        return PurchaseManager.getPurchaseList().size
+        return purchases.size
     }
 }

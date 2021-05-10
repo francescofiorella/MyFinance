@@ -13,7 +13,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.manager.FetchListener
 import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.databinding.ActivitySignupBinding
-import com.frafio.myfinance.utils.snackbar
+import com.frafio.myfinance.util.snackbar
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputLayout
@@ -103,7 +103,7 @@ class SignupActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinA
         }
     }
 
-    override fun onFetchSuccess() {
+    override fun onFetchSuccess(message: String?) {
         mProgressIndicator.hide()
         val returnIntent = Intent()
         setResult(RESULT_OK, returnIntent)
