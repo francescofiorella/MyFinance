@@ -6,9 +6,9 @@ import com.frafio.myfinance.data.repositories.PurchaseRepository
 class DashboardViewModel(
     repository: PurchaseRepository
 ) : ViewModel() {
-    private val stats = repository.calculateStats()
-
     val purchaseListSize = repository.purchaseListSize()
+
+    private val stats = repository.calculateStats()
 
     val dayAvgString = stats[0]
     val monthAvgString = stats[1]

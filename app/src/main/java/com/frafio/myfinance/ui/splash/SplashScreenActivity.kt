@@ -60,7 +60,7 @@ class SplashScreenActivity : AppCompatActivity(), FetchListener, KodeinAware {
         }
     }
 
-    override fun onFetchSuccess(message: String?) {
+    override fun onFetchSuccess(response: LiveData<Any>?) {
         val activityOptionsCompat = ActivityOptionsCompat
             .makeCustomAnimation(applicationContext, android.R.anim.fade_in, android.R.anim.fade_out)
         Intent(applicationContext, HomeActivity::class.java).also {

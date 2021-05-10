@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.manager.FetchListener
 import com.frafio.myfinance.data.manager.PurchaseManager
+import com.frafio.myfinance.data.manager.UserManager
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.util.snackbar
@@ -27,7 +28,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -67,9 +67,6 @@ class AddActivity : AppCompatActivity(), FetchListener {
     var day = 0
 
     private val interpolator = OvershootInterpolator()
-
-    // firebase
-    private lateinit var fAuth: FirebaseAuth
 
     private lateinit var viewModel: AddViewModel
 
@@ -340,8 +337,7 @@ class AddActivity : AppCompatActivity(), FetchListener {
     }
 
     private fun addPurchase() {
-        fAuth = FirebaseAuth.getInstance()
-        val userEmail = fAuth.currentUser?.email ?: "invalid"
+        val userEmail = UserManager.getUser()!!.email
         val name = mNameET.text.toString().trim()
 
         // controlla le info aggiunte
@@ -433,9 +429,9 @@ class AddActivity : AppCompatActivity(), FetchListener {
                                     sum += item.price ?: 0.0
                                 }
                             }
+                            val totID = "$year$month$day"
                             val totalP = Purchase(userEmail, "Totale", sum, year, month, day, 0)
                             val fStore1 = FirebaseFirestore.getInstance()
-                            val totID = "$year$month$day"
                             fStore1.collection("purchases").document(totID).set(totalP)
                                 .addOnSuccessListener {
                                     PurchaseManager.updatePurchaseList()
@@ -542,7 +538,7 @@ class AddActivity : AppCompatActivity(), FetchListener {
         }
     }
 
-    override fun onFetchSuccess(message: String?) {
+    override fun onFetchSuccess(response: LiveData<Any>?) {
         // torna alla home
         val returnIntent = Intent()
         returnIntent.putExtra("com.frafio.myfinance.purchaseRequest", true)

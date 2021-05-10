@@ -103,7 +103,7 @@ class SignupActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinA
         }
     }
 
-    override fun onFetchSuccess(message: String?) {
+    override fun onFetchSuccess(response: LiveData<Any>?) {
         mProgressIndicator.hide()
         val returnIntent = Intent()
         setResult(RESULT_OK, returnIntent)

@@ -6,17 +6,20 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
+import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.ui.store.AddActivity
 import com.frafio.myfinance.util.snackbar
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
+
 
 class HomeActivity : AppCompatActivity() {
 
@@ -89,8 +92,10 @@ class HomeActivity : AppCompatActivity() {
         } else if (requestCode == 2 && resultCode == RESULT_OK) {
             val editRequest = data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
             if (editRequest) {
-                /*val fragment = supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as ListFragment?
-                fragment?.loadPurchasesList()*/
+                val navHostFragment: Fragment? =
+                    supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView)
+                val fragment = navHostFragment!!.childFragmentManager.fragments[0] as ListFragment?
+                fragment?.reloadPurchaseList()
                 layout.snackbar("Acquisto modificato!", mAddBtn)
             }
         }

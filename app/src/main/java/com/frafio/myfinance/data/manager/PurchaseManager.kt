@@ -1,16 +1,11 @@
 package com.frafio.myfinance.data.manager
 
 import android.util.Log
-import android.util.Pair
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.models.Purchase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.*
 
 object PurchaseManager {
     var fetchListener: FetchListener? = null
@@ -37,33 +32,8 @@ object PurchaseManager {
                     // set id
                     purchase.id = document.id
 
-                    // formatta data
-                    purchase.day?.let { day ->
-                        purchase.month?.let { month ->
-                            purchase.year?.let { year ->
-                                val dayString: String = if (day < 10) {
-                                    "0$day"
-                                } else {
-                                    day.toString()
-                                }
-                                val monthString: String = if (month < 10) {
-                                    "0$month"
-                                } else {
-                                    month.toString()
-                                }
-                                purchase.formattedDate = "$dayString/$monthString/$year"
-                            }
-                        }
-                    }
-
-                    // formatta prezzo
-                    purchase.price?.let { price ->
-                        val locale = Locale("en", "UK")
-                        val nf = NumberFormat.getInstance(locale)
-                        val formatter = nf as DecimalFormat
-                        formatter.applyPattern("###,###,##0.00")
-                        purchase.formattedPrice = "€ " + formatter.format(price)
-                    }
+                    purchase.updateFormattedDate()
+                    purchase.updateFormattedPrice()
 
                     purchaseList.add(position, purchase)
                 }
@@ -97,44 +67,52 @@ object PurchaseManager {
     }
 
     fun deleteAndUpdatePurchaseAt(position: Int) {
+        val response = MutableLiveData<Any>()
         var totPosition: Int
 
-        FirebaseFirestore.getInstance().also { fStore ->
-            fStore.collection("purchases").document(purchaseList[position].id!!).delete().addOnSuccessListener {
-                if (purchaseList[position].type == 0) {
-                    purchaseList.removeAt(position)
-                    fetchListener?.onFetchSuccess("Totale eliminato!")
-                } else if (purchaseList[position].type != 3) {
-                    for (i in position - 1 downTo 0) {
-                        if (purchaseList[i].type == 0) {
-                            totPosition = i
-                            val newPurchase = purchaseList[totPosition]
-                            newPurchase.price = newPurchase.price?.minus(
-                                purchaseList[position].price!!
-                            )
-                            purchaseList[totPosition] = newPurchase
-                            purchaseList.removeAt(position)
-                            FirebaseFirestore.getInstance().also { fStore ->
-                                fStore.collection("purchases").document(purchaseList[i].id!!)
-                                    .set(purchaseList[i]).addOnSuccessListener {
-                                        fetchListener?.onFetchSuccess("Acquisto eliminato!")
-                                    }.addOnFailureListener { e ->
-                                        Log.e(TAG, "Error! ${e.localizedMessage}")
-                                        fetchListener?.onFetchFailure("Acquisto non eliminato correttamente!")
-                                    }
+        val fStore = FirebaseFirestore.getInstance()
+        fStore.collection("purchases").document(purchaseList[position].id!!).delete().addOnSuccessListener {
+            if (purchaseList[position].type == 0) {
+                purchaseList.removeAt(position)
+                response.value = Triple("Totale eliminato!", position, null)
+                fetchListener?.onFetchSuccess(response)
+                fStore.terminate()
+            } else if (purchaseList[position].type != 3) {
+                for (i in position - 1 downTo 0) {
+                    if (purchaseList[i].type == 0) {
+                        totPosition = i
+                        val newPurchase = purchaseList[totPosition]
+                        newPurchase.price = newPurchase.price?.minus(
+                            purchaseList[position].price!!
+                        )
+
+                        newPurchase.updateFormattedPrice()
+
+                        purchaseList[totPosition] = newPurchase
+                        purchaseList.removeAt(position)
+
+                        fStore.collection("purchases").document(purchaseList[i].id!!)
+                            .set(purchaseList[i]).addOnSuccessListener {
+                                response.value = Triple("Acquisto eliminato!", position, totPosition)
+                                fetchListener?.onFetchSuccess(response)
+                                fStore.terminate()
+                            }.addOnFailureListener { e ->
+                                Log.e(TAG, "Error! ${e.localizedMessage}")
+                                fetchListener?.onFetchFailure("Acquisto non eliminato correttamente!")
                                 fStore.terminate()
                             }
-                            break
-                        }
+                        break
                     }
-                } else {
-                    purchaseList.removeAt(position)
-                    fetchListener?.onFetchSuccess("Acquisto eliminato!")
                 }
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                fetchListener?.onFetchFailure("Acquisto non eliminato correttamente!")
+            } else {
+                purchaseList.removeAt(position)
+                response.value = Triple("Acquisto eliminato!", position, null)
+                fetchListener?.onFetchSuccess(response)
+                fStore.terminate()
             }
+        }.addOnFailureListener { e ->
+            Log.e(TAG, "Error! ${e.localizedMessage}")
+            fetchListener?.onFetchFailure("Acquisto non eliminato correttamente!")
             fStore.terminate()
         }
     }

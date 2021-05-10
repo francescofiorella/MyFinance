@@ -100,16 +100,33 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
         }
     }
 
-    override fun onFetchSuccess(message: String?) {
-        when (message) {
-            "Totale eliminato!" -> {
-                mRecyclerView.removeViewAt(position)
-                mRecyclerView.adapter?.notifyItemRemoved(position)
-                mRecyclerView.adapter?.notifyItemRangeChanged(position, PurchaseManager.getPurchaseList().size)
+    override fun onFetchSuccess(response: LiveData<Any>?) {
+        if (response?.value is Triple<*, *, *>) {
+            val message = (response.value as Triple<*, *, *>).first as String
+            val position = (response.value as Triple<*, *, *>).second as Int
+            val totPosition = (response.value as Triple<*, *, *>).third as Int?
+
+            when (message) {
+                "Totale eliminato!" -> {
+                    mRecyclerView.also {
+                        it.removeViewAt(position)
+                        it.adapter!!.notifyItemRemoved(position)
+                        it.adapter!!.notifyItemRangeChanged(position, PurchaseManager.getPurchaseList().size)
+                    }
+                }
+                "Acquisto eliminato!" -> {
+                    mRecyclerView.also {
+                        it.removeViewAt(position)
+                        it.adapter!!.notifyItemRemoved(position)
+                        it.adapter!!.notifyItemRangeChanged(position, PurchaseManager.getPurchaseList().size)
+                        totPosition?.let { index ->
+                            it.adapter!!.notifyItemChanged(index)
+                        }
+                    }
+                }
             }
-        }
-        message?.let {
-            (activity as HomeActivity).showSnackbar(it)
+
+            (activity as HomeActivity).showSnackbar(message)
         }
     }
 
@@ -117,12 +134,11 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
         (activity as HomeActivity).showSnackbar(message)
     }
 
-    /*fun loadPurchasesList() {
-        val mAdapter = PurchaseAdapter(activity, context, mRecyclerView, mWarningTV)
-        mRecyclerView.adapter = mAdapter
+    fun reloadPurchaseList() {
+        viewModel.getPurchases()
     }
 
     fun scrollListToTop() {
         mRecyclerView.smoothScrollToPosition(0)
-    }*/
+    }
 }

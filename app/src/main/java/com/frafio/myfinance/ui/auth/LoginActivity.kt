@@ -130,7 +130,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAw
         }
     }
 
-    override fun onFetchSuccess(message: String?) {
+    override fun onFetchSuccess(response: LiveData<Any>?) {
         mProgressIndicator.hide()
         Intent(applicationContext, HomeActivity::class.java).also {
             it.putExtra("com.frafio.myfinance.userRequest", true)
