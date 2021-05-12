@@ -24,13 +24,10 @@ class DashboardFragment : Fragment(), KodeinAware {
         val binding: FragmentDashboardBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
         viewModel = ViewModelProvider(this, factory).get(DashboardViewModel::class.java)
 
+        viewModel.getStats()
+
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
-
-        viewModel.getStats()
-        viewModel.stats.observe(viewLifecycleOwner, { stats ->
-            viewModel.setStats(stats)
-        })
 
         return binding.root
     }

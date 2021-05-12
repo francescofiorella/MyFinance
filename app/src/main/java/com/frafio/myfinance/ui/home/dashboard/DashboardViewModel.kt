@@ -45,16 +45,8 @@ class DashboardViewModel(
     val amTotString: LiveData<String>
         get() = _amTotString
 
-    private val _stats = MutableLiveData<List<String>>()
-    val stats: LiveData<List<String>>
-        get() = _stats
-
     fun getStats() {
         val stats = repository.calculateStats()
-        _stats.value = stats
-    }
-
-    fun setStats(stats: List<String>) {
         _purchaseListSize.value = PurchaseManager.getPurchaseListSize()
         _dayAvgString.value = stats[0]
         _monthAvgString.value = stats[1]
