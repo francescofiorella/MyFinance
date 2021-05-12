@@ -23,8 +23,14 @@ class DashboardFragment : Fragment(), KodeinAware {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding: FragmentDashboardBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
         viewModel = ViewModelProvider(this, factory).get(DashboardViewModel::class.java)
+
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
+
+        viewModel.getStats()
+        viewModel.stats.observe(viewLifecycleOwner, { stats ->
+            viewModel.setStats(stats)
+        })
 
         return binding.root
     }

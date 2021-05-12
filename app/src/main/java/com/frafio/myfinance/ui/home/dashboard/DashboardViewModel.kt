@@ -1,21 +1,68 @@
 package com.frafio.myfinance.ui.home.dashboard
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 
 class DashboardViewModel(
-    repository: PurchaseRepository
+    private val repository: PurchaseRepository
 ) : ViewModel() {
-    val purchaseListSize = repository.purchaseListSize()
+    private val _purchaseListSize = MutableLiveData<Int>()
+    val purchaseListSize: LiveData<Int>
+        get() = _purchaseListSize
 
-    private val stats = repository.calculateStats()
+    private val _dayAvgString = MutableLiveData<String>()
+    val dayAvgString: LiveData<String>
+        get() = _dayAvgString
 
-    val dayAvgString = stats[0]
-    val monthAvgString = stats[1]
-    val todayTotString = stats[2]
-    val totString: String = stats[3]
-    val numTotString: String = stats[4]
-    val ticketTotString: String = stats[5]
-    val trenTotString: String = stats[6]
-    val amTotString: String = stats[7]
+    private val _monthAvgString = MutableLiveData<String>()
+    val monthAvgString: LiveData<String>
+        get() = _monthAvgString
+
+    private val _todayTotString = MutableLiveData<String>()
+    val todayTotString: LiveData<String>
+        get() = _todayTotString
+
+    private val _totString = MutableLiveData<String>()
+    val totString: LiveData<String>
+        get() = _totString
+
+    private val _numTotString = MutableLiveData<String>()
+    val numTotString: LiveData<String>
+        get() = _numTotString
+
+    private val _ticketTotString = MutableLiveData<String>()
+    val ticketTotString: LiveData<String>
+        get() = _ticketTotString
+
+    private val _trenTotString = MutableLiveData<String>()
+    val trenTotString: LiveData<String>
+        get() = _trenTotString
+
+    private val _amTotString = MutableLiveData<String>()
+    val amTotString: LiveData<String>
+        get() = _amTotString
+
+    private val _stats = MutableLiveData<List<String>>()
+    val stats: LiveData<List<String>>
+        get() = _stats
+
+    fun getStats() {
+        val stats = repository.calculateStats()
+        _stats.value = stats
+    }
+
+    fun setStats(stats: List<String>) {
+        _purchaseListSize.value = PurchaseManager.getPurchaseListSize()
+        _dayAvgString.value = stats[0]
+        _monthAvgString.value = stats[1]
+        _todayTotString.value = stats[2]
+        _totString.value = stats[3]
+        _numTotString.value = stats[4]
+        _ticketTotString.value = stats[5]
+        _trenTotString.value = stats[6]
+        _amTotString.value = stats[7]
+    }
 }

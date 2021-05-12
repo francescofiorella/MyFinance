@@ -62,6 +62,10 @@ object PurchaseManager {
         return purchaseList
     }
 
+    fun getPurchaseListSize() : Int{
+        return  purchaseList.size
+    }
+
     fun resetPurchaseList() {
         purchaseList = mutableListOf()
     }

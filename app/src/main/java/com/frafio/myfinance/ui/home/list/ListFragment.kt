@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -27,7 +26,6 @@ import org.kodein.di.generic.instance
 class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, KodeinAware {
 
     private lateinit var mRecyclerView: RecyclerView
-    private lateinit var mWarningTV: TextView
 
     private lateinit var viewModel: ListViewModel
 
@@ -51,7 +49,6 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
         })
 
         mRecyclerView = binding.root.findViewById(R.id.list_recyclerView)
-        mWarningTV = binding.root.findViewById(R.id.list_warningTV)
 
         return binding.root
     }
