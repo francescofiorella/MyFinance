@@ -15,58 +15,60 @@
 
     </data>
 
-    <ScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="match_parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <TextView
+            android:id="@+id/dashboard_fragmentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nav_1"
+            android:fontFamily="@font/nunito"
+            android:textSize="21sp"
+            android:padding="10dp"
+            android:textColor="@color/primary_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <View
+            android:id="@+id/dashboard_divider"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0.1dp"
+            android:background="@color/primary_text"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_fragmentTitle"/>
 
-            <TextView
-                android:id="@+id/dashboard_fragmentTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/nav_1"
-                android:fontFamily="@font/nunito"
-                android:textSize="21sp"
-                android:padding="10dp"
-                android:textColor="@color/primary_text"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+        <TextView
+            android:id="@+id/dashboard_warningTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito"
+            android:padding="10dp"
+            android:text="Aggiungi il tuo primo acquisto!"
+            android:textColor="@color/error"
+            android:textSize="21sp"
+            android:visibility="@{viewmodel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
+            tools:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_divider" />
 
-            <View
-                android:id="@+id/dashboard_divider"
-                android:layout_width="match_parent"
-                android:layout_height="0.1dp"
-                android:background="@color/primary_text"
-                app:layout_constraintTop_toBottomOf="@id/dashboard_fragmentTitle"/>
-
-            <TextView
-                android:id="@+id/dashboard_warningTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/nunito"
-                android:padding="10dp"
-                android:text="Aggiungi il tuo primo acquisto!"
-                android:textColor="@color/error"
-                android:textSize="21sp"
-                android:visibility="@{viewmodel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/dashboard_divider" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_divider">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/stats_layout"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:visibility="@{viewmodel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/dashboard_divider">
+                tools:visibility="visible">
 
                 <TextView
                     android:id="@+id/textViewMedia"
@@ -132,6 +134,7 @@
                                     android:text="@{viewmodel.dayAvgString}"
                                     android:textColor="@color/primary_text"
                                     android:textSize="24sp"
+                                    tools:text="€ 0.00"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
@@ -179,6 +182,7 @@
                                     android:text="@{viewmodel.monthAvgString}"
                                     android:textColor="@color/primary_text"
                                     android:textSize="24sp"
+                                    tools:text="€ 0.00"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
@@ -256,6 +260,7 @@
                                     android:text="@{viewmodel.todayTotString}"
                                     android:textColor="@color/primary_text"
                                     android:textSize="24sp"
+                                    tools:text="€ 0.00"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
@@ -301,6 +306,7 @@
                                     android:text="@{viewmodel.totString}"
                                     android:textColor="@color/primary_text"
                                     android:textSize="24sp"
+                                    tools:text="€ 0.00"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
@@ -348,6 +354,7 @@
                                     android:text="@{viewmodel.numTotString}"
                                     android:textColor="@color/primary_text"
                                     android:textSize="24sp"
+                                    tools:text="0"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
@@ -424,6 +431,7 @@
                                     android:text="@{viewmodel.ticketTotString}"
                                     android:textColor="@color/primary_text"
                                     android:textSize="24sp"
+                                    tools:text="€ 0.00"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
@@ -469,6 +477,7 @@
                                     android:text="@{viewmodel.trenTotString}"
                                     android:textColor="@color/primary_text"
                                     android:textSize="24sp"
+                                    tools:text="0"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
@@ -516,6 +525,7 @@
                                     android:text="@{viewmodel.amTotString}"
                                     android:textColor="@color/primary_text"
                                     android:textSize="24sp"
+                                    tools:text="0"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
@@ -537,9 +547,11 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
 
-    </ScrollView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
 

@@ -7,13 +7,14 @@ import android.os.Handler
 import android.os.Looper
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityOptionsCompat
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.manager.FetchListener
 import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.manager.UserManager
+import com.frafio.myfinance.databinding.ActivitySplashScreenBinding
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.util.snackbar
@@ -24,18 +25,16 @@ import org.kodein.di.generic.instance
 
 class SplashScreenActivity : AppCompatActivity(), FetchListener, KodeinAware {
 
-    lateinit var layout: ConstraintLayout
+    lateinit var binding: ActivitySplashScreenBinding
 
     override val kodein by kodein()
     private val fAuth: FirebaseAuth by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash_screen)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_splash_screen)
 
         PurchaseManager.fetchListener = this
-
-        layout = findViewById(R.id.splashScreen_layout)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.decorView.windowInsetsController!!.hide(
@@ -70,6 +69,6 @@ class SplashScreenActivity : AppCompatActivity(), FetchListener, KodeinAware {
     }
 
     override fun onFetchFailure(message: String) {
-        layout.snackbar(message)
+        binding.root.snackbar(message)
     }
 }

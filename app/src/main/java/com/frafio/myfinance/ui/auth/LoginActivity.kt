@@ -3,7 +3,6 @@ package com.frafio.myfinance.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
@@ -17,25 +16,17 @@ import com.frafio.myfinance.util.snackbar
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.google.android.material.textfield.TextInputLayout
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
 class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAware {
 
-    // definizione variabili
-    private lateinit var layout: RelativeLayout
-
-    private lateinit var mToolbar: MaterialToolbar
-    private lateinit var mEmailLayout: TextInputLayout
-    private lateinit var mPasswordLayout: TextInputLayout
-    private lateinit var mProgressIndicator: LinearProgressIndicator
+    // binding
+    private lateinit var binding: ActivityLoginBinding
 
     // viewModel
-    lateinit var viewModel: AuthViewModel
+    private lateinit var viewModel: AuthViewModel
 
     // login Google
     private lateinit var mGoogleSignInClient: GoogleSignInClient
@@ -50,7 +41,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAw
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding: ActivityLoginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
         viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
         binding.viewmodel = viewModel
 
@@ -58,18 +49,11 @@ class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAw
         PurchaseManager.fetchListener = this
 
         // toolbar
-        mToolbar = findViewById(R.id.login_toolbar)
-        setSupportActionBar(mToolbar)
-
-        // collegamento view
-        layout = findViewById(R.id.login_layout)
-        mProgressIndicator = findViewById(R.id.login_progressIindicator)
-        mEmailLayout = findViewById(R.id.login_emailInputLayout)
-        mPasswordLayout = findViewById(R.id.login_passwordInputLayout)
+        setSupportActionBar(binding.loginToolbar)
     }
 
     fun  onGoogleButtonClick(view: View){
-        mProgressIndicator.show()
+        binding.loginProgressIindicator.show()
 
         mGoogleSignInClient = getGoogleClient()
 
@@ -98,40 +82,40 @@ class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAw
     }
 
     override fun onAuthStarted() {
-        mProgressIndicator.show()
+        binding.loginProgressIindicator.show()
 
-        mEmailLayout.isErrorEnabled = false
-        mPasswordLayout.isErrorEnabled = false
+        binding.loginEmailInputLayout.isErrorEnabled = false
+        binding.loginPasswordInputLayout.isErrorEnabled = false
     }
 
     override fun onAuthSuccess(response: LiveData<Any>) {
         response.observe(this, { responseData ->
             if (responseData != 1) {
-                mProgressIndicator.hide()
+                binding.loginProgressIindicator.hide()
             }
 
             when (responseData) {
                 1 -> PurchaseManager.updatePurchaseList()
-                2 -> mEmailLayout.error = "L'email inserita non è ben formata."
-                3 -> mPasswordLayout.error = "La password inserita non è corretta."
-                4 -> mEmailLayout.error = "L'email inserita non ha un account associato."
-                is String -> layout.snackbar(responseData)
+                2 -> binding.loginEmailInputLayout.error = "L'email inserita non è ben formata."
+                3 -> binding.loginPasswordInputLayout.error = "La password inserita non è corretta."
+                4 -> binding.loginEmailInputLayout.error = "L'email inserita non ha un account associato."
+                is String -> binding.root.snackbar(responseData)
             }
         })
     }
 
     override fun onAuthFailure(errorCode: Int) {
-        mProgressIndicator.hide()
+        binding.loginProgressIindicator.hide()
 
         when (errorCode) {
-            1 -> mEmailLayout.error = "Inserisci la tua email."
-            2 -> mPasswordLayout.error = "Inserisci la password."
-            3 -> mPasswordLayout.error = "La password deve essere lunga almeno 8 caratteri!"
+            1 -> binding.loginEmailInputLayout.error = "Inserisci la tua email."
+            2 -> binding.loginPasswordInputLayout.error = "Inserisci la password."
+            3 -> binding.loginPasswordInputLayout.error = "La password deve essere lunga almeno 8 caratteri!"
         }
     }
 
     override fun onFetchSuccess(response: LiveData<Any>?) {
-        mProgressIndicator.hide()
+        binding.loginProgressIindicator.hide()
         Intent(applicationContext, HomeActivity::class.java).also {
             it.putExtra("com.frafio.myfinance.userRequest", true)
             it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -140,8 +124,8 @@ class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAw
     }
 
     override fun onFetchFailure(message: String) {
-        mProgressIndicator.hide()
-        layout.snackbar(message)
+        binding.loginProgressIindicator.hide()
+        binding.root.snackbar(message)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

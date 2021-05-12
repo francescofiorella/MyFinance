@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         
@@ -25,6 +26,7 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="20dp"
             android:visibility="@{purchase.type == 0 ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -36,6 +38,7 @@
                 android:fontFamily="@font/nunito"
                 android:text="@{purchase.formattedDate}"
                 android:textSize="14sp"
+                tools:text="01/01/2000"
                 android:layout_marginVertical="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -75,6 +78,7 @@
                 android:fontFamily="@font/nunito"
                 android:text="@{purchase.type == 0 ? purchase.name : @string/empty + purchase.name}"
                 android:textColor="@color/primary_text"
+                tools:text="Acquisto"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -86,6 +90,7 @@
                 android:fontFamily="@font/nunito"
                 android:text="@{purchase.formattedPrice}"
                 android:textSize="18sp"
+                tools:text="€ 0.00"
                 app:layout_constraintBottom_toBottomOf="@id/recView_purchaseItem_nomeTextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/recView_purchaseItem_nomeTextView" />

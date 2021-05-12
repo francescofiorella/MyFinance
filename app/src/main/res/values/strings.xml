@@ -6,6 +6,7 @@
     <string name="nav_2_extended">Lista Acquisti</string>
     <string name="nav_3">Profilo</string>
     <string name="nav_4">Menu</string>
+    <string name="add">Acquisto</string>
 
     <string name="addBtnContentDescription">Aggiungi un acquisto</string>
 

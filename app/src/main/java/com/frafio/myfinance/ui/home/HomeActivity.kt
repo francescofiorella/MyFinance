@@ -4,51 +4,39 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
+import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.ui.store.AddActivity
 import com.frafio.myfinance.util.snackbar
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
-
 
 class HomeActivity : AppCompatActivity() {
 
     // definizione variabili
-    private lateinit var layout: CoordinatorLayout
-
-    private lateinit var mToolbar: MaterialToolbar
-    private lateinit var mBottomNavigationView: BottomNavigationView
-    private lateinit var mAddBtn: FloatingActionButton
+    private lateinit var binding: ActivityHomeBinding
 
     private lateinit var fAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
 
         // toolbar
-        mToolbar = findViewById(R.id.home_toolbar)
-        setSupportActionBar(mToolbar)
+        setSupportActionBar(binding.homeToolbar)
 
         // collegamento view
-        layout = findViewById(R.id.main_layout)
-        mBottomNavigationView = findViewById(R.id.home_bottomNavView)
-        mAddBtn = findViewById(R.id.home_addBtn)
-
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
         val navController = navHostFragment.navController
 
-        mBottomNavigationView.setupWithNavController(navController)
+        binding.homeBottomNavView.setupWithNavController(navController)
 
         if (savedInstanceState == null) {
             // controlla se si è appena fatto l'accesso
@@ -56,7 +44,7 @@ class HomeActivity : AppCompatActivity() {
                 val userRequest = intent.extras?.getBoolean("com.frafio.myfinance.userRequest", false) ?: false
                 if (userRequest) {
                     fAuth = FirebaseAuth.getInstance()
-                    layout.snackbar("Hai effettuato l'accesso come " + fAuth.currentUser?.displayName, mAddBtn)
+                    binding.root.snackbar("Hai effettuato l'accesso come " + fAuth.currentUser?.displayName, binding.homeAddBtn)
                 }
             }
         }
@@ -71,8 +59,8 @@ class HomeActivity : AppCompatActivity() {
 
     fun onAddButtonClick(view: View) {
         val activityOptionsCompat = ActivityOptionsCompat.makeClipRevealAnimation(
-            mAddBtn, 0, 0,
-            mAddBtn.measuredWidth, mAddBtn.measuredHeight
+            binding.homeAddBtn, 0, 0,
+            binding.homeAddBtn.measuredWidth, binding.homeAddBtn.measuredHeight
         )
         Intent(applicationContext, AddActivity::class.java).also {
             it.putExtra("com.frafio.myfinance.REQUESTCODE", 1)
@@ -86,8 +74,8 @@ class HomeActivity : AppCompatActivity() {
             val purchaseRequest =
                 data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
             if (purchaseRequest) {
-                mBottomNavigationView.selectedItemId = R.id.listFragment
-                layout.snackbar("Acquisto aggiunto!", mAddBtn)
+                binding.homeBottomNavView.selectedItemId = R.id.listFragment
+                binding.root.snackbar("Acquisto aggiunto!", binding.homeAddBtn)
             }
         } else if (requestCode == 2 && resultCode == RESULT_OK) {
             val editRequest = data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
@@ -96,12 +84,12 @@ class HomeActivity : AppCompatActivity() {
                     supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView)
                 val fragment = navHostFragment!!.childFragmentManager.fragments[0] as ListFragment?
                 fragment?.reloadPurchaseList()
-                layout.snackbar("Acquisto modificato!", mAddBtn)
+                binding.root.snackbar("Acquisto modificato!", binding.homeAddBtn)
             }
         }
     }
 
     fun showSnackbar(message: String) {
-        layout.snackbar(message, mAddBtn)
+        binding.root.snackbar(message, binding.homeAddBtn)
     }
 }

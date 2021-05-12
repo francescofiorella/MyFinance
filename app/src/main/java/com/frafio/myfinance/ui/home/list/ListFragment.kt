@@ -9,7 +9,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.manager.FetchListener
 import com.frafio.myfinance.data.manager.PurchaseManager
@@ -25,7 +24,7 @@ import org.kodein.di.generic.instance
 
 class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, KodeinAware {
 
-    private lateinit var mRecyclerView: RecyclerView
+    private lateinit var binding: FragmentListBinding
 
     private lateinit var viewModel: ListViewModel
 
@@ -33,7 +32,7 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
     private val factory: ListViewModelFactory by instance()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val binding: FragmentListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false)
         viewModel = ViewModelProvider(this, factory).get(ListViewModel::class.java)
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
@@ -42,13 +41,11 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
 
         viewModel.getPurchases()
         viewModel.purchases.observe(viewLifecycleOwner, { purchases ->
-            mRecyclerView.also {
+            binding.listRecyclerView.also {
                 it.setHasFixedSize(true)
                 it.adapter = PurchaseAdapter(purchases, this)
             }
         })
-
-        mRecyclerView = binding.root.findViewById(R.id.list_recyclerView)
 
         return binding.root
     }
@@ -101,14 +98,14 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
 
             when (message) {
                 "Totale eliminato!" -> {
-                    mRecyclerView.also {
+                    binding.listRecyclerView.also {
                         it.removeViewAt(position)
                         it.adapter!!.notifyItemRemoved(position)
                         it.adapter!!.notifyItemRangeChanged(position, PurchaseManager.getPurchaseList().size)
                     }
                 }
                 "Acquisto eliminato!" -> {
-                    mRecyclerView.also {
+                    binding.listRecyclerView.also {
                         it.removeViewAt(position)
                         it.adapter!!.notifyItemRemoved(position)
                         it.adapter!!.notifyItemRangeChanged(position, PurchaseManager.getPurchaseList().size)
@@ -132,6 +129,6 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
     }
 
     fun scrollListToTop() {
-        mRecyclerView.smoothScrollToPosition(0)
+        binding.listRecyclerView.smoothScrollToPosition(0)
     }
 }

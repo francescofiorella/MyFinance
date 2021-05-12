@@ -1,79 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.home.HomeActivity"
-    android:id="@+id/main_layout">
+    tools:context=".ui.home.HomeActivity">
 
-    <RelativeLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:id="@+id/main_layout">
 
-        <!--Toolbar-->
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/home_appBarLayout"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/home_toolbar"
+            <!--Toolbar-->
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/home_appBarLayout"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:title="@string/app_name"
-                app:titleTextColor="@color/white"
-                app:titleTextAppearance="@style/TextAppearance.MyFinance.Toolbar.MainTitle"
-                style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
+                android:layout_height="wrap_content">
 
-        </com.google.android.material.appbar.AppBarLayout>
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/home_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    app:title="@string/app_name"
+                    app:titleTextColor="@color/white"
+                    app:titleTextAppearance="@style/TextAppearance.MyFinance.Toolbar.MainTitle"
+                    style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/home_fragmentContainerView"
-            android:name="androidx.navigation.fragment.NavHostFragment"
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/home_fragmentContainerView"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="56dp"
+                android:layout_below="@id/home_appBarLayout"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/nav_graph" />
+
+        </RelativeLayout>
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/home_bottomAppBar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="56dp"
-            android:layout_below="@id/home_appBarLayout"
-            app:defaultNavHost="true"
-            app:navGraph="@navigation/nav_graph" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            style="@style/Widget.MaterialComponents.BottomAppBar.Colored">
 
-    </RelativeLayout>
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/home_bottomNavView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="16dp"
+                android:background="@android:color/transparent"
+                android:outlineAmbientShadowColor="@android:color/transparent"
+                android:outlineSpotShadowColor="@android:color/transparent"
+                android:theme="@style/Widget.MyFinance.BottomNavigationView"
+                app:itemTextColor="@color/nav_item_color"
+                app:itemIconTint="@color/nav_item_color"
+                app:itemBackground="@android:color/transparent"
+                app:menu="@menu/bottom_app_bar_menu" />
 
-    <com.google.android.material.bottomappbar.BottomAppBar
-        android:id="@+id/home_bottomAppBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        style="@style/Widget.MaterialComponents.BottomAppBar.Colored">
+        </com.google.android.material.bottomappbar.BottomAppBar>
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/home_bottomNavView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="16dp"
-            android:background="@android:color/transparent"
-            android:outlineAmbientShadowColor="@android:color/transparent"
-            android:outlineSpotShadowColor="@android:color/transparent"
-            android:theme="@style/Widget.MyFinance.BottomNavigationView"
-            app:itemTextColor="@color/nav_item_color"
-            app:itemIconTint="@color/nav_item_color"
-            app:itemBackground="@android:color/transparent"
-            app:menu="@menu/bottom_app_bar_menu" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/home_addBtn"
+            android:onClick="onAddButtonClick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:tint="@color/white"
+            app:backgroundTint="@color/accent"
+            app:srcCompat="@drawable/ic_add"
+            app:layout_anchor="@id/home_bottomAppBar"
+            android:contentDescription="@string/addBtnContentDescription" />
 
-    </com.google.android.material.bottomappbar.BottomAppBar>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/home_addBtn"
-        android:onClick="onAddButtonClick"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:tint="@color/white"
-        app:backgroundTint="@color/accent"
-        app:srcCompat="@drawable/ic_add"
-        app:layout_anchor="@id/home_bottomAppBar"
-        android:contentDescription="@string/addBtnContentDescription" />
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

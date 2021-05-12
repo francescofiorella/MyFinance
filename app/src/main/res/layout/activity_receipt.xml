@@ -68,6 +68,8 @@
             android:background="@drawable/bg_edit_text"
             android:layout_margin="10dp"
             android:scrollbars="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/recycler_view_receipt_item"
             app:layout_constraintBottom_toTopOf="@id/receipt_addLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
