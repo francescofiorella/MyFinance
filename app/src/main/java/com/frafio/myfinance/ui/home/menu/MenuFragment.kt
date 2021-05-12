@@ -35,12 +35,13 @@ class MenuFragment : Fragment(), AuthListener, KodeinAware {
         return binding.root
     }
 
-    override fun onAuthStarted() {}
+    override fun onAuthStarted() = Unit
+
     override fun onAuthSuccess(response: LiveData<Any>) {
         if (response.value == 1) {
             startActivity(Intent(context, LoginActivity::class.java))
             activity?.finish()
         }
     }
-    override fun onAuthFailure(errorCode: Int) {}
+    override fun onAuthFailure(errorCode: Int) = Unit
 }
