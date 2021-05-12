@@ -32,13 +32,23 @@ class PurchaseAdapter(
         val currentPurchase = purchases[position]
         holder.recyclerViewPurchaseItemBinding.purchase = currentPurchase
 
-        holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener {
-            listener.onRecyclerViewItemInteraction(1, currentPurchase, position)
+        if (currentPurchase.name == "Spesa Coop") {
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener {
+                listener.onRecyclerViewItemInteraction(1, currentPurchase, position)
+            }
+        } else {
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener(null)
         }
-        holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnLongClickListener {
-            listener.onRecyclerViewItemInteraction(2, currentPurchase, position)
-            true
+
+        if (!(currentPurchase.type == 0 && currentPurchase.price != 0.0)) {
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnLongClickListener {
+                listener.onRecyclerViewItemInteraction(2, currentPurchase, position)
+                true
+            }
+        } else {
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnLongClickListener(null)
         }
+
 
         if (currentPurchase.type == 0) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemNomeTextView

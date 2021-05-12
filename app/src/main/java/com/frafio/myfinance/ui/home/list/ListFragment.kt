@@ -56,43 +56,39 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
     override fun onRecyclerViewItemInteraction(interactionID: Int, purchase: Purchase, position: Int) {
         when (interactionID) {
             1 -> {
-                if (purchase.name == "Spesa Coop") {
-                    Intent(context, ReceiptActivity::class.java).also {
-                        it.putExtra("com.frafio.myfinance.purchaseID", purchase.id)
-                        it.putExtra("com.frafio.myfinance.purchaseName", purchase.name)
-                        it.putExtra("com.frafio.myfinance.purchasePrice", purchase.formattedPrice)
-                        activity?.startActivity(it)
-                    }
+                Intent(context, ReceiptActivity::class.java).also {
+                    it.putExtra("com.frafio.myfinance.purchaseID", purchase.id)
+                    it.putExtra("com.frafio.myfinance.purchaseName", purchase.name)
+                    it.putExtra("com.frafio.myfinance.purchasePrice", purchase.formattedPrice)
+                    activity?.startActivity(it)
                 }
             }
             2 -> {
-                if (!(purchase.type == 0 && purchase.price != 0.0)) {
-                    val builder = MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_MyFinance_AlertDialog)
-                    builder.setTitle(purchase.name)
-                    if (purchase.type == 0 && purchase.price == 0.0) {
-                        builder.setMessage("Vuoi eliminare l'acquisto selezionato?")
-                    } else if (purchase.type != 0) {
-                        builder.setMessage("Vuoi modificare o eliminare l'acquisto selezionato?")
-                        builder.setNegativeButton("Modifica") { _, _ ->
-                            Intent(context, AddActivity::class.java).also {
-                                it.putExtra("com.frafio.myfinance.REQUESTCODE", 2)
-                                it.putExtra("com.frafio.myfinance.PURCHASE_ID", purchase.id)
-                                it.putExtra("com.frafio.myfinance.PURCHASE_NAME", purchase.name)
-                                it.putExtra("com.frafio.myfinance.PURCHASE_PRICE", purchase.price)
-                                it.putExtra("com.frafio.myfinance.PURCHASE_TYPE", purchase.type)
-                                it.putExtra("com.frafio.myfinance.PURCHASE_POSITION", position)
-                                it.putExtra("com.frafio.myfinance.PURCHASE_YEAR", purchase.year)
-                                it.putExtra("com.frafio.myfinance.PURCHASE_MONTH", purchase.month)
-                                it.putExtra("com.frafio.myfinance.PURCHASE_DAY", purchase.day)
-                                activity?.startActivityForResult(it, 2)
-                            }
+                val builder = MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_MyFinance_AlertDialog)
+                builder.setTitle(purchase.name)
+                if (purchase.type == 0 && purchase.price == 0.0) {
+                    builder.setMessage("Vuoi eliminare l'acquisto selezionato?")
+                } else if (purchase.type != 0) {
+                    builder.setMessage("Vuoi modificare o eliminare l'acquisto selezionato?")
+                    builder.setNegativeButton("Modifica") { _, _ ->
+                        Intent(context, AddActivity::class.java).also {
+                            it.putExtra("com.frafio.myfinance.REQUESTCODE", 2)
+                            it.putExtra("com.frafio.myfinance.PURCHASE_ID", purchase.id)
+                            it.putExtra("com.frafio.myfinance.PURCHASE_NAME", purchase.name)
+                            it.putExtra("com.frafio.myfinance.PURCHASE_PRICE", purchase.price)
+                            it.putExtra("com.frafio.myfinance.PURCHASE_TYPE", purchase.type)
+                            it.putExtra("com.frafio.myfinance.PURCHASE_POSITION", position)
+                            it.putExtra("com.frafio.myfinance.PURCHASE_YEAR", purchase.year)
+                            it.putExtra("com.frafio.myfinance.PURCHASE_MONTH", purchase.month)
+                            it.putExtra("com.frafio.myfinance.PURCHASE_DAY", purchase.day)
+                            activity?.startActivityForResult(it, 2)
                         }
                     }
-                    builder.setPositiveButton("Elimina") { _, _ ->
-                        PurchaseManager.deleteAndUpdatePurchaseAt(position)
-                    }
-                    builder.show()
                 }
+                builder.setPositiveButton("Elimina") { _, _ ->
+                    PurchaseManager.deleteAndUpdatePurchaseAt(position)
+                }
+                builder.show()
             }
         }
     }
