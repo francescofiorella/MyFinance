@@ -24,7 +24,8 @@ fun View.snackbar(message: String) {
 fun View.snackbar(message: String, anchor: View) {
     val nunito = ResourcesCompat.getFont(context, R.font.nunito)
 
-    val snackbar = Snackbar.make(this, message, BaseTransientBottomBar.LENGTH_SHORT).setAnchorView(anchor)
+    val snackbar = Snackbar.make(this, message, BaseTransientBottomBar.LENGTH_SHORT)
+        .setAnchorView(anchor)
         .setBackgroundTint(ContextCompat.getColor(context, R.color.snackbar_bg))
         .setTextColor(ContextCompat.getColor(context, R.color.inverted_primary_text))
     val tv = snackbar.view.findViewById<TextView>(R.id.snackbar_text)

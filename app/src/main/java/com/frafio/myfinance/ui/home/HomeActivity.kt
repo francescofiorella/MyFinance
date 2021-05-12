@@ -8,22 +8,19 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.manager.UserManager
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.ui.store.AddActivity
 import com.frafio.myfinance.util.snackbar
-import com.google.firebase.auth.FirebaseAuth
 
 class HomeActivity : AppCompatActivity() {
 
     // definizione variabili
     private lateinit var binding: ActivityHomeBinding
 
-    private lateinit var fAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,18 +40,10 @@ class HomeActivity : AppCompatActivity() {
             if (intent.hasExtra("com.frafio.myfinance.userRequest")) {
                 val userRequest = intent.extras?.getBoolean("com.frafio.myfinance.userRequest", false) ?: false
                 if (userRequest) {
-                    fAuth = FirebaseAuth.getInstance()
-                    binding.root.snackbar("Hai effettuato l'accesso come " + fAuth.currentUser?.displayName, binding.homeAddBtn)
+                    binding.root.snackbar("Hai effettuato l'accesso come " + UserManager.getUser()?.fullName, binding.homeAddBtn)
                 }
             }
         }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        return NavigationUI.navigateUp(
-            (supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment).navController,
-            AppBarConfiguration(setOf(R.id.dashboardFragment, R.id.listFragment, R.id.profileFragment, R.id.menuFragment))
-        )
     }
 
     fun onAddButtonClick(view: View) {
