@@ -2,7 +2,8 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.auth.LoginActivity">
 
     <data>
         
@@ -15,8 +16,7 @@
     <RelativeLayout
         android:id="@+id/login_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.auth.LoginActivity">
+        android:layout_height="match_parent">
 
         <!--Toolbar-->
         <com.google.android.material.appbar.AppBarLayout
