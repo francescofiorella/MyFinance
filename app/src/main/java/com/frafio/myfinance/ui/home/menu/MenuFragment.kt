@@ -24,9 +24,14 @@ class MenuFragment : Fragment(), AuthListener, KodeinAware {
     override val kodein by kodein()
     private val factory: MenuViewModelFactory by instance()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
 
-        val binding: FragmentMenuBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_menu, container, false)
+        val binding: FragmentMenuBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_menu, container, false)
         viewModel = ViewModelProvider(this, factory).get(MenuViewModel::class.java)
         viewModel.authListener = this
         binding.viewmodel = viewModel
@@ -38,10 +43,15 @@ class MenuFragment : Fragment(), AuthListener, KodeinAware {
     override fun onAuthStarted() = Unit
 
     override fun onAuthSuccess(response: LiveData<Any>) {
-        if (response.value == 1) {
-            startActivity(Intent(context, LoginActivity::class.java))
-            activity?.finish()
-        }
+        response.observe(this, { value ->
+            if (value == 1) {
+                Intent(context, LoginActivity::class.java).also {
+                    it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(it)
+                }
+            }
+        })
     }
+
     override fun onAuthFailure(errorCode: Int) = Unit
 }

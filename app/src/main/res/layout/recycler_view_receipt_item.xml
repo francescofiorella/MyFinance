@@ -1,41 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/recView_receiptItem_constraintLayout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingHorizontal="20dp"
-    android:paddingVertical="10dp"
-    android:background="?attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/recView_receiptItem_nomeTextView"
-        android:layout_width="wrap_content"
+    <data>
+
+        <variable
+            name="receiptItem"
+            type="com.frafio.myfinance.data.models.ReceiptItem" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/recView_receiptItem_constraintLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/nunito"
-        android:text="Acquisto"
-        android:textColor="@color/primary_text"
-        android:textSize="16sp"
-        android:textAllCaps="true"
-        tools:text="Acquisto"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
 
-    <TextView
-        android:id="@+id/recView_receiptItem_priceTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/nunito"
-        android:text="Prezzo"
-        android:textSize="16sp"
-        tools:text="€ 0.00"
-        app:layout_constraintBottom_toBottomOf="@id/recView_receiptItem_nomeTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/recView_receiptItem_nomeTextView" />
+        <TextView
+            android:id="@+id/recView_receiptItem_nomeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito"
+            android:text="@{receiptItem.name}"
+            android:textColor="@color/primary_text"
+            android:textSize="16sp"
+            android:textAllCaps="true"
+            tools:text="Acquisto"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/recView_receiptItem_priceTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito"
+            android:text="@{receiptItem.formattedPrice}"
+            android:textSize="16sp"
+            tools:text="€ 0.00"
+            app:layout_constraintBottom_toBottomOf="@id/recView_receiptItem_nomeTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/recView_receiptItem_nomeTextView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

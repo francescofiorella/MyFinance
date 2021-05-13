@@ -9,17 +9,16 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.manager.FetchListener
-import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.databinding.ActivitySignupBinding
 import com.frafio.myfinance.util.snackbar
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-class SignupActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAware {
+class SignupActivity : AppCompatActivity(), AuthListener, KodeinAware {
 
     private lateinit var binding: ActivitySignupBinding
+    private lateinit var viewModel: AuthViewModel
 
     override val kodein by kodein()
     private val factory: AuthViewModelFactory by instance()
@@ -28,11 +27,10 @@ class SignupActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinA
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_signup)
-        val viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
         binding.viewmodel = viewModel
 
         viewModel.authListener = this
-        PurchaseManager.fetchListener = this
 
         // toolbar
         setSupportActionBar(binding.signupToolbar)
@@ -58,10 +56,17 @@ class SignupActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinA
             }
 
             when (responseData) {
-                1 -> PurchaseManager.updatePurchaseList()
-                2 -> binding.signupPasswordConfirmInputLayout.error = "Le password inserite non corrispondono!"
+                1 -> viewModel.updateUserData()
+                2 -> binding.signupPasswordConfirmInputLayout.error =
+                    "Le password inserite non corrispondono!"
                 3 -> binding.signupEmailInputLayout.error = "L'email inserita non è ben formata."
-                4 -> binding.signupEmailInputLayout.error = "L'email inserita ha già un account associato."
+                4 -> binding.signupEmailInputLayout.error =
+                    "L'email inserita ha già un account associato."
+                "List updated" ->
+                    Intent().also {
+                        setResult(RESULT_OK, it)
+                        finish()
+                    }
                 is String -> binding.root.snackbar(responseData)
             }
         })
@@ -74,22 +79,13 @@ class SignupActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinA
             1 -> binding.signupNameInputLayout.error = "Inserisci nome e cognome."
             2 -> binding.signupEmailInputLayout.error = "Inserisci la tua email."
             3 -> binding.signupPasswordInputLayout.error = "Inserisci la password."
-            4 -> binding.signupPasswordInputLayout.error = "La password deve essere lunga almeno 8 caratteri!"
-            5 -> binding.signupPasswordConfirmInputLayout.error = "Inserisci nuovamente la password."
-            6 -> binding.signupPasswordConfirmInputLayout.error = "Le password inserite non corrispondono!"
+            4 -> binding.signupPasswordInputLayout.error =
+                "La password deve essere lunga almeno 8 caratteri!"
+            5 -> binding.signupPasswordConfirmInputLayout.error =
+                "Inserisci nuovamente la password."
+            6 -> binding.signupPasswordConfirmInputLayout.error =
+                "Le password inserite non corrispondono!"
         }
-    }
-
-    override fun onFetchSuccess(response: LiveData<Any>?) {
-        binding.signupProgressIndicator.hide()
-        val returnIntent = Intent()
-        setResult(RESULT_OK, returnIntent)
-        finish()
-    }
-
-    override fun onFetchFailure(message: String) {
-        binding.signupProgressIndicator.hide()
-        binding.root.snackbar(message)
     }
 
     fun goToLoginActivity(view: View) {

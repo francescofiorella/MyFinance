@@ -2,12 +2,14 @@ package com.frafio.myfinance
 
 import android.app.Application
 import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.frafio.myfinance.data.repositories.ReceiptRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.ui.auth.AuthViewModelFactory
 import com.frafio.myfinance.ui.home.dashboard.DashboardViewModelFactory
 import com.frafio.myfinance.ui.home.list.ListViewModelFactory
+import com.frafio.myfinance.ui.home.list.receipt.ReceiptViewModelFactory
 import com.frafio.myfinance.ui.home.menu.MenuViewModelFactory
-import com.google.firebase.auth.FirebaseAuth
+import com.frafio.myfinance.ui.splash.SplashScreenViewModelFactory
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.androidXModule
@@ -23,10 +25,12 @@ class MyFinanceApplication : Application(), KodeinAware {
 
         bind() from singleton { UserRepository() }
         bind() from singleton { PurchaseRepository() }
-        bind() from provider { AuthViewModelFactory(instance()) }
+        bind() from singleton { ReceiptRepository() }
+        bind() from provider { SplashScreenViewModelFactory(instance(), instance()) }
+        bind() from provider { AuthViewModelFactory(instance(), instance()) }
         bind() from provider { DashboardViewModelFactory(instance()) }
         bind() from provider { ListViewModelFactory(instance()) }
         bind() from provider { MenuViewModelFactory(instance()) }
-        bind() from provider { FirebaseAuth.getInstance() }
+        bind() from provider { ReceiptViewModelFactory(instance()) }
     }
 }

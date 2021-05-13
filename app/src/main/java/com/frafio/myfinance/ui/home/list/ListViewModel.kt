@@ -3,13 +3,14 @@ package com.frafio.myfinance.ui.home.list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 
 class ListViewModel(
-    repository: PurchaseRepository
+    private val repository: PurchaseRepository
 ) : ViewModel() {
+
+    var listener: DeleteListener? = null
 
     val purchaseListSize = repository.purchaseListSize()
 
@@ -18,7 +19,12 @@ class ListViewModel(
         get() = _purchases
 
     fun getPurchases() {
-        val purchases = PurchaseManager.getPurchaseList()
+        val purchases = repository.getPurchaseList()
         _purchases.value = purchases
+    }
+
+    fun deletePurchaseAt(position: Int) {
+        val response = repository.deletePurchaseAt(position)
+        listener?.onDeleteComplete(response)
     }
 }

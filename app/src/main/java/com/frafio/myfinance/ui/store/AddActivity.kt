@@ -18,7 +18,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.manager.FetchListener
 import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.manager.UserManager
 import com.frafio.myfinance.data.models.Purchase
@@ -34,23 +33,23 @@ import java.text.NumberFormat
 import java.time.LocalDate
 import java.util.*
 
-class AddActivity : AppCompatActivity(), FetchListener {
+class AddActivity : AppCompatActivity() {
 
     lateinit var layout: RelativeLayout
 
     lateinit var mToolbar: MaterialToolbar
     lateinit var mNameET: EditText
-    lateinit var mPriceET:EditText
+    lateinit var mPriceET: EditText
     lateinit var mDateBtn: ConstraintLayout
     lateinit var mTypeLayout: GridLayout
     lateinit var mBigliettoLayout: GridLayout
     lateinit var mDateET: TextView
-    lateinit var mGenBtn:TextView
-    lateinit var mSpeBtn:TextView
-    lateinit var mBigBtn:TextView
-    lateinit var mTIBtn:TextView
-    lateinit var mAmBtn:TextView
-    lateinit var mAltroBtn:TextView
+    lateinit var mGenBtn: TextView
+    lateinit var mSpeBtn: TextView
+    lateinit var mBigBtn: TextView
+    lateinit var mTIBtn: TextView
+    lateinit var mAmBtn: TextView
+    lateinit var mAltroBtn: TextView
     lateinit var mDateArrowImg: ImageView
     lateinit var mTotSwitch: SwitchMaterial
     lateinit var mAddBtn: ExtendedFloatingActionButton
@@ -77,11 +76,10 @@ class AddActivity : AppCompatActivity(), FetchListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding: ActivityAddBinding = DataBindingUtil.setContentView(this, R.layout.activity_add)
+        val binding: ActivityAddBinding =
+            DataBindingUtil.setContentView(this, R.layout.activity_add)
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
         binding.viewmodel = viewModel
-
-        PurchaseManager.fetchListener = this
 
         // toolbar
         mToolbar = findViewById(R.id.add_toolbar)
@@ -279,7 +277,8 @@ class AddActivity : AppCompatActivity(), FetchListener {
 
     private fun openTicketBtn() {
         if (mBigliettoLayout.visibility == View.GONE) {
-            mBigliettoLayout.animate().setInterpolator(interpolator).alpha(1f).setDuration(1500).start()
+            mBigliettoLayout.animate().setInterpolator(interpolator).alpha(1f).setDuration(1500)
+                .start()
             mBigliettoLayout.visibility = View.VISIBLE
 
             val root = layout as ViewGroup
@@ -292,7 +291,8 @@ class AddActivity : AppCompatActivity(), FetchListener {
 
     private fun closeTicketBtn() {
         if (mBigliettoLayout.visibility == View.VISIBLE) {
-            mBigliettoLayout.animate().setInterpolator(interpolator).alpha(0f).setDuration(1500).start()
+            mBigliettoLayout.animate().setInterpolator(interpolator).alpha(0f).setDuration(1500)
+                .start()
             mBigliettoLayout.visibility = View.GONE
 
             val root = layout as ViewGroup
@@ -358,7 +358,7 @@ class AddActivity : AppCompatActivity(), FetchListener {
             val totID = "$year$month$day"
             fStore.collection("purchases").document(totID).set(purchase)
                 .addOnSuccessListener {
-                    PurchaseManager.updatePurchaseList()
+                    //PurchaseManager.updatePurchaseList()
                 }.addOnFailureListener { e ->
                     Log.e(TAG, "Error! ${e.localizedMessage}")
                     layout.snackbar("Totale non aggiunto!")
@@ -395,7 +395,8 @@ class AddActivity : AppCompatActivity(), FetchListener {
                         for (item in PurchaseManager.getPurchaseList()) {
                             if (item.email == userEmail && item.type != 0
                                 && item.type != 3 && item.year == purchase.year
-                                && item.month == purchase.month && item.day == purchase.day) {
+                                && item.month == purchase.month && item.day == purchase.day
+                            ) {
                                 sum += item.price ?: 0.0
                             }
                         }
@@ -404,7 +405,7 @@ class AddActivity : AppCompatActivity(), FetchListener {
                         val totID = "$year$month$day"
                         fStore1.collection("purchases").document(totID).set(totalP)
                             .addOnSuccessListener {
-                                PurchaseManager.updatePurchaseList()
+                                //PurchaseManager.updatePurchaseList()
                             }
                             .addOnFailureListener { e ->
                                 Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -425,7 +426,8 @@ class AddActivity : AppCompatActivity(), FetchListener {
                             for (item in PurchaseManager.getPurchaseList()) {
                                 if (item.email == userEmail && item.type != 0
                                     && item.type != 3 && item.year == purchase.year
-                                    && item.month == purchase.month && item.day == purchase.day) {
+                                    && item.month == purchase.month && item.day == purchase.day
+                                ) {
                                     sum += item.price ?: 0.0
                                 }
                             }
@@ -434,7 +436,7 @@ class AddActivity : AppCompatActivity(), FetchListener {
                             val fStore1 = FirebaseFirestore.getInstance()
                             fStore1.collection("purchases").document(totID).set(totalP)
                                 .addOnSuccessListener {
-                                    PurchaseManager.updatePurchaseList()
+                                    //PurchaseManager.updatePurchaseList()
                                 }
                                 .addOnFailureListener { e ->
                                     Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -538,7 +540,7 @@ class AddActivity : AppCompatActivity(), FetchListener {
         }
     }
 
-    override fun onFetchSuccess(response: LiveData<Any>?) {
+    /*override fun onFetchSuccess(response: LiveData<Any>?) {
         // torna alla home
         val returnIntent = Intent()
         returnIntent.putExtra("com.frafio.myfinance.purchaseRequest", true)
@@ -548,5 +550,5 @@ class AddActivity : AppCompatActivity(), FetchListener {
 
     override fun onFetchFailure(message: String) {
         layout.snackbar(message)
-    }
+    }*/
 }

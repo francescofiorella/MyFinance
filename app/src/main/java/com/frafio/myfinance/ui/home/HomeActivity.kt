@@ -30,7 +30,8 @@ class HomeActivity : AppCompatActivity() {
         setSupportActionBar(binding.homeToolbar)
 
         // collegamento view
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
         val navController = navHostFragment.navController
 
         binding.homeBottomNavView.setupWithNavController(navController)
@@ -38,9 +39,13 @@ class HomeActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             // controlla se si è appena fatto l'accesso
             if (intent.hasExtra("com.frafio.myfinance.userRequest")) {
-                val userRequest = intent.extras?.getBoolean("com.frafio.myfinance.userRequest", false) ?: false
+                val userRequest =
+                    intent.extras?.getBoolean("com.frafio.myfinance.userRequest", false) ?: false
                 if (userRequest) {
-                    binding.root.snackbar("Hai effettuato l'accesso come " + UserManager.getUser()?.fullName, binding.homeAddBtn)
+                    binding.root.snackbar(
+                        "Hai effettuato l'accesso come " + UserManager.getUser()?.fullName,
+                        binding.homeAddBtn
+                    )
                 }
             }
         }

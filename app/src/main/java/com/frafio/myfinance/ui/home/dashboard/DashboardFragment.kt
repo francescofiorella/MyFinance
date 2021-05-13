@@ -20,8 +20,13 @@ class DashboardFragment : Fragment(), KodeinAware {
     override val kodein by kodein()
     private val factory: DashboardViewModelFactory by instance()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val binding: FragmentDashboardBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val binding: FragmentDashboardBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
         viewModel = ViewModelProvider(this, factory).get(DashboardViewModel::class.java)
 
         viewModel.getStats()

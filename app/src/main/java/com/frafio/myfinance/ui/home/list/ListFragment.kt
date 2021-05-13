@@ -10,8 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.manager.FetchListener
-import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.FragmentListBinding
 import com.frafio.myfinance.ui.home.HomeActivity
@@ -22,7 +20,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.kodein
 import org.kodein.di.generic.instance
 
-class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, KodeinAware {
+class ListFragment : Fragment(), PurchaseInteractionListener, DeleteListener, KodeinAware {
 
     private lateinit var binding: FragmentListBinding
 
@@ -31,13 +29,15 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
     override val kodein by kodein()
     private val factory: ListViewModelFactory by instance()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false)
         viewModel = ViewModelProvider(this, factory).get(ListViewModel::class.java)
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
-
-        PurchaseManager.fetchListener = this
 
         viewModel.getPurchases()
         viewModel.purchases.observe(viewLifecycleOwner, { purchases ->
@@ -50,7 +50,11 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
         return binding.root
     }
 
-    override fun onRecyclerViewItemInteraction(interactionID: Int, purchase: Purchase, position: Int) {
+    override fun onItemInteraction(
+        interactionID: Int,
+        purchase: Purchase,
+        position: Int
+    ) {
         when (interactionID) {
             1 -> {
                 Intent(context, ReceiptActivity::class.java).also {
@@ -61,7 +65,10 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
                 }
             }
             2 -> {
-                val builder = MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_MyFinance_AlertDialog)
+                val builder = MaterialAlertDialogBuilder(
+                    requireContext(),
+                    R.style.ThemeOverlay_MyFinance_AlertDialog
+                )
                 builder.setTitle(purchase.name)
                 if (purchase.type == 0 && purchase.price == 0.0) {
                     builder.setMessage("Vuoi eliminare l'acquisto selezionato?")
@@ -83,45 +90,53 @@ class ListFragment : Fragment(),RecyclerViewInteractionListener, FetchListener, 
                     }
                 }
                 builder.setPositiveButton("Elimina") { _, _ ->
-                    PurchaseManager.deleteAndUpdatePurchaseAt(position)
+                    viewModel.deletePurchaseAt(position)
                 }
                 builder.show()
             }
         }
     }
 
-    override fun onFetchSuccess(response: LiveData<Any>?) {
-        if (response?.value is Triple<*, *, *>) {
-            val message = (response.value as Triple<*, *, *>).first as String
-            val position = (response.value as Triple<*, *, *>).second as Int
-            val totPosition = (response.value as Triple<*, *, *>).third as Int?
+    override fun onDeleteComplete(response: LiveData<Any>) {
+        response.observe(this, { value ->
+            when (value) {
+                is Triple<*, *, *> -> {
+                    val message = value.first as String
+                    val position = value.second as Int
+                    val totPosition = value.third as Int?
 
-            when (message) {
-                "Totale eliminato!" -> {
-                    binding.listRecyclerView.also {
-                        it.removeViewAt(position)
-                        it.adapter!!.notifyItemRemoved(position)
-                        it.adapter!!.notifyItemRangeChanged(position, PurchaseManager.getPurchaseList().size)
-                    }
-                }
-                "Acquisto eliminato!" -> {
-                    binding.listRecyclerView.also {
-                        it.removeViewAt(position)
-                        it.adapter!!.notifyItemRemoved(position)
-                        it.adapter!!.notifyItemRangeChanged(position, PurchaseManager.getPurchaseList().size)
-                        totPosition?.let { index ->
-                            it.adapter!!.notifyItemChanged(index)
+                    when (message) {
+                        "Totale eliminato!" -> {
+                            binding.listRecyclerView.also {
+                                it.removeViewAt(position)
+                                it.adapter!!.notifyItemRemoved(position)
+                                it.adapter!!.notifyItemRangeChanged(
+                                    position,
+                                    viewModel.purchaseListSize
+                                )
+                            }
+                        }
+                        "Acquisto eliminato!" -> {
+                            binding.listRecyclerView.also {
+                                it.removeViewAt(position)
+                                it.adapter!!.notifyItemRemoved(position)
+                                it.adapter!!.notifyItemRangeChanged(
+                                    position,
+                                    viewModel.purchaseListSize
+                                )
+                                totPosition?.let { index ->
+                                    it.adapter!!.notifyItemChanged(index)
+                                }
+                            }
                         }
                     }
+
+                    (activity as HomeActivity).showSnackbar(message)
                 }
+
+                is String -> (activity as HomeActivity).showSnackbar(value)
             }
-
-            (activity as HomeActivity).showSnackbar(message)
-        }
-    }
-
-    override fun onFetchFailure(message: String) {
-        (activity as HomeActivity).showSnackbar(message)
+        })
     }
 
     fun reloadPurchaseList() {

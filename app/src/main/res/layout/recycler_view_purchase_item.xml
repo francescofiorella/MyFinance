@@ -7,8 +7,6 @@
     <data>
         
         <import type="android.view.View" />
-
-        <import type="android.util.TypedValue" />
         
         <variable
             name="purchase"

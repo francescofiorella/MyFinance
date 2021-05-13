@@ -3,10 +3,12 @@ package com.frafio.myfinance.ui.auth
 import android.content.Intent
 import android.view.View
 import androidx.lifecycle.ViewModel
+import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 
 class AuthViewModel(
-        private val repository: UserRepository
+    private val userRepository: UserRepository,
+    private val purchaseRepository: PurchaseRepository
 ) : ViewModel() {
 
     var email: String? = null
@@ -35,7 +37,7 @@ class AuthViewModel(
             return
         }
 
-        val loginResponse = repository.userLogin(email!!, password!!)
+        val loginResponse = userRepository.userLogin(email!!, password!!)
         authListener?.onAuthSuccess(loginResponse)
     }
 
@@ -47,14 +49,14 @@ class AuthViewModel(
             return
         }
 
-        val resetResponse = repository.resetPassword(email!!)
+        val resetResponse = userRepository.resetPassword(email!!)
         authListener?.onAuthSuccess(resetResponse)
     }
 
     fun onGoogleRequest(data: Intent?) {
         authListener?.onAuthStarted()
 
-        val googleResponse = repository.userLogin(data)
+        val googleResponse = userRepository.userLogin(data)
         authListener?.onAuthSuccess(googleResponse)
     }
 
@@ -92,7 +94,12 @@ class AuthViewModel(
             return
         }
 
-        val signupResponse = repository.userSignup(fullName!!, email!!, password!!)
+        val signupResponse = userRepository.userSignup(fullName!!, email!!, password!!)
         authListener?.onAuthSuccess(signupResponse)
+    }
+
+    fun updateUserData() {
+        val response = purchaseRepository.updatePurchaseList()
+        authListener?.onAuthSuccess(response)
     }
 }

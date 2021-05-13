@@ -3,6 +3,7 @@ package com.frafio.myfinance.ui.auth
 import androidx.lifecycle.LiveData
 
 interface AuthListener {
+
     fun onAuthStarted()
 
     // onLogin:

@@ -11,12 +11,12 @@ import com.frafio.myfinance.databinding.RecyclerViewPurchaseItemBinding
 
 class PurchaseAdapter(
     private val purchases: List<Purchase>,
-    private val listener: RecyclerViewInteractionListener
+    private val listener: PurchaseInteractionListener
 ) : RecyclerView.Adapter<PurchaseAdapter.PurchaseViewHolder>() {
 
     inner class PurchaseViewHolder(
         val recyclerViewPurchaseItemBinding: RecyclerViewPurchaseItemBinding
-        ) : RecyclerView.ViewHolder(recyclerViewPurchaseItemBinding.root)
+    ) : RecyclerView.ViewHolder(recyclerViewPurchaseItemBinding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         PurchaseViewHolder(
@@ -34,19 +34,23 @@ class PurchaseAdapter(
 
         if (currentPurchase.name == "Spesa Coop") {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener {
-                listener.onRecyclerViewItemInteraction(1, currentPurchase, position)
+                listener.onItemInteraction(1, currentPurchase, position)
             }
         } else {
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener(null)
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener(
+                null
+            )
         }
 
         if (!(currentPurchase.type == 0 && currentPurchase.price != 0.0)) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnLongClickListener {
-                listener.onRecyclerViewItemInteraction(2, currentPurchase, position)
+                listener.onItemInteraction(2, currentPurchase, position)
                 true
             }
         } else {
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnLongClickListener(null)
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnLongClickListener(
+                null
+            )
         }
 
 

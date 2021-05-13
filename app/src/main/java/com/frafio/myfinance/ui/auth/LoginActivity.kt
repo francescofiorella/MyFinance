@@ -8,8 +8,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.manager.FetchListener
-import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.util.snackbar
@@ -20,7 +18,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAware {
+class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
 
     // binding
     private lateinit var binding: ActivityLoginBinding
@@ -46,13 +44,12 @@ class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAw
         binding.viewmodel = viewModel
 
         viewModel.authListener = this
-        PurchaseManager.fetchListener = this
 
         // toolbar
         setSupportActionBar(binding.loginToolbar)
     }
 
-    fun  onGoogleButtonClick(view: View){
+    fun onGoogleButtonClick(view: View) {
         binding.loginProgressIindicator.show()
 
         mGoogleSignInClient = getGoogleClient()
@@ -64,12 +61,12 @@ class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAw
 
     }
 
-    private fun getGoogleClient() : GoogleSignInClient {
+    private fun getGoogleClient(): GoogleSignInClient {
         // Create request
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build()
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
 
         // Build a GoogleSignInClient with the options specified by gso.
         return GoogleSignIn.getClient(this, gso)
@@ -95,10 +92,17 @@ class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAw
             }
 
             when (responseData) {
-                1 -> PurchaseManager.updatePurchaseList()
+                1 -> viewModel.updateUserData()
                 2 -> binding.loginEmailInputLayout.error = "L'email inserita non è ben formata."
                 3 -> binding.loginPasswordInputLayout.error = "La password inserita non è corretta."
-                4 -> binding.loginEmailInputLayout.error = "L'email inserita non ha un account associato."
+                4 -> binding.loginEmailInputLayout.error =
+                    "L'email inserita non ha un account associato."
+                "List updated" ->
+                    Intent(applicationContext, HomeActivity::class.java).also {
+                        it.putExtra("com.frafio.myfinance.userRequest", true)
+                        it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(it)
+                    }
                 is String -> binding.root.snackbar(responseData)
             }
         })
@@ -110,22 +114,9 @@ class LoginActivity : AppCompatActivity(), AuthListener, FetchListener, KodeinAw
         when (errorCode) {
             1 -> binding.loginEmailInputLayout.error = "Inserisci la tua email."
             2 -> binding.loginPasswordInputLayout.error = "Inserisci la password."
-            3 -> binding.loginPasswordInputLayout.error = "La password deve essere lunga almeno 8 caratteri!"
+            3 -> binding.loginPasswordInputLayout.error =
+                "La password deve essere lunga almeno 8 caratteri!"
         }
-    }
-
-    override fun onFetchSuccess(response: LiveData<Any>?) {
-        binding.loginProgressIindicator.hide()
-        Intent(applicationContext, HomeActivity::class.java).also {
-            it.putExtra("com.frafio.myfinance.userRequest", true)
-            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(it)
-        }
-    }
-
-    override fun onFetchFailure(message: String) {
-        binding.loginProgressIindicator.hide()
-        binding.root.snackbar(message)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

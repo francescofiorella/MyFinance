@@ -6,7 +6,7 @@ import com.frafio.myfinance.data.repositories.UserRepository
 
 @Suppress("UNCHECKED_CAST")
 class MenuViewModelFactory(
-        private val repository: UserRepository
+    private val repository: UserRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {

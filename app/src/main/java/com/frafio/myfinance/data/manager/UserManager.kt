@@ -15,7 +15,7 @@ object UserManager {
         user = User(fUser.displayName, fUser.email, userPic)
     }
 
-    fun getUser() : User? {
+    fun getUser(): User? {
         return user
     }
 
