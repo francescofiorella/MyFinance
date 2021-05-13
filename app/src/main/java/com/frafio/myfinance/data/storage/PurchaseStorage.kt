@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.manager
+package com.frafio.myfinance.data.storage
 
 import com.frafio.myfinance.data.models.Purchase
 

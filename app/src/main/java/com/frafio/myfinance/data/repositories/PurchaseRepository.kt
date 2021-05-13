@@ -3,8 +3,8 @@ package com.frafio.myfinance.data.repositories
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.manager.PurchaseStorage
-import com.frafio.myfinance.data.manager.UserStorage
+import com.frafio.myfinance.data.storage.PurchaseStorage
+import com.frafio.myfinance.data.storage.UserStorage
 import com.frafio.myfinance.data.models.Purchase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -45,12 +45,10 @@ class PurchaseRepository {
                     }
 
                     response.value = "List updated"
-                    fStore.terminate()
                 }.addOnFailureListener { e ->
                     Log.e(TAG, "Error! ${e.localizedMessage}")
 
                     response.value = "Error! ${e.localizedMessage}"
-                    fStore.terminate()
                 }
         }
 
@@ -203,6 +201,111 @@ class PurchaseRepository {
                 response.value = "Acquisto non eliminato correttamente!"
                 fStore.terminate()
             }
+
+        return response
+    }
+
+    fun addTotale(purchase: Purchase): LiveData<Any> {
+        val response = MutableLiveData<Any>()
+
+        purchase.id = "${purchase.year}${purchase.month}${purchase.day}"
+        FirebaseFirestore.getInstance().also { fStore ->
+            fStore.collection("purchases").document(purchase.id!!).set(purchase)
+                .addOnSuccessListener {
+                    response.value = 1
+                }.addOnFailureListener { e ->
+                    Log.e(TAG, "Error! ${e.localizedMessage}")
+                    response.value = "Totale non aggiunto!"
+                }
+        }
+
+        return response
+    }
+
+    fun addPurchase(purchase: Purchase): LiveData<Any> {
+        val response = MutableLiveData<Any>()
+
+        val userEmail = UserStorage.getUser()!!.email
+
+        FirebaseFirestore.getInstance().also { fStore ->
+            fStore.collection("purchases").add(purchase)
+                .addOnSuccessListener {
+                    var sum = if (purchase.type != 3) {
+                        purchase.price ?: 0.0
+                    } else {
+                        0.0
+                    }
+                    for (item in PurchaseStorage.getPurchaseList()) {
+                        if (item.email == userEmail && item.type != 0
+                            && item.type != 3 && item.year == purchase.year
+                            && item.month == purchase.month && item.day == purchase.day
+                        ) {
+                            sum += item.price ?: 0.0
+                        }
+                    }
+                    val totalP = Purchase(userEmail, "Totale", sum, purchase.year, purchase.month, purchase.day, 0)
+                    FirebaseFirestore.getInstance().also { fStore1 ->
+                        totalP.id = "${purchase.year}${purchase.month}${purchase.day}"
+                        fStore1.collection("purchases").document(totalP.id!!).set(totalP)
+                            .addOnSuccessListener {
+                                response.value = 1
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e(TAG, "Error! ${e.localizedMessage}")
+                                response.value = "Acquisto non aggiunto correttamente!"
+                            }
+                    }
+                }.addOnFailureListener { e ->
+                    Log.e(TAG, "Error! ${e.localizedMessage}")
+                    response.value = "Acquisto non aggiunto!"
+                }
+        }
+
+        return response
+    }
+
+    fun editPurchase(purchase: Purchase, position: Int, purchasePrice: Double): LiveData<Any> {
+        val response = MutableLiveData<Any>()
+
+        FirebaseFirestore.getInstance().also { fStore ->
+            fStore.collection("purchases").document(purchase.id!!).set(purchase)
+                .addOnSuccessListener {
+
+                    purchase.updateFormattedPrice()
+                    purchase.updateFormattedDate()
+
+                    PurchaseStorage.updatePurchaseAt(position, purchase)
+                    if (purchase.price != purchasePrice) {
+                        var sum = 0.0
+                        for (item in PurchaseStorage.getPurchaseList()) {
+                            if (item.email == purchase.email && item.type != 0
+                                && item.type != 3 && item.year == purchase.year
+                                && item.month == purchase.month && item.day == purchase.day
+                            ) {
+                                sum += item.price ?: 0.0
+                            }
+                        }
+                        val totID = "${purchase.year}${purchase.month}${purchase.day}"
+                        val totalP = Purchase(purchase.email, "Totale", sum, purchase.year, purchase.month, purchase.day, 0, totID)
+                        FirebaseFirestore.getInstance().also { fStore1 ->
+                            fStore1.collection("purchases").document(totID).set(totalP)
+                                .addOnSuccessListener {
+                                    response.value = 1
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e(TAG, "Error! ${e.localizedMessage}")
+                                    response.value = "Acquisto non aggiunto correttamente!"
+                                }
+                        }
+
+                    } else {
+                        response.value = "List updated"
+                    }
+                }.addOnFailureListener { e ->
+                    Log.e(TAG, "Error! ${e.localizedMessage}")
+                    response.value = "Acquisto non modificato!"
+                }
+        }
 
         return response
     }

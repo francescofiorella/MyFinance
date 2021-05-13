@@ -22,7 +22,7 @@ import org.kodein.di.generic.instance
 
 class SplashScreenActivity : AppCompatActivity(), SplashScreenListener, KodeinAware {
 
-    lateinit var binding: ActivitySplashScreenBinding
+    private lateinit var binding: ActivitySplashScreenBinding
     private lateinit var viewModel: SplashScreenViewModel
 
     override val kodein by kodein()

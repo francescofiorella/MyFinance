@@ -4,6 +4,7 @@ import android.app.Application
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.ReceiptRepository
 import com.frafio.myfinance.data.repositories.UserRepository
+import com.frafio.myfinance.ui.add.AddViewModelFactory
 import com.frafio.myfinance.ui.auth.AuthViewModelFactory
 import com.frafio.myfinance.ui.home.dashboard.DashboardViewModelFactory
 import com.frafio.myfinance.ui.home.list.ListViewModelFactory
@@ -34,5 +35,6 @@ class MyFinanceApplication : Application(), KodeinAware {
         bind() from provider { ProfileViewModelFactory(instance()) }
         bind() from provider { MenuViewModelFactory(instance()) }
         bind() from provider { ReceiptViewModelFactory(instance()) }
+        bind() from provider { AddViewModelFactory(instance(), instance()) }
     }
 }

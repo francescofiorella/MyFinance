@@ -2,7 +2,6 @@ package com.frafio.myfinance.ui.home.list
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,7 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.FragmentListBinding
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptActivity
-import com.frafio.myfinance.ui.store.AddActivity
+import com.frafio.myfinance.ui.add.AddActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.kodein
@@ -24,7 +23,6 @@ import org.kodein.di.generic.instance
 class ListFragment : Fragment(), PurchaseInteractionListener, DeleteListener, KodeinAware {
 
     private lateinit var binding: FragmentListBinding
-
     private lateinit var viewModel: ListViewModel
 
     override val kodein by kodein()

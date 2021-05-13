@@ -3,13 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.store.AddActivity">
+    tools:context=".ui.add.AddActivity">
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewmodel"
-            type="com.frafio.myfinance.ui.store.AddViewModel" />
+            type="com.frafio.myfinance.ui.add.AddViewModel" />
 
     </data>
 
@@ -35,6 +37,17 @@
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
 
         </com.google.android.material.appbar.AppBarLayout>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/add_progressIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:indeterminate="true"
+            app:showAnimationBehavior="inward"
+            app:hideAnimationBehavior="outward"
+            app:indicatorColor="@color/nav_items"
+            android:layout_below="@id/add_appBarLayout" />
 
         <TextView
             android:id="@+id/add_purchaseTitle"
@@ -76,6 +89,7 @@
                     android:background="@drawable/bg_edit_text"
                     android:fontFamily="@font/nunito"
                     android:inputType="text|textCapSentences|textNoSuggestions"
+                    android:text="@={viewmodel.name}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -93,6 +107,7 @@
                     android:fontFamily="@font/nunito"
                     android:drawableEnd="@drawable/ic_euro"
                     android:inputType="numberDecimal"
+                    android:text="@={viewmodel.priceString}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/add_name_EditText" />
@@ -104,8 +119,8 @@
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/bg_date_picker"
-                    android:clickable="true"
-                    android:focusable="true"
+                    android:clickable="@{viewmodel.requestCode == 1 ? true : false}"
+                    android:focusable="@{viewmodel.requestCode == 1 ? true : false}"
                     app:layout_constraintCircleRadius="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -123,6 +138,7 @@
                             android:fontFamily="@font/nunito"
                             android:textColor="@color/primary_text"
                             android:textSize="18sp"
+                            android:text="@{viewmodel.dateString}"
                             tools:text="01/01/2000"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -132,10 +148,12 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/ic_arrow_drop_down"
+                            android:visibility="@{viewmodel.requestCode == 1 ? View.VISIBLE : View.GONE}"
+                            tools:visibility="visible"
                             app:layout_constraintBottom_toBottomOf="@id/add_dateTextView"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="@id/add_dateTextView"
-                            android:contentDescription="DatePicker" />
+                            android:contentDescription="DatePickerArrow" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -214,6 +232,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="10dp"
                     android:visibility="gone"
+                    tools:visibility="visible"
                     app:layout_constraintTop_toBottomOf="@id/add_typeLayout"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
@@ -277,6 +296,8 @@
                     android:textSize="18sp"
                     android:fontFamily="@font/nunito"
                     android:background="@drawable/bg_edit_text"
+                    android:visibility="@{viewmodel.requestCode == 1 ? View.VISIBLE : View.GONE}"
+                    tools:visibility="visible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/add_bigliettoLayout" />
@@ -290,10 +311,13 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:fontFamily="@font/nunito_semibold"
-                    android:text="Aggiungi"
+                    android:text="@{viewmodel.requestCode == 1 ? @string/Aggiungi : @string/Modifica}"
+                    tools:text="@string/Aggiungi"
+                    android:onClick="@{viewmodel::onAddButtonClick}"
                     app:backgroundTint="@color/accent"
                     app:elevation="2dp"
-                    app:icon="@drawable/ic_add"
+                    app:icon="@{viewmodel.requestCode == 1 ? @drawable/ic_add : @drawable/ic_create}"
+                    tools:icon="@drawable/ic_add"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />

@@ -4,8 +4,8 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.manager.PurchaseStorage
-import com.frafio.myfinance.data.manager.UserStorage
+import com.frafio.myfinance.data.storage.PurchaseStorage
+import com.frafio.myfinance.data.storage.UserStorage
 import com.frafio.myfinance.data.models.User
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException

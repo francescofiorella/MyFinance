@@ -50,7 +50,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
     }
 
     fun onGoogleButtonClick(view: View) {
-        binding.loginProgressIindicator.show()
+        binding.loginProgressIndicator.show()
 
         mGoogleSignInClient = getGoogleClient()
 
@@ -79,7 +79,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
     }
 
     override fun onAuthStarted() {
-        binding.loginProgressIindicator.show()
+        binding.loginProgressIndicator.show()
 
         binding.loginEmailInputLayout.isErrorEnabled = false
         binding.loginPasswordInputLayout.isErrorEnabled = false
@@ -88,7 +88,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
     override fun onAuthSuccess(response: LiveData<Any>) {
         response.observe(this, { responseData ->
             if (responseData != 1) {
-                binding.loginProgressIindicator.hide()
+                binding.loginProgressIndicator.hide()
             }
 
             when (responseData) {
@@ -97,19 +97,22 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
                 3 -> binding.loginPasswordInputLayout.error = "La password inserita non è corretta."
                 4 -> binding.loginEmailInputLayout.error =
                     "L'email inserita non ha un account associato."
-                "List updated" ->
+                "List updated" -> {
+                    val name = viewModel.getUserName()
                     Intent(applicationContext, HomeActivity::class.java).also {
                         it.putExtra("com.frafio.myfinance.userRequest", true)
+                        it.putExtra("com.frafio.myfinance.userName", name)
                         it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(it)
                     }
+                }
                 is String -> binding.root.snackbar(responseData)
             }
         })
     }
 
     override fun onAuthFailure(errorCode: Int) {
-        binding.loginProgressIindicator.hide()
+        binding.loginProgressIndicator.hide()
 
         when (errorCode) {
             1 -> binding.loginEmailInputLayout.error = "Inserisci la tua email."
@@ -126,8 +129,10 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
         if (requestCode == RC_SIGN_IN) {
             viewModel.onGoogleRequest(data)
         } else if (requestCode == 1 && resultCode == RESULT_OK) {
+            val name = viewModel.getUserName()
             Intent(applicationContext, HomeActivity::class.java).also {
                 it.putExtra("com.frafio.myfinance.userRequest", true)
+                it.putExtra("com.frafio.myfinance.userName", name)
                 it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(it)
             }

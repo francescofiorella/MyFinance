@@ -18,10 +18,7 @@ import org.kodein.di.generic.instance
 class ReceiptActivity : AppCompatActivity(), ReceiptItemLongClickListener, ReceiptListener,
     KodeinAware {
 
-    // binding
     private lateinit var binding: ActivityReceiptBinding
-
-    // viewModel
     private lateinit var viewModel: ReceiptViewModel
 
     override val kodein by kodein()

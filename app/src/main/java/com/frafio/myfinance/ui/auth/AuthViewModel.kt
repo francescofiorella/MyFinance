@@ -102,4 +102,8 @@ class AuthViewModel(
         val response = purchaseRepository.updatePurchaseList()
         authListener?.onAuthSuccess(response)
     }
+
+    fun getUserName(): String {
+        return userRepository.getUser()!!.fullName!!
+    }
 }

@@ -11,4 +11,7 @@
     <string name="addBtnContentDescription">Aggiungi un acquisto</string>
 
     <string name="empty">"   "</string>
+
+    <string name="Aggiungi">Aggiungi</string>
+    <string name="Modifica">Modifica</string>
 </resources>
