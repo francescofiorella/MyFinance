@@ -9,6 +9,7 @@ import com.frafio.myfinance.ui.home.dashboard.DashboardViewModelFactory
 import com.frafio.myfinance.ui.home.list.ListViewModelFactory
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptViewModelFactory
 import com.frafio.myfinance.ui.home.menu.MenuViewModelFactory
+import com.frafio.myfinance.ui.home.profile.ProfileViewModelFactory
 import com.frafio.myfinance.ui.splash.SplashScreenViewModelFactory
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -30,6 +31,7 @@ class MyFinanceApplication : Application(), KodeinAware {
         bind() from provider { AuthViewModelFactory(instance(), instance()) }
         bind() from provider { DashboardViewModelFactory(instance()) }
         bind() from provider { ListViewModelFactory(instance()) }
+        bind() from provider { ProfileViewModelFactory(instance()) }
         bind() from provider { MenuViewModelFactory(instance()) }
         bind() from provider { ReceiptViewModelFactory(instance()) }
     }

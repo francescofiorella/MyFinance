@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.manager.UserManager
+import com.frafio.myfinance.data.manager.UserStorage
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.ui.store.AddActivity
@@ -43,7 +43,7 @@ class HomeActivity : AppCompatActivity() {
                     intent.extras?.getBoolean("com.frafio.myfinance.userRequest", false) ?: false
                 if (userRequest) {
                     binding.root.snackbar(
-                        "Hai effettuato l'accesso come " + UserManager.getUser()?.fullName,
+                        "Hai effettuato l'accesso come " + UserStorage.getUser()?.fullName,
                         binding.homeAddBtn
                     )
                 }

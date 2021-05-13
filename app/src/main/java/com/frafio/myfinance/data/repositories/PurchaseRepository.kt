@@ -3,9 +3,9 @@ package com.frafio.myfinance.data.repositories
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.manager.PurchaseManager
+import com.frafio.myfinance.data.manager.PurchaseStorage
+import com.frafio.myfinance.data.manager.UserStorage
 import com.frafio.myfinance.data.models.Purchase
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import java.text.DecimalFormat
@@ -22,46 +22,47 @@ class PurchaseRepository {
     fun updatePurchaseList(): LiveData<Any> {
         val response = MutableLiveData<Any>()
 
-        val fAuth = FirebaseAuth.getInstance()
-        val fStore = FirebaseFirestore.getInstance()
+        FirebaseFirestore.getInstance().also { fStore ->
+            fStore.collection("purchases")
+                .whereEqualTo("email", UserStorage.getUser()!!.email)
+                .orderBy("year", Query.Direction.DESCENDING)
+                .orderBy("month", Query.Direction.DESCENDING)
+                .orderBy("day", Query.Direction.DESCENDING).orderBy("type")
+                .orderBy("price", Query.Direction.DESCENDING)
+                .get().addOnSuccessListener { queryDocumentSnapshots ->
+                    PurchaseStorage.resetPurchaseList()
 
-        fStore.collection("purchases").whereEqualTo("email", fAuth.currentUser!!.email)
-            .orderBy("year", Query.Direction.DESCENDING)
-            .orderBy("month", Query.Direction.DESCENDING)
-            .orderBy("day", Query.Direction.DESCENDING).orderBy("type")
-            .orderBy("price", Query.Direction.DESCENDING)
-            .get().addOnSuccessListener { queryDocumentSnapshots ->
-                PurchaseManager.resetPurchaseList()
+                    queryDocumentSnapshots.forEach { document ->
+                        val purchase = document.toObject(Purchase::class.java)
 
-                queryDocumentSnapshots.forEach { document ->
-                    val purchase = document.toObject(Purchase::class.java)
+                        // set id
+                        purchase.id = document.id
 
-                    // set id
-                    purchase.id = document.id
+                        purchase.updateFormattedDate()
+                        purchase.updateFormattedPrice()
 
-                    purchase.updateFormattedDate()
-                    purchase.updateFormattedPrice()
+                        PurchaseStorage.addPurchase(purchase)
+                    }
 
-                    PurchaseManager.addPurchase(purchase)
+                    response.value = "List updated"
+                    fStore.terminate()
+                }.addOnFailureListener { e ->
+                    Log.e(TAG, "Error! ${e.localizedMessage}")
+
+                    response.value = "Error! ${e.localizedMessage}"
+                    fStore.terminate()
                 }
+        }
 
-                response.value = "List updated"
-                fStore.terminate()
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-
-                response.value = "Error! ${e.localizedMessage}"
-                fStore.terminate()
-            }
         return response
     }
 
     fun purchaseListSize(): Int {
-        return PurchaseManager.getPurchaseList().size
+        return PurchaseStorage.getPurchaseList().size
     }
 
     fun getPurchaseList(): List<Purchase> {
-        return PurchaseManager.getPurchaseList()
+        return PurchaseStorage.getPurchaseList()
     }
 
     fun calculateStats(): List<String> {
@@ -79,7 +80,7 @@ class PurchaseRepository {
         var lastMonth = 0
         var lastYear = 0
 
-        PurchaseManager.getPurchaseList().forEach { purchase ->
+        PurchaseStorage.getPurchaseList().forEach { purchase ->
             // totale biglietti Amtab
             if (purchase.name == "Biglietto Amtab") {
                 amTot++
@@ -147,19 +148,22 @@ class PurchaseRepository {
         val response = MutableLiveData<Any>()
         var totPosition: Int
 
-        val purchaseList = PurchaseManager.getPurchaseList()
+        val purchaseList = PurchaseStorage.getPurchaseList()
 
         val fStore = FirebaseFirestore.getInstance()
         fStore.collection("purchases").document(purchaseList[position].id!!).delete()
             .addOnSuccessListener {
                 if (purchaseList[position].type == 0) {
                     purchaseList.removeAt(position)
+                    PurchaseStorage.setPurchaseList(purchaseList)
+
                     response.value = Triple("Totale eliminato!", position, null)
                     fStore.terminate()
                 } else if (purchaseList[position].type != 3) {
                     for (i in position - 1 downTo 0) {
                         if (purchaseList[i].type == 0) {
                             totPosition = i
+
                             val newPurchase = purchaseList[totPosition]
                             newPurchase.price = newPurchase.price?.minus(
                                 purchaseList[position].price!!
@@ -172,12 +176,14 @@ class PurchaseRepository {
 
                             fStore.collection("purchases").document(purchaseList[i].id!!)
                                 .set(purchaseList[i]).addOnSuccessListener {
+                                    PurchaseStorage.setPurchaseList(purchaseList)
+
                                     response.value =
                                         Triple("Acquisto eliminato!", position, totPosition)
-                                    PurchaseManager.setPurchaseList(purchaseList)
                                     fStore.terminate()
                                 }.addOnFailureListener { e ->
                                     Log.e(TAG, "Error! ${e.localizedMessage}")
+
                                     response.value = "Acquisto non eliminato correttamente!"
                                     fStore.terminate()
                                 }
@@ -186,15 +192,18 @@ class PurchaseRepository {
                     }
                 } else {
                     purchaseList.removeAt(position)
+                    PurchaseStorage.setPurchaseList(purchaseList)
+
                     response.value = Triple("Acquisto eliminato!", position, null)
-                    PurchaseManager.setPurchaseList(purchaseList)
                     fStore.terminate()
                 }
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
+
                 response.value = "Acquisto non eliminato correttamente!"
                 fStore.terminate()
             }
+
         return response
     }
 }

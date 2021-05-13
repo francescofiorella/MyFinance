@@ -4,8 +4,9 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.manager.PurchaseManager
-import com.frafio.myfinance.data.manager.UserManager
+import com.frafio.myfinance.data.manager.PurchaseStorage
+import com.frafio.myfinance.data.manager.UserStorage
+import com.frafio.myfinance.data.models.User
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -23,7 +24,7 @@ class UserRepository {
         // authenticate the user
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
-                UserManager.updateUser(authResult.user!!)
+                UserStorage.updateUser(authResult.user!!)
                 response.value = 1
             }.addOnFailureListener { e ->
             Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -62,7 +63,7 @@ class UserRepository {
                 .addOnCompleteListener { authTask ->
                     response.value = if (authTask.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
-                        UserManager.updateUser(authTask.result!!.user!!)
+                        UserStorage.updateUser(authTask.result!!.user!!)
                         1
                     } else {
                         // If sign in fails, display a message to the user.
@@ -113,7 +114,7 @@ class UserRepository {
                 val profileUpdates =
                     UserProfileChangeRequest.Builder().setDisplayName(fullName).build()
                 fUser?.updateProfile(profileUpdates)?.addOnSuccessListener {
-                    UserManager.updateUser(authResult.user!!)
+                    UserStorage.updateUser(authResult.user!!)
                     response.value = 1
                 }?.addOnFailureListener { e ->
                     Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -140,8 +141,8 @@ class UserRepository {
 
         FirebaseAuth.getInstance().signOut()
 
-        PurchaseManager.resetPurchaseList()
-        UserManager.resetUser()
+        PurchaseStorage.resetPurchaseList()
+        UserStorage.resetUser()
 
         response.value = 1
         return (response)
@@ -153,12 +154,16 @@ class UserRepository {
         val fAuth = FirebaseAuth.getInstance()
 
         return if (fAuth.currentUser != null) {
-            UserManager.updateUser(fAuth.currentUser!!)
+            UserStorage.updateUser(fAuth.currentUser!!)
             response.value = "User logged"
             response
         } else {
             response.value = "User not logged"
             response
         }
+    }
+
+    fun getUser(): User? {
+        return UserStorage.getUser()
     }
 }

@@ -3,7 +3,6 @@ package com.frafio.myfinance.ui.home.dashboard
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 
 class DashboardViewModel(
@@ -47,7 +46,7 @@ class DashboardViewModel(
 
     fun getStats() {
         val stats = repository.calculateStats()
-        _purchaseListSize.value = PurchaseManager.getPurchaseListSize()
+        _purchaseListSize.value = repository.purchaseListSize()
         _dayAvgString.value = stats[0]
         _monthAvgString.value = stats[1]
         _todayTotString.value = stats[2]

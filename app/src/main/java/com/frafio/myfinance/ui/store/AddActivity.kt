@@ -15,11 +15,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.manager.PurchaseManager
-import com.frafio.myfinance.data.manager.UserManager
+import com.frafio.myfinance.data.manager.PurchaseStorage
+import com.frafio.myfinance.data.manager.UserStorage
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.util.snackbar
@@ -337,7 +336,7 @@ class AddActivity : AppCompatActivity() {
     }
 
     private fun addPurchase() {
-        val userEmail = UserManager.getUser()!!.email
+        val userEmail = UserStorage.getUser()!!.email
         val name = mNameET.text.toString().trim()
 
         // controlla le info aggiunte
@@ -392,7 +391,7 @@ class AddActivity : AppCompatActivity() {
                         } else {
                             0.0
                         }
-                        for (item in PurchaseManager.getPurchaseList()) {
+                        for (item in PurchaseStorage.getPurchaseList()) {
                             if (item.email == userEmail && item.type != 0
                                 && item.type != 3 && item.year == purchase.year
                                 && item.month == purchase.month && item.day == purchase.day
@@ -420,10 +419,10 @@ class AddActivity : AppCompatActivity() {
                 val fStore = FirebaseFirestore.getInstance()
                 fStore.collection("purchases").document(purchaseId).set(purchase)
                     .addOnSuccessListener {
-                        PurchaseManager.updatePurchaseAt(purchasePosition, purchase)
+                        PurchaseStorage.updatePurchaseAt(purchasePosition, purchase)
                         if (price != purchasePrice) {
                             var sum = 0.0
-                            for (item in PurchaseManager.getPurchaseList()) {
+                            for (item in PurchaseStorage.getPurchaseList()) {
                                 if (item.email == userEmail && item.type != 0
                                     && item.type != 3 && item.year == purchase.year
                                     && item.month == purchase.month && item.day == purchase.day

@@ -1,9 +1,12 @@
 package com.frafio.myfinance.ui.home.profile
 
 import androidx.lifecycle.ViewModel
-import com.frafio.myfinance.data.manager.UserManager
+import com.frafio.myfinance.data.manager.UserStorage
+import com.frafio.myfinance.data.repositories.UserRepository
 
-class ProfileViewModel : ViewModel() {
+class ProfileViewModel(
+    repository: UserRepository
+) : ViewModel() {
 
-    val user = UserManager.getUser()
+    val user = repository.getUser()
 }

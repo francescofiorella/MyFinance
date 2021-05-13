@@ -2,6 +2,7 @@ package com.frafio.myfinance.ui.home.list
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,8 +37,11 @@ class ListFragment : Fragment(), PurchaseInteractionListener, DeleteListener, Ko
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false)
         viewModel = ViewModelProvider(this, factory).get(ListViewModel::class.java)
+
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
+
+        viewModel.listener = this
 
         viewModel.getPurchases()
         viewModel.purchases.observe(viewLifecycleOwner, { purchases ->
@@ -98,7 +102,7 @@ class ListFragment : Fragment(), PurchaseInteractionListener, DeleteListener, Ko
     }
 
     override fun onDeleteComplete(response: LiveData<Any>) {
-        response.observe(this, { value ->
+        response.observe(viewLifecycleOwner, { value ->
             when (value) {
                 is Triple<*, *, *> -> {
                     val message = value.first as String
@@ -141,9 +145,5 @@ class ListFragment : Fragment(), PurchaseInteractionListener, DeleteListener, Ko
 
     fun reloadPurchaseList() {
         viewModel.getPurchases()
-    }
-
-    fun scrollListToTop() {
-        binding.listRecyclerView.smoothScrollToPosition(0)
     }
 }

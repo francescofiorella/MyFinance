@@ -3,7 +3,7 @@ package com.frafio.myfinance.data.manager
 import com.frafio.myfinance.data.models.User
 import com.google.firebase.auth.FirebaseUser
 
-object UserManager {
+object UserStorage {
 
     private var user: User? = null
 
