@@ -16,7 +16,7 @@ fun View.snackbar(message: String, anchor: View? = null) {
         .setTextColor(ContextCompat.getColor(context, R.color.inverted_primary_text))
 
     anchor?.let{
-        snackbar.setAnchorView(anchor)
+        snackbar.setAnchorView(it)
     }
 
     val tv = snackbar.view.findViewById<TextView>(R.id.snackbar_text)
