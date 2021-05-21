@@ -11,9 +11,14 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.ActivityHomeBinding
-import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.ui.add.AddActivity
+import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.util.snackbar
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.RelativeCornerSize
+import com.google.android.material.shape.RoundedCornerTreatment
+
 
 class HomeActivity : AppCompatActivity() {
 
@@ -47,6 +52,15 @@ class HomeActivity : AppCompatActivity() {
                         binding.homeAddBtn
                     )
                 }
+            }
+        }
+
+        binding.homeBottomAppBar.also { bottomAppBar ->
+            (bottomAppBar.background as MaterialShapeDrawable).also { bottomBarBackground ->
+                bottomBarBackground.shapeAppearanceModel = bottomBarBackground.shapeAppearanceModel
+                    .toBuilder()
+                    .setAllCorners(RoundedCornerTreatment()).setAllCornerSizes(RelativeCornerSize(0.3f))
+                    .build()
             }
         }
     }
