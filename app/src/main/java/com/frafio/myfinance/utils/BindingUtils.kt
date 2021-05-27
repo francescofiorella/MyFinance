@@ -1,4 +1,4 @@
-package com.frafio.myfinance.util
+package com.frafio.myfinance.utils
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter

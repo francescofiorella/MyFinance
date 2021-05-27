@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.util.snackbar
+import com.frafio.myfinance.utils.snackbar
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

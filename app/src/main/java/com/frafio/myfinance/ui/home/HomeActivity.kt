@@ -13,8 +13,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.list.ListFragment
-import com.frafio.myfinance.util.snackbar
-import com.google.android.material.bottomappbar.BottomAppBar
+import com.frafio.myfinance.utils.snackbar
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.RelativeCornerSize
 import com.google.android.material.shape.RoundedCornerTreatment

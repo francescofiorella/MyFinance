@@ -1,4 +1,4 @@
-package com.frafio.myfinance.util
+package com.frafio.myfinance.utils
 
 import android.view.View
 import android.widget.TextView

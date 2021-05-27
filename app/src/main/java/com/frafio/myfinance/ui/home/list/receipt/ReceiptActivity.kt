@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.ReceiptItem
 import com.frafio.myfinance.databinding.ActivityReceiptBinding
-import com.frafio.myfinance.util.snackbar
+import com.frafio.myfinance.utils.snackbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein

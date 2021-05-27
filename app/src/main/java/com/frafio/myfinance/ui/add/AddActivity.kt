@@ -15,7 +15,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.ActivityAddBinding
-import com.frafio.myfinance.util.snackbar
+import com.frafio.myfinance.utils.snackbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
