@@ -55,7 +55,7 @@ dependencies {
     implementation 'org.kodein.di:kodein-di-generic-jvm:6.5.5'
     implementation 'org.kodein.di:kodein-di-framework-android-x:6.5.5'
 
-    // Android Naviogation Architecture
+    // Android Navigation Architecture
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
