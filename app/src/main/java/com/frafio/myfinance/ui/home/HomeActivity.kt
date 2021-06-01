@@ -14,16 +14,11 @@ import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.utils.snackbar
-import com.google.android.material.shape.MaterialShapeDrawable
-import com.google.android.material.shape.RelativeCornerSize
-import com.google.android.material.shape.RoundedCornerTreatment
-
 
 class HomeActivity : AppCompatActivity() {
 
     // definizione variabili
     private lateinit var binding: ActivityHomeBinding
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,15 +48,6 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
-
-        binding.homeBottomAppBar.also { bottomAppBar ->
-            (bottomAppBar.background as MaterialShapeDrawable).also { bottomBarBackground ->
-                bottomBarBackground.shapeAppearanceModel = bottomBarBackground.shapeAppearanceModel
-                    .toBuilder()
-                    .setAllCorners(RoundedCornerTreatment()).setAllCornerSizes(RelativeCornerSize(0.3f))
-                    .build()
-            }
-        }
     }
 
     fun onAddButtonClick(view: View) {
@@ -76,23 +62,34 @@ class HomeActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            val purchaseRequest =
-                data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
-            if (purchaseRequest) {
-                binding.homeBottomNavView.selectedItemId = R.id.listFragment
-                binding.root.snackbar("Acquisto aggiunto!", binding.homeAddBtn)
+        when (requestCode) {
+            1 -> {
+                if (resultCode == RESULT_OK) {
+                    val purchaseRequest =
+                        data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
+                    if (purchaseRequest) {
+                        binding.homeBottomNavView.selectedItemId = R.id.listFragment
+                        binding.root.snackbar("Acquisto aggiunto!", binding.homeAddBtn)
+                    }
+                }
             }
-        } else if (requestCode == 2 && resultCode == RESULT_OK) {
-            val editRequest = data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
-            if (editRequest) {
-                val navHostFragment: Fragment? =
-                    supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView)
-                val fragment = navHostFragment!!.childFragmentManager.fragments[0] as ListFragment?
-                fragment?.reloadPurchaseList()
-                binding.root.snackbar("Acquisto modificato!", binding.homeAddBtn)
+
+            2 -> {
+                if (resultCode == RESULT_OK) {
+                    val editRequest =
+                        data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
+                    if (editRequest) {
+                        val navHostFragment: Fragment? =
+                            supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView)
+                        val fragment =
+                            navHostFragment!!.childFragmentManager.fragments[0] as ListFragment?
+                        fragment?.reloadPurchaseList()
+                        binding.root.snackbar("Acquisto modificato!", binding.homeAddBtn)
+                    }
+                }
             }
+
+            else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
