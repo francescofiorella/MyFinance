@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
@@ -19,6 +21,8 @@ class HomeActivity : AppCompatActivity() {
 
     // definizione variabili
     private lateinit var binding: ActivityHomeBinding
+    private lateinit var navHostFragment: NavHostFragment
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +32,9 @@ class HomeActivity : AppCompatActivity() {
         setSupportActionBar(binding.homeToolbar)
 
         // collegamento view
-        val navHostFragment =
+        navHostFragment =
             supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
 
         binding.homeBottomNavView.setupWithNavController(navController)
 
@@ -68,7 +72,10 @@ class HomeActivity : AppCompatActivity() {
                     val purchaseRequest =
                         data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
                     if (purchaseRequest) {
-                        binding.homeBottomNavView.selectedItemId = R.id.listFragment
+                        navController.navigate(R.id.listFragment)
+                        val fragment =
+                            navHostFragment.childFragmentManager.fragments[0] as ListFragment?
+                        fragment?.reloadPurchaseList()
                         binding.root.snackbar("Acquisto aggiunto!", binding.homeAddBtn)
                     }
                 }
@@ -79,10 +86,8 @@ class HomeActivity : AppCompatActivity() {
                     val editRequest =
                         data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
                     if (editRequest) {
-                        val navHostFragment: Fragment? =
-                            supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView)
                         val fragment =
-                            navHostFragment!!.childFragmentManager.fragments[0] as ListFragment?
+                            navHostFragment.childFragmentManager.fragments[0] as ListFragment?
                         fragment?.reloadPurchaseList()
                         binding.root.snackbar("Acquisto modificato!", binding.homeAddBtn)
                     }
