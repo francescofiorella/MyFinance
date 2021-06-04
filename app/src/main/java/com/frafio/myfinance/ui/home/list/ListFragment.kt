@@ -1,10 +1,12 @@
 package com.frafio.myfinance.ui.home.list
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -12,9 +14,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.FragmentListBinding
+import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptActivity
-import com.frafio.myfinance.ui.add.AddActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.kodein
@@ -27,6 +29,18 @@ class ListFragment : Fragment(), PurchaseInteractionListener, DeleteListener, Ko
 
     override val kodein by kodein()
     private val factory: ListViewModelFactory by instance()
+
+    private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data: Intent? = result.data
+            val editRequest =
+                data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
+            if (editRequest) {
+                viewModel.getPurchases()
+                (activity as HomeActivity).showSnackbar("Acquisto modificato!")
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -87,7 +101,7 @@ class ListFragment : Fragment(), PurchaseInteractionListener, DeleteListener, Ko
                             it.putExtra("com.frafio.myfinance.PURCHASE_YEAR", purchase.year)
                             it.putExtra("com.frafio.myfinance.PURCHASE_MONTH", purchase.month)
                             it.putExtra("com.frafio.myfinance.PURCHASE_DAY", purchase.day)
-                            activity?.startActivityForResult(it, 2)
+                            editResultLauncher.launch(it)
                         }
                     }
                 }
@@ -139,9 +153,5 @@ class ListFragment : Fragment(), PurchaseInteractionListener, DeleteListener, Ko
                 is String -> (activity as HomeActivity).showSnackbar(value)
             }
         })
-    }
-
-    fun reloadPurchaseList() {
-        viewModel.getPurchases()
     }
 }

@@ -3,18 +3,16 @@ package com.frafio.myfinance.ui.home
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
-import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.add.AddActivity
-import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.utils.snackbar
 
 class HomeActivity : AppCompatActivity() {
@@ -23,6 +21,21 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var navController: NavController
+
+    private var addResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data: Intent? = result.data
+            val purchaseRequest =
+                data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
+            if (purchaseRequest) {
+                if (binding.homeBottomNavView.selectedItemId == R.id.listFragment) {
+                    navController.popBackStack()
+                }
+                navController.navigate(R.id.listFragment)
+                binding.root.snackbar("Acquisto aggiunto!", binding.homeAddBtn)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,40 +74,7 @@ class HomeActivity : AppCompatActivity() {
         )
         Intent(applicationContext, AddActivity::class.java).also {
             it.putExtra("com.frafio.myfinance.REQUESTCODE", 1)
-            startActivityForResult(it, 1, activityOptionsCompat.toBundle())
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            1 -> {
-                if (resultCode == RESULT_OK) {
-                    val purchaseRequest =
-                        data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
-                    if (purchaseRequest) {
-                        navController.navigate(R.id.listFragment)
-                        val fragment =
-                            navHostFragment.childFragmentManager.fragments[0] as ListFragment?
-                        fragment?.reloadPurchaseList()
-                        binding.root.snackbar("Acquisto aggiunto!", binding.homeAddBtn)
-                    }
-                }
-            }
-
-            2 -> {
-                if (resultCode == RESULT_OK) {
-                    val editRequest =
-                        data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
-                    if (editRequest) {
-                        val fragment =
-                            navHostFragment.childFragmentManager.fragments[0] as ListFragment?
-                        fragment?.reloadPurchaseList()
-                        binding.root.snackbar("Acquisto modificato!", binding.homeAddBtn)
-                    }
-                }
-            }
-
-            else -> super.onActivityResult(requestCode, resultCode, data)
+            addResultLauncher.launch(it, activityOptionsCompat)
         }
     }
 
