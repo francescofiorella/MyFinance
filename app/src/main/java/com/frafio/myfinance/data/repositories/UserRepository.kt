@@ -4,6 +4,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.frafio.myfinance.data.managers.AuthManager
 import com.frafio.myfinance.data.storage.PurchaseStorage
 import com.frafio.myfinance.data.storage.UserStorage
 import com.frafio.myfinance.data.models.User
@@ -13,6 +14,8 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 
 class UserRepository {
+
+    private val authManager: AuthManager = AuthManager()
 
     companion object {
         private val TAG = UserRepository::class.java.simpleName
@@ -151,19 +154,11 @@ class UserRepository {
     fun isUserLogged(): LiveData<Any> {
         val response = MutableLiveData<Any>()
 
-        val fAuth = FirebaseAuth.getInstance()
-
-        return if (fAuth.currentUser != null) {
-            UserStorage.updateUser(fAuth.currentUser!!)
-            response.value = "User logged"
-            response
-        } else {
-            response.value = "User not logged"
-            response
-        }
+        response.value = authManager.isUserLogged()
+        return response
     }
 
     fun getUser(): User? {
-        return UserStorage.getUser()
+        return UserStorage.user
     }
 }

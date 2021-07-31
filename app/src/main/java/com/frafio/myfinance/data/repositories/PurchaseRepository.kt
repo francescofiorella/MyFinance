@@ -3,11 +3,11 @@ package com.frafio.myfinance.data.repositories
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.frafio.myfinance.data.managers.PurchaseManager
+import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.storage.PurchaseStorage
 import com.frafio.myfinance.data.storage.UserStorage
-import com.frafio.myfinance.data.models.Purchase
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.LocalDate
@@ -19,48 +19,18 @@ class PurchaseRepository {
         private val TAG = PurchaseRepository::class.java.simpleName
     }
 
+    private val purchaseManager: PurchaseManager = PurchaseManager()
+
     fun updatePurchaseList(): LiveData<Any> {
-        val response = MutableLiveData<Any>()
-
-        FirebaseFirestore.getInstance().also { fStore ->
-            fStore.collection("purchases")
-                .whereEqualTo("email", UserStorage.getUser()!!.email)
-                .orderBy("year", Query.Direction.DESCENDING)
-                .orderBy("month", Query.Direction.DESCENDING)
-                .orderBy("day", Query.Direction.DESCENDING).orderBy("type")
-                .orderBy("price", Query.Direction.DESCENDING)
-                .get().addOnSuccessListener { queryDocumentSnapshots ->
-                    PurchaseStorage.resetPurchaseList()
-
-                    queryDocumentSnapshots.forEach { document ->
-                        val purchase = document.toObject(Purchase::class.java)
-
-                        // set id
-                        purchase.id = document.id
-
-                        purchase.updateFormattedDate()
-                        purchase.updateFormattedPrice()
-
-                        PurchaseStorage.addPurchase(purchase)
-                    }
-
-                    response.value = "List updated"
-                }.addOnFailureListener { e ->
-                    Log.e(TAG, "Error! ${e.localizedMessage}")
-
-                    response.value = "Error! ${e.localizedMessage}"
-                }
-        }
-
-        return response
+        return purchaseManager.updateList()
     }
 
     fun purchaseListSize(): Int {
-        return PurchaseStorage.getPurchaseList().size
+        return PurchaseStorage.purchaseList.size
     }
 
     fun getPurchaseList(): List<Purchase> {
-        return PurchaseStorage.getPurchaseList()
+        return PurchaseStorage.purchaseList
     }
 
     fun calculateStats(): List<String> {
@@ -78,7 +48,7 @@ class PurchaseRepository {
         var lastMonth = 0
         var lastYear = 0
 
-        PurchaseStorage.getPurchaseList().forEach { purchase ->
+        PurchaseStorage.purchaseList.forEach { purchase ->
             // totale biglietti Amtab
             if (purchase.name == "Biglietto Amtab") {
                 amTot++
@@ -146,14 +116,14 @@ class PurchaseRepository {
         val response = MutableLiveData<Any>()
         var totPosition: Int
 
-        val purchaseList = PurchaseStorage.getPurchaseList()
+        val purchaseList = PurchaseStorage.purchaseList
 
         val fStore = FirebaseFirestore.getInstance()
         fStore.collection("purchases").document(purchaseList[position].id!!).delete()
             .addOnSuccessListener {
                 if (purchaseList[position].type == 0) {
                     purchaseList.removeAt(position)
-                    PurchaseStorage.setPurchaseList(purchaseList)
+                    PurchaseStorage.purchaseList = purchaseList
 
                     response.value = Triple("Totale eliminato!", position, null)
                     fStore.terminate()
@@ -167,14 +137,14 @@ class PurchaseRepository {
                                 purchaseList[position].price!!
                             )
 
-                            newPurchase.updateFormattedPrice()
+                            newPurchase.updatePurchase(date = false)
 
                             purchaseList[totPosition] = newPurchase
                             purchaseList.removeAt(position)
 
                             fStore.collection("purchases").document(purchaseList[i].id!!)
                                 .set(purchaseList[i]).addOnSuccessListener {
-                                    PurchaseStorage.setPurchaseList(purchaseList)
+                                    PurchaseStorage.purchaseList = purchaseList
 
                                     response.value =
                                         Triple("Acquisto eliminato!", position, totPosition)
@@ -190,7 +160,7 @@ class PurchaseRepository {
                     }
                 } else {
                     purchaseList.removeAt(position)
-                    PurchaseStorage.setPurchaseList(purchaseList)
+                    PurchaseStorage.purchaseList = purchaseList
 
                     response.value = Triple("Acquisto eliminato!", position, null)
                     fStore.terminate()
@@ -225,7 +195,7 @@ class PurchaseRepository {
     fun addPurchase(purchase: Purchase): LiveData<Any> {
         val response = MutableLiveData<Any>()
 
-        val userEmail = UserStorage.getUser()!!.email
+        val userEmail = UserStorage.user!!.email
 
         FirebaseFirestore.getInstance().also { fStore ->
             fStore.collection("purchases").add(purchase)
@@ -235,7 +205,7 @@ class PurchaseRepository {
                     } else {
                         0.0
                     }
-                    for (item in PurchaseStorage.getPurchaseList()) {
+                    for (item in PurchaseStorage.purchaseList) {
                         if (item.email == userEmail && item.type != 0
                             && item.type != 3 && item.year == purchase.year
                             && item.month == purchase.month && item.day == purchase.day
@@ -271,13 +241,12 @@ class PurchaseRepository {
             fStore.collection("purchases").document(purchase.id!!).set(purchase)
                 .addOnSuccessListener {
 
-                    purchase.updateFormattedPrice()
-                    purchase.updateFormattedDate()
+                    purchase.updatePurchase()
 
-                    PurchaseStorage.updatePurchaseAt(position, purchase)
+                    PurchaseStorage.purchaseList[position] = purchase
                     if (purchase.price != purchasePrice) {
                         var sum = 0.0
-                        for (item in PurchaseStorage.getPurchaseList()) {
+                        for (item in PurchaseStorage.purchaseList) {
                             if (item.email == purchase.email && item.type != 0
                                 && item.type != 3 && item.year == purchase.year
                                 && item.month == purchase.month && item.day == purchase.day

@@ -12,11 +12,31 @@ data class Purchase(
     val month: Int? = null,
     val day: Int? = null,
     val type: Int? = null,
-    var id: String? = null,
-    var formattedDate: String? = null,
-    var formattedPrice: String? = null
+    var id: String? = null
 ) {
-    fun updateFormattedDate() {
+    private var privateFormattedDate: String? = null
+    val formattedDate: String?
+        get() = privateFormattedDate
+
+    private var privateFormattedPrice: String? = null
+    val formattedPrice: String?
+        get() = privateFormattedPrice
+
+    fun updatePurchase(id: String? = null, date: Boolean = true, price: Boolean = true) {
+        id?.let {
+            this.id = it
+        }
+
+        if (date) {
+            updateFormattedDate()
+        }
+
+        if (price) {
+            updateFormattedPrice()
+        }
+    }
+
+    private fun updateFormattedDate() {
         day?.let { day ->
             month?.let { month ->
                 year?.let { year ->
@@ -30,19 +50,19 @@ data class Purchase(
                     } else {
                         month.toString()
                     }
-                    formattedDate = "$dayString/$monthString/$year"
+                    privateFormattedDate = "$dayString/$monthString/$year"
                 }
             }
         }
     }
 
-    fun updateFormattedPrice() {
+    private fun updateFormattedPrice() {
         price?.let { price ->
             val locale = Locale("en", "UK")
             val nf = NumberFormat.getInstance(locale)
             val formatter = nf as DecimalFormat
             formatter.applyPattern("###,###,##0.00")
-            formattedPrice = "€ ${formatter.format(price)}"
+            privateFormattedPrice = "€ ${formatter.format(price)}"
         }
     }
 }

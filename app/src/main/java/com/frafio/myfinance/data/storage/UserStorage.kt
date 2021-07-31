@@ -5,21 +5,20 @@ import com.google.firebase.auth.FirebaseUser
 
 object UserStorage {
 
-    private var user: User? = null
+    private var privateUser: User? = null
+
+    val user: User?
+        get() = privateUser
 
     fun updateUser(fUser: FirebaseUser) {
         var userPic = ""
         fUser.photoUrl?.let { uri ->
             userPic = uri.toString()
         }
-        user = User(fUser.displayName, fUser.email, userPic)
-    }
-
-    fun getUser(): User? {
-        return user
+        privateUser = User(fUser.displayName, fUser.email, userPic)
     }
 
     fun resetUser() {
-        user = null
+        privateUser = null
     }
 }

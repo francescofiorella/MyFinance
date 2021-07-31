@@ -3,22 +3,21 @@ package com.frafio.myfinance.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.ActivityLoginBinding
+import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.snackbar
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
+class LoginActivity : BaseActivity(), AuthListener {
 
     // binding
     private lateinit var binding: ActivityLoginBinding
@@ -29,12 +28,12 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
     // login Google
     private lateinit var mGoogleSignInClient: GoogleSignInClient
 
-    companion object {
-        private const val RC_SIGN_IN = 101
-    }
-
-    override val kodein by kodein()
     private val factory: AuthViewModelFactory by instance()
+
+    private val googleSignInResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        val data: Intent? = result.data
+        viewModel.onGoogleRequest(data)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +55,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
 
         // SignIn Intent
         mGoogleSignInClient.signInIntent.also {
-            startActivityForResult(it, RC_SIGN_IN)
+            googleSignInResultLauncher.launch(it)
         }
 
     }
@@ -72,9 +71,21 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
         return GoogleSignIn.getClient(this, gso)
     }
 
+    private val signUpResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val name = viewModel.getUserName()
+            Intent(applicationContext, HomeActivity::class.java).also {
+                it.putExtra("com.frafio.myfinance.userRequest", true)
+                it.putExtra("com.frafio.myfinance.userName", name)
+                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(it)
+            }
+        }
+    }
+
     fun goToSignupActivity(view: View) {
         Intent(applicationContext, SignupActivity::class.java).also {
-            startActivityForResult(it, 1)
+            signUpResultLauncher.launch(it)
         }
     }
 
@@ -119,23 +130,6 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
             2 -> binding.loginPasswordInputLayout.error = "Inserisci la password."
             3 -> binding.loginPasswordInputLayout.error =
                 "La password deve essere lunga almeno 8 caratteri!"
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            viewModel.onGoogleRequest(data)
-        } else if (requestCode == 1 && resultCode == RESULT_OK) {
-            val name = viewModel.getUserName()
-            Intent(applicationContext, HomeActivity::class.java).also {
-                it.putExtra("com.frafio.myfinance.userRequest", true)
-                it.putExtra("com.frafio.myfinance.userName", name)
-                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(it)
-            }
         }
     }
 }

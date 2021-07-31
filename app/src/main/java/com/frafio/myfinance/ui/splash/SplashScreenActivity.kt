@@ -6,26 +6,30 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.managers.AuthManager.Companion.USER_LOGGED
+import com.frafio.myfinance.data.managers.AuthManager.Companion.USER_NOT_LOGGED
+import com.frafio.myfinance.data.managers.PurchaseManager.Companion.LIST_UPDATED
 import com.frafio.myfinance.databinding.ActivitySplashScreenBinding
+import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.snackbar
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-class SplashScreenActivity : AppCompatActivity(), SplashScreenListener, KodeinAware {
+class SplashScreenActivity : BaseActivity(), SplashScreenListener {
+
+    companion object {
+        private const val SPLASH_TIME: Long = 500
+    }
 
     private lateinit var binding: ActivitySplashScreenBinding
     private lateinit var viewModel: SplashScreenViewModel
 
-    override val kodein by kodein()
     private val factory: SplashScreenViewModelFactory by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,9 +56,9 @@ class SplashScreenActivity : AppCompatActivity(), SplashScreenListener, KodeinAw
     override fun onComplete(response: LiveData<Any>) {
         response.observe(this, { value ->
             when (value) {
-                "User logged" -> viewModel.updateUserData()
+                USER_LOGGED -> viewModel.updateUserData()
 
-                "User not logged" -> {
+                USER_NOT_LOGGED -> {
                     Handler(Looper.getMainLooper()).postDelayed({
                         ActivityOptionsCompat
                             .makeCustomAnimation(
@@ -68,22 +72,21 @@ class SplashScreenActivity : AppCompatActivity(), SplashScreenListener, KodeinAw
                                     startActivity(it, options.toBundle())
                                 }
                             }
-                    }, 500)
+                    }, SPLASH_TIME)
                 }
 
-                "List updated" -> {
-                    ActivityOptionsCompat
-                        .makeCustomAnimation(
-                            applicationContext,
-                            android.R.anim.fade_in,
-                            android.R.anim.fade_out
-                        ).also { options ->
-                            Intent(applicationContext, HomeActivity::class.java).also {
-                                it.flags =
-                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                startActivity(it, options.toBundle())
-                            }
+                LIST_UPDATED -> {
+                    ActivityOptionsCompat.makeCustomAnimation(
+                        applicationContext,
+                        android.R.anim.fade_in,
+                        android.R.anim.fade_out
+                    ).also { options ->
+                        Intent(applicationContext, HomeActivity::class.java).also {
+                            it.flags =
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(it, options.toBundle())
                         }
+                    }
                 }
 
                 is String -> binding.root.snackbar(value)

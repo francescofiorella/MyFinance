@@ -8,30 +8,27 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.ActivityAddBinding
+import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.snackbar
 import com.google.android.material.datepicker.MaterialDatePicker
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
 
-class AddActivity : AppCompatActivity(), AddListener, KodeinAware {
+class AddActivity : BaseActivity(), AddListener {
 
     private val interpolator = OvershootInterpolator()
 
     private lateinit var binding: ActivityAddBinding
     private lateinit var viewModel: AddViewModel
 
-    override val kodein by kodein()
     private val factory: AddViewModelFactory by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {

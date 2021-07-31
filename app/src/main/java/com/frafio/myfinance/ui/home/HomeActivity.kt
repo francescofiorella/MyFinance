@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
@@ -12,10 +11,11 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.ActivityHomeBinding
+import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.utils.snackbar
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : BaseActivity() {
 
     // definizione variabili
     private lateinit var binding: ActivityHomeBinding

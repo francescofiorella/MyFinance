@@ -4,23 +4,20 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.ActivitySignupBinding
+import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.snackbar
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-class SignupActivity : AppCompatActivity(), AuthListener, KodeinAware {
+class SignupActivity : BaseActivity(), AuthListener {
 
     private lateinit var binding: ActivitySignupBinding
     private lateinit var viewModel: AuthViewModel
 
-    override val kodein by kodein()
     private val factory: AuthViewModelFactory by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
