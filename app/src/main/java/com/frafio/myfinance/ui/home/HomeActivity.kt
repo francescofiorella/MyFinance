@@ -26,13 +26,13 @@ class HomeActivity : BaseActivity() {
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
             val purchaseRequest =
-                data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
+                data!!.getBooleanExtra("${getString(R.string.default_path)}.purchaseRequest", false)
             if (purchaseRequest) {
                 if (binding.homeBottomNavView.selectedItemId == R.id.listFragment) {
                     navController.popBackStack()
                 }
                 navController.navigate(R.id.listFragment)
-                binding.root.snackbar("Acquisto aggiunto!", binding.homeAddBtn)
+                binding.root.snackbar(getString(R.string.purchase_added), binding.homeAddBtn)
             }
         }
     }
@@ -53,13 +53,19 @@ class HomeActivity : BaseActivity() {
 
         if (savedInstanceState == null) {
             // controlla se si è appena fatto l'accesso
-            if (intent.hasExtra("com.frafio.myfinance.userRequest")) {
+            if (intent.hasExtra("${getString(R.string.default_path)}.userRequest")) {
                 val userRequest =
-                    intent.extras?.getBoolean("com.frafio.myfinance.userRequest", false) ?: false
-                val userName = intent.extras?.getString("com.frafio.myfinance.userName")
+                    intent.extras?.getBoolean(
+                        "${getString(R.string.default_path)}.userRequest",
+                        false
+                    ) ?: false
+
+                val userName =
+                    intent.extras?.getString("${getString(R.string.default_path)}.userName")
+
                 if (userRequest) {
                     binding.root.snackbar(
-                        "Hai effettuato l'accesso come $userName",
+                        "${getString(R.string.login_successful)} $userName",
                         binding.homeAddBtn
                     )
                 }
@@ -69,11 +75,12 @@ class HomeActivity : BaseActivity() {
 
     fun onAddButtonClick(view: View) {
         val activityOptionsCompat = ActivityOptionsCompat.makeClipRevealAnimation(
-            binding.homeAddBtn, 0, 0,
-            binding.homeAddBtn.measuredWidth, binding.homeAddBtn.measuredHeight
+            view, 0, 0,
+            view.measuredWidth, view.measuredHeight
         )
+
         Intent(applicationContext, AddActivity::class.java).also {
-            it.putExtra("com.frafio.myfinance.REQUESTCODE", 1)
+            it.putExtra("${getString(R.string.default_path)}.REQUESTCODE", 1)
             addResultLauncher.launch(it, activityOptionsCompat)
         }
     }

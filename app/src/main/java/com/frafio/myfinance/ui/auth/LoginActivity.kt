@@ -8,6 +8,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.enums.AUTH_RESULT
+import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.home.HomeActivity
@@ -30,10 +32,24 @@ class LoginActivity : BaseActivity(), AuthListener {
 
     private val factory: AuthViewModelFactory by instance()
 
-    private val googleSignInResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        val data: Intent? = result.data
-        viewModel.onGoogleRequest(data)
-    }
+    private val googleSignInResultLauncher =
+        registerForActivityResult(StartActivityForResult()) { result ->
+            val data: Intent? = result.data
+            viewModel.onGoogleRequest(data)
+        }
+
+    private val signUpResultLauncher =
+        registerForActivityResult(StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val name = viewModel.getUserName()
+                Intent(applicationContext, HomeActivity::class.java).also {
+                    it.putExtra("${getString(R.string.default_path)}.userRequest", true)
+                    it.putExtra("${getString(R.string.default_path)}.userName", name)
+                    it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(it)
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,18 +87,6 @@ class LoginActivity : BaseActivity(), AuthListener {
         return GoogleSignIn.getClient(this, gso)
     }
 
-    private val signUpResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val name = viewModel.getUserName()
-            Intent(applicationContext, HomeActivity::class.java).also {
-                it.putExtra("com.frafio.myfinance.userRequest", true)
-                it.putExtra("com.frafio.myfinance.userName", name)
-                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(it)
-            }
-        }
-    }
-
     fun goToSignupActivity(view: View) {
         Intent(applicationContext, SignupActivity::class.java).also {
             signUpResultLauncher.launch(it)
@@ -96,40 +100,53 @@ class LoginActivity : BaseActivity(), AuthListener {
         binding.loginPasswordInputLayout.isErrorEnabled = false
     }
 
-    override fun onAuthSuccess(response: LiveData<Any>) {
-        response.observe(this, { responseData ->
-            if (responseData != 1) {
+    override fun onAuthSuccess(response: LiveData<AuthResult>) {
+        response.observe(this, { authResult ->
+            if (authResult.code != AUTH_RESULT.LOGIN_SUCCESS.code) {
                 binding.loginProgressIndicator.hide()
             }
 
-            when (responseData) {
-                1 -> viewModel.updateUserData()
-                2 -> binding.loginEmailInputLayout.error = "L'email inserita non è ben formata."
-                3 -> binding.loginPasswordInputLayout.error = "La password inserita non è corretta."
-                4 -> binding.loginEmailInputLayout.error =
-                    "L'email inserita non ha un account associato."
-                "List updated" -> {
+            when (authResult.code) {
+                AUTH_RESULT.LOGIN_SUCCESS.code -> viewModel.updateUserData()
+
+                AUTH_RESULT.GOOGLE_LOGIN_FAILURE.code
+                        or AUTH_RESULT.USER_DISABLED.code
+                        or AUTH_RESULT.LOGIN_FAILURE.code
+                        or AUTH_RESULT.USER_DATA_NOT_UPDATED.code ->
+                    binding.root.snackbar(authResult.message)
+
+                AUTH_RESULT.INVALID_EMAIL.code or AUTH_RESULT.USER_NOT_FOUND.code->
+                    binding.loginEmailInputLayout.error = authResult.message
+
+                AUTH_RESULT.WRONG_PASSWORD.code -> binding.loginPasswordInputLayout.error =
+                    authResult.message
+
+                AUTH_RESULT.USER_DATA_UPDATED.code -> {
                     val name = viewModel.getUserName()
                     Intent(applicationContext, HomeActivity::class.java).also {
-                        it.putExtra("com.frafio.myfinance.userRequest", true)
-                        it.putExtra("com.frafio.myfinance.userName", name)
+                        it.putExtra("${getString(R.string.default_path)}.userRequest", true)
+                        it.putExtra("${getString(R.string.default_path)}.userName", name)
                         it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(it)
                     }
                 }
-                is String -> binding.root.snackbar(responseData)
+
+                else -> Unit
             }
         })
     }
 
-    override fun onAuthFailure(errorCode: Int) {
+    override fun onAuthFailure(authResult: AuthResult) {
         binding.loginProgressIndicator.hide()
 
-        when (errorCode) {
-            1 -> binding.loginEmailInputLayout.error = "Inserisci la tua email."
-            2 -> binding.loginPasswordInputLayout.error = "Inserisci la password."
-            3 -> binding.loginPasswordInputLayout.error =
-                "La password deve essere lunga almeno 8 caratteri!"
+        when (authResult.code) {
+            AUTH_RESULT.EMPTY_EMAIL.code ->
+                binding.loginEmailInputLayout.error = authResult.message
+
+            AUTH_RESULT.EMPTY_PASSWORD.code or AUTH_RESULT.SHORT_PASSWORD.code ->
+                binding.loginPasswordInputLayout.error = authResult.message
+
+            else -> Unit
         }
     }
 }

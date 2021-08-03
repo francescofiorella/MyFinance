@@ -1,6 +1,7 @@
 package com.frafio.myfinance.ui.add
 
 import android.view.View
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.repositories.PurchaseRepository
@@ -108,6 +109,6 @@ class AddViewModel(
 
     fun updateLocalList() {
         val response = purchaseRepository.updatePurchaseList()
-        listener?.onAddSuccess(response)
+        listener?.onAddSuccess(response as LiveData<Any>)
     }
 }

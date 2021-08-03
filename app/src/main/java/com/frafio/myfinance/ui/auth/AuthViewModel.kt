@@ -3,6 +3,8 @@ package com.frafio.myfinance.ui.auth
 import android.content.Intent
 import android.view.View
 import androidx.lifecycle.ViewModel
+import com.frafio.myfinance.data.enums.AUTH_RESULT
+import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 
@@ -23,17 +25,17 @@ class AuthViewModel(
         authListener?.onAuthStarted()
 
         if (email.isNullOrEmpty()) {
-            authListener?.onAuthFailure(1)
+            authListener?.onAuthFailure(AuthResult(AUTH_RESULT.EMPTY_EMAIL))
             return
         }
 
         if (password.isNullOrEmpty()) {
-            authListener?.onAuthFailure(2)
+            authListener?.onAuthFailure(AuthResult(AUTH_RESULT.EMPTY_PASSWORD))
             return
         }
 
         if (password!!.length < 8) {
-            authListener?.onAuthFailure(3)
+            authListener?.onAuthFailure(AuthResult(AUTH_RESULT.SHORT_PASSWORD))
             return
         }
 
@@ -45,7 +47,7 @@ class AuthViewModel(
         authListener?.onAuthStarted()
 
         if (email.isNullOrEmpty()) {
-            authListener?.onAuthFailure(1)
+            authListener?.onAuthFailure(AuthResult(AUTH_RESULT.EMPTY_EMAIL))
             return
         }
 
@@ -65,32 +67,32 @@ class AuthViewModel(
 
         // controlla la info aggiunte
         if (fullName.isNullOrEmpty()) {
-            authListener?.onAuthFailure(1)
+            authListener?.onAuthFailure(AuthResult(AUTH_RESULT.EMPTY_NAME))
             return
         }
 
         if (email.isNullOrEmpty()) {
-            authListener?.onAuthFailure(2)
+            authListener?.onAuthFailure(AuthResult(AUTH_RESULT.EMPTY_EMAIL))
             return
         }
 
         if (password.isNullOrEmpty()) {
-            authListener?.onAuthFailure(3)
+            authListener?.onAuthFailure(AuthResult(AUTH_RESULT.EMPTY_PASSWORD))
             return
         }
 
         if (password!!.length < 8) {
-            authListener?.onAuthFailure(4)
+            authListener?.onAuthFailure(AuthResult(AUTH_RESULT.SHORT_PASSWORD))
             return
         }
 
         if (passwordConfirm.isNullOrEmpty()) {
-            authListener?.onAuthFailure(5)
+            authListener?.onAuthFailure(AuthResult(AUTH_RESULT.EMPTY_PASSWORD_CONFIRM))
             return
         }
 
         if (passwordConfirm != password) {
-            authListener?.onAuthFailure(6)
+            authListener?.onAuthFailure(AuthResult(AUTH_RESULT.PASSWORD_NOT_MATCH))
             return
         }
 

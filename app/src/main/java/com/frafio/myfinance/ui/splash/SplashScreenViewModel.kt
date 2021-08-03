@@ -1,12 +1,10 @@
 package com.frafio.myfinance.ui.splash
 
 import androidx.lifecycle.ViewModel
-import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 
 class SplashScreenViewModel(
-    private val userRepository: UserRepository,
-    private val purchaseRepository: PurchaseRepository
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     var listener: SplashScreenListener? = null
@@ -17,7 +15,7 @@ class SplashScreenViewModel(
     }
 
     fun updateUserData() {
-        val response = purchaseRepository.updatePurchaseList()
+        val response = userRepository.updateUserData()
         listener?.onComplete(response)
     }
 }

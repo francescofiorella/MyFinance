@@ -11,9 +11,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.managers.AuthManager.Companion.USER_LOGGED
-import com.frafio.myfinance.data.managers.AuthManager.Companion.USER_NOT_LOGGED
-import com.frafio.myfinance.data.managers.PurchaseManager.Companion.LIST_UPDATED
+import com.frafio.myfinance.data.enums.AUTH_RESULT
+import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivitySplashScreenBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
@@ -53,12 +52,12 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
         viewModel.checkUser()
     }
 
-    override fun onComplete(response: LiveData<Any>) {
-        response.observe(this, { value ->
-            when (value) {
-                USER_LOGGED -> viewModel.updateUserData()
+    override fun onComplete(response: LiveData<AuthResult>) {
+        response.observe(this, { authResult ->
+            when (authResult.code) {
+                AUTH_RESULT.USER_LOGGED.code -> viewModel.updateUserData()
 
-                USER_NOT_LOGGED -> {
+                AUTH_RESULT.USER_NOT_LOGGED.code -> {
                     Handler(Looper.getMainLooper()).postDelayed({
                         ActivityOptionsCompat
                             .makeCustomAnimation(
@@ -75,7 +74,7 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
                     }, SPLASH_TIME)
                 }
 
-                LIST_UPDATED -> {
+                AUTH_RESULT.USER_DATA_UPDATED.code -> {
                     ActivityOptionsCompat.makeCustomAnimation(
                         applicationContext,
                         android.R.anim.fade_in,
@@ -89,7 +88,9 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
                     }
                 }
 
-                is String -> binding.root.snackbar(value)
+                AUTH_RESULT.USER_DATA_NOT_UPDATED.code -> binding.root.snackbar(authResult.message)
+
+                else -> Unit
             }
         })
     }

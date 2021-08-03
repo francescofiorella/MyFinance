@@ -3,10 +3,12 @@ package com.frafio.myfinance.data.managers
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.frafio.myfinance.data.enums.AUTH_RESULT
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.storage.PurchaseStorage
 import com.frafio.myfinance.data.storage.UserStorage
-import com.frafio.myfinance.data.db_enums.DbPurchases
+import com.frafio.myfinance.data.enums.DB_PURCHASES
+import com.frafio.myfinance.data.models.AuthResult
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
@@ -14,23 +16,21 @@ class PurchaseManager {
 
     companion object {
         private val TAG = PurchaseManager::class.java.simpleName
-
-        const val LIST_UPDATED: Int = 10
     }
 
     private val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
 
-    fun updateList(): LiveData<Any> {
-        val response = MutableLiveData<Any>()
+    fun updateList(): LiveData<AuthResult> {
+        val response = MutableLiveData<AuthResult>()
 
-        fStore.collection(DbPurchases.PURCHASES.value)
-            .whereEqualTo(DbPurchases.EMAIL.value, UserStorage.user!!.email)
-            .orderBy(DbPurchases.YEAR.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.MONTH.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.DAY.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.TYPE.value)
-            .orderBy(DbPurchases.PRICE.value, Query.Direction.DESCENDING)
+        fStore.collection(DB_PURCHASES.PURCHASES.value)
+            .whereEqualTo(DB_PURCHASES.EMAIL.value, UserStorage.user!!.email)
+            .orderBy(DB_PURCHASES.YEAR.value, Query.Direction.DESCENDING)
+            .orderBy(DB_PURCHASES.MONTH.value, Query.Direction.DESCENDING)
+            .orderBy(DB_PURCHASES.DAY.value, Query.Direction.DESCENDING)
+            .orderBy(DB_PURCHASES.TYPE.value)
+            .orderBy(DB_PURCHASES.PRICE.value, Query.Direction.DESCENDING)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
                 PurchaseStorage.resetPurchaseList()
 
@@ -43,12 +43,12 @@ class PurchaseManager {
                     PurchaseStorage.purchaseList.add(purchase)
                 }
 
-                response.value = LIST_UPDATED
+                response.value = AuthResult(AUTH_RESULT.USER_DATA_UPDATED)
             }.addOnFailureListener { e ->
                 val error = "Error! ${e.localizedMessage}"
                 Log.e(TAG, error)
 
-                response.value = "Error! ${e.localizedMessage}"
+                response.value = AuthResult(AUTH_RESULT.USER_DATA_NOT_UPDATED)
             }
 
         return response

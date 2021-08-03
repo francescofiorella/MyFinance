@@ -13,6 +13,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.enums.AUTH_RESULT
+import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.snackbar
@@ -342,15 +344,21 @@ class AddActivity : BaseActivity(), AddListener {
             }
 
             when (value) {
-                1 -> viewModel.updateLocalList()
+                is AuthResult -> {
+                    when (value.code) {
+                        AUTH_RESULT.USER_DATA_UPDATED.code ->
+                            // torna alla home
+                            Intent().also {
+                                it.putExtra("com.frafio.myfinance.purchaseRequest", true)
+                                setResult(RESULT_OK, it)
+                                finish()
+                            }
 
-                "List updated" ->
-                    // torna alla home
-                    Intent().also {
-                        it.putExtra("com.frafio.myfinance.purchaseRequest", true)
-                        setResult(RESULT_OK, it)
-                        finish()
+                        AUTH_RESULT.USER_DATA_NOT_UPDATED.code -> Unit // errore
                     }
+                }
+
+                1 -> viewModel.updateLocalList()
 
                 is String -> binding.root.snackbar(value, binding.addAddButton)
             }

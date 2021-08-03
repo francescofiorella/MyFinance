@@ -28,7 +28,7 @@ class MyFinanceApplication : Application(), KodeinAware {
         bind() from singleton { UserRepository() }
         bind() from singleton { PurchaseRepository() }
         bind() from singleton { ReceiptRepository() }
-        bind() from provider { SplashScreenViewModelFactory(instance(), instance()) }
+        bind() from provider { SplashScreenViewModelFactory(instance()) }
         bind() from provider { AuthViewModelFactory(instance(), instance()) }
         bind() from provider { DashboardViewModelFactory(instance()) }
         bind() from provider { ListViewModelFactory(instance()) }

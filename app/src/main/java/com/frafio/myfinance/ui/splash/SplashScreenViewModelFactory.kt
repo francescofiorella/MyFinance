@@ -7,11 +7,10 @@ import com.frafio.myfinance.data.repositories.UserRepository
 
 @Suppress("UNCHECKED_CAST")
 class SplashScreenViewModelFactory(
-    private val userRepository: UserRepository,
-    private val purchaseRepository: PurchaseRepository
+    private val userRepository: UserRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return SplashScreenViewModel(userRepository, purchaseRepository) as T
+        return SplashScreenViewModel(userRepository) as T
     }
 }

@@ -12,6 +12,13 @@
 
     <string name="empty">"   "</string>
 
-    <string name="Aggiungi">Aggiungi</string>
-    <string name="Modifica">Modifica</string>
+    <string name="aggiungi">Aggiungi</string>
+    <string name="modifica">Modifica</string>
+
+    <string name="default_path">com.frafio.myfinance</string>
+
+    <string name="purchase_added">Acquisto aggiunto!</string>
+
+    <string name="login_successful">Hai effettuato l\'accesso come</string>
+
 </resources>

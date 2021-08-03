@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.managers.PurchaseManager
+import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.storage.PurchaseStorage
 import com.frafio.myfinance.data.storage.UserStorage
@@ -21,7 +22,7 @@ class PurchaseRepository {
 
     private val purchaseManager: PurchaseManager = PurchaseManager()
 
-    fun updatePurchaseList(): LiveData<Any> {
+    fun updatePurchaseList(): LiveData<AuthResult> {
         return purchaseManager.updateList()
     }
 
