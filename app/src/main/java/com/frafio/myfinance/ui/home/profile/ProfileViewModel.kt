@@ -6,6 +6,5 @@ import com.frafio.myfinance.data.repositories.UserRepository
 class ProfileViewModel(
     repository: UserRepository
 ) : ViewModel() {
-
     val user = repository.getUser()
 }

@@ -15,13 +15,11 @@ import java.text.NumberFormat
 import java.time.LocalDate
 import java.util.*
 
-class PurchaseRepository {
+class PurchaseRepository(private val purchaseManager: PurchaseManager) {
 
     companion object {
         private val TAG = PurchaseRepository::class.java.simpleName
     }
-
-    private val purchaseManager: PurchaseManager = PurchaseManager()
 
     fun updatePurchaseList(): LiveData<AuthResult> {
         return purchaseManager.updateList()

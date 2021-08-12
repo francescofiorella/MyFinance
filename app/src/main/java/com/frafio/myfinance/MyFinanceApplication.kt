@@ -1,6 +1,8 @@
 package com.frafio.myfinance
 
 import android.app.Application
+import com.frafio.myfinance.data.managers.AuthManager
+import com.frafio.myfinance.data.managers.PurchaseManager
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.ReceiptRepository
 import com.frafio.myfinance.data.repositories.UserRepository
@@ -25,9 +27,16 @@ class MyFinanceApplication : Application(), KodeinAware {
     override val kodein: Kodein = Kodein.lazy {
         import(androidXModule(this@MyFinanceApplication))
 
-        bind() from singleton { UserRepository() }
-        bind() from singleton { PurchaseRepository() }
+        // managers
+        bind() from singleton { AuthManager() }
+        bind() from singleton { PurchaseManager() }
+
+        // repositories
+        bind() from singleton { UserRepository(instance(), instance()) }
+        bind() from singleton { PurchaseRepository(instance()) }
         bind() from singleton { ReceiptRepository() }
+
+        // viewModelFactories
         bind() from provider { SplashScreenViewModelFactory(instance()) }
         bind() from provider { AuthViewModelFactory(instance(), instance()) }
         bind() from provider { DashboardViewModelFactory(instance()) }

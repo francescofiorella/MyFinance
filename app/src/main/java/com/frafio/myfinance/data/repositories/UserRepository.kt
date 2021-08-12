@@ -9,10 +9,7 @@ import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.models.User
 import com.frafio.myfinance.data.storage.UserStorage
 
-class UserRepository {
-
-    private val authManager: AuthManager = AuthManager()
-    private val purchaseManager: PurchaseManager = PurchaseManager()
+class UserRepository(private val authManager: AuthManager, private val purchaseManager: PurchaseManager) {
 
     fun userLogin(email: String, password: String): LiveData<AuthResult> {
         return authManager.defaultLogin(email, password)

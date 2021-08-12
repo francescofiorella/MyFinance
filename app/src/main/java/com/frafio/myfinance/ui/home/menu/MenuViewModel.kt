@@ -14,7 +14,6 @@ class MenuViewModel(
     var authListener: AuthListener? = null
 
     fun onLogoutButtonClick(view: View) {
-        authListener?.onAuthStarted()
         val logoutResponse = repository.userLogout()
         authListener?.onAuthSuccess(logoutResponse)
     }
