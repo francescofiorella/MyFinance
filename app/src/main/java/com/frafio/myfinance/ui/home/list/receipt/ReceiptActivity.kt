@@ -2,26 +2,22 @@ package com.frafio.myfinance.ui.home.list.receipt
 
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.ReceiptItem
 import com.frafio.myfinance.databinding.ActivityReceiptBinding
+import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.snackbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-class ReceiptActivity : AppCompatActivity(), ReceiptItemLongClickListener, ReceiptListener,
-    KodeinAware {
+class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptListener {
 
     private lateinit var binding: ActivityReceiptBinding
     private lateinit var viewModel: ReceiptViewModel
 
-    override val kodein by kodein()
     private val factory: ReceiptViewModelFactory by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {

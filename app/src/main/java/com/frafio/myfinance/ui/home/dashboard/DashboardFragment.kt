@@ -5,19 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.x.kodein
+import com.frafio.myfinance.ui.BaseFragment
 import org.kodein.di.generic.instance
 
-class DashboardFragment : Fragment(), KodeinAware {
+class DashboardFragment : BaseFragment() {
 
     private lateinit var viewModel: DashboardViewModel
 
-    override val kodein by kodein()
     private val factory: DashboardViewModelFactory by instance()
 
     override fun onCreateView(

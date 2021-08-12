@@ -8,26 +8,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.FragmentListBinding
 import com.frafio.myfinance.ui.add.AddActivity
+import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.x.kodein
 import org.kodein.di.generic.instance
 
-class ListFragment : Fragment(), PurchaseInteractionListener, DeleteListener, KodeinAware {
+class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener {
 
     private lateinit var binding: FragmentListBinding
     private lateinit var viewModel: ListViewModel
 
-    override val kodein by kodein()
     private val factory: ListViewModelFactory by instance()
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
