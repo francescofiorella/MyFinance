@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.AUTH_RESULT
+import com.frafio.myfinance.data.enums.auth.AUTH_RESULT
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.BaseActivity

@@ -3,11 +3,11 @@ package com.frafio.myfinance.data.managers
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.enums.AUTH_RESULT
+import com.frafio.myfinance.data.enums.auth.AUTH_RESULT
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.storage.PurchaseStorage
 import com.frafio.myfinance.data.storage.UserStorage
-import com.frafio.myfinance.data.enums.DB_PURCHASES
+import com.frafio.myfinance.data.enums.db.DB_PURCHASES
 import com.frafio.myfinance.data.models.AuthResult
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query

@@ -3,7 +3,7 @@ package com.frafio.myfinance.data.repositories
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.enums.PURCHASE_NAME
+import com.frafio.myfinance.data.enums.db.PURCHASE_NAME
 import com.frafio.myfinance.data.managers.PurchaseManager
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.models.Purchase

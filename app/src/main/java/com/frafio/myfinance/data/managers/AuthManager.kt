@@ -4,8 +4,8 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.enums.AUTH_RESULT
-import com.frafio.myfinance.data.enums.SIGNIN_EXCEPTION
+import com.frafio.myfinance.data.enums.auth.AUTH_RESULT
+import com.frafio.myfinance.data.enums.auth.SIGNIN_EXCEPTION
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.storage.PurchaseStorage
 import com.frafio.myfinance.data.storage.UserStorage
@@ -81,9 +81,11 @@ class AuthManager {
                 when (e) {
                     is FirebaseAuthInvalidCredentialsException -> {
                         when (e.errorCode) {
-                            SIGNIN_EXCEPTION.EXCEPTION_INVALID_EMAIL.value -> response.value = AuthResult(AUTH_RESULT.INVALID_EMAIL)
+                            SIGNIN_EXCEPTION.EXCEPTION_INVALID_EMAIL.value -> response.value = AuthResult(
+                                AUTH_RESULT.INVALID_EMAIL)
 
-                            SIGNIN_EXCEPTION.EXCEPTION_WRONG_PASSWORD.value -> response.value = AuthResult(AUTH_RESULT.WRONG_PASSWORD)
+                            SIGNIN_EXCEPTION.EXCEPTION_WRONG_PASSWORD.value -> response.value = AuthResult(
+                                AUTH_RESULT.WRONG_PASSWORD)
 
                             else -> response.value = AuthResult(AUTH_RESULT.LOGIN_FAILURE)
                         }
@@ -91,9 +93,11 @@ class AuthManager {
 
                     is FirebaseAuthInvalidUserException -> {
                         when (e.errorCode) {
-                            SIGNIN_EXCEPTION.EXCEPTION_USER_NOT_FOUND.value -> response.value = AuthResult(AUTH_RESULT.USER_NOT_FOUND)
+                            SIGNIN_EXCEPTION.EXCEPTION_USER_NOT_FOUND.value -> response.value = AuthResult(
+                                AUTH_RESULT.USER_NOT_FOUND)
 
-                            SIGNIN_EXCEPTION.EXCEPTION_USER_DISABLED.value -> response.value = AuthResult(AUTH_RESULT.USER_DISABLED)
+                            SIGNIN_EXCEPTION.EXCEPTION_USER_DISABLED.value -> response.value = AuthResult(
+                                AUTH_RESULT.USER_DISABLED)
 
                             else -> response.value = AuthResult(AUTH_RESULT.LOGIN_FAILURE)
                         }

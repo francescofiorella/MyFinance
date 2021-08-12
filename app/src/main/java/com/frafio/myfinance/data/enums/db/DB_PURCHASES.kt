@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.enums
+package com.frafio.myfinance.data.enums.db
 
 enum class DB_PURCHASES(val value: String) {
     PURCHASES("purchases"),

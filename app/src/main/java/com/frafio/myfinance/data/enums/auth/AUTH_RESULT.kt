@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.enums
+package com.frafio.myfinance.data.enums.auth
 
 enum class AUTH_RESULT(val code: Int, val message: String) {
     LOGIN_SUCCESS(1, "Accesso avvenuto con successo!"),

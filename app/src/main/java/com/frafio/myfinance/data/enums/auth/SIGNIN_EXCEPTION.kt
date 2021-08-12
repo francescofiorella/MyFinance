@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.enums
+package com.frafio.myfinance.data.enums.auth
 
 enum class SIGNIN_EXCEPTION(val value: String) {
     EXCEPTION_INVALID_EMAIL("ERROR_INVALID_EMAIL"),

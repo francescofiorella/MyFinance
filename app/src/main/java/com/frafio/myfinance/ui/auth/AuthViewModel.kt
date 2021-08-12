@@ -3,7 +3,7 @@ package com.frafio.myfinance.ui.auth
 import android.content.Intent
 import android.view.View
 import androidx.lifecycle.ViewModel
-import com.frafio.myfinance.data.enums.AUTH_RESULT
+import com.frafio.myfinance.data.enums.auth.AUTH_RESULT
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
