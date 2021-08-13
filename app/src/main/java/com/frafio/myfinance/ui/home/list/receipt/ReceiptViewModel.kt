@@ -3,13 +3,15 @@ package com.frafio.myfinance.ui.home.list.receipt
 import android.view.View
 import androidx.lifecycle.ViewModel
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.frafio.myfinance.data.enums.db.AddCode
+import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.models.ReceiptItem
 import com.frafio.myfinance.data.repositories.ReceiptRepository
 
 class ReceiptViewModel(
     private val repository: ReceiptRepository,
 ) : ViewModel() {
-    private var purchaseID: String? = null
+    var purchaseID: String? = null
     var purchaseName: String? = null
     var purchasePrice: String? = null
 
@@ -18,23 +20,19 @@ class ReceiptViewModel(
 
     var listener: ReceiptListener? = null
 
-    fun setPurchaseID(id: String) {
-        purchaseID = id
-    }
-
-    fun setOptions(): FirestoreRecyclerOptions<ReceiptItem> {
-        return repository.setOptions(purchaseID!!)
+    fun getOptions(): FirestoreRecyclerOptions<ReceiptItem> {
+        return repository.getOptions(purchaseID!!)
     }
 
     fun onAddButtonClick(view: View) {
         // controlla la info aggiunte
         if (receiptName.isNullOrEmpty()) {
-            listener?.onLoadFailure(1)
+            listener?.onLoadFailure(PurchaseResult(AddCode.EMPTY_NAME))
             return
         }
 
         if (receiptPrice.isNullOrEmpty()) {
-            listener?.onLoadFailure(2)
+            listener?.onLoadFailure(PurchaseResult(AddCode.EMPTY_PRICE))
             return
         }
 

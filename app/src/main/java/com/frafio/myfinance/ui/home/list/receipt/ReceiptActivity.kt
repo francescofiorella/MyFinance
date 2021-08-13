@@ -6,6 +6,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.enums.db.AddCode
+import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.models.ReceiptItem
 import com.frafio.myfinance.databinding.ActivityReceiptBinding
 import com.frafio.myfinance.ui.BaseActivity
@@ -37,21 +39,19 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // retrieve purchase data from intent
-        intent.getStringExtra("com.frafio.myfinance.purchaseID")?.let {
-            viewModel.setPurchaseID(it)
+        intent.getStringExtra("${getString(R.string.default_path)}.purchaseID")?.let {
+            viewModel.purchaseID = it
         }
-        intent.getStringExtra("com.frafio.myfinance.purchaseName")?.let {
+        intent.getStringExtra("${getString(R.string.default_path)}.purchaseName")?.let {
             viewModel.purchaseName = it
         }
-        intent.getStringExtra("com.frafio.myfinance.purchasePrice")?.let {
+        intent.getStringExtra("${getString(R.string.default_path)}.purchasePrice")?.let {
             viewModel.purchasePrice = it
         }
 
-        viewModel.setOptions().also { options ->
-            binding.receiptRecView.also {
-                it.setHasFixedSize(true)
-                it.adapter = ReceiptItemAdapter(options, this)
-            }
+        binding.receiptRecView.also {
+            it.setHasFixedSize(true)
+            it.adapter = ReceiptItemAdapter(viewModel.getOptions(), this)
         }
     }
 
@@ -66,6 +66,41 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
         (binding.receiptRecView.adapter as ReceiptItemAdapter).stopListening()
     }
 
+    // purchaseInteractionListener
+    override fun onItemLongClick(receiptItem: ReceiptItem) {
+        val builder = MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_MyFinance_AlertDialog)
+        builder.setTitle(receiptItem.name)
+        builder.setMessage(getString(R.string.receipt_delete_dialog))
+        builder.setNegativeButton(getString(R.string.annulla), null)
+        builder.setPositiveButton(R.string.elimina) { _, _ ->
+            viewModel.onDeleteClick(receiptItem)
+        }
+        builder.show()
+    }
+
+    // receiptListener
+    override fun onLoadSuccess(response: LiveData<PurchaseResult>) {
+        response.observe(this, { result ->
+            when (result.code) {
+                AddCode.RECEIPT_ADD_SUCCESS.code -> {
+                    binding.root.snackbar(result.message, binding.receiptNameEditText)
+                    binding.receiptNameEditText.setText("")
+                    binding.receiptPriceEditText.setText("")
+                }
+
+                else ->
+                    binding.root.snackbar(result.message, binding.receiptNameEditText)
+            }
+        })
+    }
+
+    override fun onLoadFailure(result: PurchaseResult) {
+        when (result.code) {
+            AddCode.EMPTY_NAME.code -> binding.receiptNameEditText.error = result.message
+            AddCode.EMPTY_PRICE.code -> binding.receiptPriceEditText.error = result.message
+        }
+    }
+
     // ends this activity (back arrow)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
@@ -73,38 +108,5 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
             finish()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onItemLongClick(receiptItem: ReceiptItem) {
-        val builder = MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_MyFinance_AlertDialog)
-        builder.setTitle(receiptItem.name)
-        builder.setMessage("Vuoi eliminare la voce selezionata?")
-        builder.setNegativeButton("Annulla", null)
-        builder.setPositiveButton("Elimina") { _, _ ->
-            viewModel.onDeleteClick(receiptItem)
-        }
-        builder.show()
-    }
-
-    override fun onLoadSuccess(response: LiveData<Any>) {
-        response.observe(this, { value ->
-            when (value) {
-                "Voce aggiunta!" -> {
-                    binding.root.snackbar(value as String, binding.receiptNameEditText)
-                    binding.receiptNameEditText.setText("")
-                    binding.receiptPriceEditText.setText("")
-                }
-
-                is String ->
-                    binding.root.snackbar(value, binding.receiptNameEditText)
-            }
-        })
-    }
-
-    override fun onLoadFailure(message: Any) {
-        when (message) {
-            1 -> binding.receiptNameEditText.error = "Inserisci il nome dell'acquisto."
-            2 -> binding.receiptPriceEditText.error = "Inserisci il costo dell'acquisto."
-        }
     }
 }

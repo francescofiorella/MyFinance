@@ -3,6 +3,7 @@ package com.frafio.myfinance
 import android.app.Application
 import com.frafio.myfinance.data.managers.AuthManager
 import com.frafio.myfinance.data.managers.PurchaseManager
+import com.frafio.myfinance.data.managers.ReceiptManager
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.ReceiptRepository
 import com.frafio.myfinance.data.repositories.UserRepository
@@ -30,11 +31,12 @@ class MyFinanceApplication : Application(), KodeinAware {
         // managers
         bind() from singleton { AuthManager() }
         bind() from singleton { PurchaseManager() }
+        bind() from singleton { ReceiptManager() }
 
         // repositories
         bind() from singleton { UserRepository(instance(), instance()) }
         bind() from singleton { PurchaseRepository(instance()) }
-        bind() from singleton { ReceiptRepository() }
+        bind() from singleton { ReceiptRepository(instance()) }
 
         // viewModelFactories
         bind() from provider { SplashScreenViewModelFactory(instance()) }

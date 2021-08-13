@@ -9,7 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.auth.AUTH_RESULT
+import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.FragmentMenuBinding
 import com.frafio.myfinance.ui.auth.AuthListener
@@ -42,7 +42,7 @@ class MenuFragment : BaseFragment(), AuthListener {
 
     override fun onAuthSuccess(response: LiveData<AuthResult>) {
         response.observe(this, { authResult ->
-            if (authResult.code == AUTH_RESULT.LOGOUT_SUCCESS.code) {
+            if (authResult.code == AuthCode.LOGOUT_SUCCESS.code) {
                 Intent(context, LoginActivity::class.java).also {
                     it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(it)

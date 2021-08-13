@@ -13,7 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.auth.AUTH_RESULT
+import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.ui.BaseActivity
@@ -346,7 +346,7 @@ class AddActivity : BaseActivity(), AddListener {
             when (value) {
                 is AuthResult -> {
                     when (value.code) {
-                        AUTH_RESULT.USER_DATA_UPDATED.code ->
+                        AuthCode.USER_DATA_UPDATED.code ->
                             // torna alla home
                             Intent().also {
                                 it.putExtra("com.frafio.myfinance.purchaseRequest", true)
@@ -354,7 +354,7 @@ class AddActivity : BaseActivity(), AddListener {
                                 finish()
                             }
 
-                        AUTH_RESULT.USER_DATA_NOT_UPDATED.code -> Unit // errore
+                        AuthCode.USER_DATA_NOT_UPDATED.code -> Unit // errore
                     }
                 }
 

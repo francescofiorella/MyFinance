@@ -3,7 +3,7 @@ package com.frafio.myfinance.data.repositories
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.enums.db.PURCHASE_NAME
+import com.frafio.myfinance.data.enums.db.PurchaseName
 import com.frafio.myfinance.data.managers.PurchaseManager
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.models.Purchase
@@ -50,7 +50,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
 
         PurchaseStorage.purchaseList.forEach { purchase ->
             // totale biglietti Amtab
-            if (purchase.name == PURCHASE_NAME.AMTAB.value) {
+            if (purchase.name == PurchaseName.AMTAB.value) {
                 amTot++
             }
             if (purchase.type == 0) {
@@ -85,7 +85,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                 ticketTot += purchase.price ?: 0.0
 
                 // totale biglietti TrenItalia
-                if (purchase.name == PURCHASE_NAME.TRENITALIA.value) {
+                if (purchase.name == PurchaseName.TRENITALIA.value) {
                     trenTot++
                 }
             }

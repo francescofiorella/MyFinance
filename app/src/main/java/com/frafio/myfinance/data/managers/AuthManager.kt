@@ -4,8 +4,8 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.enums.auth.AUTH_RESULT
-import com.frafio.myfinance.data.enums.auth.SIGNIN_EXCEPTION
+import com.frafio.myfinance.data.enums.auth.AuthCode
+import com.frafio.myfinance.data.enums.auth.SigninException
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.storage.PurchaseStorage
 import com.frafio.myfinance.data.storage.UserStorage
@@ -32,9 +32,9 @@ class AuthManager {
         fUser.also {
             return if (it != null) {
                 UserStorage.updateUser(it)
-                AuthResult(AUTH_RESULT.USER_LOGGED)
+                AuthResult(AuthCode.USER_LOGGED)
             } else {
-                AuthResult(AUTH_RESULT.USER_NOT_LOGGED)
+                AuthResult(AuthCode.USER_NOT_LOGGED)
             }
         }
     }
@@ -52,17 +52,17 @@ class AuthManager {
                     response.value = if (authTask.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         UserStorage.updateUser(authTask.result!!.user!!)
-                        AuthResult(AUTH_RESULT.LOGIN_SUCCESS)
+                        AuthResult(AuthCode.LOGIN_SUCCESS)
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.e(TAG, "Error! ${authTask.exception?.localizedMessage}")
-                        AuthResult(AUTH_RESULT.GOOGLE_LOGIN_FAILURE)
+                        AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
                     }
                 }
         } catch (e: ApiException) {
             // Google Sign In failed, update UI appropriately
             Log.e(TAG, "Error! ${e.localizedMessage}")
-            response.value = AuthResult(AUTH_RESULT.GOOGLE_LOGIN_FAILURE)
+            response.value = AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
         }
 
         return response
@@ -75,35 +75,35 @@ class AuthManager {
         fAuth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
                 UserStorage.updateUser(authResult.user!!)
-                response.value = AuthResult(AUTH_RESULT.LOGIN_SUCCESS)
+                response.value = AuthResult(AuthCode.LOGIN_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
                 when (e) {
                     is FirebaseAuthInvalidCredentialsException -> {
                         when (e.errorCode) {
-                            SIGNIN_EXCEPTION.EXCEPTION_INVALID_EMAIL.value -> response.value = AuthResult(
-                                AUTH_RESULT.INVALID_EMAIL)
+                            SigninException.EXCEPTION_INVALID_EMAIL.value -> response.value = AuthResult(
+                                AuthCode.INVALID_EMAIL)
 
-                            SIGNIN_EXCEPTION.EXCEPTION_WRONG_PASSWORD.value -> response.value = AuthResult(
-                                AUTH_RESULT.WRONG_PASSWORD)
+                            SigninException.EXCEPTION_WRONG_PASSWORD.value -> response.value = AuthResult(
+                                AuthCode.WRONG_PASSWORD)
 
-                            else -> response.value = AuthResult(AUTH_RESULT.LOGIN_FAILURE)
+                            else -> response.value = AuthResult(AuthCode.LOGIN_FAILURE)
                         }
                     }
 
                     is FirebaseAuthInvalidUserException -> {
                         when (e.errorCode) {
-                            SIGNIN_EXCEPTION.EXCEPTION_USER_NOT_FOUND.value -> response.value = AuthResult(
-                                AUTH_RESULT.USER_NOT_FOUND)
+                            SigninException.EXCEPTION_USER_NOT_FOUND.value -> response.value = AuthResult(
+                                AuthCode.USER_NOT_FOUND)
 
-                            SIGNIN_EXCEPTION.EXCEPTION_USER_DISABLED.value -> response.value = AuthResult(
-                                AUTH_RESULT.USER_DISABLED)
+                            SigninException.EXCEPTION_USER_DISABLED.value -> response.value = AuthResult(
+                                AuthCode.USER_DISABLED)
 
-                            else -> response.value = AuthResult(AUTH_RESULT.LOGIN_FAILURE)
+                            else -> response.value = AuthResult(AuthCode.LOGIN_FAILURE)
                         }
                     }
 
-                    else -> response.value = AuthResult(AUTH_RESULT.LOGIN_FAILURE)
+                    else -> response.value = AuthResult(AuthCode.LOGIN_FAILURE)
                 }
             }
 
@@ -115,13 +115,13 @@ class AuthManager {
 
         fAuth.sendPasswordResetEmail(email)
             .addOnSuccessListener {
-                response.value = AuthResult(AUTH_RESULT.EMAIL_SENT)
+                response.value = AuthResult(AuthCode.EMAIL_SENT)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
                 if (e is FirebaseTooManyRequestsException) {
-                    response.value = AuthResult(AUTH_RESULT.EMAIL_NOT_SENT_TOO_MANY_REQUESTS)
+                    response.value = AuthResult(AuthCode.EMAIL_NOT_SENT_TOO_MANY_REQUESTS)
                 } else {
-                    response.value = AuthResult(AUTH_RESULT.EMAIL_NOT_SENT)
+                    response.value = AuthResult(AuthCode.EMAIL_NOT_SENT)
                 }
             }
 
@@ -137,7 +137,7 @@ class AuthManager {
                 val fUser = authResult.user
 
                 fUser?.sendEmailVerification()?.addOnSuccessListener {
-                    Log.d(TAG, "Email di verifica inviata!")
+                    Log.d(TAG, AuthCode.EMAIL_SENT.message)
                 }?.addOnFailureListener { e ->
                     Log.e(TAG, "Error! ${e.localizedMessage}")
                 }
@@ -147,24 +147,24 @@ class AuthManager {
 
                 fUser?.updateProfile(profileUpdates)?.addOnSuccessListener {
                     UserStorage.updateUser(authResult.user!!)
-                    response.value = AuthResult(AUTH_RESULT.SIGNUP_SUCCESS)
+                    response.value = AuthResult(AuthCode.SIGNUP_SUCCESS)
                 }?.addOnFailureListener { e ->
                     Log.e(TAG, "Error! ${e.localizedMessage}")
-                    response.value = AuthResult(AUTH_RESULT.PROFILE_NOT_UPDATED)
+                    response.value = AuthResult(AuthCode.PROFILE_NOT_UPDATED)
                 }
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
                 when (e) {
                     is FirebaseAuthWeakPasswordException ->
-                        response.value = AuthResult(AUTH_RESULT.WEAK_PASSWORD)
+                        response.value = AuthResult(AuthCode.WEAK_PASSWORD)
 
                     is FirebaseAuthInvalidCredentialsException ->
-                        response.value = AuthResult(AUTH_RESULT.EMAIL_NOT_WELL_FORMED)
+                        response.value = AuthResult(AuthCode.EMAIL_NOT_WELL_FORMED)
 
                     is FirebaseAuthUserCollisionException ->
-                        response.value = AuthResult(AUTH_RESULT.EMAIL_ALREADY_ASSOCIATED)
+                        response.value = AuthResult(AuthCode.EMAIL_ALREADY_ASSOCIATED)
 
-                    else -> response.value = AuthResult(AUTH_RESULT.SIGNUP_FAILURE)
+                    else -> response.value = AuthResult(AuthCode.SIGNUP_FAILURE)
                 }
             }
 
@@ -179,7 +179,7 @@ class AuthManager {
         PurchaseStorage.resetPurchaseList()
         UserStorage.resetUser()
 
-        response.value = AuthResult(AUTH_RESULT.LOGOUT_SUCCESS)
+        response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
         return (response)
     }
 }

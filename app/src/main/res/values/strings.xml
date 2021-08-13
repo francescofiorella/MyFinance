@@ -14,6 +14,8 @@
 
     <string name="aggiungi">Aggiungi</string>
     <string name="modifica">Modifica</string>
+    <string name="elimina">Elimina</string>
+    <string name="annulla">Annulla</string>
 
     <string name="default_path">com.frafio.myfinance</string>
 
@@ -21,4 +23,5 @@
 
     <string name="login_successful">Hai effettuato l\'accesso come</string>
 
+    <string name="receipt_delete_dialog">Vuoi eliminare la voce selezionata?</string>
 </resources>

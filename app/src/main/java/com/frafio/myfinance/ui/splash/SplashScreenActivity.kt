@@ -11,7 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.auth.AUTH_RESULT
+import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivitySplashScreenBinding
 import com.frafio.myfinance.ui.BaseActivity
@@ -55,9 +55,9 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
     override fun onComplete(response: LiveData<AuthResult>) {
         response.observe(this, { authResult ->
             when (authResult.code) {
-                AUTH_RESULT.USER_LOGGED.code -> viewModel.updateUserData()
+                AuthCode.USER_LOGGED.code -> viewModel.updateUserData()
 
-                AUTH_RESULT.USER_NOT_LOGGED.code -> {
+                AuthCode.USER_NOT_LOGGED.code -> {
                     Handler(Looper.getMainLooper()).postDelayed({
                         ActivityOptionsCompat
                             .makeCustomAnimation(
@@ -74,7 +74,7 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
                     }, SPLASH_TIME)
                 }
 
-                AUTH_RESULT.USER_DATA_UPDATED.code -> {
+                AuthCode.USER_DATA_UPDATED.code -> {
                     ActivityOptionsCompat.makeCustomAnimation(
                         applicationContext,
                         android.R.anim.fade_in,
@@ -88,7 +88,7 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
                     }
                 }
 
-                AUTH_RESULT.USER_DATA_NOT_UPDATED.code -> binding.root.snackbar(authResult.message)
+                AuthCode.USER_DATA_NOT_UPDATED.code -> binding.root.snackbar(authResult.message)
 
                 else -> Unit
             }

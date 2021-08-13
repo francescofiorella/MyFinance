@@ -1,6 +1,6 @@
 package com.frafio.myfinance.data.enums.auth
 
-enum class SIGNIN_EXCEPTION(val value: String) {
+enum class SigninException(val value: String) {
     EXCEPTION_INVALID_EMAIL("ERROR_INVALID_EMAIL"),
     EXCEPTION_WRONG_PASSWORD("ERROR_WRONG_PASSWORD"),
     EXCEPTION_USER_NOT_FOUND("ERROR_USER_NOT_FOUND"),

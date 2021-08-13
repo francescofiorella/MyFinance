@@ -1,6 +1,6 @@
 package com.frafio.myfinance.data.enums.auth
 
-enum class AUTH_RESULT(val code: Int, val message: String) {
+enum class AuthCode(val code: Int, val message: String) {
     LOGIN_SUCCESS(1, "Accesso avvenuto con successo!"),
     GOOGLE_LOGIN_FAILURE(2, "Accesso con Google fallito!"),
     LOGIN_FAILURE(3, "Accesso fallito!"),
