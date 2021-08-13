@@ -34,13 +34,13 @@ class MyFinanceApplication : Application(), KodeinAware {
         bind() from singleton { ReceiptManager() }
 
         // repositories
-        bind() from singleton { UserRepository(instance(), instance()) }
+        bind() from singleton { UserRepository(instance()) }
         bind() from singleton { PurchaseRepository(instance()) }
         bind() from singleton { ReceiptRepository(instance()) }
 
         // viewModelFactories
         bind() from provider { SplashScreenViewModelFactory(instance()) }
-        bind() from provider { AuthViewModelFactory(instance(), instance()) }
+        bind() from provider { AuthViewModelFactory(instance()) }
         bind() from provider { DashboardViewModelFactory(instance()) }
         bind() from provider { ListViewModelFactory(instance()) }
         bind() from provider { ProfileViewModelFactory(instance()) }

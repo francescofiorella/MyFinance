@@ -3,7 +3,7 @@ package com.frafio.myfinance.data.managers
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.enums.db.AddCode
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.DbReceipt
 import com.frafio.myfinance.data.models.PurchaseResult
@@ -21,20 +21,20 @@ class ReceiptManager {
         get() = FirebaseFirestore.getInstance()
 
     fun getQuery(purchaseID: String): Query {
-        return fStore.collection(DbPurchases.PURCHASES.value).document(purchaseID)
-            .collection(DbReceipt.RECEIPT.value).orderBy(DbReceipt.NAME.value)
+        return fStore.collection(DbPurchases.FIELDS.PURCHASES.value).document(purchaseID)
+            .collection(DbReceipt.FIELDS.RECEIPT.value).orderBy(DbReceipt.FIELDS.NAME.value)
     }
 
     fun addItem(receiptItem: ReceiptItem, purchaseID: String): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
-        fStore.collection(DbPurchases.PURCHASES.value).document(purchaseID)
-            .collection(DbReceipt.RECEIPT.value).add(receiptItem)
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value).document(purchaseID)
+            .collection(DbReceipt.FIELDS.RECEIPT.value).add(receiptItem)
             .addOnSuccessListener {
-                response.value = PurchaseResult(AddCode.RECEIPT_ADD_SUCCESS)
+                response.value = PurchaseResult(PurchaseCode.RECEIPT_ADD_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = PurchaseResult(AddCode.RECEIPT_ADD_FAILURE)
+                response.value = PurchaseResult(PurchaseCode.RECEIPT_ADD_FAILURE)
             }
 
         return response
@@ -43,13 +43,13 @@ class ReceiptManager {
     fun deleteItem(receiptItem: ReceiptItem, purchaseID: String): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
-        fStore.collection(DbPurchases.PURCHASES.value).document(purchaseID)
-            .collection(DbReceipt.RECEIPT.value).document(receiptItem.id!!).delete()
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value).document(purchaseID)
+            .collection(DbReceipt.FIELDS.RECEIPT.value).document(receiptItem.id!!).delete()
             .addOnSuccessListener {
-                response.value = PurchaseResult(AddCode.RECEIPT_DELETE_SUCCESS)
+                response.value = PurchaseResult(PurchaseCode.RECEIPT_DELETE_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = PurchaseResult(AddCode.RECEIPT_DELETE_FAILURE)
+                response.value = PurchaseResult(PurchaseCode.RECEIPT_DELETE_FAILURE)
             }
 
         return response

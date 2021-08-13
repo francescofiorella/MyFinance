@@ -5,12 +5,10 @@ import android.view.View
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
-import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 
 class AuthViewModel(
-    private val userRepository: UserRepository,
-    private val purchaseRepository: PurchaseRepository
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     var email: String? = null
@@ -101,7 +99,7 @@ class AuthViewModel(
     }
 
     fun updateUserData() {
-        val response = purchaseRepository.updatePurchaseList()
+        val response = userRepository.updateUserData()
         authListener?.onAuthSuccess(response)
     }
 

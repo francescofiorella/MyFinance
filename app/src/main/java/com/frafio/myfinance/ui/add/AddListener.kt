@@ -1,13 +1,14 @@
 package com.frafio.myfinance.ui.add
 
 import androidx.lifecycle.LiveData
+import com.frafio.myfinance.data.models.PurchaseResult
 
 interface AddListener {
 
     fun onAddStart()
 
-    fun onAddSuccess(response: LiveData<Any>)
+    fun onAddSuccess(response: LiveData<PurchaseResult>)
 
-    // 1: nome vuoto, 2: nome="Totale", 3: prezzo vuoto
-    fun onAddFailure(errorCode: Int)
+    fun onAddFailure(result: PurchaseResult)
+
 }

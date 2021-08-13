@@ -11,10 +11,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentListBinding
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.BaseFragment
+import com.frafio.myfinance.ui.add.AddActivity.Companion.EDIT_PURCHASE_CODE
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -30,11 +33,15 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
-            val editRequest =
-                data!!.getBooleanExtra("com.frafio.myfinance.purchaseRequest", false)
+
+            val editRequest = data!!.getBooleanExtra(
+                "${getString(R.string.default_path)}.purchaseRequest",
+                false
+            )
+
             if (editRequest) {
                 viewModel.getPurchases()
-                (activity as HomeActivity).showSnackbar("Acquisto modificato!")
+                (activity as HomeActivity).showSnackbar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
             }
         }
     }
@@ -71,9 +78,12 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         when (interactionID) {
             1 -> {
                 Intent(context, ReceiptActivity::class.java).also {
-                    it.putExtra("com.frafio.myfinance.purchaseID", purchase.id)
-                    it.putExtra("com.frafio.myfinance.purchaseName", purchase.name)
-                    it.putExtra("com.frafio.myfinance.purchasePrice", purchase.formattedPrice)
+                    it.putExtra("${getString(R.string.default_path)}.purchaseID", purchase.id)
+                    it.putExtra("${getString(R.string.default_path)}.purchaseName", purchase.name)
+                    it.putExtra(
+                        "${getString(R.string.default_path)}.purchasePrice",
+                        purchase.formattedPrice
+                    )
                     activity?.startActivity(it)
                 }
             }
@@ -84,25 +94,52 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                 )
                 builder.setTitle(purchase.name)
                 if (purchase.type == 0 && purchase.price == 0.0) {
-                    builder.setMessage("Vuoi eliminare l'acquisto selezionato?")
+                    builder.setMessage(getString(R.string.purchase_delete_dialog))
                 } else if (purchase.type != 0) {
-                    builder.setMessage("Vuoi modificare o eliminare l'acquisto selezionato?")
-                    builder.setNegativeButton("Modifica") { _, _ ->
+                    builder.setMessage(getString(R.string.purchase_edit_delete_dialog))
+                    builder.setNegativeButton(getString(R.string.modifica)) { _, _ ->
                         Intent(context, AddActivity::class.java).also {
-                            it.putExtra("com.frafio.myfinance.REQUESTCODE", 2)
-                            it.putExtra("com.frafio.myfinance.PURCHASE_ID", purchase.id)
-                            it.putExtra("com.frafio.myfinance.PURCHASE_NAME", purchase.name)
-                            it.putExtra("com.frafio.myfinance.PURCHASE_PRICE", purchase.price)
-                            it.putExtra("com.frafio.myfinance.PURCHASE_TYPE", purchase.type)
-                            it.putExtra("com.frafio.myfinance.PURCHASE_POSITION", position)
-                            it.putExtra("com.frafio.myfinance.PURCHASE_YEAR", purchase.year)
-                            it.putExtra("com.frafio.myfinance.PURCHASE_MONTH", purchase.month)
-                            it.putExtra("com.frafio.myfinance.PURCHASE_DAY", purchase.day)
+                            it.putExtra(
+                                "${getString(R.string.default_path)}.REQUESTCODE",
+                                EDIT_PURCHASE_CODE
+                            )
+                            it.putExtra(
+                                "${getString(R.string.default_path)}.PURCHASE_ID",
+                                purchase.id
+                            )
+                            it.putExtra(
+                                "${getString(R.string.default_path)}.PURCHASE_NAME",
+                                purchase.name
+                            )
+                            it.putExtra(
+                                "${getString(R.string.default_path)}.PURCHASE_PRICE",
+                                purchase.price
+                            )
+                            it.putExtra(
+                                "${getString(R.string.default_path)}.PURCHASE_TYPE",
+                                purchase.type
+                            )
+                            it.putExtra(
+                                "${getString(R.string.default_path)}.PURCHASE_POSITION",
+                                position
+                            )
+                            it.putExtra(
+                                "${getString(R.string.default_path)}.PURCHASE_YEAR",
+                                purchase.year
+                            )
+                            it.putExtra(
+                                "${getString(R.string.default_path)}.PURCHASE_MONTH",
+                                purchase.month
+                            )
+                            it.putExtra(
+                                "${getString(R.string.default_path)}.PURCHASE_DAY",
+                                purchase.day
+                            )
                             editResultLauncher.launch(it)
                         }
                     }
                 }
-                builder.setPositiveButton("Elimina") { _, _ ->
+                builder.setPositiveButton(getString(R.string.elimina)) { _, _ ->
                     viewModel.deletePurchaseAt(position)
                 }
                 builder.show()
@@ -110,45 +147,40 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         }
     }
 
-    override fun onDeleteComplete(response: LiveData<Any>) {
+    override fun onDeleteComplete(response: LiveData<Triple<PurchaseResult, Int?, Int?>>) {
         response.observe(viewLifecycleOwner, { value ->
-            when (value) {
-                is Triple<*, *, *> -> {
-                    val message = value.first as String
-                    val position = value.second as Int
-                    val totPosition = value.third as Int?
+            val result = value.first
+            val position = value.second
+            val totPosition = value.third
 
-                    when (message) {
-                        "Totale eliminato!" -> {
-                            binding.listRecyclerView.also {
-                                it.removeViewAt(position)
-                                it.adapter!!.notifyItemRemoved(position)
-                                it.adapter!!.notifyItemRangeChanged(
-                                    position,
-                                    viewModel.purchaseListSize
-                                )
-                            }
-                        }
-                        "Acquisto eliminato!" -> {
-                            binding.listRecyclerView.also {
-                                it.removeViewAt(position)
-                                it.adapter!!.notifyItemRemoved(position)
-                                it.adapter!!.notifyItemRangeChanged(
-                                    position,
-                                    viewModel.purchaseListSize
-                                )
-                                totPosition?.let { index ->
-                                    it.adapter!!.notifyItemChanged(index)
-                                }
-                            }
-                        }
+            when (result.code) {
+                PurchaseCode.TOTAL_DELETE_SUCCESS.code -> {
+                    binding.listRecyclerView.also {
+                        it.removeViewAt(position!!)
+                        it.adapter!!.notifyItemRemoved(position)
+                        it.adapter!!.notifyItemRangeChanged(
+                            position,
+                            viewModel.purchaseListSize
+                        )
                     }
-
-                    (activity as HomeActivity).showSnackbar(message)
                 }
 
-                is String -> (activity as HomeActivity).showSnackbar(value)
+                PurchaseCode.PURCHASE_DELETE_SUCCESS.code -> {
+                    binding.listRecyclerView.also {
+                        it.removeViewAt(position!!)
+                        it.adapter!!.notifyItemRemoved(position)
+                        it.adapter!!.notifyItemRangeChanged(
+                            position,
+                            viewModel.purchaseListSize
+                        )
+                        totPosition?.let { index ->
+                            it.adapter!!.notifyItemChanged(index)
+                        }
+                    }
+                }
             }
+
+            (activity as HomeActivity).showSnackbar(result.message)
         })
     }
 }

@@ -1,18 +1,21 @@
 package com.frafio.myfinance.ui.add
 
 import android.view.View
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
+import com.frafio.myfinance.ui.add.AddActivity.Companion.ADD_PURCHASE_CODE
+import com.frafio.myfinance.ui.add.AddActivity.Companion.EDIT_PURCHASE_CODE
 import java.time.LocalDate
 
 class AddViewModel(
     private val userRepository: UserRepository,
     private val purchaseRepository: PurchaseRepository
 ) : ViewModel() {
-
     var listener: AddListener? = null
 
     var name: String? = null
@@ -70,38 +73,41 @@ class AddViewModel(
         listener?.onAddStart()
 
         val userEmail = userRepository.getUser()!!.email
-        // controlla la info aggiunte
+
+        // controlla le info aggiunte
         if (name.isNullOrEmpty()) {
-            listener?.onAddFailure(1)
+            listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_NAME))
             return
         }
 
-        if (name == "Totale" && !totChecked) {
-            listener?.onAddFailure(2)
+        if (name == DbPurchases.NAMES.TOTALE.value && !totChecked) {
+            listener?.onAddFailure(PurchaseResult(PurchaseCode.WRONG_NAME_TOTAL))
             return
         }
-
 
         if (totChecked) {
-            val purchase = Purchase(userEmail, name, 0.0, year, month, day, 0)
+            val purchase =
+                Purchase(userEmail, name, 0.0, year, month, day, DbPurchases.TYPES.TOTAL.value)
             val response = purchaseRepository.addTotale(purchase)
             listener?.onAddSuccess(response)
         } else {
             if (priceString.isNullOrEmpty()) {
-                listener?.onAddFailure(3)
+                listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_PRICE))
                 return
             }
 
             val price = priceString!!.toDouble()
 
-            if (requestCode == 1) {
+            if (requestCode == ADD_PURCHASE_CODE) {
                 val purchase = Purchase(userEmail, name, price, year, month, day, type)
                 val response = purchaseRepository.addPurchase(purchase)
                 listener?.onAddSuccess(response)
-            } else if (requestCode == 2) {
-                val purchase = Purchase(userEmail, name, price, year, month, day, purchaseType, purchaseID)
+            } else if (requestCode == EDIT_PURCHASE_CODE) {
+                val purchase =
+                    Purchase(userEmail, name, price, year, month, day, purchaseType, purchaseID)
 
-                val response = purchaseRepository.editPurchase(purchase, purchasePosition!!, purchasePrice!!)
+                val response =
+                    purchaseRepository.editPurchase(purchase, purchasePosition!!, purchasePrice!!)
                 listener?.onAddSuccess(response)
             }
         }
@@ -109,6 +115,6 @@ class AddViewModel(
 
     fun updateLocalList() {
         val response = purchaseRepository.updatePurchaseList()
-        listener?.onAddSuccess(response as LiveData<Any>)
+        listener?.onAddSuccess(response)
     }
 }

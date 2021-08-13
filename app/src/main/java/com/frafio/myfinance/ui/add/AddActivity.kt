@@ -13,8 +13,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.auth.AuthCode
-import com.frafio.myfinance.data.models.AuthResult
+import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.snackbar
@@ -25,6 +26,13 @@ import java.text.NumberFormat
 import java.util.*
 
 class AddActivity : BaseActivity(), AddListener {
+
+    companion object {
+        const val ADD_PURCHASE_CODE: Int = 1
+        const val EDIT_PURCHASE_CODE: Int = 2
+
+        private const val DATE_PICKER_TAG: String = "DATE_PICKER"
+    }
 
     private val interpolator = OvershootInterpolator()
 
@@ -48,8 +56,7 @@ class AddActivity : BaseActivity(), AddListener {
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // stabilisci se bisogna creare un nuovo evento (1) o modificarne uno esistente (2)
-        intent.getIntExtra("com.frafio.myfinance.REQUESTCODE", 0).also {
+        intent.getIntExtra("${getString(R.string.default_path)}.REQUESTCODE", 0).also {
             viewModel.requestCode = it
             binding.addBigliettoLayout.alpha = 0f
             initLayout(it)
@@ -58,59 +65,63 @@ class AddActivity : BaseActivity(), AddListener {
     }
 
     private fun initLayout(code: Int) {
-        if (code == 1) {
+        if (code == ADD_PURCHASE_CODE) {
             binding.addGenericoTv.isSelected = true
-            viewModel.type = 2
+            viewModel.type = DbPurchases.TYPES.GENERIC.value
 
             setTypeButton()
             setTotSwitch()
 
             setDatePicker()
-        } else if (code == 2) {
+        } else if (code == EDIT_PURCHASE_CODE) {
             intent.also { intent ->
-                intent.getStringExtra("com.frafio.myfinance.PURCHASE_ID")?.let {
+                intent.getStringExtra("${getString(R.string.default_path)}.PURCHASE_ID")?.let {
                     viewModel.purchaseID = it
                 }
-                intent.getStringExtra("com.frafio.myfinance.PURCHASE_NAME")?.let {
+                intent.getStringExtra("${getString(R.string.default_path)}.PURCHASE_NAME")?.let {
                     viewModel.name = it
                 }
-                intent.getDoubleExtra("com.frafio.myfinance.PURCHASE_PRICE", 0.0).also {
-                    val locale = Locale("en", "UK")
-                    val nf = NumberFormat.getInstance(locale)
-                    val formatter = nf as DecimalFormat
-                    formatter.applyPattern("###,###,##0.00")
-                    viewModel.priceString = formatter.format(it)
-                    viewModel.purchasePrice = it
-                }
-                intent.getIntExtra("com.frafio.myfinance.PURCHASE_TYPE", 0).also {
+                intent.getDoubleExtra("${getString(R.string.default_path)}.PURCHASE_PRICE", 0.0)
+                    .also {
+                        val locale = Locale("en", "UK")
+                        val nf = NumberFormat.getInstance(locale)
+                        val formatter = nf as DecimalFormat
+                        formatter.applyPattern("###,###,##0.00")
+                        viewModel.priceString = formatter.format(it)
+                        viewModel.purchasePrice = it
+                    }
+                intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_TYPE", 0).also {
                     viewModel.purchaseType = it
                 }
-                intent.getIntExtra("com.frafio.myfinance.PURCHASE_POSITION", 0).also {
-                    viewModel.purchasePosition = it
-                }
-                intent.getIntExtra("com.frafio.myfinance.PURCHASE_YEAR", 0).also {
+                intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_POSITION", 0)
+                    .also {
+                        viewModel.purchasePosition = it
+                    }
+                intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_YEAR", 0).also {
                     viewModel.year = it
                 }
-                intent.getIntExtra("com.frafio.myfinance.PURCHASE_MONTH", 0).also {
+                intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_MONTH", 0).also {
                     viewModel.month = it
                 }
-                intent.getIntExtra("com.frafio.myfinance.PURCHASE_DAY", 0).also {
+                intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_DAY", 0).also {
                     viewModel.day = it
                 }
             }
 
             when (viewModel.purchaseType) {
-                1 -> {
+                DbPurchases.TYPES.SHOPPING.value -> {
                     binding.addGenericoTv.isEnabled = false
                     binding.addSpesaTv.isSelected = true
                     binding.addBigliettoTv.isEnabled = false
                 }
-                2 -> {
+
+                DbPurchases.TYPES.GENERIC.value -> {
                     binding.addGenericoTv.isSelected = true
                     binding.addSpesaTv.isEnabled = false
                     binding.addBigliettoTv.isEnabled = false
                 }
-                3 -> {
+
+                DbPurchases.TYPES.TICKET.value -> {
                     binding.addGenericoTv.isEnabled = false
                     binding.addSpesaTv.isEnabled = false
                     binding.addBigliettoTv.isSelected = true
@@ -135,7 +146,7 @@ class AddActivity : BaseActivity(), AddListener {
         calendar.clear()
         val today = MaterialDatePicker.todayInUtcMilliseconds()
         val builder = MaterialDatePicker.Builder.datePicker()
-        builder.setTitleText("Seleziona una data")
+        builder.setTitleText(getString(R.string.date_picker))
         builder.setSelection(today)
         builder.setTheme(R.style.ThemeOverlay_MyFinance_DatePicker)
         val materialDatePicker = builder.build()
@@ -147,7 +158,7 @@ class AddActivity : BaseActivity(), AddListener {
 
     private fun showDatePicker(materialDatePicker: MaterialDatePicker<*>) {
         if (!materialDatePicker.isAdded) {
-            materialDatePicker.show(supportFragmentManager, "DATE_PICKER")
+            materialDatePicker.show(supportFragmentManager, DATE_PICKER_TAG)
             materialDatePicker.addOnPositiveButtonClickListener { selection ->
                 // get selected date
                 val date = Date(selection.toString().toLong())
@@ -178,7 +189,7 @@ class AddActivity : BaseActivity(), AddListener {
                 binding.addSpesaTv.isSelected = false
                 binding.addBigliettoTv.isSelected = false
             }
-            viewModel.type = 2
+            viewModel.type = DbPurchases.TYPES.GENERIC.value
         }
 
         binding.addSpesaTv.setOnClickListener {
@@ -194,7 +205,7 @@ class AddActivity : BaseActivity(), AddListener {
                 binding.addSpesaTv.isSelected = true
                 binding.addBigliettoTv.isSelected = false
             }
-            viewModel.type = 1
+            viewModel.type = DbPurchases.TYPES.SHOPPING.value
         }
 
         binding.addBigliettoTv.setOnClickListener {
@@ -205,7 +216,7 @@ class AddActivity : BaseActivity(), AddListener {
 
                 setBigliettoLayout()
             }
-            viewModel.type = 3
+            viewModel.type = DbPurchases.TYPES.TICKET.value
         }
     }
 
@@ -219,7 +230,7 @@ class AddActivity : BaseActivity(), AddListener {
                     binding.addAmtabTv.isSelected = false
                     binding.addAltroTv.isSelected = false
 
-                    binding.addNameEditText.setText("Biglietto TrenItalia")
+                    binding.addNameEditText.setText(DbPurchases.NAMES.TRENITALIA.value)
                     binding.addNameEditText.isEnabled = false
                 }
             }
@@ -230,7 +241,7 @@ class AddActivity : BaseActivity(), AddListener {
                     binding.addAmtabTv.isSelected = true
                     binding.addAltroTv.isSelected = false
 
-                    binding.addNameEditText.setText("Biglietto Amtab")
+                    binding.addNameEditText.setText(DbPurchases.NAMES.AMTAB.value)
                     binding.addNameEditText.isEnabled = false
                 }
             }
@@ -246,11 +257,11 @@ class AddActivity : BaseActivity(), AddListener {
                 }
             }
 
-            if (viewModel.requestCode == 2) {
+            if (viewModel.requestCode == EDIT_PURCHASE_CODE) {
                 when (viewModel.name) {
-                    "Biglietto TrenItalia" -> binding.addTrenitaliaTv.performClick()
+                    DbPurchases.NAMES.TRENITALIA.value -> binding.addTrenitaliaTv.performClick()
 
-                    "Biglietto Amtab" -> binding.addAmtabTv.performClick()
+                    DbPurchases.NAMES.AMTAB.value -> binding.addAmtabTv.performClick()
 
                     else -> binding.addAltroTv.performClick()
                 }
@@ -294,10 +305,10 @@ class AddActivity : BaseActivity(), AddListener {
         binding.addTotaleSwitch.setOnCheckedChangeListener { _, isChecked ->
             viewModel.totChecked = isChecked
             if (isChecked) {
-                binding.addNameEditText.setText("Totale")
+                binding.addNameEditText.setText(DbPurchases.NAMES.TOTALE.value)
                 binding.addNameEditText.isEnabled = false
 
-                binding.addPriceEditText.setText("0.00")
+                binding.addPriceEditText.setText(DbPurchases.NAMES.TOTALE_ZERO.value)
                 binding.addPriceEditText.isEnabled = false
 
                 binding.addNameEditText.error = null
@@ -337,41 +348,45 @@ class AddActivity : BaseActivity(), AddListener {
         binding.addProgressIndicator.show()
     }
 
-    override fun onAddSuccess(response: LiveData<Any>) {
-        response.observe(this, { value ->
-            if (value != 1) {
+    override fun onAddSuccess(response: LiveData<PurchaseResult>) {
+        response.observe(this, { result ->
+            if (result.code != PurchaseCode.TOTAL_ADD_SUCCESS.code) {
                 binding.addProgressIndicator.hide()
             }
 
-            when (value) {
-                is AuthResult -> {
-                    when (value.code) {
-                        AuthCode.USER_DATA_UPDATED.code ->
-                            // torna alla home
-                            Intent().also {
-                                it.putExtra("com.frafio.myfinance.purchaseRequest", true)
-                                setResult(RESULT_OK, it)
-                                finish()
-                            }
+            when (result.code) {
+                PurchaseCode.TOTAL_ADD_SUCCESS.code -> viewModel.updateLocalList()
 
-                        AuthCode.USER_DATA_NOT_UPDATED.code -> Unit // errore
+                PurchaseCode.PURCHASE_EDIT_SUCCESS.code -> {
+                    // torna alla home
+                    Intent().also {
+                        it.putExtra("${getString(R.string.default_path)}.purchaseRequest", true)
+                        setResult(RESULT_OK, it)
+                        finish()
                     }
                 }
 
-                1 -> viewModel.updateLocalList()
+                PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
+                    // torna alla home
+                    Intent().also {
+                        it.putExtra("${getString(R.string.default_path)}.purchaseRequest", true)
+                        setResult(RESULT_OK, it)
+                        finish()
+                    }
+                }
 
-                is String -> binding.root.snackbar(value, binding.addAddButton)
+                else -> binding.root.snackbar(result.message, binding.addAddButton)
             }
         })
     }
 
-    override fun onAddFailure(errorCode: Int) {
+    override fun onAddFailure(result: PurchaseResult) {
         binding.addProgressIndicator.hide()
 
-        when (errorCode) {
-            1 -> binding.addNameEditText.error = "Inserisci il nome dell'acquisto."
-            2 -> binding.addNameEditText.error = "L'acquisto non può chiamarsi 'Totale'."
-            3 -> binding.addPriceEditText.error = "Inserisci il costo dell'acquisto."
+        when (result.code) {
+            PurchaseCode.EMPTY_NAME.code -> binding.addNameEditText.error = result.message
+            PurchaseCode.WRONG_NAME_TOTAL.code -> binding.addNameEditText.error = result.message
+            PurchaseCode.EMPTY_PRICE.code -> binding.addPriceEditText.error = result.message
         }
     }
 }

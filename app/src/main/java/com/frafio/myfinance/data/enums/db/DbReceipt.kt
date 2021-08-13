@@ -1,7 +1,9 @@
 package com.frafio.myfinance.data.enums.db
 
-enum class DbReceipt(val value: String) {
-    RECEIPT("receipt"),
-    NAME("name"),
-    PRICE("price")
+object DbReceipt {
+    enum class FIELDS(val value: String) {
+        RECEIPT("receipt"),
+        NAME("name"),
+        PRICE("price")
+    }
 }

@@ -6,19 +6,27 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.auth.SigninException
+import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.AuthResult
+import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.storage.PurchaseStorage
 import com.frafio.myfinance.data.storage.UserStorage
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class AuthManager {
 
-    companion object{
+    companion object {
         private val TAG = AuthManager::class.java.simpleName
     }
+
+    // FirebaseFirestore
+    private val fStore: FirebaseFirestore
+        get() = FirebaseFirestore.getInstance()
 
     // FirebaseAuth
     private val fAuth: FirebaseAuth
@@ -81,11 +89,15 @@ class AuthManager {
                 when (e) {
                     is FirebaseAuthInvalidCredentialsException -> {
                         when (e.errorCode) {
-                            SigninException.EXCEPTION_INVALID_EMAIL.value -> response.value = AuthResult(
-                                AuthCode.INVALID_EMAIL)
+                            SigninException.EXCEPTION_INVALID_EMAIL.value -> response.value =
+                                AuthResult(
+                                    AuthCode.INVALID_EMAIL
+                                )
 
-                            SigninException.EXCEPTION_WRONG_PASSWORD.value -> response.value = AuthResult(
-                                AuthCode.WRONG_PASSWORD)
+                            SigninException.EXCEPTION_WRONG_PASSWORD.value -> response.value =
+                                AuthResult(
+                                    AuthCode.WRONG_PASSWORD
+                                )
 
                             else -> response.value = AuthResult(AuthCode.LOGIN_FAILURE)
                         }
@@ -93,11 +105,15 @@ class AuthManager {
 
                     is FirebaseAuthInvalidUserException -> {
                         when (e.errorCode) {
-                            SigninException.EXCEPTION_USER_NOT_FOUND.value -> response.value = AuthResult(
-                                AuthCode.USER_NOT_FOUND)
+                            SigninException.EXCEPTION_USER_NOT_FOUND.value -> response.value =
+                                AuthResult(
+                                    AuthCode.USER_NOT_FOUND
+                                )
 
-                            SigninException.EXCEPTION_USER_DISABLED.value -> response.value = AuthResult(
-                                AuthCode.USER_DISABLED)
+                            SigninException.EXCEPTION_USER_DISABLED.value -> response.value =
+                                AuthResult(
+                                    AuthCode.USER_DISABLED
+                                )
 
                             else -> response.value = AuthResult(AuthCode.LOGIN_FAILURE)
                         }
@@ -181,5 +197,38 @@ class AuthManager {
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
         return (response)
+    }
+
+    fun updateUserData(): LiveData<AuthResult> {
+        val response = MutableLiveData<AuthResult>()
+
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .whereEqualTo(DbPurchases.FIELDS.EMAIL.value, UserStorage.user!!.email)
+            .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
+            .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
+            .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
+            .orderBy(DbPurchases.FIELDS.TYPE.value)
+            .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
+            .get().addOnSuccessListener { queryDocumentSnapshots ->
+                PurchaseStorage.resetPurchaseList()
+
+                queryDocumentSnapshots.forEach { document ->
+                    val purchase = document.toObject(Purchase::class.java)
+
+                    // set id and update formattedThings
+                    purchase.updatePurchase(document.id)
+
+                    PurchaseStorage.purchaseList.add(purchase)
+                }
+
+                response.value = AuthResult(AuthCode.USER_DATA_UPDATED)
+            }.addOnFailureListener { e ->
+                val error = "Error! ${e.localizedMessage}"
+                Log.e(TAG, error)
+
+                response.value = AuthResult(AuthCode.USER_DATA_NOT_UPDATED)
+            }
+
+        return response
     }
 }

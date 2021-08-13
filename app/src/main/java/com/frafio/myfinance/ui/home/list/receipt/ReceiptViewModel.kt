@@ -3,7 +3,7 @@ package com.frafio.myfinance.ui.home.list.receipt
 import android.view.View
 import androidx.lifecycle.ViewModel
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.frafio.myfinance.data.enums.db.AddCode
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.models.ReceiptItem
 import com.frafio.myfinance.data.repositories.ReceiptRepository
@@ -27,12 +27,12 @@ class ReceiptViewModel(
     fun onAddButtonClick(view: View) {
         // controlla la info aggiunte
         if (receiptName.isNullOrEmpty()) {
-            listener?.onLoadFailure(PurchaseResult(AddCode.EMPTY_NAME))
+            listener?.onLoadFailure(PurchaseResult(PurchaseCode.EMPTY_NAME))
             return
         }
 
         if (receiptPrice.isNullOrEmpty()) {
-            listener?.onLoadFailure(PurchaseResult(AddCode.EMPTY_PRICE))
+            listener?.onLoadFailure(PurchaseResult(PurchaseCode.EMPTY_PRICE))
             return
         }
 
