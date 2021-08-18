@@ -221,7 +221,7 @@ class AddActivity : BaseActivity(), AddListener {
 
                 typeBtnTrio.isEnabled = true
 
-                ticketBtnTrio.show(binding.root)
+                typeBtnTrio.performClick()
             }
         }
     }
