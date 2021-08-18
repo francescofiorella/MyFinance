@@ -1,8 +1,6 @@
 package com.frafio.myfinance.data.models
 
-import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.*
+import com.frafio.myfinance.utils.formatPrice
 
 data class ReceiptItem(
     val name: String? = null,
@@ -12,11 +10,7 @@ data class ReceiptItem(
 ) {
     fun updateFormattedPrice() {
         price?.let { price ->
-            val locale = Locale("en", "UK")
-            val nf = NumberFormat.getInstance(locale)
-            val formatter = nf as DecimalFormat
-            formatter.applyPattern("###,###,##0.00")
-            formattedPrice = "€ ${formatter.format(price)}"
+            formattedPrice = "€ ${formatPrice(price)}"
         }
     }
 }

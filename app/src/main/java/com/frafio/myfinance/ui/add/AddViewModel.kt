@@ -4,6 +4,7 @@ import android.view.View
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.models.DatePickerButton
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.repositories.PurchaseRepository
@@ -24,9 +25,10 @@ class AddViewModel(
 
     var dateString: String? = null
 
-    var year: Int? = null
-    var month: Int? = null
-    var day: Int? = null
+    var year: Int? = LocalDate.now().year
+    var month: Int? = LocalDate.now().monthValue
+    var day: Int? = LocalDate.now().dayOfMonth
+
     var totChecked: Boolean = false
 
     var purchaseID: String? = null
@@ -36,37 +38,11 @@ class AddViewModel(
 
     var requestCode: Int? = null
 
-    fun updateDateTV(code: Int?): String? {
-        code?.let {
-            if (code == 1) {
-                // set data odierna
-                year = LocalDate.now().year
-                month = LocalDate.now().monthValue
-                day = LocalDate.now().dayOfMonth
-            }
-        }
-
-        day?.let { day ->
-            month?.let { month ->
-                year?.let { year ->
-                    val dayString: String = if (day < 10) {
-                        "0$day"
-                    } else {
-                        day.toString() + ""
-                    }
-
-                    val monthString: String = if (month < 10) {
-                        "0$month"
-                    } else {
-                        month.toString() + ""
-                    }
-
-                    dateString = "$dayString/$monthString/$year"
-                }
-            }
-        }
-
-        return dateString
+    fun updateTime(datePickerBtn: DatePickerButton) {
+        year = datePickerBtn.year
+        month = datePickerBtn.month
+        day = datePickerBtn.day
+        dateString = datePickerBtn.dateString
     }
 
     fun onAddButtonClick(view: View) {

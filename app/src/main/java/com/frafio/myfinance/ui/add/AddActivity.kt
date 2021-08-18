@@ -2,27 +2,21 @@ package com.frafio.myfinance.ui.add
 
 import android.content.Intent
 import android.os.Bundle
-import android.transition.AutoTransition
-import android.transition.TransitionManager
 import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.view.animation.OvershootInterpolator
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.models.ButtonTrio
+import com.frafio.myfinance.data.models.DatePickerButton
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.ui.BaseActivity
+import com.frafio.myfinance.utils.formatPrice
 import com.frafio.myfinance.utils.snackbar
-import com.google.android.material.datepicker.MaterialDatePicker
 import org.kodein.di.generic.instance
-import java.text.DecimalFormat
-import java.text.NumberFormat
 import java.util.*
 
 class AddActivity : BaseActivity(), AddListener {
@@ -30,16 +24,17 @@ class AddActivity : BaseActivity(), AddListener {
     companion object {
         const val ADD_PURCHASE_CODE: Int = 1
         const val EDIT_PURCHASE_CODE: Int = 2
-
-        private const val DATE_PICKER_TAG: String = "DATE_PICKER"
     }
-
-    private val interpolator = OvershootInterpolator()
 
     private lateinit var binding: ActivityAddBinding
     private lateinit var viewModel: AddViewModel
 
     private val factory: AddViewModelFactory by instance()
+
+    // custom layouts
+    private lateinit var typeBtnTrio: ButtonTrio
+    private lateinit var ticketBtnTrio: ButtonTrio
+    private lateinit var datePickerBtn: DatePickerButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,24 +51,98 @@ class AddActivity : BaseActivity(), AddListener {
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        intent.getIntExtra("${getString(R.string.default_path)}.REQUESTCODE", 0).also {
-            viewModel.requestCode = it
-            binding.addBigliettoLayout.alpha = 0f
-            initLayout(it)
-            viewModel.updateDateTV(it)
+        intent.getIntExtra("${getString(R.string.default_path)}.REQUESTCODE", 0).also { code ->
+            viewModel.requestCode = code
+            initLayout(code)
+            ticketBtnTrio.isVisible = false
         }
     }
 
     private fun initLayout(code: Int) {
+        datePickerBtn = object : DatePickerButton(
+            binding.addDateLayout,
+            binding.addDateTextView,
+            this@AddActivity
+        ) {
+            override fun onPositiveBtnClickListener() {
+                super.onPositiveBtnClickListener()
+                viewModel.year = year
+                viewModel.month = month
+                viewModel.day = day
+                viewModel.dateString = dateString
+            }
+        }
+
+        ticketBtnTrio = object : ButtonTrio(
+            binding.addBigliettoLayout,
+            binding.addTrenitaliaTv,
+            binding.addAmtabTv,
+            binding.addAltroTv
+        ) {
+            override fun onBtn1ClickAction() {
+                super.onBtn1ClickAction()
+                binding.addNameEditText.setText(DbPurchases.NAMES.TRENITALIA.value)
+                binding.addNameEditText.isEnabled = false
+            }
+
+            override fun onBtn2ClickAction() {
+                super.onBtn2ClickAction()
+                binding.addNameEditText.setText(DbPurchases.NAMES.AMTAB.value)
+                binding.addNameEditText.isEnabled = false
+            }
+
+            override fun onBtn3ClickAction() {
+                super.onBtn3ClickAction()
+                binding.addNameEditText.setText("")
+                binding.addNameEditText.isEnabled = true
+            }
+        }
+
+        typeBtnTrio = object : ButtonTrio(
+            binding.addTypeLayout,
+            binding.addGenericoTv,
+            binding.addSpesaTv,
+            binding.addBigliettoTv
+        ) {
+            override fun onBtn1ClickAction() {
+                super.onBtn1ClickAction()
+                ticketBtnTrio.hide(binding.root)
+
+                if (selectedBtn == Button.BUTTON_3) {
+                    binding.addNameEditText.setText("")
+                }
+                binding.addNameEditText.isEnabled = true
+
+                viewModel.type = DbPurchases.TYPES.GENERIC.value
+            }
+
+            override fun onBtn2ClickAction() {
+                super.onBtn2ClickAction()
+                ticketBtnTrio.hide(binding.root)
+
+                if (selectedBtn == Button.BUTTON_3) {
+                    binding.addNameEditText.setText("")
+                }
+                binding.addNameEditText.isEnabled = true
+
+                viewModel.type = DbPurchases.TYPES.SHOPPING.value
+            }
+
+            override fun onBtn3ClickAction() {
+                super.onBtn3ClickAction()
+                ticketBtnTrio.show(binding.root)
+                ticketBtnTrio.performClick()
+
+                viewModel.type = DbPurchases.TYPES.TICKET.value
+            }
+        }
+
         if (code == ADD_PURCHASE_CODE) {
-            binding.addGenericoTv.isSelected = true
-            viewModel.type = DbPurchases.TYPES.GENERIC.value
-
-            setTypeButton()
             setTotSwitch()
-
-            setDatePicker()
         } else if (code == EDIT_PURCHASE_CODE) {
+            typeBtnTrio.isEnabled = false
+            setTicket()
+
             intent.also { intent ->
                 intent.getStringExtra("${getString(R.string.default_path)}.PURCHASE_ID")?.let {
                     viewModel.purchaseID = it
@@ -83,11 +152,7 @@ class AddActivity : BaseActivity(), AddListener {
                 }
                 intent.getDoubleExtra("${getString(R.string.default_path)}.PURCHASE_PRICE", 0.0)
                     .also {
-                        val locale = Locale("en", "UK")
-                        val nf = NumberFormat.getInstance(locale)
-                        val formatter = nf as DecimalFormat
-                        formatter.applyPattern("###,###,##0.00")
-                        viewModel.priceString = formatter.format(it)
+                        viewModel.priceString = formatPrice(it)
                         viewModel.purchasePrice = it
                     }
                 intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_TYPE", 0).also {
@@ -98,207 +163,37 @@ class AddActivity : BaseActivity(), AddListener {
                         viewModel.purchasePosition = it
                     }
                 intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_YEAR", 0).also {
-                    viewModel.year = it
+                    datePickerBtn.year = it
                 }
                 intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_MONTH", 0).also {
-                    viewModel.month = it
+                    datePickerBtn.month = it
                 }
                 intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_DAY", 0).also {
-                    viewModel.day = it
+                    datePickerBtn.day = it
                 }
             }
 
+            datePickerBtn.isEnabled = false
+
             when (viewModel.purchaseType) {
-                DbPurchases.TYPES.SHOPPING.value -> {
-                    binding.addGenericoTv.isEnabled = false
-                    binding.addSpesaTv.isSelected = true
-                    binding.addBigliettoTv.isEnabled = false
+                DbPurchases.TYPES.GENERIC.value -> {
+                    typeBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_1
+                    typeBtnTrio.enableOnlySelectedBtn()
                 }
 
-                DbPurchases.TYPES.GENERIC.value -> {
-                    binding.addGenericoTv.isSelected = true
-                    binding.addSpesaTv.isEnabled = false
-                    binding.addBigliettoTv.isEnabled = false
+                DbPurchases.TYPES.SHOPPING.value -> {
+                    typeBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_2
+                    typeBtnTrio.enableOnlySelectedBtn()
                 }
 
                 DbPurchases.TYPES.TICKET.value -> {
-                    binding.addGenericoTv.isEnabled = false
-                    binding.addSpesaTv.isEnabled = false
-                    binding.addBigliettoTv.isSelected = true
-                    setBigliettoLayout()
+                    typeBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_3
+                    typeBtnTrio.enableOnlySelectedBtn()
                 }
             }
-
-            viewModel.updateDateTV(null)
-
-            binding.addDateTextView.setTextColor(
-                ContextCompat.getColor(
-                    applicationContext,
-                    R.color.disabled_text
-                )
-            )
-        }
-    }
-
-    private fun setDatePicker() {
-        // date picker
-        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        calendar.clear()
-        val today = MaterialDatePicker.todayInUtcMilliseconds()
-        val builder = MaterialDatePicker.Builder.datePicker()
-        builder.setTitleText(getString(R.string.date_picker))
-        builder.setSelection(today)
-        builder.setTheme(R.style.ThemeOverlay_MyFinance_DatePicker)
-        val materialDatePicker = builder.build()
-
-        binding.addDateLayout.setOnClickListener {
-            showDatePicker(materialDatePicker)
-        }
-    }
-
-    private fun showDatePicker(materialDatePicker: MaterialDatePicker<*>) {
-        if (!materialDatePicker.isAdded) {
-            materialDatePicker.show(supportFragmentManager, DATE_PICKER_TAG)
-            materialDatePicker.addOnPositiveButtonClickListener { selection ->
-                // get selected date
-                val date = Date(selection.toString().toLong())
-                val calendar = Calendar.getInstance()
-
-                calendar.time = date
-
-                viewModel.year = calendar[Calendar.YEAR]
-                viewModel.month = calendar[Calendar.MONTH] + 1
-                viewModel.day = calendar[Calendar.DAY_OF_MONTH]
-
-                binding.addDateTextView.text = viewModel.updateDateTV(null)
-            }
-        }
-    }
-
-    private fun setTypeButton() {
-        binding.addGenericoTv.setOnClickListener {
-            if (!binding.addGenericoTv.isSelected) {
-                closeTicketBtn()
-
-                if (binding.addBigliettoTv.isSelected) {
-                    binding.addNameEditText.setText("")
-                }
-                binding.addNameEditText.isEnabled = true
-
-                binding.addGenericoTv.isSelected = true
-                binding.addSpesaTv.isSelected = false
-                binding.addBigliettoTv.isSelected = false
-            }
-            viewModel.type = DbPurchases.TYPES.GENERIC.value
         }
 
-        binding.addSpesaTv.setOnClickListener {
-            if (!binding.addSpesaTv.isSelected) {
-                closeTicketBtn()
-
-                if (binding.addBigliettoTv.isSelected) {
-                    binding.addNameEditText.setText("")
-                }
-                binding.addNameEditText.isEnabled = true
-
-                binding.addGenericoTv.isSelected = false
-                binding.addSpesaTv.isSelected = true
-                binding.addBigliettoTv.isSelected = false
-            }
-            viewModel.type = DbPurchases.TYPES.SHOPPING.value
-        }
-
-        binding.addBigliettoTv.setOnClickListener {
-            if (!binding.addBigliettoTv.isSelected) {
-                binding.addGenericoTv.isSelected = false
-                binding.addSpesaTv.isSelected = false
-                binding.addBigliettoTv.isSelected = true
-
-                setBigliettoLayout()
-            }
-            viewModel.type = DbPurchases.TYPES.TICKET.value
-        }
-    }
-
-    private fun setBigliettoLayout() {
-        if (binding.addBigliettoTv.isSelected) {
-            openTicketBtn()
-
-            binding.addTrenitaliaTv.setOnClickListener {
-                if (!binding.addTrenitaliaTv.isSelected) {
-                    binding.addTrenitaliaTv.isSelected = true
-                    binding.addAmtabTv.isSelected = false
-                    binding.addAltroTv.isSelected = false
-
-                    binding.addNameEditText.setText(DbPurchases.NAMES.TRENITALIA.value)
-                    binding.addNameEditText.isEnabled = false
-                }
-            }
-
-            binding.addAmtabTv.setOnClickListener {
-                if (!binding.addAmtabTv.isSelected) {
-                    binding.addTrenitaliaTv.isSelected = false
-                    binding.addAmtabTv.isSelected = true
-                    binding.addAltroTv.isSelected = false
-
-                    binding.addNameEditText.setText(DbPurchases.NAMES.AMTAB.value)
-                    binding.addNameEditText.isEnabled = false
-                }
-            }
-
-            binding.addAltroTv.setOnClickListener {
-                if (!binding.addAltroTv.isSelected) {
-                    binding.addTrenitaliaTv.isSelected = false
-                    binding.addAmtabTv.isSelected = false
-                    binding.addAltroTv.isSelected = true
-
-                    binding.addNameEditText.setText("")
-                    binding.addNameEditText.isEnabled = true
-                }
-            }
-
-            if (viewModel.requestCode == EDIT_PURCHASE_CODE) {
-                when (viewModel.name) {
-                    DbPurchases.NAMES.TRENITALIA.value -> binding.addTrenitaliaTv.performClick()
-
-                    DbPurchases.NAMES.AMTAB.value -> binding.addAmtabTv.performClick()
-
-                    else -> binding.addAltroTv.performClick()
-                }
-            } else {
-                binding.addTrenitaliaTv.performClick()
-            }
-        } else {
-            closeTicketBtn()
-        }
-    }
-
-    private fun openTicketBtn() {
-        if (binding.addBigliettoLayout.visibility == View.GONE) {
-            binding.addBigliettoLayout.animate().setInterpolator(interpolator).alpha(1f)
-                .setDuration(1500)
-                .start()
-            binding.addBigliettoLayout.visibility = View.VISIBLE
-
-            TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
-            val transition = AutoTransition()
-            transition.duration = 2000
-            TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
-        }
-    }
-
-    private fun closeTicketBtn() {
-        if (binding.addBigliettoLayout.visibility == View.VISIBLE) {
-            binding.addBigliettoLayout.animate().setInterpolator(interpolator).alpha(0f)
-                .setDuration(1500)
-                .start()
-            binding.addBigliettoLayout.visibility = View.GONE
-
-            TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
-            val transition = AutoTransition()
-            transition.duration = 2000
-            TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
-        }
+        viewModel.updateTime(datePickerBtn)
     }
 
     private fun setTotSwitch() {
@@ -314,11 +209,9 @@ class AddActivity : BaseActivity(), AddListener {
                 binding.addNameEditText.error = null
                 binding.addPriceEditText.error = null
 
-                binding.addGenericoTv.isEnabled = false
-                binding.addSpesaTv.isEnabled = false
-                binding.addBigliettoTv.isEnabled = false
+                typeBtnTrio.isEnabled = false
 
-                closeTicketBtn()
+                ticketBtnTrio.hide(binding.root)
             } else {
                 binding.addNameEditText.setText("")
                 binding.addNameEditText.isEnabled = true
@@ -326,12 +219,22 @@ class AddActivity : BaseActivity(), AddListener {
                 binding.addPriceEditText.setText("")
                 binding.addPriceEditText.isEnabled = true
 
-                binding.addGenericoTv.isEnabled = true
-                binding.addSpesaTv.isEnabled = true
-                binding.addBigliettoTv.isEnabled = true
+                typeBtnTrio.isEnabled = true
 
-                setBigliettoLayout()
+                ticketBtnTrio.show(binding.root)
             }
+        }
+    }
+
+    private fun setTicket() {
+        when (viewModel.name) {
+            DbPurchases.NAMES.TRENITALIA.value ->
+                ticketBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_1
+
+            DbPurchases.NAMES.AMTAB.value ->
+                ticketBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_2
+
+            else -> ticketBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_3
         }
     }
 

@@ -1,8 +1,7 @@
 package com.frafio.myfinance.data.models
 
-import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.*
+import com.frafio.myfinance.utils.formatDate
+import com.frafio.myfinance.utils.formatPrice
 
 data class Purchase(
     val email: String? = null,
@@ -14,9 +13,9 @@ data class Purchase(
     val type: Int? = null,
     var id: String? = null
 ) {
-    private var privateFormattedDate: String? = null
+    private var _formattedDate: String? = null
     val formattedDate: String?
-        get() = privateFormattedDate
+        get() = _formattedDate
 
     private var privateFormattedPrice: String? = null
     val formattedPrice: String?
@@ -37,32 +36,12 @@ data class Purchase(
     }
 
     private fun updateFormattedDate() {
-        day?.let { day ->
-            month?.let { month ->
-                year?.let { year ->
-                    val dayString: String = if (day < 10) {
-                        "0$day"
-                    } else {
-                        day.toString()
-                    }
-                    val monthString: String = if (month < 10) {
-                        "0$month"
-                    } else {
-                        month.toString()
-                    }
-                    privateFormattedDate = "$dayString/$monthString/$year"
-                }
-            }
-        }
+        _formattedDate = formatDate(day, month, year)
     }
 
     private fun updateFormattedPrice() {
         price?.let { price ->
-            val locale = Locale("en", "UK")
-            val nf = NumberFormat.getInstance(locale)
-            val formatter = nf as DecimalFormat
-            formatter.applyPattern("###,###,##0.00")
-            privateFormattedPrice = "€ ${formatter.format(price)}"
+            privateFormattedPrice = "€ ${formatPrice(price)}"
         }
     }
 }

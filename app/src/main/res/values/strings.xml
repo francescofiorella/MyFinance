@@ -28,8 +28,6 @@
 
     <string name="receipt_delete_dialog">Vuoi eliminare la voce selezionata?</string>
 
-    <string name="date_picker">Seleziona una data</string>
-
     <string name="nome">Nome</string>
     <string name="costo">Costo</string>
     <string name="datepickerarrow">DatePickerArrow</string>
