@@ -85,14 +85,15 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
                     android:padding="15dp"
-                    android:hint="Nome"
+                    android:hint="@string/nome"
                     android:background="@drawable/bg_edit_text"
                     android:fontFamily="@font/nunito"
                     android:inputType="text|textCapSentences|textNoSuggestions"
                     android:text="@={viewmodel.name}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:autofillHints="none" />
 
                 <EditText
                     android:id="@+id/add_price_EditText"
@@ -103,14 +104,15 @@
                     android:layout_marginEnd="10dp"
                     android:padding="15dp"
                     android:background="@drawable/bg_edit_text"
-                    android:hint="Costo"
+                    android:hint="@string/costo"
                     android:fontFamily="@font/nunito"
                     android:drawableEnd="@drawable/ic_euro"
                     android:inputType="numberDecimal"
                     android:text="@={viewmodel.priceString}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_name_EditText" />
+                    app:layout_constraintTop_toBottomOf="@id/add_name_EditText"
+                    android:autofillHints="none" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/add_dateLayout"
@@ -153,7 +155,7 @@
                             app:layout_constraintBottom_toBottomOf="@id/add_dateTextView"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="@id/add_dateTextView"
-                            android:contentDescription="DatePickerArrow" />
+                            android:contentDescription="@string/datepickerarrow" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -177,7 +179,7 @@
                         android:id="@+id/add_generico_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Generico"
+                        android:text="@string/generico"
                         android:textSize="16sp"
                         android:textAlignment="center"
                         android:textColor="@color/type_button_color"
@@ -192,7 +194,7 @@
                         android:id="@+id/add_spesa_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Spesa"
+                        android:text="@string/spesa"
                         android:textSize="16sp"
                         android:textAlignment="center"
                         android:textColor="@color/type_button_color"
@@ -208,7 +210,7 @@
                         android:id="@+id/add_biglietto_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Biglietto"
+                        android:text="@string/biglietto"
                         android:textSize="16sp"
                         android:textAlignment="center"
                         android:textColor="@color/type_button_color"
@@ -241,7 +243,7 @@
                         android:id="@+id/add_trenitalia_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="TrenItalia"
+                        android:text="@string/trenitalia"
                         android:textSize="16sp"
                         android:textAlignment="center"
                         android:textColor="@color/type_button_color"
@@ -256,7 +258,7 @@
                         android:id="@+id/add_amtab_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Amtab"
+                        android:text="@string/amtab"
                         android:textSize="16sp"
                         android:textAlignment="center"
                         android:textColor="@color/type_button_color"
@@ -271,7 +273,7 @@
                         android:id="@+id/add_altro_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Altro"
+                        android:text="@string/altro"
                         android:textSize="16sp"
                         android:textAlignment="center"
                         android:textColor="@color/type_button_color"
@@ -288,7 +290,7 @@
                     android:id="@+id/add_totale_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Nessun acquisto"
+                    android:text="@string/nessun_acquisto"
                     android:layout_marginTop="10dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
@@ -301,7 +303,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/add_bigliettoLayout" />
-
 
                 <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                     android:id="@+id/add_addButton"

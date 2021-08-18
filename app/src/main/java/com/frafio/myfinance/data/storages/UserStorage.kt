@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.storage
+package com.frafio.myfinance.data.storages
 
 import com.frafio.myfinance.data.models.User
 import com.google.firebase.auth.FirebaseUser

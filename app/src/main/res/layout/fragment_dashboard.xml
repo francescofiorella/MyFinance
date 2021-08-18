@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/nunito"
             android:padding="10dp"
-            android:text="Aggiungi il tuo primo acquisto!"
+            android:text="@string/warning_home"
             android:textColor="@color/error"
             android:textSize="21sp"
             android:visibility="@{viewmodel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
@@ -98,7 +98,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
-                            android:text="Media giornaliera"
+                            android:text="@string/media_giornaliera"
                             android:textSize="16sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -148,7 +148,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
-                            android:text="Media mensile"
+                            android:text="@string/media_mensile"
                             android:textSize="16sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -198,7 +198,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
-                            android:text="Oggi"
+                            android:text="@string/oggi"
                             android:textSize="16sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -248,7 +248,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
-                            android:text="N° acquisti"
+                            android:text="@string/n_acquisti"
                             android:textSize="16sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -298,7 +298,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
-                            android:text="Totale"
+                            android:text="@string/totale"
                             android:textSize="16sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -348,7 +348,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
-                            android:text="Totale biglietti"
+                            android:text="@string/totale_biglietti"
                             android:textSize="16sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -398,7 +398,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
-                            android:text="N° TrenItalia"
+                            android:text="@string/n_trenitalia"
                             android:textSize="16sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -448,7 +448,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
-                            android:text="N° Amtab"
+                            android:text="@string/n_amtab"
                             android:textSize="16sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -473,50 +473,6 @@
                 </com.google.android.material.card.MaterialCardView>
 
             </GridLayout>
-
-            <!--<androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="invisible">
-
-                <TextView
-                    android:id="@+id/textViewMedia"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nunito"
-                    android:paddingTop="10dp"
-                    android:paddingHorizontal="10dp"
-                    android:text="Statistiche medie"
-                    android:textColor="@color/primary_text"
-                    android:textSize="18sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/textViewTotale"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nunito"
-                    android:paddingHorizontal="10dp"
-                    android:text="Statistiche totali"
-                    android:textColor="@color/primary_text"
-                    android:textSize="18sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/media_scrollview" />
-
-                <TextView
-                    android:id="@+id/textViewBiglietti"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nunito"
-                    android:paddingHorizontal="10dp"
-                    android:text="Statistiche biglietti"
-                    android:textColor="@color/primary_text"
-                    android:textSize="18sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tot_scrollview" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>-->
 
         </ScrollView>
 

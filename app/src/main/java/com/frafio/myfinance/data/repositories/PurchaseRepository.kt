@@ -5,7 +5,7 @@ import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.managers.PurchaseManager
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
-import com.frafio.myfinance.data.storage.PurchaseStorage
+import com.frafio.myfinance.data.storages.PurchaseStorage
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.LocalDate

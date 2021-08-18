@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/accent"
             android:fontFamily="@font/nunito_semibold"
-            android:text="Log Out"
+            android:text="@string/log_out"
             android:textColor="@color/white"
             app:cornerRadius="@dimen/field_corner_radius"
             app:layout_constraintBottom_toBottomOf="parent"

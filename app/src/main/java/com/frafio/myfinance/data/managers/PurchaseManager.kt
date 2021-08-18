@@ -7,8 +7,8 @@ import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
-import com.frafio.myfinance.data.storage.PurchaseStorage
-import com.frafio.myfinance.data.storage.UserStorage
+import com.frafio.myfinance.data.storages.PurchaseStorage
+import com.frafio.myfinance.data.storages.UserStorage
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 

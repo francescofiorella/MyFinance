@@ -103,14 +103,15 @@
                     android:layout_marginBottom="10dp"
                     android:background="@drawable/bg_edit_text"
                     android:fontFamily="@font/nunito"
-                    android:hint="Nome"
+                    android:hint="@string/nome"
                     android:inputType="text|textCapCharacters"
                     android:padding="15dp"
                     android:text="@={viewmodel.receiptName}"
                     app:layout_constraintBottom_toTopOf="@id/receipt_price_EditText"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:autofillHints="none" />
 
                 <EditText
                     android:id="@+id/receipt_price_EditText"
@@ -120,7 +121,7 @@
                     android:layout_marginEnd="10dp"
                     android:background="@drawable/bg_edit_text"
                     android:fontFamily="@font/nunito"
-                    android:hint="Costo"
+                    android:hint="@string/costo"
                     android:padding="15dp"
                     android:drawableEnd="@drawable/ic_euro"
                     android:inputType="numberDecimal"
@@ -128,7 +129,8 @@
                     app:layout_constraintBottom_toBottomOf="@+id/receipt_addBtn"
                     app:layout_constraintEnd_toStartOf="@+id/receipt_addBtn"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/receipt_addBtn" />
+                    app:layout_constraintTop_toTopOf="@+id/receipt_addBtn"
+                    android:autofillHints="none" />
 
                 <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                     android:id="@+id/receipt_addBtn"
@@ -140,7 +142,7 @@
                     android:focusable="true"
                     app:backgroundTint="@color/accent"
                     app:elevation="2dp"
-                    android:text="Aggiungi"
+                    android:text="@string/aggiungi"
                     android:fontFamily="@font/nunito_semibold"
                     android:onClick="@{viewmodel::onAddButtonClick}"
                     app:icon="@drawable/ic_add"

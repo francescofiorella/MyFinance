@@ -45,7 +45,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/profile_divider"
             app:srcCompat="@drawable/ic_user"
-            app:roundImage="@{viewmodel.user.photoUrl}" />
+            app:roundImage="@{viewmodel.user.photoUrl}"
+            android:contentDescription="@string/propic" />
 
         <TextView
             android:id="@+id/profile_username_tv"

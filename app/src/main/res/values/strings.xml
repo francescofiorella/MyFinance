@@ -29,4 +29,37 @@
     <string name="receipt_delete_dialog">Vuoi eliminare la voce selezionata?</string>
 
     <string name="date_picker">Seleziona una data</string>
+
+    <string name="nome">Nome</string>
+    <string name="costo">Costo</string>
+    <string name="datepickerarrow">DatePickerArrow</string>
+    <string name="generico">Generico</string>
+    <string name="spesa">Spesa</string>
+    <string name="biglietto">Biglietto</string>
+    <string name="trenitalia">TrenItalia</string>
+    <string name="amtab">Amtab</string>
+    <string name="altro">Altro</string>
+    <string name="nessun_acquisto">Nessun acquisto</string>
+    <string name="login_signup_email">Inserisci la tua email</string>
+    <string name="login_password">Inserisci la password</string>
+    <string name="accedi">Accedi</string>
+    <string name="forgotten_password">Hai dimenticato la password?</string>
+    <string name="login_google">Accedi con Google</string>
+    <string name="login_signup">Non hai un account? Iscriviti</string>
+    <string name="signup_name">Inserisci nome e cognome</string>
+    <string name="signup_password">Inserisci una password</string>
+    <string name="signup_password_confirm">Inserisci nuovamente la password</string>
+    <string name="registrati">Registrati</string>
+    <string name="signup_login">Hai già un account? Accedi</string>
+    <string name="warning_home">Aggiungi il tuo primo acquisto!</string>
+    <string name="media_giornaliera">Media giornaliera</string>
+    <string name="media_mensile">Media mensile</string>
+    <string name="oggi">Oggi</string>
+    <string name="n_acquisti">N° acquisti</string>
+    <string name="totale">Totale</string>
+    <string name="totale_biglietti">Totale biglietti</string>
+    <string name="n_trenitalia">N° TrenItalia</string>
+    <string name="n_amtab">N° Amtab</string>
+    <string name="log_out">Log Out</string>
+    <string name="propic">Immagine di profilo</string>
 </resources>

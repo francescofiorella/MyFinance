@@ -9,8 +9,8 @@ import com.frafio.myfinance.data.enums.auth.SigninException
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.models.Purchase
-import com.frafio.myfinance.data.storage.PurchaseStorage
-import com.frafio.myfinance.data.storage.UserStorage
+import com.frafio.myfinance.data.storages.PurchaseStorage
+import com.frafio.myfinance.data.storages.UserStorage
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
