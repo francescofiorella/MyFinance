@@ -22,28 +22,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/nav_3"
-            android:fontFamily="@font/nunito"
-            android:textSize="21sp"
-            android:padding="10dp"
+            android:fontFamily="@font/nunito_bold"
+            android:textSize="@dimen/title_size"
+            android:padding="@dimen/title_padding"
             android:textColor="@color/primary_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-        <View
-            android:id="@+id/profile_divider"
-            android:layout_width="match_parent"
-            android:layout_height="0.1dp"
-            android:background="@color/primary_text"
-            app:layout_constraintTop_toBottomOf="@id/profile_fragmentTitle"/>
+            android:layout_marginTop="@dimen/title_margin_vertical"
+            android:layout_marginStart="@dimen/title_margin_start"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/profile_propic_iv"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:layout_margin="10dp"
+            android:layout_marginTop="@dimen/title_margin_vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profile_divider"
+            app:layout_constraintTop_toBottomOf="@id/profile_fragmentTitle"
             app:srcCompat="@drawable/ic_user"
             app:roundImage="@{viewmodel.user.photoUrl}"
             android:contentDescription="@string/propic" />

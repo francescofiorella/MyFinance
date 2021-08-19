@@ -31,13 +31,6 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
 
         viewModel.listener = this
 
-        // toolbar
-        setSupportActionBar(binding.receiptToolbar)
-
-        // back arrow
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         // retrieve purchase data from intent
         intent.getStringExtra("${getString(R.string.default_path)}.purchaseID")?.let {
             viewModel.purchaseID = it

@@ -30,13 +30,6 @@ class SignupActivity : BaseActivity(), AuthListener {
         binding.viewmodel = viewModel
 
         viewModel.authListener = this
-
-        // toolbar
-        setSupportActionBar(binding.signupToolbar)
-
-        // back arrow
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onAuthStarted() {

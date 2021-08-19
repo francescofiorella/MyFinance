@@ -13,35 +13,11 @@
 
     </data>
 
-    <RelativeLayout
-
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/signup_layout">
-
-        <!--Toolbar-->
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/signup_appBarLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/signup_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:title="Registrati"
-                app:titleTextColor="@color/white"
-                app:titleTextAppearance="@style/TextAppearance.MyFinance.Toolbar.Title"
-                style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
-
-        </com.google.android.material.appbar.AppBarLayout>
-
         <ScrollView
+            android:id="@+id/signup_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:layout_below="@id/signup_appBarLayout">
+            android:fillViewport="true">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -64,7 +40,7 @@
                     android:id="@+id/signupTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="100dp"
+                    android:layout_marginTop="150dp"
                     android:fontFamily="casual"
                     android:text="@string/app_name"
                     android:textColor="@color/accent"
@@ -235,7 +211,5 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </ScrollView>
-
-    </RelativeLayout>
 
 </layout>

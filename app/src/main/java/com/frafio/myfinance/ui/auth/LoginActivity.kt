@@ -59,9 +59,6 @@ class LoginActivity : BaseActivity(), AuthListener {
         binding.viewmodel = viewModel
 
         viewModel.authListener = this
-
-        // toolbar
-        setSupportActionBar(binding.loginToolbar)
     }
 
     fun onGoogleButtonClick(view: View) {

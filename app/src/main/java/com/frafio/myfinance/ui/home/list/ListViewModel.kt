@@ -5,26 +5,29 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.frafio.myfinance.data.repositories.UserRepository
 
 class ListViewModel(
-    private val repository: PurchaseRepository
+    private val purchaseRepository: PurchaseRepository,
+    userRepository: UserRepository
 ) : ViewModel() {
+    val proPic: String? = userRepository.getProPic()
 
     var listener: DeleteListener? = null
 
-    val purchaseListSize = repository.purchaseListSize()
+    val purchaseListSize = purchaseRepository.purchaseListSize()
 
     private val _purchases = MutableLiveData<List<Purchase>>()
     val purchases: LiveData<List<Purchase>>
         get() = _purchases
 
     fun getPurchases() {
-        val purchases = repository.getPurchaseList()
+        val purchases = purchaseRepository.getPurchaseList()
         _purchases.value = purchases
     }
 
     fun deletePurchaseAt(position: Int) {
-        val response = repository.deletePurchaseAt(position)
+        val response = purchaseRepository.deletePurchaseAt(position)
         listener?.onDeleteComplete(response)
     }
 }

@@ -6,7 +6,7 @@
     <string name="nav_2_extended">Lista Acquisti</string>
     <string name="nav_3">Profilo</string>
     <string name="nav_4">Menu</string>
-    <string name="add">Aggiungi Acquisto</string>
+    <string name="add">Nuovo Acquisto</string>
 
     <string name="addBtnContentDescription">Aggiungi un acquisto</string>
 
@@ -58,8 +58,8 @@
     <string name="n_acquisti">Numero \nAcquisti</string>
     <string name="totale">Totale \nAcquisti</string>
     <string name="totale_biglietti">Totale \nBiglietti</string>
-    <string name="n_trenitalia">Numero \nTrenItalia</string>
-    <string name="n_amtab">Numero \nAmtab</string>
+    <string name="n_trenitalia">N° Biglietti \nTrenItalia</string>
+    <string name="n_amtab">N° Biglietti \nAmtab</string>
 
     <string name="log_out">Log Out</string>
     <string name="propic">Immagine di profilo</string>

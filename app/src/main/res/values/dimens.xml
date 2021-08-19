@@ -9,6 +9,14 @@
     <dimen name="card_elevation">1dp</dimen>
     <dimen name="card_corner_radius">15dp</dimen>
 
-    <dimen name="title_size">16sp</dimen>
-    <dimen name="price_size">28sp</dimen>
+    <dimen name="card_title_size">16sp</dimen>
+    <dimen name="card_price_size">28sp</dimen>
+
+    <dimen name="title_size">26sp</dimen>
+    <dimen name="title_padding">10dp</dimen>
+    <dimen name="title_margin_vertical">20dp</dimen>
+    <dimen name="title_margin_start">10dp</dimen>
+
+    <dimen name="propic_size">40dp</dimen>
+    <dimen name="propic_margin_end">20dp</dimen>
 </resources>
