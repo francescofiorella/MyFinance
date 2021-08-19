@@ -52,15 +52,17 @@
     <string name="signup_login">Hai già un account? Accedi</string>
     <string name="warning_home">Aggiungi il tuo primo acquisto!</string>
 
-    <string name="media_giornaliera">Media Giornaliera</string>
-    <string name="media_mensile">Media Mensile</string>
-    <string name="oggi">Oggi</string>
-    <string name="n_acquisti">Numero Acquisti</string>
-    <string name="totale">Totale</string>
-    <string name="totale_biglietti">Totale Biglietti</string>
-    <string name="n_trenitalia">Numero TrenItalia</string>
-    <string name="n_amtab">Numero Amtab</string>
+    <string name="media_giornaliera">Media \nGiornaliera</string>
+    <string name="media_mensile">Media \nMensile</string>
+    <string name="oggi">Acquisti \nOggi</string>
+    <string name="n_acquisti">Numero \nAcquisti</string>
+    <string name="totale">Totale \nAcquisti</string>
+    <string name="totale_biglietti">Totale \nBiglietti</string>
+    <string name="n_trenitalia">Numero \nTrenItalia</string>
+    <string name="n_amtab">Numero \nAmtab</string>
 
     <string name="log_out">Log Out</string>
     <string name="propic">Immagine di profilo</string>
+
+    <string name="card_dimension_ratio">1.2:1</string>
 </resources>
