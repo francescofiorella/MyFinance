@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -16,11 +15,11 @@
         android:id="@+id/recView_receiptItem_constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="10dp"
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
-        android:focusable="true">
+        android:focusable="true"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp">
 
         <TextView
             android:id="@+id/recView_receiptItem_nomeTextView"
@@ -28,13 +27,13 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/nunito"
             android:text="@{receiptItem.name}"
+            android:textAllCaps="true"
             android:textColor="@color/primary_text"
             android:textSize="16sp"
-            android:textAllCaps="true"
-            tools:text="Acquisto"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Acquisto" />
 
         <TextView
             android:id="@+id/recView_receiptItem_priceTextView"
@@ -43,10 +42,10 @@
             android:fontFamily="@font/nunito"
             android:text="@{receiptItem.formattedPrice}"
             android:textSize="16sp"
-            tools:text="€ 0.00"
             app:layout_constraintBottom_toBottomOf="@id/recView_receiptItem_nomeTextView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/recView_receiptItem_nomeTextView" />
+            app:layout_constraintTop_toTopOf="@id/recView_receiptItem_nomeTextView"
+            tools:text="€ 0.00" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

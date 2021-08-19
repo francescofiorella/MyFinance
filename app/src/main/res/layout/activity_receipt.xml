@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.home.list.receipt.ReceiptActivity">
@@ -14,24 +13,24 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/receipt_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/receipt_layout">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/receipt_purchaseTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewmodel.purchaseName}"
-            tools:text="Acquisto"
-            android:fontFamily="@font/nunito_bold"
-            android:textSize="@dimen/title_size"
-            android:padding="@dimen/title_padding"
-            android:textColor="@color/primary_text"
-            android:layout_marginTop="@dimen/title_margin_vertical"
             android:layout_marginStart="@dimen/title_margin_start"
+            android:layout_marginTop="@dimen/title_margin_vertical"
+            android:fontFamily="@font/nunito_bold"
+            android:padding="@dimen/title_padding"
+            android:text="@{viewmodel.purchaseName}"
+            android:textColor="@color/primary_text"
+            android:textSize="@dimen/title_size"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            tools:text="Acquisto" />
 
         <TextView
             android:id="@+id/receipt_purchasePrice"
@@ -51,17 +50,17 @@
             android:id="@+id/receipt_recView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="@drawable/bg_edit_text"
-            android:layout_marginTop="@dimen/title_margin_vertical"
             android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="@dimen/title_margin_vertical"
             android:layout_marginBottom="10dp"
+            android:background="@drawable/bg_edit_text"
             android:scrollbars="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/recycler_view_receipt_item"
             app:layout_constraintBottom_toTopOf="@id/receipt_addLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/receipt_purchaseTitle" />
+            app:layout_constraintTop_toBottomOf="@id/receipt_purchaseTitle"
+            tools:listitem="@layout/recycler_view_receipt_item" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/receipt_addLayout"
@@ -77,6 +76,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
+                android:autofillHints="none"
                 android:background="@drawable/bg_edit_text"
                 android:fontFamily="@font/nunito"
                 android:hint="@string/nome"
@@ -86,8 +86,7 @@
                 app:layout_constraintBottom_toTopOf="@id/receipt_price_EditText"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:autofillHints="none" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <EditText
                 android:id="@+id/receipt_price_EditText"
@@ -95,18 +94,18 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
+                android:autofillHints="none"
                 android:background="@drawable/bg_edit_text"
+                android:drawableEnd="@drawable/ic_euro"
                 android:fontFamily="@font/nunito"
                 android:hint="@string/costo"
-                android:padding="15dp"
-                android:drawableEnd="@drawable/ic_euro"
                 android:inputType="numberDecimal"
+                android:padding="15dp"
                 android:text="@={viewmodel.receiptPrice}"
                 app:layout_constraintBottom_toBottomOf="@+id/receipt_addBtn"
                 app:layout_constraintEnd_toStartOf="@+id/receipt_addBtn"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/receipt_addBtn"
-                android:autofillHints="none" />
+                app:layout_constraintTop_toTopOf="@+id/receipt_addBtn" />
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/receipt_addBtn"
@@ -116,11 +115,11 @@
                 android:layout_marginBottom="20dp"
                 android:clickable="true"
                 android:focusable="true"
-                app:backgroundTint="@color/accent"
-                app:elevation="2dp"
-                android:text="@string/aggiungi"
                 android:fontFamily="@font/nunito_semibold"
                 android:onClick="@{viewmodel::onAddButtonClick}"
+                android:text="@string/aggiungi"
+                app:backgroundTint="@color/accent"
+                app:elevation="2dp"
                 app:icon="@drawable/ic_add"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.home.profile.ProfileFragment">
-    
+
     <data>
-        
+
         <variable
             name="viewmodel"
             type="com.frafio.myfinance.ui.home.profile.ProfileViewModel" />
@@ -21,27 +20,27 @@
             android:id="@+id/profile_fragmentTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/nav_3"
-            android:fontFamily="@font/nunito_bold"
-            android:textSize="@dimen/title_size"
-            android:padding="@dimen/title_padding"
-            android:textColor="@color/primary_text"
-            android:layout_marginTop="@dimen/title_margin_vertical"
             android:layout_marginStart="@dimen/title_margin_start"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:layout_marginTop="@dimen/title_margin_vertical"
+            android:fontFamily="@font/nunito_bold"
+            android:padding="@dimen/title_padding"
+            android:text="@string/nav_3"
+            android:textColor="@color/primary_text"
+            android:textSize="@dimen/title_size"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/profile_propic_iv"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginTop="@dimen/title_margin_vertical"
+            android:contentDescription="@string/propic"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/profile_fragmentTitle"
-            app:srcCompat="@drawable/ic_user"
             app:roundImage="@{viewmodel.user.photoUrl}"
-            android:contentDescription="@string/propic" />
+            app:srcCompat="@drawable/ic_user" />
 
         <TextView
             android:id="@+id/profile_username_tv"
@@ -52,10 +51,10 @@
             android:text="@{viewmodel.user.fullName}"
             android:textColor="@color/primary_text"
             android:textSize="26sp"
-            tools:text="FullName"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profile_propic_iv" />
+            app:layout_constraintTop_toBottomOf="@id/profile_propic_iv"
+            tools:text="FullName" />
 
         <TextView
             android:id="@+id/profile_email_tv"
@@ -64,10 +63,10 @@
             android:fontFamily="@font/nunito"
             android:text="@{viewmodel.user.email}"
             android:textSize="16sp"
-            tools:text="user@email.com"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profile_username_tv" />
+            app:layout_constraintTop_toBottomOf="@id/profile_username_tv"
+            tools:text="user@email.com" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/profile_logoutBtn"
@@ -88,13 +87,13 @@
             android:id="@+id/profile_appVersion_TV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/nunito"
             android:layout_marginTop="10dp"
+            android:fontFamily="@font/nunito"
             android:text="@{viewmodel.versionName}"
-            tools:text="MyFinance 1.0.0"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profile_logoutBtn" />
+            app:layout_constraintTop_toBottomOf="@+id/profile_logoutBtn"
+            tools:text="MyFinance 1.0.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

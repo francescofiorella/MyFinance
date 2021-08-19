@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        
+
         <import type="android.view.View" />
-        
+
         <variable
             name="purchase"
             type="com.frafio.myfinance.data.models.Purchase" />
@@ -24,30 +23,30 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="20dp"
             android:visibility="@{purchase.type == 0 ? View.VISIBLE : View.GONE}"
-            tools:visibility="visible"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
 
             <TextView
                 android:id="@+id/recView_purchaseItem_dataTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginVertical="5dp"
                 android:fontFamily="@font/nunito"
                 android:text="@{purchase.formattedDate}"
                 android:textSize="14sp"
-                tools:text="01/01/2000"
-                android:layout_marginVertical="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="01/01/2000" />
 
             <View
                 android:id="@+id/recView_purchaseItem_divider"
                 android:layout_width="0dp"
                 android:layout_height="0.1dp"
-                android:background="@android:color/darker_gray"
                 android:layout_marginStart="10dp"
+                android:background="@android:color/darker_gray"
                 app:layout_constraintBottom_toBottomOf="@+id/recView_purchaseItem_dataTextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_dataTextView"
@@ -59,11 +58,11 @@
             android:id="@+id/recView_purchaseItem_constraintLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:longClickable="true"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
+            android:longClickable="true"
             android:paddingHorizontal="20dp"
-            android:background="?attr/selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/recView_purchaseItem_dataLayout">
@@ -76,10 +75,10 @@
                 android:fontFamily="@font/nunito"
                 android:text="@{purchase.type == 0 ? purchase.name : @string/empty + purchase.name}"
                 android:textColor="@color/primary_text"
-                tools:text="Acquisto"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Acquisto" />
 
             <TextView
                 android:id="@+id/recView_purchaseItem_priceTextView"
@@ -88,10 +87,10 @@
                 android:fontFamily="@font/nunito"
                 android:text="@{purchase.formattedPrice}"
                 android:textSize="18sp"
-                tools:text="€ 0.00"
                 app:layout_constraintBottom_toBottomOf="@id/recView_purchaseItem_nomeTextView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/recView_purchaseItem_nomeTextView" />
+                app:layout_constraintTop_toTopOf="@id/recView_purchaseItem_nomeTextView"
+                tools:text="€ 0.00" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

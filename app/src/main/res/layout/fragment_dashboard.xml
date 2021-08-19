@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.home.dashboard.DashboardFragment">
@@ -23,51 +22,51 @@
             android:id="@+id/dashboard_fragmentTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/nav_1"
-            android:fontFamily="@font/nunito_bold"
-            android:textSize="@dimen/title_size"
-            android:padding="@dimen/title_padding"
-            android:textColor="@color/primary_text"
-            android:layout_marginTop="@dimen/title_margin_vertical"
             android:layout_marginStart="@dimen/title_margin_start"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:layout_marginTop="@dimen/title_margin_vertical"
+            android:fontFamily="@font/nunito_bold"
+            android:padding="@dimen/title_padding"
+            android:text="@string/nav_1"
+            android:textColor="@color/primary_text"
+            android:textSize="@dimen/title_size"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:layout_width="@dimen/propic_size"
             android:layout_height="@dimen/propic_size"
             android:layout_marginEnd="@dimen/propic_margin_end"
-            app:srcCompat="@drawable/ic_user"
-            app:roundImage="@{viewmodel.proPic}"
+            android:contentDescription="@string/propic"
             app:layout_constraintBottom_toBottomOf="@+id/dashboard_fragmentTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/dashboard_fragmentTitle"
-            android:contentDescription="@string/propic" />
+            app:roundImage="@{viewmodel.proPic}"
+            app:srcCompat="@drawable/ic_user" />
 
         <TextView
             android:id="@+id/dashboard_warningTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:fontFamily="@font/nunito"
             android:padding="10dp"
             android:text="@string/warning_home"
             android:textColor="@color/error"
             android:textSize="21sp"
             android:visibility="@{viewmodel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
-            tools:visibility="gone"
-            android:layout_marginTop="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_fragmentTitle" />
+            app:layout_constraintTop_toBottomOf="@id/dashboard_fragmentTitle"
+            tools:visibility="gone" />
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:fillViewport="true"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dashboard_fragmentTitle">
 
             <GridLayout
@@ -90,15 +89,15 @@
                         android:id="@+id/materialCardView"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_marginTop="@dimen/dashboard_top_margin"
                         android:layout_marginStart="@dimen/card_full_margin"
-                        android:layout_marginBottom="@dimen/card_half_margin"
+                        android:layout_marginTop="@dimen/dashboard_top_margin"
                         android:layout_marginEnd="@dimen/card_half_margin"
+                        android:layout_marginBottom="@dimen/card_half_margin"
                         app:cardBackgroundColor="@color/edit_text"
                         app:cardCornerRadius="@dimen/card_corner_radius"
                         app:cardElevation="@dimen/card_elevation"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
                         app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
@@ -148,18 +147,18 @@
                         android:id="@+id/materialCardView2"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        android:layout_marginTop="@dimen/dashboard_top_margin"
-                        android:layout_marginBottom="@dimen/card_half_margin"
                         android:layout_marginStart="@dimen/card_half_margin"
+                        android:layout_marginTop="@dimen/dashboard_top_margin"
                         android:layout_marginEnd="@dimen/card_full_margin"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginBottom="@dimen/card_half_margin"
                         app:cardBackgroundColor="@color/edit_text"
                         app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="@dimen/card_elevation">
+                        app:cardElevation="@dimen/card_elevation"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -185,9 +184,9 @@
                                 android:text="@{viewmodel.monthAvgString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
-                                tools:text="€ 0.00"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"/>
+                                app:layout_constraintStart_toStartOf="parent"
+                                tools:text="€ 0.00" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -206,18 +205,18 @@
                         android:id="@+id/materialCardView3"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        android:layout_marginTop="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/card_half_margin"
                         android:layout_marginStart="@dimen/card_full_margin"
+                        android:layout_marginTop="@dimen/card_half_margin"
                         android:layout_marginEnd="@dimen/card_half_margin"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginBottom="@dimen/card_half_margin"
                         app:cardBackgroundColor="@color/edit_text"
                         app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="@dimen/card_elevation">
+                        app:cardElevation="@dimen/card_elevation"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -243,9 +242,9 @@
                                 android:text="@{viewmodel.todayTotString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
-                                tools:text="€ 0.00"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"/>
+                                app:layout_constraintStart_toStartOf="parent"
+                                tools:text="€ 0.00" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -264,18 +263,18 @@
                         android:id="@+id/materialCardView5"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        android:layout_marginTop="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/card_half_margin"
                         android:layout_marginStart="@dimen/card_half_margin"
+                        android:layout_marginTop="@dimen/card_half_margin"
                         android:layout_marginEnd="@dimen/card_full_margin"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginBottom="@dimen/card_half_margin"
                         app:cardBackgroundColor="@color/edit_text"
                         app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="@dimen/card_elevation">
+                        app:cardElevation="@dimen/card_elevation"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -301,9 +300,9 @@
                                 android:text="@{viewmodel.numTotString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
-                                tools:text="0"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent" />
+                                app:layout_constraintStart_toStartOf="parent"
+                                tools:text="0" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -322,18 +321,18 @@
                         android:id="@+id/materialCardView4"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        android:layout_marginTop="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/card_half_margin"
                         android:layout_marginStart="@dimen/card_full_margin"
+                        android:layout_marginTop="@dimen/card_half_margin"
                         android:layout_marginEnd="@dimen/card_half_margin"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginBottom="@dimen/card_half_margin"
                         app:cardBackgroundColor="@color/edit_text"
                         app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="@dimen/card_elevation">
+                        app:cardElevation="@dimen/card_elevation"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -359,9 +358,9 @@
                                 android:text="@{viewmodel.totString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
-                                tools:text="€ 0.00"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent" />
+                                app:layout_constraintStart_toStartOf="parent"
+                                tools:text="€ 0.00" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -380,18 +379,18 @@
                         android:id="@+id/materialCardView6"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        android:layout_marginTop="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/card_half_margin"
                         android:layout_marginStart="@dimen/card_half_margin"
+                        android:layout_marginTop="@dimen/card_half_margin"
                         android:layout_marginEnd="@dimen/card_full_margin"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginBottom="@dimen/card_half_margin"
                         app:cardBackgroundColor="@color/edit_text"
                         app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="@dimen/card_elevation">
+                        app:cardElevation="@dimen/card_elevation"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -417,9 +416,9 @@
                                 android:text="@{viewmodel.ticketTotString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
-                                tools:text="€ 0.00"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent" />
+                                app:layout_constraintStart_toStartOf="parent"
+                                tools:text="€ 0.00" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -438,18 +437,18 @@
                         android:id="@+id/materialCardView7"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        android:layout_marginTop="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/dashboard_bottom_margin"
                         android:layout_marginStart="@dimen/card_full_margin"
+                        android:layout_marginTop="@dimen/card_half_margin"
                         android:layout_marginEnd="@dimen/card_half_margin"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginBottom="@dimen/dashboard_bottom_margin"
                         app:cardBackgroundColor="@color/edit_text"
                         app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="@dimen/card_elevation">
+                        app:cardElevation="@dimen/card_elevation"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -475,9 +474,9 @@
                                 android:text="@{viewmodel.trenTotString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
-                                tools:text="0"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent" />
+                                app:layout_constraintStart_toStartOf="parent"
+                                tools:text="0" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -496,18 +495,18 @@
                         android:id="@+id/materialCardView8"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        android:layout_marginTop="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/dashboard_bottom_margin"
                         android:layout_marginStart="@dimen/card_half_margin"
+                        android:layout_marginTop="@dimen/card_half_margin"
                         android:layout_marginEnd="@dimen/card_full_margin"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginBottom="@dimen/dashboard_bottom_margin"
                         app:cardBackgroundColor="@color/edit_text"
                         app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="@dimen/card_elevation">
+                        app:cardElevation="@dimen/card_elevation"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -533,9 +532,9 @@
                                 android:text="@{viewmodel.amTotString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
-                                tools:text="0"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent" />
+                                app:layout_constraintStart_toStartOf="parent"
+                                tools:text="0" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 

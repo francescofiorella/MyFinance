@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.home.HomeActivity">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/main_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/main_layout">
+        android:layout_height="match_parent">
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/home_fragmentContainerView"
@@ -21,10 +20,10 @@
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/home_bottomAppBar"
+            style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            style="@style/Widget.MaterialComponents.BottomAppBar.Colored">
+            android:layout_gravity="bottom">
 
             <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/home_bottomNavView"
@@ -35,23 +34,23 @@
                 android:outlineAmbientShadowColor="@android:color/transparent"
                 android:outlineSpotShadowColor="@android:color/transparent"
                 android:theme="@style/Widget.MyFinance.BottomNavigationView"
-                app:itemTextColor="@color/nav_item_color"
-                app:itemIconTint="@color/nav_item_color"
                 app:itemBackground="@android:color/transparent"
+                app:itemIconTint="@color/nav_item_color"
+                app:itemTextColor="@color/nav_item_color"
                 app:menu="@menu/bottom_app_bar_menu" />
 
         </com.google.android.material.bottomappbar.BottomAppBar>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/home_addBtn"
-            android:onClick="onAddButtonClick"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:tint="@color/white"
+            android:contentDescription="@string/addBtnContentDescription"
+            android:onClick="onAddButtonClick"
             app:backgroundTint="@color/accent"
-            app:srcCompat="@drawable/ic_add"
             app:layout_anchor="@id/home_bottomAppBar"
-            android:contentDescription="@string/addBtnContentDescription" />
+            app:srcCompat="@drawable/ic_add"
+            app:tint="@color/white" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
