@@ -38,6 +38,7 @@
     <string name="amtab">Amtab</string>
     <string name="altro">Altro</string>
     <string name="nessun_acquisto">Nessun acquisto</string>
+
     <string name="login_signup_email">Inserisci la tua email</string>
     <string name="login_password">Inserisci la password</string>
     <string name="accedi">Accedi</string>
@@ -50,14 +51,16 @@
     <string name="registrati">Registrati</string>
     <string name="signup_login">Hai già un account? Accedi</string>
     <string name="warning_home">Aggiungi il tuo primo acquisto!</string>
-    <string name="media_giornaliera">Media giornaliera</string>
-    <string name="media_mensile">Media mensile</string>
+
+    <string name="media_giornaliera">Media Giornaliera</string>
+    <string name="media_mensile">Media Mensile</string>
     <string name="oggi">Oggi</string>
-    <string name="n_acquisti">N° acquisti</string>
+    <string name="n_acquisti">Numero Acquisti</string>
     <string name="totale">Totale</string>
-    <string name="totale_biglietti">Totale biglietti</string>
-    <string name="n_trenitalia">N° TrenItalia</string>
-    <string name="n_amtab">N° Amtab</string>
+    <string name="totale_biglietti">Totale Biglietti</string>
+    <string name="n_trenitalia">Numero TrenItalia</string>
+    <string name="n_amtab">Numero Amtab</string>
+
     <string name="log_out">Log Out</string>
     <string name="propic">Immagine di profilo</string>
 </resources>

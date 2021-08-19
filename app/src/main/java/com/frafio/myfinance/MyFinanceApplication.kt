@@ -44,7 +44,7 @@ class MyFinanceApplication : Application(), KodeinAware {
         bind() from provider { DashboardViewModelFactory(instance()) }
         bind() from provider { ListViewModelFactory(instance()) }
         bind() from provider { ProfileViewModelFactory(instance()) }
-        bind() from provider { MenuViewModelFactory(instance()) }
+        bind() from provider { MenuViewModelFactory() }
         bind() from provider { ReceiptViewModelFactory(instance()) }
         bind() from provider { AddViewModelFactory(instance(), instance()) }
     }
