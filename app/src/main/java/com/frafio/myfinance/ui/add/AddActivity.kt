@@ -44,13 +44,6 @@ class AddActivity : BaseActivity(), AddListener {
         binding.viewmodel = viewModel
         viewModel.listener = this
 
-        // toolbar
-        setSupportActionBar(binding.addToolbar)
-
-        // back arrow
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         intent.getIntExtra("${getString(R.string.default_path)}.REQUESTCODE", 0).also { code ->
             viewModel.requestCode = code
             initLayout(code)

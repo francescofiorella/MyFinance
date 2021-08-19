@@ -4,10 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.frafio.myfinance.data.repositories.UserRepository
 
 class DashboardViewModel(
-    private val repository: PurchaseRepository
+    private val purchaseRepository: PurchaseRepository,
+    userRepository: UserRepository
 ) : ViewModel() {
+    val proPic: String? = userRepository.getProPic()
+
     private val _purchaseListSize = MutableLiveData<Int>()
     val purchaseListSize: LiveData<Int>
         get() = _purchaseListSize
@@ -45,8 +49,8 @@ class DashboardViewModel(
         get() = _amTotString
 
     fun getStats() {
-        val stats = repository.calculateStats()
-        _purchaseListSize.value = repository.purchaseListSize()
+        val stats = purchaseRepository.calculateStats()
+        _purchaseListSize.value = purchaseRepository.purchaseListSize()
         _dayAvgString.value = stats[0]
         _monthAvgString.value = stats[1]
         _todayTotString.value = stats[2]

@@ -24,19 +24,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/nav_1"
-            android:fontFamily="@font/nunito"
-            android:textSize="21sp"
+            android:fontFamily="@font/nunito_bold"
+            android:textSize="24sp"
             android:padding="10dp"
             android:textColor="@color/primary_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <View
-            android:id="@+id/dashboard_divider"
-            android:layout_width="match_parent"
-            android:layout_height="0.1dp"
-            android:background="@color/primary_text"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_fragmentTitle"/>
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="20dp"
+            app:srcCompat="@drawable/ic_user"
+            app:roundImage="@{viewmodel.proPic}"
+            app:layout_constraintBottom_toBottomOf="@+id/dashboard_fragmentTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/dashboard_fragmentTitle"
+            android:contentDescription="@string/propic" />
 
         <TextView
             android:id="@+id/dashboard_warningTV"
@@ -49,10 +55,11 @@
             android:textSize="21sp"
             android:visibility="@{viewmodel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
             tools:visibility="gone"
+            android:layout_marginTop="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_divider" />
+            app:layout_constraintTop_toBottomOf="@id/dashboard_fragmentTitle" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -61,7 +68,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_divider">
+            app:layout_constraintTop_toBottomOf="@id/dashboard_fragmentTitle">
 
             <GridLayout
                 android:id="@+id/stats_layout"

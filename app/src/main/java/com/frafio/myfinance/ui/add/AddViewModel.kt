@@ -19,6 +19,8 @@ class AddViewModel(
 ) : ViewModel() {
     var listener: AddListener? = null
 
+    val proPic: String? = userRepository.getProPic()
+
     var name: String? = null
     var priceString: String? = null
     var type: Int? = null
