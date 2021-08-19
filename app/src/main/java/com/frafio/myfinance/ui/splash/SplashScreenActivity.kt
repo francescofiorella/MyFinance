@@ -23,7 +23,7 @@ import org.kodein.di.generic.instance
 class SplashScreenActivity : BaseActivity(), SplashScreenListener {
 
     companion object {
-        private const val SPLASH_TIME: Long = 500
+        private const val SPLASH_TIME: Long = 1000
     }
 
     private lateinit var binding: ActivitySplashScreenBinding
@@ -55,7 +55,13 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
     override fun onComplete(response: LiveData<AuthResult>) {
         response.observe(this, { authResult ->
             when (authResult.code) {
-                AuthCode.USER_LOGGED.code -> viewModel.updateUserData()
+                AuthCode.USER_LOGGED.code -> {
+                    viewModel.updateUserData()
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        binding.progressBar.show()
+                    }, SPLASH_TIME)
+                }
 
                 AuthCode.USER_NOT_LOGGED.code -> {
                     Handler(Looper.getMainLooper()).postDelayed({
