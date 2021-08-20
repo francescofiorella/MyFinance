@@ -66,7 +66,6 @@
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/title_margin_vertical"
             android:background="@color/background"
-            android:paddingBottom="5dp"
             android:scrollbars="vertical"
             android:visibility="@{viewmodel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

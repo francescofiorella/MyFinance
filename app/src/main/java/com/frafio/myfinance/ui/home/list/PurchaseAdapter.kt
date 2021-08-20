@@ -37,20 +37,19 @@ class PurchaseAdapter(
                 listener.onItemInteraction(1, currentPurchase, position)
             }
         } else {
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener(
-                null
-            )
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
+                .setOnClickListener(null)
         }
 
         if (!(currentPurchase.type == 0 && currentPurchase.price != 0.0)) {
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnLongClickListener {
-                listener.onItemInteraction(2, currentPurchase, position)
-                true
-            }
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
+                .setOnLongClickListener {
+                    listener.onItemInteraction(2, currentPurchase, position)
+                    true
+                }
         } else {
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnLongClickListener(
-                null
-            )
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
+                .setOnLongClickListener(null)
         }
 
 
