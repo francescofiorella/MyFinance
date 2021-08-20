@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.auth.SignupActivity">
@@ -15,9 +14,9 @@
 
     <RelativeLayout
 
+        android:id="@+id/signup_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/signup_layout">
+        android:layout_height="match_parent">
 
         <!--Toolbar-->
         <com.google.android.material.appbar.AppBarLayout
@@ -27,21 +26,21 @@
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/signup_toolbar"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
                 app:title="Registrati"
-                app:titleTextColor="@color/white"
                 app:titleTextAppearance="@style/TextAppearance.MyFinance.Toolbar.Title"
-                style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
+                app:titleTextColor="@color/white" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:layout_below="@id/signup_appBarLayout">
+            android:layout_below="@id/signup_appBarLayout"
+            android:fillViewport="true">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -53,12 +52,12 @@
                     android:layout_height="wrap_content"
                     android:indeterminate="true"
                     android:visibility="invisible"
-                    app:showAnimationBehavior="inward"
                     app:hideAnimationBehavior="outward"
                     app:indicatorColor="@color/nav_items"
-                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:showAnimationBehavior="inward" />
 
                 <TextView
                     android:id="@+id/signupTextView"
@@ -80,23 +79,23 @@
                     android:layout_marginHorizontal="30dp"
                     android:layout_marginTop="20dp"
                     android:hint="@string/signup_name"
-                    app:startIconDrawable="@drawable/ic_person"
+                    app:boxBackgroundMode="outline"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
-                    app:boxBackgroundMode="outline"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/signupTextView">
+                    app:layout_constraintTop_toBottomOf="@id/signupTextView"
+                    app:startIconDrawable="@drawable/ic_person">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/signup_nameInputText"
-                        android:text="@={viewmodel.fullName}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
-                        android:inputType="textPersonName|textCapWords" />
+                        android:inputType="textPersonName|textCapWords"
+                        android:text="@={viewmodel.fullName}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -106,23 +105,23 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="30dp"
                     android:hint="@string/login_signup_email"
-                    app:startIconDrawable="@drawable/ic_email"
+                    app:boxBackgroundMode="outline"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
-                    app:boxBackgroundMode="outline"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/signup_nameInputLayout">
+                    app:layout_constraintTop_toBottomOf="@id/signup_nameInputLayout"
+                    app:startIconDrawable="@drawable/ic_email">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/signup_emailInputText"
-                        android:text="@={viewmodel.email}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
-                        android:inputType="textEmailAddress" />
+                        android:inputType="textEmailAddress"
+                        android:text="@={viewmodel.email}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -132,24 +131,24 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="30dp"
                     android:hint="@string/signup_password"
-                    app:startIconDrawable="@drawable/ic_lock"
+                    app:boxBackgroundMode="outline"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
-                    app:boxBackgroundMode="outline"
                     app:endIconMode="password_toggle"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/signup_emailInputLayout">
+                    app:layout_constraintTop_toBottomOf="@id/signup_emailInputLayout"
+                    app:startIconDrawable="@drawable/ic_lock">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/signup_passwordInputText"
-                        android:text="@={viewmodel.password}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
-                        android:inputType="textPassword" />
+                        android:inputType="textPassword"
+                        android:text="@={viewmodel.password}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -160,35 +159,35 @@
                     android:layout_marginHorizontal="30dp"
                     android:layout_marginTop="5dp"
                     android:hint="@string/signup_password_confirm"
-                    app:startIconDrawable="@drawable/ic_password_confirm"
+                    app:boxBackgroundMode="outline"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
-                    app:boxBackgroundMode="outline"
                     app:endIconMode="password_toggle"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/signup_passwordInputLayout">
+                    app:layout_constraintTop_toBottomOf="@id/signup_passwordInputLayout"
+                    app:startIconDrawable="@drawable/ic_password_confirm">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/signup_passwordAgainInputText"
-                        android:text="@={viewmodel.passwordConfirm}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
-                        android:inputType="textPassword" />
+                        android:inputType="textPassword"
+                        android:text="@={viewmodel.passwordConfirm}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/signupButton"
-                    android:onClick="@{viewmodel::onSignupButtonClick}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:backgroundTint="@color/accent"
                     android:fontFamily="@font/nunito_semibold"
+                    android:onClick="@{viewmodel::onSignupButtonClick}"
                     android:text="@string/registrati"
                     android:textColor="@color/white"
                     app:cornerRadius="@dimen/field_corner_radius"
@@ -220,11 +219,11 @@
 
                     <TextView
                         android:id="@+id/sLogintextView"
-                        android:onClick="goToLoginActivity"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
                         android:fontFamily="@font/nunito"
+                        android:onClick="goToLoginActivity"
                         android:text="@string/signup_login"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"

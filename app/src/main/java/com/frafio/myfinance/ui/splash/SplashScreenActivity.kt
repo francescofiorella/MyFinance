@@ -55,13 +55,7 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
     override fun onComplete(response: LiveData<AuthResult>) {
         response.observe(this, { authResult ->
             when (authResult.code) {
-                AuthCode.USER_LOGGED.code -> {
-                    viewModel.updateUserData()
-
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        binding.progressBar.show()
-                    }, SPLASH_TIME)
-                }
+                AuthCode.USER_LOGGED.code -> viewModel.updateUserData()
 
                 AuthCode.USER_NOT_LOGGED.code -> {
                     Handler(Looper.getMainLooper()).postDelayed({

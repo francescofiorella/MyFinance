@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.home.profile.ProfileFragment">
-    
+
     <data>
-        
+
         <variable
             name="viewmodel"
             type="com.frafio.myfinance.ui.home.profile.ProfileViewModel" />
@@ -21,32 +20,32 @@
             android:id="@+id/profile_fragmentTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/nav_3"
             android:fontFamily="@font/nunito"
-            android:textSize="21sp"
             android:padding="10dp"
+            android:text="@string/nav_3"
             android:textColor="@color/primary_text"
+            android:textSize="21sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <View
             android:id="@+id/profile_divider"
             android:layout_width="match_parent"
             android:layout_height="0.1dp"
             android:background="@color/primary_text"
-            app:layout_constraintTop_toBottomOf="@id/profile_fragmentTitle"/>
+            app:layout_constraintTop_toBottomOf="@id/profile_fragmentTitle" />
 
         <ImageView
             android:id="@+id/profile_propic_iv"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_margin="10dp"
+            android:contentDescription="@string/propic"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/profile_divider"
-            app:srcCompat="@drawable/ic_user"
             app:roundImage="@{viewmodel.user.photoUrl}"
-            android:contentDescription="@string/propic" />
+            app:srcCompat="@drawable/ic_user" />
 
         <TextView
             android:id="@+id/profile_username_tv"
@@ -57,10 +56,10 @@
             android:text="@{viewmodel.user.fullName}"
             android:textColor="@color/primary_text"
             android:textSize="26sp"
-            tools:text="FullName"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profile_propic_iv" />
+            app:layout_constraintTop_toBottomOf="@id/profile_propic_iv"
+            tools:text="FullName" />
 
         <TextView
             android:id="@+id/profile_email_tv"
@@ -69,10 +68,10 @@
             android:fontFamily="@font/nunito"
             android:text="@{viewmodel.user.email}"
             android:textSize="16sp"
-            tools:text="user@email.com"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profile_username_tv" />
+            app:layout_constraintTop_toBottomOf="@id/profile_username_tv"
+            tools:text="user@email.com" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
