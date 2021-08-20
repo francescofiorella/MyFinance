@@ -20,12 +20,12 @@
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/home_bottomAppBar"
-            android:backgroundTint="@color/edit_text"
-            app:elevation="2dp"
             style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom">
+            android:layout_gravity="bottom"
+            android:backgroundTint="@color/edit_text"
+            app:elevation="3dp">
 
             <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/home_bottomNavView"
@@ -50,6 +50,7 @@
             android:contentDescription="@string/addBtnContentDescription"
             android:onClick="onAddButtonClick"
             app:backgroundTint="@color/accent"
+            app:elevation="1dp"
             app:layout_anchor="@id/home_bottomAppBar"
             app:srcCompat="@drawable/ic_add"
             app:tint="@color/white" />

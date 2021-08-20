@@ -103,4 +103,8 @@ class SignupActivity : BaseActivity(), AuthListener {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    fun onBackClick(view: View) {
+        finish()
+    }
 }

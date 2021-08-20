@@ -3,6 +3,7 @@ package com.frafio.myfinance.ui.add
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -238,6 +239,10 @@ class AddActivity : BaseActivity(), AddListener {
             finish()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun onBackClick(view: View) {
+        finish()
     }
 
     override fun onAddStart() {

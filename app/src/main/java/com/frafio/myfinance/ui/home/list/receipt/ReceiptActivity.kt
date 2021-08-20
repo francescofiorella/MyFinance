@@ -2,6 +2,7 @@ package com.frafio.myfinance.ui.home.list.receipt
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -101,5 +102,9 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
             finish()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun onBackClick(view: View) {
+        finish()
     }
 }

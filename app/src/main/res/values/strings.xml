@@ -65,4 +65,5 @@
     <string name="propic">Immagine di profilo</string>
 
     <string name="card_dimension_ratio">1.2:1</string>
+    <string name="back_arrow">Back Arrow</string>
 </resources>
