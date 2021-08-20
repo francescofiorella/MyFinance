@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.home
 
+import android.R.attr
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -14,6 +15,14 @@ import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.utils.snackbar
+import android.R.attr.radius
+
+import com.google.android.material.shape.CornerFamily
+
+import com.google.android.material.shape.MaterialShapeDrawable
+
+
+
 
 class HomeActivity : BaseActivity() {
 
@@ -67,6 +76,14 @@ class HomeActivity : BaseActivity() {
                     )
                 }
             }
+        }
+
+        (binding.homeBottomAppBar.background as MaterialShapeDrawable).also { background ->
+            background.shapeAppearanceModel = background.shapeAppearanceModel
+                .toBuilder()
+                .setTopRightCorner(CornerFamily.ROUNDED, 50f)
+                .setTopLeftCorner(CornerFamily.ROUNDED, 50f)
+                .build()
         }
     }
 

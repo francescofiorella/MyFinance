@@ -15,7 +15,7 @@
 
     <!--Theme colors-->
     <color name="primary">#2C3240</color>
-    <color name="background">@color/white</color>
+    <color name="background">#F4F4F4</color>
     <color name="accent">#01579b</color>
     <color name="error">@color/carmine</color>
     <color name="primary_text">@color/black</color>
@@ -23,8 +23,9 @@
     <color name="disabled_text">#D4D4D4</color>
     <color name="snackbar_bg">#101D25</color>
 
-    <color name="edit_text">#EBEEF5</color>
+    <color name="edit_text">@color/white</color>
     <color name="nav_items">#3278F2</color>
+    <color name="default_nav_items">@color/quantum_grey_600</color>
 
     <color name="icon_bg">#3D5576</color>
 </resources>

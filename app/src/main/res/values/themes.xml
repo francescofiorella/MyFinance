@@ -20,15 +20,6 @@
         <item name="textInputStyle">@style/Widget.MyFinance.TextInputLayout.OutlinedBox</item>
     </style>
 
-    <!--Toolbar theme. -->
-    <style name="TextAppearance.MyFinance.Toolbar.MainTitle" parent="TextAppearance.AppCompat.Large">
-        <item name="fontFamily">casual</item>
-        <item name="android:textSize">26sp</item>
-    </style>
-    <style name="TextAppearance.MyFinance.Toolbar.Title" parent="TextAppearance.AppCompat.Large">
-        <item name="fontFamily">@font/nunito</item>
-    </style>
-
     <!--BottomNavigationView theme. -->
     <style name="Widget.MyFinance.BottomNavigationView" parent="Widget.Design.BottomNavigationView">
         <item name="fontFamily">@font/nunito</item>

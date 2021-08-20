@@ -3,8 +3,8 @@
 
     <item
         android:state_selected="true"
-        android:color="@color/nav_items" />
+        android:color="@color/accent" />
 
-    <item android:color="@color/white" />
+    <item android:color="@color/default_nav_items" />
 
 </selector>

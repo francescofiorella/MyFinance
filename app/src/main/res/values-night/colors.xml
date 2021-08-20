@@ -12,4 +12,5 @@
 
     <color name="edit_text">#191C25</color>
     <color name="nav_items">#3278F2</color>
+    <color name="default_nav_items">@color/white</color>
 </resources>
