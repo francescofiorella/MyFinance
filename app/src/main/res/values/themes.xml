@@ -27,7 +27,7 @@
 
     <!--Dialog theme. -->
     <style name="ThemeOverlay.MyFinance.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="android:backgroundTint">@color/edit_text</item>
+        <item name="android:backgroundTint">@color/card_bg</item>
         <item name="materialAlertDialogTitleTextStyle">@style/TextAppearance.MyFinance.AlertDialog.Title</item>
         <item name="materialAlertDialogBodyTextStyle">@style/TextAppearance.MyFinance.AlertDialog.Body</item>
         <item name="buttonBarNeutralButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
@@ -42,7 +42,7 @@
         <item name="fontFamily">@font/nunito</item>
     </style>
     <style name="Widget.MyFinance.AlertDialog.Button" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/nav_items</item>
+        <item name="android:textColor">@color/accent</item>
         <item name="fontFamily">@font/nunito_semibold</item>
     </style>
 

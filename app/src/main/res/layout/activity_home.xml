@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:backgroundTint="@color/edit_text"
+            android:backgroundTint="@color/card_bg"
             app:elevation="3dp">
 
             <com.google.android.material.bottomnavigation.BottomNavigationView

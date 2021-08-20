@@ -7,7 +7,7 @@
 
     <item
         android:state_selected="true"
-        android:color="@color/nav_items" />
+        android:color="@color/accent" />
 
     <item android:color="@color/primary_text" />
 
