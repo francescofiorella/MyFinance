@@ -39,7 +39,7 @@
             android:fontFamily="@font/nunito_semibold"
             android:onClick="@{viewmodel::onLogoutButtonClick}"
             app:backgroundTint="@color/card_bg"
-            app:elevation="1dp"
+            app:elevation="@dimen/card_elevation"
             app:fabCustomSize="45dp"
             app:layout_constraintBottom_toBottomOf="@+id/profile_fragmentTitle"
             app:layout_constraintEnd_toEndOf="parent"

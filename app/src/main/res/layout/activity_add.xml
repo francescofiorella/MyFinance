@@ -75,7 +75,6 @@
             android:id="@+id/scrollView2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="@dimen/title_margin_vertical"
             android:fillViewport="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -84,7 +83,9 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingTop="@dimen/title_margin_vertical">
 
                 <EditText
                     android:id="@+id/add_name_EditText"
@@ -94,6 +95,7 @@
                     android:layout_marginEnd="10dp"
                     android:autofillHints="none"
                     android:background="@drawable/bg_edit_text"
+                    android:elevation="@dimen/card_elevation"
                     android:fontFamily="@font/nunito"
                     android:hint="@string/nome"
                     android:inputType="text|textCapSentences|textNoSuggestions"
@@ -113,6 +115,7 @@
                     android:autofillHints="none"
                     android:background="@drawable/bg_edit_text"
                     android:drawableEnd="@drawable/ic_euro"
+                    android:elevation="@dimen/card_elevation"
                     android:fontFamily="@font/nunito"
                     android:hint="@string/costo"
                     android:inputType="numberDecimal"
@@ -130,6 +133,7 @@
                     android:layout_marginTop="10dp"
                     android:background="@drawable/bg_date_picker"
                     android:clickable="@{viewmodel.requestCode == 1 ? true : false}"
+                    android:elevation="@dimen/card_elevation"
                     android:focusable="@{viewmodel.requestCode == 1 ? true : false}"
                     app:layout_constraintCircleRadius="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -178,6 +182,7 @@
                     android:layout_marginEnd="10dp"
                     android:background="@drawable/bg_edit_text"
                     android:columnCount="3"
+                    android:elevation="@dimen/card_elevation"
                     android:rowCount="1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -240,6 +245,7 @@
                     android:layout_marginEnd="10dp"
                     android:background="@drawable/bg_edit_text"
                     android:columnCount="3"
+                    android:elevation="@dimen/card_elevation"
                     android:rowCount="1"
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -302,6 +308,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="10dp"
                     android:background="@drawable/bg_edit_text"
+                    android:elevation="@dimen/card_elevation"
                     android:fontFamily="@font/nunito"
                     android:padding="15dp"
                     android:text="@string/nessun_acquisto"
@@ -323,7 +330,7 @@
                     android:onClick="@{viewmodel::onAddButtonClick}"
                     android:text="@{viewmodel.requestCode == 1 ? @string/aggiungi : @string/modifica}"
                     app:backgroundTint="@color/accent"
-                    app:elevation="2dp"
+                    app:elevation="@dimen/card_elevation"
                     app:icon="@{viewmodel.requestCode == 1 ? @drawable/ic_add : @drawable/ic_create}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
