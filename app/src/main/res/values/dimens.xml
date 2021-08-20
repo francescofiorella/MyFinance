@@ -16,9 +16,10 @@
     <dimen name="title_padding">10dp</dimen>
     <dimen name="title_margin_vertical">20dp</dimen>
     <dimen name="title_margin_start">10dp</dimen>
+    <dimen name="title_distance_from_arrow">5dp</dimen>
 
-    <dimen name="arrow_size">24dp</dimen>
-    <dimen name="arrow_margin_start">20dp</dimen>
+    <dimen name="arrow_margin_start">15dp</dimen>
+    <dimen name="arrow_padding">5dp</dimen>
 
     <dimen name="propic_size">40dp</dimen>
     <dimen name="propic_margin_end">20dp</dimen>
