@@ -10,7 +10,6 @@ class ProfileViewModel(
 ) : ViewModel() {
     val user = repository.getUser()
 
-    val versionName: String = "MyFinance ${BuildConfig.VERSION_NAME}"
     var profileListener: ProfileListener? = null
 
     fun onLogoutButtonClick(view: View) {
