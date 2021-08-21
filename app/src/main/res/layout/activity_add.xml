@@ -51,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/title_distance_from_arrow"
-            android:layout_marginTop="@dimen/title_margin_vertical"
+            android:layout_marginTop="@dimen/title_margin_top"
             android:fontFamily="@font/nunito_bold"
             android:padding="@dimen/title_padding"
             android:text="@string/add"
@@ -85,7 +85,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:paddingTop="@dimen/title_margin_vertical">
+                android:paddingTop="@dimen/title_margin_bottom">
 
                 <EditText
                     android:id="@+id/add_name_EditText"

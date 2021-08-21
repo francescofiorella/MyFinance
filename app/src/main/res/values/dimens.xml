@@ -1,7 +1,7 @@
 <resources>
     <dimen name="field_corner_radius">30dp</dimen>
 
-    <dimen name="dashboard_top_margin">20dp</dimen>
+    <dimen name="dashboard_top_margin">@dimen/title_margin_bottom</dimen>
     <dimen name="dashboard_bottom_margin">40dp</dimen>
     <dimen name="card_full_margin">20dp</dimen>
     <dimen name="card_half_margin">10dp</dimen>
@@ -14,7 +14,8 @@
 
     <dimen name="title_size">26sp</dimen>
     <dimen name="title_padding">10dp</dimen>
-    <dimen name="title_margin_vertical">20dp</dimen>
+    <dimen name="title_margin_top">10dp</dimen>
+    <dimen name="title_margin_bottom">20dp</dimen>
     <dimen name="title_margin_start">10dp</dimen>
     <dimen name="title_distance_from_arrow">5dp</dimen>
 

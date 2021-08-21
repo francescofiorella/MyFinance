@@ -24,6 +24,7 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
 
     companion object {
         private const val SPLASH_TIME: Long = 1000
+        private const val LOAD_DELAY: Long = 2000
     }
 
     private lateinit var binding: ActivitySplashScreenBinding
@@ -60,7 +61,7 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
 
                     Handler(Looper.getMainLooper()).postDelayed({
                         binding.progressBar.show()
-                    }, SPLASH_TIME)
+                    }, LOAD_DELAY)
                 }
 
                 AuthCode.USER_NOT_LOGGED.code -> {
