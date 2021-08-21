@@ -24,3 +24,11 @@ fun View.snackbar(message: String, anchor: View? = null) {
 
     snackbar.show()
 }
+
+fun View.show() {
+    visibility = View.VISIBLE
+}
+
+fun View.hide() {
+    visibility = View.GONE
+}
