@@ -43,6 +43,7 @@
                 android:layout_width="@dimen/propic_size"
                 android:layout_height="@dimen/propic_size"
                 android:layout_marginEnd="@dimen/propic_margin_end"
+                android:onClick="onProPicClick"
                 android:contentDescription="@string/propic"
                 app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
                 app:layout_constraintEnd_toEndOf="parent"

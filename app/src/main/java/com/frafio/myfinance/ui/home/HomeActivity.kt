@@ -86,6 +86,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
             }
         }
 
+        // make bottomAppBar corners round
         (binding.homeBottomAppBar.background as MaterialShapeDrawable).also { background ->
             background.shapeAppearanceModel = background.shapeAppearanceModel
                 .toBuilder()
@@ -157,5 +158,10 @@ class HomeActivity : BaseActivity(), LogoutListener {
                 }
             }
         })
+    }
+
+    fun onProPicClick(view: View) {
+        navController.navigateUp()
+        navController.navigate(R.id.profileFragment)
     }
 }
