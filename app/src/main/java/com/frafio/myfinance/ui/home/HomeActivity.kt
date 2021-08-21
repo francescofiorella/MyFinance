@@ -105,7 +105,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
             }
 
             getString(R.string.nav_2_extended) -> {
-                binding.fragmentTitle.text = getString(R.string.nav_2_extended)
+                binding.fragmentTitle.text = destination.label
                 binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()}
 
