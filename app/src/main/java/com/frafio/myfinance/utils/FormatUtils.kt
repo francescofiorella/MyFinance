@@ -3,6 +3,7 @@ package com.frafio.myfinance.utils
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
+import kotlin.math.round
 
 fun formatPrice(price: Double): String {
     val locale = Locale("en", "UK")
@@ -34,4 +35,10 @@ fun formatDate(dayOfMonth: Int?, month: Int?, year: Int?) : String? {
     }
 
     return formattedDate
+}
+
+fun Float.round(decimals: Int): Float {
+    var multiplier = 1.0f
+    repeat(decimals) { multiplier *= 10 }
+    return round(this * multiplier) / multiplier
 }

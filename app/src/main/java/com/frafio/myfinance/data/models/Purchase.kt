@@ -17,20 +17,24 @@ data class Purchase(
     val formattedDate: String?
         get() = _formattedDate
 
-    private var privateFormattedPrice: String? = null
+    private var _formattedPrice: String? = null
     val formattedPrice: String?
-        get() = privateFormattedPrice
+        get() = _formattedPrice
 
-    fun updatePurchase(id: String? = null, date: Boolean = true, price: Boolean = true) {
+    fun updatePurchase(
+        id: String? = null,
+        updateDate: Boolean = true,
+        updatePrice: Boolean = true
+    ) {
         id?.let {
             this.id = it
         }
 
-        if (date) {
+        if (updateDate) {
             updateFormattedDate()
         }
 
-        if (price) {
+        if (updatePrice) {
             updateFormattedPrice()
         }
     }
@@ -41,7 +45,7 @@ data class Purchase(
 
     private fun updateFormattedPrice() {
         price?.let { price ->
-            privateFormattedPrice = "€ ${formatPrice(price)}"
+            _formattedPrice = "€ ${formatPrice(price)}"
         }
     }
 }

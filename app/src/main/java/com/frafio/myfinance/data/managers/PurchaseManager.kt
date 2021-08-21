@@ -79,7 +79,7 @@ class PurchaseManager {
                                 purchaseList[position].price!!
                             )
 
-                            newPurchase.updatePurchase(date = false)
+                            newPurchase.updatePurchase(updateDate = false)
 
                             purchaseList[totPosition] = newPurchase
                             purchaseList.removeAt(position)
