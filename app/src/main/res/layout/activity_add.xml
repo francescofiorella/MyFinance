@@ -60,17 +60,6 @@
             app:layout_constraintStart_toEndOf="@+id/back_arrow"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:layout_width="@dimen/propic_size"
-            android:layout_height="@dimen/propic_size"
-            android:layout_marginEnd="@dimen/propic_margin_end"
-            android:contentDescription="@string/propic"
-            app:layout_constraintBottom_toBottomOf="@+id/add_purchaseTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/add_purchaseTitle"
-            app:roundImage="@{viewmodel.proPic}"
-            app:srcCompat="@drawable/ic_user" />
-
         <ScrollView
             android:id="@+id/scrollView2"
             android:layout_width="match_parent"

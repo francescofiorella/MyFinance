@@ -14,48 +14,29 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/menu_fragmentTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/title_margin_start"
-            android:layout_marginTop="@dimen/title_margin_top"
-            android:fontFamily="@font/nunito_bold"
-            android:padding="@dimen/title_padding"
-            android:text="@string/nav_4"
-            android:textColor="@color/primary_text"
-            android:textSize="@dimen/title_size"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:layout_width="@dimen/propic_size"
-            android:layout_height="@dimen/propic_size"
-            android:layout_marginEnd="@dimen/propic_margin_end"
-            android:contentDescription="@string/propic"
-            app:layout_constraintBottom_toBottomOf="@+id/menu_fragmentTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/menu_fragmentTitle"
-            app:roundImage="@{viewmodel.proPic}"
-            app:srcCompat="@drawable/ic_user" />
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/chart_card"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/menu_fragmentTitle">
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/fragment_margin_top"
+            android:clipToPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingBottom="15dp">
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/chart_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/title_margin_bottom"
                 android:layout_marginHorizontal="@dimen/card_full_margin"
                 app:cardBackgroundColor="@color/card_bg"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -70,7 +51,7 @@
                         android:id="@+id/textView10"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/nunito"
+                        android:fontFamily="@font/nunito_semibold"
                         android:paddingBottom="5dp"
                         android:text="@string/trend_media_giornaliera"
                         android:textColor="@color/primary_text"
@@ -88,12 +69,12 @@
                         app:egIndicatorTextColor="@color/primary_text"
                         app:egIndicatorTextUnit="€"
                         app:egLegendHeight="0dp"
+                        app:egShowDecimal="true"
                         app:egShowLegendBeneathIndicator="true"
                         app:egShowValueIndicator="true"
                         app:egUseCubic="true"
                         app:egUseOverlapFill="true"
                         app:egXAxisStroke="0dp"
-                        app:egShowDecimal="true"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -103,43 +84,43 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/version_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/card_full_margin"
-                android:layout_marginTop="@dimen/card_full_margin"
-                app:cardBackgroundColor="@color/card_bg"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/chart_card">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingHorizontal="25dp"
-                    android:paddingVertical="20dp">
-
-                    <TextView
-                        android:id="@+id/profile_appVersion_TV"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/nunito"
-                        android:text="@{viewmodel.versionName}"
-                        android:textColor="@color/primary_text"
-                        android:textSize="18sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="MyFinance 1.0.0" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/version_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/card_full_margin"
+            android:layout_marginTop="@dimen/fragment_margin_top"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chart_card">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="25dp"
+                android:paddingVertical="20dp">
+
+                <TextView
+                    android:id="@+id/profile_appVersion_TV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/nunito"
+                    android:text="@{viewmodel.versionName}"
+                    android:textColor="@color/primary_text"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="MyFinance 1.0.0" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

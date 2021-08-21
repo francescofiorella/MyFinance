@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.widget.GridLayout
 import android.widget.TextView
-import com.frafio.myfinance.utils.hide
-import com.frafio.myfinance.utils.show
+import com.frafio.myfinance.utils.instantHide
+import com.frafio.myfinance.utils.instantShow
 
 open class ButtonTrio(
     private val layout: GridLayout,
@@ -99,7 +99,7 @@ open class ButtonTrio(
             layout.animate().setInterpolator(interpolator).alpha(1f)
                 .setDuration(ANIMATION_DURATION)
                 .start()
-            layout.show()
+            layout.instantShow()
 
             root?.let {
                 TransitionManager.beginDelayedTransition(root as ViewGroup)
@@ -119,7 +119,7 @@ open class ButtonTrio(
             layout.animate().setInterpolator(interpolator).alpha(0f)
                 .setDuration(ANIMATION_DURATION)
                 .start()
-            layout.hide()
+            layout.instantHide()
 
             root?.let {
                 TransitionManager.beginDelayedTransition(root as ViewGroup)

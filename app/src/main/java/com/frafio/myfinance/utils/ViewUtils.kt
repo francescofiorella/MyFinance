@@ -25,10 +25,10 @@ fun View.snackbar(message: String, anchor: View? = null) {
     snackbar.show()
 }
 
-fun View.show() {
+fun View.instantShow() {
     visibility = View.VISIBLE
 }
 
-fun View.hide() {
+fun View.instantHide() {
     visibility = View.GONE
 }

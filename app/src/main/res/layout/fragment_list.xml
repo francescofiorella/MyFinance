@@ -19,31 +19,6 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/list_fragmentTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/title_margin_start"
-            android:layout_marginTop="@dimen/title_margin_top"
-            android:fontFamily="@font/nunito_bold"
-            android:padding="@dimen/title_padding"
-            android:text="@string/nav_2_extended"
-            android:textColor="@color/primary_text"
-            android:textSize="@dimen/title_size"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:layout_width="@dimen/propic_size"
-            android:layout_height="@dimen/propic_size"
-            android:layout_marginEnd="@dimen/propic_margin_end"
-            android:contentDescription="@string/propic"
-            app:layout_constraintBottom_toBottomOf="@+id/list_fragmentTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/list_fragmentTitle"
-            app:roundImage="@{viewmodel.proPic}"
-            app:srcCompat="@drawable/ic_user" />
-
-        <TextView
             android:id="@+id/list_warningTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,14 +32,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/list_fragmentTitle"
+            app:layout_constraintTop_toTopOf="parent"
             tools:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="@dimen/title_margin_bottom"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/fragment_margin_top"
             android:background="@color/background"
             android:scrollbars="vertical"
             android:visibility="@{viewmodel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
@@ -72,7 +47,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/list_fragmentTitle"
+            app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/recycler_view_purchase_item"
             tools:visibility="visible" />
 

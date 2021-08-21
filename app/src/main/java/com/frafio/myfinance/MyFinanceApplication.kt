@@ -9,6 +9,7 @@ import com.frafio.myfinance.data.repositories.ReceiptRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.ui.add.AddViewModelFactory
 import com.frafio.myfinance.ui.auth.AuthViewModelFactory
+import com.frafio.myfinance.ui.home.HomeViewModelFactory
 import com.frafio.myfinance.ui.home.dashboard.DashboardViewModelFactory
 import com.frafio.myfinance.ui.home.list.ListViewModelFactory
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptViewModelFactory
@@ -41,10 +42,11 @@ class MyFinanceApplication : Application(), KodeinAware {
         // viewModelFactories
         bind() from provider { SplashScreenViewModelFactory(instance()) }
         bind() from provider { AuthViewModelFactory(instance()) }
-        bind() from provider { DashboardViewModelFactory(instance(), instance()) }
-        bind() from provider { ListViewModelFactory(instance(), instance()) }
+        bind() from provider { HomeViewModelFactory(instance()) }
+        bind() from provider { DashboardViewModelFactory(instance()) }
+        bind() from provider { ListViewModelFactory(instance()) }
         bind() from provider { ProfileViewModelFactory(instance()) }
-        bind() from provider { MenuViewModelFactory(instance(), instance()) }
+        bind() from provider { MenuViewModelFactory(instance()) }
         bind() from provider { ReceiptViewModelFactory(instance()) }
         bind() from provider { AddViewModelFactory(instance(), instance()) }
     }

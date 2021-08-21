@@ -19,31 +19,6 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/dashboard_fragmentTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/title_margin_start"
-            android:layout_marginTop="@dimen/title_margin_top"
-            android:fontFamily="@font/nunito_bold"
-            android:padding="@dimen/title_padding"
-            android:text="@string/nav_1"
-            android:textColor="@color/primary_text"
-            android:textSize="@dimen/title_size"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:layout_width="@dimen/propic_size"
-            android:layout_height="@dimen/propic_size"
-            android:layout_marginEnd="@dimen/propic_margin_end"
-            android:contentDescription="@string/propic"
-            app:layout_constraintBottom_toBottomOf="@+id/dashboard_fragmentTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/dashboard_fragmentTitle"
-            app:roundImage="@{viewmodel.proPic}"
-            app:srcCompat="@drawable/ic_user" />
-
-        <TextView
             android:id="@+id/dashboard_warningTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,7 +32,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_fragmentTitle"
+            app:layout_constraintTop_toTopOf="parent"
             tools:visibility="gone" />
 
         <ScrollView
@@ -67,7 +42,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_fragmentTitle">
+            app:layout_constraintTop_toTopOf="parent">
 
             <GridLayout
                 android:id="@+id/stats_layout"
@@ -85,7 +60,7 @@
                     android:layout_column="0"
                     android:layout_columnWeight="1"
                     android:clipToPadding="false"
-                    android:paddingTop="@dimen/title_margin_bottom">
+                    android:paddingTop="@dimen/fragment_margin_top">
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/materialCardView"
@@ -144,7 +119,7 @@
                     android:layout_column="1"
                     android:layout_columnWeight="1"
                     android:clipToPadding="false"
-                    android:paddingTop="@dimen/title_margin_bottom">
+                    android:paddingTop="@dimen/fragment_margin_top">
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/materialCardView2"

@@ -5,13 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.repositories.PurchaseRepository
-import com.frafio.myfinance.data.repositories.UserRepository
 
 class ListViewModel(
-    private val purchaseRepository: PurchaseRepository,
-    userRepository: UserRepository
+    private val purchaseRepository: PurchaseRepository
 ) : ViewModel() {
-    val proPic: String? = userRepository.getProPic()
 
     var listener: DeleteListener? = null
 

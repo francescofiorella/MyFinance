@@ -7,21 +7,16 @@ import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.BuildConfig
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.repositories.PurchaseRepository
-import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.utils.round
 import org.eazegraph.lib.models.ValueLinePoint
 import org.eazegraph.lib.models.ValueLineSeries
-import kotlin.math.round
 
 class MenuViewModel(
-    userRepository: UserRepository,
     private val purchaseRepository: PurchaseRepository
 ) : ViewModel() {
     companion object {
         private const val CHART_COLOR_ALPHA: Int = 150
     }
-
-    val proPic: String? = userRepository.getProPic()
 
     val versionName: String = "MyFinance ${BuildConfig.VERSION_NAME}"
 
