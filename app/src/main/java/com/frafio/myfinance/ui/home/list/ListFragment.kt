@@ -19,6 +19,8 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity.Companion.EDIT_PURCHASE_CODE
 import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_CLICK
+import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.generic.instance
@@ -76,7 +78,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         position: Int
     ) {
         when (interactionID) {
-            1 -> {
+            ON_CLICK -> {
                 Intent(context, ReceiptActivity::class.java).also {
                     it.putExtra("${getString(R.string.default_path)}.purchaseID", purchase.id)
                     it.putExtra("${getString(R.string.default_path)}.purchaseName", purchase.name)
@@ -87,7 +89,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                     activity?.startActivity(it)
                 }
             }
-            2 -> {
+            ON_LONG_CLICK -> {
                 val builder = MaterialAlertDialogBuilder(
                     requireContext(),
                     R.style.ThemeOverlay_MyFinance_AlertDialog

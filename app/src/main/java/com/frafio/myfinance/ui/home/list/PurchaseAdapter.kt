@@ -6,8 +6,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.RecyclerViewPurchaseItemBinding
+import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_CLICK
+import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 
 class PurchaseAdapter(
     private val purchases: List<Purchase>,
@@ -32,9 +35,9 @@ class PurchaseAdapter(
         val currentPurchase = purchases[position]
         holder.recyclerViewPurchaseItemBinding.purchase = currentPurchase
 
-        if (currentPurchase.name == "Spesa Coop") {
+        if (currentPurchase.type == DbPurchases.TYPES.SHOPPING.value) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener {
-                listener.onItemInteraction(1, currentPurchase, position)
+                listener.onItemInteraction(ON_CLICK, currentPurchase, position)
             }
         } else {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
@@ -44,7 +47,7 @@ class PurchaseAdapter(
         if (!(currentPurchase.type == 0 && currentPurchase.price != 0.0)) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener {
-                    listener.onItemInteraction(2, currentPurchase, position)
+                    listener.onItemInteraction(ON_LONG_CLICK, currentPurchase, position)
                     true
                 }
         } else {

@@ -38,7 +38,6 @@ class ReceiptItemAdapter(
         holder.recyclerViewReceiptItemBinding.receiptItem = model
 
         holder.recyclerViewReceiptItemBinding.root.setOnLongClickListener {
-
             model.id = snapshots.getSnapshot(position).id
             listener.onItemLongClick(model)
             true
