@@ -6,8 +6,8 @@ import com.frafio.myfinance.data.managers.PurchaseManager
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
-import com.frafio.myfinance.utils.formatDate
-import com.frafio.myfinance.utils.formatPrice
+import com.frafio.myfinance.utils.dateToString
+import com.frafio.myfinance.utils.doubleToString
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -90,12 +90,12 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         monthAvg = tot / nMonth
 
         val stats = mutableListOf<String>()
-        stats.add("€ ${formatPrice(dayAvg)}")
-        stats.add("€ ${formatPrice(monthAvg)}")
-        stats.add("€ ${formatPrice(todayTot)}")
-        stats.add("€ ${formatPrice(tot)}")
+        stats.add("€ ${doubleToString(dayAvg)}")
+        stats.add("€ ${doubleToString(monthAvg)}")
+        stats.add("€ ${doubleToString(todayTot)}")
+        stats.add("€ ${doubleToString(tot)}")
         stats.add(numTot.toString())
-        stats.add("€ ${formatPrice(ticketTot)}")
+        stats.add("€ ${doubleToString(ticketTot)}")
         stats.add(trenTot.toString())
         stats.add(amTot.toString())
 
@@ -139,7 +139,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         var purchaseCount = 0
 
         var lastCount = 0
-        val lastDate = formatDate(
+        val lastDate = dateToString(
             PurchaseStorage.purchaseList.first().day!!,
             PurchaseStorage.purchaseList.first().month!!,
             PurchaseStorage.purchaseList.first().year!!
@@ -167,7 +167,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                         // calcola la nuova media
                         val newValue: Double = priceSum / purchaseCount
                         val element = Pair(
-                            formatDate(purchase.day, purchase.month, purchase.year)!!,
+                            dateToString(purchase.day, purchase.month, purchase.year)!!,
                             newValue
                         )
                         avgList.add(element)

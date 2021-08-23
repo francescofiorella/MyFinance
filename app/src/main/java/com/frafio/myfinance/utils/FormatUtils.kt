@@ -5,16 +5,16 @@ import java.text.NumberFormat
 import java.util.*
 import kotlin.math.round
 
-fun formatPrice(price: Double): String {
+fun doubleToString(double: Double): String {
     val locale = Locale("en", "UK")
     val nf = NumberFormat.getInstance(locale)
     val formatter = nf as DecimalFormat
     formatter.applyPattern("###,###,##0.00")
 
-    return formatter.format(price)
+    return formatter.format(double)
 }
 
-fun formatDate(dayOfMonth: Int?, month: Int?, year: Int?) : String? {
+fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?) : String? {
     var formattedDate: String? = null
     dayOfMonth?.let { day ->
         month?.let { month ->

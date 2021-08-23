@@ -1,6 +1,6 @@
 package com.frafio.myfinance.data.models
 
-import com.frafio.myfinance.utils.formatPrice
+import com.frafio.myfinance.utils.doubleToString
 
 data class ReceiptItem(
     val name: String? = null,
@@ -10,7 +10,7 @@ data class ReceiptItem(
 ) {
     fun updateFormattedPrice() {
         price?.let { price ->
-            formattedPrice = "€ ${formatPrice(price)}"
+            formattedPrice = "€ ${doubleToString(price)}"
         }
     }
 }

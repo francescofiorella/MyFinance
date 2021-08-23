@@ -91,7 +91,7 @@
             android:layout_gravity="bottom"
             android:backgroundTint="@color/card_bg"
             android:paddingVertical="2dp"
-            app:topCornerRadius="@{50f}"
+            app:cornerRadiusTop="@{50f}"
             app:elevation="@dimen/card_elevation">
 
             <com.google.android.material.bottomnavigation.BottomNavigationView

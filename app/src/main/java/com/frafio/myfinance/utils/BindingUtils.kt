@@ -18,7 +18,7 @@ fun loadImage(view: ImageView, url: String) {
     }
 }
 
-@BindingAdapter("topCornerRadius")
+@BindingAdapter("cornerRadiusTop")
 fun setCornerRadius(view: BottomAppBar, cornerSize: Float) {
     (view.background as MaterialShapeDrawable).also { background ->
         background.shapeAppearanceModel = background.shapeAppearanceModel

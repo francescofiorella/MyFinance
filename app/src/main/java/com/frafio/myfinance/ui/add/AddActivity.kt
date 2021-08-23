@@ -17,7 +17,7 @@ import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.clearText
-import com.frafio.myfinance.utils.formatPrice
+import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.snackbar
 import org.kodein.di.generic.instance
 import java.util.*
@@ -148,7 +148,7 @@ class AddActivity : BaseActivity(), AddListener {
                 }
                 intent.getDoubleExtra("${getString(R.string.default_path)}.PURCHASE_PRICE", 0.0)
                     .also {
-                        viewModel.priceString = formatPrice(it)
+                        viewModel.priceString = doubleToString(it)
                         viewModel.purchasePrice = it
                     }
                 intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_TYPE", 0).also {

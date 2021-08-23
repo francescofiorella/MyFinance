@@ -5,7 +5,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.frafio.myfinance.R
-import com.frafio.myfinance.utils.formatDate
+import com.frafio.myfinance.utils.dateToString
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.time.LocalDate
 import java.util.*
@@ -52,7 +52,7 @@ open class DatePickerButton(
 
     val dateString: String?
         get() {
-            return formatDate(day, month, year)
+            return dateToString(day, month, year)
         }
 
     init {

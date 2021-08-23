@@ -1,7 +1,7 @@
 package com.frafio.myfinance.data.models
 
-import com.frafio.myfinance.utils.formatDate
-import com.frafio.myfinance.utils.formatPrice
+import com.frafio.myfinance.utils.dateToString
+import com.frafio.myfinance.utils.doubleToString
 
 data class Purchase(
     val email: String? = null,
@@ -40,12 +40,12 @@ data class Purchase(
     }
 
     private fun updateFormattedDate() {
-        _formattedDate = formatDate(day, month, year)
+        _formattedDate = dateToString(day, month, year)
     }
 
     private fun updateFormattedPrice() {
         price?.let { price ->
-            _formattedPrice = "€ ${formatPrice(price)}"
+            _formattedPrice = "€ ${doubleToString(price)}"
         }
     }
 }
