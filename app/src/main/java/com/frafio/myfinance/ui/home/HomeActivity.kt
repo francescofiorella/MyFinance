@@ -85,15 +85,6 @@ class HomeActivity : BaseActivity(), LogoutListener {
                 }
             }
         }
-
-        // make bottomAppBar corners round
-        (binding.homeBottomAppBar.background as MaterialShapeDrawable).also { background ->
-            background.shapeAppearanceModel = background.shapeAppearanceModel
-                .toBuilder()
-                .setTopRightCorner(CornerFamily.ROUNDED, 50f)
-                .setTopLeftCorner(CornerFamily.ROUNDED, 50f)
-                .build()
-        }
     }
 
     val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
