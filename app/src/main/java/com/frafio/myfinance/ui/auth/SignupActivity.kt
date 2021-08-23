@@ -59,7 +59,7 @@ class SignupActivity : BaseActivity(), AuthListener {
                 AuthCode.PROFILE_NOT_UPDATED.code
                         or AuthCode.SIGNUP_FAILURE.code
                         or AuthCode.USER_DATA_NOT_UPDATED.code ->
-                    binding.root.snackbar(authResult.message)
+                    snackbar(authResult.message)
 
                 AuthCode.USER_DATA_UPDATED.code ->
                     Intent().also {

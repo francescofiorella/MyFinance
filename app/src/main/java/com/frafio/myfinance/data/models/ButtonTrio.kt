@@ -92,7 +92,7 @@ open class ButtonTrio(
         }
     }
 
-    fun show(root: View? = null) {
+    fun show(root: ViewGroup? = null) {
         if (!_isVisible) {
             val interpolator = OvershootInterpolator()
 
@@ -102,7 +102,7 @@ open class ButtonTrio(
             layout.instantShow()
 
             root?.let {
-                TransitionManager.beginDelayedTransition(root as ViewGroup)
+                TransitionManager.beginDelayedTransition(root)
                 val transition = AutoTransition()
                 transition.duration = TRANSITION_DURATION
                 TransitionManager.beginDelayedTransition(root, transition)
@@ -112,7 +112,7 @@ open class ButtonTrio(
         }
     }
 
-    fun hide(root: View? = null) {
+    fun hide(root: ViewGroup? = null) {
         if (_isVisible) {
             val interpolator = OvershootInterpolator()
 
@@ -122,7 +122,7 @@ open class ButtonTrio(
             layout.instantHide()
 
             root?.let {
-                TransitionManager.beginDelayedTransition(root as ViewGroup)
+                TransitionManager.beginDelayedTransition(root)
                 val transition = AutoTransition()
                 transition.duration = TRANSITION_DURATION
                 TransitionManager.beginDelayedTransition(root, transition)

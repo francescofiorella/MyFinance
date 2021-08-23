@@ -21,8 +21,6 @@ import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.snackbar
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.MaterialShapeDrawable
 import org.kodein.di.generic.instance
 
 class HomeActivity : BaseActivity(), LogoutListener {
@@ -31,7 +29,6 @@ class HomeActivity : BaseActivity(), LogoutListener {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var viewModel: HomeViewModel
 
-    private lateinit var navHostFragment: NavHostFragment
     private lateinit var navController: NavController
 
     private val factory: HomeViewModelFactory by instance()
@@ -46,7 +43,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
                     navController.popBackStack()
                 }
                 navController.navigate(R.id.listFragment)
-                binding.root.snackbar(getString(R.string.purchase_added), binding.homeAddBtn)
+                snackbar(getString(R.string.purchase_added), binding.homeAddBtn)
             }
         }
     }
@@ -59,7 +56,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
         binding.viewmodel = viewModel
 
         // collegamento view
-        navHostFragment =
+        val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
 
@@ -78,7 +75,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
                     intent.extras?.getString("${getString(R.string.default_path)}.userName")
 
                 if (userRequest) {
-                    binding.root.snackbar(
+                    snackbar(
                         "${getString(R.string.login_successful)} $userName",
                         binding.homeAddBtn
                     )
@@ -98,17 +95,20 @@ class HomeActivity : BaseActivity(), LogoutListener {
             getString(R.string.nav_2_extended) -> {
                 binding.fragmentTitle.text = destination.label
                 binding.logoutBtn.instantHide()
-                binding.propicImageView.instantShow()}
+                binding.propicImageView.instantShow()
+            }
 
             getString(R.string.nav_3) -> {
                 binding.fragmentTitle.text = destination.label
                 binding.logoutBtn.instantShow()
-                binding.propicImageView.instantHide()}
+                binding.propicImageView.instantHide()
+            }
 
             getString(R.string.nav_4) -> {
                 binding.fragmentTitle.text = destination.label
                 binding.logoutBtn.instantHide()
-                binding.propicImageView.instantShow()}
+                binding.propicImageView.instantShow()
+            }
         }
     }
 
@@ -121,7 +121,6 @@ class HomeActivity : BaseActivity(), LogoutListener {
         super.onPause()
         navController.removeOnDestinationChangedListener(listener)
     }
-
 
 
     fun onAddButtonClick(view: View) {
@@ -137,7 +136,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
     }
 
     fun showSnackbar(message: String) {
-        binding.root.snackbar(message, binding.homeAddBtn)
+        snackbar(message, binding.homeAddBtn)
     }
 
     override fun onLogOutSuccess(response: LiveData<AuthResult>) {

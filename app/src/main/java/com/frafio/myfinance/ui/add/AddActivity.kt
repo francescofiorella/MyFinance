@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -15,6 +16,7 @@ import com.frafio.myfinance.data.models.DatePickerButton
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.ui.BaseActivity
+import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.formatPrice
 import com.frafio.myfinance.utils.snackbar
 import org.kodein.di.generic.instance
@@ -87,7 +89,7 @@ class AddActivity : BaseActivity(), AddListener {
 
             override fun onBtn3ClickAction() {
                 super.onBtn3ClickAction()
-                binding.addNameEditText.setText("")
+                binding.addNameEditText.clearText()
                 binding.addNameEditText.isEnabled = true
             }
         }
@@ -100,10 +102,10 @@ class AddActivity : BaseActivity(), AddListener {
         ) {
             override fun onBtn1ClickAction() {
                 super.onBtn1ClickAction()
-                ticketBtnTrio.hide(binding.root)
+                ticketBtnTrio.hide(binding.root as ViewGroup)
 
                 if (selectedBtn == Button.BUTTON_3) {
-                    binding.addNameEditText.setText("")
+                    binding.addNameEditText.clearText()
                 }
                 binding.addNameEditText.isEnabled = true
 
@@ -112,10 +114,10 @@ class AddActivity : BaseActivity(), AddListener {
 
             override fun onBtn2ClickAction() {
                 super.onBtn2ClickAction()
-                ticketBtnTrio.hide(binding.root)
+                ticketBtnTrio.hide(binding.root as ViewGroup)
 
                 if (selectedBtn == Button.BUTTON_3) {
-                    binding.addNameEditText.setText("")
+                    binding.addNameEditText.clearText()
                 }
                 binding.addNameEditText.isEnabled = true
 
@@ -124,7 +126,7 @@ class AddActivity : BaseActivity(), AddListener {
 
             override fun onBtn3ClickAction() {
                 super.onBtn3ClickAction()
-                ticketBtnTrio.show(binding.root)
+                ticketBtnTrio.show(binding.root as ViewGroup)
                 ticketBtnTrio.performClick()
 
                 viewModel.type = DbPurchases.TYPES.TICKET.value
@@ -205,12 +207,12 @@ class AddActivity : BaseActivity(), AddListener {
 
                 typeBtnTrio.isEnabled = false
 
-                ticketBtnTrio.hide(binding.root)
+                ticketBtnTrio.hide(binding.root as ViewGroup)
             } else {
-                binding.addNameEditText.setText("")
+                binding.addNameEditText.clearText()
                 binding.addNameEditText.isEnabled = true
 
-                binding.addPriceEditText.setText("")
+                binding.addPriceEditText.clearText()
                 binding.addPriceEditText.isEnabled = true
 
                 typeBtnTrio.isEnabled = true
@@ -276,7 +278,7 @@ class AddActivity : BaseActivity(), AddListener {
                     }
                 }
 
-                else -> binding.root.snackbar(result.message, binding.addAddButton)
+                else -> snackbar(result.message, binding.addAddButton)
             }
         })
     }

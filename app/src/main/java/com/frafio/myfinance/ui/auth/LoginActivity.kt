@@ -110,7 +110,7 @@ class LoginActivity : BaseActivity(), AuthListener {
                         or AuthCode.USER_DISABLED.code
                         or AuthCode.LOGIN_FAILURE.code
                         or AuthCode.USER_DATA_NOT_UPDATED.code ->
-                    binding.root.snackbar(authResult.message)
+                    snackbar(authResult.message)
 
                 AuthCode.INVALID_EMAIL.code or AuthCode.USER_NOT_FOUND.code->
                     binding.loginEmailInputLayout.error = authResult.message

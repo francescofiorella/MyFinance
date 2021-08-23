@@ -1,11 +1,9 @@
 package com.frafio.myfinance.ui.splash
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.WindowManager
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
@@ -17,6 +15,7 @@ import com.frafio.myfinance.databinding.ActivitySplashScreenBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.utils.setFullScreenEnabled
 import com.frafio.myfinance.utils.snackbar
 import org.kodein.di.generic.instance
 
@@ -39,16 +38,7 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
 
         viewModel.listener = this
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.decorView.windowInsetsController!!.hide(
-                android.view.WindowInsets.Type.statusBars()
-            )
-        } else {
-            window.setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-            )
-        }
+        setFullScreenEnabled(true)
 
         viewModel.checkUser()
     }
@@ -95,7 +85,7 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
                     }
                 }
 
-                AuthCode.USER_DATA_NOT_UPDATED.code -> binding.root.snackbar(authResult.message)
+                AuthCode.USER_DATA_NOT_UPDATED.code -> snackbar(authResult.message)
 
                 else -> Unit
             }
