@@ -14,37 +14,18 @@
         android:theme="@style/Theme.MyFinance">
         <activity
             android:name=".ui.splash.SplashScreenActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.add.AddActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name=".ui.home.list.receipt.ReceiptActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name=".ui.auth.SignupActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name=".ui.auth.LoginActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name=".ui.home.HomeActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustNothing"
-            tools:ignore="LockedOrientationActivity" />
+        <activity android:name=".ui.add.AddActivity" />
+        <activity android:name=".ui.home.list.receipt.ReceiptActivity" />
+        <activity android:name=".ui.auth.SignupActivity" />
+        <activity android:name=".ui.auth.LoginActivity" />
+        <activity android:name=".ui.home.HomeActivity" />
     </application>
 
 </manifest>

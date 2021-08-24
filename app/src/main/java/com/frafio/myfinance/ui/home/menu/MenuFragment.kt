@@ -37,8 +37,6 @@ class MenuFragment : BaseFragment() {
     }
 
     private fun setChartData() {
-        binding.lineChart.clearChart()
-
         ValueLineSeries().also { series ->
             series.color = viewModel.getChartColor(requireContext())
 
@@ -49,7 +47,6 @@ class MenuFragment : BaseFragment() {
             } else {
                 binding.chartCard.instantShow()
                 binding.lineChart.addSeries(series)
-                binding.lineChart.startAnimation()
             }
         }
     }
