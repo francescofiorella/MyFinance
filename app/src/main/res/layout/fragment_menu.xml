@@ -6,6 +6,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewmodel"
             type="com.frafio.myfinance.ui.home.menu.MenuViewModel" />
@@ -28,9 +30,11 @@
                 android:clipToPadding="false"
                 android:paddingTop="@dimen/fragment_margin_top"
                 android:paddingBottom="15dp"
+                android:visibility="@{viewmodel.avgTrendListSize &lt; 2 ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -67,6 +71,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:layout_marginTop="20dp"
+                            app:data="@{viewmodel.avgTrendList}"
+                            app:egAnimationTime="1000"
                             app:egCurveSmoothness="0.4"
                             app:egIndicatorLineColor="@color/primary_text"
                             app:egIndicatorTextColor="@color/primary_text"
@@ -78,7 +84,6 @@
                             app:egUseCubic="true"
                             app:egUseOverlapFill="true"
                             app:egXAxisStroke="0dp"
-                            app:egAnimationTime="1000"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -96,10 +101,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/card_full_margin"
                 android:layout_marginTop="@dimen/fragment_margin_top"
+                android:layout_marginBottom="@dimen/dashboard_bottom_margin"
                 app:cardBackgroundColor="@color/card_bg"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation"
-                android:layout_marginBottom="@dimen/dashboard_bottom_margin"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -11,7 +11,6 @@ import com.frafio.myfinance.databinding.FragmentMenuBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
-import org.eazegraph.lib.models.ValueLineSeries
 import org.kodein.di.generic.instance
 
 class MenuFragment : BaseFragment() {
@@ -31,23 +30,6 @@ class MenuFragment : BaseFragment() {
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
 
-        setChartData()
-
         return binding.root
-    }
-
-    private fun setChartData() {
-        ValueLineSeries().also { series ->
-            series.color = viewModel.getChartColor(requireContext())
-
-            viewModel.addCharPointsTo(series)
-
-            if (series.series.size < 2) {
-                binding.chartCard.instantHide()
-            } else {
-                binding.chartCard.instantShow()
-                binding.lineChart.addSeries(series)
-            }
-        }
     }
 }

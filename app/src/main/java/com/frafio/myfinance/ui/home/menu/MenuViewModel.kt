@@ -14,25 +14,10 @@ import org.eazegraph.lib.models.ValueLineSeries
 class MenuViewModel(
     private val purchaseRepository: PurchaseRepository
 ) : ViewModel() {
-    companion object {
-        private const val CHART_COLOR_ALPHA: Int = 150
-    }
-
     val versionName: String = "MyFinance ${BuildConfig.VERSION_NAME}"
 
-    fun getChartColor(context: Context): Int {
-        return ColorUtils.setAlphaComponent(
-            ContextCompat.getColor(context, R.color.accent),
-            CHART_COLOR_ALPHA
-        )
-    }
+    val avgTrendList: List<Pair<String, Double>>
+        get() = purchaseRepository.avgTrendList
 
-    fun addCharPointsTo(series: ValueLineSeries) {
-        purchaseRepository.avgTrendList.forEach { pair ->
-            val date: String = pair.first
-            // converti to Float e arrotonda alla seconda cifra decimale
-            val value: Float = pair.second.toFloat().round(2)
-            series.addPoint(ValueLinePoint(date, value))
-        }
-    }
+    val avgTrendListSize: Int = avgTrendList.size
 }
