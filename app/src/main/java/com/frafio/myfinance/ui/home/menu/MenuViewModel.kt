@@ -22,7 +22,7 @@ class MenuViewModel(
 
     fun getChartColor(context: Context): Int {
         return ColorUtils.setAlphaComponent(
-            ContextCompat.getColor(context, R.color.linechar),
+            ContextCompat.getColor(context, R.color.accent),
             CHART_COLOR_ALPHA
         )
     }
