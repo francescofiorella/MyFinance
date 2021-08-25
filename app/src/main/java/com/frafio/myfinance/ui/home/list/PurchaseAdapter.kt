@@ -25,7 +25,7 @@ class PurchaseAdapter(
         PurchaseViewHolder(
             DataBindingUtil.inflate(
                 LayoutInflater.from(parent.context),
-                R.layout.recycler_view_purchase_item,
+                R.layout.layout_purchase_item_rv,
                 parent,
                 false
             )

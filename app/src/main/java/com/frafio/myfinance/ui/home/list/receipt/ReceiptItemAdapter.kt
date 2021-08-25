@@ -23,7 +23,7 @@ class ReceiptItemAdapter(
         ReceiptItemViewHolder(
             DataBindingUtil.inflate(
                 LayoutInflater.from(parent.context),
-                R.layout.recycler_view_receipt_item,
+                R.layout.layout_receipt_item_rv,
                 parent,
                 false
             )

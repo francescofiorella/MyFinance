@@ -75,7 +75,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/receipt_purchaseTitle"
-            tools:listitem="@layout/recycler_view_receipt_item" />
+            tools:listitem="@layout/layout_receipt_item_rv" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/receipt_addLayout"

@@ -39,9 +39,18 @@ class HomeActivity : BaseActivity(), LogoutListener {
             val purchaseRequest =
                 data!!.getBooleanExtra("${getString(R.string.default_path)}.purchaseRequest", false)
             if (purchaseRequest) {
-                if (binding.homeBottomNavView.selectedItemId == R.id.listFragment) {
-                    navController.popBackStack()
+                binding.homeBottomNavView?.let { view ->
+                    if (view.selectedItemId == R.id.listFragment) {
+                        navController.popBackStack()
+                    }
                 }
+
+                binding.navRailView?.let { view ->
+                    if (view.selectedItemId == R.id.listFragment) {
+                        navController.popBackStack()
+                    }
+                }
+
                 navController.navigate(R.id.listFragment)
                 snackbar(getString(R.string.purchase_added), binding.homeAddBtn)
             }
@@ -60,7 +69,36 @@ class HomeActivity : BaseActivity(), LogoutListener {
             supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
 
-        binding.homeBottomNavView.setupWithNavController(navController)
+        binding.homeBottomNavView?.setupWithNavController(navController)
+        binding.navRailView?.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.dashboardFragment -> {
+                    navController.navigateUp()
+                    navController.navigate(R.id.dashboardFragment)
+                    true
+                }
+
+                R.id.listFragment -> {
+                    navController.navigateUp()
+                    navController.navigate(R.id.listFragment)
+                    true
+                }
+
+                R.id.profileFragment -> {
+                    navController.navigateUp()
+                    navController.navigate(R.id.profileFragment)
+                    true
+                }
+
+                R.id.menuFragment -> {
+                    navController.navigateUp()
+                    navController.navigate(R.id.menuFragment)
+                    true
+                }
+
+                else -> false
+            }
+        }
 
         if (savedInstanceState == null) {
             // controlla se si è appena fatto l'accesso
@@ -153,5 +191,12 @@ class HomeActivity : BaseActivity(), LogoutListener {
     fun onProPicClick(view: View) {
         navController.navigateUp()
         navController.navigate(R.id.profileFragment)
+
+        binding.navRailView?.selectedItemId = R.id.profileFragment
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        binding.navRailView?.selectedItemId = R.id.dashboardFragment
     }
 }

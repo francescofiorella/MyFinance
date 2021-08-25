@@ -48,7 +48,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:listitem="@layout/recycler_view_purchase_item"
+            tools:listitem="@layout/layout_purchase_item_rv"
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
