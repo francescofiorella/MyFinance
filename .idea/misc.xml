@@ -14,6 +14,9 @@
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_menu.xml" value="0.175" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-land/activity_home.xml" value="0.22" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-land/fragment_dashboard.xml" value="0.2125" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-land/layout_navigation_landscape.xml" value="0.1359375" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-sw600dp-land/activity_home.xml" value="0.101953125" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-sw600dp/activity_home.xml" value="0.134765625" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/activity_add.xml" value="0.2537037037037037" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/activity_home.xml" value="0.13999999999999999" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/activity_login.xml" value="0.1425925925925926" />
@@ -24,6 +27,10 @@
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/fragment_list.xml" value="0.1425925925925926" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/fragment_menu.xml" value="0.1796875" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/fragment_profile.xml" value="0.1425925925925926" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/layout_nav_rail_header.xml" value="0.1796875" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/layout_nav_tablet_land.xml" value="0.1796875" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/layout_navigation_landscape.xml" value="0.1796875" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/layout_receipt_item_rv.xml" value="0.1796875" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/nav_rail_header.xml" value="0.1796875" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/recycler_view_purchase_item.xml" value="0.2966804979253112" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/recycler_view_receipt_item.xml" value="0.1425925925925926" />

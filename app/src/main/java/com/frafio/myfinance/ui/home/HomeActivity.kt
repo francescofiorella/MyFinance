@@ -70,6 +70,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
         navController = navHostFragment.navController
 
         binding.homeBottomNavView?.setupWithNavController(navController)
+
         binding.navRailView?.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.dashboardFragment -> {

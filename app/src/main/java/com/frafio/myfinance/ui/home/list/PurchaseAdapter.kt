@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Purchase
-import com.frafio.myfinance.databinding.RecyclerViewPurchaseItemBinding
+import com.frafio.myfinance.databinding.LayoutPurchaseItemRvBinding
 import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 
@@ -18,7 +18,7 @@ class PurchaseAdapter(
 ) : RecyclerView.Adapter<PurchaseAdapter.PurchaseViewHolder>() {
 
     inner class PurchaseViewHolder(
-        val recyclerViewPurchaseItemBinding: RecyclerViewPurchaseItemBinding
+        val recyclerViewPurchaseItemBinding: LayoutPurchaseItemRvBinding
     ) : RecyclerView.ViewHolder(recyclerViewPurchaseItemBinding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =

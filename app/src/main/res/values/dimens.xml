@@ -26,6 +26,6 @@
     <dimen name="propic_size">40dp</dimen>
     <dimen name="propic_margin_end">20dp</dimen>
 
-    <dimen name="navigation_item_land_padding_horizontal">10dp</dimen>
-    <dimen name="navigation_item_land_padding_vertical">10dp</dimen>
+    <dimen name="navigation_item_land_padding_horizontal">20dp</dimen>
+    <dimen name="navigation_item_land_padding_vertical">15dp</dimen>
 </resources>

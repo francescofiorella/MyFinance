@@ -24,6 +24,7 @@
     <color name="snackbar_bg">#101D25</color>
 
     <color name="card_bg">@color/white</color>
+    <color name="card_bg_inverted">#191C25</color>
     <color name="default_nav_items">#606368</color>
 
     <color name="icon_bg">#3D5576</color>
