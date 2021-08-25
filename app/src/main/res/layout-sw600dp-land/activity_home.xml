@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/title_margin_start"
-            android:layout_marginTop="@*android:dimen/status_bar_height"
+            android:layout_marginTop="@dimen/title_margin_top"
             android:fontFamily="@font/nunito_bold"
             android:padding="@dimen/title_padding"
             android:textColor="@color/primary_text"
