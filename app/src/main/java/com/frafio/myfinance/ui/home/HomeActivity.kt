@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
+import com.frafio.myfinance.data.models.TabletNavigation
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.add.AddActivity
@@ -29,6 +30,8 @@ class HomeActivity : BaseActivity(), LogoutListener {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var viewModel: HomeViewModel
 
+    private lateinit var navTablet: TabletNavigation
+
     private lateinit var navController: NavController
 
     private val factory: HomeViewModelFactory by instance()
@@ -43,15 +46,26 @@ class HomeActivity : BaseActivity(), LogoutListener {
                     if (view.selectedItemId == R.id.listFragment) {
                         navController.popBackStack()
                     }
+
+                    navController.navigate(R.id.listFragment)
                 }
 
                 binding.navRailView?.let { view ->
                     if (view.selectedItemId == R.id.listFragment) {
                         navController.popBackStack()
                     }
+
+                    view.selectedItemId = R.id.listFragment
                 }
 
-                navController.navigate(R.id.listFragment)
+                binding.navigationTabletLayout?.let {
+                    if (navTablet.selectedItem == TabletNavigation.Item.ITEM_2) {
+                        navController.popBackStack()
+                    }
+
+                    navTablet.selectedItem = TabletNavigation.Item.ITEM_2
+                }
+
                 snackbar(getString(R.string.purchase_added), binding.homeAddBtn)
             }
         }
@@ -71,6 +85,52 @@ class HomeActivity : BaseActivity(), LogoutListener {
 
         binding.homeBottomNavView?.setupWithNavController(navController)
 
+        setNavRailListener()
+
+        if (savedInstanceState == null) {
+            setNavTabletListener(true)
+
+            // controlla se si è appena fatto l'accesso
+            if (intent.hasExtra("${getString(R.string.default_path)}.userRequest")) {
+                val userRequest =
+                    intent.extras?.getBoolean(
+                        "${getString(R.string.default_path)}.userRequest",
+                        false
+                    ) ?: false
+
+                val userName =
+                    intent.extras?.getString("${getString(R.string.default_path)}.userName")
+
+                if (userRequest) {
+                    snackbar(
+                        "${getString(R.string.login_successful)} $userName",
+                        binding.homeAddBtn
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        binding.navRailView?.selectedItemId = navController.currentDestination!!.id
+
+        binding.navigationTabletLayout?.let {
+            setNavTabletListener(false)
+
+            when (navController.currentDestination!!.id) {
+                R.id.dashboardFragment -> navTablet.selectedItem = TabletNavigation.Item.ITEM_1
+
+                R.id.listFragment -> navTablet.selectedItem = TabletNavigation.Item.ITEM_2
+
+                R.id.profileFragment -> navTablet.selectedItem = TabletNavigation.Item.ITEM_3
+
+                R.id.menuFragment -> navTablet.selectedItem = TabletNavigation.Item.ITEM_4
+            }
+        }
+    }
+
+    private fun setNavRailListener() {
         binding.navRailView?.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.dashboardFragment -> {
@@ -100,24 +160,47 @@ class HomeActivity : BaseActivity(), LogoutListener {
                 else -> false
             }
         }
+    }
 
-        if (savedInstanceState == null) {
-            // controlla se si è appena fatto l'accesso
-            if (intent.hasExtra("${getString(R.string.default_path)}.userRequest")) {
-                val userRequest =
-                    intent.extras?.getBoolean(
-                        "${getString(R.string.default_path)}.userRequest",
-                        false
-                    ) ?: false
+    private fun setNavTabletListener(firstTime: Boolean) {
+        binding.navigationTabletLayout?.let { rootLayout ->
+            navTablet = object : TabletNavigation(
+                rootLayout.dashboardLayout,
+                rootLayout.dashboardItemIcon,
+                rootLayout.dashboardItemText,
+                rootLayout.listLayout,
+                rootLayout.listItemIcon,
+                rootLayout.listItemText,
+                rootLayout.profileLayout,
+                rootLayout.profileItemIcon,
+                rootLayout.profileItemText,
+                rootLayout.menuLayout,
+                rootLayout.menuItemIcon,
+                rootLayout.menuItemText,
+                firstTime
+            ) {
+                override fun onItem1ClickAction() {
+                    super.onItem1ClickAction()
+                    navController.navigateUp()
+                    navController.navigate(R.id.dashboardFragment)
+                }
 
-                val userName =
-                    intent.extras?.getString("${getString(R.string.default_path)}.userName")
+                override fun onItem2ClickAction() {
+                    super.onItem2ClickAction()
+                    navController.navigateUp()
+                    navController.navigate(R.id.listFragment)
+                }
 
-                if (userRequest) {
-                    snackbar(
-                        "${getString(R.string.login_successful)} $userName",
-                        binding.homeAddBtn
-                    )
+                override fun onItem3ClickAction() {
+                    super.onItem3ClickAction()
+                    navController.navigateUp()
+                    navController.navigate(R.id.profileFragment)
+                }
+
+                override fun onItem4ClickAction() {
+                    super.onItem4ClickAction()
+                    navController.navigateUp()
+                    navController.navigate(R.id.menuFragment)
                 }
             }
         }
@@ -194,10 +277,20 @@ class HomeActivity : BaseActivity(), LogoutListener {
         navController.navigate(R.id.profileFragment)
 
         binding.navRailView?.selectedItemId = R.id.profileFragment
+
+        binding.navigationTabletLayout?.let {
+            navTablet.selectedItem = TabletNavigation.Item.ITEM_3
+        }
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
+        binding.navRailView?.setOnItemSelectedListener(null)
         binding.navRailView?.selectedItemId = R.id.dashboardFragment
+        setNavRailListener()
+
+        binding.navigationTabletLayout?.let {
+            navTablet.setDashboardBlue()
+        }
+        super.onBackPressed()
     }
 }

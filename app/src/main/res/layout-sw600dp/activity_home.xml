@@ -16,26 +16,35 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
-        <include
-            android:id="@+id/navigation_tablet_layout"
-            layout="@layout/layout_nav_tablet_land"
+        <com.google.android.material.navigationrail.NavigationRailView
+            android:id="@+id/nav_rail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:backgroundTint="@color/background"
+            app:elevation="0dp"
+            app:headerLayout="@layout/layout_nav_rail_header"
+            app:itemIconTint="@color/nav_item_color"
+            app:itemTextColor="@color/nav_item_color"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:itemBackground="@android:color/transparent"
+            app:menu="@menu/navigation_rail_menu" />
 
         <TextView
             android:id="@+id/fragmentTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/title_margin_start"
-            android:layout_marginTop="@*android:dimen/status_bar_height"
+            android:layout_marginTop="@dimen/title_margin_top"
             android:fontFamily="@font/nunito_bold"
             android:padding="@dimen/title_padding"
             android:textColor="@color/primary_text"
             android:textSize="@dimen/title_size"
-            app:layout_constraintStart_toEndOf="@id/navigation_tablet_layout"
+            app:layout_constraintStart_toEndOf="@id/nav_rail_view"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/nav_1" />
 
@@ -79,7 +88,7 @@
             app:defaultNavHost="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/navigation_tablet_layout"
+            app:layout_constraintStart_toEndOf="@+id/nav_rail_view"
             app:layout_constraintTop_toBottomOf="@+id/fragmentTitle"
             app:navGraph="@navigation/nav_graph" />
 
