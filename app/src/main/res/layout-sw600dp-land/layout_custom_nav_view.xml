@@ -45,7 +45,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/list_layout"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:paddingHorizontal="@dimen/navigation_item_land_padding_horizontal"
             android:paddingVertical="@dimen/navigation_item_land_padding_vertical"

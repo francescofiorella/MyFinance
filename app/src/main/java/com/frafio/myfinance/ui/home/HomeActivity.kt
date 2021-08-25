@@ -14,7 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
-import com.frafio.myfinance.data.models.TabletNavigation
+import com.frafio.myfinance.data.models.CustomNavigation
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.add.AddActivity
@@ -30,7 +30,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var viewModel: HomeViewModel
 
-    private lateinit var navTablet: TabletNavigation
+    private lateinit var navCustom: CustomNavigation
 
     private lateinit var navController: NavController
 
@@ -50,20 +50,12 @@ class HomeActivity : BaseActivity(), LogoutListener {
                     navController.navigate(R.id.listFragment)
                 }
 
-                binding.navRailView?.let { view ->
-                    if (view.selectedItemId == R.id.listFragment) {
+                binding.navigationLayout?.let {
+                    if (navCustom.selectedItem == CustomNavigation.Item.ITEM_2) {
                         navController.popBackStack()
                     }
 
-                    view.selectedItemId = R.id.listFragment
-                }
-
-                binding.navigationTabletLayout?.let {
-                    if (navTablet.selectedItem == TabletNavigation.Item.ITEM_2) {
-                        navController.popBackStack()
-                    }
-
-                    navTablet.selectedItem = TabletNavigation.Item.ITEM_2
+                    navCustom.selectedItem = CustomNavigation.Item.ITEM_2
                 }
 
                 snackbar(getString(R.string.purchase_added), binding.homeAddBtn)
@@ -85,10 +77,8 @@ class HomeActivity : BaseActivity(), LogoutListener {
 
         binding.homeBottomNavView?.setupWithNavController(navController)
 
-        setNavRailListener()
-
         if (savedInstanceState == null) {
-            setNavTabletListener(true)
+            setNavCustomListener(true, binding.landHolder != null)
 
             // controlla se si è appena fatto l'accesso
             if (intent.hasExtra("${getString(R.string.default_path)}.userRequest")) {
@@ -113,58 +103,25 @@ class HomeActivity : BaseActivity(), LogoutListener {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        binding.navRailView?.selectedItemId = navController.currentDestination!!.id
 
-        binding.navigationTabletLayout?.let {
-            setNavTabletListener(false)
+        binding.navigationLayout?.let {
+            setNavCustomListener(false, binding.landHolder != null)
 
             when (navController.currentDestination!!.id) {
-                R.id.dashboardFragment -> navTablet.selectedItem = TabletNavigation.Item.ITEM_1
+                R.id.dashboardFragment -> navCustom.selectedItem = CustomNavigation.Item.ITEM_1
 
-                R.id.listFragment -> navTablet.selectedItem = TabletNavigation.Item.ITEM_2
+                R.id.listFragment -> navCustom.selectedItem = CustomNavigation.Item.ITEM_2
 
-                R.id.profileFragment -> navTablet.selectedItem = TabletNavigation.Item.ITEM_3
+                R.id.profileFragment -> navCustom.selectedItem = CustomNavigation.Item.ITEM_3
 
-                R.id.menuFragment -> navTablet.selectedItem = TabletNavigation.Item.ITEM_4
+                R.id.menuFragment -> navCustom.selectedItem = CustomNavigation.Item.ITEM_4
             }
         }
     }
 
-    private fun setNavRailListener() {
-        binding.navRailView?.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.dashboardFragment -> {
-                    navController.navigateUp()
-                    navController.navigate(R.id.dashboardFragment)
-                    true
-                }
-
-                R.id.listFragment -> {
-                    navController.navigateUp()
-                    navController.navigate(R.id.listFragment)
-                    true
-                }
-
-                R.id.profileFragment -> {
-                    navController.navigateUp()
-                    navController.navigate(R.id.profileFragment)
-                    true
-                }
-
-                R.id.menuFragment -> {
-                    navController.navigateUp()
-                    navController.navigate(R.id.menuFragment)
-                    true
-                }
-
-                else -> false
-            }
-        }
-    }
-
-    private fun setNavTabletListener(firstTime: Boolean) {
-        binding.navigationTabletLayout?.let { rootLayout ->
-            navTablet = object : TabletNavigation(
+    private fun setNavCustomListener(firstTime: Boolean, animateTV: Boolean) {
+        binding.navigationLayout?.let { rootLayout ->
+            navCustom = object : CustomNavigation(
                 rootLayout.dashboardLayout,
                 rootLayout.dashboardItemIcon,
                 rootLayout.dashboardItemText,
@@ -177,30 +134,39 @@ class HomeActivity : BaseActivity(), LogoutListener {
                 rootLayout.menuLayout,
                 rootLayout.menuItemIcon,
                 rootLayout.menuItemText,
-                firstTime
+                firstTime,
+                animateTV
             ) {
                 override fun onItem1ClickAction() {
                     super.onItem1ClickAction()
-                    navController.navigateUp()
-                    navController.navigate(R.id.dashboardFragment)
+                    if (selectedItem != Item.ITEM_1) {
+                        navController.navigateUp()
+                        navController.navigate(R.id.dashboardFragment)
+                    }
                 }
 
                 override fun onItem2ClickAction() {
                     super.onItem2ClickAction()
-                    navController.navigateUp()
-                    navController.navigate(R.id.listFragment)
+                    if (selectedItem != Item.ITEM_2) {
+                        navController.navigateUp()
+                        navController.navigate(R.id.listFragment)
+                    }
                 }
 
                 override fun onItem3ClickAction() {
                     super.onItem3ClickAction()
-                    navController.navigateUp()
-                    navController.navigate(R.id.profileFragment)
+                    if (selectedItem != Item.ITEM_3) {
+                        navController.navigateUp()
+                        navController.navigate(R.id.profileFragment)
+                    }
                 }
 
                 override fun onItem4ClickAction() {
                     super.onItem4ClickAction()
-                    navController.navigateUp()
-                    navController.navigate(R.id.menuFragment)
+                    if (selectedItem != Item.ITEM_4) {
+                        navController.navigateUp()
+                        navController.navigate(R.id.menuFragment)
+                    }
                 }
             }
         }
@@ -276,21 +242,17 @@ class HomeActivity : BaseActivity(), LogoutListener {
         navController.navigateUp()
         navController.navigate(R.id.profileFragment)
 
-        binding.navRailView?.selectedItemId = R.id.profileFragment
-
-        binding.navigationTabletLayout?.let {
-            navTablet.selectedItem = TabletNavigation.Item.ITEM_3
+        binding.navigationLayout?.let {
+            navCustom.selectedItem = CustomNavigation.Item.ITEM_3
         }
     }
 
     override fun onBackPressed() {
-        binding.navRailView?.setOnItemSelectedListener(null)
-        binding.navRailView?.selectedItemId = R.id.dashboardFragment
-        setNavRailListener()
-
-        binding.navigationTabletLayout?.let {
-            navTablet.setDashboardBlue()
-        }
         super.onBackPressed()
+        binding.navigationLayout?.let {
+            if (navCustom.selectedItem != CustomNavigation.Item.ITEM_1) {
+                navCustom.selectedItem = CustomNavigation.Item.ITEM_1
+            }
+        }
     }
 }

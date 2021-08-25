@@ -3,8 +3,10 @@ package com.frafio.myfinance.data.models
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.frafio.myfinance.utils.instantHide
+import com.frafio.myfinance.utils.instantShow
 
-open class TabletNavigation(
+open class CustomNavigation(
     private val dashboardLayout: ConstraintLayout,
     private val dashboardIcon: ImageView,
     private val dashboardText: TextView,
@@ -17,7 +19,8 @@ open class TabletNavigation(
     private val menuLayout: ConstraintLayout,
     private val menuIcon: ImageView,
     private val menuText: TextView,
-    firstTime: Boolean
+    firstTime: Boolean,
+    private val animateTV: Boolean
 ) {
     private var _selectedItem: Item = Item.ITEM_1
     var selectedItem: Item
@@ -42,7 +45,7 @@ open class TabletNavigation(
         }
     }
 
-    fun setDashboardBlue() {
+    private fun setDashboardBlue() {
         dashboardIcon.isSelected = true
         dashboardText.isSelected = true
         listIcon.isSelected = false
@@ -51,6 +54,13 @@ open class TabletNavigation(
         profileText.isSelected = false
         menuIcon.isSelected = false
         menuText.isSelected = false
+
+        if (animateTV) {
+            dashboardText.instantShow()
+            listText.instantHide()
+            profileText.instantHide()
+            menuText.instantHide()
+        }
     }
 
     private fun setOnClickListener() {
@@ -67,6 +77,13 @@ open class TabletNavigation(
             profileText.isSelected = false
             menuIcon.isSelected = false
             menuText.isSelected = false
+
+            if (animateTV) {
+                dashboardText.instantShow()
+                listText.instantHide()
+                profileText.instantHide()
+                menuText.instantHide()
+            }
         }
 
         listLayout.setOnClickListener {
@@ -82,6 +99,13 @@ open class TabletNavigation(
             profileText.isSelected = false
             menuIcon.isSelected = false
             menuText.isSelected = false
+
+            if (animateTV) {
+                dashboardText.instantHide()
+                listText.instantShow()
+                profileText.instantHide()
+                menuText.instantHide()
+            }
         }
 
         profileLayout.setOnClickListener {
@@ -97,6 +121,13 @@ open class TabletNavigation(
             profileText.isSelected = true
             menuIcon.isSelected = false
             menuText.isSelected = false
+
+            if (animateTV) {
+                dashboardText.instantHide()
+                listText.instantHide()
+                profileText.instantShow()
+                menuText.instantHide()
+            }
         }
 
         menuLayout.setOnClickListener {
@@ -112,6 +143,13 @@ open class TabletNavigation(
             profileText.isSelected = false
             menuIcon.isSelected = true
             menuText.isSelected = true
+
+            if (animateTV) {
+                dashboardText.instantHide()
+                listText.instantHide()
+                profileText.instantHide()
+                menuText.instantShow()
+            }
         }
     }
 
