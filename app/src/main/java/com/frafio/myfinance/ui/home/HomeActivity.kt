@@ -239,7 +239,6 @@ class HomeActivity : BaseActivity(), LogoutListener {
     }
 
     fun onProPicClick(view: View) {
-        navController.navigateUp()
         navController.navigate(R.id.profileFragment)
 
         binding.navigationLayout?.let {
@@ -251,7 +250,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
         super.onBackPressed()
         binding.navigationLayout?.let {
             if (navCustom.selectedItem != CustomNavigation.Item.ITEM_1) {
-                navCustom.selectedItem = CustomNavigation.Item.ITEM_1
+                navCustom.setDashboardBlue()
             }
         }
     }

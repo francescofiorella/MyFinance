@@ -45,7 +45,7 @@ open class CustomNavigation(
         }
     }
 
-    private fun setDashboardBlue() {
+    fun setDashboardBlue() {
         dashboardIcon.isSelected = true
         dashboardText.isSelected = true
         listIcon.isSelected = false
