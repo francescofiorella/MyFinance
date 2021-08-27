@@ -8,6 +8,6 @@
         android:right="1dp"
         android:bottom="1dp" />
 
-    <corners android:radius="10dp" />
+    <corners android:radius="@dimen/card_corner_radius" />
 
 </shape>
