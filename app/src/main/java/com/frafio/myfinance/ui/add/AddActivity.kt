@@ -2,7 +2,6 @@ package com.frafio.myfinance.ui.add
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -234,15 +233,6 @@ class AddActivity : BaseActivity(), AddListener {
         }
     }
 
-    // ends this activity (back arrow)
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            finish()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     fun onBackClick(view: View) {
         finish()
     }
@@ -288,7 +278,9 @@ class AddActivity : BaseActivity(), AddListener {
 
         when (result.code) {
             PurchaseCode.EMPTY_NAME.code -> binding.addNameEditText.error = result.message
+
             PurchaseCode.WRONG_NAME_TOTAL.code -> binding.addNameEditText.error = result.message
+
             PurchaseCode.EMPTY_PRICE.code -> binding.addPriceEditText.error = result.message
         }
     }

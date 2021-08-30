@@ -2,7 +2,6 @@ package com.frafio.myfinance.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
@@ -53,13 +52,17 @@ class SignupActivity : BaseActivity(), AuthListener {
                 AuthCode.WEAK_PASSWORD.code ->
                     binding.signupPasswordConfirmInputLayout.error = authResult.message
 
-                AuthCode.EMAIL_NOT_WELL_FORMED.code or AuthCode.EMAIL_ALREADY_ASSOCIATED.code ->
+                AuthCode.EMAIL_NOT_WELL_FORMED.code ->
                     binding.signupEmailInputLayout.error = authResult.message
 
-                AuthCode.PROFILE_NOT_UPDATED.code
-                        or AuthCode.SIGNUP_FAILURE.code
-                        or AuthCode.USER_DATA_NOT_UPDATED.code ->
-                    snackbar(authResult.message)
+                AuthCode.EMAIL_ALREADY_ASSOCIATED.code ->
+                    binding.signupEmailInputLayout.error = authResult.message
+
+                AuthCode.PROFILE_NOT_UPDATED.code -> snackbar(authResult.message)
+
+                AuthCode.SIGNUP_FAILURE.code -> snackbar(authResult.message)
+
+                AuthCode.USER_DATA_NOT_UPDATED.code -> snackbar(authResult.message)
 
                 AuthCode.USER_DATA_UPDATED.code ->
                     Intent().also {
@@ -81,27 +84,20 @@ class SignupActivity : BaseActivity(), AuthListener {
             AuthCode.EMPTY_EMAIL.code ->
                 binding.signupEmailInputLayout.error = authResult.message
 
-            AuthCode.EMPTY_PASSWORD.code or AuthCode.SHORT_PASSWORD.code ->
+            AuthCode.EMPTY_PASSWORD.code ->
                 binding.signupPasswordInputLayout.error = authResult.message
 
-            AuthCode.EMPTY_PASSWORD_CONFIRM.code or AuthCode.PASSWORD_NOT_MATCH.code ->
+            AuthCode.SHORT_PASSWORD.code ->
+                binding.signupPasswordInputLayout.error = authResult.message
+
+            AuthCode.EMPTY_PASSWORD_CONFIRM.code ->
+                binding.signupPasswordConfirmInputLayout.error = authResult.message
+
+            AuthCode.PASSWORD_NOT_MATCH.code ->
                 binding.signupPasswordConfirmInputLayout.error = authResult.message
 
             else -> Unit
         }
-    }
-
-    fun goToLoginActivity(view: View) {
-        finish()
-    }
-
-    // ends this activity (back arrow)
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            finish()
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     fun onBackClick(view: View) {

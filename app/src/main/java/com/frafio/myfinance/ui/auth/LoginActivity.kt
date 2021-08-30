@@ -106,17 +106,22 @@ class LoginActivity : BaseActivity(), AuthListener {
             when (authResult.code) {
                 AuthCode.LOGIN_SUCCESS.code -> viewModel.updateUserData()
 
-                AuthCode.GOOGLE_LOGIN_FAILURE.code
-                        or AuthCode.USER_DISABLED.code
-                        or AuthCode.LOGIN_FAILURE.code
-                        or AuthCode.USER_DATA_NOT_UPDATED.code ->
-                    snackbar(authResult.message)
+                AuthCode.GOOGLE_LOGIN_FAILURE.code -> snackbar(authResult.message)
 
-                AuthCode.INVALID_EMAIL.code or AuthCode.USER_NOT_FOUND.code->
+                AuthCode.USER_DISABLED.code -> snackbar(authResult.message)
+
+                AuthCode.LOGIN_FAILURE.code -> snackbar(authResult.message)
+
+                AuthCode.USER_DATA_NOT_UPDATED.code -> snackbar(authResult.message)
+
+                AuthCode.INVALID_EMAIL.code ->
                     binding.loginEmailInputLayout.error = authResult.message
 
-                AuthCode.WRONG_PASSWORD.code -> binding.loginPasswordInputLayout.error =
-                    authResult.message
+                AuthCode.USER_NOT_FOUND.code ->
+                    binding.loginEmailInputLayout.error = authResult.message
+
+                AuthCode.WRONG_PASSWORD.code ->
+                    binding.loginPasswordInputLayout.error = authResult.message
 
                 AuthCode.USER_DATA_UPDATED.code -> {
                     val name = viewModel.getUserName()

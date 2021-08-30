@@ -1,7 +1,6 @@
 package com.frafio.myfinance.ui.home.list.receipt
 
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
@@ -83,8 +82,7 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
                     binding.receiptPriceEditText.clearText()
                 }
 
-                else ->
-                    snackbar(result.message, binding.receiptNameEditText)
+                else -> snackbar(result.message, binding.receiptNameEditText)
             }
         })
     }
@@ -92,17 +90,9 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
     override fun onLoadFailure(result: PurchaseResult) {
         when (result.code) {
             PurchaseCode.EMPTY_NAME.code -> binding.receiptNameEditText.error = result.message
+
             PurchaseCode.EMPTY_PRICE.code -> binding.receiptPriceEditText.error = result.message
         }
-    }
-
-    // ends this activity (back arrow)
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            finish()
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     fun onBackClick(view: View) {

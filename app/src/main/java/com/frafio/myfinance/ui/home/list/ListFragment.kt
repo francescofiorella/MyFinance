@@ -89,6 +89,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                     activity?.startActivity(it)
                 }
             }
+
             ON_LONG_CLICK -> {
                 val builder = MaterialAlertDialogBuilder(
                     requireContext(),

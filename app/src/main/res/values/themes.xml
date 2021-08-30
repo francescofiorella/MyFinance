@@ -55,16 +55,16 @@
 
     <!--Material Fields theme. -->
     <style name="Widget.MyFinance.TextInputLayout.OutlinedBox" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.NoWaste.TextInputLayout.OutlinedBox
+        <item name="materialThemeOverlay">@style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
         </item>
     </style>
 
-    <style name="Widget.NoWaste.TextInputLayout.OutlinedBox.ExposedDropdownMenu" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.NoWaste.TextInputLayout.OutlinedBox
+    <style name="Widget.MyFinance.TextInputLayout.OutlinedBox.ExposedDropdownMenu" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
         </item>
     </style>
 
-    <style name="ThemeOverlay.NoWaste.TextInputLayout.OutlinedBox" parent="">
+    <style name="ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox" parent="">
         <item name="colorPrimary">@color/accent</item>
         <item name="editTextStyle">@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox
         </item>
