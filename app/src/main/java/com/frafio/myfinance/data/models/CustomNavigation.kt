@@ -1,5 +1,8 @@
 package com.frafio.myfinance.data.models
 
+import android.transition.AutoTransition
+import android.transition.TransitionManager
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -7,6 +10,7 @@ import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 
 open class CustomNavigation(
+    private val root: ViewGroup,
     private val dashboardLayout: ConstraintLayout,
     private val dashboardIcon: ImageView,
     private val dashboardText: TextView,
@@ -22,6 +26,10 @@ open class CustomNavigation(
     firstTime: Boolean,
     private val animateTV: Boolean
 ) {
+    companion object {
+        private const val TRANSITION_DURATION: Long = 500
+    }
+
     private var _selectedItem: Item = Item.ITEM_1
     var selectedItem: Item
         get() = _selectedItem
@@ -60,6 +68,7 @@ open class CustomNavigation(
             listText.instantHide()
             profileText.instantHide()
             menuText.instantHide()
+            animateLayout()
         }
     }
 
@@ -83,6 +92,7 @@ open class CustomNavigation(
                 listText.instantHide()
                 profileText.instantHide()
                 menuText.instantHide()
+                animateLayout()
             }
         }
 
@@ -105,6 +115,7 @@ open class CustomNavigation(
                 listText.instantShow()
                 profileText.instantHide()
                 menuText.instantHide()
+                animateLayout()
             }
         }
 
@@ -127,6 +138,7 @@ open class CustomNavigation(
                 listText.instantHide()
                 profileText.instantShow()
                 menuText.instantHide()
+                animateLayout()
             }
         }
 
@@ -149,6 +161,7 @@ open class CustomNavigation(
                 listText.instantHide()
                 profileText.instantHide()
                 menuText.instantShow()
+                animateLayout()
             }
         }
     }
@@ -166,5 +179,12 @@ open class CustomNavigation(
         ITEM_2,
         ITEM_3,
         ITEM_4
+    }
+
+    private fun animateLayout() {
+        TransitionManager.beginDelayedTransition(root)
+        val transition = AutoTransition()
+        transition.duration = TRANSITION_DURATION
+        TransitionManager.beginDelayedTransition(root, transition)
     }
 }

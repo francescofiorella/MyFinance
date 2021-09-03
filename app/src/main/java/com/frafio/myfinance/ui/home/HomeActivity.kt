@@ -122,6 +122,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
     private fun setNavCustomListener(firstTime: Boolean, animateTV: Boolean) {
         binding.navigationLayout?.let { rootLayout ->
             navCustom = object : CustomNavigation(
+                rootLayout.navViewLayout,
                 rootLayout.dashboardLayout,
                 rootLayout.dashboardItemIcon,
                 rootLayout.dashboardItemText,
