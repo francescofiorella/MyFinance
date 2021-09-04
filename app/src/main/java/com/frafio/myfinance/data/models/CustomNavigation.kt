@@ -53,47 +53,13 @@ open class CustomNavigation(
         }
     }
 
-    fun setDashboardBlue() {
-        dashboardIcon.isSelected = true
-        dashboardText.isSelected = true
-        listIcon.isSelected = false
-        listText.isSelected = false
-        profileIcon.isSelected = false
-        profileText.isSelected = false
-        menuIcon.isSelected = false
-        menuText.isSelected = false
-
-        if (animateTV) {
-            dashboardText.instantShow()
-            listText.instantHide()
-            profileText.instantHide()
-            menuText.instantHide()
-            animateLayout()
-        }
-    }
-
     private fun setOnClickListener() {
         dashboardLayout.setOnClickListener {
             onItem1ClickAction()
 
             _selectedItem = Item.ITEM_1
 
-            dashboardIcon.isSelected = true
-            dashboardText.isSelected = true
-            listIcon.isSelected = false
-            listText.isSelected = false
-            profileIcon.isSelected = false
-            profileText.isSelected = false
-            menuIcon.isSelected = false
-            menuText.isSelected = false
-
-            if (animateTV) {
-                dashboardText.instantShow()
-                listText.instantHide()
-                profileText.instantHide()
-                menuText.instantHide()
-                animateLayout()
-            }
+            setDashboardBlue()
         }
 
         listLayout.setOnClickListener {
@@ -101,22 +67,7 @@ open class CustomNavigation(
 
             _selectedItem = Item.ITEM_2
 
-            dashboardIcon.isSelected = false
-            dashboardText.isSelected = false
-            listIcon.isSelected = true
-            listText.isSelected = true
-            profileIcon.isSelected = false
-            profileText.isSelected = false
-            menuIcon.isSelected = false
-            menuText.isSelected = false
-
-            if (animateTV) {
-                dashboardText.instantHide()
-                listText.instantShow()
-                profileText.instantHide()
-                menuText.instantHide()
-                animateLayout()
-            }
+            setListBlue()
         }
 
         profileLayout.setOnClickListener {
@@ -124,22 +75,7 @@ open class CustomNavigation(
 
             _selectedItem = Item.ITEM_3
 
-            dashboardIcon.isSelected = false
-            dashboardText.isSelected = false
-            listIcon.isSelected = false
-            listText.isSelected = false
-            profileIcon.isSelected = true
-            profileText.isSelected = true
-            menuIcon.isSelected = false
-            menuText.isSelected = false
-
-            if (animateTV) {
-                dashboardText.instantHide()
-                listText.instantHide()
-                profileText.instantShow()
-                menuText.instantHide()
-                animateLayout()
-            }
+            setProfileBlue()
         }
 
         menuLayout.setOnClickListener {
@@ -147,22 +83,7 @@ open class CustomNavigation(
 
             _selectedItem = Item.ITEM_4
 
-            dashboardIcon.isSelected = false
-            dashboardText.isSelected = false
-            listIcon.isSelected = false
-            listText.isSelected = false
-            profileIcon.isSelected = false
-            profileText.isSelected = false
-            menuIcon.isSelected = true
-            menuText.isSelected = true
-
-            if (animateTV) {
-                dashboardText.instantHide()
-                listText.instantHide()
-                profileText.instantHide()
-                menuText.instantShow()
-                animateLayout()
-            }
+            setMenuBlue()
         }
     }
 
@@ -186,5 +107,81 @@ open class CustomNavigation(
         val transition = AutoTransition()
         transition.duration = TRANSITION_DURATION
         TransitionManager.beginDelayedTransition(root, transition)
+    }
+
+    fun setDashboardBlue() {
+        dashboardIcon.isSelected = true
+        dashboardText.isSelected = true
+        listIcon.isSelected = false
+        listText.isSelected = false
+        profileIcon.isSelected = false
+        profileText.isSelected = false
+        menuIcon.isSelected = false
+        menuText.isSelected = false
+
+        if (animateTV) {
+            dashboardText.instantShow()
+            listText.instantHide()
+            profileText.instantHide()
+            menuText.instantHide()
+            animateLayout()
+        }
+    }
+
+    fun setListBlue() {
+        dashboardIcon.isSelected = false
+        dashboardText.isSelected = false
+        listIcon.isSelected = true
+        listText.isSelected = true
+        profileIcon.isSelected = false
+        profileText.isSelected = false
+        menuIcon.isSelected = false
+        menuText.isSelected = false
+
+        if (animateTV) {
+            dashboardText.instantHide()
+            listText.instantShow()
+            profileText.instantHide()
+            menuText.instantHide()
+            animateLayout()
+        }
+    }
+
+    fun setProfileBlue() {
+        dashboardIcon.isSelected = false
+        dashboardText.isSelected = false
+        listIcon.isSelected = false
+        listText.isSelected = false
+        profileIcon.isSelected = true
+        profileText.isSelected = true
+        menuIcon.isSelected = false
+        menuText.isSelected = false
+
+        if (animateTV) {
+            dashboardText.instantHide()
+            listText.instantHide()
+            profileText.instantShow()
+            menuText.instantHide()
+            animateLayout()
+        }
+    }
+
+    fun setMenuBlue() {
+        dashboardIcon.isSelected = false
+        dashboardText.isSelected = false
+        listIcon.isSelected = false
+        listText.isSelected = false
+        profileIcon.isSelected = false
+        profileText.isSelected = false
+        menuIcon.isSelected = true
+        menuText.isSelected = true
+
+        if (animateTV) {
+            dashboardText.instantHide()
+            listText.instantHide()
+            profileText.instantHide()
+            menuText.instantShow()
+            animateLayout()
+        }
     }
 }

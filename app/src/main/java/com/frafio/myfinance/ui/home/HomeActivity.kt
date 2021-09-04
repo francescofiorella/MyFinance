@@ -78,7 +78,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
         binding.homeBottomNavView?.setupWithNavController(navController)
 
         if (savedInstanceState == null) {
-            setNavCustomListener(true, binding.landHolder != null)
+            setNavCustomLayout(true, binding.landHolder != null)
 
             // controlla se si è appena fatto l'accesso
             if (intent.hasExtra("${getString(R.string.default_path)}.userRequest")) {
@@ -105,21 +105,21 @@ class HomeActivity : BaseActivity(), LogoutListener {
         super.onRestoreInstanceState(savedInstanceState)
 
         binding.navigationLayout?.let {
-            setNavCustomListener(false, binding.landHolder != null)
+            setNavCustomLayout(false, binding.landHolder != null)
 
             when (navController.currentDestination!!.id) {
-                R.id.dashboardFragment -> navCustom.selectedItem = CustomNavigation.Item.ITEM_1
+                R.id.dashboardFragment -> navCustom.setDashboardBlue()
 
-                R.id.listFragment -> navCustom.selectedItem = CustomNavigation.Item.ITEM_2
+                R.id.listFragment -> navCustom.setListBlue()
 
-                R.id.profileFragment -> navCustom.selectedItem = CustomNavigation.Item.ITEM_3
+                R.id.profileFragment -> navCustom.setProfileBlue()
 
-                R.id.menuFragment -> navCustom.selectedItem = CustomNavigation.Item.ITEM_4
+                R.id.menuFragment -> navCustom.setMenuBlue()
             }
         }
     }
 
-    private fun setNavCustomListener(firstTime: Boolean, animateTV: Boolean) {
+    private fun setNavCustomLayout(firstTime: Boolean, animateTV: Boolean) {
         binding.navigationLayout?.let { rootLayout ->
             navCustom = object : CustomNavigation(
                 rootLayout.navViewLayout,
@@ -250,9 +250,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
     override fun onBackPressed() {
         super.onBackPressed()
         binding.navigationLayout?.let {
-            if (navCustom.selectedItem != CustomNavigation.Item.ITEM_1) {
-                navCustom.setDashboardBlue()
-            }
+            navCustom.setDashboardBlue()
         }
     }
 }
