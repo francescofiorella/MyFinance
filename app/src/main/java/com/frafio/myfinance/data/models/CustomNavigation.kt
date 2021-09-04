@@ -27,7 +27,7 @@ open class CustomNavigation(
     private val animateTV: Boolean
 ) {
     companion object {
-        private const val TRANSITION_DURATION: Long = 500
+        private const val TRANSITION_DURATION: Long = 250
     }
 
     private var _selectedItem: Item = Item.ITEM_1
