@@ -57,15 +57,11 @@ open class CustomNavigation(
         dashboardLayout.setOnClickListener {
             onItem1ClickAction()
 
-            _selectedItem = Item.ITEM_1
-
             setDashboardBlue()
         }
 
         listLayout.setOnClickListener {
             onItem2ClickAction()
-
-            _selectedItem = Item.ITEM_2
 
             setListBlue()
         }
@@ -73,15 +69,11 @@ open class CustomNavigation(
         profileLayout.setOnClickListener {
             onItem3ClickAction()
 
-            _selectedItem = Item.ITEM_3
-
             setProfileBlue()
         }
 
         menuLayout.setOnClickListener {
             onItem4ClickAction()
-
-            _selectedItem = Item.ITEM_4
 
             setMenuBlue()
         }
@@ -119,6 +111,8 @@ open class CustomNavigation(
         menuIcon.isSelected = false
         menuText.isSelected = false
 
+        _selectedItem = Item.ITEM_1
+
         if (animateTV) {
             dashboardText.instantShow()
             listText.instantHide()
@@ -137,6 +131,8 @@ open class CustomNavigation(
         profileText.isSelected = false
         menuIcon.isSelected = false
         menuText.isSelected = false
+
+        _selectedItem = Item.ITEM_2
 
         if (animateTV) {
             dashboardText.instantHide()
@@ -157,6 +153,8 @@ open class CustomNavigation(
         menuIcon.isSelected = false
         menuText.isSelected = false
 
+        _selectedItem = Item.ITEM_3
+
         if (animateTV) {
             dashboardText.instantHide()
             listText.instantHide()
@@ -175,6 +173,8 @@ open class CustomNavigation(
         profileText.isSelected = false
         menuIcon.isSelected = true
         menuText.isSelected = true
+
+        _selectedItem = Item.ITEM_4
 
         if (animateTV) {
             dashboardText.instantHide()

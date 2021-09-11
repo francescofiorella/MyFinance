@@ -39,37 +39,9 @@
         <item name="buttonBarPositiveButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
     </style>
 
-    <style name="TextAppearance.MyFinance.AlertDialog.Title" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
-        <item name="fontFamily">@font/nunito_semibold</item>
-        <item name="android:textSize">20sp</item>
-    </style>
-
-    <style name="TextAppearance.MyFinance.AlertDialog.Body" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
-        <item name="fontFamily">@font/nunito</item>
-    </style>
-
-    <style name="Widget.MyFinance.AlertDialog.Button" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/accent</item>
-        <item name="fontFamily">@font/nunito_semibold</item>
-    </style>
-
     <!--Material Fields theme. -->
     <style name="Widget.MyFinance.TextInputLayout.OutlinedBox" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="materialThemeOverlay">@style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
-        </item>
-    </style>
-
-    <style name="Widget.MyFinance.TextInputLayout.OutlinedBox.ExposedDropdownMenu" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
-        </item>
-    </style>
-
-    <style name="ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox" parent="">
-        <item name="colorPrimary">@color/accent</item>
-        <item name="editTextStyle">@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox
-        </item>
-        <item name="autoCompleteTextViewStyle">
-            @style/Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox
         </item>
     </style>
 
@@ -79,10 +51,4 @@
         <item name="buttonBarPositiveButtonStyle">@style/Widget.MyFinance.DatePicker.Button</item>
         <item name="buttonBarNegativeButtonStyle">@style/Widget.MyFinance.DatePicker.Button</item>
     </style>
-
-    <style name="Widget.MyFinance.DatePicker.Button" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/accent</item>
-        <item name="fontFamily">@font/nunito_bold</item>
-    </style>
-
 </resources>

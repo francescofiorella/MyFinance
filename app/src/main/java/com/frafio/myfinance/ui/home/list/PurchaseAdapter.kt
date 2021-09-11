@@ -44,7 +44,7 @@ class PurchaseAdapter(
                 .setOnClickListener(null)
         }
 
-        if (!(currentPurchase.type == 0 && currentPurchase.price != 0.0)) {
+        if (!(currentPurchase.type == DbPurchases.TYPES.TOTAL.value && currentPurchase.price != 0.0)) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener {
                     listener.onItemInteraction(ON_LONG_CLICK, currentPurchase, position)
@@ -56,7 +56,7 @@ class PurchaseAdapter(
         }
 
 
-        if (currentPurchase.type == 0) {
+        if (currentPurchase.type == DbPurchases.TYPES.TOTAL.value) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemNomeTextView
                 .setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
         } else {
