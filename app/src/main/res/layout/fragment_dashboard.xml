@@ -22,7 +22,6 @@
             android:id="@+id/dashboard_warningTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:fontFamily="@font/nunito"
             android:padding="10dp"
             android:text="@string/warning_home"

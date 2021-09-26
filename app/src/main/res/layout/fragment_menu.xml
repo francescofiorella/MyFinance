@@ -96,12 +96,31 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/collection_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/card_full_margin"
+                android:layout_marginTop="@dimen/fragment_margin_top"
+                android:background="@drawable/bg_edit_text"
+                android:elevation="@dimen/card_elevation"
+                android:fontFamily="@font/nunito"
+                android:paddingHorizontal="25dp"
+                android:paddingVertical="20dp"
+                android:text="@string/mostra_2020_2021"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/chart_card"
+                app:layout_constraintVertical_bias="0.0" />
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/version_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/card_full_margin"
-                android:layout_marginTop="@dimen/fragment_margin_top"
+                android:layout_marginTop="@dimen/card_full_margin"
                 android:layout_marginBottom="@dimen/dashboard_bottom_margin"
                 app:cardBackgroundColor="@color/card_bg"
                 app:cardCornerRadius="@dimen/card_corner_radius"
@@ -109,7 +128,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/chart_card"
+                app:layout_constraintTop_toBottomOf="@id/collection_switch"
                 app:layout_constraintVertical_bias="0.0">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
