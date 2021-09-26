@@ -25,6 +25,7 @@ class PurchaseManager {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
             .whereEqualTo(DbPurchases.FIELDS.EMAIL.value, UserStorage.user!!.email)
             .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
@@ -60,8 +61,9 @@ class PurchaseManager {
 
         val purchaseList = PurchaseStorage.purchaseList
 
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value).document(purchaseList[position].id!!)
-            .delete()
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+            .document(purchaseList[position].id!!).delete()
             .addOnSuccessListener {
                 if (purchaseList[position].type == DbPurchases.TYPES.TOTAL.value) {
                     purchaseList.removeAt(position)
@@ -83,6 +85,7 @@ class PurchaseManager {
                             purchaseList.removeAt(position)
 
                             fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+                                .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
                                 .document(purchaseList[i].id!!)
                                 .set(purchaseList[i]).addOnSuccessListener {
                                     PurchaseStorage.purchaseList = purchaseList
@@ -126,8 +129,9 @@ class PurchaseManager {
         val response = MutableLiveData<PurchaseResult>()
 
         purchase.id = "${purchase.year}${purchase.month}${purchase.day}"
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value).document(purchase.id!!).set(purchase)
-            .addOnSuccessListener {
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+            .document(purchase.id!!).set(purchase).addOnSuccessListener {
                 response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -142,8 +146,9 @@ class PurchaseManager {
 
         val userEmail = UserStorage.user!!.email
 
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value).add(purchase)
-            .addOnSuccessListener {
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+            .add(purchase).addOnSuccessListener {
                 var sum = if (purchase.type != DbPurchases.TYPES.TICKET.value) {
                     purchase.price ?: 0.0
                 } else {
@@ -167,8 +172,9 @@ class PurchaseManager {
                     DbPurchases.TYPES.TOTAL.value
                 )
                 totalP.id = "${purchase.year}${purchase.month}${purchase.day}"
-                fStore.collection(DbPurchases.FIELDS.PURCHASES.value).document(totalP.id!!)
-                    .set(totalP)
+                fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+                    .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+                    .document(totalP.id!!).set(totalP)
                     .addOnSuccessListener {
                         response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
                     }
@@ -192,8 +198,9 @@ class PurchaseManager {
     ): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value).document(purchase.id!!).set(purchase)
-            .addOnSuccessListener {
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+            .document(purchase.id!!).set(purchase).addOnSuccessListener {
                 PurchaseStorage.purchaseList[position] = purchase
                 if (purchase.price != purchasePrice) {
                     var sum = 0.0
@@ -217,8 +224,9 @@ class PurchaseManager {
                         totID
                     )
 
-                    fStore.collection(DbPurchases.FIELDS.PURCHASES.value).document(totID)
-                        .set(totalP)
+                    fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+                        .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+                        .document(totID).set(totalP)
                         .addOnSuccessListener {
                             response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
                         }

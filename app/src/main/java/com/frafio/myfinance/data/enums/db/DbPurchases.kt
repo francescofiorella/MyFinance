@@ -25,4 +25,9 @@ object DbPurchases {
         GENERIC(2),
         TICKET(3)
     }
+
+    enum class COLLECTIONS(val value: String) {
+        ZERO_UNO("2020_2021"),
+        UNO_DUE("2021_2022")
+    }
 }

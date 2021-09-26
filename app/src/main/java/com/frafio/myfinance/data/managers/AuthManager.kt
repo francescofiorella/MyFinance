@@ -203,6 +203,7 @@ class AuthManager {
         val response = MutableLiveData<AuthResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
             .whereEqualTo(DbPurchases.FIELDS.EMAIL.value, UserStorage.user!!.email)
             .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
