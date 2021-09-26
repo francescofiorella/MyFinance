@@ -215,8 +215,8 @@ class AuthManager {
                 queryDocumentSnapshots.forEach { document ->
                     val purchase = document.toObject(Purchase::class.java)
 
-                    // set id and update formattedThings
-                    purchase.updatePurchase(document.id)
+                    // set id
+                    purchase.updateID(document.id)
 
                     PurchaseStorage.purchaseList.add(purchase)
                 }

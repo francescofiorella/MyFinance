@@ -34,7 +34,6 @@ class ReceiptItemAdapter(
         position: Int,
         model: ReceiptItem
     ) {
-        model.updateFormattedPrice()
         holder.recyclerViewReceiptItemBinding.receiptItem = model
 
         holder.recyclerViewReceiptItemBinding.root.setOnLongClickListener {

@@ -38,7 +38,7 @@ class PurchaseManager {
                     val purchase = document.toObject(Purchase::class.java)
 
                     // set id and update formattedThings
-                    purchase.updatePurchase(document.id)
+                    purchase.updateID(document.id)
 
                     PurchaseStorage.purchaseList.add(purchase)
                 }
@@ -78,8 +78,6 @@ class PurchaseManager {
                             newPurchase.price = newPurchase.price?.minus(
                                 purchaseList[position].price!!
                             )
-
-                            newPurchase.updatePurchase(updateDate = false)
 
                             purchaseList[totPosition] = newPurchase
                             purchaseList.removeAt(position)
@@ -196,8 +194,6 @@ class PurchaseManager {
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value).document(purchase.id!!).set(purchase)
             .addOnSuccessListener {
-                purchase.updatePurchase()
-
                 PurchaseStorage.purchaseList[position] = purchase
                 if (purchase.price != purchasePrice) {
                     var sum = 0.0

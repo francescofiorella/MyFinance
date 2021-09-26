@@ -14,7 +14,11 @@ fun doubleToString(double: Double): String {
     return formatter.format(double)
 }
 
-fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?) : String? {
+fun doubleToPrice(double: Double): String {
+    return "€ ${doubleToString(double)}"
+}
+
+fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?): String? {
     var formattedDate: String? = null
     dayOfMonth?.let { day ->
         month?.let { month ->

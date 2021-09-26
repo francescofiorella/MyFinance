@@ -22,6 +22,7 @@ import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptActivity
+import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.generic.instance
 
@@ -84,7 +85,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                     it.putExtra("${getString(R.string.default_path)}.purchaseName", purchase.name)
                     it.putExtra(
                         "${getString(R.string.default_path)}.purchasePrice",
-                        purchase.formattedPrice
+                        doubleToPrice(purchase.price!!)
                     )
                     activity?.startActivity(it)
                 }

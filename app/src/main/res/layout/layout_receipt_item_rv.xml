@@ -9,6 +9,8 @@
             name="receiptItem"
             type="com.frafio.myfinance.data.models.ReceiptItem" />
 
+        <import type="com.frafio.myfinance.utils.FormatUtilsKt" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -40,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/nunito"
-            android:text="@{receiptItem.formattedPrice}"
+            android:text="@{FormatUtilsKt.doubleToPrice(receiptItem.price)}"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@id/recView_receiptItem_nomeTextView"
             app:layout_constraintEnd_toEndOf="parent"
