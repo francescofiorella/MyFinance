@@ -226,70 +226,6 @@
 
                 </GridLayout>
 
-                <GridLayout
-                    android:id="@+id/add_bigliettoLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/bg_edit_text"
-                    android:columnCount="3"
-                    android:elevation="@dimen/card_elevation"
-                    android:rowCount="1"
-                    android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_typeLayout"
-                    tools:visibility="visible">
-
-                    <TextView
-                        android:id="@+id/add_trenitalia_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0"
-                        android:layout_column="0"
-                        android:layout_columnWeight="1"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:fontFamily="@font/nunito"
-                        android:paddingVertical="15dp"
-                        android:text="@string/trenitalia"
-                        android:textAlignment="center"
-                        android:textColor="@color/type_button_color"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/add_amtab_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0"
-                        android:layout_column="1"
-                        android:layout_columnWeight="1"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:fontFamily="@font/nunito"
-                        android:paddingVertical="15dp"
-                        android:text="@string/amtab"
-                        android:textAlignment="center"
-                        android:textColor="@color/type_button_color"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/add_altro_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_row="0"
-                        android:layout_column="2"
-                        android:layout_columnWeight="1"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:fontFamily="@font/nunito"
-                        android:padding="15dp"
-                        android:text="@string/altro"
-                        android:textAlignment="center"
-                        android:textColor="@color/type_button_color"
-                        android:textSize="16sp" />
-
-                </GridLayout>
-
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/add_totale_switch"
                     android:layout_width="match_parent"
@@ -306,7 +242,7 @@
                     android:visibility="@{viewmodel.requestCode == 1 ? View.VISIBLE : View.GONE}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_bigliettoLayout"
+                    app:layout_constraintTop_toBottomOf="@id/add_typeLayout"
                     tools:visibility="visible" />
 
                 <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

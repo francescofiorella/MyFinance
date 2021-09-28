@@ -2,7 +2,6 @@ package com.frafio.myfinance.data.models
 
 import android.transition.AutoTransition
 import android.transition.TransitionManager
-import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.widget.GridLayout

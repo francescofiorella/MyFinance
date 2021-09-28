@@ -3,7 +3,6 @@ package com.frafio.myfinance.ui.add
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -35,7 +34,6 @@ class AddActivity : BaseActivity(), AddListener {
 
     // custom layouts
     private lateinit var typeBtnTrio: ButtonTrio
-    private lateinit var ticketBtnTrio: ButtonTrio
     private lateinit var datePickerBtn: DatePickerButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +47,6 @@ class AddActivity : BaseActivity(), AddListener {
         intent.getIntExtra("${getString(R.string.default_path)}.REQUESTCODE", 0).also { code ->
             viewModel.requestCode = code
             initLayout(code)
-            ticketBtnTrio.isVisible = false
         }
     }
 
@@ -68,31 +65,6 @@ class AddActivity : BaseActivity(), AddListener {
             }
         }
 
-        ticketBtnTrio = object : ButtonTrio(
-            binding.addBigliettoLayout,
-            binding.addTrenitaliaTv,
-            binding.addAmtabTv,
-            binding.addAltroTv
-        ) {
-            override fun onBtn1ClickAction() {
-                super.onBtn1ClickAction()
-                binding.addNameEditText.setText(DbPurchases.NAMES.TRENITALIA.value)
-                binding.addNameEditText.isEnabled = false
-            }
-
-            override fun onBtn2ClickAction() {
-                super.onBtn2ClickAction()
-                binding.addNameEditText.setText(DbPurchases.NAMES.AMTAB.value)
-                binding.addNameEditText.isEnabled = false
-            }
-
-            override fun onBtn3ClickAction() {
-                super.onBtn3ClickAction()
-                binding.addNameEditText.clearText()
-                binding.addNameEditText.isEnabled = true
-            }
-        }
-
         typeBtnTrio = object : ButtonTrio(
             binding.addTypeLayout,
             binding.addGenericoTv,
@@ -101,11 +73,7 @@ class AddActivity : BaseActivity(), AddListener {
         ) {
             override fun onBtn1ClickAction() {
                 super.onBtn1ClickAction()
-                ticketBtnTrio.hide(binding.root as ViewGroup)
 
-                if (selectedBtn == Button.BUTTON_3) {
-                    binding.addNameEditText.clearText()
-                }
                 binding.addNameEditText.isEnabled = true
 
                 viewModel.type = DbPurchases.TYPES.GENERIC.value
@@ -113,11 +81,7 @@ class AddActivity : BaseActivity(), AddListener {
 
             override fun onBtn2ClickAction() {
                 super.onBtn2ClickAction()
-                ticketBtnTrio.hide(binding.root as ViewGroup)
 
-                if (selectedBtn == Button.BUTTON_3) {
-                    binding.addNameEditText.clearText()
-                }
                 binding.addNameEditText.isEnabled = true
 
                 viewModel.type = DbPurchases.TYPES.SHOPPING.value
@@ -125,8 +89,6 @@ class AddActivity : BaseActivity(), AddListener {
 
             override fun onBtn3ClickAction() {
                 super.onBtn3ClickAction()
-                ticketBtnTrio.show(binding.root as ViewGroup)
-                ticketBtnTrio.performClick()
 
                 viewModel.type = DbPurchases.TYPES.TICKET.value
             }
@@ -136,7 +98,6 @@ class AddActivity : BaseActivity(), AddListener {
             setTotSwitch()
         } else if (code == EDIT_PURCHASE_CODE) {
             typeBtnTrio.isEnabled = false
-            setTicket()
 
             intent.also { intent ->
                 intent.getStringExtra("${getString(R.string.default_path)}.PURCHASE_ID")?.let {
@@ -205,8 +166,6 @@ class AddActivity : BaseActivity(), AddListener {
                 binding.addPriceEditText.error = null
 
                 typeBtnTrio.isEnabled = false
-
-                ticketBtnTrio.hide(binding.root as ViewGroup)
             } else {
                 binding.addNameEditText.clearText()
                 binding.addNameEditText.isEnabled = true
@@ -218,18 +177,6 @@ class AddActivity : BaseActivity(), AddListener {
 
                 typeBtnTrio.performClick()
             }
-        }
-    }
-
-    private fun setTicket() {
-        when (viewModel.name) {
-            DbPurchases.NAMES.TRENITALIA.value ->
-                ticketBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_1
-
-            DbPurchases.NAMES.AMTAB.value ->
-                ticketBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_2
-
-            else -> ticketBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_3
         }
     }
 

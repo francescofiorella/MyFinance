@@ -1,11 +1,9 @@
 package com.frafio.myfinance.ui.home.menu
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -15,7 +13,6 @@ import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentMenuBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.utils.snackbar
 import org.kodein.di.generic.instance
 
 class MenuFragment : BaseFragment(), MenuListener {
