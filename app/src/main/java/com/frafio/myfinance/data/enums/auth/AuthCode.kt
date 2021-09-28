@@ -16,7 +16,7 @@ enum class AuthCode(val code: Int, val message: String) {
     PROFILE_NOT_UPDATED(14, "Registrazione non avvenuta correttamente! Contatta l'amministratore"),
     SIGNUP_FAILURE(15, "Registrazione fallita!"),
 
-    EMPTY_EMAIL(20, "Inserisci l'email."),
+    EMPTY_EMAIL(20, "Inserisci la tua email."),
     EMPTY_PASSWORD(21, "Inserisci la password."),
     SHORT_PASSWORD(22, "La password deve essere lunga almeno 8 caratteri!"),
     EMPTY_NAME(23, "Inserisci nome e cognome."),
