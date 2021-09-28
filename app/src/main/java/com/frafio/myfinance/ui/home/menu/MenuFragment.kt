@@ -1,19 +1,24 @@
 package com.frafio.myfinance.ui.home.menu
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentMenuBinding
 import com.frafio.myfinance.ui.BaseFragment
-import com.frafio.myfinance.utils.instantHide
-import com.frafio.myfinance.utils.instantShow
+import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.utils.snackbar
 import org.kodein.di.generic.instance
 
-class MenuFragment : BaseFragment() {
+class MenuFragment : BaseFragment(), MenuListener {
 
     private lateinit var viewModel: MenuViewModel
     private lateinit var binding: FragmentMenuBinding
@@ -30,6 +35,31 @@ class MenuFragment : BaseFragment() {
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
 
+        binding.collectionSwitch.also {
+            it.isChecked = viewModel.isSwitchChecked
+
+            it.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.setCollection(isChecked)
+            }
+        }
+
+
         return binding.root
+    }
+
+    override fun onStarted() {
+        (activity as HomeActivity).showProgressIndicator()
+    }
+
+    override fun onCompleted(result: LiveData<PurchaseResult>) {
+        result.observe(this, { purchaseResult ->
+            when (purchaseResult.code) {
+                PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
+                    (activity as HomeActivity).hideProgressIndicator()
+                }
+
+                else -> (activity as HomeActivity).showSnackbar(purchaseResult.message)
+            }
+        })
     }
 }

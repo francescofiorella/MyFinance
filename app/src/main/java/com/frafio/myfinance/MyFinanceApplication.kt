@@ -1,6 +1,7 @@
 package com.frafio.myfinance
 
 import android.app.Application
+import android.content.Context
 import com.frafio.myfinance.data.managers.AuthManager
 import com.frafio.myfinance.data.managers.PurchaseManager
 import com.frafio.myfinance.data.managers.ReceiptManager
@@ -26,13 +27,22 @@ import org.kodein.di.generic.singleton
 
 class MyFinanceApplication : Application(), KodeinAware {
 
+    companion object {
+        const val PREFERENCES_KEY = "SettingsPreferences"
+        const val COLLECTION_KEY = "collection_option"
+    }
+
+    private val sharedPreferences by lazy {
+        getSharedPreferences(PREFERENCES_KEY, Context.MODE_PRIVATE)
+    }
+
     override val kodein: Kodein = Kodein.lazy {
         import(androidXModule(this@MyFinanceApplication))
 
         // managers
-        bind() from singleton { AuthManager() }
-        bind() from singleton { PurchaseManager() }
-        bind() from singleton { ReceiptManager() }
+        bind() from singleton { AuthManager(sharedPreferences) }
+        bind() from singleton { PurchaseManager(sharedPreferences) }
+        bind() from singleton { ReceiptManager(sharedPreferences) }
 
         // repositories
         bind() from singleton { UserRepository(instance()) }

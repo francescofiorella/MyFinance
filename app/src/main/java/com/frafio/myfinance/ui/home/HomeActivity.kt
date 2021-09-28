@@ -253,4 +253,12 @@ class HomeActivity : BaseActivity(), LogoutListener {
             navCustom.setDashboardBlue()
         }
     }
+
+    fun showProgressIndicator() {
+        binding.homeProgressIndicator.show()
+    }
+
+    fun hideProgressIndicator() {
+        binding.homeProgressIndicator.hide()
+    }
 }

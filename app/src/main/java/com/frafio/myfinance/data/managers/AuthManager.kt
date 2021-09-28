@@ -1,6 +1,7 @@
 package com.frafio.myfinance.data.managers
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +12,7 @@ import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
+import com.frafio.myfinance.utils.getSharedCollection
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -18,7 +20,7 @@ import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-class AuthManager {
+class AuthManager(private val sharedPreferences: SharedPreferences) {
 
     companion object {
         private val TAG = AuthManager::class.java.simpleName
@@ -203,7 +205,7 @@ class AuthManager {
         val response = MutableLiveData<AuthResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+            .document(UserStorage.user!!.email!!).collection(getSharedCollection(sharedPreferences))
             .whereEqualTo(DbPurchases.FIELDS.EMAIL.value, UserStorage.user!!.email)
             .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)

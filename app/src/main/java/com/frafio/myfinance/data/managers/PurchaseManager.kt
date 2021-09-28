@@ -1,5 +1,6 @@
 package com.frafio.myfinance.data.managers
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,10 +10,12 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
+import com.frafio.myfinance.utils.getSharedCollection
+import com.frafio.myfinance.utils.setSharedCollection
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-class PurchaseManager {
+class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
     companion object {
         private val TAG = PurchaseManager::class.java.simpleName
@@ -25,7 +28,8 @@ class PurchaseManager {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(getSharedCollection(sharedPreferences))
             .whereEqualTo(DbPurchases.FIELDS.EMAIL.value, UserStorage.user!!.email)
             .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
@@ -62,7 +66,8 @@ class PurchaseManager {
         val purchaseList = PurchaseStorage.purchaseList
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(getSharedCollection(sharedPreferences))
             .document(purchaseList[position].id!!).delete()
             .addOnSuccessListener {
                 if (purchaseList[position].type == DbPurchases.TYPES.TOTAL.value) {
@@ -85,7 +90,8 @@ class PurchaseManager {
                             purchaseList.removeAt(position)
 
                             fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                                .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+                                .document(UserStorage.user!!.email!!)
+                                .collection(getSharedCollection(sharedPreferences))
                                 .document(purchaseList[i].id!!)
                                 .set(purchaseList[i]).addOnSuccessListener {
                                     PurchaseStorage.purchaseList = purchaseList
@@ -130,7 +136,8 @@ class PurchaseManager {
 
         purchase.id = "${purchase.year}${purchase.month}${purchase.day}"
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(getSharedCollection(sharedPreferences))
             .document(purchase.id!!).set(purchase).addOnSuccessListener {
                 response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
             }.addOnFailureListener { e ->
@@ -147,7 +154,8 @@ class PurchaseManager {
         val userEmail = UserStorage.user!!.email
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(getSharedCollection(sharedPreferences))
             .add(purchase).addOnSuccessListener {
                 var sum = if (purchase.type != DbPurchases.TYPES.TICKET.value) {
                     purchase.price ?: 0.0
@@ -173,7 +181,8 @@ class PurchaseManager {
                 )
                 totalP.id = "${purchase.year}${purchase.month}${purchase.day}"
                 fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                    .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+                    .document(UserStorage.user!!.email!!)
+                    .collection(getSharedCollection(sharedPreferences))
                     .document(totalP.id!!).set(totalP)
                     .addOnSuccessListener {
                         response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
@@ -199,7 +208,8 @@ class PurchaseManager {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(getSharedCollection(sharedPreferences))
             .document(purchase.id!!).set(purchase).addOnSuccessListener {
                 PurchaseStorage.purchaseList[position] = purchase
                 if (purchase.price != purchasePrice) {
@@ -225,7 +235,8 @@ class PurchaseManager {
                     )
 
                     fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                        .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.UNO_DUE.value)
+                        .document(UserStorage.user!!.email!!)
+                        .collection(getSharedCollection(sharedPreferences))
                         .document(totID).set(totalP)
                         .addOnSuccessListener {
                             response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
@@ -244,5 +255,19 @@ class PurchaseManager {
 
 
         return response
+    }
+
+    fun updateListByCollection(isOldYear: Boolean): LiveData<PurchaseResult> {
+        val collection: String = if (isOldYear) {
+            DbPurchases.COLLECTIONS.ZERO_UNO.value
+        } else {
+            DbPurchases.COLLECTIONS.UNO_DUE.value
+        }
+        setSharedCollection(sharedPreferences, collection)
+        return updateList()
+    }
+
+    fun getSelectedCollection(): String {
+        return getSharedCollection(sharedPreferences)
     }
 }

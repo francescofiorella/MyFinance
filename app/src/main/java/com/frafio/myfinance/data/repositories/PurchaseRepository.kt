@@ -188,4 +188,12 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
     private fun hasPassedAWeekBetween(startDate: LocalDate, endDate: LocalDate): Boolean {
         return ChronoUnit.DAYS.between(startDate, endDate) > 7
     }
+
+    fun setCollection(isOldYear: Boolean): LiveData<PurchaseResult> {
+        return purchaseManager.updateListByCollection(isOldYear)
+    }
+
+    fun getSelectedCollection(): String {
+        return purchaseManager.getSelectedCollection()
+    }
 }

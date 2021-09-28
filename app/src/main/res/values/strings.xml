@@ -33,7 +33,7 @@
     <string name="datepickerarrow">DatePickerArrow</string>
     <string name="generico">Generico</string>
     <string name="spesa">Spesa</string>
-    <string name="biglietto">Biglietto</string>
+    <string name="biglietto">Trasporti</string>
     <string name="trenitalia">TrenItalia</string>
     <string name="amtab">Amtab</string>
     <string name="altro">Altro</string>
@@ -57,7 +57,7 @@
     <string name="oggi">Acquisti \nOggi</string>
     <string name="n_acquisti">Numero \nAcquisti</string>
     <string name="totale">Totale \nAcquisti</string>
-    <string name="totale_biglietti">Totale \nBiglietti</string>
+    <string name="totale_biglietti">Totale \nTrasporti</string>
     <string name="n_trenitalia">N° Biglietti \nTrenItalia</string>
     <string name="n_amtab">N° Biglietti \nAmtab</string>
 
