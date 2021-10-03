@@ -53,6 +53,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
                 binding.navigationLayout?.let {
                     if (navCustom.selectedItem == CustomNavigation.Item.ITEM_2) {
                         navController.popBackStack()
+                        navController.navigate(R.id.listFragment)
                     }
 
                     navCustom.selectedItem = CustomNavigation.Item.ITEM_2

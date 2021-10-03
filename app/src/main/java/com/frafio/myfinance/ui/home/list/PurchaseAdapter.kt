@@ -4,6 +4,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
@@ -13,7 +14,7 @@ import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.O
 import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 
 class PurchaseAdapter(
-    private val purchases: List<Purchase>,
+    private var purchases: List<Purchase>,
     private val listener: PurchaseInteractionListener
 ) : RecyclerView.Adapter<PurchaseAdapter.PurchaseViewHolder>() {
 
@@ -67,5 +68,12 @@ class PurchaseAdapter(
 
     override fun getItemCount(): Int {
         return purchases.size
+    }
+
+    fun setData(newPurchaseList: List<Purchase>) {
+        val diffUtil = PurchaseDiffUtil(purchases, newPurchaseList)
+        val diffResult = DiffUtil.calculateDiff(diffUtil)
+        purchases = newPurchaseList
+        diffResult.dispatchUpdatesTo(this)
     }
 }

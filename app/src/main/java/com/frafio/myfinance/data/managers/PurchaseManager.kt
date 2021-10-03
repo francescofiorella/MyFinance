@@ -59,11 +59,15 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun deleteAt(position: Int): LiveData<Triple<PurchaseResult, Int?, Int?>> {
-        val response = MutableLiveData<Triple<PurchaseResult, Int?, Int?>>()
+    fun deleteAt(position: Int): LiveData<Pair<PurchaseResult, List<Purchase>>> {
+        val response = MutableLiveData<Pair<PurchaseResult, List<Purchase>>>()
         var totPosition: Int
 
-        val purchaseList = PurchaseStorage.purchaseList
+        val purchaseList = mutableListOf<Purchase>()
+
+        PurchaseStorage.purchaseList.forEach {
+            purchaseList.add(it)
+        }
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
@@ -74,8 +78,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     purchaseList.removeAt(position)
                     PurchaseStorage.purchaseList = purchaseList
 
-                    response.value =
-                        Triple(PurchaseResult(PurchaseCode.TOTAL_DELETE_SUCCESS), position, null)
+                    response.value = Pair(PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS), purchaseList)
                 } else if (purchaseList[position].type != DbPurchases.TYPES.TICKET.value) {
                     for (i in position - 1 downTo 0) {
                         if (purchaseList[i].type == DbPurchases.TYPES.TOTAL.value) {
@@ -96,20 +99,11 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                                 .set(purchaseList[i]).addOnSuccessListener {
                                     PurchaseStorage.purchaseList = purchaseList
 
-                                    response.value =
-                                        Triple(
-                                            PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
-                                            position,
-                                            totPosition
-                                        )
+                                    response.value = Pair(PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS), purchaseList)
                                 }.addOnFailureListener { e ->
                                     Log.e(TAG, "Error! ${e.localizedMessage}")
 
-                                    response.value = Triple(
-                                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE),
-                                        null,
-                                        null
-                                    )
+                                    response.value = Pair(PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE), purchaseList)
                                 }
                             break
                         }
@@ -118,14 +112,12 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     purchaseList.removeAt(position)
                     PurchaseStorage.purchaseList = purchaseList
 
-                    response.value =
-                        Triple(PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS), position, null)
+                    response.value = Pair(PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS), purchaseList)
                 }
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
 
-                response.value =
-                    Triple(PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE), null, null)
+                response.value = Pair(PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE), purchaseList)
             }
 
         return response

@@ -102,7 +102,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return stats
     }
 
-    fun deletePurchaseAt(position: Int): LiveData<Triple<PurchaseResult, Int?, Int?>> {
+    fun deletePurchaseAt(position: Int): LiveData<Pair<PurchaseResult, List<Purchase>>> {
         return purchaseManager.deleteAt(position)
     }
 
