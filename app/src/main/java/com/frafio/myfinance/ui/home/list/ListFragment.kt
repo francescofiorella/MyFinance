@@ -151,13 +151,17 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         }
     }
 
-    override fun onDeleteComplete(response: LiveData<Pair<PurchaseResult, List<Purchase>>>) {
+    override fun onDeleteComplete(response: LiveData<Triple<PurchaseResult, List<Purchase>, Int?>>) {
         response.observe(viewLifecycleOwner, { value ->
             val result = value.first
             val newList = value.second
+            val totPosition = value.third
 
-            if (result.code == PurchaseCode.PURCHASE_DELETE_SUCCESS.code) {
-                (binding.listRecyclerView.adapter as PurchaseAdapter).setData(newList)
+            if (result.code != PurchaseCode.PURCHASE_DELETE_FAILURE.code) {
+                totPosition?.let {
+                    binding.listRecyclerView.adapter!!.notifyItemChanged(it)
+                }
+                (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(newList)
             }
 
             (activity as HomeActivity).showSnackbar(result.message)

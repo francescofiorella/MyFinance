@@ -70,7 +70,7 @@ class PurchaseAdapter(
         return purchases.size
     }
 
-    fun setData(newPurchaseList: List<Purchase>) {
+    fun updateData(newPurchaseList: List<Purchase>) {
         val diffUtil = PurchaseDiffUtil(purchases, newPurchaseList)
         val diffResult = DiffUtil.calculateDiff(diffUtil)
         purchases = newPurchaseList
