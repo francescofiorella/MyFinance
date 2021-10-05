@@ -196,4 +196,8 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
     fun getSelectedCollection(): String {
         return purchaseManager.getSelectedCollection()
     }
+
+    fun existLastYear(): Boolean {
+        return PurchaseStorage.existLastYear
+    }
 }

@@ -40,7 +40,6 @@ class MenuFragment : BaseFragment(), MenuListener {
             }
         }
 
-
         return binding.root
     }
 

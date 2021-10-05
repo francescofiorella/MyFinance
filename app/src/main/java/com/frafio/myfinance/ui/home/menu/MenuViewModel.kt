@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.home.menu
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.BuildConfig
 import com.frafio.myfinance.data.enums.db.DbPurchases
@@ -11,6 +12,8 @@ class MenuViewModel(
     var listener: MenuListener? = null
 
     var isSwitchChecked: Boolean = getChecked()
+
+    var isLastYearOk: Boolean = purchaseRepository.existLastYear()
 
     val versionName: String = "MyFinance ${BuildConfig.VERSION_NAME}"
 
@@ -25,7 +28,7 @@ class MenuViewModel(
         listener?.onCompleted(response)
     }
 
-    private fun getChecked() : Boolean {
+    private fun getChecked(): Boolean {
         return purchaseRepository.getSelectedCollection() == DbPurchases.COLLECTIONS.ZERO_UNO.value
     }
 }

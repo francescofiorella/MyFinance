@@ -204,6 +204,8 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
     fun updateUserData(): LiveData<AuthResult> {
         val response = MutableLiveData<AuthResult>()
 
+        checkLastYear()
+
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!).collection(getSharedCollection(sharedPreferences))
             .whereEqualTo(DbPurchases.FIELDS.EMAIL.value, UserStorage.user!!.email)
@@ -233,5 +235,13 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
             }
 
         return response
+    }
+
+    fun checkLastYear() {
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.ZERO_UNO.value)
+            .get().addOnSuccessListener { queryDocumentSnapshots ->
+                PurchaseStorage.existLastYear = !queryDocumentSnapshots.isEmpty
+            }
     }
 }

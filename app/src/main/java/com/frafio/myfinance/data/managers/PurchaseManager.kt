@@ -74,7 +74,11 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     purchaseList.removeAt(position)
                     PurchaseStorage.purchaseList = purchaseList
 
-                    response.value = Triple(PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS), purchaseList, null)
+                    response.value = Triple(
+                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
+                        purchaseList,
+                        null
+                    )
                 } else if (purchaseList[position].type != DbPurchases.TYPES.TICKET.value) {
                     for (i in position - 1 downTo 0) {
                         if (purchaseList[i].type == DbPurchases.TYPES.TOTAL.value) {
@@ -95,11 +99,19 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                                 .set(purchaseList[i]).addOnSuccessListener {
                                     PurchaseStorage.purchaseList = purchaseList
 
-                                    response.value = Triple(PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS), purchaseList, totPosition)
+                                    response.value = Triple(
+                                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
+                                        purchaseList,
+                                        totPosition
+                                    )
                                 }.addOnFailureListener { e ->
                                     Log.e(TAG, "Error! ${e.localizedMessage}")
 
-                                    response.value = Triple(PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE), purchaseList, totPosition)
+                                    response.value = Triple(
+                                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE),
+                                        purchaseList,
+                                        totPosition
+                                    )
                                 }
                             break
                         }
@@ -108,12 +120,17 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     purchaseList.removeAt(position)
                     PurchaseStorage.purchaseList = purchaseList
 
-                    response.value = Triple(PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS), purchaseList, null)
+                    response.value = Triple(
+                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
+                        purchaseList,
+                        null
+                    )
                 }
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
 
-                response.value = Triple(PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE), purchaseList, null)
+                response.value =
+                    Triple(PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE), purchaseList, null)
             }
 
         return response
