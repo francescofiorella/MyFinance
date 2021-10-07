@@ -71,7 +71,7 @@ class MenuFragment : BaseFragment(), MenuListener {
                         }
 
                         lineChart.clearChart()
-                        setData(lineChart, viewModel.avgTrendList)
+                        setData(lineChart, list)
                     }
                 }
 
