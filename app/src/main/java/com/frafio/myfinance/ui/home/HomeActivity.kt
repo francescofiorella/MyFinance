@@ -241,6 +241,7 @@ class HomeActivity : BaseActivity(), LogoutListener {
     }
 
     fun onProPicClick(view: View) {
+        navController.navigateUp()
         navController.navigate(R.id.profileFragment)
 
         binding.navigationLayout?.let {
