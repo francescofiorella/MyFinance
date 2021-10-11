@@ -96,6 +96,22 @@
             app:layout_constraintTop_toBottomOf="@+id/fragmentTitle"
             app:navGraph="@navigation/nav_graph" />
 
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/home_addExtBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:contentDescription="@string/addBtnContentDescription"
+            android:onClick="onAddButtonClick"
+            android:text="@string/aggiungi"
+            android:textColor="@color/primary_text"
+            app:backgroundTint="@color/accent"
+            app:elevation="@dimen/card_elevation"
+            app:icon="@drawable/ic_add"
+            app:iconTint="@color/primary_text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
