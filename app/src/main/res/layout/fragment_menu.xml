@@ -55,16 +55,27 @@
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
 
+                        <ImageView
+                            android:id="@+id/chart_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/chart_icon"
+                            android:src="@drawable/ic_trending_up"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView10"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/textView10" />
+
                         <TextView
                             android:id="@+id/textView10"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
                             android:fontFamily="@font/nunito_semibold"
                             android:paddingBottom="5dp"
                             android:text="@string/trend_media_giornaliera"
                             android:textColor="@color/primary_text"
                             android:textSize="20sp"
-                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/chart_icon"
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <org.eazegraph.lib.charts.ValueLineChart
@@ -96,23 +107,60 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/collection_switch"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/collection_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/card_full_margin"
                 android:layout_marginTop="@dimen/fragment_margin_top"
-                android:background="@drawable/bg_edit_text"
-                android:elevation="@dimen/card_elevation"
-                android:fontFamily="@font/nunito"
-                android:paddingHorizontal="25dp"
-                android:paddingVertical="15dp"
-                android:text="@string/mostra_2020_2021"
-                android:textSize="18sp"
                 android:visibility="@{viewmodel.isLastYearOk ? View.VISIBLE : View.GONE}"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/chart_card" />
+                app:layout_constraintTop_toBottomOf="@id/chart_card">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingHorizontal="25dp">
+
+                    <ImageView
+                        android:id="@+id/collection_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/collection_icon"
+                        android:src="@drawable/ic_visibility"
+                        app:layout_constraintBottom_toBottomOf="@+id/collection_TV"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/collection_TV" />
+
+                    <TextView
+                        android:id="@+id/collection_TV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:fontFamily="@font/nunito"
+                        android:text="@string/mostra_2020_2021"
+                        android:textColor="@color/primary_text"
+                        android:textSize="18sp"
+                        android:paddingVertical="15dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/collection_icon"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/collection_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/version_card"
@@ -127,7 +175,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/collection_switch"
+                app:layout_constraintTop_toBottomOf="@id/collection_card"
                 app:layout_constraintVertical_bias="0.0">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -136,16 +184,27 @@
                     android:paddingHorizontal="25dp"
                     android:paddingVertical="15dp">
 
-                    <TextView
-                        android:id="@+id/profile_appVersion_TV"
+                    <ImageView
+                        android:id="@+id/version_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:contentDescription="@string/version_icon"
+                        android:src="@drawable/ic_android"
+                        app:layout_constraintBottom_toBottomOf="@id/version_TV"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/version_TV" />
+
+                    <TextView
+                        android:id="@+id/version_TV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
                         android:fontFamily="@font/nunito"
                         android:text="@{viewmodel.versionName}"
                         android:textColor="@color/primary_text"
                         android:textSize="18sp"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/version_icon"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="MyFinance 1.0.0" />
 

@@ -14,12 +14,18 @@
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable-v24/ic_password_confirm.xml" value="0.175" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable-v24/ic_person.xml" value="0.175" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/dashboard_empty_image.xml" value="0.19583333333333333" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/home_24.xml" value="1.075" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_audit_amico.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_audit_pana.xml" value="0.19583333333333333" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_baseline_show_chart_24.xml" value="0.19583333333333333" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_baseline_trending_up_24.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_create.xml" value="0.175" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_email.xml" value="0.175" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_euro.xml" value="0.175" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_game_analytics_bro.xml" value="0.1" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_home.xml" value="0.19583333333333333" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_home_solid.xml" value="0.19583333333333333" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_homee.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_late_at_night_amico.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_list_alt.xml" value="0.175" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_memory_storage_rafiki.xml" value="0.19583333333333333" />
@@ -28,6 +34,7 @@
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_overcome_amico.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_shared_goals_amico.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/ic_starry_window_pana.xml" value="0.19583333333333333" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/icon_home.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/image_empty_dashboard.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/image_empty_list.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/lista_empty_image.xml" value="0.19583333333333333" />

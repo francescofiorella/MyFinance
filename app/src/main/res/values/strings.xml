@@ -70,4 +70,7 @@
     <string name="mostra_2020_2021">Mostra 2020/2021</string>
     <string name="dashboard_empty">dashboard_empty</string>
     <string name="list_empty">list_empty</string>
+    <string name="chart_icon">Chart Icon</string>
+    <string name="version_icon">Version Icon</string>
+    <string name="collection_icon">Collection Icon</string>
 </resources>

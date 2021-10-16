@@ -51,13 +51,16 @@ class MenuFragment : BaseFragment(), MenuListener {
 
     override fun onStarted() {
         (activity as HomeActivity).showProgressIndicator()
+        binding.collectionSwitch.isEnabled = false
     }
 
     override fun onCompleted(result: LiveData<PurchaseResult>) {
         result.observe(this, { purchaseResult ->
+            (activity as HomeActivity).hideProgressIndicator()
+            binding.collectionSwitch.isEnabled = true
+
             when (purchaseResult.code) {
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
-                    (activity as HomeActivity).hideProgressIndicator()
 
                     binding.lineChart.also { lineChart ->
                         val list = viewModel.avgTrendList
@@ -75,7 +78,9 @@ class MenuFragment : BaseFragment(), MenuListener {
                     }
                 }
 
-                else -> (activity as HomeActivity).showSnackbar(purchaseResult.message)
+                else -> {
+                    (activity as HomeActivity).showSnackbar(purchaseResult.message)
+                }
             }
         })
     }
