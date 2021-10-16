@@ -7,7 +7,7 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.utils.dateToString
-import com.frafio.myfinance.utils.doubleToString
+import com.frafio.myfinance.utils.doubleToPrice
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -90,12 +90,12 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         monthAvg = tot / nMonth
 
         val stats = mutableListOf<String>()
-        stats.add("€ ${doubleToString(dayAvg)}")
-        stats.add("€ ${doubleToString(monthAvg)}")
-        stats.add("€ ${doubleToString(todayTot)}")
-        stats.add("€ ${doubleToString(tot)}")
+        stats.add(doubleToPrice(dayAvg))
+        stats.add(doubleToPrice(monthAvg))
+        stats.add(doubleToPrice(todayTot))
+        stats.add(doubleToPrice(tot))
         stats.add(numTot.toString())
-        stats.add("€ ${doubleToString(ticketTot)}")
+        stats.add(doubleToPrice(ticketTot))
         stats.add(trenTot.toString())
         stats.add(amTot.toString())
 
