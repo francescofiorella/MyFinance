@@ -133,7 +133,7 @@ class LoginActivity : BaseActivity(), AuthListener {
                     }
                 }
 
-                else -> Unit
+                else -> snackbar(authResult.message)
             }
         })
     }
@@ -151,7 +151,7 @@ class LoginActivity : BaseActivity(), AuthListener {
             AuthCode.SHORT_PASSWORD.code ->
                 binding.loginPasswordInputLayout.error = authResult.message
 
-            else -> Unit
+            else -> snackbar(authResult.message)
         }
     }
 }

@@ -70,7 +70,7 @@ class SignupActivity : BaseActivity(), AuthListener {
                         finish()
                     }
 
-                else -> Unit
+                else -> snackbar(authResult.message)
             }
         })
     }
@@ -96,7 +96,7 @@ class SignupActivity : BaseActivity(), AuthListener {
             AuthCode.PASSWORD_NOT_MATCH.code ->
                 binding.signupPasswordConfirmInputLayout.error = authResult.message
 
-            else -> Unit
+            else -> snackbar(authResult.message)
         }
     }
 
