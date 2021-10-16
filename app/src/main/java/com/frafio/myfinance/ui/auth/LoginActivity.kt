@@ -145,7 +145,10 @@ class LoginActivity : BaseActivity(), AuthListener {
             AuthCode.EMPTY_EMAIL.code ->
                 binding.loginEmailInputLayout.error = authResult.message
 
-            AuthCode.EMPTY_PASSWORD.code or AuthCode.SHORT_PASSWORD.code ->
+            AuthCode.EMPTY_PASSWORD.code ->
+                binding.loginPasswordInputLayout.error = authResult.message
+
+            AuthCode.SHORT_PASSWORD.code ->
                 binding.loginPasswordInputLayout.error = authResult.message
 
             else -> Unit
