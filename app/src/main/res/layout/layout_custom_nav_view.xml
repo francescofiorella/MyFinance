@@ -34,7 +34,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_home"
+                    app:srcCompat="@drawable/ic_baseline_home"
                     app:tint="@color/nav_item_color" />
 
                 <TextView
@@ -79,7 +79,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_list_alt"
+                    app:srcCompat="@drawable/ic_format_list_bulleted"
                     app:tint="@color/nav_item_color" />
 
                 <TextView
@@ -125,7 +125,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_account_circle"
+                    app:srcCompat="@drawable/ic_baseline_account_circle"
                     app:tint="@color/nav_item_color" />
 
                 <TextView
