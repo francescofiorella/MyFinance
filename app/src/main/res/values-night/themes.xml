@@ -19,16 +19,4 @@
         <item name="materialCalendarTheme">@style/ThemeOverlay.MyFinance.DatePicker</item>
         <item name="textInputStyle">@style/Widget.MyFinance.TextInputLayout.OutlinedBox</item>
     </style>
-
-    <!--Material DatePicker theme. -->
-    <style name="ThemeOverlay.MyFinance.DatePicker" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
-        <item name="android:fontFamily">@font/nunito</item>
-        <item name="buttonBarPositiveButtonStyle">@style/Widget.MyFinance.DatePicker.Button</item>
-        <item name="buttonBarNegativeButtonStyle">@style/Widget.MyFinance.DatePicker.Button</item>
-        <item name="shapeAppearanceMediumComponent">
-            @style/ShapeAppearance.MyFinance.MediumComponent
-        </item>
-        <item name="backgroundTint">@color/accent</item>
-        <item name="android:backgroundTint">@color/card_bg</item>
-    </style>
 </resources>
