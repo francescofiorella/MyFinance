@@ -131,6 +131,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:contentDescription="@string/collection_icon"
+                        android:paddingVertical="15dp"
                         android:src="@drawable/ic_visibility"
                         app:layout_constraintBottom_toBottomOf="@+id/collection_TV"
                         app:layout_constraintStart_toStartOf="parent"
@@ -145,10 +146,9 @@
                         android:text="@string/mostra_2020_2021"
                         android:textColor="@color/primary_text"
                         android:textSize="18sp"
-                        android:paddingVertical="15dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@id/collection_icon"
-                        app:layout_constraintTop_toTopOf="parent"/>
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/collection_switch"
