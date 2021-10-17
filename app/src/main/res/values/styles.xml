@@ -34,4 +34,7 @@
         <item name="android:textColor">@color/accent</item>
         <item name="fontFamily">@font/nunito_bold</item>
     </style>
+    <style name="ShapeAppearance.MyFinance.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerSize">@dimen/card_corner_radius</item>
+    </style>
 </resources>

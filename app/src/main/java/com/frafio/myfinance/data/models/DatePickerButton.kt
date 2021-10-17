@@ -72,7 +72,6 @@ open class DatePickerButton(
             val builder = MaterialDatePicker.Builder.datePicker()
             builder.setTitleText(DATE_PICKER_TITLE)
             builder.setSelection(today)
-            builder.setTheme(R.style.ThemeOverlay_MyFinance_DatePicker)
             val materialDatePicker = builder.build()
 
             showDatePicker(materialDatePicker)
