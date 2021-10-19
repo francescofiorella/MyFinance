@@ -63,7 +63,8 @@
                             android:src="@drawable/ic_trending_up"
                             app:layout_constraintBottom_toBottomOf="@+id/textView10"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="@+id/textView10" />
+                            app:layout_constraintTop_toTopOf="@+id/textView10"
+                            app:tint="@color/primary_text" />
 
                         <TextView
                             android:id="@+id/textView10"
@@ -135,7 +136,8 @@
                         android:src="@drawable/ic_visibility"
                         app:layout_constraintBottom_toBottomOf="@+id/collection_TV"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/collection_TV" />
+                        app:layout_constraintTop_toTopOf="@+id/collection_TV"
+                        app:tint="@color/primary_text" />
 
                     <TextView
                         android:id="@+id/collection_TV"
@@ -192,7 +194,8 @@
                         android:src="@drawable/ic_android"
                         app:layout_constraintBottom_toBottomOf="@id/version_TV"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/version_TV" />
+                        app:layout_constraintTop_toTopOf="@id/version_TV"
+                        app:tint="@color/primary_text" />
 
                     <TextView
                         android:id="@+id/version_TV"
