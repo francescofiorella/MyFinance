@@ -85,13 +85,13 @@ class HomeActivity : BaseActivity(), HomeListener {
             object : ViewTreeObserver.OnPreDrawListener {
                 override fun onPreDraw(): Boolean {
                     // Check if the initial data is ready.
-                    viewModel.checkUser()
                     return if (viewModel.isReady) {
                         // The content is ready; start drawing.
                         content.viewTreeObserver.removeOnPreDrawListener(this)
                         true
                     } else {
                         // The content is not ready; suspend.
+                        viewModel.checkUser()
                         false
                     }
                 }
