@@ -2,9 +2,13 @@ package com.frafio.myfinance.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
+import android.view.ViewTreeObserver
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -24,7 +28,7 @@ import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.snackbar
 import org.kodein.di.generic.instance
 
-class HomeActivity : BaseActivity(), LogoutListener {
+class HomeActivity : BaseActivity(), HomeListener {
 
     // definizione variabili
     private lateinit var binding: ActivityHomeBinding
@@ -66,10 +70,33 @@ class HomeActivity : BaseActivity(), LogoutListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // inizializza la splashScreen
+        installSplashScreen()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
-        viewModel.logoutListener = this
+        viewModel.listener = this
         binding.viewmodel = viewModel
+
+        // importa i dati dal db
+        val content: View = findViewById(android.R.id.content)
+        binding.propicImageView.viewTreeObserver.addOnPreDrawListener(
+            object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    // Check if the initial data is ready.
+                    viewModel.checkUser()
+                    return if (viewModel.isReady) {
+                        // The content is ready; start drawing.
+                        content.viewTreeObserver.removeOnPreDrawListener(this)
+                        true
+                    } else {
+                        // The content is not ready; suspend.
+                        false
+                    }
+                }
+            }
+        )
 
         // collegamento view
         val navHostFragment =
@@ -236,6 +263,41 @@ class HomeActivity : BaseActivity(), LogoutListener {
                     it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(it)
                 }
+            }
+        })
+    }
+
+    override fun onSplashOperationComplete(response: LiveData<AuthResult>) {
+        response.observe(this, { authResult ->
+            when (authResult.code) {
+                AuthCode.USER_LOGGED.code -> {
+                    viewModel.updateUserData()
+                }
+
+                AuthCode.USER_NOT_LOGGED.code -> {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        ActivityOptionsCompat
+                            .makeCustomAnimation(
+                                applicationContext,
+                                android.R.anim.fade_in,
+                                android.R.anim.fade_out
+                            ).also { options ->
+                                Intent(applicationContext, LoginActivity::class.java).also {
+                                    it.flags =
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    startActivity(it, options.toBundle())
+                                }
+                            }
+                    }, 1000)
+                }
+
+                AuthCode.USER_DATA_UPDATED.code -> {
+                    viewModel.isReady = true
+                }
+
+                AuthCode.USER_DATA_NOT_UPDATED.code -> snackbar(authResult.message)
+
+                else -> Unit
             }
         })
     }
