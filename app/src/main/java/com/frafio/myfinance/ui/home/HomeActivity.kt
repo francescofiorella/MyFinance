@@ -2,11 +2,10 @@ package com.frafio.myfinance.ui.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
@@ -72,31 +71,18 @@ class HomeActivity : BaseActivity(), HomeListener {
         super.onCreate(savedInstanceState)
 
         // inizializza la splashScreen
-        installSplashScreen()
+        if (!intent.hasExtra("${getString(R.string.default_path)}.userRequest")
+            && savedInstanceState == null) {
+            setTheme(R.style.Theme_MyFinance_SplashScreen)
+            installSplashScreen()
+        } else {
+            setTheme(R.style.Theme_MyFinance)
+        }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
         viewModel.listener = this
         binding.viewmodel = viewModel
-
-        // importa i dati dal db
-        val content: View = findViewById(android.R.id.content)
-        binding.propicImageView.viewTreeObserver.addOnPreDrawListener(
-            object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    // Check if the initial data is ready.
-                    return if (viewModel.isReady) {
-                        // The content is ready; start drawing.
-                        content.viewTreeObserver.removeOnPreDrawListener(this)
-                        true
-                    } else {
-                        // The content is not ready; suspend.
-                        viewModel.checkUser()
-                        false
-                    }
-                }
-            }
-        )
 
         // collegamento view
         val navHostFragment =
@@ -106,6 +92,43 @@ class HomeActivity : BaseActivity(), HomeListener {
         binding.homeBottomNavView?.setupWithNavController(navController)
 
         if (savedInstanceState == null) {
+            // importa i dati dal db
+            viewModel.checkUser()
+
+            findViewById<View>(android.R.id.content).also{ content ->
+                binding.propicImageView.viewTreeObserver.addOnPreDrawListener(
+                    object : ViewTreeObserver.OnPreDrawListener {
+                        override fun onPreDraw(): Boolean {
+                            // Check if the initial data is ready.
+                            return if (viewModel.isReady && !viewModel.isLoginRequired) {
+                                // The content is ready; start drawing.
+                                content.viewTreeObserver.removeOnPreDrawListener(this)
+
+                                true
+                            } else if (viewModel.isLoginRequired) {
+                                // user is not logged; go to login
+                                content.viewTreeObserver.removeOnPreDrawListener(this)
+                                ActivityOptionsCompat.makeCustomAnimation(
+                                    applicationContext,
+                                    android.R.anim.fade_in,
+                                    android.R.anim.fade_out
+                                ).also { options ->
+                                    Intent(applicationContext, LoginActivity::class.java).also {
+                                        it.flags =
+                                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        startActivity(it, options.toBundle())
+                                    }
+                                }
+                                true
+                            } else {
+                                // The content is not ready; suspend.
+                                false
+                            }
+                        }
+                    }
+                )
+            }
+
             setNavCustomLayout(true, binding.landHolder != null)
 
             // controlla se si è appena fatto l'accesso
@@ -275,20 +298,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                 }
 
                 AuthCode.USER_NOT_LOGGED.code -> {
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        ActivityOptionsCompat
-                            .makeCustomAnimation(
-                                applicationContext,
-                                android.R.anim.fade_in,
-                                android.R.anim.fade_out
-                            ).also { options ->
-                                Intent(applicationContext, LoginActivity::class.java).also {
-                                    it.flags =
-                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                    startActivity(it, options.toBundle())
-                                }
-                            }
-                    }, 1000)
+                    viewModel.isLoginRequired = true
                 }
 
                 AuthCode.USER_DATA_UPDATED.code -> {

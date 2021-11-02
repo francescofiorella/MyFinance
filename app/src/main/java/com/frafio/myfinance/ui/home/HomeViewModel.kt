@@ -10,6 +10,7 @@ class HomeViewModel(
 ) : ViewModel(){
     val proPic: String? = userRepository.getProPic()
     var isReady: Boolean = false
+    var isLoginRequired: Boolean = false
 
     var listener: HomeListener? = null
 
