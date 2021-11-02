@@ -21,6 +21,10 @@
         <item name="textInputStyle">@style/Widget.MyFinance.TextInputLayout.OutlinedBox</item>
     </style>
 
+    <style name="Theme.MyFinance.SplashScreen" parent="Theme.MyFinance">
+        <item name="android:statusBarColor" tools:targetApi="l">@color/icon_bg</item>
+    </style>
+
     <!--BottomNavigationView theme. -->
     <style name="Widget.MyFinance.BottomNavigationView" parent="Widget.Design.BottomNavigationView">
         <item name="fontFamily">@font/nunito</item>

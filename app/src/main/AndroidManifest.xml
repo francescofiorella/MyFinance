@@ -14,7 +14,8 @@
         android:theme="@style/Theme.MyFinance">
         <activity
             android:name=".ui.splash.SplashScreenActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.MyFinance.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

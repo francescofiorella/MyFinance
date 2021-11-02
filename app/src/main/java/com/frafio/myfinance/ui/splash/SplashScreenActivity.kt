@@ -22,7 +22,7 @@ import org.kodein.di.generic.instance
 class SplashScreenActivity : BaseActivity(), SplashScreenListener {
 
     companion object {
-        private const val SPLASH_TIME: Long = 1000
+        private const val SPLASH_TIME: Long = 500
         private const val LOAD_DELAY: Long = 2000
     }
 
@@ -37,8 +37,6 @@ class SplashScreenActivity : BaseActivity(), SplashScreenListener {
         viewModel = ViewModelProvider(this, factory).get(SplashScreenViewModel::class.java)
 
         viewModel.listener = this
-
-        setFullScreenEnabled(true)
 
         viewModel.checkUser()
     }
