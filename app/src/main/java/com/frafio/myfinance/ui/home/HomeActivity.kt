@@ -69,8 +69,9 @@ class HomeActivity : BaseActivity(), HomeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val splashScreen = installSplashScreen()
-        splashScreen.setKeepVisibleCondition(splashExitCondition)
+        nstallSplashScreen().also{
+            it.setKeepVisibleCondition(splashExitCondition)
+        }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
