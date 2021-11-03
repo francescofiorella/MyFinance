@@ -3,10 +3,9 @@ package com.frafio.myfinance.ui.home
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.ViewTreeObserver
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
@@ -24,6 +23,7 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
+import com.frafio.myfinance.utils.loadImage
 import com.frafio.myfinance.utils.snackbar
 import org.kodein.di.generic.instance
 
@@ -49,7 +49,6 @@ class HomeActivity : BaseActivity(), HomeListener {
                     if (view.selectedItemId == R.id.listFragment) {
                         navController.popBackStack()
                     }
-
                     navController.navigate(R.id.listFragment)
                 }
 
@@ -70,85 +69,26 @@ class HomeActivity : BaseActivity(), HomeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // inizializza la splashScreen
-        if (!intent.hasExtra("${getString(R.string.default_path)}.userRequest")
-            && savedInstanceState == null) {
-            setTheme(R.style.Theme_MyFinance_SplashScreen)
-            installSplashScreen()
-        } else {
-            setTheme(R.style.Theme_MyFinance)
-        }
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepVisibleCondition(splashExitCondition)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
         viewModel.listener = this
         binding.viewmodel = viewModel
 
-        // collegamento view
+        // importa i dati dal db
+        viewModel.checkUser()
+
+        // collegamento fragment view
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
-        navController = navHostFragment.navController
-
-        binding.homeBottomNavView?.setupWithNavController(navController)
+        navController = navHostFragment.navController.also {
+            binding.homeBottomNavView?.setupWithNavController(it)
+        }
 
         if (savedInstanceState == null) {
-            // importa i dati dal db
-            viewModel.checkUser()
-
-            findViewById<View>(android.R.id.content).also{ content ->
-                binding.propicImageView.viewTreeObserver.addOnPreDrawListener(
-                    object : ViewTreeObserver.OnPreDrawListener {
-                        override fun onPreDraw(): Boolean {
-                            // Check if the initial data is ready.
-                            return if (viewModel.isReady && !viewModel.isLoginRequired) {
-                                // The content is ready; start drawing.
-                                content.viewTreeObserver.removeOnPreDrawListener(this)
-
-                                true
-                            } else if (viewModel.isLoginRequired) {
-                                // user is not logged; go to login
-                                content.viewTreeObserver.removeOnPreDrawListener(this)
-                                ActivityOptionsCompat.makeCustomAnimation(
-                                    applicationContext,
-                                    android.R.anim.fade_in,
-                                    android.R.anim.fade_out
-                                ).also { options ->
-                                    Intent(applicationContext, LoginActivity::class.java).also {
-                                        it.flags =
-                                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                        startActivity(it, options.toBundle())
-                                    }
-                                }
-                                true
-                            } else {
-                                // The content is not ready; suspend.
-                                false
-                            }
-                        }
-                    }
-                )
-            }
-
             setNavCustomLayout(true, binding.landHolder != null)
-
-            // controlla se si è appena fatto l'accesso
-            if (intent.hasExtra("${getString(R.string.default_path)}.userRequest")) {
-                val userRequest =
-                    intent.extras?.getBoolean(
-                        "${getString(R.string.default_path)}.userRequest",
-                        false
-                    ) ?: false
-
-                val userName =
-                    intent.extras?.getString("${getString(R.string.default_path)}.userName")
-
-                if (userRequest) {
-                    snackbar(
-                        "${getString(R.string.login_successful)} $userName",
-                        binding.homeAddBtn
-                    )
-                }
-            }
         }
     }
 
@@ -252,6 +192,34 @@ class HomeActivity : BaseActivity(), HomeListener {
         }
     }
 
+    private val splashExitCondition = SplashScreen.KeepOnScreenCondition {
+        viewModel.isReady
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // controlla se si è appena fatto il login
+        if (intent.hasExtra("${getString(R.string.default_path)}.userRequest")) {
+            val userRequest =
+                intent.extras?.getBoolean(
+                    "${getString(R.string.default_path)}.userRequest",
+                    false
+                ) ?: false
+
+            val userName =
+                intent.extras?.getString("${getString(R.string.default_path)}.userName")
+
+            if (userRequest) {
+                snackbar(
+                    "${getString(R.string.login_successful)} $userName",
+                    binding.homeAddBtn
+                )
+            }
+
+            intent.replaceExtras(null)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         navController.addOnDestinationChangedListener(listener)
@@ -295,13 +263,22 @@ class HomeActivity : BaseActivity(), HomeListener {
             when (authResult.code) {
                 AuthCode.USER_LOGGED.code -> {
                     viewModel.updateUserData()
+
+                    viewModel.isLoginRequired = false
+                    viewModel.isReady = false
                 }
 
                 AuthCode.USER_NOT_LOGGED.code -> {
                     viewModel.isLoginRequired = true
+                    viewModel.isReady = true
                 }
 
                 AuthCode.USER_DATA_UPDATED.code -> {
+                    navController.popBackStack()
+                    navController.navigate(R.id.dashboardFragment)
+                    loadImage(binding.propicImageView, viewModel.proPic)
+
+                    viewModel.isLoginRequired = false
                     viewModel.isReady = true
                 }
 
@@ -313,11 +290,17 @@ class HomeActivity : BaseActivity(), HomeListener {
     }
 
     fun onProPicClick(view: View) {
-        navController.navigateUp()
-        navController.navigate(R.id.profileFragment)
+        if (viewModel.isLoginRequired) {
+            Intent(applicationContext, LoginActivity::class.java).also {
+                startActivity(it)
+            }
+        } else {
+            navController.navigateUp()
+            navController.navigate(R.id.profileFragment)
 
-        binding.navigationLayout?.let {
-            navCustom.selectedItem = CustomNavigation.Item.ITEM_3
+            binding.navigationLayout?.let {
+                navCustom.selectedItem = CustomNavigation.Item.ITEM_3
+            }
         }
     }
 

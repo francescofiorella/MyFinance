@@ -56,12 +56,11 @@
                 android:layout_width="@dimen/propic_size"
                 android:layout_height="@dimen/propic_size"
                 android:layout_marginEnd="@dimen/propic_margin_end"
-                android:onClick="onProPicClick"
                 android:contentDescription="@string/propic"
+                android:onClick="onProPicClick"
                 app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/fragmentTitle"
-
                 app:srcCompat="@drawable/ic_user" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton

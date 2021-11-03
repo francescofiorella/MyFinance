@@ -24,7 +24,6 @@ class HomeViewModel(
     }
 
     fun updateUserData() {
-        val response = userRepository.updateUserData()
-        listener?.onSplashOperationComplete(response)
+        listener?.onSplashOperationComplete(userRepository.updateUserData())
     }
 }
