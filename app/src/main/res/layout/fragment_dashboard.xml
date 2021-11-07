@@ -9,10 +9,6 @@
         <import type="android.view.View" />
 
         <variable
-            name="parentVM"
-            type="com.frafio.myfinance.ui.home.HomeViewModel" />
-
-        <variable
             name="viewmodel"
             type="com.frafio.myfinance.ui.home.dashboard.DashboardViewModel" />
 
@@ -52,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="50dp"
                 android:fontFamily="@font/nunito_semibold"
-                android:text="@{parentVM.isLoginRequired ? @string/warning_home : @string/warning_not_logged_home}"
+                android:text="@{viewmodel.isLogged ? @string/warning_home : @string/warning_not_logged_home}"
                 android:textAlignment="center"
                 android:textColor="@color/primary_text"
                 android:textSize="21sp"

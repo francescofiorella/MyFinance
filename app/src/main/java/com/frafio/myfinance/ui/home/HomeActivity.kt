@@ -2,6 +2,7 @@ package com.frafio.myfinance.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.app.ActivityOptionsCompat
@@ -15,12 +16,14 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
+import com.frafio.myfinance.data.managers.AuthManager
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.models.CustomNavigation
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
+import com.frafio.myfinance.ui.auth.SignupActivity
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.loadImage
@@ -66,10 +69,31 @@ class HomeActivity : BaseActivity(), HomeListener {
         }
     }
 
+    private val logInResultLauncher =
+        registerForActivityResult(StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val userRequest =
+                    intent.extras?.getBoolean(
+                        "${getString(R.string.default_path)}.userRequest",
+                        false
+                    ) ?: false
+
+                val userName =
+                    intent.extras?.getString("${getString(R.string.default_path)}.userName")
+
+                if (userRequest) {
+                    snackbar(
+                        "${getString(R.string.login_successful)} $userName",
+                        binding.homeAddBtn
+                    )
+                }
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        nstallSplashScreen().also{
+        installSplashScreen().also {
             it.setKeepVisibleCondition(splashExitCondition)
         }
 
@@ -194,31 +218,7 @@ class HomeActivity : BaseActivity(), HomeListener {
     }
 
     private val splashExitCondition = SplashScreen.KeepOnScreenCondition {
-        viewModel.isReady
-    }
-
-    override fun onStart() {
-        super.onStart()
-        // controlla se si è appena fatto il login
-        if (intent.hasExtra("${getString(R.string.default_path)}.userRequest")) {
-            val userRequest =
-                intent.extras?.getBoolean(
-                    "${getString(R.string.default_path)}.userRequest",
-                    false
-                ) ?: false
-
-            val userName =
-                intent.extras?.getString("${getString(R.string.default_path)}.userName")
-
-            if (userRequest) {
-                snackbar(
-                    "${getString(R.string.login_successful)} $userName",
-                    binding.homeAddBtn
-                )
-            }
-
-            intent.replaceExtras(null)
-        }
+        !viewModel.isReady
     }
 
     override fun onResume() {
@@ -251,10 +251,7 @@ class HomeActivity : BaseActivity(), HomeListener {
     override fun onLogOutSuccess(response: LiveData<AuthResult>) {
         response.observe(this, { authResult ->
             if (authResult.code == AuthCode.LOGOUT_SUCCESS.code) {
-                Intent(applicationContext, LoginActivity::class.java).also {
-                    it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(it)
-                }
+                goToLogin()
             }
         })
     }
@@ -292,9 +289,7 @@ class HomeActivity : BaseActivity(), HomeListener {
 
     fun onProPicClick(view: View) {
         if (viewModel.isLoginRequired) {
-            Intent(applicationContext, LoginActivity::class.java).also {
-                startActivity(it)
-            }
+            goToLogin()
         } else {
             navController.navigateUp()
             navController.navigate(R.id.profileFragment)
@@ -302,6 +297,12 @@ class HomeActivity : BaseActivity(), HomeListener {
             binding.navigationLayout?.let {
                 navCustom.selectedItem = CustomNavigation.Item.ITEM_3
             }
+        }
+    }
+
+    private fun goToLogin() {
+        Intent(applicationContext, LoginActivity::class.java).also {
+            logInResultLauncher.launch(it)
         }
     }
 

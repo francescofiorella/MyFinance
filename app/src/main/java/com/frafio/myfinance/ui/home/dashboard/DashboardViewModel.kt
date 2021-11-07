@@ -4,10 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.frafio.myfinance.data.repositories.UserRepository
 
 class DashboardViewModel(
-    private val purchaseRepository: PurchaseRepository
+    private val purchaseRepository: PurchaseRepository,
+    userRepository: UserRepository
 ) : ViewModel() {
+    val isLogged: Boolean = userRepository.getIsLogged()
+
     private val _purchaseListSize = MutableLiveData<Int>()
     val purchaseListSize: LiveData<Int>
         get() = _purchaseListSize
