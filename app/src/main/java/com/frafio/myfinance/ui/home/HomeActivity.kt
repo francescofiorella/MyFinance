@@ -9,6 +9,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -103,7 +105,13 @@ class HomeActivity : BaseActivity(), HomeListener {
         super.onCreate(savedInstanceState)
 
         installSplashScreen().also {
-            it.setKeepVisibleCondition(splashExitCondition)
+            it.setKeepVisibleCondition{
+                !viewModel.isLayoutReady
+            }
+            it.setOnExitAnimationListener{ splashScreenViewProvider ->
+                supportFragmentManager.unregisterFragmentLifecycleCallbacks(dashboardCallback)
+                splashScreenViewProvider.remove()
+            }
         }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
@@ -198,6 +206,17 @@ class HomeActivity : BaseActivity(), HomeListener {
         }
     }
 
+    private val dashboardCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
+        override fun onFragmentCreated(
+            fm: FragmentManager,
+            f: Fragment,
+            savedInstanceState: Bundle?
+        ) {
+            super.onFragmentCreated(fm, f, savedInstanceState)
+            viewModel.isLayoutReady = true
+        }
+    }
+
     val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
         when (destination.label) {
             getString(R.string.nav_1) -> {
@@ -224,10 +243,6 @@ class HomeActivity : BaseActivity(), HomeListener {
                 binding.propicImageView.instantShow()
             }
         }
-    }
-
-    private val splashExitCondition = SplashScreen.KeepOnScreenCondition {
-        !viewModel.isLayoutReady
     }
 
     override fun onResume() {
@@ -302,10 +317,9 @@ class HomeActivity : BaseActivity(), HomeListener {
                 }
 
                 AuthCode.USER_DATA_UPDATED.code -> {
-                    reloadDashboard()
+                    supportFragmentManager.registerFragmentLifecycleCallbacks(dashboardCallback, true)
                     loadRoundImage(binding.propicImageView, viewModel.getProPic())
-
-                    viewModel.isLayoutReady = true
+                    reloadDashboard()
                 }
 
                 AuthCode.USER_DATA_NOT_UPDATED.code -> snackbar(authResult.message)
