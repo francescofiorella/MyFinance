@@ -15,12 +15,14 @@ import org.eazegraph.lib.models.ValueLinePoint
 import org.eazegraph.lib.models.ValueLineSeries
 
 @BindingAdapter("srcRound")
-fun loadImage(view: ImageView, url: String?) {
+fun loadRoundImage(view: ImageView, url: String?) {
     if (!url.isNullOrBlank()) {
         Glide.with(view)
             .load(url)
             .apply(RequestOptions.circleCropTransform())
             .into(view)
+    } else {
+        view.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_user))
     }
 }
 

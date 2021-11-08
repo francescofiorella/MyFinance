@@ -9,5 +9,6 @@ object PurchaseStorage {
 
     fun resetPurchaseList() {
         purchaseList = mutableListOf()
+        existLastYear = false
     }
 }

@@ -8,16 +8,9 @@ import com.frafio.myfinance.ui.splash.SplashScreenListener
 class HomeViewModel(
     private val userRepository: UserRepository
 ) : ViewModel(){
-    val proPic: String? = userRepository.getProPic()
-    var isReady: Boolean = false
-    var isLoginRequired: Boolean = false
+    var isLayoutReady: Boolean = false
 
     var listener: HomeListener? = null
-
-    fun onLogoutButtonClick(view: View) {
-        val logoutResponse = userRepository.userLogout()
-        listener?.onLogOutSuccess(logoutResponse)
-    }
 
     fun checkUser() {
         listener?.onSplashOperationComplete(userRepository.isUserLogged())
@@ -25,5 +18,18 @@ class HomeViewModel(
 
     fun updateUserData() {
         listener?.onSplashOperationComplete(userRepository.updateUserData())
+    }
+
+    fun isLogged(): Boolean {
+        return userRepository.getIsLogged()
+    }
+
+    fun getProPic(): String? {
+        return userRepository.getProPic()
+    }
+
+    fun logOut() {
+        val logoutResponse = userRepository.userLogout()
+        listener?.onLogOutSuccess(logoutResponse)
     }
 }

@@ -246,6 +246,6 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
     }
 
     fun getIsUserLogged(): Boolean {
-        return UserStorage.isLogged
+        return UserStorage.user != null
     }
 }
