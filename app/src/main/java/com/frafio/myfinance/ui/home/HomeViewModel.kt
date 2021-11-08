@@ -1,9 +1,7 @@
 package com.frafio.myfinance.ui.home
 
-import android.view.View
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.repositories.UserRepository
-import com.frafio.myfinance.ui.splash.SplashScreenListener
 
 class HomeViewModel(
     private val userRepository: UserRepository
