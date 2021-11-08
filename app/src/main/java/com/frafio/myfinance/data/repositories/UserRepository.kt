@@ -41,11 +41,15 @@ class UserRepository(private val authManager: AuthManager) {
         return UserStorage.user
     }
 
-    fun getProPic() : String? {
+    fun getProPic(): String? {
         return UserStorage.user?.photoUrl
     }
 
     fun updateUserData(): LiveData<AuthResult> {
         return authManager.updateUserData()
+    }
+
+    fun getIsLogged(): Boolean {
+        return authManager.getIsUserLogged()
     }
 }

@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -21,10 +24,11 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
+import com.frafio.myfinance.utils.loadRoundImage
 import com.frafio.myfinance.utils.snackbar
 import org.kodein.di.generic.instance
 
-class HomeActivity : BaseActivity(), LogoutListener {
+class HomeActivity : BaseActivity(), HomeListener {
 
     // definizione variabili
     private lateinit var binding: ActivityHomeBinding
@@ -46,7 +50,6 @@ class HomeActivity : BaseActivity(), LogoutListener {
                     if (view.selectedItemId == R.id.listFragment) {
                         navController.popBackStack()
                     }
-
                     navController.navigate(R.id.listFragment)
                 }
 
@@ -64,33 +67,26 @@ class HomeActivity : BaseActivity(), LogoutListener {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
-        viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
-        viewModel.logoutListener = this
-        binding.viewmodel = viewModel
+    private val logInResultLauncher =
+        registerForActivityResult(StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                reloadDashboard()
+                binding.logoutBtn.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        this,
+                        R.drawable.ic_logout
+                    )
+                )
+                loadRoundImage(binding.propicImageView, viewModel.getProPic())
 
-        // collegamento view
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
-        navController = navHostFragment.navController
-
-        binding.homeBottomNavView?.setupWithNavController(navController)
-
-        if (savedInstanceState == null) {
-            setNavCustomLayout(true, binding.landHolder != null)
-
-            // controlla se si è appena fatto l'accesso
-            if (intent.hasExtra("${getString(R.string.default_path)}.userRequest")) {
                 val userRequest =
-                    intent.extras?.getBoolean(
+                    result.data?.extras?.getBoolean(
                         "${getString(R.string.default_path)}.userRequest",
                         false
                     ) ?: false
 
                 val userName =
-                    intent.extras?.getString("${getString(R.string.default_path)}.userName")
+                    result.data?.extras?.getString("${getString(R.string.default_path)}.userName")
 
                 if (userRequest) {
                     snackbar(
@@ -98,7 +94,35 @@ class HomeActivity : BaseActivity(), LogoutListener {
                         binding.homeAddBtn
                     )
                 }
+            } else {
+                reloadDashboard()
             }
+        }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        installSplashScreen().also {
+            it.setKeepVisibleCondition(splashExitCondition)
+        }
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
+        viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
+        viewModel.listener = this
+        binding.viewmodel = viewModel
+
+        // importa i dati dal db
+        viewModel.checkUser()
+
+        // collegamento fragment view
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
+        navController = navHostFragment.navController.also {
+            binding.homeBottomNavView?.setupWithNavController(it)
+        }
+
+        if (savedInstanceState == null) {
+            setNavCustomLayout(true, binding.landHolder != null)
         }
     }
 
@@ -202,6 +226,10 @@ class HomeActivity : BaseActivity(), LogoutListener {
         }
     }
 
+    private val splashExitCondition = SplashScreen.KeepOnScreenCondition {
+        !viewModel.isLayoutReady
+    }
+
     override fun onResume() {
         super.onResume()
         navController.addOnDestinationChangedListener(listener)
@@ -214,15 +242,19 @@ class HomeActivity : BaseActivity(), LogoutListener {
 
 
     fun onAddButtonClick(view: View) {
-        val activityOptionsCompat = ActivityOptionsCompat.makeClipRevealAnimation(
-            view, 0, 0,
-            view.measuredWidth, view.measuredHeight
-        )
-
-        Intent(applicationContext, AddActivity::class.java).also {
-            it.putExtra("${getString(R.string.default_path)}.REQUESTCODE", 1)
-            addResultLauncher.launch(it, activityOptionsCompat)
+        if (viewModel.isLogged()) {
+            ActivityOptionsCompat.makeClipRevealAnimation(
+                view, 0, 0, view.measuredWidth, view.measuredHeight
+            ).also { activityOptionsCompat ->
+                Intent(applicationContext, AddActivity::class.java).also {
+                    it.putExtra("${getString(R.string.default_path)}.REQUESTCODE", 1)
+                    addResultLauncher.launch(it, activityOptionsCompat)
+                }
+            }
+        } else {
+            snackbar(getString(R.string.warning_not_logged_home), binding.homeAddBtn)
         }
+
     }
 
     fun showSnackbar(message: String) {
@@ -232,20 +264,73 @@ class HomeActivity : BaseActivity(), LogoutListener {
     override fun onLogOutSuccess(response: LiveData<AuthResult>) {
         response.observe(this, { authResult ->
             if (authResult.code == AuthCode.LOGOUT_SUCCESS.code) {
-                Intent(applicationContext, LoginActivity::class.java).also {
-                    it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(it)
+                loadRoundImage(binding.propicImageView, null)
+                binding.logoutBtn.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        this,
+                        R.drawable.ic_login
+                    )
+                )
+                goToLogin()
+            }
+        })
+    }
+
+    override fun onSplashOperationComplete(response: LiveData<AuthResult>) {
+        response.observe(this, { authResult ->
+            when (authResult.code) {
+                AuthCode.USER_LOGGED.code -> {
+                    viewModel.updateUserData()
+                    binding.logoutBtn.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            this,
+                            R.drawable.ic_logout
+                        )
+                    )
+
+                    viewModel.isLayoutReady = false
                 }
+
+                AuthCode.USER_NOT_LOGGED.code -> {
+                    binding.logoutBtn.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            this,
+                            R.drawable.ic_login
+                        )
+                    )
+                    viewModel.isLayoutReady = true
+                }
+
+                AuthCode.USER_DATA_UPDATED.code -> {
+                    reloadDashboard()
+                    loadRoundImage(binding.propicImageView, viewModel.getProPic())
+
+                    viewModel.isLayoutReady = true
+                }
+
+                AuthCode.USER_DATA_NOT_UPDATED.code -> snackbar(authResult.message)
+
+                else -> Unit
             }
         })
     }
 
     fun onProPicClick(view: View) {
-        navController.navigateUp()
-        navController.navigate(R.id.profileFragment)
+        if (viewModel.isLogged()) {
+            navController.navigateUp()
+            navController.navigate(R.id.profileFragment)
 
-        binding.navigationLayout?.let {
-            navCustom.selectedItem = CustomNavigation.Item.ITEM_3
+            binding.navigationLayout?.let {
+                navCustom.selectedItem = CustomNavigation.Item.ITEM_3
+            }
+        } else {
+            goToLogin()
+        }
+    }
+
+    private fun goToLogin() {
+        Intent(applicationContext, LoginActivity::class.java).also {
+            logInResultLauncher.launch(it)
         }
     }
 
@@ -262,5 +347,18 @@ class HomeActivity : BaseActivity(), LogoutListener {
 
     fun hideProgressIndicator() {
         binding.homeProgressIndicator.hide()
+    }
+
+    private fun reloadDashboard() {
+        navController.popBackStack()
+        navController.navigate(R.id.dashboardFragment)
+    }
+
+    fun onLogoutButtonClick(view: View) {
+        if (viewModel.isLogged()) {
+            viewModel.logOut()
+        } else {
+            goToLogin()
+        }
     }
 }

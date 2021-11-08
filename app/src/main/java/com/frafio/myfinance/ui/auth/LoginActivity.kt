@@ -42,11 +42,11 @@ class LoginActivity : BaseActivity(), AuthListener {
         registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val name = viewModel.getUserName()
-                Intent(applicationContext, HomeActivity::class.java).also {
+                Intent().also {
                     it.putExtra("${getString(R.string.default_path)}.userRequest", true)
                     it.putExtra("${getString(R.string.default_path)}.userName", name)
-                    it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(it)
+                    setResult(RESULT_OK, it)
+                    finish()
                 }
             }
         }
@@ -125,11 +125,11 @@ class LoginActivity : BaseActivity(), AuthListener {
 
                 AuthCode.USER_DATA_UPDATED.code -> {
                     val name = viewModel.getUserName()
-                    Intent(applicationContext, HomeActivity::class.java).also {
+                    Intent().also {
                         it.putExtra("${getString(R.string.default_path)}.userRequest", true)
                         it.putExtra("${getString(R.string.default_path)}.userName", name)
-                        it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(it)
+                        setResult(RESULT_OK, it)
+                        finish()
                     }
                 }
 

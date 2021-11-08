@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.frafio.myfinance">
 
     <application
@@ -12,8 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyFinance">
+        <activity android:name=".ui.add.AddActivity" />
+        <activity android:name=".ui.home.list.receipt.ReceiptActivity" />
+        <activity android:name=".ui.auth.SignupActivity" />
+        <activity android:name=".ui.auth.LoginActivity" />
         <activity
-            android:name=".ui.splash.SplashScreenActivity"
+            android:name=".ui.home.HomeActivity"
             android:exported="true"
             android:theme="@style/Theme.MyFinance.SplashScreen">
             <intent-filter>
@@ -22,11 +25,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.add.AddActivity" />
-        <activity android:name=".ui.home.list.receipt.ReceiptActivity" />
-        <activity android:name=".ui.auth.SignupActivity" />
-        <activity android:name=".ui.auth.LoginActivity" />
-        <activity android:name=".ui.home.HomeActivity" />
     </application>
 
 </manifest>

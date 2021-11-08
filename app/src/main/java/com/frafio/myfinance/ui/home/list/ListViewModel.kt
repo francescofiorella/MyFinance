@@ -5,10 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.frafio.myfinance.data.repositories.UserRepository
 
 class ListViewModel(
-    private val purchaseRepository: PurchaseRepository
+    private val purchaseRepository: PurchaseRepository,
+    userRepository: UserRepository
 ) : ViewModel() {
+    val isLogged: Boolean = userRepository.getIsLogged()
 
     var listener: DeleteListener? = null
 

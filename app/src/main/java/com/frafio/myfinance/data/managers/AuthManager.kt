@@ -244,4 +244,8 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
                 PurchaseStorage.existLastYear = !queryDocumentSnapshots.isEmpty
             }
     }
+
+    fun getIsUserLogged(): Boolean {
+        return UserStorage.user != null
+    }
 }
