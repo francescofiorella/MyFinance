@@ -6,7 +6,6 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
-import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -14,6 +13,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
@@ -96,8 +96,6 @@ class HomeActivity : BaseActivity(), HomeListener {
                         binding.homeAddBtn
                     )
                 }
-            } else {
-                reloadDashboard()
             }
         }
 
@@ -130,29 +128,24 @@ class HomeActivity : BaseActivity(), HomeListener {
         }
 
         if (savedInstanceState == null) {
-            setNavCustomLayout(true, binding.landHolder != null)
+            setNavCustomLayout(binding.landHolder != null)
         }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
 
+        // risolve bug (se non sono sul primo fragment, si sovrappongono i fragment nello stack)
+        if (navController.currentDestination?.id != R.id.dashboardFragment) {
+            navController.navigateUp()
+        }
+
         binding.navigationLayout?.let {
-            setNavCustomLayout(false, binding.landHolder != null)
-
-            when (navController.currentDestination!!.id) {
-                R.id.dashboardFragment -> navCustom.setDashboardBlue()
-
-                R.id.listFragment -> navCustom.setListBlue()
-
-                R.id.profileFragment -> navCustom.setProfileBlue()
-
-                R.id.menuFragment -> navCustom.setMenuBlue()
-            }
+            setNavCustomLayout(binding.landHolder != null)
         }
     }
 
-    private fun setNavCustomLayout(firstTime: Boolean, animateTV: Boolean) {
+    private fun setNavCustomLayout(animateTV: Boolean) {
         binding.navigationLayout?.let { rootLayout ->
             navCustom = object : CustomNavigation(
                 rootLayout.navViewLayout,
@@ -168,7 +161,6 @@ class HomeActivity : BaseActivity(), HomeListener {
                 rootLayout.menuLayout,
                 rootLayout.menuItemIcon,
                 rootLayout.menuItemText,
-                firstTime,
                 animateTV
             ) {
                 override fun onItem1ClickAction() {
@@ -217,7 +209,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         }
     }
 
-    val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
+    private val navigationListener = NavController.OnDestinationChangedListener { _, destination, _ ->
         when (destination.label) {
             getString(R.string.nav_1) -> {
                 binding.fragmentTitle.text = destination.label
@@ -247,12 +239,12 @@ class HomeActivity : BaseActivity(), HomeListener {
 
     override fun onResume() {
         super.onResume()
-        navController.addOnDestinationChangedListener(listener)
+        navController.addOnDestinationChangedListener(navigationListener)
     }
 
     override fun onPause() {
         super.onPause()
-        navController.removeOnDestinationChangedListener(listener)
+        navController.removeOnDestinationChangedListener(navigationListener)
     }
 
 
@@ -272,6 +264,7 @@ class HomeActivity : BaseActivity(), HomeListener {
 
     }
 
+    // method for children
     fun showSnackbar(message: String) {
         snackbar(message, binding.homeAddBtn)
     }
@@ -287,6 +280,8 @@ class HomeActivity : BaseActivity(), HomeListener {
                     )
                 )
                 goToLogin()
+                // close profile fragment so that there will not be 2 dashboards
+                navController.popBackStack()
             }
         })
     }
@@ -351,7 +346,7 @@ class HomeActivity : BaseActivity(), HomeListener {
     override fun onBackPressed() {
         super.onBackPressed()
         binding.navigationLayout?.let {
-            navCustom.setDashboardBlue()
+            navCustom.checkDashboard()
         }
     }
 
@@ -366,6 +361,9 @@ class HomeActivity : BaseActivity(), HomeListener {
     private fun reloadDashboard() {
         navController.popBackStack()
         navController.navigate(R.id.dashboardFragment)
+        binding.navigationLayout?.let {
+            navCustom.checkDashboard()
+        }
     }
 
     fun onLogoutButtonClick(view: View) {

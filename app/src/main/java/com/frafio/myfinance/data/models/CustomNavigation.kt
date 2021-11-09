@@ -23,7 +23,6 @@ open class CustomNavigation(
     private val menuLayout: ConstraintLayout,
     private val menuIcon: ImageView,
     private val menuText: TextView,
-    firstTime: Boolean,
     private val animateTV: Boolean
 ) {
     companion object {
@@ -48,34 +47,32 @@ open class CustomNavigation(
 
     init {
         setOnClickListener()
-        if (firstTime) {
-            setDashboardBlue()
-        }
+        checkDashboard()
     }
 
     private fun setOnClickListener() {
         dashboardLayout.setOnClickListener {
             onItem1ClickAction()
 
-            setDashboardBlue()
+            checkDashboard()
         }
 
         listLayout.setOnClickListener {
             onItem2ClickAction()
 
-            setListBlue()
+            checkList()
         }
 
         profileLayout.setOnClickListener {
             onItem3ClickAction()
 
-            setProfileBlue()
+            checkProfile()
         }
 
         menuLayout.setOnClickListener {
             onItem4ClickAction()
 
-            setMenuBlue()
+            checkMenu()
         }
     }
 
@@ -101,7 +98,7 @@ open class CustomNavigation(
         TransitionManager.beginDelayedTransition(root, transition)
     }
 
-    fun setDashboardBlue() {
+    fun checkDashboard() {
         dashboardIcon.isSelected = true
         dashboardText.isSelected = true
         listIcon.isSelected = false
@@ -122,7 +119,7 @@ open class CustomNavigation(
         }
     }
 
-    fun setListBlue() {
+    private fun checkList() {
         dashboardIcon.isSelected = false
         dashboardText.isSelected = false
         listIcon.isSelected = true
@@ -143,7 +140,7 @@ open class CustomNavigation(
         }
     }
 
-    fun setProfileBlue() {
+    private fun checkProfile() {
         dashboardIcon.isSelected = false
         dashboardText.isSelected = false
         listIcon.isSelected = false
@@ -164,7 +161,7 @@ open class CustomNavigation(
         }
     }
 
-    fun setMenuBlue() {
+    private fun checkMenu() {
         dashboardIcon.isSelected = false
         dashboardText.isSelected = false
         listIcon.isSelected = false
