@@ -13,6 +13,7 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
 import com.frafio.myfinance.utils.getSharedCollection
+import com.frafio.myfinance.utils.setSharedCollection
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -195,7 +196,9 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         fAuth.signOut()
 
         PurchaseStorage.resetPurchaseList()
+        PurchaseStorage.existLastYear = false
         UserStorage.resetUser()
+        setSharedCollection(sharedPreferences, DbPurchases.COLLECTIONS.UNO_DUE.value)
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
         return (response)
@@ -237,7 +240,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun checkLastYear() {
+    private fun checkLastYear() {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.ZERO_UNO.value)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
