@@ -407,7 +407,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text="@string/totale_biglietti"
+                                android:text="@string/tot_affitto"
                                 android:textSize="@dimen/card_title_size"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -465,7 +465,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text="@string/n_trenitalia"
+                                android:text="@string/tot_spesa"
                                 android:textSize="@dimen/card_title_size"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -523,7 +523,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text="@string/n_amtab"
+                                android:text="@string/totale_biglietti"
                                 android:textSize="@dimen/card_title_size"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />

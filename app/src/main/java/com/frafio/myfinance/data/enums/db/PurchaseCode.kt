@@ -15,7 +15,6 @@ enum class PurchaseCode(val code: Int, val message: String) {
 
     PURCHASE_DELETE_SUCCESS(30, "Acquisto eliminato!"),
     PURCHASE_DELETE_FAILURE(31, "Acquisto non eliminato correttamente!"),
-    TOTAL_DELETE_SUCCESS(32, "Totale eliminato!"),
 
     PURCHASE_LIST_UPDATE_SUCCESS(40, "List Updated!"),
     PURCHASE_LIST_UPDATE_FAILURE(41, "List not updated!"),

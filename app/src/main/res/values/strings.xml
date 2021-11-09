@@ -60,8 +60,8 @@
     <string name="n_acquisti">Numero \nAcquisti</string>
     <string name="totale">Totale \nAcquisti</string>
     <string name="totale_biglietti">Totale \nTrasporti</string>
-    <string name="n_trenitalia">N° Biglietti \nTrenItalia</string>
-    <string name="n_amtab">N° Biglietti \nAmtab</string>
+    <string name="tot_affitto">Totale \nAffitto</string>
+    <string name="tot_spesa">Totale \n Spesa</string>
 
     <string name="log_out">Log Out</string>
     <string name="propic">Immagine di profilo</string>

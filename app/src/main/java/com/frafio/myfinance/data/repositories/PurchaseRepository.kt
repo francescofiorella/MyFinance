@@ -35,8 +35,8 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         var tot = 0.0
         var ticketTot = 0.0
         var numTot = 0
-        var trenTot = 0
-        var amTot = 0
+        var rentTot = 0.0
+        var spesaTot = 0.0
 
         var nDays = 0
         var nMonth = 0
@@ -44,44 +44,54 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         var lastYear = 0
 
         PurchaseStorage.purchaseList.forEach { purchase ->
-            // totale biglietti Amtab
-            if (purchase.name == DbPurchases.NAMES.AMTAB.value) {
-                amTot++
-            }
-            if (purchase.type == DbPurchases.TYPES.TOTAL.value) {
-                // totale di oggi
-                val year = LocalDate.now().year
-                val month = LocalDate.now().monthValue
-                val day = LocalDate.now().dayOfMonth
-                if (purchase.year == year && purchase.month == month && purchase.day == day) {
-                    todayTot = purchase.price ?: 0.0
+            when (purchase.type) {
+                DbPurchases.TYPES.TOTAL.value -> {
+                    // totale di oggi
+                    val year = LocalDate.now().year
+                    val month = LocalDate.now().monthValue
+                    val day = LocalDate.now().dayOfMonth
+                    if (purchase.year == year && purchase.month == month && purchase.day == day) {
+                        todayTot = purchase.price ?: 0.0
+                    }
+
+                    // incrementa il totale
+                    tot += purchase.price ?: 0.0
+
+                    // conta i giorni
+                    nDays++
+
+                    // conta i mesi
+                    if (purchase.year != lastYear) {
+                        lastYear = purchase.year ?: 0
+                        lastMonth = purchase.month ?: 0
+                        nMonth++
+                    } else if (purchase.month != lastMonth) {
+                        lastMonth = purchase.month ?: 0
+                        nMonth++
+                    }
                 }
 
-                // incrementa il totale
-                tot += purchase.price ?: 0.0
-
-                // conta i giorni
-                nDays++
-
-                // conta i mesi
-                if (purchase.year != lastYear) {
-                    lastYear = purchase.year ?: 0
-                    lastMonth = purchase.month ?: 0
-                    nMonth++
-                } else if (purchase.month != lastMonth) {
-                    lastMonth = purchase.month ?: 0
-                    nMonth++
+                DbPurchases.TYPES.TICKET.value -> {
+                    // totale biglietti
+                    ticketTot += purchase.price ?: 0.0
                 }
-            } else if (purchase.type != DbPurchases.TYPES.TICKET.value) {
-                // totale acquisti (senza biglietti)
-                numTot++
-            } else {
-                // totale biglietti
-                ticketTot += purchase.price ?: 0.0
 
-                // totale biglietti TrenItalia
-                if (purchase.name == DbPurchases.NAMES.TRENITALIA.value) {
-                    trenTot++
+                DbPurchases.TYPES.RENT.value -> {
+                    // totale affitto
+                    rentTot += purchase.price ?: 0.0
+                }
+
+                DbPurchases.TYPES.SHOPPING.value -> {
+                    // totale spesa
+                    spesaTot += purchase.price ?: 0.0
+
+                    // totale acquisti (senza biglietti e affitti)
+                    numTot++
+                }
+
+                DbPurchases.TYPES.GENERIC.value -> {
+                    // totale acquisti (senza biglietti e affitti)
+                    numTot++
                 }
             }
         }
@@ -95,9 +105,9 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         stats.add(doubleToPrice(todayTot))
         stats.add(doubleToPrice(tot))
         stats.add(numTot.toString())
+        stats.add(doubleToPrice(rentTot))
+        stats.add(doubleToPrice(spesaTot))
         stats.add(doubleToPrice(ticketTot))
-        stats.add(trenTot.toString())
-        stats.add(amTot.toString())
 
         return stats
     }

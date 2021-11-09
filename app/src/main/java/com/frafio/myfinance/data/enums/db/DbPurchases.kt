@@ -14,8 +14,6 @@ object DbPurchases {
 
     enum class NAMES(val value: String) {
         TOTALE("Totale"),
-        AMTAB("Biglietto Amtab"),
-        TRENITALIA("Biglietto TrenItalia"),
         TOTALE_ZERO("0.00")
     }
 
@@ -23,7 +21,8 @@ object DbPurchases {
         TOTAL(0),
         SHOPPING(1),
         GENERIC(2),
-        TICKET(3)
+        TICKET(3),
+        RENT(4)
     }
 
     enum class COLLECTIONS(val value: String) {
