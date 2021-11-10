@@ -4,7 +4,7 @@
     <color name="primary">#2C3240</color>
     <color name="background">@color/black</color>
     <color name="accent">#01579b</color>
-    <color name="error">@color/cinnamon_satin</color>
+    <!--<color name="error">@color/cinnamon_satin</color>-->
     <color name="primary_text">@color/white</color>
     <color name="inverted_primary_text">@color/black</color>
     <color name="disabled_text">#3F4952</color>
