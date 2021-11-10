@@ -13,13 +13,11 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
-import com.frafio.myfinance.data.models.CustomNavigation
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.add.AddActivity
@@ -28,6 +26,7 @@ import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.loadRoundImage
 import com.frafio.myfinance.utils.snackbar
+import com.google.android.material.navigation.NavigationBarView
 import org.kodein.di.generic.instance
 
 class HomeActivity : BaseActivity(), HomeListener {
@@ -35,8 +34,6 @@ class HomeActivity : BaseActivity(), HomeListener {
     // definizione variabili
     private lateinit var binding: ActivityHomeBinding
     private lateinit var viewModel: HomeViewModel
-
-    private lateinit var navCustom: CustomNavigation
 
     private lateinit var navController: NavController
 
@@ -48,21 +45,10 @@ class HomeActivity : BaseActivity(), HomeListener {
             val purchaseRequest =
                 data!!.getBooleanExtra("${getString(R.string.default_path)}.purchaseRequest", false)
             if (purchaseRequest) {
-                binding.homeBottomNavView?.let { view ->
-                    if (view.selectedItemId == R.id.listFragment) {
-                        navController.popBackStack()
-                    }
-                    navController.navigate(R.id.listFragment)
+                if (navController.currentDestination?.id == R.id.listFragment) {
+                    navController.popBackStack()
                 }
-
-                binding.navigationLayout?.let {
-                    if (navCustom.selectedItem == CustomNavigation.Item.ITEM_2) {
-                        navController.popBackStack()
-                        navController.navigate(R.id.listFragment)
-                    }
-
-                    navCustom.selectedItem = CustomNavigation.Item.ITEM_2
-                }
+                navController.navigate(R.id.listFragment)
 
                 snackbar(getString(R.string.purchase_added), binding.homeAddBtn)
             }
@@ -103,10 +89,10 @@ class HomeActivity : BaseActivity(), HomeListener {
         super.onCreate(savedInstanceState)
 
         installSplashScreen().also {
-            it.setKeepVisibleCondition{
+            it.setKeepVisibleCondition {
                 !viewModel.isLayoutReady
             }
-            it.setOnExitAnimationListener{ splashScreenViewProvider ->
+            it.setOnExitAnimationListener { splashScreenViewProvider ->
                 supportFragmentManager.unregisterFragmentLifecycleCallbacks(dashboardCallback)
                 splashScreenViewProvider.remove()
             }
@@ -124,12 +110,11 @@ class HomeActivity : BaseActivity(), HomeListener {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController.also {
-            binding.homeBottomNavView?.setupWithNavController(it)
+            binding.navBottom?.setupWithNavController(it)
+            //binding.navRail?.setupWithNavController(it)
         }
 
-        if (savedInstanceState == null) {
-            setNavCustomLayout(binding.landHolder != null)
-        }
+        binding.navRail?.setOnItemSelectedListener(navRailListener)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -137,64 +122,37 @@ class HomeActivity : BaseActivity(), HomeListener {
 
         // risolve bug (se non sono sul primo fragment, si sovrappongono i fragment nello stack)
         if (navController.currentDestination?.id != R.id.dashboardFragment) {
-            navController.navigateUp()
-        }
-
-        binding.navigationLayout?.let {
-            setNavCustomLayout(binding.landHolder != null)
+            navController.popBackStack()
         }
     }
 
-    private fun setNavCustomLayout(animateTV: Boolean) {
-        binding.navigationLayout?.let { rootLayout ->
-            navCustom = object : CustomNavigation(
-                rootLayout.navViewLayout,
-                rootLayout.dashboardLayout,
-                rootLayout.dashboardItemIcon,
-                rootLayout.dashboardItemText,
-                rootLayout.listLayout,
-                rootLayout.listItemIcon,
-                rootLayout.listItemText,
-                rootLayout.profileLayout,
-                rootLayout.profileItemIcon,
-                rootLayout.profileItemText,
-                rootLayout.menuLayout,
-                rootLayout.menuItemIcon,
-                rootLayout.menuItemText,
-                animateTV
-            ) {
-                override fun onItem1ClickAction() {
-                    super.onItem1ClickAction()
-                    if (selectedItem != Item.ITEM_1) {
-                        navController.navigateUp()
-                        navController.navigate(R.id.dashboardFragment)
-                    }
-                }
-
-                override fun onItem2ClickAction() {
-                    super.onItem2ClickAction()
-                    if (selectedItem != Item.ITEM_2) {
-                        navController.navigateUp()
-                        navController.navigate(R.id.listFragment)
-                    }
-                }
-
-                override fun onItem3ClickAction() {
-                    super.onItem3ClickAction()
-                    if (selectedItem != Item.ITEM_3) {
-                        navController.navigateUp()
-                        navController.navigate(R.id.profileFragment)
-                    }
-                }
-
-                override fun onItem4ClickAction() {
-                    super.onItem4ClickAction()
-                    if (selectedItem != Item.ITEM_4) {
-                        navController.navigateUp()
-                        navController.navigate(R.id.menuFragment)
-                    }
-                }
+    private val navRailListener = NavigationBarView.OnItemSelectedListener { item ->
+        when (item.itemId) {
+            R.id.dashboardFragment -> {
+                navController.navigateUp()
+                navController.navigate(R.id.dashboardFragment)
+                true
             }
+
+            R.id.listFragment -> {
+                navController.navigateUp()
+                navController.navigate(R.id.listFragment)
+                true
+            }
+
+            R.id.profileFragment -> {
+                navController.navigateUp()
+                navController.navigate(R.id.profileFragment)
+                true
+            }
+
+            R.id.menuFragment -> {
+                navController.navigateUp()
+                navController.navigate(R.id.menuFragment)
+                true
+            }
+
+            else -> false
         }
     }
 
@@ -209,33 +167,34 @@ class HomeActivity : BaseActivity(), HomeListener {
         }
     }
 
-    private val navigationListener = NavController.OnDestinationChangedListener { _, destination, _ ->
-        when (destination.label) {
-            getString(R.string.nav_1) -> {
-                binding.fragmentTitle.text = destination.label
-                binding.logoutBtn.instantHide()
-                binding.propicImageView.instantShow()
-            }
+    private val navigationListener =
+        NavController.OnDestinationChangedListener { _, destination, _ ->
+            when (destination.label) {
+                getString(R.string.nav_1) -> {
+                    binding.fragmentTitle.text = destination.label
+                    binding.logoutBtn.instantHide()
+                    binding.propicImageView.instantShow()
+                }
 
-            getString(R.string.nav_2_extended) -> {
-                binding.fragmentTitle.text = destination.label
-                binding.logoutBtn.instantHide()
-                binding.propicImageView.instantShow()
-            }
+                getString(R.string.nav_2_extended) -> {
+                    binding.fragmentTitle.text = destination.label
+                    binding.logoutBtn.instantHide()
+                    binding.propicImageView.instantShow()
+                }
 
-            getString(R.string.nav_3) -> {
-                binding.fragmentTitle.text = destination.label
-                binding.logoutBtn.instantShow()
-                binding.propicImageView.instantHide()
-            }
+                getString(R.string.nav_3) -> {
+                    binding.fragmentTitle.text = destination.label
+                    binding.logoutBtn.instantShow()
+                    binding.propicImageView.instantHide()
+                }
 
-            getString(R.string.nav_4) -> {
-                binding.fragmentTitle.text = destination.label
-                binding.logoutBtn.instantHide()
-                binding.propicImageView.instantShow()
+                getString(R.string.nav_4) -> {
+                    binding.fragmentTitle.text = destination.label
+                    binding.logoutBtn.instantHide()
+                    binding.propicImageView.instantShow()
+                }
             }
         }
-    }
 
     override fun onResume() {
         super.onResume()
@@ -282,6 +241,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                 goToLogin()
                 // close profile fragment so that there will not be 2 dashboards
                 navController.popBackStack()
+                checkDashboardInRailView()
             }
         })
     }
@@ -312,7 +272,10 @@ class HomeActivity : BaseActivity(), HomeListener {
                 }
 
                 AuthCode.USER_DATA_UPDATED.code -> {
-                    supportFragmentManager.registerFragmentLifecycleCallbacks(dashboardCallback, true)
+                    supportFragmentManager.registerFragmentLifecycleCallbacks(
+                        dashboardCallback,
+                        true
+                    )
                     loadRoundImage(binding.propicImageView, viewModel.getProPic())
                     reloadDashboard()
                 }
@@ -326,11 +289,11 @@ class HomeActivity : BaseActivity(), HomeListener {
 
     fun onProPicClick(view: View) {
         if (viewModel.isLogged()) {
-            navController.navigateUp()
-            navController.navigate(R.id.profileFragment)
-
-            binding.navigationLayout?.let {
-                navCustom.selectedItem = CustomNavigation.Item.ITEM_3
+            if (binding.navBottom != null) {
+                navController.navigateUp()
+                navController.navigate(R.id.profileFragment)
+            } else {
+                binding.navRail?.selectedItemId = R.id.profileFragment
             }
         } else {
             goToLogin()
@@ -343,13 +306,6 @@ class HomeActivity : BaseActivity(), HomeListener {
         }
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        binding.navigationLayout?.let {
-            navCustom.checkDashboard()
-        }
-    }
-
     fun showProgressIndicator() {
         binding.homeProgressIndicator.show()
     }
@@ -359,11 +315,14 @@ class HomeActivity : BaseActivity(), HomeListener {
     }
 
     private fun reloadDashboard() {
+        checkDashboardInRailView()
         navController.popBackStack()
         navController.navigate(R.id.dashboardFragment)
-        binding.navigationLayout?.let {
-            navCustom.checkDashboard()
-        }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        checkDashboardInRailView()
     }
 
     fun onLogoutButtonClick(view: View) {
@@ -371,6 +330,14 @@ class HomeActivity : BaseActivity(), HomeListener {
             viewModel.logOut()
         } else {
             goToLogin()
+        }
+    }
+
+    private fun checkDashboardInRailView() {
+        binding.navRail?.let {
+            it.setOnItemSelectedListener(null)
+            it.selectedItemId = R.id.dashboardFragment
+            it.setOnItemSelectedListener(navRailListener)
         }
     }
 }

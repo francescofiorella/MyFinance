@@ -5,7 +5,7 @@
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="TextAppearance.MyFinance.AlertDialog.Body" parent="MaterialAlertDialog.Material3.Body.Text">
+    <style name="TextAppearance.MyFinance.Body" parent="MaterialAlertDialog.Material3.Body.Text">
         <item name="fontFamily">@font/nunito</item>
     </style>
 
@@ -36,5 +36,11 @@
     </style>
     <style name="ShapeAppearance.MyFinance.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
         <item name="cornerSize">@dimen/card_corner_radius</item>
+    </style>
+
+    <!-- TextAppearance style. -->
+    <style name="TextAppearance.MyFinance.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">@font/nunito</item>
+        <item name="android:fontFamily">@font/nunito</item>
     </style>
 </resources>

@@ -19,20 +19,13 @@
         <item name="textInputStyle">@style/Widget.MyFinance.TextInputLayout.OutlinedBox</item>
     </style>
 
-    <!--BottomNavigationView theme. -->
-    <style name="Widget.MyFinance.BottomNavigationView" parent="Widget.Design.BottomNavigationView">
-        <item name="fontFamily">@font/nunito</item>
-    </style>
-
     <!--Dialog theme. -->
     <style name="ThemeOverlay.MyFinance.AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="android:backgroundTint">@color/card_bg</item>
         <item name="materialAlertDialogTitleTextStyle">
             @style/TextAppearance.MyFinance.AlertDialog.Title
         </item>
-        <item name="materialAlertDialogBodyTextStyle">
-            @style/TextAppearance.MyFinance.AlertDialog.Body
-        </item>
+        <item name="materialAlertDialogBodyTextStyle">@style/TextAppearance.MyFinance.Body</item>
         <item name="buttonBarNeutralButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
         <item name="buttonBarNegativeButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
         <item name="buttonBarPositiveButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>

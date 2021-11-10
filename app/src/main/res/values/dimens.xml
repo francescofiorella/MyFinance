@@ -31,4 +31,6 @@
     <dimen name="navigation_item_land_padding_horizontal_2">10dp</dimen>
     <dimen name="navigation_item_land_padding_vertical_2">10dp</dimen>
     <dimen name="navigation_item_height">65dp</dimen>
+
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

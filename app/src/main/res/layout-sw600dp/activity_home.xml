@@ -31,12 +31,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:showAnimationBehavior="inward" />
 
-        <include
-            android:id="@+id/navigation_layout"
-            layout="@layout/layout_custom_nav_view"
+        <com.google.android.material.navigationrail.NavigationRailView
+            android:id="@+id/nav_rail"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:backgroundTint="@color/background"
+            app:itemTextAppearanceActive="@style/TextAppearance.MyFinance.Caption"
+            app:itemTextAppearanceInactive="@style/TextAppearance.MyFinance.Caption"
+            app:labelVisibilityMode="labeled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:menu="@menu/bottom_app_bar_menu" />
 
         <TextView
             android:id="@+id/fragmentTitle"
@@ -48,7 +54,7 @@
             android:padding="@dimen/title_padding"
             android:textColor="@color/primary_text"
             android:textSize="@dimen/title_size"
-            app:layout_constraintStart_toEndOf="@id/navigation_layout"
+            app:layout_constraintStart_toEndOf="@id/nav_rail"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/nav_1" />
 
@@ -67,21 +73,19 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/logout_btn"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:contentDescription="@string/log_out"
-            android:fontFamily="@font/nunito_semibold"
             android:onClick="onLogoutButtonClick"
             android:visibility="gone"
             app:backgroundTint="@color/card_bg"
-            app:elevation="@dimen/card_elevation"
             app:fabCustomSize="45dp"
             app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/fragmentTitle"
-            app:srcCompat="@drawable/ic_logout"
-            app:tint="@color/primary_text" />
+            app:srcCompat="@drawable/ic_logout" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/home_fragmentContainerView"
@@ -92,7 +96,7 @@
             app:defaultNavHost="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/navigation_layout"
+            app:layout_constraintStart_toEndOf="@+id/nav_rail"
             app:layout_constraintTop_toBottomOf="@+id/fragmentTitle"
             app:navGraph="@navigation/nav_graph" />
 
@@ -100,16 +104,12 @@
             android:id="@+id/home_addExtBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
+            android:layout_margin="@dimen/fab_margin"
             android:contentDescription="@string/addBtnContentDescription"
             android:fontFamily="@font/nunito_semibold"
             android:onClick="onAddButtonClick"
             android:text="@string/aggiungi"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/accent"
-            app:elevation="@dimen/card_elevation"
             app:icon="@drawable/ic_add"
-            app:iconTint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
