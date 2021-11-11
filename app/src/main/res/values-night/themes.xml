@@ -1,25 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.MyFinance" parent="Theme.Material3.Dark.NoActionBar">
-        <!-- Primary brand color. -->
-        <!--<item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>-->
-        <!-- Secondary brand color. -->
-        <!--<item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/white</item>-->
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
-        <!-- Customize your theme here. -->
-        <!--<item name="android:colorBackground">@color/background</item>-->
-        <item name="colorAccent">@color/accent</item>
-
-        <!--Custom widgets theme. -->
-        <item name="materialCalendarTheme">@style/ThemeOverlay.MyFinance.DatePicker</item>
-        <item name="textInputStyle">@style/Widget.MyFinance.TextInputLayout.OutlinedBox</item>
-
-        <!-- Material Builder theme. -->
+        <!-- Material You theme. -->
         <item name="colorPrimary">@color/md_theme_dark_primary</item>
         <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_dark_primaryContainer</item>
@@ -46,5 +28,15 @@
         <item name="colorOnSurfaceInverse">@color/md_theme_dark_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_primaryInverse</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+
+        <!-- Customize your theme here. -->
+        <item name="colorAccent">@color/accent</item>
+
+        <!--Custom widgets theme. -->
+        <item name="materialCalendarTheme">@style/ThemeOverlay.MyFinance.DatePicker</item>
+        <item name="textInputStyle">@style/Widget.MyFinance.TextInputLayout.OutlinedBox</item>
     </style>
 </resources>

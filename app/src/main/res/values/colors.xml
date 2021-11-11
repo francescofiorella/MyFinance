@@ -1,33 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="quantum_grey_600">#757575</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-
-    <!--Custom colors-->
-    <color name="carmine">#B00020</color>
-    <color name="cinnamon_satin">#cf6679</color>
-
-    <!--Theme colors-->
-    <color name="primary">#2C3240</color>
-    <color name="background">#F4F4F4</color>
-    <color name="accent">#1772E6</color>
-    <!--<color name="error">@color/carmine</color>-->
-    <color name="primary_text">@color/black</color>
-    <color name="inverted_primary_text">@color/white</color>
-    <color name="disabled_text">#D4D4D4</color>
-    <color name="snackbar_bg">#101D25</color>
-
-    <color name="card_bg">@color/white</color>
-    <color name="default_nav_items">#606368</color>
-
-    <color name="icon_bg">#3D5576</color>
-
+    <!-- Theme colors. -->
     <color name="md_theme_light_primary">#00668B</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
     <color name="md_theme_light_primaryContainer">#C2E8FF</color>
@@ -82,4 +55,24 @@
     <color name="md_theme_dark_primaryInverse">#00668B</color>
     <color name="seed">#03374C</color>
     <color name="error">#BA1B1B</color>
+
+    <!--Custom colors. -->
+    <color name="quantum_grey_600">#757575</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="carmine">#B00020</color>
+    <color name="cinnamon_satin">#cf6679</color>
+
+    <!--Theme-related custom colors. -->
+    <color name="primary">#2C3240</color>
+    <color name="background">#F4F4F4</color>
+    <color name="accent">#1772E6</color>
+    <!--<color name="error">@color/carmine</color>-->
+    <color name="primary_text">@color/black</color>
+    <color name="inverted_primary_text">@color/white</color>
+    <color name="disabled_text">#D4D4D4</color>
+    <color name="snackbar_bg">#101D25</color>
+    <color name="card_bg">@color/white</color>
+    <color name="default_nav_items">#606368</color>
+    <color name="launcher_icon_bg">#3D5576</color>
 </resources>

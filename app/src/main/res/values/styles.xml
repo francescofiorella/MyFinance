@@ -1,5 +1,16 @@
 <resources>
     <!--Dialog style. -->
+    <style name="ThemeOverlay.MyFinance.AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="android:backgroundTint">@color/card_bg</item>
+        <item name="materialAlertDialogTitleTextStyle">
+            @style/TextAppearance.MyFinance.AlertDialog.Title
+        </item>
+        <item name="materialAlertDialogBodyTextStyle">@style/TextAppearance.MyFinance.Body</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
+    </style>
+
     <style name="TextAppearance.MyFinance.AlertDialog.Title" parent="MaterialAlertDialog.Material3.Title.Text">
         <item name="fontFamily">@font/nunito_semibold</item>
         <item name="android:textSize">20sp</item>
@@ -15,6 +26,11 @@
     </style>
 
     <!--Material Fields style.-->
+    <style name="Widget.MyFinance.TextInputLayout.OutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
+        </item>
+    </style>
+
     <style name="Widget.MyFinance.TextInputLayout.OutlinedBox.ExposedDropdownMenu" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
         <item name="materialThemeOverlay">@style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
         </item>
@@ -30,10 +46,23 @@
     </style>
 
     <!--Material DatePicker style. -->
+    <style name="ThemeOverlay.MyFinance.DatePicker" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.MyFinance.DatePicker.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.MyFinance.DatePicker.Button</item>
+        <item name="shapeAppearanceMediumComponent">
+            @style/ShapeAppearance.MyFinance.MediumComponent
+        </item>
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorSurface">@color/card_bg</item>
+        <item name="elevationOverlayEnabled">false</item>
+    </style>
+
     <style name="Widget.MyFinance.DatePicker.Button" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">@color/accent</item>
         <item name="fontFamily">@font/nunito_bold</item>
     </style>
+
     <style name="ShapeAppearance.MyFinance.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
         <item name="cornerSize">@dimen/card_corner_radius</item>
     </style>
