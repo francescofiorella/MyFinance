@@ -92,10 +92,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
             }
 
             ON_LONG_CLICK -> {
-                val builder = MaterialAlertDialogBuilder(
-                    requireContext(),
-                    R.style.ThemeOverlay_MyFinance_AlertDialog
-                )
+                val builder = MaterialAlertDialogBuilder(requireContext())
                 builder.setTitle(purchase.name)
                 if (purchase.type == 0 && purchase.price == 0.0) {
                     builder.setMessage(getString(R.string.purchase_delete_dialog))

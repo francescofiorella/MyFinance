@@ -1,7 +1,6 @@
 <resources>
     <!--Dialog style. -->
     <style name="ThemeOverlay.MyFinance.AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="android:backgroundTint">@color/card_bg</item>
         <item name="materialAlertDialogTitleTextStyle">
             @style/TextAppearance.MyFinance.AlertDialog.Title
         </item>
@@ -13,7 +12,6 @@
 
     <style name="TextAppearance.MyFinance.AlertDialog.Title" parent="MaterialAlertDialog.Material3.Title.Text">
         <item name="fontFamily">@font/nunito_semibold</item>
-        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="TextAppearance.MyFinance.Body" parent="MaterialAlertDialog.Material3.Body.Text">
@@ -21,7 +19,6 @@
     </style>
 
     <style name="Widget.MyFinance.AlertDialog.Button" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/accent</item>
         <item name="fontFamily">@font/nunito_semibold</item>
     </style>
 
@@ -37,7 +34,6 @@
     </style>
 
     <style name="ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox" parent="">
-        <item name="colorPrimary">@color/accent</item>
         <item name="editTextStyle">@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox
         </item>
         <item name="autoCompleteTextViewStyle">
@@ -53,13 +49,9 @@
         <item name="shapeAppearanceMediumComponent">
             @style/ShapeAppearance.MyFinance.MediumComponent
         </item>
-        <item name="colorPrimary">@color/accent</item>
-        <item name="colorSurface">@color/card_bg</item>
-        <item name="elevationOverlayEnabled">false</item>
     </style>
 
     <style name="Widget.MyFinance.DatePicker.Button" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/accent</item>
         <item name="fontFamily">@font/nunito_bold</item>
     </style>
 
@@ -70,6 +62,5 @@
     <!-- TextAppearance style. -->
     <style name="TextAppearance.MyFinance.Caption" parent="TextAppearance.MaterialComponents.Caption">
         <item name="fontFamily">@font/nunito</item>
-        <item name="android:fontFamily">@font/nunito</item>
     </style>
 </resources>

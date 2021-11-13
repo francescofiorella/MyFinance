@@ -41,7 +41,12 @@ fun setCornerRadius(view: BottomAppBar, cornerSize: Float) {
 fun setData(view: ValueLineChart, list: List<Pair<String, Double>>) {
     ValueLineSeries().also { series ->
         series.color = ColorUtils
-            .setAlphaComponent(ContextCompat.getColor(view.context, R.color.accent), 150)
+            .setAlphaComponent(
+                ContextCompat.getColor(
+                    view.context,
+                    R.color.md_theme_primaryContainer
+                ), 200
+            )
 
         list.forEach { pair ->
             val date: String = pair.first

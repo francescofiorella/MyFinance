@@ -52,7 +52,7 @@ class AddActivity : BaseActivity(), AddListener {
 
     private fun initLayout(code: Int) {
         datePickerBtn = object : DatePickerButton(
-            binding.addDateLayout,
+            binding.addDateCard,
             binding.addDateTextView,
             this@AddActivity
         ) {

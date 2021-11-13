@@ -26,7 +26,6 @@
             android:indeterminate="true"
             android:visibility="invisible"
             app:hideAnimationBehavior="outward"
-            app:indicatorColor="@color/accent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -77,58 +76,71 @@
                 android:clipToPadding="false"
                 android:paddingTop="@dimen/title_margin_bottom">
 
-                <EditText
-                    android:id="@+id/add_name_EditText"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/add_name_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:autofillHints="none"
-                    android:background="@drawable/bg_edit_text"
-                    android:elevation="@dimen/card_elevation"
-                    android:fontFamily="@font/nunito"
-                    android:hint="@string/nome"
-                    android:inputType="text|textCapSentences|textNoSuggestions"
-                    android:padding="15dp"
-                    android:text="@={viewmodel.name}"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <EditText
-                    android:id="@+id/add_price_EditText"
+                    <EditText
+                        android:id="@+id/add_name_EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="none"
+                        android:background="@android:color/transparent"
+                        android:fontFamily="@font/nunito"
+                        android:hint="@string/nome"
+                        android:inputType="text|textCapSentences|textNoSuggestions"
+                        android:padding="15dp"
+                        android:text="@={viewmodel.name}" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/add_price_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="10dp"
-                    android:autofillHints="none"
-                    android:background="@drawable/bg_edit_text"
-                    android:drawableEnd="@drawable/ic_euro"
-                    android:elevation="@dimen/card_elevation"
-                    android:fontFamily="@font/nunito"
-                    android:hint="@string/costo"
-                    android:inputType="numberDecimal"
-                    android:padding="15dp"
-                    android:text="@={viewmodel.priceString}"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_name_EditText" />
+                    app:layout_constraintTop_toBottomOf="@id/add_name_card">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/add_dateLayout"
+                    <EditText
+                        android:id="@+id/add_price_EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="none"
+                        android:background="@android:color/transparent"
+                        android:drawableEnd="@drawable/ic_euro"
+                        android:elevation="@dimen/card_elevation"
+                        android:fontFamily="@font/nunito"
+                        android:hint="@string/costo"
+                        android:inputType="numberDecimal"
+                        android:padding="15dp"
+                        android:text="@={viewmodel.priceString}" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/add_date_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_card"
                     android:clickable="@{viewmodel.requestCode == 1 ? true : false}"
-                    android:elevation="@dimen/card_elevation"
                     android:focusable="@{viewmodel.requestCode == 1 ? true : false}"
-                    app:layout_constraintCircleRadius="10dp"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_price_EditText">
+                    app:layout_constraintTop_toBottomOf="@id/add_price_card">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -161,7 +173,7 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
                 <GridLayout
                     android:id="@+id/add_typeLayout"
@@ -170,13 +182,12 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="10dp"
-                    android:background="@drawable/bg_edit_text"
                     android:columnCount="3"
                     android:elevation="@dimen/card_elevation"
                     android:rowCount="1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_dateLayout">
+                    app:layout_constraintTop_toBottomOf="@id/add_date_card">
 
                     <TextView
                         android:id="@+id/add_generico_tv"
@@ -190,7 +201,6 @@
                         android:paddingVertical="15dp"
                         android:text="@string/generico"
                         android:textAlignment="center"
-                        android:textColor="@color/type_button_color"
                         android:textSize="16sp" />
 
                     <TextView
@@ -206,7 +216,6 @@
                         android:paddingVertical="15dp"
                         android:text="@string/spesa"
                         android:textAlignment="center"
-                        android:textColor="@color/type_button_color"
                         android:textSize="16sp" />
 
                     <TextView
@@ -221,7 +230,7 @@
                         android:paddingVertical="15dp"
                         android:text="@string/biglietto"
                         android:textAlignment="center"
-                        android:textColor="@color/type_button_color"
+
                         android:textSize="16sp" />
 
                 </GridLayout>
@@ -233,7 +242,6 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="10dp"
-                    android:background="@drawable/bg_edit_text"
                     android:elevation="@dimen/card_elevation"
                     android:fontFamily="@font/nunito"
                     android:padding="15dp"

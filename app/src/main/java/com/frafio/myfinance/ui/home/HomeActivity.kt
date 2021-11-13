@@ -59,7 +59,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 reloadDashboard()
-                binding.logoutBtn.setImageDrawable(
+                binding.logoutImage.setImageDrawable(
                     ContextCompat.getDrawable(
                         this,
                         R.drawable.ic_logout
@@ -172,25 +172,25 @@ class HomeActivity : BaseActivity(), HomeListener {
             when (destination.label) {
                 getString(R.string.nav_1) -> {
                     binding.fragmentTitle.text = destination.label
-                    binding.logoutBtn.instantHide()
+                    binding.logoutCard.instantHide()
                     binding.propicImageView.instantShow()
                 }
 
                 getString(R.string.nav_2_extended) -> {
                     binding.fragmentTitle.text = destination.label
-                    binding.logoutBtn.instantHide()
+                    binding.logoutCard.instantHide()
                     binding.propicImageView.instantShow()
                 }
 
                 getString(R.string.nav_3) -> {
                     binding.fragmentTitle.text = destination.label
-                    binding.logoutBtn.instantShow()
+                    binding.logoutCard.instantShow()
                     binding.propicImageView.instantHide()
                 }
 
                 getString(R.string.nav_4) -> {
                     binding.fragmentTitle.text = destination.label
-                    binding.logoutBtn.instantHide()
+                    binding.logoutCard.instantHide()
                     binding.propicImageView.instantShow()
                 }
             }
@@ -232,7 +232,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         response.observe(this, { authResult ->
             if (authResult.code == AuthCode.LOGOUT_SUCCESS.code) {
                 loadRoundImage(binding.propicImageView, null)
-                binding.logoutBtn.setImageDrawable(
+                binding.logoutImage.setImageDrawable(
                     ContextCompat.getDrawable(
                         this,
                         R.drawable.ic_login
@@ -251,7 +251,7 @@ class HomeActivity : BaseActivity(), HomeListener {
             when (authResult.code) {
                 AuthCode.USER_LOGGED.code -> {
                     viewModel.updateUserData()
-                    binding.logoutBtn.setImageDrawable(
+                    binding.logoutImage.setImageDrawable(
                         ContextCompat.getDrawable(
                             this,
                             R.drawable.ic_logout
@@ -262,7 +262,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                 }
 
                 AuthCode.USER_NOT_LOGGED.code -> {
-                    binding.logoutBtn.setImageDrawable(
+                    binding.logoutImage.setImageDrawable(
                         ContextCompat.getDrawable(
                             this,
                             R.drawable.ic_login

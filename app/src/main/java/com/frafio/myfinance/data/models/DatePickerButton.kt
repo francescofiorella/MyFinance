@@ -6,12 +6,13 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.frafio.myfinance.R
 import com.frafio.myfinance.utils.dateToString
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.time.LocalDate
 import java.util.*
 
 open class DatePickerButton(
-    private val layout: ConstraintLayout,
+    private val layout: MaterialCardView,
     private val textView: TextView,
     private val context: FragmentActivity
 ) {

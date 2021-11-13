@@ -1,14 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Theme colors. -->
+    <color name="md_theme_primary">#78D1FF</color>
+    <color name="md_theme_onPrimary">#00344A</color>
+    <color name="md_theme_primaryContainer">#004C69</color>
+    <color name="md_theme_onPrimaryContainer">#C2E8FF</color>
+    <color name="md_theme_secondary">#B5C9D7</color>
+    <color name="md_theme_onSecondary">#20333E</color>
+    <color name="md_theme_secondaryContainer">#374955</color>
+    <color name="md_theme_onSecondaryContainer">#D1E5F3</color>
+    <color name="md_theme_tertiary">#CAC1EA</color>
+    <color name="md_theme_onTertiary">#322C4C</color>
+    <color name="md_theme_tertiaryContainer">#484264</color>
+    <color name="md_theme_onTertiaryContainer">#E7DEFF</color>
+    <color name="md_theme_error">#FFB4A9</color>
+    <color name="md_theme_errorContainer">#930006</color>
+    <color name="md_theme_onError">#680003</color>
+    <color name="md_theme_onErrorContainer">#FFDAD4</color>
+    <color name="md_theme_background">#191C1E</color>
+    <color name="md_theme_onBackground">#E1E2E5</color>
+    <color name="md_theme_surface">#191C1E</color>
+    <color name="md_theme_onSurface">#E1E2E5</color>
+    <color name="md_theme_surfaceVariant">#41484D</color>
+    <color name="md_theme_onSurfaceVariant">#C0C7CD</color>
+    <color name="md_theme_outline">#8B9298</color>
+    <color name="md_theme_inverseOnSurface">#191C1E</color>
+    <color name="md_theme_inverseSurface">#E1E2E5</color>
+    <color name="md_theme_primaryInverse">#00668B</color>
+
     <!--Theme-related custom colors. -->
-    <color name="primary">#2C3240</color>
-    <color name="background">@color/black</color>
-    <color name="accent">#01579b</color>
-    <!--<color name="error">@color/cinnamon_satin</color>-->
     <color name="primary_text">@color/white</color>
     <color name="inverted_primary_text">@color/black</color>
     <color name="disabled_text">#3F4952</color>
-    <color name="snackbar_bg">#F4F4F4</color>
-    <color name="card_bg">#191C25</color>
-    <color name="default_nav_items">@color/white</color>
 </resources>

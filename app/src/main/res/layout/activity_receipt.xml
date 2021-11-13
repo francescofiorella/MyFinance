@@ -60,22 +60,28 @@
             app:layout_constraintTop_toTopOf="@+id/receipt_purchaseTitle"
             tools:text="€ 0.00" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/receipt_recView"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/receipt_list_card"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginHorizontal="10dp"
             android:layout_marginTop="@dimen/title_margin_bottom"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/bg_edit_text"
-            android:elevation="@dimen/card_elevation"
-            android:scrollbars="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:cardCornerRadius="@dimen/card_corner_radius"
             app:layout_constraintBottom_toTopOf="@id/receipt_addLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/receipt_purchaseTitle"
-            tools:listitem="@layout/layout_receipt_item_rv" />
+            app:layout_constraintTop_toBottomOf="@id/receipt_purchaseTitle">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/receipt_recView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/layout_receipt_item_rv" />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/receipt_addLayout"
@@ -83,46 +89,56 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent">
 
-            <EditText
-                android:id="@+id/receipt_name_EditText"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/receipt_name_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
-                android:autofillHints="none"
-                android:background="@drawable/bg_edit_text"
-                android:elevation="@dimen/card_elevation"
-                android:fontFamily="@font/nunito"
-                android:hint="@string/nome"
-                android:inputType="text|textCapCharacters"
-                android:padding="15dp"
-                android:text="@={viewmodel.receiptName}"
-                app:layout_constraintBottom_toTopOf="@id/receipt_price_EditText"
+                android:layout_margin="10dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:layout_constraintBottom_toTopOf="@id/receipt_price_card"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <EditText
-                android:id="@+id/receipt_price_EditText"
+                <EditText
+                    android:id="@+id/receipt_name_EditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="none"
+                    android:background="@android:color/transparent"
+                    android:fontFamily="@font/nunito"
+                    android:hint="@string/nome"
+                    android:inputType="text|textCapCharacters"
+                    android:padding="15dp"
+                    android:text="@={viewmodel.receiptName}" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/receipt_price_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:autofillHints="none"
-                android:background="@drawable/bg_edit_text"
-                android:drawableEnd="@drawable/ic_euro"
-                android:elevation="@dimen/card_elevation"
-                android:fontFamily="@font/nunito"
-                android:hint="@string/costo"
-                android:inputType="numberDecimal"
-                android:padding="15dp"
-                android:text="@={viewmodel.receiptPrice}"
+                android:layout_margin="10dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
                 app:layout_constraintBottom_toBottomOf="@+id/receipt_addBtn"
                 app:layout_constraintEnd_toStartOf="@+id/receipt_addBtn"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/receipt_addBtn" />
+                app:layout_constraintTop_toTopOf="@+id/receipt_addBtn">
+
+                <EditText
+                    android:id="@+id/receipt_price_EditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="none"
+                    android:background="@android:color/transparent"
+                    android:drawableEnd="@drawable/ic_euro"
+                    android:fontFamily="@font/nunito"
+                    android:hint="@string/costo"
+                    android:inputType="numberDecimal"
+                    android:padding="15dp"
+                    android:text="@={viewmodel.receiptPrice}" />
+
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/receipt_addBtn"
@@ -134,7 +150,6 @@
                 android:fontFamily="@font/nunito_semibold"
                 android:onClick="@{viewmodel::onAddButtonClick}"
                 android:text="@string/aggiungi"
-                app:elevation="@dimen/card_elevation"
                 app:icon="@drawable/ic_add"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
