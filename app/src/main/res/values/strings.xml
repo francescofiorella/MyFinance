@@ -75,4 +75,13 @@
     <string name="chart_icon">Chart Icon</string>
     <string name="version_icon">Version Icon</string>
     <string name="collection_icon">Collection Icon</string>
+    <string name="tipo">Tipo</string>
+
+    <string-array name="types">
+        <item>Generico</item>
+        <item>Spesa</item>
+        <item>Trasporti</item>
+        <item>Affitto</item>
+        <item>Totale</item>
+    </string-array>
 </resources>

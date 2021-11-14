@@ -3,6 +3,7 @@ package com.frafio.myfinance.ui.add
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -32,8 +33,7 @@ class AddActivity : BaseActivity(), AddListener {
 
     private val factory: AddViewModelFactory by instance()
 
-    // custom layouts
-    private lateinit var typeBtnTrio: ButtonTrio
+    // custom datePicker layout
     private lateinit var datePickerBtn: DatePickerButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +65,17 @@ class AddActivity : BaseActivity(), AddListener {
             }
         }
 
-        typeBtnTrio = object : ButtonTrio(
+        resources.getStringArray(R.array.types).also { items ->
+            ArrayAdapter(
+                applicationContext,
+                R.layout.layout_type_dropdown_item,
+                items
+            ).also { adapter ->
+                binding.typeAutoCompleteTV.setAdapter(adapter)
+            }
+        }
+
+        /*typeBtnTrio = object : ButtonTrio( TODO
             binding.addTypeLayout,
             binding.addGenericoTv,
             binding.addSpesaTv,
@@ -92,12 +102,12 @@ class AddActivity : BaseActivity(), AddListener {
 
                 viewModel.type = DbPurchases.TYPES.TICKET.value
             }
-        }
+        }*/
 
         if (code == ADD_PURCHASE_CODE) {
-            setTotSwitch()
+            //setTotSwitch() TODO
         } else if (code == EDIT_PURCHASE_CODE) {
-            typeBtnTrio.isEnabled = false
+            //typeBtnTrio.isEnabled = false TODO
 
             intent.also { intent ->
                 intent.getStringExtra("${getString(R.string.default_path)}.PURCHASE_ID")?.let {
@@ -131,7 +141,7 @@ class AddActivity : BaseActivity(), AddListener {
 
             datePickerBtn.isEnabled = false
 
-            when (viewModel.purchaseType) {
+            /*when (viewModel.purchaseType) { TODO
                 DbPurchases.TYPES.GENERIC.value -> {
                     typeBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_1
                     typeBtnTrio.enableOnlySelectedBtn()
@@ -146,13 +156,13 @@ class AddActivity : BaseActivity(), AddListener {
                     typeBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_3
                     typeBtnTrio.enableOnlySelectedBtn()
                 }
-            }
+            }*/
         }
 
         viewModel.updateTime(datePickerBtn)
     }
 
-    private fun setTotSwitch() {
+    /*private fun setTotSwitch() { TODO
         binding.addTotaleSwitch.setOnCheckedChangeListener { _, isChecked ->
             viewModel.totChecked = isChecked
             if (isChecked) {
@@ -178,7 +188,7 @@ class AddActivity : BaseActivity(), AddListener {
                 typeBtnTrio.performClick()
             }
         }
-    }
+    }*/
 
     fun onBackClick(view: View) {
         finish()
