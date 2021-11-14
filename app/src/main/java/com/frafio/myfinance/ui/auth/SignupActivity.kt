@@ -101,6 +101,6 @@ class SignupActivity : BaseActivity(), AuthListener {
     }
 
     fun onBackClick(view: View) {
-        finish()
+        onBackPressed()
     }
 }

@@ -29,8 +29,6 @@ class AddViewModel(
     var month: Int? = LocalDate.now().monthValue
     var day: Int? = LocalDate.now().dayOfMonth
 
-    var totChecked: Boolean = false
-
     var purchaseID: String? = null
     var purchasePrice: Double? = null
     var purchaseType: Int? = null
@@ -56,12 +54,12 @@ class AddViewModel(
             return
         }
 
-        if (name == DbPurchases.NAMES.TOTALE.value && !totChecked) {
+        if (name == DbPurchases.NAMES.TOTALE.value && type != DbPurchases.TYPES.TOTAL.value) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.WRONG_NAME_TOTAL))
             return
         }
 
-        if (totChecked) {
+        if (type == DbPurchases.TYPES.TOTAL.value) {
             val purchase =
                 Purchase(userEmail, name, 0.0, year, month, day, DbPurchases.TYPES.TOTAL.value)
             val response = purchaseRepository.addTotale(purchase)

@@ -154,4 +154,8 @@ class LoginActivity : BaseActivity(), AuthListener {
             else -> snackbar(authResult.message)
         }
     }
+
+    fun onBackClick(view: View) {
+        onBackPressed()
+    }
 }

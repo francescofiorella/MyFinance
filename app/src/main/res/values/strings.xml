@@ -31,13 +31,6 @@
     <string name="nome">Nome</string>
     <string name="costo">Costo</string>
     <string name="datepickerarrow">DatePickerArrow</string>
-    <string name="generico">Generico</string>
-    <string name="spesa">Spesa</string>
-    <string name="biglietto">Trasporti</string>
-    <string name="trenitalia">TrenItalia</string>
-    <string name="amtab">Amtab</string>
-    <string name="altro">Altro</string>
-    <string name="nessun_acquisto">Nessun acquisto</string>
 
     <string name="login_signup_email">Inserisci la tua email</string>
     <string name="login_password">Inserisci la password</string>
@@ -75,13 +68,19 @@
     <string name="chart_icon">Chart Icon</string>
     <string name="version_icon">Version Icon</string>
     <string name="collection_icon">Collection Icon</string>
+
     <string name="tipo">Tipo</string>
+    <string name="generico">Generico</string>
+    <string name="spesa">Spesa</string>
+    <string name="trasporti">Trasporti</string>
+    <string name="affitto">Affitto</string>
+    <string name="nessun_acquisto">Nessun acquisto</string>
 
     <string-array name="types">
-        <item>Generico</item>
-        <item>Spesa</item>
-        <item>Trasporti</item>
-        <item>Affitto</item>
-        <item>Totale</item>
+        <item>@string/generico</item>
+        <item>@string/spesa</item>
+        <item>@string/trasporti</item>
+        <item>@string/affitto</item>
+        <item>@string/nessun_acquisto</item>
     </string-array>
 </resources>

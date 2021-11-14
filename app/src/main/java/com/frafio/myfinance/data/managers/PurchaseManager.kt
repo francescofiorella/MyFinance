@@ -79,7 +79,9 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                         purchaseList,
                         null
                     )
-                } else if (purchaseList[position].type != DbPurchases.TYPES.TICKET.value) {
+                } else if (purchaseList[position].type != DbPurchases.TYPES.TRANSPORT.value
+                    && purchaseList[position].type != DbPurchases.TYPES.RENT.value
+                ) {
                     for (i in position - 1 downTo 0) {
                         if (purchaseList[i].type == DbPurchases.TYPES.TOTAL.value) {
                             totPosition = i
@@ -162,14 +164,17 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .document(UserStorage.user!!.email!!)
             .collection(getSharedCollection(sharedPreferences))
             .add(purchase).addOnSuccessListener {
-                var sum = if (purchase.type != DbPurchases.TYPES.TICKET.value) {
-                    purchase.price ?: 0.0
-                } else {
-                    0.0
-                }
+                var sum =
+                    if (purchase.type != DbPurchases.TYPES.TRANSPORT.value
+                        && purchase.type != DbPurchases.TYPES.RENT.value
+                    ) {
+                        purchase.price ?: 0.0
+                    } else {
+                        0.0
+                    }
                 for (item in PurchaseStorage.purchaseList) {
                     if (item.email == userEmail && item.type != DbPurchases.TYPES.TOTAL.value
-                        && item.type != DbPurchases.TYPES.TICKET.value && item.year == purchase.year
+                        && item.type != DbPurchases.TYPES.TRANSPORT.value && item.year == purchase.year
                         && item.month == purchase.month && item.day == purchase.day
                     ) {
                         sum += item.price ?: 0.0
@@ -221,7 +226,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     var sum = 0.0
                     for (item in PurchaseStorage.purchaseList) {
                         if (item.email == purchase.email && item.type != DbPurchases.TYPES.TOTAL.value
-                            && item.type != DbPurchases.TYPES.TICKET.value && item.year == purchase.year
+                            && item.type != DbPurchases.TYPES.TRANSPORT.value && item.year == purchase.year
                             && item.month == purchase.month && item.day == purchase.day
                         ) {
                             sum += item.price ?: 0.0

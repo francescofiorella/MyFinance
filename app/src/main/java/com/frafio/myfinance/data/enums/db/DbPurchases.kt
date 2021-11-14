@@ -13,6 +13,7 @@ object DbPurchases {
     }
 
     enum class NAMES(val value: String) {
+        AFFITTO("Affitto"),
         TOTALE("Totale"),
         TOTALE_ZERO("0.00")
     }
@@ -21,7 +22,7 @@ object DbPurchases {
         TOTAL(0),
         SHOPPING(1),
         GENERIC(2),
-        TICKET(3),
+        TRANSPORT(3),
         RENT(4)
     }
 

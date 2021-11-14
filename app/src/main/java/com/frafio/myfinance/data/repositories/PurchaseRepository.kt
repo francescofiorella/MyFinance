@@ -71,7 +71,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                     }
                 }
 
-                DbPurchases.TYPES.TICKET.value -> {
+                DbPurchases.TYPES.TRANSPORT.value -> {
                     // totale biglietti
                     ticketTot += purchase.price ?: 0.0
                 }

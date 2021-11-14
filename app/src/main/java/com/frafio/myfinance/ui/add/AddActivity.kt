@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
-import com.frafio.myfinance.data.models.ButtonTrio
 import com.frafio.myfinance.data.models.DatePickerButton
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
@@ -71,43 +70,63 @@ class AddActivity : BaseActivity(), AddListener {
                 R.layout.layout_type_dropdown_item,
                 items
             ).also { adapter ->
-                binding.typeAutoCompleteTV.setAdapter(adapter)
+                binding.typeAutoCompleteTV.also { autoCompleteTextView ->
+                    autoCompleteTextView.setAdapter(adapter)
+                    autoCompleteTextView.setOnItemClickListener { parent, view, position, id ->
+                        if (binding.addNameEditText.text.toString() == DbPurchases.NAMES.AFFITTO.value
+                            || (binding.addNameEditText.text.toString() == DbPurchases.NAMES.TOTALE.value
+                                    && binding.addPriceEditText.text.toString() == DbPurchases.NAMES.TOTALE_ZERO.value)
+                        ) {
+                            binding.addNameEditText.clearText()
+                            binding.addNameEditText.isEnabled = true
+
+                            binding.addPriceEditText.clearText()
+                            binding.addPriceEditText.isEnabled = true
+                        }
+
+                        (parent.getItemAtPosition(position) as String).also { item ->
+                            when (item) {
+                                items[0] -> {
+                                    viewModel.type = DbPurchases.TYPES.GENERIC.value
+                                }
+
+                                items[1] -> {
+                                    viewModel.type = DbPurchases.TYPES.SHOPPING.value
+                                }
+
+                                items[2] -> {
+                                    viewModel.type = DbPurchases.TYPES.TRANSPORT.value
+                                }
+
+                                items[3] -> {
+                                    binding.addNameEditText.setText(DbPurchases.NAMES.AFFITTO.value)
+                                    binding.addNameEditText.isEnabled = false
+                                    viewModel.type = DbPurchases.TYPES.RENT.value
+                                }
+
+                                items[4] -> {
+                                    binding.addNameEditText.setText(DbPurchases.NAMES.TOTALE.value)
+                                    binding.addNameEditText.isEnabled = false
+
+                                    binding.addPriceEditText.setText(DbPurchases.NAMES.TOTALE_ZERO.value)
+                                    binding.addPriceEditText.isEnabled = false
+
+                                    binding.addNameEditText.error = null
+                                    binding.addPriceEditText.error = null
+
+                                    viewModel.type = DbPurchases.TYPES.TOTAL.value
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        /*typeBtnTrio = object : ButtonTrio( TODO
-            binding.addTypeLayout,
-            binding.addGenericoTv,
-            binding.addSpesaTv,
-            binding.addBigliettoTv
-        ) {
-            override fun onBtn1ClickAction() {
-                super.onBtn1ClickAction()
-
-                binding.addNameEditText.isEnabled = true
-
-                viewModel.type = DbPurchases.TYPES.GENERIC.value
-            }
-
-            override fun onBtn2ClickAction() {
-                super.onBtn2ClickAction()
-
-                binding.addNameEditText.isEnabled = true
-
-                viewModel.type = DbPurchases.TYPES.SHOPPING.value
-            }
-
-            override fun onBtn3ClickAction() {
-                super.onBtn3ClickAction()
-
-                viewModel.type = DbPurchases.TYPES.TICKET.value
-            }
-        }*/
-
         if (code == ADD_PURCHASE_CODE) {
-            //setTotSwitch() TODO
+            viewModel.type = DbPurchases.TYPES.GENERIC.value
         } else if (code == EDIT_PURCHASE_CODE) {
-            //typeBtnTrio.isEnabled = false TODO
+            binding.typeTextInputLayout.isEnabled = false
 
             intent.also { intent ->
                 intent.getStringExtra("${getString(R.string.default_path)}.PURCHASE_ID")?.let {
@@ -141,57 +160,30 @@ class AddActivity : BaseActivity(), AddListener {
 
             datePickerBtn.isEnabled = false
 
-            /*when (viewModel.purchaseType) { TODO
+            when (viewModel.purchaseType) {
                 DbPurchases.TYPES.GENERIC.value -> {
-                    typeBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_1
-                    typeBtnTrio.enableOnlySelectedBtn()
+                    binding.typeAutoCompleteTV.setText(getString(R.string.generico))
                 }
 
                 DbPurchases.TYPES.SHOPPING.value -> {
-                    typeBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_2
-                    typeBtnTrio.enableOnlySelectedBtn()
+                    binding.typeAutoCompleteTV.setText(getString(R.string.spesa))
                 }
 
-                DbPurchases.TYPES.TICKET.value -> {
-                    typeBtnTrio.selectedBtn = ButtonTrio.Button.BUTTON_3
-                    typeBtnTrio.enableOnlySelectedBtn()
+                DbPurchases.TYPES.TRANSPORT.value -> {
+                    binding.typeAutoCompleteTV.setText(getString(R.string.trasporti))
                 }
-            }*/
+
+                DbPurchases.TYPES.RENT.value -> {
+                    binding.typeAutoCompleteTV.setText(getString(R.string.affitto))
+                }
+            }
         }
 
         viewModel.updateTime(datePickerBtn)
     }
 
-    /*private fun setTotSwitch() { TODO
-        binding.addTotaleSwitch.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.totChecked = isChecked
-            if (isChecked) {
-                binding.addNameEditText.setText(DbPurchases.NAMES.TOTALE.value)
-                binding.addNameEditText.isEnabled = false
-
-                binding.addPriceEditText.setText(DbPurchases.NAMES.TOTALE_ZERO.value)
-                binding.addPriceEditText.isEnabled = false
-
-                binding.addNameEditText.error = null
-                binding.addPriceEditText.error = null
-
-                typeBtnTrio.isEnabled = false
-            } else {
-                binding.addNameEditText.clearText()
-                binding.addNameEditText.isEnabled = true
-
-                binding.addPriceEditText.clearText()
-                binding.addPriceEditText.isEnabled = true
-
-                typeBtnTrio.isEnabled = true
-
-                typeBtnTrio.performClick()
-            }
-        }
-    }*/
-
     fun onBackClick(view: View) {
-        finish()
+        onBackPressed()
     }
 
     override fun onAddStart() {

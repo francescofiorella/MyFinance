@@ -176,12 +176,12 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/type_card"
+                    android:id="@+id/type_textInputLayout"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:hint="@string/tipo"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
@@ -215,7 +215,7 @@
                     app:icon="@{viewmodel.requestCode == 1 ? @drawable/ic_add : @drawable/ic_create}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/type_card"
+                    app:layout_constraintTop_toBottomOf="@+id/type_textInputLayout"
                     app:layout_constraintVertical_bias="1.0"
                     tools:icon="@drawable/ic_add"
                     tools:text="@string/aggiungi" />
