@@ -73,15 +73,15 @@ class AddActivity : BaseActivity(), AddListener {
                 binding.typeAutoCompleteTV.also { autoCompleteTextView ->
                     autoCompleteTextView.setAdapter(adapter)
                     autoCompleteTextView.setOnItemClickListener { parent, view, position, id ->
-                        if (binding.addNameEditText.text.toString() == DbPurchases.NAMES.AFFITTO.value
-                            || (binding.addNameEditText.text.toString() == DbPurchases.NAMES.TOTALE.value
-                                    && binding.addPriceEditText.text.toString() == DbPurchases.NAMES.TOTALE_ZERO.value)
+                        if (binding.nameEditText.text.toString() == DbPurchases.NAMES.AFFITTO.value
+                            || (binding.nameEditText.text.toString() == DbPurchases.NAMES.TOTALE.value
+                                    && binding.priceEditText.text.toString() == DbPurchases.NAMES.TOTALE_ZERO.value)
                         ) {
-                            binding.addNameEditText.clearText()
-                            binding.addNameEditText.isEnabled = true
+                            binding.nameEditText.clearText()
+                            binding.nameTextInputLayout.isEnabled = true
 
-                            binding.addPriceEditText.clearText()
-                            binding.addPriceEditText.isEnabled = true
+                            binding.priceEditText.clearText()
+                            binding.priceTextInputLayout.isEnabled = true
                         }
 
                         (parent.getItemAtPosition(position) as String).also { item ->
@@ -99,20 +99,27 @@ class AddActivity : BaseActivity(), AddListener {
                                 }
 
                                 items[3] -> {
-                                    binding.addNameEditText.setText(DbPurchases.NAMES.AFFITTO.value)
-                                    binding.addNameEditText.isEnabled = false
+                                    binding.nameEditText.setText(DbPurchases.NAMES.AFFITTO.value)
                                     viewModel.type = DbPurchases.TYPES.RENT.value
+
+                                    binding.nameTextInputLayout.isEnabled = false
+
+                                    binding.nameTextInputLayout.isErrorEnabled = false
+                                    binding.nameTextInputLayout.error = null
                                 }
 
                                 items[4] -> {
-                                    binding.addNameEditText.setText(DbPurchases.NAMES.TOTALE.value)
-                                    binding.addNameEditText.isEnabled = false
+                                    binding.nameEditText.setText(DbPurchases.NAMES.TOTALE.value)
+                                    binding.nameTextInputLayout.isEnabled = false
 
-                                    binding.addPriceEditText.setText(DbPurchases.NAMES.TOTALE_ZERO.value)
-                                    binding.addPriceEditText.isEnabled = false
+                                    binding.priceEditText.setText(DbPurchases.NAMES.TOTALE_ZERO.value)
+                                    binding.priceTextInputLayout.isEnabled = false
 
-                                    binding.addNameEditText.error = null
-                                    binding.addPriceEditText.error = null
+                                    binding.nameTextInputLayout.isErrorEnabled = false
+                                    binding.nameTextInputLayout.error = null
+
+                                    binding.priceTextInputLayout.isErrorEnabled = false
+                                    binding.priceTextInputLayout.error = null
 
                                     viewModel.type = DbPurchases.TYPES.TOTAL.value
                                 }
@@ -126,8 +133,6 @@ class AddActivity : BaseActivity(), AddListener {
         if (code == ADD_PURCHASE_CODE) {
             viewModel.type = DbPurchases.TYPES.GENERIC.value
         } else if (code == EDIT_PURCHASE_CODE) {
-            binding.typeTextInputLayout.isEnabled = false
-
             intent.also { intent ->
                 intent.getStringExtra("${getString(R.string.default_path)}.PURCHASE_ID")?.let {
                     viewModel.purchaseID = it
@@ -224,11 +229,11 @@ class AddActivity : BaseActivity(), AddListener {
         binding.addProgressIndicator.hide()
 
         when (result.code) {
-            PurchaseCode.EMPTY_NAME.code -> binding.addNameEditText.error = result.message
+            PurchaseCode.EMPTY_NAME.code -> binding.nameTextInputLayout.error = result.message
 
-            PurchaseCode.WRONG_NAME_TOTAL.code -> binding.addNameEditText.error = result.message
+            PurchaseCode.WRONG_NAME_TOTAL.code -> binding.nameTextInputLayout.error = result.message
 
-            PurchaseCode.EMPTY_PRICE.code -> binding.addPriceEditText.error = result.message
+            PurchaseCode.EMPTY_PRICE.code -> binding.priceTextInputLayout.error = result.message
         }
     }
 }

@@ -76,58 +76,60 @@
                 android:clipToPadding="false"
                 android:paddingTop="@dimen/title_margin_bottom">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/add_name_card"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/name_textInputLayout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    android:layout_marginHorizontal="10dp"
+                    android:hint="@string/nome"
+                    app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
+                    app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
+                    app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
+                    app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
+                    app:endIconMode="clear_text"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:startIconDrawable="@drawable/ic_payments_myfinance">
 
-                    <EditText
-                        android:id="@+id/add_name_EditText"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/name_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:autofillHints="none"
-                        android:background="@android:color/transparent"
                         android:fontFamily="@font/nunito"
-                        android:hint="@string/nome"
                         android:inputType="text|textCapSentences|textNoSuggestions"
-                        android:padding="15dp"
                         android:text="@={viewmodel.name}" />
 
-                </com.google.android.material.card.MaterialCardView>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/add_price_card"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/price_textInputLayout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="10dp"
-                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="5dp"
+                    android:hint="@string/costo"
+                    app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
+                    app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
+                    app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
+                    app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
+                    app:endIconMode="clear_text"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_name_card">
+                    app:layout_constraintTop_toBottomOf="@id/name_textInputLayout"
+                    app:startIconDrawable="@drawable/ic_euro">
 
-                    <EditText
-                        android:id="@+id/add_price_EditText"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/price_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:autofillHints="none"
-                        android:background="@android:color/transparent"
-                        android:drawableEnd="@drawable/ic_euro"
-                        android:elevation="@dimen/card_elevation"
                         android:fontFamily="@font/nunito"
-                        android:hint="@string/costo"
                         android:inputType="numberDecimal"
-                        android:padding="15dp"
                         android:text="@={viewmodel.priceString}" />
 
-                </com.google.android.material.card.MaterialCardView>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/date_picker_textInputLayout"
@@ -145,7 +147,7 @@
                     app:endIconMode="dropdown_menu"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_price_card"
+                    app:layout_constraintTop_toBottomOf="@id/price_textInputLayout"
                     app:startIconDrawable="@drawable/ic_calendar_today">
 
                     <AutoCompleteTextView
@@ -166,6 +168,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="5dp"
+                    android:enabled="@{viewmodel.requestCode == 1 ? true : false}"
                     android:hint="@string/tipo"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
@@ -174,7 +177,8 @@
                     app:endIconMode="dropdown_menu"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/date_picker_textInputLayout">
+                    app:layout_constraintTop_toBottomOf="@+id/date_picker_textInputLayout"
+                    app:startIconDrawable="@drawable/ic_numbers">
 
                     <AutoCompleteTextView
                         android:id="@+id/type_auto_complete_TV"
