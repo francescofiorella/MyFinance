@@ -129,51 +129,35 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/add_date_card"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/date_picker_textInputLayout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
-                    android:layout_marginTop="10dp"
-                    android:clickable="@{viewmodel.requestCode == 1 ? true : false}"
-                    android:focusable="@{viewmodel.requestCode == 1 ? true : false}"
-                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    android:layout_marginTop="5dp"
+                    android:enabled="@{viewmodel.requestCode == 1 ? true : false}"
+                    android:hint="@string/date"
+                    app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
+                    app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
+                    app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
+                    app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
+                    app:endIconMode="dropdown_menu"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_price_card">
+                    app:layout_constraintTop_toBottomOf="@id/add_price_card"
+                    app:startIconDrawable="@drawable/ic_calendar_today">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <AutoCompleteTextView
+                        android:id="@+id/date_auto_complete_TV"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:padding="15dp">
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nunito"
+                        android:inputType="none"
+                        android:text="@{viewmodel.dateString}"
+                        tools:text="01/01/2000" />
 
-                        <TextView
-                            android:id="@+id/add_dateTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/nunito"
-                            android:text="@{viewmodel.dateString}"
-                            android:textColor="@color/primary_text"
-                            android:textSize="18sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:text="01/01/2000" />
-
-                        <ImageView
-                            android:id="@+id/add_dateArrowImageView"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:contentDescription="@string/datepickerarrow"
-                            android:src="@drawable/ic_arrow_drop_down"
-                            android:visibility="@{viewmodel.requestCode == 1 ? View.VISIBLE : View.GONE}"
-                            app:layout_constraintBottom_toBottomOf="@id/add_dateTextView"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="@id/add_dateTextView"
-                            tools:visibility="visible" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </com.google.android.material.card.MaterialCardView>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/type_textInputLayout"
@@ -190,7 +174,7 @@
                     app:endIconMode="dropdown_menu"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/add_date_card">
+                    app:layout_constraintTop_toBottomOf="@+id/date_picker_textInputLayout">
 
                     <AutoCompleteTextView
                         android:id="@+id/type_auto_complete_TV"

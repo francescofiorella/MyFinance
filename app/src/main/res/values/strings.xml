@@ -75,6 +75,7 @@
     <string name="trasporti">Trasporti</string>
     <string name="affitto">Affitto</string>
     <string name="nessun_acquisto">Nessun acquisto</string>
+    <string name="date">Data</string>
 
     <string-array name="types">
         <item>@string/generico</item>

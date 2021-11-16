@@ -1,19 +1,17 @@
 package com.frafio.myfinance.data.models
 
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
+import android.view.View
+import android.widget.AutoCompleteTextView
 import androidx.fragment.app.FragmentActivity
-import com.frafio.myfinance.R
 import com.frafio.myfinance.utils.dateToString
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.textfield.TextInputLayout
 import java.time.LocalDate
 import java.util.*
 
 open class DatePickerButton(
-    private val layout: MaterialCardView,
-    private val textView: TextView,
+    private val layout: TextInputLayout,
+    private val textView: AutoCompleteTextView,
     private val context: FragmentActivity
 ) {
     companion object {
@@ -21,34 +19,35 @@ open class DatePickerButton(
         private const val DATE_PICKER_TAG: String = "DATE_PICKER"
     }
 
-    var isEnabled: Boolean = true
-        set(value) {
-            field = value
+    val listener = View.OnClickListener {
+        // date picker
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        calendar.clear()
+        val today = MaterialDatePicker.todayInUtcMilliseconds()
+        val builder = MaterialDatePicker.Builder.datePicker()
+        builder.setTitleText(DATE_PICKER_TITLE)
+        builder.setSelection(today)
+        val materialDatePicker = builder.build()
 
-            if (value) {
-                setOnClickListener()
-            } else {
-                removeOnClickListener()
-                textView.setTextColor(ContextCompat.getColor(context, R.color.disabled_text))
-            }
-        }
+        showDatePicker(materialDatePicker)
+    }
 
     var year: Int? = null
         set(value) {
             field = value
-            textView.text = dateString
+            textView.setText(dateString)
         }
 
     var month: Int? = null
         set(value) {
             field = value
-            textView.text = dateString
+            textView.setText(dateString)
         }
 
     var day: Int? = null
         set(value) {
             field = value
-            textView.text = dateString
+            textView.setText(dateString)
         }
 
     val dateString: String?
@@ -65,22 +64,13 @@ open class DatePickerButton(
     }
 
     private fun setOnClickListener() {
-        layout.setOnClickListener {
-            // date picker
-            val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-            calendar.clear()
-            val today = MaterialDatePicker.todayInUtcMilliseconds()
-            val builder = MaterialDatePicker.Builder.datePicker()
-            builder.setTitleText(DATE_PICKER_TITLE)
-            builder.setSelection(today)
-            val materialDatePicker = builder.build()
-
-            showDatePicker(materialDatePicker)
-        }
+        layout.setEndIconOnClickListener(listener)
+        textView.setOnClickListener(listener)
     }
 
     private fun removeOnClickListener() {
-        layout.setOnClickListener(null)
+        layout.setEndIconOnClickListener(listener)
+        textView.setOnClickListener(null)
     }
 
     private fun showDatePicker(materialDatePicker: MaterialDatePicker<*>) {

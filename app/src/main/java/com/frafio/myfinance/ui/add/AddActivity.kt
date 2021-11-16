@@ -51,8 +51,8 @@ class AddActivity : BaseActivity(), AddListener {
 
     private fun initLayout(code: Int) {
         datePickerBtn = object : DatePickerButton(
-            binding.addDateCard,
-            binding.addDateTextView,
+            binding.datePickerTextInputLayout,
+            binding.dateAutoCompleteTV,
             this@AddActivity
         ) {
             override fun onPositiveBtnClickListener() {
@@ -157,8 +157,6 @@ class AddActivity : BaseActivity(), AddListener {
                     datePickerBtn.day = it
                 }
             }
-
-            datePickerBtn.isEnabled = false
 
             when (viewModel.purchaseType) {
                 DbPurchases.TYPES.GENERIC.value -> {
