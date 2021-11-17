@@ -63,8 +63,8 @@
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_marginEnd="16dp"
-            app:cardCornerRadius="@dimen/card_corner_radius"
             android:onClick="onLogoutButtonClick"
+            app:cardCornerRadius="@dimen/card_corner_radius"
             app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/fragmentTitle">
@@ -87,7 +87,7 @@
             android:paddingTop="@dimen/title_margin_bottom"
             android:paddingBottom="5dp"
             app:defaultNavHost="true"
-            app:layout_constraintBottom_toTopOf="@+id/nav_bottom"
+            app:layout_constraintBottom_toTopOf="@+id/nav_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/fragmentTitle"
@@ -105,7 +105,7 @@
             app:srcCompat="@drawable/ic_add" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/nav_bottom"
+            android:id="@+id/nav_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:itemTextAppearanceActive="@style/TextAppearance.MyFinance.Caption"

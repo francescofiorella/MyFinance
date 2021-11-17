@@ -30,14 +30,11 @@
             app:layout_constraintTop_toTopOf="parent"
             app:showAnimationBehavior="inward" />
 
-        <com.google.android.material.navigationrail.NavigationRailView
-            android:id="@+id/nav_rail"
-            android:layout_width="wrap_content"
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/nav_drawer"
+            android:layout_width="200dp"
             android:layout_height="match_parent"
-            app:backgroundTint="@color/md_theme_background"
-            app:itemTextAppearanceActive="@style/TextAppearance.MyFinance.Caption"
-            app:itemTextAppearanceInactive="@style/TextAppearance.MyFinance.Caption"
-            app:labelVisibilityMode="labeled"
+            app:itemTextAppearance="@style/TextAppearance.MyFinance.Caption"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -53,7 +50,7 @@
             android:padding="@dimen/title_padding"
             android:textColor="@color/primary_text"
             android:textSize="@dimen/title_size"
-            app:layout_constraintStart_toEndOf="@id/nav_rail"
+            app:layout_constraintStart_toEndOf="@id/nav_drawer"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/nav_1" />
 
@@ -72,18 +69,20 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/logout_card"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_marginEnd="16dp"
             android:onClick="onLogoutButtonClick"
+            app:cardCornerRadius="@dimen/card_corner_radius"
             app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/fragmentTitle">
 
             <ImageView
                 android:id="@+id/logout_image"
-                android:layout_width="@dimen/propic_size"
-                android:layout_height="@dimen/propic_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:contentDescription="@string/log_out"
                 app:srcCompat="@drawable/ic_logout" />
 
@@ -98,7 +97,7 @@
             app:defaultNavHost="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/nav_rail"
+            app:layout_constraintStart_toEndOf="@+id/nav_drawer"
             app:layout_constraintTop_toBottomOf="@+id/fragmentTitle"
             app:navGraph="@navigation/nav_graph" />
 

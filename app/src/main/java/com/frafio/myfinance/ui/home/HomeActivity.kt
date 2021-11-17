@@ -110,7 +110,8 @@ class HomeActivity : BaseActivity(), HomeListener {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController.also {
-            binding.navBottom?.setupWithNavController(it)
+            binding.navBar?.setupWithNavController(it)
+            binding.navDrawer?.setupWithNavController(it)
             //binding.navRail?.setupWithNavController(it)
         }
 
@@ -289,7 +290,7 @@ class HomeActivity : BaseActivity(), HomeListener {
 
     fun onProPicClick(view: View) {
         if (viewModel.isLogged()) {
-            if (binding.navBottom != null) {
+            if (binding.navBar != null || binding.navDrawer != null) {
                 navController.navigateUp()
                 navController.navigate(R.id.profileFragment)
             } else {
