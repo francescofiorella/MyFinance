@@ -34,7 +34,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         var todayTot = 0.0
         var tot = 0.0
         var ticketTot = 0.0
-        var numTot = 0
+        var lastMonthTot = 0.0
         var rentTot = 0.0
         var spesaTot = 0.0
 
@@ -50,8 +50,12 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                     val year = LocalDate.now().year
                     val month = LocalDate.now().monthValue
                     val day = LocalDate.now().dayOfMonth
-                    if (purchase.year == year && purchase.month == month && purchase.day == day) {
-                        todayTot = purchase.price ?: 0.0
+                    if (purchase.year == year && purchase.month == month) {
+                        lastMonthTot += purchase.price ?: 0.0
+
+                        if (purchase.day == day) {
+                            todayTot = purchase.price ?: 0.0
+                        }
                     }
 
                     // incrementa il totale
@@ -84,14 +88,6 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                 DbPurchases.TYPES.SHOPPING.value -> {
                     // totale spesa
                     spesaTot += purchase.price ?: 0.0
-
-                    // totale acquisti (senza biglietti e affitti)
-                    numTot++
-                }
-
-                DbPurchases.TYPES.GENERIC.value -> {
-                    // totale acquisti (senza biglietti e affitti)
-                    numTot++
                 }
             }
         }
@@ -104,7 +100,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         stats.add(doubleToPrice(monthAvg))
         stats.add(doubleToPrice(todayTot))
         stats.add(doubleToPrice(tot))
-        stats.add(numTot.toString())
+        stats.add(doubleToPrice(lastMonthTot))
         stats.add(doubleToPrice(rentTot))
         stats.add(doubleToPrice(spesaTot))
         stats.add(doubleToPrice(ticketTot))
