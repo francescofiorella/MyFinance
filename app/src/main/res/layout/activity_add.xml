@@ -149,7 +149,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/price_textInputLayout"
-                    app:startIconDrawable="@drawable/ic_calendar_today">
+                    app:startIconDrawable="@drawable/ic_today">
 
                     <AutoCompleteTextView
                         android:id="@+id/date_auto_complete_TV"
