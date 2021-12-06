@@ -14,8 +14,21 @@ fun doubleToString(double: Double): String {
     return formatter.format(double)
 }
 
+fun doubleToStringWithoutDecimals(double: Double): String {
+    val locale = Locale("en", "UK")
+    val nf = NumberFormat.getInstance(locale)
+    val formatter = nf as DecimalFormat
+    formatter.applyPattern("###,###,##0")
+
+    return formatter.format(double)
+}
+
 fun doubleToPrice(double: Double): String {
     return "€ ${doubleToString(double)}"
+}
+
+fun doubleToPriceWithoutDecimals(double: Double): String {
+    return "€ ${doubleToStringWithoutDecimals(double)}"
 }
 
 fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?): String? {

@@ -8,6 +8,8 @@ import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
+import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
+import com.frafio.myfinance.utils.doubleToStringWithoutDecimals
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -29,14 +31,19 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
     }
 
     fun calculateStats(): List<String> {
-        val dayAvg: Double
-        val monthAvg: Double
-        var todayTot = 0.0
-        var tot = 0.0
-        var ticketTot = 0.0
-        var lastMonthTot = 0.0
-        var rentTot = 0.0
-        var spesaTot = 0.0
+        /*
+        values (index)
+        0: dayAvg
+        1: monthAvg
+        2: todayTot
+        3: tot
+        4: lastMonthTot
+        5: rentTot
+        6: spesaTot
+        7: ticketTot
+        */
+
+        val values = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
         var nDays = 0
         var nMonth = 0
@@ -51,15 +58,15 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                     val month = LocalDate.now().monthValue
                     val day = LocalDate.now().dayOfMonth
                     if (purchase.year == year && purchase.month == month) {
-                        lastMonthTot += purchase.price ?: 0.0
+                        values[4] += purchase.price ?: 0.0
 
                         if (purchase.day == day) {
-                            todayTot = purchase.price ?: 0.0
+                            values[2] = purchase.price ?: 0.0
                         }
                     }
 
                     // incrementa il totale
-                    tot += purchase.price ?: 0.0
+                    values[3] += purchase.price ?: 0.0
 
                     // conta i giorni
                     nDays++
@@ -77,33 +84,34 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
 
                 DbPurchases.TYPES.TRANSPORT.value -> {
                     // totale biglietti
-                    ticketTot += purchase.price ?: 0.0
+                    values[7] += purchase.price ?: 0.0
                 }
 
                 DbPurchases.TYPES.RENT.value -> {
                     // totale affitto
-                    rentTot += purchase.price ?: 0.0
+                    values[5] += purchase.price ?: 0.0
                 }
 
                 DbPurchases.TYPES.SHOPPING.value -> {
                     // totale spesa
-                    spesaTot += purchase.price ?: 0.0
+                    values[6] += purchase.price ?: 0.0
                 }
             }
         }
 
-        dayAvg = tot / nDays
-        monthAvg = tot / nMonth
+        values[0] = values[3] / nDays
+        values[1] = values[3] / nMonth
 
         val stats = mutableListOf<String>()
-        stats.add(doubleToPrice(dayAvg))
-        stats.add(doubleToPrice(monthAvg))
-        stats.add(doubleToPrice(todayTot))
-        stats.add(doubleToPrice(tot))
-        stats.add(doubleToPrice(lastMonthTot))
-        stats.add(doubleToPrice(rentTot))
-        stats.add(doubleToPrice(spesaTot))
-        stats.add(doubleToPrice(ticketTot))
+
+        values.forEach { value ->
+            val string = if (value < 1000.0) {
+                doubleToPrice(value)
+            } else {
+                doubleToPriceWithoutDecimals(value)
+            }
+            stats.add(string)
+        }
 
         return stats
     }
