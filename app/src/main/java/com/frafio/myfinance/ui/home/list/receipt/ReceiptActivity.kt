@@ -63,6 +63,7 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
     // purchaseInteractionListener
     override fun onItemLongClick(receiptItem: ReceiptItem) {
         val builder = MaterialAlertDialogBuilder(this)
+        builder.setIcon(R.drawable.ic_delete)
         builder.setTitle(receiptItem.name)
         builder.setMessage(getString(R.string.receipt_delete_dialog))
         builder.setNegativeButton(getString(R.string.annulla), null)

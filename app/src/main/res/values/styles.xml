@@ -4,17 +4,20 @@
         <item name="materialAlertDialogTitleTextStyle">
             @style/TextAppearance.MyFinance.AlertDialog.Title
         </item>
-        <item name="materialAlertDialogBodyTextStyle">@style/TextAppearance.MyFinance.Body</item>
+        <item name="materialAlertDialogBodyTextStyle">
+            @style/TextAppearance.MyFinance.AlertDialog.Body
+        </item>
         <item name="buttonBarNeutralButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
         <item name="buttonBarNegativeButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
         <item name="buttonBarPositiveButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
+        <item name="fontFamily">@font/nunito</item>
     </style>
 
     <style name="TextAppearance.MyFinance.AlertDialog.Title" parent="MaterialAlertDialog.Material3.Title.Text">
         <item name="fontFamily">@font/nunito_semibold</item>
     </style>
 
-    <style name="TextAppearance.MyFinance.Body" parent="MaterialAlertDialog.Material3.Body.Text">
+    <style name="TextAppearance.MyFinance.AlertDialog.Body" parent="MaterialAlertDialog.Material3.Body.Text">
         <item name="fontFamily">@font/nunito</item>
     </style>
 

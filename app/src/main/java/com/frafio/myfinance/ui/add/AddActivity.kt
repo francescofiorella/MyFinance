@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.add
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -17,6 +18,7 @@ import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.snackbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.generic.instance
 import java.util.*
 
@@ -49,6 +51,85 @@ class AddActivity : BaseActivity(), AddListener {
         }
     }
 
+    private val typeViewListener = View.OnClickListener {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setIcon(R.drawable.ic_numbers)
+        builder.setTitle(getString(R.string.tipo))
+        builder.setSingleChoiceItems(
+            resources.getStringArray(R.array.types),
+            when (viewModel.type) {
+                DbPurchases.TYPES.GENERIC.value -> 0
+                DbPurchases.TYPES.SHOPPING.value -> 1
+                DbPurchases.TYPES.TRANSPORT.value -> 2
+                DbPurchases.TYPES.RENT.value -> 3
+                DbPurchases.TYPES.TOTAL.value -> 4
+                else -> -1
+            },
+            typeListener
+        )
+        builder.show()
+    }
+
+    private val typeListener = DialogInterface.OnClickListener { dialog, selectedItem ->
+        if (binding.nameEditText.text.toString() == DbPurchases.NAMES.AFFITTO.value
+            || (binding.nameEditText.text.toString() == DbPurchases.NAMES.TOTALE.value
+                    && binding.priceEditText.text.toString() == DbPurchases.NAMES.TOTALE_ZERO.value)
+        ) {
+            binding.nameEditText.clearText()
+            binding.nameTextInputLayout.isEnabled = true
+
+            binding.priceEditText.clearText()
+            binding.priceTextInputLayout.isEnabled = true
+        }
+
+        when (selectedItem) {
+            0 -> {
+                binding.typeAutoCompleteTV.setText(getString(R.string.generico))
+                viewModel.type = DbPurchases.TYPES.GENERIC.value
+            }
+
+            1 -> {
+                binding.typeAutoCompleteTV.setText(getString(R.string.spesa))
+                viewModel.type = DbPurchases.TYPES.SHOPPING.value
+            }
+
+            2 -> {
+                binding.typeAutoCompleteTV.setText(getString(R.string.trasporti))
+                viewModel.type = DbPurchases.TYPES.TRANSPORT.value
+            }
+
+            3 -> {
+                binding.typeAutoCompleteTV.setText(getString(R.string.affitto))
+                binding.nameEditText.setText(DbPurchases.NAMES.AFFITTO.value)
+                viewModel.type = DbPurchases.TYPES.RENT.value
+
+                binding.nameTextInputLayout.isEnabled = false
+
+                binding.nameTextInputLayout.isErrorEnabled = false
+                binding.nameTextInputLayout.error = null
+            }
+
+            4 -> {
+                binding.typeAutoCompleteTV.setText(getString(R.string.nessun_acquisto))
+                binding.nameEditText.setText(DbPurchases.NAMES.TOTALE.value)
+                binding.nameTextInputLayout.isEnabled = false
+
+                binding.priceEditText.setText(DbPurchases.NAMES.TOTALE_ZERO.value)
+                binding.priceTextInputLayout.isEnabled = false
+
+                binding.nameTextInputLayout.isErrorEnabled = false
+                binding.nameTextInputLayout.error = null
+
+                binding.priceTextInputLayout.isErrorEnabled = false
+                binding.priceTextInputLayout.error = null
+
+                viewModel.type = DbPurchases.TYPES.TOTAL.value
+            }
+        }
+
+        dialog.dismiss()
+    }
+
     private fun initLayout(code: Int) {
         datePickerBtn = object : DatePickerButton(
             binding.datePickerTextInputLayout,
@@ -64,71 +145,8 @@ class AddActivity : BaseActivity(), AddListener {
             }
         }
 
-        resources.getStringArray(R.array.types).also { items ->
-            ArrayAdapter(
-                applicationContext,
-                R.layout.layout_type_dropdown_item,
-                items
-            ).also { adapter ->
-                binding.typeAutoCompleteTV.also { autoCompleteTextView ->
-                    autoCompleteTextView.setAdapter(adapter)
-                    autoCompleteTextView.setOnItemClickListener { parent, view, position, id ->
-                        if (binding.nameEditText.text.toString() == DbPurchases.NAMES.AFFITTO.value
-                            || (binding.nameEditText.text.toString() == DbPurchases.NAMES.TOTALE.value
-                                    && binding.priceEditText.text.toString() == DbPurchases.NAMES.TOTALE_ZERO.value)
-                        ) {
-                            binding.nameEditText.clearText()
-                            binding.nameTextInputLayout.isEnabled = true
-
-                            binding.priceEditText.clearText()
-                            binding.priceTextInputLayout.isEnabled = true
-                        }
-
-                        (parent.getItemAtPosition(position) as String).also { item ->
-                            when (item) {
-                                items[0] -> {
-                                    viewModel.type = DbPurchases.TYPES.GENERIC.value
-                                }
-
-                                items[1] -> {
-                                    viewModel.type = DbPurchases.TYPES.SHOPPING.value
-                                }
-
-                                items[2] -> {
-                                    viewModel.type = DbPurchases.TYPES.TRANSPORT.value
-                                }
-
-                                items[3] -> {
-                                    binding.nameEditText.setText(DbPurchases.NAMES.AFFITTO.value)
-                                    viewModel.type = DbPurchases.TYPES.RENT.value
-
-                                    binding.nameTextInputLayout.isEnabled = false
-
-                                    binding.nameTextInputLayout.isErrorEnabled = false
-                                    binding.nameTextInputLayout.error = null
-                                }
-
-                                items[4] -> {
-                                    binding.nameEditText.setText(DbPurchases.NAMES.TOTALE.value)
-                                    binding.nameTextInputLayout.isEnabled = false
-
-                                    binding.priceEditText.setText(DbPurchases.NAMES.TOTALE_ZERO.value)
-                                    binding.priceTextInputLayout.isEnabled = false
-
-                                    binding.nameTextInputLayout.isErrorEnabled = false
-                                    binding.nameTextInputLayout.error = null
-
-                                    binding.priceTextInputLayout.isErrorEnabled = false
-                                    binding.priceTextInputLayout.error = null
-
-                                    viewModel.type = DbPurchases.TYPES.TOTAL.value
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        binding.typeAutoCompleteTV.setOnClickListener(typeViewListener)
+        binding.typeTextInputLayout.setEndIconOnClickListener(typeViewListener)
 
         if (code == ADD_PURCHASE_CODE) {
             viewModel.type = DbPurchases.TYPES.GENERIC.value

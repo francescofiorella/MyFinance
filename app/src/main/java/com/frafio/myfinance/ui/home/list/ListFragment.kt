@@ -95,8 +95,10 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                 val builder = MaterialAlertDialogBuilder(requireContext())
                 builder.setTitle(purchase.name)
                 if (purchase.type == 0 && purchase.price == 0.0) {
+                    builder.setIcon(R.drawable.ic_delete)
                     builder.setMessage(getString(R.string.purchase_delete_dialog))
                 } else if (purchase.type != 0) {
+                    builder.setIcon(R.drawable.ic_create)
                     builder.setMessage(getString(R.string.purchase_edit_delete_dialog))
                     builder.setNegativeButton(getString(R.string.modifica)) { _, _ ->
                         Intent(context, AddActivity::class.java).also {
