@@ -13,9 +13,9 @@ object DbPurchases {
     }
 
     enum class NAMES(val value: String) {
-        AFFITTO("Affitto"),
-        TOTALE("Totale"),
-        TOTALE_ZERO("0.00")
+        RENT("Affitto"),
+        TOTAL("Totale"),
+        TOTAL_PRICE("0.00")
     }
 
     enum class TYPES(val value: Int) {
@@ -27,7 +27,7 @@ object DbPurchases {
     }
 
     enum class COLLECTIONS(val value: String) {
-        ZERO_UNO("2020_2021"),
-        UNO_DUE("2021_2022")
+        ZERO_ONE("2020_2021"),
+        ONE_TWO("2021_2022")
     }
 }

@@ -12,7 +12,7 @@ import com.frafio.myfinance.data.models.ReceiptItem
 import com.frafio.myfinance.databinding.ActivityReceiptBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.clearText
-import com.frafio.myfinance.utils.snackbar
+import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.generic.instance
 
@@ -66,8 +66,8 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
         builder.setIcon(R.drawable.ic_delete)
         builder.setTitle(receiptItem.name)
         builder.setMessage(getString(R.string.receipt_delete_dialog))
-        builder.setNegativeButton(getString(R.string.annulla), null)
-        builder.setPositiveButton(R.string.elimina) { _, _ ->
+        builder.setNegativeButton(getString(R.string.cancel), null)
+        builder.setPositiveButton(R.string.delete) { _, _ ->
             viewModel.onDeleteClick(receiptItem)
         }
         builder.show()
@@ -78,12 +78,12 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
         response.observe(this, { result ->
             when (result.code) {
                 PurchaseCode.RECEIPT_ADD_SUCCESS.code -> {
-                    snackbar(result.message, binding.receiptNameEditText)
+                    snackBar(result.message, binding.receiptNameEditText)
                     binding.receiptNameEditText.clearText()
                     binding.receiptPriceEditText.clearText()
                 }
 
-                else -> snackbar(result.message, binding.receiptNameEditText)
+                else -> snackBar(result.message, binding.receiptNameEditText)
             }
         })
     }

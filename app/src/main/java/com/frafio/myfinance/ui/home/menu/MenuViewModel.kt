@@ -1,6 +1,5 @@
 package com.frafio.myfinance.ui.home.menu
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.BuildConfig
 import com.frafio.myfinance.data.enums.db.DbPurchases
@@ -29,6 +28,6 @@ class MenuViewModel(
     }
 
     private fun getChecked(): Boolean {
-        return purchaseRepository.getSelectedCollection() == DbPurchases.COLLECTIONS.ZERO_UNO.value
+        return purchaseRepository.getSelectedCollection() == DbPurchases.COLLECTIONS.ZERO_ONE.value
     }
 }

@@ -100,7 +100,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                 } else if (purchase.type != 0) {
                     builder.setIcon(R.drawable.ic_create)
                     builder.setMessage(getString(R.string.purchase_edit_delete_dialog))
-                    builder.setNegativeButton(getString(R.string.modifica)) { _, _ ->
+                    builder.setNegativeButton(getString(R.string.edit)) { _, _ ->
                         Intent(context, AddActivity::class.java).also {
                             it.putExtra(
                                 "${getString(R.string.default_path)}.REQUESTCODE",
@@ -142,7 +142,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                         }
                     }
                 }
-                builder.setPositiveButton(getString(R.string.elimina)) { _, _ ->
+                builder.setPositiveButton(getString(R.string.delete)) { _, _ ->
                     viewModel.deletePurchaseAt(position)
                 }
                 builder.show()

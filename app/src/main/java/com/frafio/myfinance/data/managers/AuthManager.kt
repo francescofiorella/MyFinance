@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.auth.AuthCode
-import com.frafio.myfinance.data.enums.auth.SigninException
+import com.frafio.myfinance.data.enums.auth.SignupException
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.models.Purchase
@@ -92,12 +92,12 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
                 when (e) {
                     is FirebaseAuthInvalidCredentialsException -> {
                         when (e.errorCode) {
-                            SigninException.EXCEPTION_INVALID_EMAIL.value -> response.value =
+                            SignupException.EXCEPTION_INVALID_EMAIL.value -> response.value =
                                 AuthResult(
                                     AuthCode.INVALID_EMAIL
                                 )
 
-                            SigninException.EXCEPTION_WRONG_PASSWORD.value -> response.value =
+                            SignupException.EXCEPTION_WRONG_PASSWORD.value -> response.value =
                                 AuthResult(
                                     AuthCode.WRONG_PASSWORD
                                 )
@@ -108,12 +108,12 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
 
                     is FirebaseAuthInvalidUserException -> {
                         when (e.errorCode) {
-                            SigninException.EXCEPTION_USER_NOT_FOUND.value -> response.value =
+                            SignupException.EXCEPTION_USER_NOT_FOUND.value -> response.value =
                                 AuthResult(
                                     AuthCode.USER_NOT_FOUND
                                 )
 
-                            SigninException.EXCEPTION_USER_DISABLED.value -> response.value =
+                            SignupException.EXCEPTION_USER_DISABLED.value -> response.value =
                                 AuthResult(
                                     AuthCode.USER_DISABLED
                                 )
@@ -198,7 +198,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         PurchaseStorage.resetPurchaseList()
         PurchaseStorage.existLastYear = false
         UserStorage.resetUser()
-        setSharedCollection(sharedPreferences, DbPurchases.COLLECTIONS.UNO_DUE.value)
+        setSharedCollection(sharedPreferences, DbPurchases.COLLECTIONS.ONE_TWO.value)
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
         return (response)
@@ -242,7 +242,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
 
     private fun checkLastYear() {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.ZERO_UNO.value)
+            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.ZERO_ONE.value)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
                 PurchaseStorage.existLastYear = !queryDocumentSnapshots.isEmpty
             }

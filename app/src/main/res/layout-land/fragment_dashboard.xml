@@ -112,7 +112,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text="@string/media_giornaliera"
+                                android:text="@string/avg_day"
                                 android:textSize="@dimen/card_title_size"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -169,7 +169,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text="@string/media_mensile"
+                                android:text="@string/avg_month"
                                 android:textSize="@dimen/card_title_size"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -226,7 +226,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text="@string/oggi"
+                                android:text="@string/today"
                                 android:textSize="@dimen/card_title_size"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -339,7 +339,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text="@string/totale"
+                                android:text="@string/total"
                                 android:textSize="@dimen/card_title_size"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -395,7 +395,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text="@string/tot_affitto"
+                                android:text="@string/total_rent"
                                 android:textSize="@dimen/card_title_size"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -451,7 +451,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text="@string/tot_spesa"
+                                android:text="@string/total_shopping"
                                 android:textSize="@dimen/card_title_size"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -507,7 +507,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text="@string/totale_biglietti"
+                                android:text="@string/total_transport"
                                 android:textSize="@dimen/card_title_size"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />

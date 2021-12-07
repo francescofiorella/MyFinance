@@ -11,7 +11,7 @@ import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivitySignupBinding
 import com.frafio.myfinance.ui.BaseActivity
-import com.frafio.myfinance.utils.snackbar
+import com.frafio.myfinance.utils.snackBar
 import org.kodein.di.generic.instance
 
 class SignupActivity : BaseActivity(), AuthListener {
@@ -58,11 +58,11 @@ class SignupActivity : BaseActivity(), AuthListener {
                 AuthCode.EMAIL_ALREADY_ASSOCIATED.code ->
                     binding.signupEmailInputLayout.error = authResult.message
 
-                AuthCode.PROFILE_NOT_UPDATED.code -> snackbar(authResult.message)
+                AuthCode.PROFILE_NOT_UPDATED.code -> snackBar(authResult.message)
 
-                AuthCode.SIGNUP_FAILURE.code -> snackbar(authResult.message)
+                AuthCode.SIGNUP_FAILURE.code -> snackBar(authResult.message)
 
-                AuthCode.USER_DATA_NOT_UPDATED.code -> snackbar(authResult.message)
+                AuthCode.USER_DATA_NOT_UPDATED.code -> snackBar(authResult.message)
 
                 AuthCode.USER_DATA_UPDATED.code ->
                     Intent().also {
@@ -70,7 +70,7 @@ class SignupActivity : BaseActivity(), AuthListener {
                         finish()
                     }
 
-                else -> snackbar(authResult.message)
+                else -> snackBar(authResult.message)
             }
         })
     }
@@ -96,7 +96,7 @@ class SignupActivity : BaseActivity(), AuthListener {
             AuthCode.PASSWORD_NOT_MATCH.code ->
                 binding.signupPasswordConfirmInputLayout.error = authResult.message
 
-            else -> snackbar(authResult.message)
+            else -> snackBar(authResult.message)
         }
     }
 

@@ -107,7 +107,7 @@
                     android:autofillHints="none"
                     android:background="@android:color/transparent"
                     android:fontFamily="@font/nunito"
-                    android:hint="@string/nome"
+                    android:hint="@string/name"
                     android:inputType="text|textCapCharacters"
                     android:padding="15dp"
                     android:text="@={viewmodel.receiptName}" />
@@ -133,7 +133,7 @@
                     android:background="@android:color/transparent"
                     android:drawableEnd="@drawable/ic_euro"
                     android:fontFamily="@font/nunito"
-                    android:hint="@string/costo"
+                    android:hint="@string/price"
                     android:inputType="numberDecimal"
                     android:padding="15dp"
                     android:text="@={viewmodel.receiptPrice}" />
@@ -149,7 +149,7 @@
                 android:focusable="true"
                 android:fontFamily="@font/nunito_semibold"
                 android:onClick="@{viewmodel::onAddButtonClick}"
-                android:text="@string/aggiungi"
+                android:text="@string/add"
                 app:icon="@drawable/ic_add"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />

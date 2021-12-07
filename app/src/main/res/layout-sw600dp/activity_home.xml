@@ -56,10 +56,10 @@
 
         <ImageView
             android:id="@+id/propic_image_view"
-            android:layout_width="@dimen/propic_size"
-            android:layout_height="@dimen/propic_size"
-            android:layout_marginEnd="@dimen/propic_margin_end"
-            android:contentDescription="@string/propic"
+            android:layout_width="@dimen/profile_picture_size"
+            android:layout_height="@dimen/profile_picture_size"
+            android:layout_marginEnd="@dimen/profile_picture_margin_end"
+            android:contentDescription="@string/profile_picture"
             android:onClick="onProPicClick"
             app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
             app:layout_constraintEnd_toEndOf="parent"
@@ -83,7 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:contentDescription="@string/log_out"
+                android:contentDescription="@string/logout"
                 app:srcCompat="@drawable/ic_logout" />
 
         </com.google.android.material.card.MaterialCardView>
@@ -106,15 +106,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
-            android:contentDescription="@{viewmodel.isLogged() ? @string/addBtnContentDescription : @string/accedi}"
+            android:contentDescription="@{viewmodel.isLogged() ? @string/addBtnContentDescription : @string/login}"
             android:fontFamily="@font/nunito_semibold"
             android:onClick="onAddButtonClick"
-            android:text="@{viewmodel.isLogged() ? @string/aggiungi : @string/accedi}"
+            android:text="@{viewmodel.isLogged() ? @string/add : @string/login}"
             app:icon="@{viewmodel.isLogged() ? @drawable/ic_add : @drawable/ic_login}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:icon="@drawable/ic_add"
-            tools:text="@string/aggiungi" />
+            tools:text="@string/add" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

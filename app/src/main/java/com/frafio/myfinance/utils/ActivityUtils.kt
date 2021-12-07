@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.frafio.myfinance.R
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -38,18 +37,18 @@ fun Activity.setFullScreenEnabled(enable: Boolean) {
     }
 }
 
-fun Activity.snackbar(message: String, anchor: View? = null) {
+fun Activity.snackBar(message: String, anchor: View? = null) {
     val root = findViewById<ViewGroup>(android.R.id.content).rootView
     val nunito = ResourcesCompat.getFont(applicationContext, R.font.nunito)
 
-    Snackbar.make(root, message, BaseTransientBottomBar.LENGTH_SHORT).also { snackbar ->
+    Snackbar.make(root, message, BaseTransientBottomBar.LENGTH_SHORT).also { snackBar ->
         anchor?.let{
-            snackbar.setAnchorView(it)
+            snackBar.setAnchorView(it)
         }
 
-        val tv = snackbar.view.findViewById<TextView>(R.id.snackbar_text)
+        val tv = snackBar.view.findViewById<TextView>(R.id.snackbar_text)
         tv.typeface = nunito
 
-        snackbar.show()
+        snackBar.show()
     }
 }

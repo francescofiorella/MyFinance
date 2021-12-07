@@ -50,7 +50,7 @@ fun setData(view: ValueLineChart, list: List<Pair<String, Double>>) {
 
         list.forEach { pair ->
             val date: String = pair.first
-            // converti to Float e arrotonda alla seconda cifra decimale
+            // convert to Float e round the the second decimal figure
             val value: Float = pair.second.toFloat().round(2)
             series.addPoint(ValueLinePoint(date, value))
         }

@@ -53,7 +53,7 @@
             android:layout_marginTop="@dimen/title_margin_top"
             android:fontFamily="@font/nunito_bold"
             android:padding="@dimen/title_padding"
-            android:text="@string/add"
+            android:text="@string/add_purchase"
             android:textColor="@color/primary_text"
             android:textSize="@dimen/title_size"
             app:layout_constraintStart_toEndOf="@+id/back_arrow"
@@ -82,7 +82,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
-                    android:hint="@string/nome"
+                    android:hint="@string/name"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
@@ -110,7 +110,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="5dp"
-                    android:hint="@string/costo"
+                    android:hint="@string/price"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
@@ -170,7 +170,7 @@
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="5dp"
                     android:enabled="@{viewmodel.requestCode == 1 ? true : false}"
-                    android:hint="@string/tipo"
+                    android:hint="@string/type"
                     android:labelFor="@id/type_auto_complete_TV"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
@@ -188,7 +188,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
                         android:inputType="none"
-                        android:text="@string/generico" />
+                        android:text="@string/generic" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -201,14 +201,14 @@
                     android:focusable="true"
                     android:fontFamily="@font/nunito_semibold"
                     android:onClick="@{viewmodel::onAddButtonClick}"
-                    android:text="@{viewmodel.requestCode == 1 ? @string/aggiungi : @string/modifica}"
+                    android:text="@{viewmodel.requestCode == 1 ? @string/add : @string/edit}"
                     app:icon="@{viewmodel.requestCode == 1 ? @drawable/ic_add : @drawable/ic_create}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/type_textInputLayout"
                     app:layout_constraintVertical_bias="1.0"
                     tools:icon="@drawable/ic_add"
-                    tools:text="@string/aggiungi" />
+                    tools:text="@string/add" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

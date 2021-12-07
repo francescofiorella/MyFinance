@@ -5,8 +5,8 @@ import com.frafio.myfinance.MyFinanceApplication.Companion.COLLECTION_KEY
 import com.frafio.myfinance.data.enums.db.DbPurchases
 
 fun getSharedCollection(sharedPreferences: SharedPreferences): String {
-    return sharedPreferences.getString(COLLECTION_KEY, DbPurchases.COLLECTIONS.UNO_DUE.value)
-        ?: DbPurchases.COLLECTIONS.UNO_DUE.value
+    return sharedPreferences.getString(COLLECTION_KEY, DbPurchases.COLLECTIONS.ONE_TWO.value)
+        ?: DbPurchases.COLLECTIONS.ONE_TWO.value
 }
 
 fun setSharedCollection(sharedPreferences: SharedPreferences, collection: String) {

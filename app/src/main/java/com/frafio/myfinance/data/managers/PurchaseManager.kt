@@ -138,7 +138,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun addTotale(purchase: Purchase): LiveData<PurchaseResult> {
+    fun addTotal(purchase: Purchase): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
         purchase.id = "${purchase.year}${purchase.month}${purchase.day}"
@@ -182,7 +182,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                 }
                 val totalP = Purchase(
                     userEmail,
-                    DbPurchases.NAMES.TOTALE.value,
+                    DbPurchases.NAMES.TOTAL.value,
                     sum,
                     purchase.year,
                     purchase.month,
@@ -235,7 +235,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     val totID = "${purchase.year}${purchase.month}${purchase.day}"
                     val totalP = Purchase(
                         purchase.email,
-                        DbPurchases.NAMES.TOTALE.value,
+                        DbPurchases.NAMES.TOTAL.value,
                         sum,
                         purchase.year,
                         purchase.month,
@@ -269,9 +269,9 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
     fun updateListByCollection(isOldYear: Boolean): LiveData<PurchaseResult> {
         val collection: String = if (isOldYear) {
-            DbPurchases.COLLECTIONS.ZERO_UNO.value
+            DbPurchases.COLLECTIONS.ZERO_ONE.value
         } else {
-            DbPurchases.COLLECTIONS.UNO_DUE.value
+            DbPurchases.COLLECTIONS.ONE_TWO.value
         }
         setSharedCollection(sharedPreferences, collection)
         return updateList()

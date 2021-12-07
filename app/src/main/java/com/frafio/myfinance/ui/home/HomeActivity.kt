@@ -25,7 +25,7 @@ import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.loadRoundImage
-import com.frafio.myfinance.utils.snackbar
+import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.navigation.NavigationBarView
 import org.kodein.di.generic.instance
 
@@ -50,7 +50,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                 }
                 navController.navigate(R.id.listFragment)
 
-                snackbar(getString(R.string.purchase_added), binding.homeAddBtn)
+                snackBar(getString(R.string.purchase_added), binding.homeAddBtn)
             }
         }
     }
@@ -72,7 +72,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                     result.data?.extras?.getString("${getString(R.string.default_path)}.userName")
 
                 if (userRequest) {
-                    snackbar(
+                    snackBar(
                         "${getString(R.string.login_successful)} $userName",
                         binding.homeAddBtn
                     )
@@ -221,7 +221,7 @@ class HomeActivity : BaseActivity(), HomeListener {
 
     // method for children
     fun showSnackbar(message: String) {
-        snackbar(message, binding.homeAddBtn)
+        snackBar(message, binding.homeAddBtn)
     }
 
     override fun onLogOutSuccess(response: LiveData<AuthResult>) {
@@ -262,7 +262,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                     reloadDashboard()
                 }
 
-                AuthCode.USER_DATA_NOT_UPDATED.code -> snackbar(authResult.message)
+                AuthCode.USER_DATA_NOT_UPDATED.code -> snackBar(authResult.message)
 
                 else -> Unit
             }
@@ -335,7 +335,7 @@ class HomeActivity : BaseActivity(), HomeListener {
 
             binding.homeAddExtBtn?.also { extFab ->
                 extFab.icon = ContextCompat.getDrawable(this, R.drawable.ic_add)
-                extFab.text = getString(R.string.aggiungi)
+                extFab.text = getString(R.string.add)
                 extFab.contentDescription = getString(R.string.addBtnContentDescription)
             }
 
@@ -349,13 +349,13 @@ class HomeActivity : BaseActivity(), HomeListener {
 
             binding.homeAddBtn?.also { fab ->
                 fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_login))
-                fab.contentDescription = getString(R.string.accedi)
+                fab.contentDescription = getString(R.string.login)
             }
 
             binding.homeAddExtBtn?.also { extFab ->
                 extFab.icon = ContextCompat.getDrawable(this, R.drawable.ic_login)
-                extFab.text = getString(R.string.accedi)
-                extFab.contentDescription = getString(R.string.accedi)
+                extFab.text = getString(R.string.login)
+                extFab.contentDescription = getString(R.string.login)
             }
         }
     }

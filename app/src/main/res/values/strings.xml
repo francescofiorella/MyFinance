@@ -6,16 +6,16 @@
     <string name="nav_2_extended">Lista Acquisti</string>
     <string name="nav_3">Profilo</string>
     <string name="nav_4">Menu</string>
-    <string name="add">Nuovo Acquisto</string>
+    <string name="add_purchase">Nuovo Acquisto</string>
 
     <string name="addBtnContentDescription">Aggiungi un acquisto</string>
 
     <string name="empty">"   "</string>
 
-    <string name="aggiungi">Aggiungi</string>
-    <string name="modifica">Modifica</string>
-    <string name="elimina">Elimina</string>
-    <string name="annulla">Annulla</string>
+    <string name="add">Aggiungi</string>
+    <string name="edit">Modifica</string>
+    <string name="delete">Elimina</string>
+    <string name="cancel">Annulla</string>
 
     <string name="default_path">com.frafio.myfinance</string>
 
@@ -28,60 +28,60 @@
 
     <string name="receipt_delete_dialog">Vuoi eliminare la voce selezionata?</string>
 
-    <string name="nome">Nome</string>
-    <string name="costo">Costo</string>
-    <string name="datepickerarrow">DatePickerArrow</string>
+    <string name="name">Nome</string>
+    <string name="price">Costo</string>
+    <string name="date_picker_arrow">DatePickerArrow</string>
 
     <string name="login_signup_email">Inserisci la tua email</string>
     <string name="login_password">Inserisci la password</string>
-    <string name="accedi">Accedi</string>
+    <string name="login">Accedi</string>
     <string name="forgotten_password">Hai dimenticato la password?</string>
     <string name="login_google">Accedi con Google</string>
     <string name="login_signup">Non hai un account? Iscriviti</string>
     <string name="signup_name">Inserisci nome e cognome</string>
     <string name="signup_password">Inserisci una password</string>
     <string name="signup_password_confirm">Inserisci nuovamente la password</string>
-    <string name="registrati">Registrati</string>
+    <string name="signup">Registrati</string>
     <string name="signup_login">Hai già un account? Accedi</string>
     <string name="warning_home">Aggiungi il tuo primo acquisto!</string>
     <string name="warning_not_logged_home">Accedi per aggiungere il tuo primo acquisto!</string>
     <string name="warning_not_logged">Accedi al tuo account!</string>
 
-    <string name="media_giornaliera">Media \nGiornaliera</string>
-    <string name="media_mensile">Media \nMensile</string>
-    <string name="oggi">Acquisti \nOggi</string>
+    <string name="avg_day">Media \nGiornaliera</string>
+    <string name="avg_month">Media \nMensile</string>
+    <string name="today">Acquisti \nOggi</string>
     <string name="this_month">Ultimo \nMese</string>
-    <string name="totale">Totale \nAcquisti</string>
-    <string name="totale_biglietti">Totale \nTrasporti</string>
-    <string name="tot_affitto">Totale \nAffitto</string>
-    <string name="tot_spesa">Totale \n Spesa</string>
+    <string name="total">Totale \nAcquisti</string>
+    <string name="total_transport">Totale \nTrasporti</string>
+    <string name="total_rent">Totale \nAffitto</string>
+    <string name="total_shopping">Totale \n Spesa</string>
 
-    <string name="log_out">Log Out</string>
-    <string name="propic">Immagine di profilo</string>
+    <string name="logout">Log Out</string>
+    <string name="profile_picture">Immagine di profilo</string>
 
     <string name="card_dimension_ratio">1.2:1</string>
     <string name="back_arrow">Back Arrow</string>
-    <string name="trend_media_giornaliera">Trend Media Giornaliera</string>
-    <string name="mostra_2020_2021">Mostra 2020/2021</string>
+    <string name="trend_avg_day">Trend Media Giornaliera</string>
+    <string name="show_2020_2021">Mostra 2020/2021</string>
     <string name="dashboard_empty">dashboard_empty</string>
     <string name="list_empty">list_empty</string>
     <string name="chart_icon">Chart Icon</string>
     <string name="version_icon">Version Icon</string>
     <string name="collection_icon">Collection Icon</string>
 
-    <string name="tipo">Tipo</string>
-    <string name="generico">Generico</string>
-    <string name="spesa">Spesa</string>
-    <string name="trasporti">Trasporti</string>
-    <string name="affitto">Affitto</string>
-    <string name="nessun_acquisto">Nessun acquisto</string>
+    <string name="type">Tipo</string>
+    <string name="generic">Generico</string>
+    <string name="shopping">Spesa</string>
+    <string name="transport">Trasporti</string>
+    <string name="rent">Affitto</string>
+    <string name="zero_purchase">Nessun acquisto</string>
     <string name="date">Data</string>
 
     <string-array name="types">
-        <item>@string/generico</item>
-        <item>@string/spesa</item>
-        <item>@string/trasporti</item>
-        <item>@string/affitto</item>
-        <item>@string/nessun_acquisto</item>
+        <item>@string/generic</item>
+        <item>@string/shopping</item>
+        <item>@string/transport</item>
+        <item>@string/rent</item>
+        <item>@string/zero_purchase</item>
     </string-array>
 </resources>

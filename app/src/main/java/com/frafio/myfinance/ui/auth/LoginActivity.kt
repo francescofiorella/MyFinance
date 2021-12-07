@@ -12,8 +12,7 @@ import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.BaseActivity
-import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.utils.snackbar
+import com.frafio.myfinance.utils.snackBar
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -106,13 +105,13 @@ class LoginActivity : BaseActivity(), AuthListener {
             when (authResult.code) {
                 AuthCode.LOGIN_SUCCESS.code -> viewModel.updateUserData()
 
-                AuthCode.GOOGLE_LOGIN_FAILURE.code -> snackbar(authResult.message)
+                AuthCode.GOOGLE_LOGIN_FAILURE.code -> snackBar(authResult.message)
 
-                AuthCode.USER_DISABLED.code -> snackbar(authResult.message)
+                AuthCode.USER_DISABLED.code -> snackBar(authResult.message)
 
-                AuthCode.LOGIN_FAILURE.code -> snackbar(authResult.message)
+                AuthCode.LOGIN_FAILURE.code -> snackBar(authResult.message)
 
-                AuthCode.USER_DATA_NOT_UPDATED.code -> snackbar(authResult.message)
+                AuthCode.USER_DATA_NOT_UPDATED.code -> snackBar(authResult.message)
 
                 AuthCode.INVALID_EMAIL.code ->
                     binding.loginEmailInputLayout.error = authResult.message
@@ -133,7 +132,7 @@ class LoginActivity : BaseActivity(), AuthListener {
                     }
                 }
 
-                else -> snackbar(authResult.message)
+                else -> snackBar(authResult.message)
             }
         })
     }
@@ -151,7 +150,7 @@ class LoginActivity : BaseActivity(), AuthListener {
             AuthCode.SHORT_PASSWORD.code ->
                 binding.loginPasswordInputLayout.error = authResult.message
 
-            else -> snackbar(authResult.message)
+            else -> snackBar(authResult.message)
         }
     }
 

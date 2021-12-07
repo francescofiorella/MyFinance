@@ -9,7 +9,6 @@ import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
-import com.frafio.myfinance.utils.doubleToStringWithoutDecimals
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -39,8 +38,8 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         3: tot
         4: lastMonthTot
         5: rentTot
-        6: spesaTot
-        7: ticketTot
+        6: shoppingTot
+        7: transportTot
         */
 
         val values = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
@@ -53,7 +52,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         PurchaseStorage.purchaseList.forEach { purchase ->
             when (purchase.type) {
                 DbPurchases.TYPES.TOTAL.value -> {
-                    // totale di oggi
+                    // today total
                     val year = LocalDate.now().year
                     val month = LocalDate.now().monthValue
                     val day = LocalDate.now().dayOfMonth
@@ -65,13 +64,13 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                         }
                     }
 
-                    // incrementa il totale
+                    // increment tot
                     values[3] += purchase.price ?: 0.0
 
-                    // conta i giorni
+                    // count the day number
                     nDays++
 
-                    // conta i mesi
+                    // count the month number
                     if (purchase.year != lastYear) {
                         lastYear = purchase.year ?: 0
                         lastMonth = purchase.month ?: 0
@@ -83,17 +82,17 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                 }
 
                 DbPurchases.TYPES.TRANSPORT.value -> {
-                    // totale biglietti
+                    // transportTot
                     values[7] += purchase.price ?: 0.0
                 }
 
                 DbPurchases.TYPES.RENT.value -> {
-                    // totale affitto
+                    // rentTot
                     values[5] += purchase.price ?: 0.0
                 }
 
                 DbPurchases.TYPES.SHOPPING.value -> {
-                    // totale spesa
+                    // shoppingTot
                     values[6] += purchase.price ?: 0.0
                 }
             }
@@ -120,8 +119,8 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return purchaseManager.deleteAt(position)
     }
 
-    fun addTotale(purchase: Purchase): LiveData<PurchaseResult> {
-        return purchaseManager.addTotale(purchase)
+    fun addTotal(purchase: Purchase): LiveData<PurchaseResult> {
+        return purchaseManager.addTotal(purchase)
     }
 
     fun addPurchase(purchase: Purchase): LiveData<PurchaseResult> {
@@ -142,7 +141,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         if (PurchaseStorage.purchaseList.isEmpty()) {
             return avgList
         }
-        // salva la data del primo acquisto
+        // save the date of the first purchase
         var startDate = LocalDate.of(
             PurchaseStorage.purchaseList.last().year!!,
             PurchaseStorage.purchaseList.last().month!!,
@@ -159,26 +158,26 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
             PurchaseStorage.purchaseList.first().year!!
         )
 
-        // purchaseList è invertita -> cicla al contrario
+        // purchaseList is inverted -> loop in reverse
         for (i in PurchaseStorage.purchaseList.size - 1 downTo 0) {
             PurchaseStorage.purchaseList[i].also { purchase ->
-                // considera solo i totali
+                // consider just the totals
                 if (purchase.type == DbPurchases.TYPES.TOTAL.value) {
-                    // incrementa sum e count
+                    // increment sum and count
                     priceSum += purchase.price!!
                     purchaseCount++
 
-                    // calcola nuova data
+                    // calculate the new date
                     val newDate = LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
 
-                    // se è passata una settimana, aggiorna
+                    // if has passed a week, update
                     if (hasPassedAWeekBetween(startDate, newDate)) {
-                        // memorizza il punto in cui effettuo il calcolo
+                        // store the point where the evaluation is made
                         lastCount = purchaseCount
 
                         startDate = newDate
 
-                        // calcola la nuova media
+                        // calculate the new average
                         val newValue: Double = priceSum / purchaseCount
                         val element = Pair(
                             dateToString(purchase.day, purchase.month, purchase.year)!!,
@@ -189,7 +188,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                 }
             }
         }
-        // se ci sono acquisti rimanenti, aggiungili
+        // if there are other purchases, add them
         if (lastCount != purchaseCount) {
             val newValue: Double = priceSum / purchaseCount
             val element = Pair(lastDate!!, newValue)

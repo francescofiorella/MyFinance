@@ -131,7 +131,7 @@
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/nunito_semibold"
                     android:onClick="@{viewmodel::onLoginButtonClick}"
-                    android:text="@string/accedi"
+                    android:text="@string/login"
                     app:cornerRadius="@dimen/field_corner_radius"
                     app:icon="@drawable/ic_login"
                     app:layout_constraintEnd_toEndOf="parent"

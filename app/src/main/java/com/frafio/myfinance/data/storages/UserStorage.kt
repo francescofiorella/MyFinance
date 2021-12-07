@@ -4,19 +4,19 @@ import com.frafio.myfinance.data.models.User
 import com.google.firebase.auth.FirebaseUser
 
 object UserStorage {
-    private var _user: User? = null
+    private var privateUser: User? = null
     val user: User?
-        get() = _user
+        get() = privateUser
 
     fun updateUser(fUser: FirebaseUser) {
         var userPic = ""
         fUser.photoUrl?.let { uri ->
             userPic = uri.toString()
         }
-        _user = User(fUser.displayName, fUser.email, userPic)
+        privateUser = User(fUser.displayName, fUser.email, userPic)
     }
 
     fun resetUser() {
-        _user = null
+        privateUser = null
     }
 }

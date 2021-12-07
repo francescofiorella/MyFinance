@@ -54,7 +54,7 @@ class AddViewModel(
             return
         }
 
-        if (name == DbPurchases.NAMES.TOTALE.value && type != DbPurchases.TYPES.TOTAL.value) {
+        if (name == DbPurchases.NAMES.TOTAL.value && type != DbPurchases.TYPES.TOTAL.value) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.WRONG_NAME_TOTAL))
             return
         }
@@ -62,7 +62,7 @@ class AddViewModel(
         if (type == DbPurchases.TYPES.TOTAL.value) {
             val purchase =
                 Purchase(userEmail, name, 0.0, year, month, day, DbPurchases.TYPES.TOTAL.value)
-            val response = purchaseRepository.addTotale(purchase)
+            val response = purchaseRepository.addTotal(purchase)
             listener?.onAddSuccess(response)
         } else {
             if (priceString.isNullOrEmpty()) {
