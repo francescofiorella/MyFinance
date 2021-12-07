@@ -328,13 +328,17 @@ class HomeActivity : BaseActivity(), HomeListener {
                 )
             )
 
-            binding.homeAddBtn?.setImageDrawable(
-                ContextCompat.getDrawable(
-                    this,
-                    R.drawable.ic_add
-                )
-            )
-            binding.homeAddExtBtn?.icon = ContextCompat.getDrawable(this, R.drawable.ic_add)
+            binding.homeAddBtn?.also { fab ->
+                fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add))
+                fab.contentDescription = getString(R.string.addBtnContentDescription)
+            }
+
+            binding.homeAddExtBtn?.also { extFab ->
+                extFab.icon = ContextCompat.getDrawable(this, R.drawable.ic_add)
+                extFab.text = getString(R.string.aggiungi)
+                extFab.contentDescription = getString(R.string.addBtnContentDescription)
+            }
+
         } else {
             binding.logoutImage.setImageDrawable(
                 ContextCompat.getDrawable(
@@ -343,13 +347,16 @@ class HomeActivity : BaseActivity(), HomeListener {
                 )
             )
 
-            binding.homeAddBtn?.setImageDrawable(
-                ContextCompat.getDrawable(
-                    this,
-                    R.drawable.ic_login
-                )
-            )
-            binding.homeAddExtBtn?.icon = ContextCompat.getDrawable(this, R.drawable.ic_login)
+            binding.homeAddBtn?.also { fab ->
+                fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_login))
+                fab.contentDescription = getString(R.string.accedi)
+            }
+
+            binding.homeAddExtBtn?.also { extFab ->
+                extFab.icon = ContextCompat.getDrawable(this, R.drawable.ic_login)
+                extFab.text = getString(R.string.accedi)
+                extFab.contentDescription = getString(R.string.accedi)
+            }
         }
     }
 }
