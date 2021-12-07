@@ -5,7 +5,7 @@ import com.frafio.myfinance.data.repositories.UserRepository
 
 class HomeViewModel(
     private val userRepository: UserRepository
-) : ViewModel(){
+) : ViewModel() {
     var isLayoutReady: Boolean = false
 
     var listener: HomeListener? = null

@@ -100,9 +100,10 @@
             android:layout_margin="@dimen/fab_margin"
             android:contentDescription="@string/addBtnContentDescription"
             android:onClick="onAddButtonClick"
+            android:src="@{viewmodel.isLogged() ? @drawable/ic_add : @drawable/ic_login}"
             app:layout_constraintBottom_toBottomOf="@+id/home_fragmentContainerView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_add" />
+            tools:src="@drawable/ic_add" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/nav_bar"

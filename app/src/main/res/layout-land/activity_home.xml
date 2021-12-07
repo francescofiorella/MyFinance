@@ -113,9 +113,10 @@
             android:fontFamily="@font/nunito_semibold"
             android:onClick="onAddButtonClick"
             android:text="@string/aggiungi"
-            app:icon="@drawable/ic_add"
+            app:icon="@{viewmodel.isLogged() ? @drawable/ic_add : @drawable/ic_login}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:icon="@drawable/ic_add" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

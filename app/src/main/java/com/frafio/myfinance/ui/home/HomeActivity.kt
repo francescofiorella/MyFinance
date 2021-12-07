@@ -59,12 +59,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 reloadDashboard()
-                binding.logoutImage.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        this,
-                        R.drawable.ic_logout
-                    )
-                )
+                setDrawableToButtons(isLogged = true)
                 loadRoundImage(binding.propicImageView, viewModel.getProPic())
 
                 val userRequest =
@@ -219,7 +214,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                 }
             }
         } else {
-            snackbar(getString(R.string.warning_not_logged_home), binding.homeAddBtn)
+            goToLogin()
         }
 
     }
@@ -233,12 +228,8 @@ class HomeActivity : BaseActivity(), HomeListener {
         response.observe(this, { authResult ->
             if (authResult.code == AuthCode.LOGOUT_SUCCESS.code) {
                 loadRoundImage(binding.propicImageView, null)
-                binding.logoutImage.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        this,
-                        R.drawable.ic_login
-                    )
-                )
+                setDrawableToButtons(isLogged = false)
+
                 goToLogin()
                 // close profile fragment so that there will not be 2 dashboards
                 navController.popBackStack()
@@ -252,23 +243,13 @@ class HomeActivity : BaseActivity(), HomeListener {
             when (authResult.code) {
                 AuthCode.USER_LOGGED.code -> {
                     viewModel.updateUserData()
-                    binding.logoutImage.setImageDrawable(
-                        ContextCompat.getDrawable(
-                            this,
-                            R.drawable.ic_logout
-                        )
-                    )
+                    setDrawableToButtons(isLogged = true)
 
                     viewModel.isLayoutReady = false
                 }
 
                 AuthCode.USER_NOT_LOGGED.code -> {
-                    binding.logoutImage.setImageDrawable(
-                        ContextCompat.getDrawable(
-                            this,
-                            R.drawable.ic_login
-                        )
-                    )
+                    setDrawableToButtons(isLogged = false)
                     viewModel.isLayoutReady = true
                 }
 
@@ -289,15 +270,11 @@ class HomeActivity : BaseActivity(), HomeListener {
     }
 
     fun onProPicClick(view: View) {
-        if (viewModel.isLogged()) {
-            if (binding.navBar != null || binding.navDrawer != null) {
-                navController.navigateUp()
-                navController.navigate(R.id.profileFragment)
-            } else {
-                binding.navRail?.selectedItemId = R.id.profileFragment
-            }
+        if (binding.navBar != null || binding.navDrawer != null) {
+            navController.navigateUp()
+            navController.navigate(R.id.profileFragment)
         } else {
-            goToLogin()
+            binding.navRail?.selectedItemId = R.id.profileFragment
         }
     }
 
@@ -339,6 +316,40 @@ class HomeActivity : BaseActivity(), HomeListener {
             it.setOnItemSelectedListener(null)
             it.selectedItemId = R.id.dashboardFragment
             it.setOnItemSelectedListener(navRailListener)
+        }
+    }
+
+    private fun setDrawableToButtons(isLogged: Boolean) {
+        if (isLogged) {
+            binding.logoutImage.setImageDrawable(
+                ContextCompat.getDrawable(
+                    this,
+                    R.drawable.ic_logout
+                )
+            )
+
+            binding.homeAddBtn?.setImageDrawable(
+                ContextCompat.getDrawable(
+                    this,
+                    R.drawable.ic_add
+                )
+            )
+            binding.homeAddExtBtn?.icon = ContextCompat.getDrawable(this, R.drawable.ic_add)
+        } else {
+            binding.logoutImage.setImageDrawable(
+                ContextCompat.getDrawable(
+                    this,
+                    R.drawable.ic_login
+                )
+            )
+
+            binding.homeAddBtn?.setImageDrawable(
+                ContextCompat.getDrawable(
+                    this,
+                    R.drawable.ic_login
+                )
+            )
+            binding.homeAddExtBtn?.icon = ContextCompat.getDrawable(this, R.drawable.ic_login)
         }
     }
 }

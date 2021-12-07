@@ -4,7 +4,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -63,7 +62,7 @@ class AddActivity : BaseActivity(), AddListener {
                 DbPurchases.TYPES.TRANSPORT.value -> 2
                 DbPurchases.TYPES.RENT.value -> 3
                 DbPurchases.TYPES.TOTAL.value -> 4
-                else -> -1
+                else -> -1 // error, do not select a default option
             },
             typeListener
         )
@@ -71,9 +70,8 @@ class AddActivity : BaseActivity(), AddListener {
     }
 
     private val typeListener = DialogInterface.OnClickListener { dialog, selectedItem ->
-        if (binding.nameEditText.text.toString() == DbPurchases.NAMES.AFFITTO.value
-            || (binding.nameEditText.text.toString() == DbPurchases.NAMES.TOTALE.value
-                    && binding.priceEditText.text.toString() == DbPurchases.NAMES.TOTALE_ZERO.value)
+        if (binding.nameEditText.text.toString() == DbPurchases.NAMES.TOTALE.value
+            && binding.priceEditText.text.toString() == DbPurchases.NAMES.TOTALE_ZERO.value
         ) {
             binding.nameEditText.clearText()
             binding.nameTextInputLayout.isEnabled = true
@@ -102,11 +100,6 @@ class AddActivity : BaseActivity(), AddListener {
                 binding.typeAutoCompleteTV.setText(getString(R.string.affitto))
                 binding.nameEditText.setText(DbPurchases.NAMES.AFFITTO.value)
                 viewModel.type = DbPurchases.TYPES.RENT.value
-
-                binding.nameTextInputLayout.isEnabled = false
-
-                binding.nameTextInputLayout.isErrorEnabled = false
-                binding.nameTextInputLayout.error = null
             }
 
             4 -> {
