@@ -17,7 +17,6 @@ import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentListBinding
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.BaseFragment
-import com.frafio.myfinance.ui.add.AddActivity.Companion.EDIT_PURCHASE_CODE
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_LONG_CLICK
@@ -38,13 +37,13 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
             val data: Intent? = result.data
 
             val editRequest = data!!.getBooleanExtra(
-                "${getString(R.string.default_path)}.purchaseRequest",
+                AddActivity.INTENT_PURCHASE_REQUEST,
                 false
             )
 
             if (editRequest) {
                 viewModel.getPurchases()
-                (activity as HomeActivity).showSnackbar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
+                (activity as HomeActivity).showSnackBar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
             }
         }
     }
@@ -81,10 +80,10 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         when (interactionID) {
             ON_CLICK -> {
                 Intent(context, ReceiptActivity::class.java).also {
-                    it.putExtra("${getString(R.string.default_path)}.purchaseID", purchase.id)
-                    it.putExtra("${getString(R.string.default_path)}.purchaseName", purchase.name)
+                    it.putExtra(AddActivity.INTENT_PURCHASE_ID, purchase.id)
+                    it.putExtra(AddActivity.INTENT_PURCHASE_NAME, purchase.name)
                     it.putExtra(
-                        "${getString(R.string.default_path)}.purchasePrice",
+                        AddActivity.INTENT_PURCHASE_PRICE,
                         doubleToPrice(purchase.price!!)
                     )
                     activity?.startActivity(it)
@@ -103,39 +102,39 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                     builder.setNegativeButton(getString(R.string.edit)) { _, _ ->
                         Intent(context, AddActivity::class.java).also {
                             it.putExtra(
-                                "${getString(R.string.default_path)}.REQUESTCODE",
-                                EDIT_PURCHASE_CODE
+                                AddActivity.INTENT_REQUEST_CODE,
+                                AddActivity.INTENT_REQUEST_EDIT_CODE
                             )
                             it.putExtra(
-                                "${getString(R.string.default_path)}.PURCHASE_ID",
+                                AddActivity.INTENT_PURCHASE_ID,
                                 purchase.id
                             )
                             it.putExtra(
-                                "${getString(R.string.default_path)}.PURCHASE_NAME",
+                                AddActivity.INTENT_PURCHASE_NAME,
                                 purchase.name
                             )
                             it.putExtra(
-                                "${getString(R.string.default_path)}.PURCHASE_PRICE",
+                                AddActivity.INTENT_PURCHASE_PRICE,
                                 purchase.price
                             )
                             it.putExtra(
-                                "${getString(R.string.default_path)}.PURCHASE_TYPE",
+                                AddActivity.INTENT_PURCHASE_TYPE,
                                 purchase.type
                             )
                             it.putExtra(
-                                "${getString(R.string.default_path)}.PURCHASE_POSITION",
+                                AddActivity.INTENT_PURCHASE_POSITION,
                                 position
                             )
                             it.putExtra(
-                                "${getString(R.string.default_path)}.PURCHASE_YEAR",
+                                AddActivity.INTENT_PURCHASE_YEAR,
                                 purchase.year
                             )
                             it.putExtra(
-                                "${getString(R.string.default_path)}.PURCHASE_MONTH",
+                                AddActivity.INTENT_PURCHASE_MONTH,
                                 purchase.month
                             )
                             it.putExtra(
-                                "${getString(R.string.default_path)}.PURCHASE_DAY",
+                                AddActivity.INTENT_PURCHASE_DAY,
                                 purchase.day
                             )
                             editResultLauncher.launch(it)
@@ -163,7 +162,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                 (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(newList)
             }
 
-            (activity as HomeActivity).showSnackbar(result.message)
+            (activity as HomeActivity).showSnackBar(result.message)
         })
     }
 }

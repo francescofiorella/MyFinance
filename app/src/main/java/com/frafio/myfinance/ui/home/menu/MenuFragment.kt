@@ -17,7 +17,7 @@ import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
-import com.frafio.myfinance.utils.setData
+import com.frafio.myfinance.utils.setValueLineChartData
 import org.kodein.di.generic.instance
 
 class MenuFragment : BaseFragment(), MenuListener {
@@ -74,18 +74,18 @@ class MenuFragment : BaseFragment(), MenuListener {
                         }
 
                         lineChart.clearChart()
-                        setData(lineChart, list)
+                        setValueLineChartData(lineChart, list)
                     }
                 }
 
                 else -> {
-                    (activity as HomeActivity).showSnackbar(purchaseResult.message)
+                    (activity as HomeActivity).showSnackBar(purchaseResult.message)
                 }
             }
         })
     }
 
-    fun animateRoot() {
+    private fun animateRoot() {
         TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
         val transition = AutoTransition()
         transition.duration = 2000

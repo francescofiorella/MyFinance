@@ -18,6 +18,12 @@ import org.kodein.di.generic.instance
 
 class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptListener {
 
+    companion object {
+        const val INTENT_PURCHASE_ID = "com.frafio.myfinance.PURCHASE_ID"
+        const val INTENT_PURCHASE_NAME = "com.frafio.myfinance.PURCHASE_NAME"
+        const val INTENT_PURCHASE_PRICE = "com.frafio.myfinance.PURCHASE_PRICE"
+    }
+
     private lateinit var binding: ActivityReceiptBinding
     private lateinit var viewModel: ReceiptViewModel
 
@@ -33,13 +39,13 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
         viewModel.listener = this
 
         // retrieve purchase data from intent
-        intent.getStringExtra("${getString(R.string.default_path)}.purchaseID")?.let {
+        intent.getStringExtra(INTENT_PURCHASE_ID)?.let {
             viewModel.purchaseID = it
         }
-        intent.getStringExtra("${getString(R.string.default_path)}.purchaseName")?.let {
+        intent.getStringExtra(INTENT_PURCHASE_NAME)?.let {
             viewModel.purchaseName = it
         }
-        intent.getStringExtra("${getString(R.string.default_path)}.purchasePrice")?.let {
+        intent.getStringExtra(INTENT_PURCHASE_PRICE)?.let {
             viewModel.purchasePrice = it
         }
 
@@ -96,7 +102,7 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
         }
     }
 
-    fun onBackClick(view: View) {
+    fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
         finish()
     }
 }

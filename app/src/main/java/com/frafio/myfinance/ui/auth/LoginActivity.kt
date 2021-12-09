@@ -20,6 +20,11 @@ import org.kodein.di.generic.instance
 
 class LoginActivity : BaseActivity(), AuthListener {
 
+    companion object {
+        const val INTENT_USER_REQUEST: String = "com.frafio.myfinance.USER_REQUEST"
+        const val INTENT_USER_NAME: String = "com.frafio.myfinance.USER_NAME"
+    }
+
     // binding
     private lateinit var binding: ActivityLoginBinding
 
@@ -42,8 +47,8 @@ class LoginActivity : BaseActivity(), AuthListener {
             if (result.resultCode == RESULT_OK) {
                 val name = viewModel.getUserName()
                 Intent().also {
-                    it.putExtra("${getString(R.string.default_path)}.userRequest", true)
-                    it.putExtra("${getString(R.string.default_path)}.userName", name)
+                    it.putExtra(INTENT_USER_REQUEST, true)
+                    it.putExtra(INTENT_USER_NAME, name)
                     setResult(RESULT_OK, it)
                     finish()
                 }
@@ -60,7 +65,7 @@ class LoginActivity : BaseActivity(), AuthListener {
         viewModel.authListener = this
     }
 
-    fun onGoogleButtonClick(view: View) {
+    fun onGoogleButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         binding.loginProgressIndicator.show()
 
         mGoogleSignInClient = getGoogleClient()
@@ -83,7 +88,7 @@ class LoginActivity : BaseActivity(), AuthListener {
         return GoogleSignIn.getClient(this, gso)
     }
 
-    fun goToSignupActivity(view: View) {
+    fun goToSignupActivity(@Suppress("UNUSED_PARAMETER") view: View) {
         Intent(applicationContext, SignupActivity::class.java).also {
             signUpResultLauncher.launch(it)
         }
@@ -125,8 +130,8 @@ class LoginActivity : BaseActivity(), AuthListener {
                 AuthCode.USER_DATA_UPDATED.code -> {
                     val name = viewModel.getUserName()
                     Intent().also {
-                        it.putExtra("${getString(R.string.default_path)}.userRequest", true)
-                        it.putExtra("${getString(R.string.default_path)}.userName", name)
+                        it.putExtra(INTENT_USER_REQUEST, true)
+                        it.putExtra(INTENT_USER_NAME, name)
                         setResult(RESULT_OK, it)
                         finish()
                     }
@@ -154,7 +159,8 @@ class LoginActivity : BaseActivity(), AuthListener {
         }
     }
 
-    fun onBackClick(view: View) {
+
+    fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
         onBackPressed()
     }
 }

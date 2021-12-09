@@ -24,14 +24,13 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
-import com.frafio.myfinance.utils.loadRoundImage
+import com.frafio.myfinance.utils.setImageViewRoundDrawable
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.navigation.NavigationBarView
 import org.kodein.di.generic.instance
 
 class HomeActivity : BaseActivity(), HomeListener {
 
-    // definizione variabili
     private lateinit var binding: ActivityHomeBinding
     private lateinit var viewModel: HomeViewModel
 
@@ -43,7 +42,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
             val purchaseRequest =
-                data!!.getBooleanExtra("${getString(R.string.default_path)}.purchaseRequest", false)
+                data!!.getBooleanExtra(AddActivity.INTENT_PURCHASE_REQUEST, false)
             if (purchaseRequest) {
                 if (navController.currentDestination?.id == R.id.listFragment) {
                     navController.popBackStack()
@@ -60,16 +59,13 @@ class HomeActivity : BaseActivity(), HomeListener {
             if (result.resultCode == RESULT_OK) {
                 reloadDashboard()
                 setDrawableToButtons(isLogged = true)
-                loadRoundImage(binding.propicImageView, viewModel.getProPic())
+                setImageViewRoundDrawable(binding.propicImageView, viewModel.getProPic())
 
                 val userRequest =
-                    result.data?.extras?.getBoolean(
-                        "${getString(R.string.default_path)}.userRequest",
-                        false
-                    ) ?: false
+                    result.data?.extras?.getBoolean(LoginActivity.INTENT_USER_REQUEST, false)
+                        ?: false
 
-                val userName =
-                    result.data?.extras?.getString("${getString(R.string.default_path)}.userName")
+                val userName = result.data?.extras?.getString(LoginActivity.INTENT_USER_NAME)
 
                 if (userRequest) {
                     snackBar(
@@ -98,10 +94,10 @@ class HomeActivity : BaseActivity(), HomeListener {
         viewModel.listener = this
         binding.viewmodel = viewModel
 
-        // importa i dati dal db
+        // import db data
         viewModel.checkUser()
 
-        // collegamento fragment view
+        // link fragment view
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.home_fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController.also {
@@ -116,7 +112,7 @@ class HomeActivity : BaseActivity(), HomeListener {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
 
-        // risolve bug (se non sono sul primo fragment, si sovrappongono i fragment nello stack)
+        // fix bug (if we're not on the dashboard, fragments overlaps in the stack)
         if (navController.currentDestination?.id != R.id.dashboardFragment) {
             navController.popBackStack()
         }
@@ -209,7 +205,10 @@ class HomeActivity : BaseActivity(), HomeListener {
                 view, 0, 0, view.measuredWidth, view.measuredHeight
             ).also { activityOptionsCompat ->
                 Intent(applicationContext, AddActivity::class.java).also {
-                    it.putExtra("${getString(R.string.default_path)}.REQUESTCODE", 1)
+                    it.putExtra(
+                        AddActivity.INTENT_REQUEST_CODE,
+                        AddActivity.INTENT_REQUEST_ADD_CODE
+                    )
                     addResultLauncher.launch(it, activityOptionsCompat)
                 }
             }
@@ -220,14 +219,20 @@ class HomeActivity : BaseActivity(), HomeListener {
     }
 
     // method for children
-    fun showSnackbar(message: String) {
-        snackBar(message, binding.homeAddBtn)
+    fun showSnackBar(message: String) {
+        val view = if (binding.homeAddBtn != null) {
+            binding.homeAddBtn
+        } else {
+            binding.homeAddExtBtn
+        }
+
+        snackBar(message, view)
     }
 
     override fun onLogOutSuccess(response: LiveData<AuthResult>) {
         response.observe(this, { authResult ->
             if (authResult.code == AuthCode.LOGOUT_SUCCESS.code) {
-                loadRoundImage(binding.propicImageView, null)
+                setImageViewRoundDrawable(binding.propicImageView, null)
                 setDrawableToButtons(isLogged = false)
 
                 goToLogin()
@@ -258,7 +263,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                         dashboardCallback,
                         true
                     )
-                    loadRoundImage(binding.propicImageView, viewModel.getProPic())
+                    setImageViewRoundDrawable(binding.propicImageView, viewModel.getProPic())
                     reloadDashboard()
                 }
 
@@ -269,7 +274,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         })
     }
 
-    fun onProPicClick(view: View) {
+    fun onProPicClick(@Suppress("UNUSED_PARAMETER") view: View) {
         if (binding.navBar != null || binding.navDrawer != null) {
             navController.navigateUp()
             navController.navigate(R.id.profileFragment)
@@ -303,7 +308,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         checkDashboardInRailView()
     }
 
-    fun onLogoutButtonClick(view: View) {
+    fun onLogoutButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         if (viewModel.isLogged()) {
             viewModel.logOut()
         } else {

@@ -17,8 +17,6 @@
     <string name="delete">Elimina</string>
     <string name="cancel">Annulla</string>
 
-    <string name="default_path">com.frafio.myfinance</string>
-
     <string name="purchase_added">Acquisto aggiunto!</string>
 
     <string name="login_successful">Hai effettuato l\'accesso come</string>

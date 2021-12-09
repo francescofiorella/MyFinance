@@ -9,8 +9,6 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
-import com.frafio.myfinance.ui.add.AddActivity.Companion.ADD_PURCHASE_CODE
-import com.frafio.myfinance.ui.add.AddActivity.Companion.EDIT_PURCHASE_CODE
 import java.time.LocalDate
 
 class AddViewModel(
@@ -43,12 +41,12 @@ class AddViewModel(
         dateString = datePickerBtn.dateString
     }
 
-    fun onAddButtonClick(view: View) {
+    fun onAddButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         listener?.onAddStart()
 
         val userEmail = userRepository.getUser()!!.email
 
-        // controlla le info aggiunte
+        // check info
         if (name.isNullOrEmpty()) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_NAME))
             return
@@ -72,11 +70,11 @@ class AddViewModel(
 
             val price = priceString!!.toDouble()
 
-            if (requestCode == ADD_PURCHASE_CODE) {
+            if (requestCode == AddActivity.INTENT_REQUEST_ADD_CODE) {
                 val purchase = Purchase(userEmail, name, price, year, month, day, type)
                 val response = purchaseRepository.addPurchase(purchase)
                 listener?.onAddSuccess(response)
-            } else if (requestCode == EDIT_PURCHASE_CODE) {
+            } else if (requestCode == AddActivity.INTENT_REQUEST_EDIT_CODE) {
                 val purchase =
                     Purchase(userEmail, name, price, year, month, day, purchaseType, purchaseID)
 

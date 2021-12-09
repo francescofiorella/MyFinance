@@ -15,7 +15,8 @@ open class DatePickerButton(
     private val context: FragmentActivity
 ) {
     companion object {
-        private const val DATE_PICKER_TITLE: String = "Seleziona una data"
+        private const val DATE_PICKER_TITLE_EN: String = "Select date"
+        private const val DATE_PICKER_TITLE_IT: String = "Seleziona data"
         private const val DATE_PICKER_TAG: String = "DATE_PICKER"
     }
 
@@ -25,7 +26,7 @@ open class DatePickerButton(
         calendar.clear()
         val today = MaterialDatePicker.todayInUtcMilliseconds()
         val builder = MaterialDatePicker.Builder.datePicker()
-        builder.setTitleText(DATE_PICKER_TITLE)
+        builder.setTitleText(DATE_PICKER_TITLE_IT)
         builder.setSelection(today)
         val materialDatePicker = builder.build()
 

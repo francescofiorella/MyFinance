@@ -19,7 +19,7 @@ class AuthViewModel(
 
     var authListener: AuthListener? = null
 
-    fun onLoginButtonClick(view: View) {
+    fun onLoginButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         authListener?.onAuthStarted()
 
         if (email.isNullOrEmpty()) {
@@ -41,7 +41,7 @@ class AuthViewModel(
         authListener?.onAuthSuccess(loginResponse)
     }
 
-    fun onResetButtonClick(view: View) {
+    fun onResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         authListener?.onAuthStarted()
 
         if (email.isNullOrEmpty()) {
@@ -60,10 +60,10 @@ class AuthViewModel(
         authListener?.onAuthSuccess(googleResponse)
     }
 
-    fun onSignupButtonClick(view: View) {
+    fun onSignupButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         authListener?.onAuthStarted()
 
-        // controlla la info aggiunte
+        // check info
         if (fullName.isNullOrEmpty()) {
             authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_NAME))
             return

@@ -11,6 +11,7 @@ import com.frafio.myfinance.R
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 
+@Suppress("UNUSED")
 fun Activity.setFullScreenEnabled(enable: Boolean) {
     if (enable) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -18,6 +19,7 @@ fun Activity.setFullScreenEnabled(enable: Boolean) {
                 android.view.WindowInsets.Type.statusBars()
             )
         } else {
+            @Suppress("DEPRECATION")
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
@@ -29,6 +31,7 @@ fun Activity.setFullScreenEnabled(enable: Boolean) {
                 android.view.WindowInsets.Type.statusBars()
             )
         } else {
+            @Suppress("DEPRECATION")
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN
@@ -42,7 +45,7 @@ fun Activity.snackBar(message: String, anchor: View? = null) {
     val nunito = ResourcesCompat.getFont(applicationContext, R.font.nunito)
 
     Snackbar.make(root, message, BaseTransientBottomBar.LENGTH_SHORT).also { snackBar ->
-        anchor?.let{
+        anchor?.let {
             snackBar.setAnchorView(it)
         }
 

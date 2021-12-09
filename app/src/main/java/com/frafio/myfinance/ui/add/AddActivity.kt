@@ -24,8 +24,18 @@ import java.util.*
 class AddActivity : BaseActivity(), AddListener {
 
     companion object {
-        const val ADD_PURCHASE_CODE: Int = 1
-        const val EDIT_PURCHASE_CODE: Int = 2
+        const val INTENT_REQUEST_CODE: String = "com.frafio.myfinance.REQUEST_CODE"
+        const val INTENT_REQUEST_ADD_CODE: Int = 1
+        const val INTENT_REQUEST_EDIT_CODE: Int = 2
+        const val INTENT_PURCHASE_REQUEST: String = "com.frafio.myfinance.PURCHASE_REQUEST"
+        const val INTENT_PURCHASE_ID: String = "com.frafio.myfinance.PURCHASE_ID"
+        const val INTENT_PURCHASE_NAME: String = "com.frafio.myfinance.PURCHASE_NAME"
+        const val INTENT_PURCHASE_PRICE: String = "com.frafio.myfinance.PURCHASE_PRICE"
+        const val INTENT_PURCHASE_TYPE: String = "com.frafio.myfinance.PURCHASE_TYPE"
+        const val INTENT_PURCHASE_POSITION: String = "com.frafio.myfinance.PURCHASE_POSITION"
+        const val INTENT_PURCHASE_YEAR: String = "com.frafio.myfinance.PURCHASE_YEAR"
+        const val INTENT_PURCHASE_MONTH: String = "com.frafio.myfinance.PURCHASE_MONTH"
+        const val INTENT_PURCHASE_DAY: String = "com.frafio.myfinance.PURCHASE_DAY"
     }
 
     private lateinit var binding: ActivityAddBinding
@@ -44,7 +54,7 @@ class AddActivity : BaseActivity(), AddListener {
         binding.viewmodel = viewModel
         viewModel.listener = this
 
-        intent.getIntExtra("${getString(R.string.default_path)}.REQUESTCODE", 0).also { code ->
+        intent.getIntExtra(INTENT_REQUEST_CODE, 0).also { code ->
             viewModel.requestCode = code
             initLayout(code)
         }
@@ -143,54 +153,58 @@ class AddActivity : BaseActivity(), AddListener {
         binding.typeAutoCompleteTV.setOnClickListener(typeViewListener)
         binding.typeTextInputLayout.setEndIconOnClickListener(typeViewListener)
 
-        if (code == ADD_PURCHASE_CODE) {
-            viewModel.type = DbPurchases.TYPES.GENERIC.value
-        } else if (code == EDIT_PURCHASE_CODE) {
-            intent.also { intent ->
-                intent.getStringExtra("${getString(R.string.default_path)}.PURCHASE_ID")?.let {
-                    viewModel.purchaseID = it
-                }
-                intent.getStringExtra("${getString(R.string.default_path)}.PURCHASE_NAME")?.let {
-                    viewModel.name = it
-                }
-                intent.getDoubleExtra("${getString(R.string.default_path)}.PURCHASE_PRICE", 0.0)
-                    .also {
-                        viewModel.priceString = doubleToString(it)
-                        viewModel.purchasePrice = it
-                    }
-                intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_TYPE", 0).also {
-                    viewModel.purchaseType = it
-                }
-                intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_POSITION", 0)
-                    .also {
-                        viewModel.purchasePosition = it
-                    }
-                intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_YEAR", 0).also {
-                    datePickerBtn.year = it
-                }
-                intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_MONTH", 0).also {
-                    datePickerBtn.month = it
-                }
-                intent.getIntExtra("${getString(R.string.default_path)}.PURCHASE_DAY", 0).also {
-                    datePickerBtn.day = it
-                }
+        when (code) {
+            INTENT_REQUEST_ADD_CODE -> {
+                viewModel.type = DbPurchases.TYPES.GENERIC.value
             }
 
-            when (viewModel.purchaseType) {
-                DbPurchases.TYPES.GENERIC.value -> {
-                    binding.typeAutoCompleteTV.setText(getString(R.string.generic))
+            INTENT_REQUEST_EDIT_CODE -> {
+                intent.also { intent ->
+                    intent.getStringExtra(INTENT_PURCHASE_ID)?.let {
+                        viewModel.purchaseID = it
+                    }
+                    intent.getStringExtra(INTENT_PURCHASE_NAME)?.let {
+                        viewModel.name = it
+                    }
+                    intent.getDoubleExtra(INTENT_PURCHASE_PRICE, 0.0)
+                        .also {
+                            viewModel.priceString = doubleToString(it)
+                            viewModel.purchasePrice = it
+                        }
+                    intent.getIntExtra(INTENT_PURCHASE_TYPE, 0).also {
+                        viewModel.purchaseType = it
+                    }
+                    intent.getIntExtra(INTENT_PURCHASE_POSITION, 0)
+                        .also {
+                            viewModel.purchasePosition = it
+                        }
+                    intent.getIntExtra(INTENT_PURCHASE_YEAR, 0).also {
+                        datePickerBtn.year = it
+                    }
+                    intent.getIntExtra(INTENT_PURCHASE_MONTH, 0).also {
+                        datePickerBtn.month = it
+                    }
+                    intent.getIntExtra(INTENT_PURCHASE_DAY, 0).also {
+                        datePickerBtn.day = it
+                    }
                 }
 
-                DbPurchases.TYPES.SHOPPING.value -> {
-                    binding.typeAutoCompleteTV.setText(getString(R.string.shopping))
-                }
+                when (viewModel.purchaseType) {
+                    DbPurchases.TYPES.GENERIC.value -> {
+                        binding.typeAutoCompleteTV.setText(getString(R.string.generic))
+                    }
 
-                DbPurchases.TYPES.TRANSPORT.value -> {
-                    binding.typeAutoCompleteTV.setText(getString(R.string.transport))
-                }
+                    DbPurchases.TYPES.SHOPPING.value -> {
+                        binding.typeAutoCompleteTV.setText(getString(R.string.shopping))
+                    }
 
-                DbPurchases.TYPES.RENT.value -> {
-                    binding.typeAutoCompleteTV.setText(getString(R.string.rent))
+                    DbPurchases.TYPES.TRANSPORT.value -> {
+                        binding.typeAutoCompleteTV.setText(getString(R.string.transport))
+                    }
+
+                    DbPurchases.TYPES.RENT.value -> {
+                        binding.typeAutoCompleteTV.setText(getString(R.string.rent))
+                    }
                 }
             }
         }
@@ -198,7 +212,7 @@ class AddActivity : BaseActivity(), AddListener {
         viewModel.updateTime(datePickerBtn)
     }
 
-    fun onBackClick(view: View) {
+    fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
         onBackPressed()
     }
 
@@ -216,18 +230,18 @@ class AddActivity : BaseActivity(), AddListener {
                 PurchaseCode.TOTAL_ADD_SUCCESS.code -> viewModel.updateLocalList()
 
                 PurchaseCode.PURCHASE_EDIT_SUCCESS.code -> {
-                    // torna alla home
+                    // go back to the homepage
                     Intent().also {
-                        it.putExtra("${getString(R.string.default_path)}.purchaseRequest", true)
+                        it.putExtra(INTENT_PURCHASE_REQUEST, true)
                         setResult(RESULT_OK, it)
                         finish()
                     }
                 }
 
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
-                    // torna alla home
+                    // go back to the homepage
                     Intent().also {
-                        it.putExtra("${getString(R.string.default_path)}.purchaseRequest", true)
+                        it.putExtra(INTENT_PURCHASE_REQUEST, true)
                         setResult(RESULT_OK, it)
                         finish()
                     }

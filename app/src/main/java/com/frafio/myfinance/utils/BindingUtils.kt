@@ -15,7 +15,7 @@ import org.eazegraph.lib.models.ValueLinePoint
 import org.eazegraph.lib.models.ValueLineSeries
 
 @BindingAdapter("srcRound")
-fun loadRoundImage(view: ImageView, url: String?) {
+fun setImageViewRoundDrawable(view: ImageView, url: String?) {
     if (!url.isNullOrBlank()) {
         Glide.with(view)
             .load(url)
@@ -26,8 +26,9 @@ fun loadRoundImage(view: ImageView, url: String?) {
     }
 }
 
+@Suppress("UNUSED")
 @BindingAdapter("cornerRadiusTop")
-fun setCornerRadius(view: BottomAppBar, cornerSize: Float) {
+fun setBottomAppBarCornerRadius(view: BottomAppBar, cornerSize: Float) {
     (view.background as MaterialShapeDrawable).also { background ->
         background.shapeAppearanceModel = background.shapeAppearanceModel
             .toBuilder()
@@ -38,7 +39,7 @@ fun setCornerRadius(view: BottomAppBar, cornerSize: Float) {
 }
 
 @BindingAdapter("data")
-fun setData(view: ValueLineChart, list: List<Pair<String, Double>>) {
+fun setValueLineChartData(view: ValueLineChart, list: List<Pair<String, Double>>) {
     ValueLineSeries().also { series ->
         series.color = ColorUtils
             .setAlphaComponent(

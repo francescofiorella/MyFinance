@@ -32,21 +32,21 @@ class DashboardViewModel(
     val totString: LiveData<String>
         get() = _totString
 
-    private val _numTotString = MutableLiveData<String>()
-    val numTotString: LiveData<String>
-        get() = _numTotString
+    private val _lastMonthString = MutableLiveData<String>()
+    val lastMonthString: LiveData<String>
+        get() = _lastMonthString
 
-    private val _ticketTotString = MutableLiveData<String>()
-    val ticketTotString: LiveData<String>
-        get() = _ticketTotString
+    private val _rentTotString = MutableLiveData<String>()
+    val rentTotString: LiveData<String>
+        get() = _rentTotString
 
-    private val _trenTotString = MutableLiveData<String>()
-    val trenTotString: LiveData<String>
-        get() = _trenTotString
+    private val _shoppingTotString = MutableLiveData<String>()
+    val shoppingTotString: LiveData<String>
+        get() = _shoppingTotString
 
-    private val _amTotString = MutableLiveData<String>()
-    val amTotString: LiveData<String>
-        get() = _amTotString
+    private val _transportTotString = MutableLiveData<String>()
+    val transportTotString: LiveData<String>
+        get() = _transportTotString
 
     fun getStats() {
         val stats = purchaseRepository.calculateStats()
@@ -55,9 +55,9 @@ class DashboardViewModel(
         _monthAvgString.value = stats[1]
         _todayTotString.value = stats[2]
         _totString.value = stats[3]
-        _numTotString.value = stats[4]
-        _ticketTotString.value = stats[5]
-        _trenTotString.value = stats[6]
-        _amTotString.value = stats[7]
+        _lastMonthString.value = stats[4]
+        _rentTotString.value = stats[5]
+        _shoppingTotString.value = stats[6]
+        _transportTotString.value = stats[7]
     }
 }

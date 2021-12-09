@@ -100,7 +100,7 @@ class SignupActivity : BaseActivity(), AuthListener {
         }
     }
 
-    fun onBackClick(view: View) {
+    fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
         onBackPressed()
     }
 }

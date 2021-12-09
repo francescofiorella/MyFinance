@@ -24,8 +24,8 @@ class ReceiptViewModel(
         return repository.getOptions(purchaseID!!)
     }
 
-    fun onAddButtonClick(view: View) {
-        // controlla la info aggiunte
+    fun onAddButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        // check info
         if (receiptName.isNullOrEmpty()) {
             listener?.onLoadFailure(PurchaseResult(PurchaseCode.EMPTY_NAME))
             return
