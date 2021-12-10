@@ -9,7 +9,7 @@
         <import type="android.view.View" />
 
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="com.frafio.myfinance.ui.home.list.ListViewModel" />
 
     </data>
@@ -21,7 +21,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:visibility="@{viewmodel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:fontFamily="@font/nunito_semibold"
-                android:text="@{viewmodel.isLogged ? @string/warning_home : @string/warning_not_logged_home}"
+                android:text="@{viewModel.isLogged ? @string/warning_home : @string/warning_not_logged_home}"
                 android:textAlignment="center"
                 android:textColor="@color/primary_text"
                 android:textSize="21sp"
@@ -64,7 +64,7 @@
             android:layout_height="match_parent"
             android:paddingTop="@dimen/fragment_margin_top"
             android:scrollbars="vertical"
-            android:visibility="@{viewmodel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
+            android:visibility="@{viewModel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
             app:backgroundTint="?android:colorBackground"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"

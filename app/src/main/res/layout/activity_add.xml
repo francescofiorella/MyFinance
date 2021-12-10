@@ -9,7 +9,7 @@
         <import type="android.view.View" />
 
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="com.frafio.myfinance.ui.add.AddViewModel" />
 
     </data>
@@ -99,7 +99,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
                         android:inputType="text|textCapSentences|textNoSuggestions"
-                        android:text="@={viewmodel.name}" />
+                        android:text="@={viewModel.name}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -127,7 +127,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
                         android:inputType="numberDecimal"
-                        android:text="@={viewmodel.priceString}" />
+                        android:text="@={viewModel.priceString}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -138,7 +138,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="5dp"
-                    android:enabled="@{viewmodel.requestCode == 1 ? true : false}"
+                    android:enabled="@{viewModel.requestCode == 1 ? true : false}"
                     android:hint="@string/date"
                     android:labelFor="@id/date_auto_complete_TV"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
@@ -157,7 +157,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
                         android:inputType="none"
-                        android:text="@{viewmodel.dateString}"
+                        android:text="@{viewModel.dateString}"
                         tools:text="01/01/2000" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -169,7 +169,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="5dp"
-                    android:enabled="@{viewmodel.requestCode == 1 ? true : false}"
+                    android:enabled="@{viewModel.requestCode == 1 ? true : false}"
                     android:hint="@string/type"
                     android:labelFor="@id/type_auto_complete_TV"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
@@ -200,9 +200,9 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:fontFamily="@font/nunito_semibold"
-                    android:onClick="@{viewmodel::onAddButtonClick}"
-                    android:text="@{viewmodel.requestCode == 1 ? @string/add : @string/edit}"
-                    app:icon="@{viewmodel.requestCode == 1 ? @drawable/ic_add : @drawable/ic_create}"
+                    android:onClick="@{viewModel::onAddButtonClick}"
+                    android:text="@{viewModel.requestCode == 1 ? @string/add : @string/edit}"
+                    app:icon="@{viewModel.requestCode == 1 ? @drawable/ic_add : @drawable/ic_create}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/type_textInputLayout"

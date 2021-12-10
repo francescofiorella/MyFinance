@@ -7,7 +7,7 @@
     <data>
 
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="com.frafio.myfinance.ui.auth.AuthViewModel" />
 
     </data>
@@ -93,7 +93,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
                         android:inputType="textEmailAddress"
-                        android:text="@={viewmodel.email}" />
+                        android:text="@={viewModel.email}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -120,7 +120,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
                         android:inputType="textPassword"
-                        android:text="@={viewmodel.password}" />
+                        android:text="@={viewModel.password}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -130,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/nunito_semibold"
-                    android:onClick="@{viewmodel::onLoginButtonClick}"
+                    android:onClick="@{viewModel::onLoginButtonClick}"
                     android:text="@string/login"
                     app:cornerRadius="@dimen/field_corner_radius"
                     app:icon="@drawable/ic_login"
@@ -144,7 +144,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/nunito"
-                    android:onClick="@{viewmodel::onResetButtonClick}"
+                    android:onClick="@{viewModel::onResetButtonClick}"
                     android:text="@string/forgotten_password"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

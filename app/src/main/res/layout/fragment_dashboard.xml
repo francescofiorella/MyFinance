@@ -9,7 +9,7 @@
         <import type="android.view.View" />
 
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="com.frafio.myfinance.ui.home.dashboard.DashboardViewModel" />
 
     </data>
@@ -21,7 +21,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="@{viewmodel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="50dp"
                 android:fontFamily="@font/nunito_semibold"
-                android:text="@{viewmodel.isLogged ? @string/warning_home : @string/warning_not_logged_home}"
+                android:text="@{viewModel.isLogged ? @string/warning_home : @string/warning_not_logged_home}"
                 android:textAlignment="center"
                 android:textColor="@color/primary_text"
                 android:textSize="21sp"
@@ -76,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:columnCount="2"
                 android:rowCount="4"
-                android:visibility="@{viewmodel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
+                android:visibility="@{viewModel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
                 tools:visibility="visible">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -124,7 +124,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito_semibold"
                                 android:maxLines="1"
-                                android:text="@{viewmodel.dayAvgString}"
+                                android:text="@{viewModel.dayAvgString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -182,7 +182,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito_semibold"
                                 android:maxLines="1"
-                                android:text="@{viewmodel.monthAvgString}"
+                                android:text="@{viewModel.monthAvgString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -239,7 +239,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito_semibold"
                                 android:maxLines="1"
-                                android:text="@{viewmodel.todayTotString}"
+                                android:text="@{viewModel.todayTotString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -296,7 +296,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito_semibold"
                                 android:maxLines="1"
-                                android:text="@{viewmodel.lastMonthString}"
+                                android:text="@{viewModel.lastMonthString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -353,7 +353,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito_semibold"
                                 android:maxLines="1"
-                                android:text="@{viewmodel.totString}"
+                                android:text="@{viewModel.totString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -410,7 +410,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito_semibold"
                                 android:maxLines="1"
-                                android:text="@{viewmodel.rentTotString}"
+                                android:text="@{viewModel.rentTotString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -467,7 +467,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito_semibold"
                                 android:maxLines="1"
-                                android:text="@{viewmodel.shoppingTotString}"
+                                android:text="@{viewModel.shoppingTotString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -524,7 +524,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito_semibold"
                                 android:maxLines="1"
-                                android:text="@{viewmodel.transportTotString}"
+                                android:text="@{viewModel.transportTotString}"
                                 android:textColor="@color/primary_text"
                                 android:textSize="@dimen/card_price_size"
                                 app:layout_constraintBottom_toBottomOf="parent"

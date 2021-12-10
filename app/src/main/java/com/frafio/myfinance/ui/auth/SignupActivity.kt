@@ -26,7 +26,7 @@ class SignupActivity : BaseActivity(), AuthListener {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_signup)
         viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
-        binding.viewmodel = viewModel
+        binding.viewModel = viewModel
 
         viewModel.authListener = this
     }

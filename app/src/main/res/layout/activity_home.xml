@@ -9,7 +9,7 @@
         <import type="android.view.View" />
 
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="com.frafio.myfinance.ui.home.HomeViewModel" />
 
     </data>
@@ -56,7 +56,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/fragmentTitle"
             app:srcCompat="@drawable/ic_user"
-            app:srcRound="@{viewmodel.getProPic()}" />
+            app:srcRound="@{viewModel.getProPic()}" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/logout_card"
@@ -98,9 +98,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
-            android:contentDescription="@{viewmodel.isLogged() ? @string/addBtnContentDescription : @string/login}"
+            android:contentDescription="@{viewModel.isLogged() ? @string/addBtnContentDescription : @string/login}"
             android:onClick="onAddButtonClick"
-            android:src="@{viewmodel.isLogged() ? @drawable/ic_add : @drawable/ic_login}"
+            android:src="@{viewModel.isLogged() ? @drawable/ic_add : @drawable/ic_login}"
             app:layout_constraintBottom_toBottomOf="@+id/home_fragmentContainerView"
             app:layout_constraintEnd_toEndOf="parent"
             tools:src="@drawable/ic_add" />

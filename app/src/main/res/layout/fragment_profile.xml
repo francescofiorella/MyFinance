@@ -7,7 +7,7 @@
     <data>
 
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="com.frafio.myfinance.ui.home.profile.ProfileViewModel" />
 
     </data>
@@ -26,7 +26,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_user"
-            app:srcRound="@{viewmodel.user.photoUrl}" />
+            app:srcRound="@{viewModel.user.photoUrl}" />
 
         <TextView
             android:id="@+id/profile_username_tv"
@@ -35,7 +35,7 @@
             android:layout_marginTop="5dp"
             android:fontFamily="@font/nunito_semibold"
             android:paddingHorizontal="20dp"
-            android:text="@{viewmodel.user != null ? viewmodel.user.fullName : @string/warning_not_logged}"
+            android:text="@{viewModel.user != null ? viewModel.user.fullName : @string/warning_not_logged}"
             android:textAlignment="center"
             android:textColor="@color/primary_text"
             android:textSize="26sp"
@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/nunito"
-            android:text="@{viewmodel.user.email}"
+            android:text="@{viewModel.user.email}"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

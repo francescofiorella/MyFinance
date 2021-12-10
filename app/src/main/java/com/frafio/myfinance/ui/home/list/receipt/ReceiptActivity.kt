@@ -34,7 +34,7 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_receipt)
         viewModel = ViewModelProvider(this, factory).get(ReceiptViewModel::class.java)
-        binding.viewmodel = viewModel
+        binding.viewModel = viewModel
 
         viewModel.listener = this
 

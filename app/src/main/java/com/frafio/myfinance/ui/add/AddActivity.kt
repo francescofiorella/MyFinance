@@ -51,7 +51,7 @@ class AddActivity : BaseActivity(), AddListener {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add)
         viewModel = ViewModelProvider(this, factory).get(AddViewModel::class.java)
-        binding.viewmodel = viewModel
+        binding.viewModel = viewModel
         viewModel.listener = this
 
         intent.getIntExtra(INTENT_REQUEST_CODE, 0).also { code ->

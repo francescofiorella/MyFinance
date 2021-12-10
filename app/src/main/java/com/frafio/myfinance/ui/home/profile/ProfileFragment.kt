@@ -25,7 +25,7 @@ class ProfileFragment : BaseFragment() {
         val binding: FragmentProfileBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_profile, container, false)
         viewModel = ViewModelProvider(this, factory).get(ProfileViewModel::class.java)
-        binding.viewmodel = viewModel
+        binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
         return binding.root

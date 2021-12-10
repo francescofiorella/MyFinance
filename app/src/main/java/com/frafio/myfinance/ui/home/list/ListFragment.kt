@@ -56,7 +56,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false)
         viewModel = ViewModelProvider(this, factory).get(ListViewModel::class.java)
 
-        binding.viewmodel = viewModel
+        binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
         viewModel.listener = this

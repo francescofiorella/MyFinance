@@ -9,7 +9,7 @@
         <import type="android.view.View" />
 
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="com.frafio.myfinance.ui.home.menu.MenuViewModel" />
 
     </data>
@@ -31,7 +31,7 @@
                 android:clipToPadding="false"
                 android:paddingTop="@dimen/fragment_margin_top"
                 android:paddingBottom="5dp"
-                android:visibility="@{viewmodel.avgTrendListSize &lt; 2 ? View.GONE : View.VISIBLE}"
+                android:visibility="@{viewModel.avgTrendListSize &lt; 2 ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -82,7 +82,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:layout_marginTop="20dp"
-                            app:data="@{viewmodel.avgTrendList}"
+                            app:data="@{viewModel.avgTrendList}"
                             app:egAnimationTime="1000"
                             app:egCurveSmoothness="0.4"
                             app:egIndicatorLineColor="@color/primary_text"
@@ -112,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/card_full_margin"
                 android:layout_marginTop="@dimen/fragment_margin_top"
-                android:visibility="@{viewmodel.isLastYearOk ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.isLastYearOk ? View.VISIBLE : View.GONE}"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -197,7 +197,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:fontFamily="@font/nunito"
-                        android:text="@{viewmodel.versionName}"
+                        android:text="@{viewModel.versionName}"
                         android:textColor="@color/primary_text"
                         android:textSize="18sp"
                         app:layout_constraintBottom_toBottomOf="parent"

@@ -49,7 +49,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                 }
                 navController.navigate(R.id.listFragment)
 
-                snackBar(getString(R.string.purchase_added), binding.homeAddBtn)
+                showSnackBar(getString(R.string.purchase_added))
             }
         }
     }
@@ -68,10 +68,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                 val userName = result.data?.extras?.getString(LoginActivity.INTENT_USER_NAME)
 
                 if (userRequest) {
-                    snackBar(
-                        "${getString(R.string.login_successful)} $userName",
-                        binding.homeAddBtn
-                    )
+                    showSnackBar("${getString(R.string.login_successful)} $userName")
                 }
             }
         }
@@ -92,7 +89,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
         viewModel.listener = this
-        binding.viewmodel = viewModel
+        binding.viewModel = viewModel
 
         // import db data
         viewModel.checkUser()
@@ -267,7 +264,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                     reloadDashboard()
                 }
 
-                AuthCode.USER_DATA_NOT_UPDATED.code -> snackBar(authResult.message)
+                AuthCode.USER_DATA_NOT_UPDATED.code -> showSnackBar(authResult.message)
 
                 else -> Unit
             }
