@@ -80,15 +80,18 @@ class AddActivity : BaseActivity(), AddListener {
     }
 
     private val typeListener = DialogInterface.OnClickListener { dialog, selectedItem ->
-        if (binding.nameEditText.text.toString() == DbPurchases.NAMES.TOTAL.value
-            && binding.priceEditText.text.toString() == DbPurchases.NAMES.TOTAL_PRICE.value
+        if ((binding.nameEditText.text.toString() == DbPurchases.NAMES.TOTAL.value_en
+                    || binding.nameEditText.text.toString() == DbPurchases.NAMES.TOTAL.value_it)
+            && (binding.priceEditText.text.toString() == DbPurchases.NAMES.TOTAL_PRICE.value_en
+                    || binding.priceEditText.text.toString() == DbPurchases.NAMES.TOTAL_PRICE.value_it)
         ) {
             binding.nameEditText.clearText()
             binding.nameTextInputLayout.isEnabled = true
 
             binding.priceEditText.clearText()
             binding.priceTextInputLayout.isEnabled = true
-        } else if (binding.nameEditText.text.toString() == DbPurchases.NAMES.RENT.value) {
+        } else if (binding.nameEditText.text.toString() == DbPurchases.NAMES.RENT.value_en
+            || binding.nameEditText.text.toString() == DbPurchases.NAMES.RENT.value_it) {
             binding.nameEditText.clearText()
         }
 
@@ -110,16 +113,16 @@ class AddActivity : BaseActivity(), AddListener {
 
             3 -> {
                 binding.typeAutoCompleteTV.setText(getString(R.string.rent))
-                binding.nameEditText.setText(DbPurchases.NAMES.RENT.value)
+                binding.nameEditText.setText(DbPurchases.NAMES.RENT.value_it)// TODO: change the language
                 viewModel.type = DbPurchases.TYPES.RENT.value
             }
 
             4 -> {
-                binding.typeAutoCompleteTV.setText(getString(R.string.zero_purchase))
-                binding.nameEditText.setText(DbPurchases.NAMES.TOTAL.value)
+                binding.typeAutoCompleteTV.setText(getString(R.string.no_purchase))
+                binding.nameEditText.setText(DbPurchases.NAMES.TOTAL.value_it)// TODO: change the language
                 binding.nameTextInputLayout.isEnabled = false
 
-                binding.priceEditText.setText(DbPurchases.NAMES.TOTAL_PRICE.value)
+                binding.priceEditText.setText(DbPurchases.NAMES.TOTAL_PRICE.value_it)// TODO: change the language
                 binding.priceTextInputLayout.isEnabled = false
 
                 binding.nameTextInputLayout.isErrorEnabled = false

@@ -52,7 +52,8 @@ class AddViewModel(
             return
         }
 
-        if (name == DbPurchases.NAMES.TOTAL.value && type != DbPurchases.TYPES.TOTAL.value) {
+        if ((name == DbPurchases.NAMES.TOTAL.value_en || name == DbPurchases.NAMES.TOTAL.value_it)
+            && type != DbPurchases.TYPES.TOTAL.value) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.WRONG_NAME_TOTAL))
             return
         }

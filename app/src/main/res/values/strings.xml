@@ -2,84 +2,84 @@
     <string name="app_name">MyFinance</string>
 
     <string name="nav_1">Dashboard</string>
-    <string name="nav_2">Lista</string>
-    <string name="nav_2_extended">Lista Acquisti</string>
-    <string name="nav_3">Profilo</string>
+    <string name="nav_2">List</string>
+    <string name="nav_2_extended">Purchase List</string>
+    <string name="nav_3">Profile</string>
     <string name="nav_4">Menu</string>
-    <string name="add_purchase">Nuovo Acquisto</string>
+    <string name="add_purchase">New Purchase</string>
 
-    <string name="addBtnContentDescription">Aggiungi un acquisto</string>
+    <string name="addBtnContentDescription">Add a purchase</string>
 
     <string name="empty">"   "</string>
 
-    <string name="add">Aggiungi</string>
-    <string name="edit">Modifica</string>
-    <string name="delete">Elimina</string>
-    <string name="cancel">Annulla</string>
+    <string name="add">Add</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
 
-    <string name="purchase_added">Acquisto aggiunto!</string>
+    <string name="purchase_added">Purchase added!</string>
 
-    <string name="login_successful">Hai effettuato l\'accesso come</string>
+    <string name="login_successful">You are logged in as</string>
 
-    <string name="purchase_delete_dialog">Vuoi eliminare l\'acquisto selezionato?</string>
-    <string name="purchase_edit_delete_dialog">Vuoi modificare o eliminare l\'acquisto selezionato?</string>
+    <string name="purchase_delete_dialog">Do you want to delete the selected purchase?</string>
+    <string name="purchase_edit_delete_dialog">Do you want to edit or delete the selected purchase?</string>
 
-    <string name="receipt_delete_dialog">Vuoi eliminare la voce selezionata?</string>
+    <string name="receipt_delete_dialog">Do you want to delete the selected item?</string>
 
-    <string name="name">Nome</string>
-    <string name="price">Costo</string>
+    <string name="name">Name</string>
+    <string name="price">Price</string>
     <string name="date_picker_arrow">DatePickerArrow</string>
 
-    <string name="login_signup_email">Inserisci la tua email</string>
-    <string name="login_password">Inserisci la password</string>
-    <string name="login">Accedi</string>
-    <string name="forgotten_password">Hai dimenticato la password?</string>
-    <string name="login_google">Accedi con Google</string>
-    <string name="login_signup">Non hai un account? Iscriviti</string>
-    <string name="signup_name">Inserisci nome e cognome</string>
-    <string name="signup_password">Inserisci una password</string>
-    <string name="signup_password_confirm">Inserisci nuovamente la password</string>
-    <string name="signup">Registrati</string>
-    <string name="signup_login">Hai già un account? Accedi</string>
-    <string name="warning_home">Aggiungi il tuo primo acquisto!</string>
-    <string name="warning_not_logged_home">Accedi per aggiungere il tuo primo acquisto!</string>
-    <string name="warning_not_logged">Accedi al tuo account!</string>
+    <string name="login_signup_email">Enter your email</string>
+    <string name="login_password">Enter your password</string>
+    <string name="login">Log In</string>
+    <string name="forgotten_password">Did you forgot the password?</string>
+    <string name="login_google">Log In with Google</string>
+    <string name="login_signup">Do not have an account? Sign Up</string>
+    <string name="signup_name">Enter your first and last name</string>
+    <string name="signup_password">Enter a password</string>
+    <string name="signup_password_confirm">Confirm the password</string>
+    <string name="signup">Sign Up</string>
+    <string name="signup_login">Do you already have an account? Log In</string>
+    <string name="warning_home">Add your first purchase!</string>
+    <string name="warning_not_logged_home">Log In to add your first purchase!</string>
+    <string name="warning_not_logged">Log In to your account!</string>
 
-    <string name="avg_day">Media \nGiornaliera</string>
-    <string name="avg_month">Media \nMensile</string>
-    <string name="today">Acquisti \nOggi</string>
-    <string name="this_month">Ultimo \nMese</string>
-    <string name="total">Totale \nAcquisti</string>
-    <string name="total_transport">Totale \nTrasporti</string>
-    <string name="total_rent">Totale \nAffitto</string>
-    <string name="total_shopping">Totale \n Spesa</string>
+    <string name="avg_day">Daily \nAverage</string>
+    <string name="avg_month">Monthly \nAverage</string>
+    <string name="today">Today \nPurchase</string>
+    <string name="this_month">Last \nMonth</string>
+    <string name="total">Purchase \nTotal</string>
+    <string name="total_transport">Transport \nTotal</string>
+    <string name="total_rent">Rent \nTotal</string>
+    <string name="total_shopping">Shopping \nTotal</string>
 
     <string name="logout">Log Out</string>
-    <string name="profile_picture">Immagine di profilo</string>
+    <string name="profile_picture">Profile Picture</string>
 
     <string name="card_dimension_ratio">1.2:1</string>
     <string name="back_arrow">Back Arrow</string>
-    <string name="trend_avg_day">Trend Media Giornaliera</string>
-    <string name="show_2020_2021">Mostra 2020/2021</string>
+    <string name="trend_avg_day">Daily Average Trend</string>
+    <string name="show_2020_2021">Show 2020/2021</string>
     <string name="dashboard_empty">dashboard_empty</string>
     <string name="list_empty">list_empty</string>
     <string name="chart_icon">Chart Icon</string>
     <string name="version_icon">Version Icon</string>
     <string name="collection_icon">Collection Icon</string>
 
-    <string name="type">Tipo</string>
-    <string name="generic">Generico</string>
-    <string name="shopping">Spesa</string>
-    <string name="transport">Trasporti</string>
-    <string name="rent">Affitto</string>
-    <string name="zero_purchase">Nessun acquisto</string>
-    <string name="date">Data</string>
+    <string name="type">Type</string>
+    <string name="generic">Generic</string>
+    <string name="shopping">Shopping</string>
+    <string name="transport">Transport</string>
+    <string name="rent">Rent</string>
+    <string name="no_purchase">No purchase</string>
+    <string name="date">Date</string>
 
     <string-array name="types">
         <item>@string/generic</item>
         <item>@string/shopping</item>
         <item>@string/transport</item>
         <item>@string/rent</item>
-        <item>@string/zero_purchase</item>
+        <item>@string/no_purchase</item>
     </string-array>
 </resources>

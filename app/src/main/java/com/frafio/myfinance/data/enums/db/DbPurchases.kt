@@ -12,10 +12,10 @@ object DbPurchases {
         PRICE("price")
     }
 
-    enum class NAMES(val value: String) {
-        RENT("Affitto"),
-        TOTAL("Totale"),
-        TOTAL_PRICE("0.00")
+    enum class NAMES(val value_en: String, val value_it: String) {
+        RENT("Rent","Affitto"),
+        TOTAL("Total","Totale"),
+        TOTAL_PRICE("0.00", "0.00")
     }
 
     enum class TYPES(val value: Int) {

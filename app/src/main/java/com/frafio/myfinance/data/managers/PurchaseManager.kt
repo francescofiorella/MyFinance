@@ -182,13 +182,13 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                 }
                 val totalP = Purchase(
                     userEmail,
-                    DbPurchases.NAMES.TOTAL.value,
+                    DbPurchases.NAMES.TOTAL.value_it,
                     sum,
                     purchase.year,
                     purchase.month,
                     purchase.day,
                     DbPurchases.TYPES.TOTAL.value
-                )
+                ) // TODO: change the language
                 totalP.id = "${purchase.year}${purchase.month}${purchase.day}"
                 fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
                     .document(UserStorage.user!!.email!!)
@@ -235,14 +235,14 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     val totID = "${purchase.year}${purchase.month}${purchase.day}"
                     val totalP = Purchase(
                         purchase.email,
-                        DbPurchases.NAMES.TOTAL.value,
+                        DbPurchases.NAMES.TOTAL.value_it,
                         sum,
                         purchase.year,
                         purchase.month,
                         purchase.day,
                         DbPurchases.TYPES.TOTAL.value,
                         totID
-                    )
+                    )// TODO: change the language
 
                     fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
                         .document(UserStorage.user!!.email!!)
