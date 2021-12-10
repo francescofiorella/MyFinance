@@ -3,7 +3,7 @@ package com.frafio.myfinance.ui.add
 import android.view.View
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.enums.db.PurchaseCodeIT
 import com.frafio.myfinance.data.models.DatePickerButton
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
@@ -48,13 +48,13 @@ class AddViewModel(
 
         // check info
         if (name.isNullOrEmpty()) {
-            listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_NAME))
+            listener?.onAddFailure(PurchaseResult(PurchaseCodeIT.EMPTY_NAME))
             return
         }
 
         if ((name == DbPurchases.NAMES.TOTAL.value_en || name == DbPurchases.NAMES.TOTAL.value_it)
             && type != DbPurchases.TYPES.TOTAL.value) {
-            listener?.onAddFailure(PurchaseResult(PurchaseCode.WRONG_NAME_TOTAL))
+            listener?.onAddFailure(PurchaseResult(PurchaseCodeIT.WRONG_NAME_TOTAL))
             return
         }
 
@@ -65,7 +65,7 @@ class AddViewModel(
             listener?.onAddSuccess(response)
         } else {
             if (priceString.isNullOrEmpty()) {
-                listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_PRICE))
+                listener?.onAddFailure(PurchaseResult(PurchaseCodeIT.EMPTY_PRICE))
                 return
             }
 

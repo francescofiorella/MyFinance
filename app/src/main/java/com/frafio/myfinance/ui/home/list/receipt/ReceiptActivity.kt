@@ -6,7 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.enums.db.PurchaseCodeIT
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.models.ReceiptItem
 import com.frafio.myfinance.databinding.ActivityReceiptBinding
@@ -83,7 +83,7 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
     override fun onLoadSuccess(response: LiveData<PurchaseResult>) {
         response.observe(this, { result ->
             when (result.code) {
-                PurchaseCode.RECEIPT_ADD_SUCCESS.code -> {
+                PurchaseCodeIT.RECEIPT_ADD_SUCCESS.code -> {
                     snackBar(result.message, binding.receiptNameEditText)
                     binding.receiptNameEditText.clearText()
                     binding.receiptPriceEditText.clearText()
@@ -96,9 +96,9 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
 
     override fun onLoadFailure(result: PurchaseResult) {
         when (result.code) {
-            PurchaseCode.EMPTY_NAME.code -> binding.receiptNameEditText.error = result.message
+            PurchaseCodeIT.EMPTY_NAME.code -> binding.receiptNameEditText.error = result.message
 
-            PurchaseCode.EMPTY_PRICE.code -> binding.receiptPriceEditText.error = result.message
+            PurchaseCodeIT.EMPTY_PRICE.code -> binding.receiptPriceEditText.error = result.message
         }
     }
 

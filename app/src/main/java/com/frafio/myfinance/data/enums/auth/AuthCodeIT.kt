@@ -1,6 +1,6 @@
 package com.frafio.myfinance.data.enums.auth
 
-enum class AuthCode(val code: Int, val message: String) {
+enum class AuthCodeIT(val code: Int, val message: String) {
     LOGIN_SUCCESS(1, "Accesso avvenuto con successo!"),
     GOOGLE_LOGIN_FAILURE(2, "Accesso con Google fallito!"),
     LOGIN_FAILURE(3, "Accesso fallito!"),
@@ -27,10 +27,10 @@ enum class AuthCode(val code: Int, val message: String) {
     EMAIL_NOT_SENT_TOO_MANY_REQUESTS(31, "Email non inviata! Sono state effettuate troppe richieste."),
     EMAIL_NOT_SENT(32, "Errore! Email non inviata."),
 
-    LOGOUT_SUCCESS(40, "User logged out!"),
+    LOGOUT_SUCCESS(40, "Utente disconnesso!"),
 
-    USER_LOGGED(100, "User logged!"),
-    USER_NOT_LOGGED(101, "User not logged"),
-    USER_DATA_UPDATED(102, "User data updated!"),
+    USER_LOGGED(100, "Utente connesso!"),
+    USER_NOT_LOGGED(101, "Utente non connesso"),
+    USER_DATA_UPDATED(102, "Dati utente aggiornati!"),
     USER_DATA_NOT_UPDATED(103, "Aggiornamento dati utente non riuscito!")
 }

@@ -9,7 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.enums.db.PurchaseCodeIT
 import com.frafio.myfinance.data.models.DatePickerButton
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
@@ -225,14 +225,14 @@ class AddActivity : BaseActivity(), AddListener {
 
     override fun onAddSuccess(response: LiveData<PurchaseResult>) {
         response.observe(this, { result ->
-            if (result.code != PurchaseCode.TOTAL_ADD_SUCCESS.code) {
+            if (result.code != PurchaseCodeIT.TOTAL_ADD_SUCCESS.code) {
                 binding.addProgressIndicator.hide()
             }
 
             when (result.code) {
-                PurchaseCode.TOTAL_ADD_SUCCESS.code -> viewModel.updateLocalList()
+                PurchaseCodeIT.TOTAL_ADD_SUCCESS.code -> viewModel.updateLocalList()
 
-                PurchaseCode.PURCHASE_EDIT_SUCCESS.code -> {
+                PurchaseCodeIT.PURCHASE_EDIT_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
                         it.putExtra(INTENT_PURCHASE_REQUEST, true)
@@ -241,7 +241,7 @@ class AddActivity : BaseActivity(), AddListener {
                     }
                 }
 
-                PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
+                PurchaseCodeIT.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
                         it.putExtra(INTENT_PURCHASE_REQUEST, true)
@@ -259,11 +259,11 @@ class AddActivity : BaseActivity(), AddListener {
         binding.addProgressIndicator.hide()
 
         when (result.code) {
-            PurchaseCode.EMPTY_NAME.code -> binding.nameTextInputLayout.error = result.message
+            PurchaseCodeIT.EMPTY_NAME.code -> binding.nameTextInputLayout.error = result.message
 
-            PurchaseCode.WRONG_NAME_TOTAL.code -> binding.nameTextInputLayout.error = result.message
+            PurchaseCodeIT.WRONG_NAME_TOTAL.code -> binding.nameTextInputLayout.error = result.message
 
-            PurchaseCode.EMPTY_PRICE.code -> binding.priceTextInputLayout.error = result.message
+            PurchaseCodeIT.EMPTY_PRICE.code -> binding.priceTextInputLayout.error = result.message
         }
     }
 }

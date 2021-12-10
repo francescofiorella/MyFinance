@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.enums.db.PurchaseCodeIT
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentMenuBinding
 import com.frafio.myfinance.ui.BaseFragment
@@ -60,7 +60,7 @@ class MenuFragment : BaseFragment(), MenuListener {
             binding.collectionSwitch.isEnabled = true
 
             when (purchaseResult.code) {
-                PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
+                PurchaseCodeIT.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
 
                     binding.lineChart.also { lineChart ->
                         val list = viewModel.avgTrendList

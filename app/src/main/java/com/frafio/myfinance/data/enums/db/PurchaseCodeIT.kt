@@ -1,6 +1,6 @@
 package com.frafio.myfinance.data.enums.db
 
-enum class PurchaseCode(val code: Int, val message: String) {
+enum class PurchaseCodeIT(val code: Int, val message: String) {
     EMPTY_NAME(1, "Inserisci il nome dell'acquisto."),
     EMPTY_PRICE(2, "Inserisci il costo dell'acquisto."),
     WRONG_NAME_TOTAL(3, "L'acquisto non può chiamarsi 'Totale'."),
@@ -16,8 +16,8 @@ enum class PurchaseCode(val code: Int, val message: String) {
     PURCHASE_DELETE_SUCCESS(30, "Acquisto eliminato!"),
     PURCHASE_DELETE_FAILURE(31, "Acquisto non eliminato correttamente!"),
 
-    PURCHASE_LIST_UPDATE_SUCCESS(40, "List Updated!"),
-    PURCHASE_LIST_UPDATE_FAILURE(41, "List not updated!"),
+    PURCHASE_LIST_UPDATE_SUCCESS(40, "Lista aggiornata!"),
+    PURCHASE_LIST_UPDATE_FAILURE(41, "Lista non aggiornata!"),
 
     RECEIPT_ADD_SUCCESS(100, "Voce aggiunta!"),
     RECEIPT_ADD_FAILURE(102, "Voce non aggiunta!"),

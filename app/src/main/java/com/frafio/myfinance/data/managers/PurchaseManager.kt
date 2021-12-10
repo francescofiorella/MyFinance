@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.enums.db.PurchaseCodeIT
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
@@ -48,12 +48,12 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     PurchaseStorage.purchaseList.add(purchase)
                 }
 
-                response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS)
+                response.value = PurchaseResult(PurchaseCodeIT.PURCHASE_LIST_UPDATE_SUCCESS)
             }.addOnFailureListener { e ->
                 val error = "Error! ${e.localizedMessage}"
                 Log.e(TAG, error)
 
-                response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_FAILURE)
+                response.value = PurchaseResult(PurchaseCodeIT.PURCHASE_LIST_UPDATE_FAILURE)
             }
 
         return response
@@ -75,7 +75,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     PurchaseStorage.purchaseList = purchaseList
 
                     response.value = Triple(
-                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
+                        PurchaseResult(PurchaseCodeIT.PURCHASE_DELETE_SUCCESS),
                         purchaseList,
                         null
                     )
@@ -102,7 +102,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                                     PurchaseStorage.purchaseList = purchaseList
 
                                     response.value = Triple(
-                                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
+                                        PurchaseResult(PurchaseCodeIT.PURCHASE_DELETE_SUCCESS),
                                         purchaseList,
                                         totPosition
                                     )
@@ -110,7 +110,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                                     Log.e(TAG, "Error! ${e.localizedMessage}")
 
                                     response.value = Triple(
-                                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE),
+                                        PurchaseResult(PurchaseCodeIT.PURCHASE_DELETE_FAILURE),
                                         purchaseList,
                                         totPosition
                                     )
@@ -123,7 +123,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     PurchaseStorage.purchaseList = purchaseList
 
                     response.value = Triple(
-                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
+                        PurchaseResult(PurchaseCodeIT.PURCHASE_DELETE_SUCCESS),
                         purchaseList,
                         null
                     )
@@ -132,7 +132,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                 Log.e(TAG, "Error! ${e.localizedMessage}")
 
                 response.value =
-                    Triple(PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE), purchaseList, null)
+                    Triple(PurchaseResult(PurchaseCodeIT.PURCHASE_DELETE_FAILURE), purchaseList, null)
             }
 
         return response
@@ -146,10 +146,10 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .document(UserStorage.user!!.email!!)
             .collection(getSharedCollection(sharedPreferences))
             .document(purchase.id!!).set(purchase).addOnSuccessListener {
-                response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
+                response.value = PurchaseResult(PurchaseCodeIT.TOTAL_ADD_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_FAILURE)
+                response.value = PurchaseResult(PurchaseCodeIT.TOTAL_ADD_FAILURE)
             }
 
         return response
@@ -195,16 +195,16 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     .collection(getSharedCollection(sharedPreferences))
                     .document(totalP.id!!).set(totalP)
                     .addOnSuccessListener {
-                        response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
+                        response.value = PurchaseResult(PurchaseCodeIT.TOTAL_ADD_SUCCESS)
                     }
                     .addOnFailureListener { e ->
                         Log.e(TAG, "Error! ${e.localizedMessage}")
-                        response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_ERROR)
+                        response.value = PurchaseResult(PurchaseCodeIT.PURCHASE_ADD_ERROR)
                     }
 
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_FAILURE)
+                response.value = PurchaseResult(PurchaseCodeIT.PURCHASE_ADD_FAILURE)
             }
 
         return response
@@ -249,18 +249,18 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                         .collection(getSharedCollection(sharedPreferences))
                         .document(totID).set(totalP)
                         .addOnSuccessListener {
-                            response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
+                            response.value = PurchaseResult(PurchaseCodeIT.TOTAL_ADD_SUCCESS)
                         }
                         .addOnFailureListener { e ->
                             Log.e(TAG, "Error! ${e.localizedMessage}")
-                            response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_ERROR)
+                            response.value = PurchaseResult(PurchaseCodeIT.PURCHASE_ADD_ERROR)
                         }
                 } else {
-                    response.value = PurchaseResult(PurchaseCode.PURCHASE_EDIT_SUCCESS)
+                    response.value = PurchaseResult(PurchaseCodeIT.PURCHASE_EDIT_SUCCESS)
                 }
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = PurchaseResult(PurchaseCode.PURCHASE_EDIT_FAILURE)
+                response.value = PurchaseResult(PurchaseCodeIT.PURCHASE_EDIT_FAILURE)
             }
 
 

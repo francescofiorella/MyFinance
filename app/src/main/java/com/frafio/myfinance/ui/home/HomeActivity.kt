@@ -16,7 +16,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.auth.AuthCode
+import com.frafio.myfinance.data.enums.auth.AuthCodeIT
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.BaseActivity
@@ -228,7 +228,7 @@ class HomeActivity : BaseActivity(), HomeListener {
 
     override fun onLogOutSuccess(response: LiveData<AuthResult>) {
         response.observe(this, { authResult ->
-            if (authResult.code == AuthCode.LOGOUT_SUCCESS.code) {
+            if (authResult.code == AuthCodeIT.LOGOUT_SUCCESS.code) {
                 setImageViewRoundDrawable(binding.propicImageView, null)
                 setDrawableToButtons(isLogged = false)
 
@@ -243,19 +243,19 @@ class HomeActivity : BaseActivity(), HomeListener {
     override fun onSplashOperationComplete(response: LiveData<AuthResult>) {
         response.observe(this, { authResult ->
             when (authResult.code) {
-                AuthCode.USER_LOGGED.code -> {
+                AuthCodeIT.USER_LOGGED.code -> {
                     viewModel.updateUserData()
                     setDrawableToButtons(isLogged = true)
 
                     viewModel.isLayoutReady = false
                 }
 
-                AuthCode.USER_NOT_LOGGED.code -> {
+                AuthCodeIT.USER_NOT_LOGGED.code -> {
                     setDrawableToButtons(isLogged = false)
                     viewModel.isLayoutReady = true
                 }
 
-                AuthCode.USER_DATA_UPDATED.code -> {
+                AuthCodeIT.USER_DATA_UPDATED.code -> {
                     supportFragmentManager.registerFragmentLifecycleCallbacks(
                         dashboardCallback,
                         true
@@ -264,7 +264,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                     reloadDashboard()
                 }
 
-                AuthCode.USER_DATA_NOT_UPDATED.code -> showSnackBar(authResult.message)
+                AuthCodeIT.USER_DATA_NOT_UPDATED.code -> showSnackBar(authResult.message)
 
                 else -> Unit
             }
