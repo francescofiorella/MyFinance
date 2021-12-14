@@ -29,6 +29,7 @@ class MyFinanceApplication : Application(), KodeinAware {
     companion object {
         const val PREFERENCES_KEY = "COLLECTION_PREFERENCES"
         const val COLLECTION_KEY = "COLLECTION_OPTIONS"
+        const val LANGUAGE_KEY = "LANGUAGE_OPTIONS"
     }
 
     private val sharedPreferences by lazy {
