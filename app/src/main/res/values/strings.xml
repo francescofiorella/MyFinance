@@ -61,11 +61,13 @@
     <string name="back_arrow">Back Arrow</string>
     <string name="trend_avg_day">Daily Average Trend</string>
     <string name="show_2020_2021">Show 2020/2021</string>
+    <string name="language">Language</string>
     <string name="dashboard_empty">dashboard_empty</string>
     <string name="list_empty">list_empty</string>
     <string name="chart_icon">Chart Icon</string>
     <string name="version_icon">Version Icon</string>
     <string name="collection_icon">Collection Icon</string>
+    <string name="language_icon">Language Icon</string>
 
     <string name="type">Type</string>
     <string name="generic">Generic</string>

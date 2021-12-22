@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCodeIT
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentMenuBinding
@@ -18,6 +19,7 @@ import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.setValueLineChartData
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.generic.instance
 
 class MenuFragment : BaseFragment(), MenuListener {
@@ -53,6 +55,25 @@ class MenuFragment : BaseFragment(), MenuListener {
         (activity as HomeActivity).showProgressIndicator()
         binding.collectionSwitch.isEnabled = false
     }
+
+    /*fun onLanguageClick(view: View) {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setIcon(R.drawable.ic_language)
+        builder.setTitle(getString(R.string.language))
+        builder.setSingleChoiceItems(
+            resources.getStringArray(R.array.types),
+            when (viewModel.type) {
+                DbPurchases.TYPES.GENERIC.value -> 0
+                DbPurchases.TYPES.SHOPPING.value -> 1
+                DbPurchases.TYPES.TRANSPORT.value -> 2
+                DbPurchases.TYPES.RENT.value -> 3
+                DbPurchases.TYPES.TOTAL.value -> 4
+                else -> -1 // error, do not select a default option
+            },
+            typeListener
+        )
+        builder.show()
+    }*/
 
     override fun onCompleted(result: LiveData<PurchaseResult>) {
         result.observe(this, { purchaseResult ->

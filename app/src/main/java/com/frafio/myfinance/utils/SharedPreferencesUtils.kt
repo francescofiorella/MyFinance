@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import com.frafio.myfinance.MyFinanceApplication.Companion.COLLECTION_KEY
 import com.frafio.myfinance.MyFinanceApplication.Companion.LANGUAGE_KEY
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.enums.db.LANGUAGES
+import com.frafio.myfinance.data.enums.db.Languages
 
 fun getSharedCollection(sharedPreferences: SharedPreferences): String {
     return sharedPreferences.getString(COLLECTION_KEY, DbPurchases.COLLECTIONS.ONE_TWO.value)
@@ -18,8 +18,8 @@ fun setSharedCollection(sharedPreferences: SharedPreferences, collection: String
 }
 
 fun getSharedLanguage(sharedPreferences: SharedPreferences): String {
-    return sharedPreferences.getString(LANGUAGE_KEY, LANGUAGES.ENGLISH.value)
-        ?: LANGUAGES.ENGLISH.value
+    return sharedPreferences.getString(LANGUAGE_KEY, Languages.ENGLISH.value)
+        ?: Languages.ENGLISH.value
 }
 
 @SuppressLint("ApplySharedPref")

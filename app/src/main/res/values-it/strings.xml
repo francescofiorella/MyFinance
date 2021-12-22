@@ -61,11 +61,13 @@
     <string name="back_arrow">Back Arrow</string>
     <string name="trend_avg_day">Trend Media Giornaliera</string>
     <string name="show_2020_2021">Mostra 2020/2021</string>
+    <string name="language">Lingua</string>
     <string name="dashboard_empty">dashboard_empty</string>
     <string name="list_empty">list_empty</string>
     <string name="chart_icon">Chart Icon</string>
     <string name="version_icon">Version Icon</string>
     <string name="collection_icon">Collection Icon</string>
+    <string name="language_icon">Language Icon</string>
 
     <string name="type">Tipo</string>
     <string name="generic">Generico</string>
