@@ -1,12 +1,16 @@
 package com.frafio.myfinance.ui.home.menu
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.BuildConfig
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.frafio.myfinance.utils.getSharedLanguage
+import com.frafio.myfinance.utils.setSharedLanguage
 
 class MenuViewModel(
-    private val purchaseRepository: PurchaseRepository
+    private val purchaseRepository: PurchaseRepository,
+    private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
     var listener: MenuListener? = null
 
@@ -29,5 +33,13 @@ class MenuViewModel(
 
     private fun getChecked(): Boolean {
         return purchaseRepository.getSelectedCollection() == DbPurchases.COLLECTIONS.ZERO_ONE.value
+    }
+
+    fun getLanguage(): String {
+        return getSharedLanguage(sharedPreferences)
+    }
+
+    fun setLanguage(language: String) {
+        setSharedLanguage(sharedPreferences, language)
     }
 }

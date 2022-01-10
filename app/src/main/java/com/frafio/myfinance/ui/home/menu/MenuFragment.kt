@@ -1,5 +1,7 @@
 package com.frafio.myfinance.ui.home.menu
 
+import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.transition.AutoTransition
 import android.transition.TransitionManager
@@ -10,7 +12,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.Languages
 import com.frafio.myfinance.data.enums.db.PurchaseCodeIT
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentMenuBinding
@@ -21,6 +23,7 @@ import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.setValueLineChartData
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.generic.instance
+import java.util.*
 
 class MenuFragment : BaseFragment(), MenuListener {
 
@@ -48,6 +51,8 @@ class MenuFragment : BaseFragment(), MenuListener {
                 viewModel.setCollection(isChecked)
             }
         }
+
+        binding.languageCard.setOnClickListener(languageCardListener)
         return binding.root
     }
 
@@ -56,24 +61,37 @@ class MenuFragment : BaseFragment(), MenuListener {
         binding.collectionSwitch.isEnabled = false
     }
 
-    /*fun onLanguageClick(view: View) {
-        val builder = MaterialAlertDialogBuilder(this)
+    private val languageCardListener = View.OnClickListener {
+        val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setIcon(R.drawable.ic_language)
         builder.setTitle(getString(R.string.language))
         builder.setSingleChoiceItems(
-            resources.getStringArray(R.array.types),
-            when (viewModel.type) {
-                DbPurchases.TYPES.GENERIC.value -> 0
-                DbPurchases.TYPES.SHOPPING.value -> 1
-                DbPurchases.TYPES.TRANSPORT.value -> 2
-                DbPurchases.TYPES.RENT.value -> 3
-                DbPurchases.TYPES.TOTAL.value -> 4
+            resources.getStringArray(R.array.languages),
+            when (viewModel.getLanguage()) {
+                Languages.ENGLISH.value -> 0
+                Languages.ITALIANO.value -> 1
                 else -> -1 // error, do not select a default option
             },
-            typeListener
+            languageListener
         )
         builder.show()
-    }*/
+    }
+
+    private val languageListener = DialogInterface.OnClickListener { dialog, selectedItem ->
+        val language: String = when (selectedItem) {
+            0 -> Languages.ENGLISH.value
+            1 -> Languages.ITALIANO.value
+            else -> Languages.ENGLISH.value
+        }
+        viewModel.setLanguage(language)
+
+        val locale = Locale(language)
+        val displayMetrics = resources.displayMetrics
+        Locale.setDefault(locale)
+        resources.configuration.setLocale(locale)
+        resources.updateConfiguration(resources.configuration, displayMetrics)
+        dialog.dismiss()
+    }
 
     override fun onCompleted(result: LiveData<PurchaseResult>) {
         result.observe(this, { purchaseResult ->
