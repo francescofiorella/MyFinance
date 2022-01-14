@@ -29,7 +29,6 @@ class MyFinanceApplication : Application(), KodeinAware {
     companion object {
         const val PREFERENCES_KEY = "COLLECTION_PREFERENCES"
         const val COLLECTION_KEY = "COLLECTION_OPTIONS"
-        const val LANGUAGE_KEY = "LANGUAGE_OPTIONS"
     }
 
     private val sharedPreferences by lazy {
@@ -55,7 +54,9 @@ class MyFinanceApplication : Application(), KodeinAware {
         bind() from provider { DashboardViewModelFactory(instance(), instance()) }
         bind() from provider { ListViewModelFactory(instance(), instance()) }
         bind() from provider { ProfileViewModelFactory(instance()) }
-        bind() from provider { MenuViewModelFactory(instance(), sharedPreferences) }
+        bind() from provider {
+            MenuViewModelFactory(instance())
+        }
         bind() from provider { ReceiptViewModelFactory(instance()) }
         bind() from provider { AddViewModelFactory(instance(), instance()) }
     }

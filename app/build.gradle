@@ -12,11 +12,12 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
+        resConfigs("en", "it")
         applicationId "com.frafio.myfinance"
         minSdkVersion 28
         targetSdkVersion 31
         versionCode 1
-        versionName "3.8.3"
+        versionName "3.8.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -32,18 +32,18 @@
 
     <string name="login_signup_email">Enter your email</string>
     <string name="login_password">Enter your password</string>
-    <string name="login">Log In</string>
+    <string name="login">Log in</string>
     <string name="forgotten_password">Did you forgot the password?</string>
-    <string name="login_google">Log In with Google</string>
+    <string name="login_google">Log in with Google</string>
     <string name="login_signup">Do not have an account? Sign Up</string>
     <string name="signup_name">Enter your first and last name</string>
     <string name="signup_password">Enter a password</string>
     <string name="signup_password_confirm">Confirm the password</string>
-    <string name="signup">Sign Up</string>
+    <string name="signup">Sign up</string>
     <string name="signup_login">Do you already have an account? Log In</string>
     <string name="warning_home">Add your first purchase!</string>
-    <string name="warning_not_logged_home">Log In to add your first purchase!</string>
-    <string name="warning_not_logged">Log In to your account!</string>
+    <string name="warning_not_logged_home">Log in to add your first purchase!</string>
+    <string name="warning_not_logged">Log in to your account!</string>
 
     <string name="avg_day">Daily \nAverage</string>
     <string name="avg_month">Monthly \nAverage</string>
@@ -77,16 +77,13 @@
     <string name="no_purchase">No purchase</string>
     <string name="date">Date</string>
 
+    <string name="translation_warning">Restart the app for the changes to take effect</string>
+
     <string-array name="types">
         <item>@string/generic</item>
         <item>@string/shopping</item>
         <item>@string/transport</item>
         <item>@string/rent</item>
         <item>@string/no_purchase</item>
-    </string-array>
-
-    <string-array name="languages">
-        <item>English</item>
-        <item>Italiano</item>
     </string-array>
 </resources>

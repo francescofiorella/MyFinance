@@ -77,16 +77,13 @@
     <string name="no_purchase">Nessun acquisto</string>
     <string name="date">Data</string>
 
+    <string name="translation_warning">Riavvia l\'app per rendere le modifiche effettive</string>
+
     <string-array name="types">
         <item>@string/generic</item>
         <item>@string/shopping</item>
         <item>@string/transport</item>
         <item>@string/rent</item>
         <item>@string/no_purchase</item>
-    </string-array>
-
-    <string-array name="languages">
-        <item>English</item>
-        <item>Italiano</item>
     </string-array>
 </resources>
