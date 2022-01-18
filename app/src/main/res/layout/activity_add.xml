@@ -172,6 +172,7 @@
                     android:enabled="@{viewModel.requestCode == 1 ? true : false}"
                     android:hint="@string/type"
                     android:labelFor="@id/type_auto_complete_TV"
+                    android:paddingBottom="70dp"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
@@ -192,27 +193,25 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                    android:id="@+id/add_addButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/fab_margin"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:fontFamily="@font/nunito_semibold"
-                    android:onClick="@{viewModel::onAddButtonClick}"
-                    android:text="@{viewModel.requestCode == 1 ? @string/add : @string/edit}"
-                    app:icon="@{viewModel.requestCode == 1 ? @drawable/ic_add : @drawable/ic_create}"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/type_textInputLayout"
-                    app:layout_constraintVertical_bias="1.0"
-                    tools:icon="@drawable/ic_add"
-                    tools:text="@string/add" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </ScrollView>
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/add_addButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/nunito_semibold"
+            android:onClick="@{viewModel::onAddButtonClick}"
+            android:text="@{viewModel.requestCode == 1 ? @string/add : @string/edit}"
+            app:icon="@{viewModel.requestCode == 1 ? @drawable/ic_add : @drawable/ic_create}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:icon="@drawable/ic_add"
+            tools:text="@string/add" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -40,7 +40,7 @@
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.MyFinance.AlertDialog</item>
     </style>
 
-    <!-- SplashScreen theme. -->
+    <!-- SplashScreen themes. -->
     <style name="Theme.MyFinance.SplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/launcher_icon_bg</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>

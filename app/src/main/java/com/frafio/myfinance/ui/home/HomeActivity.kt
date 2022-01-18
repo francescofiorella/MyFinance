@@ -1,6 +1,7 @@
 package com.frafio.myfinance.ui.home
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -77,7 +78,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         super.onCreate(savedInstanceState)
 
         installSplashScreen().also {
-            it.setKeepVisibleCondition {
+            it.setKeepOnScreenCondition {
                 !viewModel.isLayoutReady
             }
             it.setOnExitAnimationListener { splashScreenViewProvider ->
