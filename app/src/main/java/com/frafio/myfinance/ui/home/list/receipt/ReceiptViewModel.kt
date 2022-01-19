@@ -25,6 +25,8 @@ class ReceiptViewModel(
     }
 
     fun onAddButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        listener?.onLoadStarted()
+
         // check info
         if (receiptName.isNullOrEmpty()) {
             listener?.onLoadFailure(PurchaseResult(PurchaseCodeIT.EMPTY_NAME))

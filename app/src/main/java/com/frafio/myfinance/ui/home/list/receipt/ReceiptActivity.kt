@@ -79,17 +79,32 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
         builder.show()
     }
 
-    // receiptListener
+    override fun onLoadStarted() {
+        binding.receiptProgressIndicator.show()
+        binding.receiptNameEditText.isEnabled = false
+        binding.receiptPriceEditText.isEnabled = false
+    }
+
     override fun onLoadSuccess(response: LiveData<PurchaseResult>) {
         response.observe(this, { result ->
             when (result.code) {
                 PurchaseCodeIT.RECEIPT_ADD_SUCCESS.code -> {
                     snackBar(result.message, binding.receiptNameEditText)
-                    binding.receiptNameEditText.clearText()
-                    binding.receiptPriceEditText.clearText()
+                    binding.receiptNameEditText.also{
+                        it.clearText()
+                        it.isEnabled = true
+                    }
+                    binding.receiptPriceEditText.also{
+                        it.clearText()
+                        it.isEnabled = true
+                    }
+                    binding.receiptProgressIndicator.hide()
                 }
 
-                else -> snackBar(result.message, binding.receiptNameEditText)
+                else -> {
+                    snackBar(result.message, binding.receiptNameEditText)
+                    binding.receiptProgressIndicator.hide()
+                }
             }
         })
     }
@@ -100,6 +115,7 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
 
             PurchaseCodeIT.EMPTY_PRICE.code -> binding.receiptPriceEditText.error = result.message
         }
+        binding.receiptProgressIndicator.hide()
     }
 
     fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
