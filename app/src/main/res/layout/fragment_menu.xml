@@ -64,7 +64,7 @@
                             app:layout_constraintTop_toTopOf="@+id/textView10"
                             app:tint="@color/primary_text" />
 
-                        <TextView
+                        <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/textView10"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -135,7 +135,7 @@
                         app:layout_constraintTop_toTopOf="@+id/collection_TV"
                         app:tint="@color/primary_text" />
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/collection_TV"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -191,7 +191,7 @@
                         app:layout_constraintTop_toTopOf="@id/version_TV"
                         app:tint="@color/primary_text" />
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/version_TV"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

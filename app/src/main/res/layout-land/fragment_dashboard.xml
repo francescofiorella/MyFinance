@@ -42,7 +42,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/dashboard_emptyTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -107,7 +107,7 @@
                             android:paddingHorizontal="25dp"
                             android:paddingVertical="20dp">
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/textView"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/dayAvg_TV"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -164,7 +164,7 @@
                             android:paddingHorizontal="25dp"
                             android:paddingVertical="20dp">
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/textView2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -174,7 +174,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/monthAvg_TV"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -221,7 +221,7 @@
                             android:paddingHorizontal="25dp"
                             android:paddingVertical="20dp">
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/textView3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -231,7 +231,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/todayTot_TV"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -278,7 +278,7 @@
                             android:paddingHorizontal="25dp"
                             android:paddingVertical="20dp">
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/textView5"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -288,7 +288,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/numTot_TV"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -334,7 +334,7 @@
                             android:paddingHorizontal="25dp"
                             android:paddingVertical="20dp">
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/textView4"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -344,7 +344,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/tot_TV"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -390,7 +390,7 @@
                             android:paddingHorizontal="25dp"
                             android:paddingVertical="20dp">
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/textView6"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -400,7 +400,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/ticketTot_TV"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -446,7 +446,7 @@
                             android:paddingHorizontal="25dp"
                             android:paddingVertical="20dp">
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/textView7"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -456,7 +456,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/trenTot_TV"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -502,7 +502,7 @@
                             android:paddingHorizontal="25dp"
                             android:paddingVertical="20dp">
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/textView8"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -512,7 +512,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/amTot_TV"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

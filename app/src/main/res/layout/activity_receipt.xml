@@ -43,7 +43,7 @@
             app:layout_constraintTop_toTopOf="@+id/receipt_purchaseTitle"
             app:srcCompat="@drawable/ic_west" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/receipt_purchaseTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Acquisto" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/receipt_purchasePrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

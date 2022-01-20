@@ -35,6 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             app:backgroundTint="@color/md_theme_background"
+            app:itemRippleColor="@android:color/transparent"
             app:itemTextAppearanceActive="@style/TextAppearance.MyFinance.Caption"
             app:itemTextAppearanceInactive="@style/TextAppearance.MyFinance.Caption"
             app:labelVisibilityMode="labeled"
@@ -43,7 +44,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:menu="@menu/navigation_menu" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/fragmentTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

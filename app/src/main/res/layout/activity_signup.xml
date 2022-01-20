@@ -57,7 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/signupTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -201,19 +201,18 @@
                     app:layout_constraintTop_toBottomOf="@+id/signupButton"
                     app:layout_constraintVertical_bias="1.0">
 
-                    <View
-                        android:id="@+id/view"
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/signup_divider"
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:layout_marginEnd="10dp"
                         android:layout_marginBottom="15dp"
-                        android:background="@android:color/darker_gray"
                         app:layout_constraintBottom_toTopOf="@id/sLogintextView"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/sLogintextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

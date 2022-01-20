@@ -30,7 +30,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/recView_purchaseItem_dataTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -43,12 +43,11 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="01/01/2000" />
 
-            <View
+            <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/recView_purchaseItem_divider"
                 android:layout_width="0dp"
                 android:layout_height="0.1dp"
                 android:layout_marginStart="10dp"
-                android:background="@android:color/darker_gray"
                 app:layout_constraintBottom_toBottomOf="@+id/recView_purchaseItem_dataTextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_dataTextView"
@@ -69,7 +68,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/recView_purchaseItem_dataLayout">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/recView_purchaseItem_nomeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -82,7 +81,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Acquisto" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/recView_purchaseItem_priceTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

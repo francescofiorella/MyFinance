@@ -45,7 +45,7 @@
             app:layout_constraintTop_toTopOf="@+id/add_purchaseTitle"
             app:srcCompat="@drawable/ic_west" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/add_purchaseTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -151,7 +151,7 @@
                     app:layout_constraintTop_toBottomOf="@id/price_textInputLayout"
                     app:startIconDrawable="@drawable/ic_today">
 
-                    <AutoCompleteTextView
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/date_auto_complete_TV"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -183,7 +183,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/date_picker_textInputLayout"
                     app:startIconDrawable="@drawable/ic_numbers">
 
-                    <AutoCompleteTextView
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/type_auto_complete_TV"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

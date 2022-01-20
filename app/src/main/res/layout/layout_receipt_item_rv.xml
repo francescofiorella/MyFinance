@@ -23,7 +23,7 @@
         android:paddingHorizontal="20dp"
         android:paddingVertical="10dp">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/recView_receiptItem_nomeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Acquisto" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/recView_receiptItem_priceTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
