@@ -59,3 +59,7 @@ fun Float.round(decimals: Int): Float {
     repeat(decimals) { multiplier *= 10 }
     return round(this * multiplier) / multiplier
 }
+
+fun getCurrentLanguage(): String {
+    return Locale.getDefault().language
+}

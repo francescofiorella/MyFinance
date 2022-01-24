@@ -32,5 +32,38 @@ enum class AuthCodeIT(val code: Int, val message: String) {
     USER_LOGGED(100, "Utente connesso!"),
     USER_NOT_LOGGED(101, "Utente non connesso"),
     USER_DATA_UPDATED(102, "Dati utente aggiornati!"),
-    USER_DATA_NOT_UPDATED(103, "Aggiornamento dati utente non riuscito!")
+    USER_DATA_NOT_UPDATED(103, "Aggiornamento dati utente non riuscito!");
+
+    fun getMessage(authCode: Int) : String {
+        return when (authCode) {
+            LOGIN_SUCCESS.code -> LOGIN_SUCCESS.message
+            GOOGLE_LOGIN_FAILURE.code -> GOOGLE_LOGIN_FAILURE.message
+            LOGIN_FAILURE.code -> LOGIN_FAILURE.message
+            INVALID_EMAIL.code -> INVALID_EMAIL.message
+            WRONG_PASSWORD.code -> WRONG_PASSWORD.message
+            USER_NOT_FOUND.code -> USER_NOT_FOUND.message
+            USER_DISABLED.code -> USER_DISABLED.message
+            SIGNUP_SUCCESS.code -> SIGNUP_SUCCESS.message
+            WEAK_PASSWORD.code -> WEAK_PASSWORD.message
+            EMAIL_NOT_WELL_FORMED.code -> EMAIL_NOT_WELL_FORMED.message
+            EMAIL_ALREADY_ASSOCIATED.code -> EMAIL_ALREADY_ASSOCIATED.message
+            PROFILE_NOT_UPDATED.code -> PROFILE_NOT_UPDATED.message
+            SIGNUP_FAILURE.code -> SIGNUP_FAILURE.message
+            EMPTY_EMAIL.code -> EMPTY_EMAIL.message
+            EMPTY_PASSWORD.code -> EMPTY_PASSWORD.message
+            SHORT_PASSWORD.code -> SHORT_PASSWORD.message
+            EMPTY_NAME.code -> EMPTY_NAME.message
+            EMPTY_PASSWORD_CONFIRM.code -> EMPTY_PASSWORD_CONFIRM.message
+            PASSWORD_NOT_MATCH.code -> PASSWORD_NOT_MATCH.message
+            EMAIL_SENT.code -> EMAIL_SENT.message
+            EMAIL_NOT_SENT_TOO_MANY_REQUESTS.code -> EMAIL_NOT_SENT_TOO_MANY_REQUESTS.message
+            EMAIL_NOT_SENT.code -> EMAIL_NOT_SENT.message
+            LOGOUT_SUCCESS.code -> LOGOUT_SUCCESS.message
+            USER_LOGGED.code -> USER_LOGGED.message
+            USER_NOT_LOGGED.code -> USER_NOT_LOGGED.message
+            USER_DATA_UPDATED.code -> USER_DATA_UPDATED.message
+            USER_DATA_NOT_UPDATED.code -> USER_DATA_NOT_UPDATED.message
+            else -> "Errore" // should not be possible
+        }
+    }
 }

@@ -1,22 +1,9 @@
 package com.frafio.myfinance.data.managers
 
-import android.content.Context
+import java.util.*
 
-class LanguageManager(
-    private val context: Context
-) {
-    /*fun updateLanguage(languageCode: String) {
-        Locale(languageCode).also { locale ->
-            Locale.setDefault(locale)
-            context.resources.configuration.setLocale(locale)
-            context.createConfigurationContext(
-                context.resources.configuration
-            )
-        }
-        setSharedLanguage(sharedPreferences, languageCode)
+object LanguageManager {
+    fun getCurrentLanguage(): String {
+        return Locale.getDefault().language
     }
-
-    fun getLanguage(): String {
-        return getSharedLanguage(sharedPreferences)
-    }*/
 }
