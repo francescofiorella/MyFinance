@@ -45,7 +45,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         val values = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
         var nDays = 0
-        var nMonth = 0
+        var nMonth: Long
         var lastMonth = 0
         var lastYear = 0
 
@@ -74,10 +74,8 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                     if (purchase.year != lastYear) {
                         lastYear = purchase.year ?: 0
                         lastMonth = purchase.month ?: 0
-                        nMonth++
                     } else if (purchase.month != lastMonth) {
                         lastMonth = purchase.month ?: 0
-                        nMonth++
                     }
                 }
 
@@ -96,6 +94,27 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                     values[6] += purchase.price ?: 0.0
                 }
             }
+        }
+
+        if (PurchaseStorage.purchaseList.isNotEmpty()) {
+            PurchaseStorage.purchaseList.first().also { first ->
+                val endDate = LocalDate.of(
+                    first.year!!,
+                    first.month!!,
+                    first.day!!
+                )
+                PurchaseStorage.purchaseList.last().also { last ->
+                    val startDate = LocalDate.of(
+                        last.year!!,
+                        last.month!!,
+                        last.day!!
+                    )
+
+                    nMonth = ChronoUnit.MONTHS.between(startDate, endDate) + 1
+                }
+            }
+        } else {
+            nMonth = 1 // should not be executed
         }
 
         values[0] = values[3] / nDays
