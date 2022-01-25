@@ -52,7 +52,7 @@
     <string name="total">Totale \nAcquisti</string>
     <string name="total_transport">Totale \nTrasporti</string>
     <string name="total_rent">Totale \nAffitto</string>
-    <string name="total_shopping">Totale \n Spesa</string>
+    <string name="total_shopping">Totale \nSpesa</string>
 
     <string name="logout">Log Out</string>
     <string name="profile_picture">Immagine di profilo</string>
