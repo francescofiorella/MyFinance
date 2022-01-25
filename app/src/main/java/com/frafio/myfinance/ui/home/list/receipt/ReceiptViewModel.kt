@@ -3,7 +3,7 @@ package com.frafio.myfinance.ui.home.list.receipt
 import android.view.View
 import androidx.lifecycle.ViewModel
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.frafio.myfinance.data.enums.db.PurchaseCodeIT
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.models.ReceiptItem
 import com.frafio.myfinance.data.repositories.ReceiptRepository
@@ -29,12 +29,12 @@ class ReceiptViewModel(
 
         // check info
         if (receiptName.isNullOrEmpty()) {
-            listener?.onLoadFailure(PurchaseResult(PurchaseCodeIT.EMPTY_NAME))
+            listener?.onLoadFailure(PurchaseResult(PurchaseCode.EMPTY_NAME))
             return
         }
 
         if (receiptPrice.isNullOrEmpty()) {
-            listener?.onLoadFailure(PurchaseResult(PurchaseCodeIT.EMPTY_PRICE))
+            listener?.onLoadFailure(PurchaseResult(PurchaseCode.EMPTY_PRICE))
             return
         }
 

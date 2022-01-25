@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.enums.db.PurchaseCodeIT
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.DbReceipt
 import com.frafio.myfinance.data.models.PurchaseResult
@@ -39,10 +39,10 @@ class ReceiptManager(private val sharedPreferences: SharedPreferences) {
             .collection(getSharedCollection(sharedPreferences))
             .document(purchaseID).collection(DbReceipt.FIELDS.RECEIPT.value)
             .add(receiptItem).addOnSuccessListener {
-                response.value = PurchaseResult(PurchaseCodeIT.RECEIPT_ADD_SUCCESS)
+                response.value = PurchaseResult(PurchaseCode.RECEIPT_ADD_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = PurchaseResult(PurchaseCodeIT.RECEIPT_ADD_FAILURE)
+                response.value = PurchaseResult(PurchaseCode.RECEIPT_ADD_FAILURE)
             }
 
         return response
@@ -56,10 +56,10 @@ class ReceiptManager(private val sharedPreferences: SharedPreferences) {
             .collection(getSharedCollection(sharedPreferences))
             .document(purchaseID).collection(DbReceipt.FIELDS.RECEIPT.value)
             .document(receiptItem.id!!).delete().addOnSuccessListener {
-                response.value = PurchaseResult(PurchaseCodeIT.RECEIPT_DELETE_SUCCESS)
+                response.value = PurchaseResult(PurchaseCode.RECEIPT_DELETE_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = PurchaseResult(PurchaseCodeIT.RECEIPT_DELETE_FAILURE)
+                response.value = PurchaseResult(PurchaseCode.RECEIPT_DELETE_FAILURE)
             }
 
         return response

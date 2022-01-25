@@ -1,0 +1,108 @@
+package com.frafio.myfinance.data.enums.db
+
+import com.frafio.myfinance.utils.getCurrentLanguage
+
+enum class PurchaseCode(val code: Int, val message: String) {
+    EMPTY_NAME(
+        1, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Enter the purchase name."
+            Languages.ITALIANO.value -> "Inserisci il nome dell'acquisto."
+            else -> "Enter the purchase name." // english
+        }
+    ),
+
+    EMPTY_PRICE(2, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Enter the purchase price."
+        Languages.ITALIANO.value -> "Inserisci il costo dell'acquisto."
+        else -> "Enter the purchase price." // english
+    }),
+
+    WRONG_NAME_TOTAL(3, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "The purchase name can't be 'Total'."
+        Languages.ITALIANO.value -> "L'acquisto non può chiamarsi 'Totale'."
+        else -> "The purchase name can't be 'Total'." // english
+    }),
+
+    TOTAL_ADD_SUCCESS(10, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Total added!"
+        Languages.ITALIANO.value -> "Totale aggiunto!"
+        else -> "Total added!" // english
+    }),
+
+    TOTAL_ADD_FAILURE(11, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Total not added!"
+        Languages.ITALIANO.value -> "Totale non aggiunto!"
+        else -> "Total not added!" // english
+    }),
+
+    PURCHASE_ADD_FAILURE(12, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Purchase not added!"
+        Languages.ITALIANO.value -> "Acquisto non aggiunto!"
+        else -> "Purchase not added!" // english
+    }),
+    PURCHASE_ADD_ERROR(13, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Purchase not added correctly!"
+        Languages.ITALIANO.value -> "Acquisto non aggiunto correttamente!"
+        else -> "Purchase not added correctly!" // english
+    }),
+
+    PURCHASE_EDIT_SUCCESS(20, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Purchase edited!"
+        Languages.ITALIANO.value -> "Acquisto modificato!"
+        else -> "Purchase edited!" // english
+    }),
+
+    PURCHASE_EDIT_FAILURE(21, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Purchase not edited!"
+        Languages.ITALIANO.value -> "Acquisto non modificato!"
+        else -> "Purchase not edited!" // english
+    }),
+
+    PURCHASE_DELETE_SUCCESS(30, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Purchase deleted!"
+        Languages.ITALIANO.value -> "Acquisto eliminato!"
+        else -> "Purchase deleted!" // english
+    }),
+
+    PURCHASE_DELETE_FAILURE(31, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Purchase not deleted correctly!"
+        Languages.ITALIANO.value -> "Acquisto non eliminato correttamente!"
+        else -> "Purchase not deleted correctly!" // english
+    }),
+
+    PURCHASE_LIST_UPDATE_SUCCESS(40, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "List Updated!"
+        Languages.ITALIANO.value -> "Lista aggiornata!"
+        else -> "List Updated!" // english
+    }),
+
+    PURCHASE_LIST_UPDATE_FAILURE(41, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "List not updated!"
+        Languages.ITALIANO.value -> "Lista non aggiornata!"
+        else -> "List not updated!" // english
+    }),
+
+    RECEIPT_ADD_SUCCESS(100, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Item added!"
+        Languages.ITALIANO.value -> "Voce aggiunta!"
+        else -> "Item added!" // english
+    }),
+
+    RECEIPT_ADD_FAILURE(102, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Item not added!"
+        Languages.ITALIANO.value -> "Voce non aggiunta!"
+        else -> "Item not added!" // english
+    }),
+
+    RECEIPT_DELETE_SUCCESS(103, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Item deleted!"
+        Languages.ITALIANO.value -> "Voce eliminata!"
+        else -> "Item deleted!" // english
+    }),
+
+    RECEIPT_DELETE_FAILURE(104, when (getCurrentLanguage()) {
+        Languages.ENGLISH.value -> "Item not deleted!"
+        Languages.ITALIANO.value -> "Voce non eliminata!"
+        else -> "Item not deleted!" // english
+    })
+}

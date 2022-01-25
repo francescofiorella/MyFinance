@@ -9,7 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.enums.db.PurchaseCodeIT
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.DatePickerButton
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
@@ -113,16 +113,16 @@ class AddActivity : BaseActivity(), AddListener {
 
             3 -> {
                 binding.typeAutoCompleteTV.setText(getString(R.string.rent))
-                binding.nameEditText.setText(DbPurchases.NAMES.RENT.value_it)// TODO: change the language
+                binding.nameEditText.setText(DbPurchases.NAMES.RENT.value)
                 viewModel.type = DbPurchases.TYPES.RENT.value
             }
 
             4 -> {
                 binding.typeAutoCompleteTV.setText(getString(R.string.no_purchase))
-                binding.nameEditText.setText(DbPurchases.NAMES.TOTAL.value_it)// TODO: change the language
+                binding.nameEditText.setText(DbPurchases.NAMES.TOTAL.value)
                 binding.nameTextInputLayout.isEnabled = false
 
-                binding.priceEditText.setText(DbPurchases.NAMES.TOTAL_PRICE.value_it)// TODO: change the language
+                binding.priceEditText.setText(DbPurchases.NAMES.TOTAL_PRICE.value)
                 binding.priceTextInputLayout.isEnabled = false
 
                 binding.nameTextInputLayout.isErrorEnabled = false
@@ -221,27 +221,22 @@ class AddActivity : BaseActivity(), AddListener {
 
     override fun onAddStart() {
         binding.addProgressIndicator.show()
+
+        binding.nameTextInputLayout.isErrorEnabled = false
+        binding.priceTextInputLayout.isErrorEnabled = false
     }
 
     override fun onAddSuccess(response: LiveData<PurchaseResult>) {
         response.observe(this, { result ->
-            if (result.code != PurchaseCodeIT.TOTAL_ADD_SUCCESS.code) {
+            if (result.code != PurchaseCode.TOTAL_ADD_SUCCESS.code) {
                 binding.addProgressIndicator.hide()
             }
 
             when (result.code) {
-                PurchaseCodeIT.TOTAL_ADD_SUCCESS.code -> viewModel.updateLocalList()
+                PurchaseCode.TOTAL_ADD_SUCCESS.code -> viewModel.updateLocalList()
 
-                PurchaseCodeIT.PURCHASE_EDIT_SUCCESS.code -> {
-                    // go back to the homepage
-                    Intent().also {
-                        it.putExtra(INTENT_PURCHASE_REQUEST, true)
-                        setResult(RESULT_OK, it)
-                        finish()
-                    }
-                }
-
-                PurchaseCodeIT.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
+                PurchaseCode.PURCHASE_EDIT_SUCCESS.code,
+                PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
                         it.putExtra(INTENT_PURCHASE_REQUEST, true)
@@ -259,11 +254,11 @@ class AddActivity : BaseActivity(), AddListener {
         binding.addProgressIndicator.hide()
 
         when (result.code) {
-            PurchaseCodeIT.EMPTY_NAME.code -> binding.nameTextInputLayout.error = result.message
+            PurchaseCode.EMPTY_NAME.code,
+            PurchaseCode.WRONG_NAME_TOTAL.code ->
+                binding.nameTextInputLayout.error = result.message
 
-            PurchaseCodeIT.WRONG_NAME_TOTAL.code -> binding.nameTextInputLayout.error = result.message
-
-            PurchaseCodeIT.EMPTY_PRICE.code -> binding.priceTextInputLayout.error = result.message
+            PurchaseCode.EMPTY_PRICE.code -> binding.priceTextInputLayout.error = result.message
         }
     }
 }

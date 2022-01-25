@@ -1,5 +1,7 @@
 package com.frafio.myfinance.data.enums.db
 
+import com.frafio.myfinance.utils.getCurrentLanguage
+
 object DbPurchases {
     enum class FIELDS(val value: String) {
         PURCHASES("purchases"),
@@ -12,10 +14,22 @@ object DbPurchases {
         PRICE("price")
     }
 
-    enum class NAMES(val value_en: String, val value_it: String) {
-        RENT("Rent","Affitto"),
-        TOTAL("Total","Totale"),
-        TOTAL_PRICE("0.00", "0.00")
+    enum class NAMES(val value: String, val value_en: String, val value_it: String) {
+        RENT(
+            when (getCurrentLanguage()) {
+                Languages.ENGLISH.value -> "Rent"
+                Languages.ITALIANO.value -> "Affitto"
+                else -> "Rent" // english
+            }, "Rent", "Affitto"
+        ),
+        TOTAL(
+            when (getCurrentLanguage()) {
+                Languages.ENGLISH.value -> "Total"
+                Languages.ITALIANO.value -> "Totale"
+                else -> "Total" // english
+            }, "Total", "Totale"
+        ),
+        TOTAL_PRICE("0.00", "0.00", "0.00")
     }
 
     enum class TYPES(val value: Int) {

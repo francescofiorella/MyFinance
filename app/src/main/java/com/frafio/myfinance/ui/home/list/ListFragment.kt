@@ -11,7 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.PurchaseCodeIT
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentListBinding
@@ -43,7 +43,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
 
             if (editRequest) {
                 viewModel.getPurchases()
-                (activity as HomeActivity).showSnackBar(PurchaseCodeIT.PURCHASE_EDIT_SUCCESS.message)
+                (activity as HomeActivity).showSnackBar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
             }
         }
     }
@@ -155,7 +155,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
             val newList = value.second
             val totPosition = value.third
 
-            if (result.code != PurchaseCodeIT.PURCHASE_DELETE_FAILURE.code) {
+            if (result.code != PurchaseCode.PURCHASE_DELETE_FAILURE.code) {
                 totPosition?.let {
                     binding.listRecyclerView.adapter!!.notifyItemChanged(it)
                 }

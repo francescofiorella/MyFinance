@@ -1,9 +1,7 @@
 package com.frafio.myfinance.ui.home.menu
 
-import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.frafio.myfinance.data.managers.LanguageManager
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 
 @Suppress("UNCHECKED_CAST")

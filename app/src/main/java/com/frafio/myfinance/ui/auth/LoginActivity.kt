@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.auth.AuthCodeIT
+import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.BaseActivity
@@ -103,31 +103,27 @@ class LoginActivity : BaseActivity(), AuthListener {
 
     override fun onAuthSuccess(response: LiveData<AuthResult>) {
         response.observe(this, { authResult ->
-            if (authResult.code != AuthCodeIT.LOGIN_SUCCESS.code) {
+            if (authResult.code != AuthCode.LOGIN_SUCCESS.code) {
                 binding.loginProgressIndicator.hide()
             }
 
             when (authResult.code) {
-                AuthCodeIT.LOGIN_SUCCESS.code -> viewModel.updateUserData()
+                AuthCode.LOGIN_SUCCESS.code -> viewModel.updateUserData()
 
-                AuthCodeIT.GOOGLE_LOGIN_FAILURE.code -> snackBar(authResult.message)
+                AuthCode.GOOGLE_LOGIN_FAILURE.code,
+                AuthCode.USER_DISABLED.code,
+                AuthCode.LOGIN_FAILURE.code,
+                AuthCode.USER_DATA_NOT_UPDATED.code ->
+                    snackBar(authResult.message)
 
-                AuthCodeIT.USER_DISABLED.code -> snackBar(authResult.message)
-
-                AuthCodeIT.LOGIN_FAILURE.code -> snackBar(authResult.message)
-
-                AuthCodeIT.USER_DATA_NOT_UPDATED.code -> snackBar(authResult.message)
-
-                AuthCodeIT.INVALID_EMAIL.code ->
+                AuthCode.INVALID_EMAIL.code,
+                AuthCode.USER_NOT_FOUND.code ->
                     binding.loginEmailInputLayout.error = authResult.message
 
-                AuthCodeIT.USER_NOT_FOUND.code ->
-                    binding.loginEmailInputLayout.error = authResult.message
-
-                AuthCodeIT.WRONG_PASSWORD.code ->
+                AuthCode.WRONG_PASSWORD.code ->
                     binding.loginPasswordInputLayout.error = authResult.message
 
-                AuthCodeIT.USER_DATA_UPDATED.code -> {
+                AuthCode.USER_DATA_UPDATED.code -> {
                     val name = viewModel.getUserName()
                     Intent().also {
                         it.putExtra(INTENT_USER_REQUEST, true)
@@ -146,13 +142,11 @@ class LoginActivity : BaseActivity(), AuthListener {
         binding.loginProgressIndicator.hide()
 
         when (authResult.code) {
-            AuthCodeIT.EMPTY_EMAIL.code ->
+            AuthCode.EMPTY_EMAIL.code ->
                 binding.loginEmailInputLayout.error = authResult.message
 
-            AuthCodeIT.EMPTY_PASSWORD.code ->
-                binding.loginPasswordInputLayout.error = authResult.message
-
-            AuthCodeIT.SHORT_PASSWORD.code ->
+            AuthCode.EMPTY_PASSWORD.code,
+            AuthCode.SHORT_PASSWORD.code ->
                 binding.loginPasswordInputLayout.error = authResult.message
 
             else -> snackBar(authResult.message)
