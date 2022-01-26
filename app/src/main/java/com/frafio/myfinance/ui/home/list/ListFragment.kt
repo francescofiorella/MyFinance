@@ -62,12 +62,12 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         viewModel.listener = this
 
         viewModel.getPurchases()
-        viewModel.purchases.observe(viewLifecycleOwner, { purchases ->
+        viewModel.purchases.observe(viewLifecycleOwner) { purchases ->
             binding.listRecyclerView.also {
                 it.setHasFixedSize(true)
                 it.adapter = PurchaseAdapter(purchases, this)
             }
-        })
+        }
 
         return binding.root
     }
@@ -150,7 +150,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
     }
 
     override fun onDeleteComplete(response: LiveData<Triple<PurchaseResult, List<Purchase>, Int?>>) {
-        response.observe(viewLifecycleOwner, { value ->
+        response.observe(viewLifecycleOwner) { value ->
             val result = value.first
             val newList = value.second
             val totPosition = value.third
@@ -163,6 +163,6 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
             }
 
             (activity as HomeActivity).showSnackBar(result.message)
-        })
+        }
     }
 }

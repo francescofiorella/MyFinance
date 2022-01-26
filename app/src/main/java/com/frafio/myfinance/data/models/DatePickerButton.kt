@@ -3,7 +3,9 @@ package com.frafio.myfinance.data.models
 import android.view.View
 import android.widget.AutoCompleteTextView
 import androidx.fragment.app.FragmentActivity
+import com.frafio.myfinance.data.enums.db.Languages
 import com.frafio.myfinance.utils.dateToString
+import com.frafio.myfinance.utils.getCurrentLanguage
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputLayout
 import java.time.LocalDate
@@ -15,9 +17,12 @@ open class DatePickerButton(
     private val context: FragmentActivity
 ) {
     companion object {
-        private const val DATE_PICKER_TITLE_EN: String = "Select date"
-        private const val DATE_PICKER_TITLE_IT: String = "Seleziona data"
         private const val DATE_PICKER_TAG: String = "DATE_PICKER"
+        private val DATE_PICKER_TITLE: String = when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Select date"
+            Languages.ITALIANO.value -> "Seleziona data"
+            else -> "Select date"
+        }
     }
 
     val listener = View.OnClickListener {
@@ -26,7 +31,7 @@ open class DatePickerButton(
         calendar.clear()
         val today = MaterialDatePicker.todayInUtcMilliseconds()
         val builder = MaterialDatePicker.Builder.datePicker()
-        builder.setTitleText(DATE_PICKER_TITLE_IT)
+        builder.setTitleText(DATE_PICKER_TITLE)
         builder.setSelection(today)
         val materialDatePicker = builder.build()
 

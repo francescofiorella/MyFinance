@@ -86,15 +86,15 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
     }
 
     override fun onLoadSuccess(response: LiveData<PurchaseResult>) {
-        response.observe(this, { result ->
+        response.observe(this) { result ->
             when (result.code) {
                 PurchaseCode.RECEIPT_ADD_SUCCESS.code -> {
                     snackBar(result.message, binding.receiptNameEditText)
-                    binding.receiptNameEditText.also{
+                    binding.receiptNameEditText.also {
                         it.clearText()
                         it.isEnabled = true
                     }
-                    binding.receiptPriceEditText.also{
+                    binding.receiptPriceEditText.also {
                         it.clearText()
                         it.isEnabled = true
                     }
@@ -106,7 +106,7 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
                     binding.receiptProgressIndicator.hide()
                 }
             }
-        })
+        }
     }
 
     override fun onLoadFailure(result: PurchaseResult) {

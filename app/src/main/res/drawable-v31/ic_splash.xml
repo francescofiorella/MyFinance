@@ -2,10 +2,10 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:bottom="30dp"
+        android:bottom="10dp"
         android:drawable="@drawable/ic_myfinance"
-        android:end="30dp"
-        android:start="30dp"
-        android:top="30dp" />
+        android:end="10dp"
+        android:start="10dp"
+        android:top="10dp" />
 
 </layer-list>

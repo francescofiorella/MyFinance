@@ -1,7 +1,6 @@
 package com.frafio.myfinance.ui.home
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -228,7 +227,7 @@ class HomeActivity : BaseActivity(), HomeListener {
     }
 
     override fun onLogOutSuccess(response: LiveData<AuthResult>) {
-        response.observe(this, { authResult ->
+        response.observe(this) { authResult ->
             if (authResult.code == AuthCode.LOGOUT_SUCCESS.code) {
                 setImageViewRoundDrawable(binding.propicImageView, null)
                 setDrawableToButtons(isLogged = false)
@@ -238,11 +237,11 @@ class HomeActivity : BaseActivity(), HomeListener {
                 navController.popBackStack()
                 checkDashboardInRailView()
             }
-        })
+        }
     }
 
     override fun onSplashOperationComplete(response: LiveData<AuthResult>) {
-        response.observe(this, { authResult ->
+        response.observe(this) { authResult ->
             when (authResult.code) {
                 AuthCode.USER_LOGGED.code -> {
                     viewModel.updateUserData()
@@ -269,7 +268,7 @@ class HomeActivity : BaseActivity(), HomeListener {
 
                 else -> Unit
             }
-        })
+        }
     }
 
     fun onProPicClick(@Suppress("UNUSED_PARAMETER") view: View) {

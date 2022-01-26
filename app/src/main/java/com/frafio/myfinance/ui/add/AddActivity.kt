@@ -19,7 +19,6 @@ import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.generic.instance
-import java.util.*
 
 class AddActivity : BaseActivity(), AddListener {
 
@@ -227,7 +226,7 @@ class AddActivity : BaseActivity(), AddListener {
     }
 
     override fun onAddSuccess(response: LiveData<PurchaseResult>) {
-        response.observe(this, { result ->
+        response.observe(this) { result ->
             if (result.code != PurchaseCode.TOTAL_ADD_SUCCESS.code) {
                 binding.addProgressIndicator.hide()
             }
@@ -247,7 +246,7 @@ class AddActivity : BaseActivity(), AddListener {
 
                 else -> snackBar(result.message, binding.addAddButton)
             }
-        })
+        }
     }
 
     override fun onAddFailure(result: PurchaseResult) {

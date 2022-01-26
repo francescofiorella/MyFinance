@@ -55,7 +55,7 @@ class MenuFragment : BaseFragment(), MenuListener {
     }
 
     override fun onCompleted(result: LiveData<PurchaseResult>) {
-        result.observe(this, { purchaseResult ->
+        result.observe(this) { purchaseResult ->
             (activity as HomeActivity).hideProgressIndicator()
             binding.collectionSwitch.isEnabled = true
 
@@ -82,7 +82,7 @@ class MenuFragment : BaseFragment(), MenuListener {
                     (activity as HomeActivity).showSnackBar(purchaseResult.message)
                 }
             }
-        })
+        }
     }
 
     private fun animateRoot() {

@@ -41,7 +41,7 @@ class SignupActivity : BaseActivity(), AuthListener {
     }
 
     override fun onAuthSuccess(response: LiveData<AuthResult>) {
-        response.observe(this, { authResult ->
+        response.observe(this) { authResult ->
             if (authResult.code != AuthCode.SIGNUP_SUCCESS.code) {
                 binding.signupProgressIndicator.hide()
             }
@@ -68,7 +68,7 @@ class SignupActivity : BaseActivity(), AuthListener {
 
                 else -> snackBar(authResult.message)
             }
-        })
+        }
     }
 
     override fun onAuthFailure(authResult: AuthResult) {
