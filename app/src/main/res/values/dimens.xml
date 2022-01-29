@@ -9,7 +9,7 @@
     <dimen name="card_corner_radius">20dp</dimen>
 
     <dimen name="card_title_size">16sp</dimen>
-    <dimen name="card_price_size">27sp</dimen>
+    <dimen name="card_price_size">26sp</dimen>
 
     <dimen name="title_size">26sp</dimen>
     <dimen name="title_padding">10dp</dimen>
