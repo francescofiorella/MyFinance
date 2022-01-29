@@ -16,6 +16,7 @@ import com.frafio.myfinance.ui.home.list.ListViewModelFactory
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptViewModelFactory
 import com.frafio.myfinance.ui.home.menu.MenuViewModelFactory
 import com.frafio.myfinance.ui.home.profile.ProfileViewModelFactory
+import com.google.android.material.color.DynamicColors
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.androidXModule
@@ -59,5 +60,10 @@ class MyFinanceApplication : Application(), KodeinAware {
         }
         bind() from provider { ReceiptViewModelFactory(instance()) }
         bind() from provider { AddViewModelFactory(instance(), instance()) }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        DynamicColors.applyToActivitiesIfAvailable(this)
     }
 }

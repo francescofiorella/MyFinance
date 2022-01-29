@@ -6,17 +6,17 @@
     <dimen name="card_half_margin">10dp</dimen>
 
     <dimen name="card_elevation">2dp</dimen>
-    <dimen name="card_corner_radius">20dp</dimen>
+    <dimen name="card_corner_radius">30dp</dimen>
 
     <dimen name="card_title_size">16sp</dimen>
     <dimen name="card_price_size">26sp</dimen>
 
     <dimen name="title_size">26sp</dimen>
-    <dimen name="title_padding">10dp</dimen>
+    <dimen name="title_padding">5dp</dimen>
     <dimen name="title_margin_top">10dp</dimen>
-    <dimen name="title_margin_bottom">15dp</dimen>
-    <dimen name="title_margin_start">10dp</dimen>
-    <dimen name="title_distance_from_arrow">5dp</dimen>
+    <dimen name="title_margin_bottom">10dp</dimen>
+    <dimen name="title_margin_start">15dp</dimen>
+    <dimen name="title_distance_from_arrow">10dp</dimen>
 
     <dimen name="fragment_margin_top">5dp</dimen>
 
