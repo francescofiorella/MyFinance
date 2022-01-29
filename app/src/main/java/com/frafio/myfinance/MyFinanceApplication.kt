@@ -16,6 +16,7 @@ import com.frafio.myfinance.ui.home.list.ListViewModelFactory
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptViewModelFactory
 import com.frafio.myfinance.ui.home.menu.MenuViewModelFactory
 import com.frafio.myfinance.ui.home.profile.ProfileViewModelFactory
+import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.google.android.material.color.DynamicColors
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -30,6 +31,7 @@ class MyFinanceApplication : Application(), KodeinAware {
     companion object {
         const val PREFERENCES_KEY = "COLLECTION_PREFERENCES"
         const val COLLECTION_KEY = "COLLECTION_OPTIONS"
+        const val DYNAMIC_COLOR_KEY = "DYNAMIC_COLOR_OPTIONS"
     }
 
     private val sharedPreferences by lazy {
@@ -64,6 +66,9 @@ class MyFinanceApplication : Application(), KodeinAware {
 
     override fun onCreate() {
         super.onCreate()
-        DynamicColors.applyToActivitiesIfAvailable(this)
+        // if the user activated it, change the colors
+        if (getSharedDynamicColor(sharedPreferences)) {
+            DynamicColors.applyToActivitiesIfAvailable(this)
+        }
     }
 }

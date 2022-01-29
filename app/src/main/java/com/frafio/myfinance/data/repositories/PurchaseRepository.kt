@@ -229,6 +229,14 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return purchaseManager.getSelectedCollection()
     }
 
+    fun setDynamicColorActive(active: Boolean) {
+        purchaseManager.setDynamicColorActive(active)
+    }
+
+    fun getDynamicColorActive(): Boolean {
+        return purchaseManager.getDynamicColorActive()
+    }
+
     fun existLastYear(): Boolean {
         return PurchaseStorage.existLastYear
     }

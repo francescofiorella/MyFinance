@@ -252,8 +252,13 @@ class HomeActivity : BaseActivity(), HomeListener {
                 }
 
                 AuthCode.USER_NOT_LOGGED.code -> {
+                    supportFragmentManager.registerFragmentLifecycleCallbacks(
+                        dashboardCallback,
+                        true
+                    )
                     setDrawableToButtons(isLogged = false)
                     // set the navigation graph, so that the dashboard is loaded when data is ready
+
                     navController.setGraph(R.navigation.nav_graph)
                 }
 

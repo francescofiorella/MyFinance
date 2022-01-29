@@ -4,13 +4,17 @@ import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.BuildConfig
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.google.android.material.color.DynamicColors
 
 class MenuViewModel(
     private val purchaseRepository: PurchaseRepository
 ) : ViewModel() {
     var listener: MenuListener? = null
 
-    var isSwitchChecked: Boolean = getChecked()
+    var isSwitchCollectionChecked: Boolean = getCollectionCheck()
+
+    var isDynamicColorAvailable: Boolean = DynamicColors.isDynamicColorAvailable()
+    var isSwitchDynamicColorChecked: Boolean = getDynamicColorCheck()
 
     var isLastYearOk: Boolean = purchaseRepository.existLastYear()
 
@@ -27,7 +31,15 @@ class MenuViewModel(
         listener?.onCompleted(response)
     }
 
-    private fun getChecked(): Boolean {
+    private fun getCollectionCheck(): Boolean {
         return purchaseRepository.getSelectedCollection() == DbPurchases.COLLECTIONS.ZERO_ONE.value
+    }
+
+    fun setDynamicColor(active: Boolean) {
+        purchaseRepository.setDynamicColorActive(active)
+    }
+
+    private fun getDynamicColorCheck(): Boolean {
+        return purchaseRepository.getDynamicColorActive()
     }
 }

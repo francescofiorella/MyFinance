@@ -40,10 +40,19 @@ class MenuFragment : BaseFragment(), MenuListener {
         viewModel.listener = this
 
         binding.collectionSwitch.also {
-            it.isChecked = viewModel.isSwitchChecked
+            it.isChecked = viewModel.isSwitchCollectionChecked
 
             it.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setCollection(isChecked)
+            }
+        }
+
+        binding.dynamicColorSwitch.also {
+            it.isChecked = viewModel.isSwitchDynamicColorChecked
+
+            it.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.setDynamicColor(isChecked)
+                (activity as HomeActivity).showSnackBar(getString(R.string.restart_app_changes))
             }
         }
         return binding.root

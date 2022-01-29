@@ -68,6 +68,7 @@
     <string name="version_icon">Version Icon</string>
     <string name="collection_icon">Collection Icon</string>
     <string name="language_icon">Language Icon</string>
+    <string name="dynamic_color_icon">Dynamic Color Icon</string>
 
     <string name="type">Tipo</string>
     <string name="generic">Generico</string>
@@ -78,6 +79,8 @@
     <string name="date">Data</string>
 
     <string name="translation_warning">Riavvia l\'app per rendere le modifiche effettive</string>
+    <string name="use_dynamic_color">Usa i colori dinamici</string>
+    <string name="restart_app_changes">Riavvia l\'app per applicare le modifiche.</string>
 
     <string-array name="types">
         <item>@string/generic</item>

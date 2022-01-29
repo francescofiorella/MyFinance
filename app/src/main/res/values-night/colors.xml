@@ -3,6 +3,8 @@
     <!-- Theme colors. -->
 
     <!--Theme-related custom colors. -->
+    <color name="md_theme_primary">#78D1FF</color>
+    <color name="md_theme_surface">@color/md_theme_dark_surface</color>
     <color name="md_theme_primaryContainer">@color/md_theme_dark_primaryContainer</color>
     <color name="primary_text">@color/white</color>
     <color name="inverted_primary_text">@color/black</color>

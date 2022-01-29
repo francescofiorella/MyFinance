@@ -11,7 +11,9 @@ import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
 import com.frafio.myfinance.utils.getSharedCollection
+import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedCollection
+import com.frafio.myfinance.utils.setSharedDynamicColor
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
@@ -279,5 +281,13 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
     fun getSelectedCollection(): String {
         return getSharedCollection(sharedPreferences)
+    }
+
+    fun setDynamicColorActive(active: Boolean) {
+        setSharedDynamicColor(sharedPreferences, active)
+    }
+
+    fun getDynamicColorActive(): Boolean {
+        return getSharedDynamicColor(sharedPreferences)
     }
 }
