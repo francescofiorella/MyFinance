@@ -90,8 +90,7 @@
             app:layout_constraintBottom_toTopOf="@+id/nav_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fragmentTitle"
-            app:navGraph="@navigation/nav_graph" />
+            app:layout_constraintTop_toBottomOf="@+id/fragmentTitle" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/home_addBtn"

@@ -2,6 +2,7 @@ package com.frafio.myfinance.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.app.ActivityOptionsCompat
@@ -78,6 +79,7 @@ class HomeActivity : BaseActivity(), HomeListener {
 
         installSplashScreen().also {
             it.setKeepOnScreenCondition {
+                // keep if the layout is not ready
                 !viewModel.isLayoutReady
             }
             it.setOnExitAnimationListener { splashScreenViewProvider ->
@@ -103,48 +105,47 @@ class HomeActivity : BaseActivity(), HomeListener {
             //binding.navRail?.setupWithNavController(it)
         }
 
-        binding.navRail?.setOnItemSelectedListener(navRailListener)
+        binding.navRail?.setOnItemSelectedListener(navBarListener)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
 
-        // fix bug (if we're not on the dashboard, fragments overlaps in the stack)
-        if (navController.currentDestination?.id != R.id.dashboardFragment) {
-            navController.popBackStack()
-        }
+        navController.setGraph(R.navigation.nav_graph)
     }
 
-    private val navRailListener = NavigationBarView.OnItemSelectedListener { item ->
+    private val navBarListener = NavigationBarView.OnItemSelectedListener { item ->
+        navigateTo(item)
+        true
+    }
+
+    private fun navigateTo(item: MenuItem) {
         when (item.itemId) {
             R.id.dashboardFragment -> {
                 navController.navigateUp()
                 navController.navigate(R.id.dashboardFragment)
-                true
             }
 
             R.id.listFragment -> {
                 navController.navigateUp()
                 navController.navigate(R.id.listFragment)
-                true
             }
 
             R.id.profileFragment -> {
                 navController.navigateUp()
                 navController.navigate(R.id.profileFragment)
-                true
             }
 
             R.id.menuFragment -> {
                 navController.navigateUp()
                 navController.navigate(R.id.menuFragment)
-                true
             }
 
-            else -> false
+            else -> Unit // should not be possible
         }
     }
 
+    // called only one time, when the activity is loaded for the first time
     private val dashboardCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentCreated(
             fm: FragmentManager,
@@ -252,7 +253,8 @@ class HomeActivity : BaseActivity(), HomeListener {
 
                 AuthCode.USER_NOT_LOGGED.code -> {
                     setDrawableToButtons(isLogged = false)
-                    viewModel.isLayoutReady = true
+                    // set the navigation graph, so that the dashboard is loaded when data is ready
+                    navController.setGraph(R.navigation.nav_graph)
                 }
 
                 AuthCode.USER_DATA_UPDATED.code -> {
@@ -261,7 +263,8 @@ class HomeActivity : BaseActivity(), HomeListener {
                         true
                     )
                     setImageViewRoundDrawable(binding.propicImageView, viewModel.getProPic())
-                    reloadDashboard()
+                    // set the navigation graph, so that the dashboard is loaded when data is ready
+                    navController.setGraph(R.navigation.nav_graph)
                 }
 
                 AuthCode.USER_DATA_NOT_UPDATED.code -> showSnackBar(authResult.message)
@@ -317,7 +320,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         binding.navRail?.let {
             it.setOnItemSelectedListener(null)
             it.selectedItemId = R.id.dashboardFragment
-            it.setOnItemSelectedListener(navRailListener)
+            it.setOnItemSelectedListener(navBarListener)
         }
     }
 
