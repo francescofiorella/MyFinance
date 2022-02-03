@@ -9,7 +9,7 @@ class ReceiptViewModelFactory(
     private val repository: ReceiptRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return ReceiptViewModel(repository) as T
     }
 }

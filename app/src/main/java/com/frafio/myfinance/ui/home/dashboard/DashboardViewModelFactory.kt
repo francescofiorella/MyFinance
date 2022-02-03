@@ -11,7 +11,7 @@ class DashboardViewModelFactory(
     private val userRepository: UserRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return DashboardViewModel(purchaseRepository, userRepository) as T
     }
 }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import com.frafio.myfinance.R
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -48,6 +49,8 @@ fun Activity.snackBar(message: String, anchor: View? = null) {
         anchor?.let {
             snackBar.setAnchorView(it)
         }
+
+        snackBar.view.background = AppCompatResources.getDrawable(this, R.drawable.bg_snackbar)
 
         val tv = snackBar.view.findViewById<TextView>(R.id.snackbar_text)
         tv.typeface = nunito

@@ -24,7 +24,7 @@ class DashboardFragment : BaseFragment() {
     ): View {
         val binding: FragmentDashboardBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
-        viewModel = ViewModelProvider(this, factory).get(DashboardViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[DashboardViewModel::class.java]
 
         viewModel.getStats()
 

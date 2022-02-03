@@ -89,7 +89,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
-        viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
         viewModel.listener = this
         binding.viewModel = viewModel
 
@@ -218,10 +218,9 @@ class HomeActivity : BaseActivity(), HomeListener {
 
     // method for children
     fun showSnackBar(message: String) {
-        val view = if (binding.homeAddBtn != null) {
-            binding.homeAddBtn
-        } else {
-            binding.homeAddExtBtn
+        val view = when {
+            binding.homeAddBtn != null -> binding.homeAddBtn
+            else -> binding.homeAddExtBtn
         }
 
         snackBar(message, view)

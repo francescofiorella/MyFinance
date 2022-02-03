@@ -49,7 +49,7 @@ class AddActivity : BaseActivity(), AddListener {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add)
-        viewModel = ViewModelProvider(this, factory).get(AddViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[AddViewModel::class.java]
         binding.viewModel = viewModel
         viewModel.listener = this
 

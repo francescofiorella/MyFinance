@@ -9,7 +9,7 @@ class MenuViewModelFactory(
     private val purchaseRepository: PurchaseRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return MenuViewModel(purchaseRepository) as T
     }
 }

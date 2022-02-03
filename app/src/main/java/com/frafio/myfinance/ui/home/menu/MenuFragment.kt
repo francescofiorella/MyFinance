@@ -33,7 +33,7 @@ class MenuFragment : BaseFragment(), MenuListener {
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_menu, container, false)
-        viewModel = ViewModelProvider(this, factory).get(MenuViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[MenuViewModel::class.java]
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 

@@ -11,7 +11,7 @@ class AddViewModelFactory(
     private val purchaseRepository: PurchaseRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return AddViewModel(userRepository, purchaseRepository) as T
     }
 }

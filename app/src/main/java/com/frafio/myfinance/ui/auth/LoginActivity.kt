@@ -59,7 +59,7 @@ class LoginActivity : BaseActivity(), AuthListener {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
-        viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[AuthViewModel::class.java]
         binding.viewModel = viewModel
 
         viewModel.authListener = this
