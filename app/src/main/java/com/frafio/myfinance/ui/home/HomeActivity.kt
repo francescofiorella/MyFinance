@@ -2,7 +2,6 @@ package com.frafio.myfinance.ui.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.app.ActivityOptionsCompat
@@ -47,11 +46,11 @@ class HomeActivity : BaseActivity(), HomeListener {
     private val factory: HomeViewModelFactory by instance()
 
     companion object {
-        private const val ACTIVE_FRAGMENT_ID_KEY = "active_fragment_id"
-        private const val DASHBOARD_FRAGMENT_ID_KEY = "dashboard_fragment_id"
-        private const val LIST_FRAGMENT_ID_KEY = "list_fragment_id"
-        private const val PROFILE_FRAGMENT_ID_KEY = "profile_fragment_id"
-        private const val MENU_FRAGMENT_ID_KEY = "menu_fragment_id"
+        private const val ACTIVE_FRAGMENT_KEY = "active_fragment_key"
+        private const val DASHBOARD_FRAGMENT_TAG = "dashboard_fragment_tag"
+        private const val LIST_FRAGMENT_TAG = "list_fragment_tag"
+        private const val PROFILE_FRAGMENT_TAG = "profile_fragment_tag"
+        private const val MENU_FRAGMENT_TAG = "menu_fragment_tag"
     }
 
     private var addResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -117,22 +116,41 @@ class HomeActivity : BaseActivity(), HomeListener {
         binding.navDrawer?.setNavigationItemSelectedListener(navDrawerListener)
     }
 
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(ACTIVE_FRAGMENT_KEY, activeFragment.tag)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-
-        dashboardFragment = DashboardFragment()
-        listFragment = ListFragment()
-        profileFragment = supportFragmentManager.fragments[1]
-        menuFragment = MenuFragment()
-        activeFragment = profileFragment
-        supportFragmentManager.beginTransaction()
-            .add(R.id.home_fragmentContainerView, menuFragment).hide(menuFragment)
-            .add(R.id.home_fragmentContainerView, listFragment).hide(listFragment)
-            .add(R.id.home_fragmentContainerView, dashboardFragment).hide(dashboardFragment).commit()
+        dashboardFragment = supportFragmentManager.findFragmentByTag(DASHBOARD_FRAGMENT_TAG)!!
+        listFragment = supportFragmentManager.findFragmentByTag(LIST_FRAGMENT_TAG)!!
+        profileFragment = supportFragmentManager.findFragmentByTag(PROFILE_FRAGMENT_TAG)!!
+        menuFragment = supportFragmentManager.findFragmentByTag(MENU_FRAGMENT_TAG)!!
+        savedInstanceState.getString(ACTIVE_FRAGMENT_KEY).also { tag ->
+            when (tag) {
+                DASHBOARD_FRAGMENT_TAG -> {
+                    activeFragment = dashboardFragment
+                    showFragment(R.id.dashboardFragment)
+                }
+                LIST_FRAGMENT_TAG -> {
+                    activeFragment = listFragment
+                    showFragment(R.id.listFragment)
+                }
+                PROFILE_FRAGMENT_TAG -> {
+                    activeFragment = profileFragment
+                    showFragment(R.id.profileFragment)
+                }
+                MENU_FRAGMENT_TAG -> {
+                    activeFragment = menuFragment
+                    showFragment(R.id.menuFragment)
+                }
+                else -> {
+                    activeFragment = dashboardFragment
+                    showFragment(R.id.dashboardFragment)
+                }
+            }
+        }
     }
 
     private val navBarListener = NavigationBarView.OnItemSelectedListener { item ->
@@ -151,7 +169,8 @@ class HomeActivity : BaseActivity(), HomeListener {
                 binding.fragmentTitle.text = getString(R.string.nav_1)
                 binding.logoutCard.instantHide()
                 binding.propicImageView.instantShow()
-                supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                supportFragmentManager.beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment).show(dashboardFragment).commit()
                 activeFragment = dashboardFragment
             }
@@ -160,7 +179,8 @@ class HomeActivity : BaseActivity(), HomeListener {
                 binding.fragmentTitle.text = getString(R.string.nav_2_extended)
                 binding.logoutCard.instantHide()
                 binding.propicImageView.instantShow()
-                supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                supportFragmentManager.beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment).show(listFragment).commit()
                 activeFragment = listFragment
             }
@@ -169,7 +189,8 @@ class HomeActivity : BaseActivity(), HomeListener {
                 binding.fragmentTitle.text = getString(R.string.nav_3)
                 binding.logoutCard.instantShow()
                 binding.propicImageView.instantHide()
-                supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                supportFragmentManager.beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment).show(profileFragment).commit()
                 activeFragment = profileFragment
             }
@@ -178,7 +199,8 @@ class HomeActivity : BaseActivity(), HomeListener {
                 binding.fragmentTitle.text = getString(R.string.nav_4)
                 binding.logoutCard.instantHide()
                 binding.propicImageView.instantShow()
-                supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                supportFragmentManager.beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment).show(menuFragment).commit()
                 activeFragment = menuFragment
             }
@@ -363,10 +385,11 @@ class HomeActivity : BaseActivity(), HomeListener {
         binding.logoutCard.instantHide()
         binding.propicImageView.instantShow()
         supportFragmentManager.beginTransaction()
-            .add(R.id.home_fragmentContainerView, menuFragment).hide(menuFragment)
-            .add(R.id.home_fragmentContainerView, profileFragment).hide(profileFragment)
-            .add(R.id.home_fragmentContainerView, listFragment).hide(listFragment)
-            .add(R.id.home_fragmentContainerView, dashboardFragment).commit()
+            .add(R.id.home_fragmentContainerView, menuFragment, MENU_FRAGMENT_TAG)
+            .add(R.id.home_fragmentContainerView, profileFragment, PROFILE_FRAGMENT_TAG)
+            .add(R.id.home_fragmentContainerView, listFragment, LIST_FRAGMENT_TAG)
+            .add(R.id.home_fragmentContainerView, dashboardFragment, DASHBOARD_FRAGMENT_TAG)
+            .hide(menuFragment).hide(profileFragment).hide(listFragment).commit()
     }
 
     private fun showFragment(fragmentId: Int) {
