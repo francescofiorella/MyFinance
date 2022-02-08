@@ -13,6 +13,7 @@ import org.kodein.di.generic.instance
 
 class DashboardFragment : BaseFragment() {
 
+    private lateinit var binding: FragmentDashboardBinding
     private lateinit var viewModel: DashboardViewModel
 
     private val factory: DashboardViewModelFactory by instance()
@@ -22,8 +23,7 @@ class DashboardFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding: FragmentDashboardBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
         viewModel = ViewModelProvider(this, factory)[DashboardViewModel::class.java]
 
         viewModel.getStats()
@@ -36,5 +36,10 @@ class DashboardFragment : BaseFragment() {
 
     fun refreshStatsData() {
         viewModel.getStats()
+    }
+
+    override fun scrollUp() {
+        super.scrollUp()
+        binding.dashboardScrollView.scrollTo(0, 0)
     }
 }

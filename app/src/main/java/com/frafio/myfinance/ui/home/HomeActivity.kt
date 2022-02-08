@@ -170,6 +170,7 @@ class HomeActivity : BaseActivity(), HomeListener {
     private fun navigateTo(itemId: Int) {
         when (itemId) {
             R.id.dashboardFragment -> {
+                dashboardFragment.scrollUp()
                 binding.fragmentTitle.text = getString(R.string.nav_1)
                 binding.logoutCard.instantHide()
                 binding.propicImageView.instantShow()
@@ -180,6 +181,7 @@ class HomeActivity : BaseActivity(), HomeListener {
             }
 
             R.id.listFragment -> {
+                listFragment.scrollUp()
                 binding.fragmentTitle.text = getString(R.string.nav_2_extended)
                 binding.logoutCard.instantHide()
                 binding.propicImageView.instantShow()
@@ -200,6 +202,7 @@ class HomeActivity : BaseActivity(), HomeListener {
             }
 
             R.id.menuFragment -> {
+                menuFragment.scrollUp()
                 binding.fragmentTitle.text = getString(R.string.nav_4)
                 binding.logoutCard.instantHide()
                 binding.propicImageView.instantShow()

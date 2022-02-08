@@ -6,4 +6,6 @@ import org.kodein.di.android.x.kodein
 
 abstract class BaseFragment : Fragment(), KodeinAware {
     override val kodein by kodein()
+
+    open fun scrollUp() = Unit
 }

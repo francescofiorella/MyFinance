@@ -172,4 +172,9 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(viewModel.getPurchaseList())
         binding.listRecyclerView.scrollToPosition(0)
     }
+
+    override fun scrollUp() {
+        super.scrollUp()
+        binding.listRecyclerView.scrollToPosition(0)
+    }
 }

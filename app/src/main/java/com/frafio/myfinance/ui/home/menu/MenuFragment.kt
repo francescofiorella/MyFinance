@@ -106,4 +106,9 @@ class MenuFragment : BaseFragment(), MenuListener {
             setValueLineChartData(lineChart, list)
         }
     }
+
+    override fun scrollUp() {
+        super.scrollUp()
+        binding.menuScrollView.scrollTo(0, 0)
+    }
 }
