@@ -73,7 +73,7 @@
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/image_empty_dashboard.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/image_empty_list.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/drawable/lista_empty_image.xml" value="0.19583333333333333" />
-        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-land/activity_home.xml" value="0.1765625" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-land/activity_home.xml" value="0.1" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-land/fragment_dashboard.xml" value="0.22" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-land/fragment_list.xml" value="0.15729166666666666" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-land/layout_navigation_landscape.xml" value="0.1359375" />
@@ -81,7 +81,7 @@
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-sw600dp-land/layout_custom_nav_view.xml" value="0.4791666666666667" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-sw600dp-land/layout_nav_tablet.xml" value="0.1" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-sw600dp-land/layout_navigation_view.xml" value="0.159375" />
-        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-sw600dp/activity_home.xml" value="0.134765625" />
+        <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-sw600dp/activity_home.xml" value="0.10694444444444444" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout-sw600dp/layout_custom_nav_view.xml" value="0.4466666666666667" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/activity_add.xml" value="0.1361111111111111" />
         <entry key="..\:/Users/franc/AndroidStudioProjects/MyFinance/app/src/main/res/layout/activity_home.xml" value="0.13999999999999999" />

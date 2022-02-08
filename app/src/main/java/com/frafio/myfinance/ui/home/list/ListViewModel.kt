@@ -26,6 +26,10 @@ class ListViewModel(
         _purchases.value = purchases
     }
 
+    fun getPurchaseList(): List<Purchase> {
+        return purchaseRepository.getPurchaseList()
+    }
+
     fun deletePurchaseAt(position: Int) {
         val response = purchaseRepository.deletePurchaseAt(position)
         listener?.onDeleteComplete(response)

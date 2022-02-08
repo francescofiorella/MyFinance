@@ -80,16 +80,15 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/home_fragmentContainerView"
-            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:paddingTop="@dimen/title_margin_bottom"
             android:paddingBottom="5dp"
-            app:defaultNavHost="true"
             app:layout_constraintBottom_toTopOf="@+id/nav_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fragmentTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/fragmentTitle"
+            tools:layout="@layout/fragment_dashboard" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/home_addBtn"

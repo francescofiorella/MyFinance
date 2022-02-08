@@ -43,6 +43,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
 
             if (editRequest) {
                 viewModel.getPurchases()
+                (activity as HomeActivity).refreshOnPurchaseChanges()
                 (activity as HomeActivity).showSnackBar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
             }
         }
@@ -160,9 +161,15 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                     binding.listRecyclerView.adapter!!.notifyItemChanged(it)
                 }
                 (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(newList)
+                (activity as HomeActivity).refreshOnPurchaseChanges()
             }
 
             (activity as HomeActivity).showSnackBar(result.message)
         }
+    }
+
+    fun updateListData() {
+        (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(viewModel.getPurchaseList())
+        binding.listRecyclerView.scrollToPosition(0)
     }
 }
