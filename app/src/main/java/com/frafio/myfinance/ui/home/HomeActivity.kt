@@ -279,11 +279,7 @@ class HomeActivity : BaseActivity(), HomeListener {
     }
 
     fun onProPicClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        if (binding.navBar != null || binding.navDrawer != null) {
-            navigateTo(R.id.profileFragment)
-        } else {
-            binding.navRail?.selectedItemId = R.id.profileFragment
-        }
+        showFragment(R.id.profileFragment)
     }
 
     private fun goToLogin() {
