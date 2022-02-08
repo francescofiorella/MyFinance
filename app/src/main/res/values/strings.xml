@@ -42,8 +42,6 @@
     <string name="signup">Sign up</string>
     <string name="signup_login">Do you already have an account? Log In</string>
     <string name="warning_home">Add your first purchase!</string>
-    <string name="warning_not_logged_home">Log in to add your first purchase!</string>
-    <string name="warning_not_logged">Log in to your account!</string>
 
     <string name="avg_day">Daily \nAverage</string>
     <string name="avg_month">Monthly \nAverage</string>

@@ -42,8 +42,6 @@
     <string name="signup">Registrati</string>
     <string name="signup_login">Hai già un account? Accedi</string>
     <string name="warning_home">Aggiungi il tuo primo acquisto!</string>
-    <string name="warning_not_logged_home">Accedi per aggiungere il tuo primo acquisto!</string>
-    <string name="warning_not_logged">Accedi al tuo account!</string>
 
     <string name="avg_day">Media \nGiornaliera</string>
     <string name="avg_month">Media \nMensile</string>

@@ -48,8 +48,4 @@ class UserRepository(private val authManager: AuthManager) {
     fun updateUserData(): LiveData<AuthResult> {
         return authManager.updateUserData()
     }
-
-    fun getIsLogged(): Boolean {
-        return authManager.getIsUserLogged()
-    }
 }

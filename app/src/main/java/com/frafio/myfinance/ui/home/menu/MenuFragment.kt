@@ -35,7 +35,7 @@ class MenuFragment : BaseFragment(), MenuListener {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_menu, container, false)
         viewModel = ViewModelProvider(this, factory)[MenuViewModel::class.java]
         binding.viewModel = viewModel
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.listener = this
 
@@ -70,21 +70,8 @@ class MenuFragment : BaseFragment(), MenuListener {
 
             when (purchaseResult.code) {
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
-
-                    binding.lineChart.also { lineChart ->
-                        val list = viewModel.avgTrendList
-
-                        if (list.size < 2) {
-                            animateRoot()
-                            binding.chartCard.instantHide()
-                        } else {
-                            animateRoot()
-                            binding.chartCard.instantShow()
-                        }
-
-                        lineChart.clearChart()
-                        setValueLineChartData(lineChart, list)
-                    }
+                    refreshPlotData(animate = true)
+                    (activity as HomeActivity).refreshFragmentData(dashboard = true, list = true)
                 }
 
                 else -> {
@@ -99,5 +86,24 @@ class MenuFragment : BaseFragment(), MenuListener {
         val transition = AutoTransition()
         transition.duration = 2000
         TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+    }
+
+    fun refreshPlotData(animate: Boolean = false) {
+        binding.lineChart.also { lineChart ->
+            val list = viewModel.avgTrendList
+
+            if (animate) {
+                animateRoot()
+            }
+
+            if (list.size < 2) {
+                binding.chartCard.instantHide()
+            } else {
+                binding.chartCard.instantShow()
+            }
+
+            lineChart.clearChart()
+            setValueLineChartData(lineChart, list)
+        }
     }
 }

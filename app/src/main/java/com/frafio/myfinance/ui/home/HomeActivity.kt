@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.app.ActivityOptionsCompat
-import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -26,7 +25,6 @@ import com.frafio.myfinance.ui.home.menu.MenuFragment
 import com.frafio.myfinance.ui.home.profile.ProfileFragment
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
-import com.frafio.myfinance.utils.setImageViewRoundDrawable
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
@@ -37,13 +35,16 @@ class HomeActivity : BaseActivity(), HomeListener {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var viewModel: HomeViewModel
 
-    private lateinit var dashboardFragment: Fragment
-    private lateinit var listFragment: Fragment
-    private lateinit var profileFragment: Fragment
-    private lateinit var menuFragment: Fragment
+    private lateinit var dashboardFragment: DashboardFragment
+    private lateinit var listFragment: ListFragment
+    private lateinit var profileFragment: ProfileFragment
+    private lateinit var menuFragment: MenuFragment
     private lateinit var activeFragment: Fragment
 
     private val factory: HomeViewModelFactory by instance()
+
+    private var userRequest: Boolean = false
+    var isLayoutReady: Boolean = false
 
     companion object {
         private const val ACTIVE_FRAGMENT_KEY = "active_fragment_key"
@@ -60,45 +61,36 @@ class HomeActivity : BaseActivity(), HomeListener {
                 data!!.getBooleanExtra(AddActivity.INTENT_PURCHASE_REQUEST, false)
             if (purchaseRequest) {
                 showFragment(R.id.listFragment)
-                (activeFragment as ListFragment).updateListData()
-                refreshOnPurchaseChanges()
+                refreshFragmentData(dashboard = true, list = true, menu = true)
                 showSnackBar(getString(R.string.purchase_added))
             }
         }
     }
 
-    private val logInResultLauncher =
-        registerForActivityResult(StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                showFragment(R.id.dashboardFragment)
-                setDrawableToButtons(isLogged = true)
-                setImageViewRoundDrawable(binding.propicImageView, viewModel.getProPic())
-
-                val userRequest =
-                    result.data?.extras?.getBoolean(LoginActivity.INTENT_USER_REQUEST, false)
-                        ?: false
-
-                val userName = result.data?.extras?.getString(LoginActivity.INTENT_USER_NAME)
-
-                if (userRequest) {
-                    refreshFragments()
-                    showSnackBar("${getString(R.string.login_successful)} $userName")
-                }
-            }
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        installSplashScreen().also {
-            it.setKeepOnScreenCondition {
-                // keep if the layout is not ready
-                !viewModel.isLayoutReady
+        if (savedInstanceState == null) {
+            userRequest = intent.extras?.getBoolean(LoginActivity.INTENT_USER_REQUEST, false)
+                ?: false
+            if (userRequest) {
+                setTheme(R.style.Theme_MyFinance)
+            } else {
+                installSplashScreen().also {
+                    it.setKeepOnScreenCondition {
+                        // keep if the layout is not ready
+                        !isLayoutReady
+                    }
+                    it.setOnExitAnimationListener { splashScreenViewProvider ->
+                        supportFragmentManager.unregisterFragmentLifecycleCallbacks(
+                            dashboardCallback
+                        )
+                        splashScreenViewProvider.remove()
+                    }
+                }
             }
-            it.setOnExitAnimationListener { splashScreenViewProvider ->
-                supportFragmentManager.unregisterFragmentLifecycleCallbacks(dashboardCallback)
-                splashScreenViewProvider.remove()
-            }
+        } else {
+            setTheme(R.style.Theme_MyFinance)
         }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
@@ -107,8 +99,14 @@ class HomeActivity : BaseActivity(), HomeListener {
         binding.viewModel = viewModel
 
         if (savedInstanceState == null) {
-            // import db data
-            viewModel.checkUser()
+            if (userRequest) {
+                showProgressIndicator()
+                viewModel.updateUserData()
+            } else {
+                // import db data
+                viewModel.checkUser()
+            }
+
             binding.navDrawer?.setCheckedItem(R.id.dashboardFragment)
         }
 
@@ -124,10 +122,15 @@ class HomeActivity : BaseActivity(), HomeListener {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        dashboardFragment = supportFragmentManager.findFragmentByTag(DASHBOARD_FRAGMENT_TAG)!!
-        listFragment = supportFragmentManager.findFragmentByTag(LIST_FRAGMENT_TAG)!!
-        profileFragment = supportFragmentManager.findFragmentByTag(PROFILE_FRAGMENT_TAG)!!
-        menuFragment = supportFragmentManager.findFragmentByTag(MENU_FRAGMENT_TAG)!!
+        dashboardFragment = supportFragmentManager
+            .findFragmentByTag(DASHBOARD_FRAGMENT_TAG)!! as DashboardFragment
+        listFragment = supportFragmentManager
+            .findFragmentByTag(LIST_FRAGMENT_TAG)!! as ListFragment
+        profileFragment = supportFragmentManager
+            .findFragmentByTag(PROFILE_FRAGMENT_TAG)!! as ProfileFragment
+        menuFragment = supportFragmentManager
+            .findFragmentByTag(MENU_FRAGMENT_TAG)!! as MenuFragment
+
         savedInstanceState.getString(ACTIVE_FRAGMENT_KEY).also { tag ->
             when (tag) {
                 DASHBOARD_FRAGMENT_TAG -> {
@@ -218,27 +221,22 @@ class HomeActivity : BaseActivity(), HomeListener {
             savedInstanceState: Bundle?
         ) {
             super.onFragmentCreated(fm, f, savedInstanceState)
-            viewModel.isLayoutReady = true
+            isLayoutReady = true
         }
     }
 
     fun onAddButtonClick(view: View) {
-        if (viewModel.isLogged()) {
-            ActivityOptionsCompat.makeClipRevealAnimation(
-                view, 0, 0, view.measuredWidth, view.measuredHeight
-            ).also { activityOptionsCompat ->
-                Intent(applicationContext, AddActivity::class.java).also {
-                    it.putExtra(
-                        AddActivity.INTENT_REQUEST_CODE,
-                        AddActivity.INTENT_REQUEST_ADD_CODE
-                    )
-                    addResultLauncher.launch(it, activityOptionsCompat)
-                }
+        ActivityOptionsCompat.makeClipRevealAnimation(
+            view, 0, 0, view.measuredWidth, view.measuredHeight
+        ).also { activityOptionsCompat ->
+            Intent(applicationContext, AddActivity::class.java).also {
+                it.putExtra(
+                    AddActivity.INTENT_REQUEST_CODE,
+                    AddActivity.INTENT_REQUEST_ADD_CODE
+                )
+                addResultLauncher.launch(it, activityOptionsCompat)
             }
-        } else {
-            goToLogin()
         }
-
     }
 
     // method for children
@@ -254,12 +252,7 @@ class HomeActivity : BaseActivity(), HomeListener {
     override fun onLogOutSuccess(response: LiveData<AuthResult>) {
         response.observe(this) { authResult ->
             if (authResult.code == AuthCode.LOGOUT_SUCCESS.code) {
-                setImageViewRoundDrawable(binding.propicImageView, null)
-                setDrawableToButtons(isLogged = false)
-
-                goToLogin()
-                refreshFragments()
-                showFragment(R.id.dashboardFragment)
+                goToLoginActivity()
             }
         }
     }
@@ -269,29 +262,27 @@ class HomeActivity : BaseActivity(), HomeListener {
             when (authResult.code) {
                 AuthCode.USER_LOGGED.code -> {
                     viewModel.updateUserData()
-                    setDrawableToButtons(isLogged = true)
-
-                    viewModel.isLayoutReady = false
+                    isLayoutReady = false
                 }
 
                 AuthCode.USER_NOT_LOGGED.code -> {
-                    supportFragmentManager.registerFragmentLifecycleCallbacks(
-                        dashboardCallback,
-                        true
-                    )
-                    setDrawableToButtons(isLogged = false)
-
-                    initFragments()
+                    goToLoginActivity()
                 }
 
                 AuthCode.USER_DATA_UPDATED.code -> {
-                    supportFragmentManager.registerFragmentLifecycleCallbacks(
-                        dashboardCallback,
-                        true
-                    )
-                    setImageViewRoundDrawable(binding.propicImageView, viewModel.getProPic())
-
                     initFragments()
+                    if (!userRequest) {
+                        supportFragmentManager.registerFragmentLifecycleCallbacks(
+                            dashboardCallback,
+                            true
+                        )
+                        userRequest = false
+                    } else {
+                        hideProgressIndicator()
+                        intent.extras?.getString(LoginActivity.INTENT_USER_NAME).also { userName ->
+                            showSnackBar("${getString(R.string.login_successful)} $userName")
+                        }
+                    }
                 }
 
                 AuthCode.USER_DATA_NOT_UPDATED.code -> showSnackBar(authResult.message)
@@ -305,9 +296,10 @@ class HomeActivity : BaseActivity(), HomeListener {
         showFragment(R.id.profileFragment)
     }
 
-    private fun goToLogin() {
+    private fun goToLoginActivity() {
         Intent(applicationContext, LoginActivity::class.java).also {
-            logInResultLauncher.launch(it)
+            startActivity(it)
+            finish()
         }
     }
 
@@ -324,55 +316,7 @@ class HomeActivity : BaseActivity(), HomeListener {
             showFragment(R.id.dashboardFragment)
         } else {
             super.onBackPressed()
-        }
-    }
-
-    fun onLogoutButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        if (viewModel.isLogged()) {
-            viewModel.logOut()
-        } else {
-            goToLogin()
-        }
-    }
-
-    private fun setDrawableToButtons(isLogged: Boolean) {
-        if (isLogged) {
-            binding.logoutImage.setImageDrawable(
-                ContextCompat.getDrawable(
-                    this,
-                    R.drawable.ic_logout
-                )
-            )
-
-            binding.homeAddBtn?.also { fab ->
-                fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add))
-                fab.contentDescription = getString(R.string.addBtnContentDescription)
-            }
-
-            binding.homeAddExtBtn?.also { extFab ->
-                extFab.icon = ContextCompat.getDrawable(this, R.drawable.ic_add)
-                extFab.text = getString(R.string.add)
-                extFab.contentDescription = getString(R.string.addBtnContentDescription)
-            }
-
-        } else {
-            binding.logoutImage.setImageDrawable(
-                ContextCompat.getDrawable(
-                    this,
-                    R.drawable.ic_login
-                )
-            )
-
-            binding.homeAddBtn?.also { fab ->
-                fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_login))
-                fab.contentDescription = getString(R.string.login)
-            }
-
-            binding.homeAddExtBtn?.also { extFab ->
-                extFab.icon = ContextCompat.getDrawable(this, R.drawable.ic_login)
-                extFab.text = getString(R.string.login)
-                extFab.contentDescription = getString(R.string.login)
-            }
+            finish()
         }
     }
 
@@ -382,9 +326,6 @@ class HomeActivity : BaseActivity(), HomeListener {
         profileFragment = ProfileFragment()
         menuFragment = MenuFragment()
         activeFragment = dashboardFragment
-        binding.fragmentTitle.text = getString(R.string.nav_1)
-        binding.logoutCard.instantHide()
-        binding.propicImageView.instantShow()
         supportFragmentManager.beginTransaction()
             .add(R.id.home_fragmentContainerView, menuFragment, MENU_FRAGMENT_TAG)
             .add(R.id.home_fragmentContainerView, profileFragment, PROFILE_FRAGMENT_TAG)
@@ -402,21 +343,25 @@ class HomeActivity : BaseActivity(), HomeListener {
         }
     }
 
-    private fun refreshFragments() {
-        supportFragmentManager.beginTransaction().detach(dashboardFragment).commitNow()
-        supportFragmentManager.beginTransaction().attach(dashboardFragment).commitNow()
-        supportFragmentManager.beginTransaction().detach(listFragment).commitNow()
-        supportFragmentManager.beginTransaction().attach(listFragment).commitNow()
-        supportFragmentManager.beginTransaction().detach(profileFragment).commitNow()
-        supportFragmentManager.beginTransaction().attach(profileFragment).commitNow()
-        supportFragmentManager.beginTransaction().detach(menuFragment).commitNow()
-        supportFragmentManager.beginTransaction().attach(menuFragment).commitNow()
-    }
-
-    fun refreshOnPurchaseChanges() {
-        supportFragmentManager.beginTransaction().detach(dashboardFragment).commitNow()
-        supportFragmentManager.beginTransaction().attach(dashboardFragment).commitNow()
-        supportFragmentManager.beginTransaction().detach(menuFragment).commitNow()
-        supportFragmentManager.beginTransaction().attach(menuFragment).commitNow()
+    fun refreshFragmentData(
+        dashboard: Boolean = false,
+        list: Boolean = false,
+        menu: Boolean = false
+    ) {
+        if (!(dashboard && list && menu)) {
+            dashboardFragment.refreshStatsData()
+            listFragment.refreshListData()
+            menuFragment.refreshPlotData()
+        } else {
+            if (dashboard) {
+                dashboardFragment.refreshStatsData()
+            }
+            if (list) {
+                listFragment.refreshListData()
+            }
+            if (menu) {
+                menuFragment.refreshPlotData()
+            }
+        }
     }
 }

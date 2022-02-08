@@ -29,8 +29,12 @@ class DashboardFragment : BaseFragment() {
         viewModel.getStats()
 
         binding.viewModel = viewModel
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
 
         return binding.root
+    }
+
+    fun refreshStatsData() {
+        viewModel.getStats()
     }
 }

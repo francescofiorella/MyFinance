@@ -1,13 +1,12 @@
 package com.frafio.myfinance.ui.home
 
+import android.view.View
 import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.repositories.UserRepository
 
 class HomeViewModel(
     private val userRepository: UserRepository
 ) : ViewModel() {
-    var isLayoutReady: Boolean = false
-
     var listener: HomeListener? = null
 
     fun checkUser() {
@@ -18,15 +17,11 @@ class HomeViewModel(
         listener?.onSplashOperationComplete(userRepository.updateUserData())
     }
 
-    fun isLogged(): Boolean {
-        return userRepository.getIsLogged()
-    }
-
     fun getProPic(): String? {
         return userRepository.getProPic()
     }
 
-    fun logOut() {
+    fun onLogoutButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         val logoutResponse = userRepository.userLogout()
         listener?.onLogOutSuccess(logoutResponse)
     }

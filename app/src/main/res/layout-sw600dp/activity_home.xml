@@ -49,11 +49,11 @@
             android:layout_marginTop="@dimen/title_margin_top"
             android:fontFamily="@font/nunito_bold"
             android:padding="@dimen/title_padding"
+            android:text="@string/nav_1"
             android:textColor="@color/primary_text"
             android:textSize="@dimen/title_size"
             app:layout_constraintStart_toEndOf="@id/nav_drawer"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/nav_1" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/propic_image_view"
@@ -73,7 +73,8 @@
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_marginEnd="16dp"
-            android:onClick="onLogoutButtonClick"
+            android:onClick="@{viewModel::onLogoutButtonClick}"
+            android:visibility="gone"
             app:cardCornerRadius="@dimen/card_corner_radius"
             app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
             app:layout_constraintEnd_toEndOf="parent"
@@ -105,15 +106,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
-            android:contentDescription="@{viewModel.isLogged() ? @string/addBtnContentDescription : @string/login}"
+            android:contentDescription="@string/addBtnContentDescription"
             android:fontFamily="@font/nunito_semibold"
             android:onClick="onAddButtonClick"
-            android:text="@{viewModel.isLogged() ? @string/add : @string/login}"
-            app:icon="@{viewModel.isLogged() ? @drawable/ic_add : @drawable/ic_login}"
+            android:text="@string/add"
+            app:icon="@drawable/ic_add"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:icon="@drawable/ic_add"
-            tools:text="@string/add" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -12,6 +12,7 @@ import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.BaseActivity
+import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -45,13 +46,7 @@ class LoginActivity : BaseActivity(), AuthListener {
     private val signUpResultLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                val name = viewModel.getUserName()
-                Intent().also {
-                    it.putExtra(INTENT_USER_REQUEST, true)
-                    it.putExtra(INTENT_USER_NAME, name)
-                    setResult(RESULT_OK, it)
-                    finish()
-                }
+                goToHomeActivity()
             }
         }
 
@@ -124,13 +119,7 @@ class LoginActivity : BaseActivity(), AuthListener {
                     binding.loginPasswordInputLayout.error = authResult.message
 
                 AuthCode.USER_DATA_UPDATED.code -> {
-                    val name = viewModel.getUserName()
-                    Intent().also {
-                        it.putExtra(INTENT_USER_REQUEST, true)
-                        it.putExtra(INTENT_USER_NAME, name)
-                        setResult(RESULT_OK, it)
-                        finish()
-                    }
+                    goToHomeActivity()
                 }
 
                 else -> snackBar(authResult.message)
@@ -153,8 +142,15 @@ class LoginActivity : BaseActivity(), AuthListener {
         }
     }
 
+    private fun goToHomeActivity() {
+        viewModel.getUserName().also { userName ->
+            Intent(applicationContext, HomeActivity::class.java).also {
+                it.putExtra(INTENT_USER_REQUEST, true)
+                it.putExtra(INTENT_USER_NAME, userName)
+                startActivity(it)
+                finish()
+            }
+        }
 
-    fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        onBackPressed()
     }
 }

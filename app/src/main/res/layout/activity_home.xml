@@ -39,10 +39,10 @@
             android:layout_marginTop="@dimen/title_margin_top"
             android:fontFamily="@font/nunito_semibold"
             android:padding="@dimen/title_padding"
+            android:text="@string/nav_1"
             android:textSize="@dimen/title_size"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/nav_1" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/propic_image_view"
@@ -62,7 +62,8 @@
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_marginEnd="16dp"
-            android:onClick="onLogoutButtonClick"
+            android:onClick="@{viewModel::onLogoutButtonClick}"
+            android:visibility="gone"
             app:cardCornerRadius="@dimen/card_corner_radius"
             app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
             app:layout_constraintEnd_toEndOf="parent"
@@ -95,12 +96,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
-            android:contentDescription="@{viewModel.isLogged() ? @string/addBtnContentDescription : @string/login}"
+            android:contentDescription="@string/addBtnContentDescription"
             android:onClick="onAddButtonClick"
-            android:src="@{viewModel.isLogged() ? @drawable/ic_add : @drawable/ic_login}"
+            android:src="@drawable/ic_add"
             app:layout_constraintBottom_toBottomOf="@+id/home_fragmentContainerView"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:src="@drawable/ic_add" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/nav_bar"

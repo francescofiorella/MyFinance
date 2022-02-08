@@ -35,7 +35,7 @@
             android:layout_marginTop="5dp"
             android:fontFamily="@font/nunito_semibold"
             android:paddingHorizontal="20dp"
-            android:text="@{viewModel.user != null ? viewModel.user.fullName : @string/warning_not_logged}"
+            android:text="@{viewModel.user.fullName}"
             android:textAlignment="center"
             android:textColor="@color/primary_text"
             android:textSize="26sp"
