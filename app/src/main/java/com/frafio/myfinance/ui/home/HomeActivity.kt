@@ -109,6 +109,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         if (savedInstanceState == null) {
             // import db data
             viewModel.checkUser()
+            binding.navDrawer?.setCheckedItem(R.id.dashboardFragment)
         }
 
         binding.navBar?.setOnItemSelectedListener(navBarListener)
@@ -395,7 +396,10 @@ class HomeActivity : BaseActivity(), HomeListener {
     private fun showFragment(fragmentId: Int) {
         binding.navBar?.selectedItemId = fragmentId
         binding.navRail?.selectedItemId = fragmentId
-        binding.navDrawer?.setCheckedItem(fragmentId)
+        binding.navDrawer?.let {
+            it.setCheckedItem(fragmentId)
+            navigateTo(fragmentId)
+        }
     }
 
     private fun refreshFragments() {
