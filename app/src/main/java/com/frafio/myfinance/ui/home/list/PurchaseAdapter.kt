@@ -36,7 +36,7 @@ class PurchaseAdapter(
         val currentPurchase = purchases[position]
         holder.recyclerViewPurchaseItemBinding.purchase = currentPurchase
 
-        if (currentPurchase.type == DbPurchases.TYPES.SHOPPING.value) {
+        /*if (currentPurchase.type == DbPurchases.TYPES.SHOPPING.value) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener {
                 listener.onItemInteraction(ON_CLICK, currentPurchase, position)
             }
@@ -63,7 +63,7 @@ class PurchaseAdapter(
         } else {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemNomeTextView
                 .setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-        }
+        }*/
     }
 
     override fun getItemCount(): Int {

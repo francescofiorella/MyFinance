@@ -80,6 +80,8 @@
     <string name="use_dynamic_color">Usa i colori dinamici</string>
     <string name="restart_app_changes">Riavvia l\'app per applicare le modifiche.</string>
 
+    <string name="total_purchase">Totale</string>
+
     <string-array name="types">
         <item>@string/generic</item>
         <item>@string/shopping</item>
