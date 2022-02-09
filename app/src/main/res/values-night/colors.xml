@@ -6,6 +6,7 @@
     <color name="md_theme_primary">#78D1FF</color>
     <color name="md_theme_surface">@color/md_theme_dark_surface</color>
     <color name="md_theme_primaryContainer">@color/md_theme_dark_primaryContainer</color>
+    <color name="md_theme_tertiary">@color/md_theme_dark_tertiary</color>
     <color name="primary_text">@color/white</color>
     <color name="inverted_primary_text">@color/black</color>
     <color name="disabled_text">#3F4952</color>
