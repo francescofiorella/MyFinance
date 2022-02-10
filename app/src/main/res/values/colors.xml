@@ -61,6 +61,7 @@
     <color name="md_theme_surface">@color/md_theme_light_surface</color>
     <color name="md_theme_primaryContainer">@color/md_theme_light_primaryContainer</color>
     <color name="md_theme_tertiary">@color/md_theme_light_tertiary</color>
+    <color name="md_theme_onSecondaryContainer">@color/md_theme_light_onSecondaryContainer</color>
     <color name="quantum_grey_600">#757575</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>

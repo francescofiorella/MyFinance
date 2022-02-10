@@ -2,6 +2,7 @@ package com.frafio.myfinance.ui.home.list
 
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
@@ -35,6 +36,14 @@ class PurchaseAdapter(
     override fun onBindViewHolder(holder: PurchaseViewHolder, position: Int) {
         val currentPurchase = purchases[position]
         holder.recyclerViewPurchaseItemBinding.purchase = currentPurchase
+
+        if (currentPurchase.type != 0) {
+            holder.recyclerViewPurchaseItemBinding.layout.visibility = View.GONE
+            holder.recyclerViewPurchaseItemBinding.layout.maxHeight = 0
+        } else {
+            holder.recyclerViewPurchaseItemBinding.layout.visibility = View.VISIBLE
+            holder.recyclerViewPurchaseItemBinding.layout.maxHeight = 1000
+        }
 
         /*if (currentPurchase.type == DbPurchases.TYPES.SHOPPING.value) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener {
