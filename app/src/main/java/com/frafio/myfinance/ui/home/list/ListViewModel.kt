@@ -28,4 +28,20 @@ class ListViewModel(private val purchaseRepository: PurchaseRepository) : ViewMo
         val response = purchaseRepository.deletePurchaseAt(position)
         listener?.onDeleteComplete(response)
     }
+
+    fun getTotals(purchases: List<Purchase>): Pair<List<Purchase>, HashMap<Int, MutableList<Purchase>>> {
+        val totals: MutableList<Purchase> = mutableListOf()
+        val map: HashMap<Int, MutableList<Purchase>> = hashMapOf()
+        var index = -1
+        purchases.forEach { purchase ->
+            if (purchase.type == 0) {
+                totals.add(purchase)
+                index++
+                map[index] = mutableListOf()
+            } else {
+                map[index]?.add(purchase)
+            }
+        }
+        return Pair(totals, map)
+    }
 }

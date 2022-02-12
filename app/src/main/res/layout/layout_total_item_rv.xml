@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="total"
+            type="com.frafio.myfinance.data.models.Purchase" />
+
+        <import type="com.frafio.myfinance.utils.FormatUtilsKt" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="20dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/monthLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:id="@+id/dividerView"
+                android:layout_width="3dp"
+                android:layout_height="0dp"
+                android:layout_marginVertical="2dp"
+                android:background="@drawable/bg_snackbar"
+                android:backgroundTint="@color/md_theme_primary"
+                app:layout_constraintBottom_toBottomOf="@id/monthNameTV"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/monthNameTV" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/monthNameTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:fontFamily="@font/nunito_semibold"
+                android:textSize="22sp"
+                app:layout_constraintStart_toEndOf="@id/dividerView"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Mese Anno" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/dayImageTV"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_list_number"
+            android:backgroundTint="@color/md_theme_tertiary"
+            android:fontFamily="@font/nunito"
+            android:gravity="center"
+            android:text="@{total.day.toString()}"
+            android:textAlignment="center"
+            android:textColor="@color/md_theme_surface"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/monthLayout"
+            tools:text="14" />
+
+        <ImageView
+            android:id="@+id/labelIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:contentDescription="@string/total_icon"
+            android:src="@drawable/ic_label_important"
+            app:layout_constraintBottom_toBottomOf="@+id/totalNameTV"
+            app:layout_constraintStart_toEndOf="@+id/dayImageTV"
+            app:layout_constraintTop_toTopOf="@+id/totalNameTV"
+            app:tint="@color/md_theme_primaryContainer" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/totalNameTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:fontFamily="@font/nunito"
+            android:text="@string/total_purchase"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@id/labelIcon"
+            app:layout_constraintTop_toTopOf="@+id/dayImageTV" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/totalPriceTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito"
+            android:text="@{FormatUtilsKt.doubleToPrice(total.price)}"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/totalNameTV"
+            tools:text="€ 20.00" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/purchasesRV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:backgroundTint="?android:colorBackground"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/totalPriceTV"
+            app:layout_constraintStart_toStartOf="@+id/labelIcon"
+            app:layout_constraintTop_toBottomOf="@+id/totalNameTV"
+            tools:itemCount="3"
+            tools:listitem="@layout/layout_daily_purchase_rv">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

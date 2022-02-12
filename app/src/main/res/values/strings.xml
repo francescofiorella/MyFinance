@@ -83,6 +83,7 @@
     <string name="total_purchase">Total</string>
 
     <string name="restart">Restart</string>
+    <string name="total_icon">Total Icon</string>
 
     <string-array name="types">
         <item>@string/generic</item>

@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home.list
+package com.frafio.myfinance.ui.home.list.adapters
 
 import androidx.recyclerview.widget.DiffUtil
 import com.frafio.myfinance.data.models.Purchase

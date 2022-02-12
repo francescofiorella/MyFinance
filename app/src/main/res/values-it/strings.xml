@@ -84,6 +84,8 @@
 
     <string name="restart">Riavvia</string>
 
+    <string name="total_icon">Total Icon</string>
+
     <string-array name="types">
         <item>@string/generic</item>
         <item>@string/shopping</item>

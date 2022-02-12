@@ -1,8 +1,8 @@
-package com.frafio.myfinance.ui.home.list
+package com.frafio.myfinance.ui.home.list.adapters
 
 import com.frafio.myfinance.data.models.Purchase
 
-interface PurchaseInteractionListener {
+interface TotalInteractionListener {
 
     companion object{
         const val ON_CLICK: Int = 1

@@ -18,14 +18,16 @@ import com.frafio.myfinance.databinding.FragmentListBinding
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_CLICK
-import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener.Companion.ON_CLICK
+import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.ui.home.list.adapters.TotalAdapter
+import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener
 import com.frafio.myfinance.ui.home.list.receipt.ReceiptActivity
 import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.generic.instance
 
-class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener {
+class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
 
     private lateinit var binding: FragmentListBinding
     private lateinit var viewModel: ListViewModel
@@ -64,9 +66,16 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
 
         viewModel.getPurchases()
         viewModel.purchases.observe(viewLifecycleOwner) { purchases ->
+            val totalList: List<Purchase>
+            val purchaseMap: HashMap<Int, MutableList<Purchase>>
+            viewModel.getTotals(purchases).also {
+                totalList = it.first
+                purchaseMap = it.second
+            }
+
             binding.listRecyclerView.also {
                 it.setHasFixedSize(true)
-                it.adapter = PurchaseAdapter(purchases, this)
+                it.adapter = TotalAdapter(totalList, purchaseMap, this)
             }
         }
 
@@ -160,7 +169,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                 totPosition?.let {
                     binding.listRecyclerView.adapter!!.notifyItemChanged(it)
                 }
-                (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(newList)
+                (binding.listRecyclerView.adapter as TotalAdapter).updateData(newList)
                 (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
             }
 
@@ -169,7 +178,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
     }
 
     fun refreshListData() {
-        (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(viewModel.getPurchaseList())
+        (binding.listRecyclerView.adapter as TotalAdapter).updateData(viewModel.getPurchaseList())
         binding.listRecyclerView.scrollToPosition(0)
     }
 
