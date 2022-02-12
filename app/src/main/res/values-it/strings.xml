@@ -82,6 +82,8 @@
 
     <string name="total_purchase">Totale</string>
 
+    <string name="restart">Riavvia</string>
+
     <string-array name="types">
         <item>@string/generic</item>
         <item>@string/shopping</item>

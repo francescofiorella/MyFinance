@@ -1,6 +1,9 @@
 package com.frafio.myfinance.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +14,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.frafio.myfinance.R
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+
 
 @Suppress("UNUSED")
 fun Activity.setFullScreenEnabled(enable: Boolean) {
@@ -41,7 +45,7 @@ fun Activity.setFullScreenEnabled(enable: Boolean) {
     }
 }
 
-fun Activity.snackBar(message: String, anchor: View? = null) {
+fun Activity.snackBar(message: String, anchor: View? = null, show: Boolean = true) : Snackbar {
     val root = findViewById<ViewGroup>(android.R.id.content).rootView
     val nunito = ResourcesCompat.getFont(applicationContext, R.font.nunito)
 
@@ -55,6 +59,9 @@ fun Activity.snackBar(message: String, anchor: View? = null) {
         val tv = snackBar.view.findViewById<TextView>(R.id.snackbar_text)
         tv.typeface = nunito
 
-        snackBar.show()
+        if (show)
+            snackBar.show()
+
+        return snackBar
     }
 }

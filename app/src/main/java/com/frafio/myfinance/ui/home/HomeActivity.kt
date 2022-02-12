@@ -28,6 +28,7 @@ import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import org.kodein.di.generic.instance
 
 class HomeActivity : BaseActivity(), HomeListener {
@@ -243,13 +244,13 @@ class HomeActivity : BaseActivity(), HomeListener {
     }
 
     // method for children
-    fun showSnackBar(message: String) {
+    fun showSnackBar(message: String, show: Boolean = true): Snackbar {
         val view = when {
             binding.homeAddBtn != null -> binding.homeAddBtn
             else -> binding.homeAddExtBtn
         }
 
-        snackBar(message, view)
+        return snackBar(message, view, show)
     }
 
     override fun onLogOutSuccess(response: LiveData<AuthResult>) {

@@ -52,7 +52,16 @@ class MenuFragment : BaseFragment(), MenuListener {
 
             it.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setDynamicColor(isChecked)
-                (activity as HomeActivity).showSnackBar(getString(R.string.restart_app_changes))
+                (activity as HomeActivity).showSnackBar(
+                    getString(R.string.restart_app_changes),
+                    false
+                ).also { snackBar ->
+                    snackBar.setAction(getString(R.string.restart)) {
+                        (activity as HomeActivity).finish()
+                    }
+
+                    snackBar.show()
+                }
             }
         }
         return binding.root

@@ -82,6 +82,8 @@
 
     <string name="total_purchase">Total</string>
 
+    <string name="restart">Restart</string>
+
     <string-array name="types">
         <item>@string/generic</item>
         <item>@string/shopping</item>
