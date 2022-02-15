@@ -10,8 +10,6 @@
 
     <string name="addBtnContentDescription">Add a purchase</string>
 
-    <string name="empty">"   "</string>
-
     <string name="add">Add</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
@@ -28,7 +26,7 @@
 
     <string name="name">Name</string>
     <string name="price">Price</string>
-    <string name="date_picker_arrow">DatePickerArrow</string>
+    <string name="date_picker_arrow" translatable="false">DatePickerArrow</string>
 
     <string name="login_signup_email">Enter your email</string>
     <string name="login_password">Enter your password</string>
@@ -55,18 +53,19 @@
     <string name="logout">Log Out</string>
     <string name="profile_picture">Profile Picture</string>
 
-    <string name="card_dimension_ratio">1.2:1</string>
-    <string name="back_arrow">Back Arrow</string>
+    <string name="card_dimension_ratio" translatable="false">1.2:1</string>
+    <string name="back_arrow" translatable="false">Back Arrow</string>
     <string name="trend_avg_day">Daily Average Trend</string>
     <string name="show_2020_2021">Show 2020/2021</string>
     <string name="language">Language</string>
-    <string name="dashboard_empty">dashboard_empty</string>
-    <string name="list_empty">list_empty</string>
-    <string name="chart_icon">Chart Icon</string>
-    <string name="version_icon">Version Icon</string>
-    <string name="collection_icon">Collection Icon</string>
-    <string name="language_icon">Language Icon</string>
-    <string name="dynamic_color_icon">Dynamic Color Icon</string>
+    <string name="dashboard_empty" translatable="false">dashboard_empty</string>
+    <string name="list_empty" translatable="false">list_empty</string>
+    <string name="chart_icon" translatable="false">Chart Icon</string>
+    <string name="version_icon" translatable="false">Version Icon</string>
+    <string name="collection_icon" translatable="false">Collection Icon</string>
+    <string name="language_icon" translatable="false">Language Icon</string>
+    <string name="dynamic_color_icon" translatable="false">Dynamic Color Icon</string>
+    <string name="total_icon" translatable="false">Total Icon</string>
 
     <string name="type">Type</string>
     <string name="generic">Generic</string>
@@ -83,7 +82,8 @@
     <string name="total_purchase">Total</string>
 
     <string name="restart">Restart</string>
-    <string name="total_icon">Total Icon</string>
+
+    <string name="month_of_total" translatable="false">%1$s %2$d</string>
 
     <string-array name="types">
         <item>@string/generic</item>

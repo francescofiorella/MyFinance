@@ -10,8 +10,6 @@
 
     <string name="addBtnContentDescription">Aggiungi un acquisto</string>
 
-    <string name="empty">"   "</string>
-
     <string name="add">Aggiungi</string>
     <string name="edit">Modifica</string>
     <string name="delete">Elimina</string>
@@ -28,7 +26,6 @@
 
     <string name="name">Nome</string>
     <string name="price">Costo</string>
-    <string name="date_picker_arrow">DatePickerArrow</string>
 
     <string name="login_signup_email">Inserisci la tua email</string>
     <string name="login_password">Inserisci la password</string>
@@ -55,18 +52,9 @@
     <string name="logout">Log Out</string>
     <string name="profile_picture">Immagine di profilo</string>
 
-    <string name="card_dimension_ratio">1.2:1</string>
-    <string name="back_arrow">Back Arrow</string>
     <string name="trend_avg_day">Trend Media Giornaliera</string>
     <string name="show_2020_2021">Mostra 2020/2021</string>
     <string name="language">Lingua</string>
-    <string name="dashboard_empty">dashboard_empty</string>
-    <string name="list_empty">list_empty</string>
-    <string name="chart_icon">Chart Icon</string>
-    <string name="version_icon">Version Icon</string>
-    <string name="collection_icon">Collection Icon</string>
-    <string name="language_icon">Language Icon</string>
-    <string name="dynamic_color_icon">Dynamic Color Icon</string>
 
     <string name="type">Tipo</string>
     <string name="generic">Generico</string>
@@ -83,8 +71,6 @@
     <string name="total_purchase">Totale</string>
 
     <string name="restart">Riavvia</string>
-
-    <string name="total_icon">Total Icon</string>
 
     <string-array name="types">
         <item>@string/generic</item>

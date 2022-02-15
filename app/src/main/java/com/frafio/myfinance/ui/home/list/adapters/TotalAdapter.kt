@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.LayoutTotalItemRvBinding
+import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import java.text.DateFormatSymbols
@@ -40,7 +41,13 @@ class TotalAdapter(
 
         val purchaseList = purchaseMap[position]!!
         if (purchaseList.size == 0) {
-            purchaseList.add(Purchase(name = "Nessun acquisto", type = 0))
+            purchaseList.add(
+                Purchase(
+                    name = holder.recyclerViewTotalItemBinding.layout.context.getString(
+                        R.string.no_purchase
+                    ), type = 0
+                )
+            )
         }
 
         holder.recyclerViewTotalItemBinding.purchasesRV.also {
@@ -53,15 +60,41 @@ class TotalAdapter(
             if (currentMonth != totals[position - 1].month) {
                 holder.recyclerViewTotalItemBinding.monthLayout.instantShow()
                 holder.recyclerViewTotalItemBinding.monthNameTV.text =
-                    "${DateFormatSymbols().months[currentMonth!! - 1]} ${currentTotal.year}"
+                    holder.recyclerViewTotalItemBinding.layout.context.getString(
+                        R.string.month_of_total,
+                        DateFormatSymbols().months[currentMonth!! - 1],
+                        currentTotal.year
+                    )
             } else {
                 holder.recyclerViewTotalItemBinding.monthLayout.instantHide()
             }
+
+            if (position < totals.size - 1) {
+                holder.recyclerViewTotalItemBinding.emptyLayout.instantHide()
+                if (currentMonth != totals[position + 1].month) {
+                    holder.recyclerViewTotalItemBinding.divider.instantHide()
+                } else {
+                    holder.recyclerViewTotalItemBinding.divider.instantShow()
+                }
+            } else {
+                holder.recyclerViewTotalItemBinding.divider.instantHide()
+                holder.recyclerViewTotalItemBinding.emptyLayout.instantShow()
+            }
         } else {
+            holder.recyclerViewTotalItemBinding.divider.instantShow()
+            holder.recyclerViewTotalItemBinding.emptyLayout.instantHide()
             currentMonth = currentTotal.month
             holder.recyclerViewTotalItemBinding.monthNameTV.text =
-                "${DateFormatSymbols().months[currentMonth!! - 1]} ${currentTotal.year}"
+                holder.recyclerViewTotalItemBinding.layout.context.getString(
+                    R.string.month_of_total,
+                    DateFormatSymbols().months[currentMonth!! - 1],
+                    currentTotal.year
+                )
             holder.recyclerViewTotalItemBinding.monthLayout.instantShow()
+        }
+
+        holder.recyclerViewTotalItemBinding.layout.setOnClickListener {
+            listener.onItemInteraction(ON_CLICK, currentTotal, position)
         }
 
 /*if (currentPurchase.type == DbPurchases.TYPES.SHOPPING.value) {
