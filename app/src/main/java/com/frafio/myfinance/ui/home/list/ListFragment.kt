@@ -89,7 +89,8 @@ class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
     ) {
         when (interactionID) {
             ON_CLICK -> {
-                Intent(context, ReceiptActivity::class.java).also {
+
+                /*Intent(context, ReceiptActivity::class.java).also {
                     it.putExtra(AddActivity.INTENT_PURCHASE_ID, purchase.id)
                     it.putExtra(AddActivity.INTENT_PURCHASE_NAME, purchase.name)
                     it.putExtra(
@@ -97,10 +98,20 @@ class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
                         doubleToPrice(purchase.price!!)
                     )
                     activity?.startActivity(it)
-                }
+                }*/
             }
 
             ON_LONG_CLICK -> {
+                val builder = MaterialAlertDialogBuilder(requireContext())
+                builder.setTitle(getString(R.string.total_purchase))
+                builder.setIcon(R.drawable.ic_delete)
+                builder.setMessage(getString(R.string.purchase_delete_dialog))
+                builder.setNegativeButton(getString(R.string.cancel), null)
+                builder.setPositiveButton(getString(R.string.delete)) { _, _ ->
+                    viewModel.deletePurchaseAt(position)
+                }
+                builder.show()
+                /*
                 val builder = MaterialAlertDialogBuilder(requireContext())
                 builder.setTitle(purchase.name)
                 if (purchase.type == 0 && purchase.price == 0.0) {
@@ -155,6 +166,7 @@ class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
                     viewModel.deletePurchaseAt(position)
                 }
                 builder.show()
+                */
             }
         }
     }

@@ -9,6 +9,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.LayoutTotalItemRvBinding
 import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener.Companion.ON_CLICK
+import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import java.text.DateFormatSymbols
@@ -48,6 +49,16 @@ class TotalAdapter(
                     ), type = 0
                 )
             )
+            holder.recyclerViewTotalItemBinding.layout.setOnClickListener(null)
+            holder.recyclerViewTotalItemBinding.layout.setOnLongClickListener {
+                listener.onItemInteraction(ON_LONG_CLICK, currentTotal, position)
+                true
+            }
+        } else {
+            holder.recyclerViewTotalItemBinding.layout.setOnClickListener {
+                listener.onItemInteraction(ON_CLICK, currentTotal, position)
+            }
+            holder.recyclerViewTotalItemBinding.layout.setOnLongClickListener(null)
         }
 
         holder.recyclerViewTotalItemBinding.purchasesRV.also {
@@ -92,39 +103,6 @@ class TotalAdapter(
                 )
             holder.recyclerViewTotalItemBinding.monthLayout.instantShow()
         }
-
-        holder.recyclerViewTotalItemBinding.layout.setOnClickListener {
-            listener.onItemInteraction(ON_CLICK, currentTotal, position)
-        }
-
-/*if (currentPurchase.type == DbPurchases.TYPES.SHOPPING.value) {
-    holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener {
-        listener.onItemInteraction(ON_CLICK, currentPurchase, position)
-    }
-} else {
-    holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
-        .setOnClickListener(null)
-}
-
-if (!(currentPurchase.type == DbPurchases.TYPES.TOTAL.value && currentPurchase.price != 0.0)) {
-    holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
-        .setOnLongClickListener {
-            listener.onItemInteraction(ON_LONG_CLICK, currentPurchase, position)
-            true
-        }
-} else {
-    holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
-        .setOnLongClickListener(null)
-}
-
-
-if (currentPurchase.type == DbPurchases.TYPES.TOTAL.value) {
-    holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemNomeTextView
-        .setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
-} else {
-    holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemNomeTextView
-        .setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-}*/
     }
 
     override fun getItemCount(): Int {
