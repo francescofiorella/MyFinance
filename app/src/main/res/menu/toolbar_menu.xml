@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/accountItem"
+        android:contentDescription="@string/profile_picture"
+        android:icon="@drawable/ic_user"
+        android:title="@string/profile_picture"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/logoutItem"
+        android:contentDescription="@string/logout"
+        android:icon="@drawable/ic_logout"
+        android:title="@string/logout"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
+
+</menu>

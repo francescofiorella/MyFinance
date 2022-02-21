@@ -171,10 +171,12 @@ class HomeActivity : BaseActivity(), HomeListener {
     private fun navigateTo(itemId: Int) {
         when (itemId) {
             R.id.dashboardFragment -> {
+                binding.toolbar?.menu?.findItem(R.id.accountItem)?.isVisible = true
+                binding.toolbar?.menu?.findItem(R.id.logoutItem)?.isVisible = false
                 dashboardFragment.scrollUp()
-                binding.fragmentTitle.text = getString(R.string.nav_1)
-                binding.logoutCard.instantHide()
-                binding.propicImageView.instantShow()
+                binding.fragmentTitle?.text = getString(R.string.nav_1)
+                binding.logoutCard?.instantHide()
+                binding.propicImageView?.instantShow()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment).show(dashboardFragment).commit()
@@ -182,10 +184,12 @@ class HomeActivity : BaseActivity(), HomeListener {
             }
 
             R.id.listFragment -> {
+                binding.toolbar?.menu?.findItem(R.id.accountItem)?.isVisible = true
+                binding.toolbar?.menu?.findItem(R.id.logoutItem)?.isVisible = false
                 listFragment.scrollUp()
-                binding.fragmentTitle.text = getString(R.string.nav_2_extended)
-                binding.logoutCard.instantHide()
-                binding.propicImageView.instantShow()
+                binding.fragmentTitle?.text = getString(R.string.nav_2_extended)
+                binding.logoutCard?.instantHide()
+                binding.propicImageView?.instantShow()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment).show(listFragment).commit()
@@ -193,9 +197,11 @@ class HomeActivity : BaseActivity(), HomeListener {
             }
 
             R.id.profileFragment -> {
-                binding.fragmentTitle.text = getString(R.string.nav_3)
-                binding.logoutCard.instantShow()
-                binding.propicImageView.instantHide()
+                binding.toolbar?.menu?.findItem(R.id.accountItem)?.isVisible = false
+                binding.toolbar?.menu?.findItem(R.id.logoutItem)?.isVisible = true
+                binding.fragmentTitle?.text = getString(R.string.nav_3)
+                binding.logoutCard?.instantShow()
+                binding.propicImageView?.instantHide()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment).show(profileFragment).commit()
@@ -203,10 +209,12 @@ class HomeActivity : BaseActivity(), HomeListener {
             }
 
             R.id.menuFragment -> {
+                binding.toolbar?.menu?.findItem(R.id.accountItem)?.isVisible = true
+                binding.toolbar?.menu?.findItem(R.id.logoutItem)?.isVisible = false
                 menuFragment.scrollUp()
-                binding.fragmentTitle.text = getString(R.string.nav_4)
-                binding.logoutCard.instantHide()
-                binding.propicImageView.instantShow()
+                binding.fragmentTitle?.text = getString(R.string.nav_4)
+                binding.logoutCard?.instantHide()
+                binding.propicImageView?.instantShow()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment).show(menuFragment).commit()
