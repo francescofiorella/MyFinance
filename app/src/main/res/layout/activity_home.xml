@@ -31,23 +31,54 @@
             app:layout_constraintTop_toTopOf="parent"
             app:showAnimationBehavior="inward" />
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarLayout"
-            android:layout_width="match_parent"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/fragmentTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="@dimen/title_margin_start"
+            android:layout_marginTop="@dimen/title_margin_top"
+            android:fontFamily="@font/nunito_bold"
+            android:padding="@dimen/title_padding"
+            android:text="@string/nav_1"
+            android:textColor="@color/primary_text"
+            android:textSize="@dimen/title_size"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:menu="@menu/toolbar_menu"
-                app:title="@string/nav_1"
-                app:titleTextAppearance="@style/TextAppearance.MyFinance.ToolbarTitle" />
+        <ImageView
+            android:id="@+id/propic_image_view"
+            android:layout_width="@dimen/profile_picture_size"
+            android:layout_height="@dimen/profile_picture_size"
+            android:layout_marginEnd="@dimen/profile_picture_margin_end"
+            android:contentDescription="@string/profile_picture"
+            android:onClick="onProPicClick"
+            app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/fragmentTitle"
+            app:srcCompat="@drawable/ic_user"
+            app:srcRound="@{viewModel.getProPic()}" />
 
-        </com.google.android.material.appbar.AppBarLayout>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/logout_card"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginEnd="16dp"
+            android:onClick="@{viewModel::onLogoutButtonClick}"
+            android:visibility="gone"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/fragmentTitle">
+
+            <ImageView
+                android:id="@+id/logout_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/logout"
+                app:srcCompat="@drawable/ic_logout" />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/home_fragmentContainerView"
@@ -58,7 +89,7 @@
             app:layout_constraintBottom_toTopOf="@+id/nav_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
+            app:layout_constraintTop_toBottomOf="@+id/fragmentTitle"
             tools:layout="@layout/fragment_dashboard" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

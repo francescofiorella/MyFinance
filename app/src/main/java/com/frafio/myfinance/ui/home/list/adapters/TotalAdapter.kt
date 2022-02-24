@@ -44,21 +44,19 @@ class TotalAdapter(
         if (purchaseList.size == 0) {
             purchaseList.add(
                 Purchase(
-                    name = holder.recyclerViewTotalItemBinding.layout.context.getString(
+                    name = holder.recyclerViewTotalItemBinding.root.context.getString(
                         R.string.no_purchase
                     ), type = 0
                 )
             )
-            holder.recyclerViewTotalItemBinding.layout.setOnClickListener(null)
-            holder.recyclerViewTotalItemBinding.layout.setOnLongClickListener {
-                listener.onItemInteraction(ON_LONG_CLICK, currentTotal, position)
-                true
-            }
-        } else {
-            holder.recyclerViewTotalItemBinding.layout.setOnClickListener {
-                listener.onItemInteraction(ON_CLICK, currentTotal, position)
-            }
-            holder.recyclerViewTotalItemBinding.layout.setOnLongClickListener(null)
+        }
+
+        holder.recyclerViewTotalItemBinding.dayImageTV.setOnClickListener {
+            listener.onItemInteraction(ON_CLICK, currentTotal, purchaseList, position)
+        }
+        holder.recyclerViewTotalItemBinding.dayImageTV.setOnLongClickListener {
+            listener.onItemInteraction(ON_LONG_CLICK, currentTotal, purchaseList, position)
+            true
         }
 
         holder.recyclerViewTotalItemBinding.purchasesRV.also {
@@ -71,7 +69,7 @@ class TotalAdapter(
             if (currentMonth != totals[position - 1].month) {
                 holder.recyclerViewTotalItemBinding.monthLayout.instantShow()
                 holder.recyclerViewTotalItemBinding.monthNameTV.text =
-                    holder.recyclerViewTotalItemBinding.layout.context.getString(
+                    holder.recyclerViewTotalItemBinding.root.context.getString(
                         R.string.month_of_total,
                         DateFormatSymbols().months[currentMonth!! - 1],
                         currentTotal.year
@@ -96,7 +94,7 @@ class TotalAdapter(
             holder.recyclerViewTotalItemBinding.emptyLayout.instantHide()
             currentMonth = currentTotal.month
             holder.recyclerViewTotalItemBinding.monthNameTV.text =
-                holder.recyclerViewTotalItemBinding.layout.context.getString(
+                holder.recyclerViewTotalItemBinding.root.context.getString(
                     R.string.month_of_total,
                     DateFormatSymbols().months[currentMonth!! - 1],
                     currentTotal.year

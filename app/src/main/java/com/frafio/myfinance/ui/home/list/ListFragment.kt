@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.Purchase
@@ -18,6 +19,8 @@ import com.frafio.myfinance.databinding.FragmentListBinding
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.ui.home.list.adapters.DialogPurchaseAdapter
+import com.frafio.myfinance.ui.home.list.adapters.PurchaseAdapter
 import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.ui.home.list.adapters.TotalAdapter
@@ -85,11 +88,27 @@ class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
     override fun onItemInteraction(
         interactionID: Int,
         purchase: Purchase,
+        purchaseList: List<Purchase>,
         position: Int
     ) {
         when (interactionID) {
             ON_CLICK -> {
+                // if there are some purchases
+                if (purchaseList[0].type != 0) {
+                    val layoutInflater = LayoutInflater.from(requireContext())
+                    val bodyRV = layoutInflater.inflate(
+                        R.layout.layout_total_dialog_body,
+                        null
+                    ) as RecyclerView
+                    bodyRV.setHasFixedSize(true)
+                    bodyRV.adapter = DialogPurchaseAdapter(purchaseList)
 
+                    val builder = MaterialAlertDialogBuilder(requireContext())
+                    builder.setTitle(getString(R.string.total_purchase))
+                    builder.setIcon(R.drawable.ic_delete)
+                    builder.setView(bodyRV)
+                    builder.show()
+                }
                 /*Intent(context, ReceiptActivity::class.java).also {
                     it.putExtra(AddActivity.INTENT_PURCHASE_ID, purchase.id)
                     it.putExtra(AddActivity.INTENT_PURCHASE_NAME, purchase.name)
@@ -102,15 +121,18 @@ class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
             }
 
             ON_LONG_CLICK -> {
-                val builder = MaterialAlertDialogBuilder(requireContext())
-                builder.setTitle(getString(R.string.total_purchase))
-                builder.setIcon(R.drawable.ic_delete)
-                builder.setMessage(getString(R.string.purchase_delete_dialog))
-                builder.setNegativeButton(getString(R.string.cancel), null)
-                builder.setPositiveButton(getString(R.string.delete)) { _, _ ->
-                    viewModel.deletePurchaseAt(position)
+                // if there aren't any purchases
+                if (purchaseList[0].type == 0) {
+                    val builder = MaterialAlertDialogBuilder(requireContext())
+                    builder.setTitle(getString(R.string.total_purchase))
+                    builder.setIcon(R.drawable.ic_delete)
+                    builder.setMessage(getString(R.string.purchase_delete_dialog))
+                    builder.setNegativeButton(getString(R.string.cancel), null)
+                    builder.setPositiveButton(getString(R.string.delete)) { _, _ ->
+                        viewModel.deletePurchaseAt(position)
+                    }
+                    builder.show()
                 }
-                builder.show()
                 /*
                 val builder = MaterialAlertDialogBuilder(requireContext())
                 builder.setTitle(purchase.name)

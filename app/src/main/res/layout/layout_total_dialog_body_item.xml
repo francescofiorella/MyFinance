@@ -15,7 +15,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingVertical="5dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/purchaseNameTV"
@@ -24,9 +25,9 @@
             android:fontFamily="@font/nunito"
             android:text="@{purchase.name}"
             android:textColor="@color/md_theme_secondary"
-            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/purchasePriceTV"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/purchasePriceTV"
             tools:text="Purchase" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -36,10 +37,32 @@
             android:fontFamily="@font/nunito"
             android:text="@{FormatUtilsKt.doubleToPrice(purchase.price)}"
             android:textColor="@color/md_theme_secondary"
-            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/delete_fab"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/delete_fab"
             tools:text="€ 10.00" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/edit_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/edit"
+            android:src="@drawable/ic_create"
+            app:elevation="0dp"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toStartOf="@id/delete_fab"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/delete_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/delete"
+            android:src="@drawable/ic_delete"
+            app:elevation="0dp"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
