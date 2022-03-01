@@ -10,7 +10,6 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.Purchase
@@ -19,15 +18,14 @@ import com.frafio.myfinance.databinding.FragmentListBinding
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.ui.home.list.adapters.DialogPurchaseAdapter
-import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener.Companion.ON_CLICK
-import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener.Companion.ON_LONG_CLICK
-import com.frafio.myfinance.ui.home.list.adapters.TotalAdapter
-import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener
+import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_CLICK
+import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.ui.home.list.invoice.InvoiceActivity
+import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.generic.instance
 
-class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
+class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener {
 
     private lateinit var binding: FragmentListBinding
     private lateinit var viewModel: ListViewModel
@@ -66,16 +64,9 @@ class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
 
         viewModel.getPurchases()
         viewModel.purchases.observe(viewLifecycleOwner) { purchases ->
-            val totalList: List<Purchase>
-            val purchaseMap: HashMap<Int, MutableList<Purchase>>
-            viewModel.getTotals(purchases).also {
-                totalList = it.first
-                purchaseMap = it.second
-            }
-
             binding.listRecyclerView.also {
                 it.setHasFixedSize(true)
-                it.adapter = TotalAdapter(totalList, purchaseMap, this)
+                it.adapter = PurchaseAdapter(purchases, this)
             }
         }
 
@@ -85,28 +76,11 @@ class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
     override fun onItemInteraction(
         interactionID: Int,
         purchase: Purchase,
-        purchaseList: List<Purchase>,
         position: Int
     ) {
         when (interactionID) {
             ON_CLICK -> {
-                // if there are some purchases
-                if (purchaseList[0].type != 0) {
-                    val layoutInflater = LayoutInflater.from(requireContext())
-                    val bodyRV = layoutInflater.inflate(
-                        R.layout.layout_total_dialog_body,
-                        null
-                    ) as RecyclerView
-                    bodyRV.setHasFixedSize(true)
-                    bodyRV.adapter = DialogPurchaseAdapter(purchaseList)
-
-                    val builder = MaterialAlertDialogBuilder(requireContext())
-                    builder.setTitle(getString(R.string.total_purchase))
-                    builder.setIcon(R.drawable.ic_delete)
-                    builder.setView(bodyRV)
-                    builder.show()
-                }
-                /*Intent(context, ReceiptActivity::class.java).also {
+                Intent(context, InvoiceActivity::class.java).also {
                     it.putExtra(AddActivity.INTENT_PURCHASE_ID, purchase.id)
                     it.putExtra(AddActivity.INTENT_PURCHASE_NAME, purchase.name)
                     it.putExtra(
@@ -114,23 +88,10 @@ class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
                         doubleToPrice(purchase.price!!)
                     )
                     activity?.startActivity(it)
-                }*/
+                }
             }
 
             ON_LONG_CLICK -> {
-                // if there aren't any purchases
-                if (purchaseList[0].type == 0) {
-                    val builder = MaterialAlertDialogBuilder(requireContext())
-                    builder.setTitle(getString(R.string.total_purchase))
-                    builder.setIcon(R.drawable.ic_delete)
-                    builder.setMessage(getString(R.string.purchase_delete_dialog))
-                    builder.setNegativeButton(getString(R.string.cancel), null)
-                    builder.setPositiveButton(getString(R.string.delete)) { _, _ ->
-                        viewModel.deletePurchaseAt(position)
-                    }
-                    builder.show()
-                }
-                /*
                 val builder = MaterialAlertDialogBuilder(requireContext())
                 builder.setTitle(purchase.name)
                 if (purchase.type == 0 && purchase.price == 0.0) {
@@ -185,7 +146,6 @@ class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
                     viewModel.deletePurchaseAt(position)
                 }
                 builder.show()
-                */
             }
         }
     }
@@ -200,7 +160,7 @@ class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
                 totPosition?.let {
                     binding.listRecyclerView.adapter!!.notifyItemChanged(it)
                 }
-                (binding.listRecyclerView.adapter as TotalAdapter).updateData(newList)
+                (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(newList)
                 (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
             }
 
@@ -209,7 +169,7 @@ class ListFragment : BaseFragment(), TotalInteractionListener, DeleteListener {
     }
 
     fun refreshListData() {
-        (binding.listRecyclerView.adapter as TotalAdapter).updateData(viewModel.getPurchaseList())
+        (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(viewModel.getPurchaseList())
         binding.listRecyclerView.scrollToPosition(0)
     }
 
