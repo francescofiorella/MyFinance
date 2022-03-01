@@ -2,23 +2,23 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.home.list.receipt.ReceiptActivity">
+    tools:context=".ui.home.list.invoice.InvoiceActivity">
 
     <data>
 
         <variable
             name="viewModel"
-            type="com.frafio.myfinance.ui.home.list.receipt.ReceiptViewModel" />
+            type="com.frafio.myfinance.ui.home.list.invoice.InvoiceViewModel" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/receipt_layout"
+        android:id="@+id/invoice_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/receipt_progressIndicator"
+            android:id="@+id/invoice_progressIndicator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:indeterminate="true"
@@ -38,13 +38,13 @@
             android:contentDescription="@string/back_arrow"
             android:onClick="onBackClick"
             android:padding="@dimen/arrow_padding"
-            app:layout_constraintBottom_toBottomOf="@+id/receipt_purchaseTitle"
+            app:layout_constraintBottom_toBottomOf="@+id/invoice_purchaseTitle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/receipt_purchaseTitle"
+            app:layout_constraintTop_toTopOf="@+id/invoice_purchaseTitle"
             app:srcCompat="@drawable/ic_west" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/receipt_purchaseTitle"
+            android:id="@+id/invoice_purchaseTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/title_distance_from_arrow"
@@ -58,7 +58,7 @@
             tools:text="Acquisto" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/receipt_purchasePrice"
+            android:id="@+id/invoice_purchasePrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
@@ -66,53 +66,53 @@
             android:padding="10dp"
             android:text="@{viewModel.purchasePrice}"
             android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="@+id/receipt_purchaseTitle"
+            app:layout_constraintBottom_toBottomOf="@+id/invoice_purchaseTitle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/receipt_purchaseTitle"
+            app:layout_constraintTop_toTopOf="@+id/invoice_purchaseTitle"
             tools:text="€ 0.00" />
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/receipt_list_card"
+            android:id="@+id/invoice_list_card"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginHorizontal="10dp"
             android:layout_marginTop="@dimen/title_margin_bottom"
             android:layout_marginBottom="10dp"
             app:cardCornerRadius="@dimen/card_corner_radius"
-            app:layout_constraintBottom_toTopOf="@id/receipt_addLayout"
+            app:layout_constraintBottom_toTopOf="@id/invoice_addLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/receipt_purchaseTitle">
+            app:layout_constraintTop_toBottomOf="@id/invoice_purchaseTitle">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/receipt_recView"
+                android:id="@+id/invoice_recView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scrollbars="vertical"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/layout_receipt_item_rv" />
+                tools:listitem="@layout/layout_invoice_item_rv" />
 
         </com.google.android.material.card.MaterialCardView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/receipt_addLayout"
+            android:id="@+id/invoice_addLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/receipt_name_card"
+                android:id="@+id/invoice_name_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 app:cardCornerRadius="@dimen/card_corner_radius"
-                app:layout_constraintBottom_toTopOf="@id/receipt_price_card"
+                app:layout_constraintBottom_toTopOf="@id/invoice_price_card"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <EditText
-                    android:id="@+id/receipt_name_EditText"
+                    android:id="@+id/invoice_name_EditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="none"
@@ -126,18 +126,18 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/receipt_price_card"
+                android:id="@+id/invoice_price_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 app:cardCornerRadius="@dimen/card_corner_radius"
-                app:layout_constraintBottom_toBottomOf="@+id/receipt_addBtn"
-                app:layout_constraintEnd_toStartOf="@+id/receipt_addBtn"
+                app:layout_constraintBottom_toBottomOf="@+id/invoice_addBtn"
+                app:layout_constraintEnd_toStartOf="@+id/invoice_addBtn"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/receipt_addBtn">
+                app:layout_constraintTop_toTopOf="@+id/invoice_addBtn">
 
                 <EditText
-                    android:id="@+id/receipt_price_EditText"
+                    android:id="@+id/invoice_price_EditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="none"
@@ -152,7 +152,7 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/receipt_addBtn"
+                android:id="@+id/invoice_addBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"

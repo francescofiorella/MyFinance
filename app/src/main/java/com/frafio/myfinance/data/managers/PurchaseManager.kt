@@ -175,9 +175,13 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                         0.0
                     }
                 for (item in PurchaseStorage.purchaseList) {
-                    if (item.email == userEmail && item.type != DbPurchases.TYPES.TOTAL.value
-                        && item.type != DbPurchases.TYPES.TRANSPORT.value && item.year == purchase.year
-                        && item.month == purchase.month && item.day == purchase.day
+                    if (item.email == userEmail
+                        && item.type != DbPurchases.TYPES.TOTAL.value
+                        && item.type != DbPurchases.TYPES.TRANSPORT.value
+                        && item.type != DbPurchases.TYPES.RENT.value
+                        && item.year == purchase.year
+                        && item.month == purchase.month
+                        && item.day == purchase.day
                     ) {
                         sum += item.price ?: 0.0
                     }
@@ -227,9 +231,13 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                 if (purchase.price != purchasePrice) {
                     var sum = 0.0
                     for (item in PurchaseStorage.purchaseList) {
-                        if (item.email == purchase.email && item.type != DbPurchases.TYPES.TOTAL.value
-                            && item.type != DbPurchases.TYPES.TRANSPORT.value && item.year == purchase.year
-                            && item.month == purchase.month && item.day == purchase.day
+                        if (item.email == purchase.email
+                            && item.type != DbPurchases.TYPES.TOTAL.value
+                            && item.type != DbPurchases.TYPES.TRANSPORT.value
+                            && item.type != DbPurchases.TYPES.RENT.value
+                            && item.year == purchase.year
+                            && item.month == purchase.month
+                            && item.day == purchase.day
                         ) {
                             sum += item.price ?: 0.0
                         }

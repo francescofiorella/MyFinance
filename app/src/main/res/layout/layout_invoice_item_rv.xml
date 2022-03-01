@@ -6,15 +6,15 @@
     <data>
 
         <variable
-            name="receiptItem"
-            type="com.frafio.myfinance.data.models.ReceiptItem" />
+            name="invoiceItem"
+            type="com.frafio.myfinance.data.models.InvoiceItem" />
 
         <import type="com.frafio.myfinance.utils.FormatUtilsKt" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/recView_receiptItem_constraintLayout"
+        android:id="@+id/recView_invoiceItem_constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
@@ -24,11 +24,11 @@
         android:paddingVertical="10dp">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/recView_receiptItem_nomeTextView"
+            android:id="@+id/recView_invoiceItem_nomeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/nunito"
-            android:text="@{receiptItem.name}"
+            android:text="@{invoiceItem.name}"
             android:textAllCaps="true"
             android:textColor="@color/primary_text"
             android:textSize="16sp"
@@ -38,15 +38,15 @@
             tools:text="Acquisto" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/recView_receiptItem_priceTextView"
+            android:id="@+id/recView_invoiceItem_priceTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/nunito"
-            android:text="@{FormatUtilsKt.doubleToPrice(receiptItem.price)}"
+            android:text="@{FormatUtilsKt.doubleToPrice(invoiceItem.price)}"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@id/recView_receiptItem_nomeTextView"
+            app:layout_constraintBottom_toBottomOf="@id/recView_invoiceItem_nomeTextView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/recView_receiptItem_nomeTextView"
+            app:layout_constraintTop_toTopOf="@id/recView_invoiceItem_nomeTextView"
             tools:text="€ 0.00" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,14 +1,14 @@
-package com.frafio.myfinance.ui.home.list.receipt
+package com.frafio.myfinance.ui.home.list.invoice
 
 import android.view.View
 import androidx.lifecycle.ViewModel
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.PurchaseResult
-import com.frafio.myfinance.data.models.ReceiptItem
+import com.frafio.myfinance.data.models.InvoiceItem
 import com.frafio.myfinance.data.repositories.ReceiptRepository
 
-class ReceiptViewModel(
+class InvoiceViewModel(
     private val repository: ReceiptRepository,
 ) : ViewModel() {
     var purchaseID: String? = null
@@ -18,9 +18,9 @@ class ReceiptViewModel(
     var receiptName: String? = null
     var receiptPrice: String? = null
 
-    var listener: ReceiptListener? = null
+    var listener: InvoiceListener? = null
 
-    fun getOptions(): FirestoreRecyclerOptions<ReceiptItem> {
+    fun getOptions(): FirestoreRecyclerOptions<InvoiceItem> {
         return repository.getOptions(purchaseID!!)
     }
 
@@ -39,14 +39,14 @@ class ReceiptViewModel(
         }
 
         val price = receiptPrice!!.toDouble()
-        val item = ReceiptItem(receiptName, price)
+        val item = InvoiceItem(receiptName, price)
 
         val response = repository.addReceiptItem(item, purchaseID!!)
         listener?.onLoadSuccess(response)
     }
 
-    fun onDeleteClick(receiptItem: ReceiptItem) {
-        val response = repository.deleteReceiptItem(receiptItem, purchaseID!!)
+    fun onDeleteClick(invoiceItem: InvoiceItem) {
+        val response = repository.deleteReceiptItem(invoiceItem, purchaseID!!)
         listener?.onLoadSuccess(response)
     }
 }

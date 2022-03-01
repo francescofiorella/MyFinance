@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.frafio.myfinance.data.managers.AuthManager
 import com.frafio.myfinance.data.managers.PurchaseManager
-import com.frafio.myfinance.data.managers.ReceiptManager
+import com.frafio.myfinance.data.managers.InvoiceManager
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.ReceiptRepository
 import com.frafio.myfinance.data.repositories.UserRepository
@@ -13,7 +13,7 @@ import com.frafio.myfinance.ui.auth.AuthViewModelFactory
 import com.frafio.myfinance.ui.home.HomeViewModelFactory
 import com.frafio.myfinance.ui.home.dashboard.DashboardViewModelFactory
 import com.frafio.myfinance.ui.home.list.ListViewModelFactory
-import com.frafio.myfinance.ui.home.list.receipt.ReceiptViewModelFactory
+import com.frafio.myfinance.ui.home.list.invoice.InvoiceViewModelFactory
 import com.frafio.myfinance.ui.home.menu.MenuViewModelFactory
 import com.frafio.myfinance.ui.home.profile.ProfileViewModelFactory
 import com.frafio.myfinance.utils.getSharedDynamicColor
@@ -44,7 +44,7 @@ class MyFinanceApplication : Application(), KodeinAware {
         // managers
         bind() from singleton { AuthManager(sharedPreferences) }
         bind() from singleton { PurchaseManager(sharedPreferences) }
-        bind() from singleton { ReceiptManager(sharedPreferences) }
+        bind() from singleton { InvoiceManager(sharedPreferences) }
 
         // repositories
         bind() from singleton { UserRepository(instance()) }
@@ -60,7 +60,7 @@ class MyFinanceApplication : Application(), KodeinAware {
         bind() from provider {
             MenuViewModelFactory(instance())
         }
-        bind() from provider { ReceiptViewModelFactory(instance()) }
+        bind() from provider { InvoiceViewModelFactory(instance()) }
         bind() from provider { AddViewModelFactory(instance(), instance()) }
     }
 

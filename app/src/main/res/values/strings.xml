@@ -22,7 +22,7 @@
     <string name="purchase_delete_dialog">Do you want to delete the selected purchase?</string>
     <string name="purchase_edit_delete_dialog">Do you want to edit or delete the selected purchase?</string>
 
-    <string name="receipt_delete_dialog">Do you want to delete the selected item?</string>
+    <string name="invoice_delete_dialog">Do you want to delete the selected item?</string>
 
     <string name="name">Name</string>
     <string name="price">Price</string>

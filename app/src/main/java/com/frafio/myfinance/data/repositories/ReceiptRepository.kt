@@ -2,26 +2,26 @@ package com.frafio.myfinance.data.repositories
 
 import androidx.lifecycle.LiveData
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.frafio.myfinance.data.managers.ReceiptManager
+import com.frafio.myfinance.data.managers.InvoiceManager
 import com.frafio.myfinance.data.models.PurchaseResult
-import com.frafio.myfinance.data.models.ReceiptItem
+import com.frafio.myfinance.data.models.InvoiceItem
 
-class ReceiptRepository(private val receiptManager: ReceiptManager) {
+class ReceiptRepository(private val invoiceManager: InvoiceManager) {
 
-    fun getOptions(purchaseID: String): FirestoreRecyclerOptions<ReceiptItem> {
-        val query = receiptManager.getQuery(purchaseID)
+    fun getOptions(purchaseID: String): FirestoreRecyclerOptions<InvoiceItem> {
+        val query = invoiceManager.getQuery(purchaseID)
 
-        return FirestoreRecyclerOptions.Builder<ReceiptItem>().setQuery(
+        return FirestoreRecyclerOptions.Builder<InvoiceItem>().setQuery(
             query,
-            ReceiptItem::class.java
+            InvoiceItem::class.java
         ).build()
     }
 
-    fun addReceiptItem(receiptItem: ReceiptItem, purchaseID: String): LiveData<PurchaseResult> {
-        return receiptManager.addItem(receiptItem, purchaseID)
+    fun addReceiptItem(invoiceItem: InvoiceItem, purchaseID: String): LiveData<PurchaseResult> {
+        return invoiceManager.addItem(invoiceItem, purchaseID)
     }
 
-    fun deleteReceiptItem(receiptItem: ReceiptItem, purchaseID: String): LiveData<PurchaseResult> {
-        return receiptManager.deleteItem(receiptItem, purchaseID)
+    fun deleteReceiptItem(invoiceItem: InvoiceItem, purchaseID: String): LiveData<PurchaseResult> {
+        return invoiceManager.deleteItem(invoiceItem, purchaseID)
     }
 }

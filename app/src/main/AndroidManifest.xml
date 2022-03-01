@@ -17,7 +17,7 @@
         <activity
             android:name=".ui.add.AddActivity"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".ui.home.list.receipt.ReceiptActivity" />
+        <activity android:name=".ui.home.list.invoice.InvoiceActivity" />
         <activity android:name=".ui.auth.SignupActivity" />
         <activity android:name=".ui.auth.LoginActivity" />
         <activity

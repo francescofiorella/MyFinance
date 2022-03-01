@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home.list.receipt
+package com.frafio.myfinance.ui.home.list.invoice
 
 import android.os.Bundle
 import android.view.View
@@ -8,15 +8,15 @@ import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.PurchaseResult
-import com.frafio.myfinance.data.models.ReceiptItem
-import com.frafio.myfinance.databinding.ActivityReceiptBinding
+import com.frafio.myfinance.data.models.InvoiceItem
+import com.frafio.myfinance.databinding.ActivityInvoiceBinding
 import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.generic.instance
 
-class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptListener {
+class InvoiceActivity : BaseActivity(), InvoiceItemLongClickListener, InvoiceListener {
 
     companion object {
         const val INTENT_PURCHASE_ID = "com.frafio.myfinance.PURCHASE_ID"
@@ -24,16 +24,16 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
         const val INTENT_PURCHASE_PRICE = "com.frafio.myfinance.PURCHASE_PRICE"
     }
 
-    private lateinit var binding: ActivityReceiptBinding
-    private lateinit var viewModel: ReceiptViewModel
+    private lateinit var binding: ActivityInvoiceBinding
+    private lateinit var viewModel: InvoiceViewModel
 
-    private val factory: ReceiptViewModelFactory by instance()
+    private val factory: InvoiceViewModelFactory by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_receipt)
-        viewModel = ViewModelProvider(this, factory)[ReceiptViewModel::class.java]
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_invoice)
+        viewModel = ViewModelProvider(this, factory)[InvoiceViewModel::class.java]
         binding.viewModel = viewModel
 
         viewModel.listener = this
@@ -49,61 +49,61 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
             viewModel.purchasePrice = it
         }
 
-        binding.receiptRecView.also {
+        binding.invoiceRecView.also {
             it.setHasFixedSize(true)
-            it.adapter = ReceiptItemAdapter(viewModel.getOptions(), this)
+            it.adapter = InvoiceItemAdapter(viewModel.getOptions(), this)
         }
     }
 
     //start&stop listening
     override fun onStart() {
         super.onStart()
-        (binding.receiptRecView.adapter as ReceiptItemAdapter).startListening()
+        (binding.invoiceRecView.adapter as InvoiceItemAdapter).startListening()
     }
 
     override fun onStop() {
         super.onStop()
-        (binding.receiptRecView.adapter as ReceiptItemAdapter).stopListening()
+        (binding.invoiceRecView.adapter as InvoiceItemAdapter).stopListening()
     }
 
     // purchaseInteractionListener
-    override fun onItemLongClick(receiptItem: ReceiptItem) {
+    override fun onItemLongClick(invoiceItem: InvoiceItem) {
         val builder = MaterialAlertDialogBuilder(this)
         builder.setIcon(R.drawable.ic_delete)
-        builder.setTitle(receiptItem.name)
-        builder.setMessage(getString(R.string.receipt_delete_dialog))
+        builder.setTitle(invoiceItem.name)
+        builder.setMessage(getString(R.string.invoice_delete_dialog))
         builder.setNegativeButton(getString(R.string.cancel), null)
         builder.setPositiveButton(R.string.delete) { _, _ ->
-            viewModel.onDeleteClick(receiptItem)
+            viewModel.onDeleteClick(invoiceItem)
         }
         builder.show()
     }
 
     override fun onLoadStarted() {
-        binding.receiptProgressIndicator.show()
-        binding.receiptNameEditText.isEnabled = false
-        binding.receiptPriceEditText.isEnabled = false
+        binding.invoiceProgressIndicator.show()
+        binding.invoiceNameEditText.isEnabled = false
+        binding.invoicePriceEditText.isEnabled = false
     }
 
     override fun onLoadSuccess(response: LiveData<PurchaseResult>) {
         response.observe(this) { result ->
             when (result.code) {
-                PurchaseCode.RECEIPT_ADD_SUCCESS.code -> {
-                    snackBar(result.message, binding.receiptNameEditText)
-                    binding.receiptNameEditText.also {
+                PurchaseCode.INVOICE_ADD_SUCCESS.code -> {
+                    snackBar(result.message, binding.invoiceNameEditText)
+                    binding.invoiceNameEditText.also {
                         it.clearText()
                         it.isEnabled = true
                     }
-                    binding.receiptPriceEditText.also {
+                    binding.invoicePriceEditText.also {
                         it.clearText()
                         it.isEnabled = true
                     }
-                    binding.receiptProgressIndicator.hide()
+                    binding.invoiceProgressIndicator.hide()
                 }
 
                 else -> {
-                    snackBar(result.message, binding.receiptNameEditText)
-                    binding.receiptProgressIndicator.hide()
+                    snackBar(result.message, binding.invoiceNameEditText)
+                    binding.invoiceProgressIndicator.hide()
                 }
             }
         }
@@ -111,15 +111,15 @@ class ReceiptActivity : BaseActivity(), ReceiptItemLongClickListener, ReceiptLis
 
     override fun onLoadFailure(result: PurchaseResult) {
         when (result.code) {
-            PurchaseCode.EMPTY_NAME.code -> binding.receiptNameEditText.error = result.message
+            PurchaseCode.EMPTY_NAME.code -> binding.invoiceNameEditText.error = result.message
 
-            PurchaseCode.EMPTY_PRICE.code -> binding.receiptPriceEditText.error = result.message
+            PurchaseCode.EMPTY_PRICE.code -> binding.invoicePriceEditText.error = result.message
         }
 
-        binding.receiptNameEditText.isEnabled = true
-        binding.receiptPriceEditText.isEnabled = true
+        binding.invoiceNameEditText.isEnabled = true
+        binding.invoicePriceEditText.isEnabled = true
 
-        binding.receiptProgressIndicator.hide()
+        binding.invoiceProgressIndicator.hide()
     }
 
     fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {

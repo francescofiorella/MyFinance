@@ -82,25 +82,25 @@ enum class PurchaseCode(val code: Int, val message: String) {
         else -> "List not updated!" // english
     }),
 
-    RECEIPT_ADD_SUCCESS(100, when (getCurrentLanguage()) {
+    INVOICE_ADD_SUCCESS(100, when (getCurrentLanguage()) {
         Languages.ENGLISH.value -> "Item added!"
         Languages.ITALIANO.value -> "Voce aggiunta!"
         else -> "Item added!" // english
     }),
 
-    RECEIPT_ADD_FAILURE(102, when (getCurrentLanguage()) {
+    INVOICE_ADD_FAILURE(102, when (getCurrentLanguage()) {
         Languages.ENGLISH.value -> "Item not added!"
         Languages.ITALIANO.value -> "Voce non aggiunta!"
         else -> "Item not added!" // english
     }),
 
-    RECEIPT_DELETE_SUCCESS(103, when (getCurrentLanguage()) {
+    INVOICE_DELETE_SUCCESS(103, when (getCurrentLanguage()) {
         Languages.ENGLISH.value -> "Item deleted!"
         Languages.ITALIANO.value -> "Voce eliminata!"
         else -> "Item deleted!" // english
     }),
 
-    RECEIPT_DELETE_FAILURE(104, when (getCurrentLanguage()) {
+    INVOICE_DELETE_FAILURE(104, when (getCurrentLanguage()) {
         Languages.ENGLISH.value -> "Item not deleted!"
         Languages.ITALIANO.value -> "Voce non eliminata!"
         else -> "Item not deleted!" // english

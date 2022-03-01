@@ -20,13 +20,10 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.list.adapters.DialogPurchaseAdapter
-import com.frafio.myfinance.ui.home.list.adapters.PurchaseAdapter
 import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.ui.home.list.adapters.TotalAdapter
 import com.frafio.myfinance.ui.home.list.adapters.TotalInteractionListener
-import com.frafio.myfinance.ui.home.list.receipt.ReceiptActivity
-import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kodein.di.generic.instance
 
