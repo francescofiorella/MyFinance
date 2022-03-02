@@ -12,7 +12,6 @@ import com.frafio.myfinance.R
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 
-
 @Suppress("UNUSED")
 fun Activity.setFullScreenEnabled(enable: Boolean) {
     if (enable) {
