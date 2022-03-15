@@ -40,7 +40,7 @@ class HomeActivity : BaseActivity(), HomeListener {
     private lateinit var listFragment: ListFragment
     private lateinit var profileFragment: ProfileFragment
     private lateinit var menuFragment: MenuFragment
-    private lateinit var activeFragment: Fragment
+    private var activeFragment: Fragment? = null
 
     private val factory: HomeViewModelFactory by instance()
 
@@ -118,7 +118,7 @@ class HomeActivity : BaseActivity(), HomeListener {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(ACTIVE_FRAGMENT_KEY, activeFragment.tag)
+        activeFragment?.let { outState.putString(ACTIVE_FRAGMENT_KEY, it.tag) }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -159,12 +159,12 @@ class HomeActivity : BaseActivity(), HomeListener {
     }
 
     private val navBarListener = NavigationBarView.OnItemSelectedListener { item ->
-        navigateTo(item.itemId)
+        activeFragment?.let { navigateTo(item.itemId) }
         true
     }
 
     private val navDrawerListener = NavigationView.OnNavigationItemSelectedListener { item ->
-        navigateTo(item.itemId)
+        activeFragment?.let{ navigateTo(item.itemId) }
         true
     }
 
@@ -177,7 +177,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                 binding.propicImageView.instantShow()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment).show(dashboardFragment).commit()
+                    .hide(activeFragment!!).show(dashboardFragment).commit()
                 activeFragment = dashboardFragment
             }
 
@@ -188,7 +188,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                 binding.propicImageView.instantShow()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment).show(listFragment).commit()
+                    .hide(activeFragment!!).show(listFragment).commit()
                 activeFragment = listFragment
             }
 
@@ -198,7 +198,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                 binding.propicImageView.instantHide()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment).show(profileFragment).commit()
+                    .hide(activeFragment!!).show(profileFragment).commit()
                 activeFragment = profileFragment
             }
 
@@ -209,7 +209,7 @@ class HomeActivity : BaseActivity(), HomeListener {
                 binding.propicImageView.instantShow()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment).show(menuFragment).commit()
+                    .hide(activeFragment!!).show(menuFragment).commit()
                 activeFragment = menuFragment
             }
 
