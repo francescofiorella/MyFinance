@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.home.list.invoice
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.databinding.DataBindingUtil
@@ -19,9 +20,9 @@ import org.kodein.di.generic.instance
 class InvoiceActivity : BaseActivity(), InvoiceItemLongClickListener, InvoiceListener {
 
     companion object {
-        const val INTENT_PURCHASE_ID = "com.frafio.myfinance.PURCHASE_ID"
-        const val INTENT_PURCHASE_NAME = "com.frafio.myfinance.PURCHASE_NAME"
-        const val INTENT_PURCHASE_PRICE = "com.frafio.myfinance.PURCHASE_PRICE"
+        const val PURCHASE_ID_KEY = "com.frafio.myfinance.PURCHASE_ID"
+        const val PURCHASE_NAME_KEY = "com.frafio.myfinance.PURCHASE_NAME"
+        const val PURCHASE_PRICE_KEY = "com.frafio.myfinance.PURCHASE_PRICE"
     }
 
     private lateinit var binding: ActivityInvoiceBinding
@@ -39,31 +40,42 @@ class InvoiceActivity : BaseActivity(), InvoiceItemLongClickListener, InvoiceLis
         viewModel.listener = this
 
         // retrieve purchase data from intent
-        intent.getStringExtra(INTENT_PURCHASE_ID)?.let {
+        intent.getStringExtra(PURCHASE_ID_KEY)?.let {
             viewModel.purchaseID = it
         }
-        intent.getStringExtra(INTENT_PURCHASE_NAME)?.let {
+        intent.getStringExtra(PURCHASE_NAME_KEY)?.let {
             viewModel.purchaseName = it
         }
-        intent.getStringExtra(INTENT_PURCHASE_PRICE)?.let {
+        intent.getStringExtra(PURCHASE_PRICE_KEY)?.let {
             viewModel.purchasePrice = it
         }
 
-        binding.invoiceRecView.also {
-            it.setHasFixedSize(true)
-            it.adapter = InvoiceItemAdapter(viewModel.getOptions(), this)
+        viewModel.getInvoiceItems().observe(this) { invoiceItems ->
+            binding.invoiceRecView.also {
+                it.setHasFixedSize(true)
+                it.adapter = InvoiceItemAdapter(invoiceItems, this)
+            }
         }
     }
 
-    //start&stop listening
-    override fun onStart() {
-        super.onStart()
-        (binding.invoiceRecView.adapter as InvoiceItemAdapter).startListening()
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(PURCHASE_ID_KEY, viewModel.purchaseID)
+        outState.putString(PURCHASE_NAME_KEY, viewModel.purchaseName)
+        outState.putString(PURCHASE_PRICE_KEY, viewModel.purchasePrice)
     }
 
-    override fun onStop() {
-        super.onStop()
-        (binding.invoiceRecView.adapter as InvoiceItemAdapter).stopListening()
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        savedInstanceState.getString(PURCHASE_ID_KEY)?.let {
+            viewModel.purchaseID = it
+        }
+        savedInstanceState.getString(PURCHASE_NAME_KEY)?.let {
+            viewModel.purchaseName = it
+        }
+        savedInstanceState.getString(PURCHASE_PRICE_KEY)?.let {
+            viewModel.purchasePrice = it
+        }
     }
 
     // purchaseInteractionListener
@@ -85,11 +97,14 @@ class InvoiceActivity : BaseActivity(), InvoiceItemLongClickListener, InvoiceLis
         binding.invoicePriceEditText.isEnabled = false
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onLoadSuccess(response: LiveData<PurchaseResult>) {
         response.observe(this) { result ->
             when (result.code) {
                 PurchaseCode.INVOICE_ADD_SUCCESS.code -> {
                     snackBar(result.message, binding.invoiceNameEditText)
+                    (binding.invoiceRecView.adapter as InvoiceItemAdapter).notifyDataSetChanged()
+
                     binding.invoiceNameEditText.also {
                         it.clearText()
                         it.isEnabled = true
@@ -99,6 +114,11 @@ class InvoiceActivity : BaseActivity(), InvoiceItemLongClickListener, InvoiceLis
                         it.isEnabled = true
                     }
                     binding.invoiceProgressIndicator.hide()
+                }
+
+                PurchaseCode.INVOICE_DELETE_SUCCESS.code -> {
+                    snackBar(result.message, binding.invoiceNameEditText)
+                    (binding.invoiceRecView.adapter as InvoiceItemAdapter).notifyDataSetChanged()
                 }
 
                 else -> {

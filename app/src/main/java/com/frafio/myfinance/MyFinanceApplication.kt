@@ -6,7 +6,7 @@ import com.frafio.myfinance.data.managers.AuthManager
 import com.frafio.myfinance.data.managers.PurchaseManager
 import com.frafio.myfinance.data.managers.InvoiceManager
 import com.frafio.myfinance.data.repositories.PurchaseRepository
-import com.frafio.myfinance.data.repositories.ReceiptRepository
+import com.frafio.myfinance.data.repositories.InvoiceRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 import com.frafio.myfinance.ui.add.AddViewModelFactory
 import com.frafio.myfinance.ui.auth.AuthViewModelFactory
@@ -49,7 +49,7 @@ class MyFinanceApplication : Application(), KodeinAware {
         // repositories
         bind() from singleton { UserRepository(instance()) }
         bind() from singleton { PurchaseRepository(instance()) }
-        bind() from singleton { ReceiptRepository(instance()) }
+        bind() from singleton { InvoiceRepository(instance()) }
 
         // viewModelFactories
         bind() from provider { AuthViewModelFactory(instance()) }

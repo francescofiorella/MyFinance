@@ -71,11 +71,11 @@ class AddViewModel(
 
             val price = priceString!!.toDouble()
 
-            if (requestCode == AddActivity.INTENT_REQUEST_ADD_CODE) {
+            if (requestCode == AddActivity.REQUEST_ADD_CODE) {
                 val purchase = Purchase(userEmail, name, price, year, month, day, type)
                 val response = purchaseRepository.addPurchase(purchase)
                 listener?.onAddSuccess(response)
-            } else if (requestCode == AddActivity.INTENT_REQUEST_EDIT_CODE) {
+            } else if (requestCode == AddActivity.REQUEST_EDIT_CODE) {
                 val purchase =
                     Purchase(userEmail, name, price, year, month, day, purchaseType, purchaseID)
 

@@ -9,10 +9,10 @@ import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.DbReceipt
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.models.InvoiceItem
+import com.frafio.myfinance.data.storages.InvoiceItemStorage
 import com.frafio.myfinance.data.storages.UserStorage
 import com.frafio.myfinance.utils.getSharedCollection
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 
 class InvoiceManager(private val sharedPreferences: SharedPreferences) {
 
@@ -23,22 +23,42 @@ class InvoiceManager(private val sharedPreferences: SharedPreferences) {
     private val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
 
-    fun getQuery(purchaseID: String): Query {
-        return fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+    fun getInvoiceItems(purchaseID: String): LiveData<List<InvoiceItem>> {
+        val response = MutableLiveData<List<InvoiceItem>>()
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(getSharedCollection(sharedPreferences))
             .document(purchaseID).collection(DbReceipt.FIELDS.RECEIPT.value)
             .orderBy(DbReceipt.FIELDS.NAME.value)
+            .get().addOnSuccessListener { queryDocumentSnapshots ->
+                InvoiceItemStorage.setList(
+                    queryDocumentSnapshots.map { document ->
+                        document.toObject(InvoiceItem::class.java).also { it.id = document.id }
+                    }.toMutableList()
+                )
+                response.value = InvoiceItemStorage.getList()
+            }.addOnFailureListener { e ->
+                val error = "Error! ${e.localizedMessage}"
+                Log.e(TAG, error)
+
+                response.value = mutableListOf()
+            }
+        return response
     }
 
-    fun addItem(invoiceItem: InvoiceItem, purchaseID: String): LiveData<PurchaseResult> {
+    fun addItem(
+        invoiceItem: InvoiceItem,
+        purchaseID: String
+    ): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(getSharedCollection(sharedPreferences))
             .document(purchaseID).collection(DbReceipt.FIELDS.RECEIPT.value)
-            .add(invoiceItem).addOnSuccessListener {
+            .add(invoiceItem).addOnSuccessListener { document ->
+                invoiceItem.id = document.id
+                InvoiceItemStorage.addToList(invoiceItem)
                 response.value = PurchaseResult(PurchaseCode.INVOICE_ADD_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -48,7 +68,10 @@ class InvoiceManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun deleteItem(invoiceItem: InvoiceItem, purchaseID: String): LiveData<PurchaseResult> {
+    fun deleteItem(
+        invoiceItem: InvoiceItem,
+        purchaseID: String
+    ): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
@@ -56,6 +79,7 @@ class InvoiceManager(private val sharedPreferences: SharedPreferences) {
             .collection(getSharedCollection(sharedPreferences))
             .document(purchaseID).collection(DbReceipt.FIELDS.RECEIPT.value)
             .document(invoiceItem.id!!).delete().addOnSuccessListener {
+                InvoiceItemStorage.removeFromList(invoiceItem)
                 response.value = PurchaseResult(PurchaseCode.INVOICE_DELETE_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")

@@ -121,7 +121,7 @@
                     android:hint="@string/name"
                     android:inputType="text|textCapCharacters"
                     android:padding="15dp"
-                    android:text="@={viewModel.receiptName}" />
+                    android:text="@={viewModel.invoiceName}" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -147,7 +147,7 @@
                     android:hint="@string/price"
                     android:inputType="numberDecimal"
                     android:padding="15dp"
-                    android:text="@={viewModel.receiptPrice}" />
+                    android:text="@={viewModel.invoicePrice}" />
 
             </com.google.android.material.card.MaterialCardView>
 

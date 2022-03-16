@@ -23,18 +23,18 @@ import org.kodein.di.generic.instance
 class AddActivity : BaseActivity(), AddListener {
 
     companion object {
-        const val INTENT_REQUEST_CODE: String = "com.frafio.myfinance.REQUEST_CODE"
-        const val INTENT_REQUEST_ADD_CODE: Int = 1
-        const val INTENT_REQUEST_EDIT_CODE: Int = 2
-        const val INTENT_PURCHASE_REQUEST: String = "com.frafio.myfinance.PURCHASE_REQUEST"
-        const val INTENT_PURCHASE_ID: String = "com.frafio.myfinance.PURCHASE_ID"
-        const val INTENT_PURCHASE_NAME: String = "com.frafio.myfinance.PURCHASE_NAME"
-        const val INTENT_PURCHASE_PRICE: String = "com.frafio.myfinance.PURCHASE_PRICE"
-        const val INTENT_PURCHASE_TYPE: String = "com.frafio.myfinance.PURCHASE_TYPE"
-        const val INTENT_PURCHASE_POSITION: String = "com.frafio.myfinance.PURCHASE_POSITION"
-        const val INTENT_PURCHASE_YEAR: String = "com.frafio.myfinance.PURCHASE_YEAR"
-        const val INTENT_PURCHASE_MONTH: String = "com.frafio.myfinance.PURCHASE_MONTH"
-        const val INTENT_PURCHASE_DAY: String = "com.frafio.myfinance.PURCHASE_DAY"
+        const val REQUEST_ADD_CODE: Int = 1
+        const val REQUEST_EDIT_CODE: Int = 2
+        const val REQUEST_CODE_KEY: String = "com.frafio.myfinance.REQUEST_CODE"
+        const val PURCHASE_REQUEST_KEY: String = "com.frafio.myfinance.PURCHASE_REQUEST"
+        const val PURCHASE_ID_KEY: String = "com.frafio.myfinance.PURCHASE_ID"
+        const val PURCHASE_NAME_KEY: String = "com.frafio.myfinance.PURCHASE_NAME"
+        const val PURCHASE_PRICE_KEY: String = "com.frafio.myfinance.PURCHASE_PRICE"
+        const val PURCHASE_TYPE_KEY: String = "com.frafio.myfinance.PURCHASE_TYPE"
+        const val PURCHASE_POSITION_KEY: String = "com.frafio.myfinance.PURCHASE_POSITION"
+        const val PURCHASE_YEAR_KEY: String = "com.frafio.myfinance.PURCHASE_YEAR"
+        const val PURCHASE_MONTH_KEY: String = "com.frafio.myfinance.PURCHASE_MONTH"
+        const val PURCHASE_DAY_KEY: String = "com.frafio.myfinance.PURCHASE_DAY"
     }
 
     private lateinit var binding: ActivityAddBinding
@@ -53,7 +53,7 @@ class AddActivity : BaseActivity(), AddListener {
         binding.viewModel = viewModel
         viewModel.listener = this
 
-        intent.getIntExtra(INTENT_REQUEST_CODE, 0).also { code ->
+        intent.getIntExtra(REQUEST_CODE_KEY, 0).also { code ->
             viewModel.requestCode = code
             initLayout(code)
         }
@@ -156,37 +156,37 @@ class AddActivity : BaseActivity(), AddListener {
         binding.typeTextInputLayout.setEndIconOnClickListener(typeViewListener)
 
         when (code) {
-            INTENT_REQUEST_ADD_CODE -> {
+            REQUEST_ADD_CODE -> {
                 viewModel.type = DbPurchases.TYPES.GENERIC.value
             }
 
-            INTENT_REQUEST_EDIT_CODE -> {
+            REQUEST_EDIT_CODE -> {
                 intent.also { intent ->
-                    intent.getStringExtra(INTENT_PURCHASE_ID)?.let {
+                    intent.getStringExtra(PURCHASE_ID_KEY)?.let {
                         viewModel.purchaseID = it
                     }
-                    intent.getStringExtra(INTENT_PURCHASE_NAME)?.let {
+                    intent.getStringExtra(PURCHASE_NAME_KEY)?.let {
                         viewModel.name = it
                     }
-                    intent.getDoubleExtra(INTENT_PURCHASE_PRICE, 0.0)
+                    intent.getDoubleExtra(PURCHASE_PRICE_KEY, 0.0)
                         .also {
                             viewModel.priceString = doubleToString(it)
                             viewModel.purchasePrice = it
                         }
-                    intent.getIntExtra(INTENT_PURCHASE_TYPE, 0).also {
+                    intent.getIntExtra(PURCHASE_TYPE_KEY, 0).also {
                         viewModel.purchaseType = it
                     }
-                    intent.getIntExtra(INTENT_PURCHASE_POSITION, 0)
+                    intent.getIntExtra(PURCHASE_POSITION_KEY, 0)
                         .also {
                             viewModel.purchasePosition = it
                         }
-                    intent.getIntExtra(INTENT_PURCHASE_YEAR, 0).also {
+                    intent.getIntExtra(PURCHASE_YEAR_KEY, 0).also {
                         datePickerBtn.year = it
                     }
-                    intent.getIntExtra(INTENT_PURCHASE_MONTH, 0).also {
+                    intent.getIntExtra(PURCHASE_MONTH_KEY, 0).also {
                         datePickerBtn.month = it
                     }
-                    intent.getIntExtra(INTENT_PURCHASE_DAY, 0).also {
+                    intent.getIntExtra(PURCHASE_DAY_KEY, 0).also {
                         datePickerBtn.day = it
                     }
                 }
@@ -238,7 +238,7 @@ class AddActivity : BaseActivity(), AddListener {
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
-                        it.putExtra(INTENT_PURCHASE_REQUEST, true)
+                        it.putExtra(PURCHASE_REQUEST_KEY, true)
                         setResult(RESULT_OK, it)
                         finish()
                     }

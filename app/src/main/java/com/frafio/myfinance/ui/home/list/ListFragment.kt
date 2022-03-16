@@ -36,10 +36,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
 
-            val editRequest = data!!.getBooleanExtra(
-                AddActivity.INTENT_PURCHASE_REQUEST,
-                false
-            )
+            val editRequest = data!!.getBooleanExtra(AddActivity.PURCHASE_REQUEST_KEY, false)
 
             if (editRequest) {
                 viewModel.getPurchases()
@@ -81,12 +78,9 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         when (interactionID) {
             ON_CLICK -> {
                 Intent(context, InvoiceActivity::class.java).also {
-                    it.putExtra(AddActivity.INTENT_PURCHASE_ID, purchase.id)
-                    it.putExtra(AddActivity.INTENT_PURCHASE_NAME, purchase.name)
-                    it.putExtra(
-                        AddActivity.INTENT_PURCHASE_PRICE,
-                        doubleToPrice(purchase.price!!)
-                    )
+                    it.putExtra(InvoiceActivity.PURCHASE_ID_KEY, purchase.id)
+                    it.putExtra(InvoiceActivity.PURCHASE_NAME_KEY, purchase.name)
+                    it.putExtra(InvoiceActivity.PURCHASE_PRICE_KEY, doubleToPrice(purchase.price!!))
                     activity?.startActivity(it)
                 }
             }
@@ -102,42 +96,15 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                     builder.setMessage(getString(R.string.purchase_edit_delete_dialog))
                     builder.setNegativeButton(getString(R.string.edit)) { _, _ ->
                         Intent(context, AddActivity::class.java).also {
-                            it.putExtra(
-                                AddActivity.INTENT_REQUEST_CODE,
-                                AddActivity.INTENT_REQUEST_EDIT_CODE
-                            )
-                            it.putExtra(
-                                AddActivity.INTENT_PURCHASE_ID,
-                                purchase.id
-                            )
-                            it.putExtra(
-                                AddActivity.INTENT_PURCHASE_NAME,
-                                purchase.name
-                            )
-                            it.putExtra(
-                                AddActivity.INTENT_PURCHASE_PRICE,
-                                purchase.price
-                            )
-                            it.putExtra(
-                                AddActivity.INTENT_PURCHASE_TYPE,
-                                purchase.type
-                            )
-                            it.putExtra(
-                                AddActivity.INTENT_PURCHASE_POSITION,
-                                position
-                            )
-                            it.putExtra(
-                                AddActivity.INTENT_PURCHASE_YEAR,
-                                purchase.year
-                            )
-                            it.putExtra(
-                                AddActivity.INTENT_PURCHASE_MONTH,
-                                purchase.month
-                            )
-                            it.putExtra(
-                                AddActivity.INTENT_PURCHASE_DAY,
-                                purchase.day
-                            )
+                            it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
+                            it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
+                            it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
+                            it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
+                            it.putExtra(AddActivity.PURCHASE_TYPE_KEY, purchase.type)
+                            it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
+                            it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
+                            it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)
+                            it.putExtra(AddActivity.PURCHASE_DAY_KEY, purchase.day)
                             editResultLauncher.launch(it)
                         }
                     }

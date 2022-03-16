@@ -4,22 +4,20 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.InvoiceItem
 import com.frafio.myfinance.databinding.LayoutInvoiceItemRvBinding
 
 class InvoiceItemAdapter(
-    options: FirestoreRecyclerOptions<InvoiceItem>,
+    private var invoiceItems: List<InvoiceItem>,
     private val listener: InvoiceItemLongClickListener
-) : FirestoreRecyclerAdapter<InvoiceItem, InvoiceItemAdapter.InvoiceItemViewHolder>(options) {
+) : RecyclerView.Adapter<InvoiceItemAdapter.InvoiceItemViewHolder>() {
 
     inner class InvoiceItemViewHolder(
         val recyclerViewInvoiceItemBinding: LayoutInvoiceItemRvBinding
     ) : RecyclerView.ViewHolder(recyclerViewInvoiceItemBinding.root)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InvoiceItemViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         InvoiceItemViewHolder(
             DataBindingUtil.inflate(
                 LayoutInflater.from(parent.context),
@@ -29,18 +27,16 @@ class InvoiceItemAdapter(
             )
         )
 
-    override fun onBindViewHolder(
-        holder: InvoiceItemViewHolder,
-        position: Int,
-        model: InvoiceItem
-    ) {
-        holder.recyclerViewInvoiceItemBinding.invoiceItem = model
+    override fun onBindViewHolder(holder: InvoiceItemAdapter.InvoiceItemViewHolder, position: Int) {
+        holder.recyclerViewInvoiceItemBinding.invoiceItem = invoiceItems[position]
 
         holder.recyclerViewInvoiceItemBinding.root.setOnLongClickListener {
-            model.id = snapshots.getSnapshot(position).id
-            listener.onItemLongClick(model)
+            listener.onItemLongClick(invoiceItems[position])
             true
         }
     }
 
+    override fun getItemCount(): Int {
+        return invoiceItems.size
+    }
 }

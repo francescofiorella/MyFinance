@@ -59,7 +59,7 @@ class HomeActivity : BaseActivity(), HomeListener {
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
             val purchaseRequest =
-                data!!.getBooleanExtra(AddActivity.INTENT_PURCHASE_REQUEST, false)
+                data!!.getBooleanExtra(AddActivity.PURCHASE_REQUEST_KEY, false)
             if (purchaseRequest) {
                 showFragment(R.id.listFragment)
                 refreshFragmentData(dashboard = true, list = true, menu = true)
@@ -164,7 +164,7 @@ class HomeActivity : BaseActivity(), HomeListener {
     }
 
     private val navDrawerListener = NavigationView.OnNavigationItemSelectedListener { item ->
-        activeFragment?.let{ navigateTo(item.itemId) }
+        activeFragment?.let { navigateTo(item.itemId) }
         true
     }
 
@@ -235,8 +235,8 @@ class HomeActivity : BaseActivity(), HomeListener {
         ).also { activityOptionsCompat ->
             Intent(applicationContext, AddActivity::class.java).also {
                 it.putExtra(
-                    AddActivity.INTENT_REQUEST_CODE,
-                    AddActivity.INTENT_REQUEST_ADD_CODE
+                    AddActivity.REQUEST_CODE_KEY,
+                    AddActivity.REQUEST_ADD_CODE
                 )
                 addResultLauncher.launch(it, activityOptionsCompat)
             }

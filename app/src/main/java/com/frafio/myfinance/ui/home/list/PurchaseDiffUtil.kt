@@ -6,7 +6,7 @@ import com.frafio.myfinance.data.models.Purchase
 class PurchaseDiffUtil(
     private val oldPurchaseList: List<Purchase>,
     private val newPurchaseList: List<Purchase>
-): DiffUtil.Callback() {
+) : DiffUtil.Callback() {
     override fun getOldListSize(): Int {
         return oldPurchaseList.size
     }
@@ -21,8 +21,6 @@ class PurchaseDiffUtil(
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return when {
-            oldPurchaseList[oldItemPosition].id != newPurchaseList[newItemPosition].id -> false
-
             oldPurchaseList[oldItemPosition].email != newPurchaseList[newItemPosition].email -> false
 
             oldPurchaseList[oldItemPosition].name != newPurchaseList[newItemPosition].name -> false
