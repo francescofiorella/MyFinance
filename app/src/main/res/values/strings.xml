@@ -53,7 +53,6 @@
     <string name="logout">Log Out</string>
     <string name="profile_picture">Profile Picture</string>
 
-    <string name="card_dimension_ratio" translatable="false">1.2:1</string>
     <string name="back_arrow" translatable="false">Back Arrow</string>
     <string name="trend_avg_day">Daily Average Trend</string>
     <string name="show_2020_2021">Show 2020/2021</string>

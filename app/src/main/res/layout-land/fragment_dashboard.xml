@@ -80,457 +80,390 @@
                 android:visibility="@{viewModel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
                 tools:visibility="visible">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="0"
                     android:layout_column="0"
                     android:layout_columnWeight="1"
+                    android:layout_marginStart="@dimen/card_half_margin"
+                    android:layout_marginEnd="@dimen/card_half_margin"
+                    android:layout_marginBottom="@dimen/card_half_margin"
                     android:clipToPadding="false"
-                    android:paddingTop="@dimen/fragment_margin_top">
+                    android:paddingTop="@dimen/fragment_margin_top"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/materialCardView"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginHorizontal="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/card_half_margin"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingHorizontal="25dp"
-                            android:paddingVertical="20dp">
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/dayAvg_TV_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/avg_day"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/textView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito"
-                                android:text="@string/avg_day"
-                                android:textSize="@dimen/card_title_size"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/dayAvg_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/card_text_space"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:text="@{viewModel.dayAvgString}"
+                            android:textColor="@color/primary_text"
+                            android:textSize="@dimen/card_price_size"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/dayAvg_TV_title"
+                            tools:text="€ 0.00" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/dayAvg_TV"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito_semibold"
-                                android:maxLines="1"
-                                android:text="@{viewModel.dayAvgString}"
-                                android:textColor="@color/primary_text"
-                                android:textSize="@dimen/card_price_size"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                tools:text="€ 0.00" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    </com.google.android.material.card.MaterialCardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="0"
                     android:layout_column="1"
                     android:layout_columnWeight="1"
+                    android:layout_marginStart="@dimen/card_half_margin"
+                    android:layout_marginEnd="@dimen/card_half_margin"
+                    android:layout_marginBottom="@dimen/card_half_margin"
                     android:clipToPadding="false"
-                    android:paddingTop="@dimen/fragment_margin_top">
+                    android:paddingTop="@dimen/fragment_margin_top"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/materialCardView2"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginHorizontal="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/card_half_margin"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingHorizontal="25dp"
-                            android:paddingVertical="20dp">
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/monthAvg_TV_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/avg_month"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/textView2"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito"
-                                android:text="@string/avg_month"
-                                android:textSize="@dimen/card_title_size"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/monthAvg_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/card_text_space"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:text="@{viewModel.monthAvgString}"
+                            android:textColor="@color/primary_text"
+                            android:textSize="@dimen/card_price_size"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/monthAvg_TV_title"
+                            tools:text="€ 0.00" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/monthAvg_TV"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito_semibold"
-                                android:maxLines="1"
-                                android:text="@{viewModel.monthAvgString}"
-                                android:textColor="@color/primary_text"
-                                android:textSize="@dimen/card_price_size"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                tools:text="€ 0.00" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    </com.google.android.material.card.MaterialCardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView3"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="0"
                     android:layout_column="2"
                     android:layout_columnWeight="1"
+                    android:layout_marginStart="@dimen/card_half_margin"
+                    android:layout_marginEnd="@dimen/card_half_margin"
+                    android:layout_marginBottom="@dimen/card_half_margin"
                     android:clipToPadding="false"
-                    android:paddingTop="@dimen/fragment_margin_top">
+                    android:paddingTop="@dimen/fragment_margin_top"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/materialCardView3"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginHorizontal="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/card_half_margin"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingHorizontal="25dp"
-                            android:paddingVertical="20dp">
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/todayTot_TV_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/today"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/textView3"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito"
-                                android:text="@string/today"
-                                android:textSize="@dimen/card_title_size"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/todayTot_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/card_text_space"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:text="@{viewModel.todayTotString}"
+                            android:textColor="@color/primary_text"
+                            android:textSize="@dimen/card_price_size"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/todayTot_TV_title"
+                            tools:text="€ 0.00" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/todayTot_TV"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito_semibold"
-                                android:maxLines="1"
-                                android:text="@{viewModel.todayTotString}"
-                                android:textColor="@color/primary_text"
-                                android:textSize="@dimen/card_price_size"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                tools:text="€ 0.00" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    </com.google.android.material.card.MaterialCardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView5"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="0"
                     android:layout_column="3"
                     android:layout_columnWeight="1"
+                    android:layout_marginStart="@dimen/card_half_margin"
+                    android:layout_marginEnd="@dimen/card_half_margin"
+                    android:layout_marginBottom="@dimen/card_half_margin"
                     android:clipToPadding="false"
-                    android:paddingTop="@dimen/fragment_margin_top">
+                    android:paddingTop="@dimen/fragment_margin_top"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/materialCardView5"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginHorizontal="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/card_half_margin"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingHorizontal="25dp"
-                            android:paddingVertical="20dp">
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/numTot_TV_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/this_month"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/textView5"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito"
-                                android:text="@string/this_month"
-                                android:textSize="@dimen/card_title_size"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/numTot_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/card_text_space"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:text="@{viewModel.lastMonthString}"
+                            android:textColor="@color/primary_text"
+                            android:textSize="@dimen/card_price_size"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/numTot_TV_title"
+                            tools:text="€ 0.00" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/numTot_TV"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito_semibold"
-                                android:maxLines="1"
-                                android:text="@{viewModel.lastMonthString}"
-                                android:textColor="@color/primary_text"
-                                android:textSize="@dimen/card_price_size"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                tools:text="€ 0.00" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    </com.google.android.material.card.MaterialCardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView4"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="1"
                     android:layout_column="0"
-                    android:layout_columnWeight="1">
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="@dimen/card_half_margin"
+                    android:layout_marginTop="@dimen/card_half_margin"
+                    android:layout_marginEnd="@dimen/card_half_margin"
+                    android:layout_marginBottom="@dimen/dashboard_bottom_margin"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/materialCardView4"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginHorizontal="@dimen/card_half_margin"
-                        android:layout_marginTop="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/dashboard_bottom_margin"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingHorizontal="25dp"
-                            android:paddingVertical="20dp">
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/tot_TV_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/total"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/textView4"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito"
-                                android:text="@string/total"
-                                android:textSize="@dimen/card_title_size"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/tot_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/card_text_space"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:text="@{viewModel.totString}"
+                            android:textColor="@color/primary_text"
+                            android:textSize="@dimen/card_price_size"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/tot_TV_title"
+                            tools:text="€ 0.00" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/tot_TV"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito_semibold"
-                                android:maxLines="1"
-                                android:text="@{viewModel.totString}"
-                                android:textColor="@color/primary_text"
-                                android:textSize="@dimen/card_price_size"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                tools:text="€ 0.00" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    </com.google.android.material.card.MaterialCardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView6"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="1"
                     android:layout_column="1"
-                    android:layout_columnWeight="1">
+                    android:layout_columnWeight="1"
+                    android:layout_marginHorizontal="@dimen/card_half_margin"
+                    android:layout_marginTop="@dimen/card_half_margin"
+                    android:layout_marginBottom="@dimen/dashboard_bottom_margin"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/materialCardView6"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginHorizontal="@dimen/card_half_margin"
-                        android:layout_marginTop="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/dashboard_bottom_margin"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingHorizontal="25dp"
-                            android:paddingVertical="20dp">
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/ticketTot_TV_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/total_rent"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/textView6"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito"
-                                android:text="@string/total_rent"
-                                android:textSize="@dimen/card_title_size"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/ticketTot_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/card_text_space"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:text="@{viewModel.rentTotString}"
+                            android:textColor="@color/primary_text"
+                            android:textSize="@dimen/card_price_size"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/ticketTot_TV_title"
+                            tools:text="€ 0.00" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/ticketTot_TV"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito_semibold"
-                                android:maxLines="1"
-                                android:text="@{viewModel.rentTotString}"
-                                android:textColor="@color/primary_text"
-                                android:textSize="@dimen/card_price_size"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                tools:text="€ 0.00" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    </com.google.android.material.card.MaterialCardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView7"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="1"
                     android:layout_column="2"
-                    android:layout_columnWeight="1">
+                    android:layout_columnWeight="1"
+                    android:layout_marginHorizontal="@dimen/card_half_margin"
+                    android:layout_marginTop="@dimen/card_half_margin"
+                    android:layout_marginBottom="@dimen/dashboard_bottom_margin"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/materialCardView7"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginHorizontal="@dimen/card_half_margin"
-                        android:layout_marginTop="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/dashboard_bottom_margin"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingHorizontal="25dp"
-                            android:paddingVertical="20dp">
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/trenTot_TV_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/total_shopping"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/textView7"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito"
-                                android:text="@string/total_shopping"
-                                android:textSize="@dimen/card_title_size"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/trenTot_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/card_text_space"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:text="@{viewModel.shoppingTotString}"
+                            android:textColor="@color/primary_text"
+                            android:textSize="@dimen/card_price_size"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/trenTot_TV_title"
+                            tools:text="€ 0.00" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/trenTot_TV"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito_semibold"
-                                android:maxLines="1"
-                                android:text="@{viewModel.shoppingTotString}"
-                                android:textColor="@color/primary_text"
-                                android:textSize="@dimen/card_price_size"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                tools:text="€ 0.00" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    </com.google.android.material.card.MaterialCardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView8"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="1"
                     android:layout_column="3"
-                    android:layout_columnWeight="1">
+                    android:layout_columnWeight="1"
+                    android:layout_marginHorizontal="@dimen/card_half_margin"
+                    android:layout_marginTop="@dimen/card_half_margin"
+                    android:layout_marginBottom="@dimen/dashboard_bottom_margin"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/materialCardView8"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginHorizontal="@dimen/card_half_margin"
-                        android:layout_marginTop="@dimen/card_half_margin"
-                        android:layout_marginBottom="@dimen/dashboard_bottom_margin"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="@string/card_dimension_ratio"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingHorizontal="25dp"
-                            android:paddingVertical="20dp">
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/amTot_TV_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/total_transport"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/textView8"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito"
-                                android:text="@string/total_transport"
-                                android:textSize="@dimen/card_title_size"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/amTot_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/card_text_space"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:text="@{viewModel.transportTotString}"
+                            android:textColor="@color/primary_text"
+                            android:textSize="@dimen/card_price_size"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/amTot_TV_title"
+                            tools:text="0" />
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/amTot_TV"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito_semibold"
-                                android:maxLines="1"
-                                android:text="@{viewModel.transportTotString}"
-                                android:textColor="@color/primary_text"
-                                android:textSize="@dimen/card_price_size"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                tools:text="0" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
             </GridLayout>
 

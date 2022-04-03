@@ -48,4 +48,8 @@ class UserRepository(private val authManager: AuthManager) {
     fun updateUserData(): LiveData<AuthResult> {
         return authManager.updateUserData()
     }
+
+    fun isDynamicColorOn(): Boolean {
+        return authManager.isDynamicColorOn()
+    }
 }

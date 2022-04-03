@@ -25,4 +25,8 @@ class HomeViewModel(
         val logoutResponse = userRepository.userLogout()
         listener?.onLogOutSuccess(logoutResponse)
     }
+
+    fun isDynamicColorOn(): Boolean {
+        return userRepository.isDynamicColorOn()
+    }
 }

@@ -26,6 +26,7 @@ import com.frafio.myfinance.ui.home.profile.ProfileFragment
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.snackBar
+import com.google.android.material.color.DynamicColors
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -100,6 +101,10 @@ class HomeActivity : BaseActivity(), HomeListener {
         binding.viewModel = viewModel
 
         if (savedInstanceState == null) {
+            if (viewModel.isDynamicColorOn()) {
+                DynamicColors.applyToActivityIfAvailable(this)
+            }
+
             if (userRequest) {
                 showProgressIndicator()
                 viewModel.updateUserData()

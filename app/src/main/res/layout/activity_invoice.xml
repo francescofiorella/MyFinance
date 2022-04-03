@@ -77,9 +77,9 @@
             android:layout_height="0dp"
             android:layout_marginHorizontal="10dp"
             android:layout_marginTop="@dimen/title_margin_bottom"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="20dp"
             app:cardCornerRadius="@dimen/card_corner_radius"
-            app:layout_constraintBottom_toTopOf="@id/invoice_addLayout"
+            app:layout_constraintBottom_toTopOf="@+id/invoice_name_card"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/invoice_purchaseTitle">
@@ -94,78 +94,70 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/invoice_addLayout"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/invoice_name_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:layout_margin="10dp"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:layout_constraintBottom_toTopOf="@id/invoice_price_card"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/invoice_name_card"
+            <EditText
+                android:id="@+id/invoice_name_EditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:layout_constraintBottom_toTopOf="@id/invoice_price_card"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:autofillHints="none"
+                android:background="@android:color/transparent"
+                android:fontFamily="@font/nunito"
+                android:hint="@string/name"
+                android:inputType="text|textCapCharacters"
+                android:padding="15dp"
+                android:text="@={viewModel.invoiceName}" />
 
-                <EditText
-                    android:id="@+id/invoice_name_EditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:autofillHints="none"
-                    android:background="@android:color/transparent"
-                    android:fontFamily="@font/nunito"
-                    android:hint="@string/name"
-                    android:inputType="text|textCapCharacters"
-                    android:padding="15dp"
-                    android:text="@={viewModel.invoiceName}" />
+        </com.google.android.material.card.MaterialCardView>
 
-            </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/invoice_price_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:layout_constraintBottom_toBottomOf="@+id/invoice_addBtn"
+            app:layout_constraintEnd_toStartOf="@+id/invoice_addBtn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/invoice_addBtn">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/invoice_price_card"
-                android:layout_width="0dp"
+            <EditText
+                android:id="@+id/invoice_price_EditText"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:layout_constraintBottom_toBottomOf="@+id/invoice_addBtn"
-                app:layout_constraintEnd_toStartOf="@+id/invoice_addBtn"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/invoice_addBtn">
+                android:autofillHints="none"
+                android:background="@android:color/transparent"
+                android:drawableEnd="@drawable/ic_euro"
+                android:fontFamily="@font/nunito"
+                android:hint="@string/price"
+                android:inputType="numberDecimal"
+                android:padding="15dp"
+                android:text="@={viewModel.invoicePrice}" />
 
-                <EditText
-                    android:id="@+id/invoice_price_EditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:autofillHints="none"
-                    android:background="@android:color/transparent"
-                    android:drawableEnd="@drawable/ic_euro"
-                    android:fontFamily="@font/nunito"
-                    android:hint="@string/price"
-                    android:inputType="numberDecimal"
-                    android:padding="15dp"
-                    android:text="@={viewModel.invoicePrice}" />
+        </com.google.android.material.card.MaterialCardView>
 
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/invoice_addBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:fontFamily="@font/nunito_semibold"
-                android:onClick="@{viewModel::onAddButtonClick}"
-                android:text="@string/add"
-                app:icon="@drawable/ic_add"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/invoice_addBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/nunito_semibold"
+            android:onClick="@{viewModel::onAddButtonClick}"
+            android:text="@string/add"
+            app:icon="@drawable/ic_add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -13,6 +13,7 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
 import com.frafio.myfinance.utils.getSharedCollection
+import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedCollection
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
@@ -246,5 +247,9 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
             .get().addOnSuccessListener { queryDocumentSnapshots ->
                 PurchaseStorage.existLastYear = !queryDocumentSnapshots.isEmpty
             }
+    }
+
+    fun isDynamicColorOn(): Boolean {
+        return getSharedDynamicColor(sharedPreferences)
     }
 }
