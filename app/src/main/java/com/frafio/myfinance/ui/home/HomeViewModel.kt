@@ -1,12 +1,13 @@
 package com.frafio.myfinance.ui.home
 
+import android.app.Application
 import android.view.View
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.repositories.UserRepository
 
-class HomeViewModel(
-    private val userRepository: UserRepository
-) : ViewModel() {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
+    private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
     var listener: HomeListener? = null
 
     fun checkUser() {

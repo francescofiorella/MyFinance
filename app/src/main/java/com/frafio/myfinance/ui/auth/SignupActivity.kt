@@ -3,29 +3,25 @@ package com.frafio.myfinance.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivitySignupBinding
-import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.snackBar
-import org.kodein.di.generic.instance
 
-class SignupActivity : BaseActivity(), AuthListener {
+class SignupActivity : AppCompatActivity(), AuthListener {
 
     private lateinit var binding: ActivitySignupBinding
-    private lateinit var viewModel: AuthViewModel
-
-    private val factory: AuthViewModelFactory by instance()
+    private val viewModel by viewModels<AuthViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_signup)
-        viewModel = ViewModelProvider(this, factory)[AuthViewModel::class.java]
         binding.viewModel = viewModel
 
         viewModel.authListener = this

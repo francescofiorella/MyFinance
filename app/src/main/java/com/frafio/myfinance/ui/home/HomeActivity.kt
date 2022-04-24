@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
@@ -11,12 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityHomeBinding
-import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.ui.home.dashboard.DashboardFragment
@@ -30,20 +30,17 @@ import com.google.android.material.color.DynamicColors
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import org.kodein.di.generic.instance
 
-class HomeActivity : BaseActivity(), HomeListener {
+class HomeActivity : AppCompatActivity(), HomeListener {
 
     private lateinit var binding: ActivityHomeBinding
-    private lateinit var viewModel: HomeViewModel
+    private val viewModel by viewModels<HomeViewModel>()
 
     private lateinit var dashboardFragment: DashboardFragment
     private lateinit var listFragment: ListFragment
     private lateinit var profileFragment: ProfileFragment
     private lateinit var menuFragment: MenuFragment
     private var activeFragment: Fragment? = null
-
-    private val factory: HomeViewModelFactory by instance()
 
     private var userRequest: Boolean = false
     var isLayoutReady: Boolean = false
@@ -96,7 +93,6 @@ class HomeActivity : BaseActivity(), HomeListener {
         }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
-        viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
         viewModel.listener = this
         binding.viewModel = viewModel
 

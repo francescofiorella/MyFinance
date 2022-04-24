@@ -1,15 +1,16 @@
 package com.frafio.myfinance.ui.auth
 
+import android.app.Application
 import android.content.Intent
 import android.view.View
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.repositories.UserRepository
 
-class AuthViewModel(
-    private val userRepository: UserRepository
-) : ViewModel() {
+class AuthViewModel(application: Application) : AndroidViewModel(application) {
+    private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
 
     var email: String? = null
     var password: String? = null

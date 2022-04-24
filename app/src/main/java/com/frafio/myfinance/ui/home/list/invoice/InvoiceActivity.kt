@@ -3,21 +3,20 @@ package com.frafio.myfinance.ui.home.list.invoice
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.models.InvoiceItem
 import com.frafio.myfinance.databinding.ActivityInvoiceBinding
-import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.kodein.di.generic.instance
 
-class InvoiceActivity : BaseActivity(), InvoiceItemLongClickListener, InvoiceListener {
+class InvoiceActivity : AppCompatActivity(), InvoiceItemLongClickListener, InvoiceListener {
 
     companion object {
         const val PURCHASE_ID_KEY = "com.frafio.myfinance.PURCHASE_ID"
@@ -26,15 +25,12 @@ class InvoiceActivity : BaseActivity(), InvoiceItemLongClickListener, InvoiceLis
     }
 
     private lateinit var binding: ActivityInvoiceBinding
-    private lateinit var viewModel: InvoiceViewModel
-
-    private val factory: InvoiceViewModelFactory by instance()
+    private val viewModel by viewModels<InvoiceViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_invoice)
-        viewModel = ViewModelProvider(this, factory)[InvoiceViewModel::class.java]
         binding.viewModel = viewModel
 
         viewModel.listener = this

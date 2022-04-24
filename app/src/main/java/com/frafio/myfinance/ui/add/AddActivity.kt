@@ -4,23 +4,22 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.DatePickerButton
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
-import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.kodein.di.generic.instance
 
-class AddActivity : BaseActivity(), AddListener {
+class AddActivity : AppCompatActivity(), AddListener {
 
     companion object {
         const val REQUEST_ADD_CODE: Int = 1
@@ -38,9 +37,7 @@ class AddActivity : BaseActivity(), AddListener {
     }
 
     private lateinit var binding: ActivityAddBinding
-    private lateinit var viewModel: AddViewModel
-
-    private val factory: AddViewModelFactory by instance()
+    private val viewModel by viewModels<AddViewModel>()
 
     // custom datePicker layout
     private lateinit var datePickerBtn: DatePickerButton
@@ -49,7 +46,6 @@ class AddActivity : BaseActivity(), AddListener {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add)
-        viewModel = ViewModelProvider(this, factory)[AddViewModel::class.java]
         binding.viewModel = viewModel
         viewModel.listener = this
 

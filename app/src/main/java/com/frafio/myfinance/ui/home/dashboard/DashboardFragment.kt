@@ -5,18 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import com.frafio.myfinance.R
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
 import com.frafio.myfinance.ui.BaseFragment
-import org.kodein.di.generic.instance
 
 class DashboardFragment : BaseFragment() {
-
     private lateinit var binding: FragmentDashboardBinding
-    private lateinit var viewModel: DashboardViewModel
-
-    private val factory: DashboardViewModelFactory by instance()
+    private val viewModel by viewModels<DashboardViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -24,7 +20,6 @@ class DashboardFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
-        viewModel = ViewModelProvider(this, factory)[DashboardViewModel::class.java]
 
         viewModel.getStats()
 

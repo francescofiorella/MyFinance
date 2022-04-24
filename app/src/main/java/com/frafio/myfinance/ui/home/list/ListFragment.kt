@@ -8,29 +8,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentListBinding
-import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.BaseFragment
+import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.ui.home.list.invoice.InvoiceActivity
 import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.kodein.di.generic.instance
 
 class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener {
 
     private lateinit var binding: FragmentListBinding
-    private lateinit var viewModel: ListViewModel
-
-    private val factory: ListViewModelFactory by instance()
+    private val viewModel by viewModels<ListViewModel>()
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -52,7 +49,6 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false)
-        viewModel = ViewModelProvider(this, factory)[ListViewModel::class.java]
 
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner

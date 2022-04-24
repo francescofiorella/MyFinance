@@ -5,26 +5,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
+import androidx.fragment.app.viewModels
 import com.frafio.myfinance.databinding.FragmentProfileBinding
 import com.frafio.myfinance.ui.BaseFragment
-import org.kodein.di.generic.instance
 
 class ProfileFragment : BaseFragment() {
 
-    private lateinit var viewModel: ProfileViewModel
-
-    private val factory: ProfileViewModelFactory by instance()
+    private val viewModel by viewModels<ProfileViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding: FragmentProfileBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_profile, container, false)
-        viewModel = ViewModelProvider(this, factory)[ProfileViewModel::class.java]
+        val binding: FragmentProfileBinding = DataBindingUtil
+            .inflate(inflater, R.layout.fragment_profile, container, false)
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 

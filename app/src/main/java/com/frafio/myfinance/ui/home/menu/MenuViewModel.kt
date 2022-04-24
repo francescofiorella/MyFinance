@@ -1,14 +1,18 @@
 package com.frafio.myfinance.ui.home.menu
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.BuildConfig
+import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.google.android.material.color.DynamicColors
 
-class MenuViewModel(
-    private val purchaseRepository: PurchaseRepository
-) : ViewModel() {
+class MenuViewModel(application: Application) : AndroidViewModel(application) {
+    private val purchaseRepository = PurchaseRepository(
+        (application as MyFinanceApplication).purchaseManager
+    )
+
     var listener: MenuListener? = null
 
     var isSwitchCollectionChecked: Boolean = getCollectionCheck()

@@ -1,11 +1,17 @@
 package com.frafio.myfinance.ui.home.dashboard
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 
-class DashboardViewModel(private val purchaseRepository: PurchaseRepository) : ViewModel() {
+class DashboardViewModel(application: Application) : AndroidViewModel(application) {
+    private val purchaseRepository = PurchaseRepository(
+        (application as MyFinanceApplication).purchaseManager
+    )
+
     private val _purchaseListSize = MutableLiveData<Int>()
     val purchaseListSize: LiveData<Int>
         get() = _purchaseListSize

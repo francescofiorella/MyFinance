@@ -4,22 +4,21 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityLoginBinding
-import com.frafio.myfinance.ui.BaseActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import org.kodein.di.generic.instance
 
-class LoginActivity : BaseActivity(), AuthListener {
+class LoginActivity : AppCompatActivity(), AuthListener {
 
     companion object {
         const val INTENT_USER_REQUEST: String = "com.frafio.myfinance.USER_REQUEST"
@@ -30,12 +29,10 @@ class LoginActivity : BaseActivity(), AuthListener {
     private lateinit var binding: ActivityLoginBinding
 
     // viewModel
-    private lateinit var viewModel: AuthViewModel
+    private val viewModel by viewModels<AuthViewModel>()
 
     // login Google
     private lateinit var mGoogleSignInClient: GoogleSignInClient
-
-    private val factory: AuthViewModelFactory by instance()
 
     private val googleSignInResultLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
@@ -54,7 +51,6 @@ class LoginActivity : BaseActivity(), AuthListener {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
-        viewModel = ViewModelProvider(this, factory)[AuthViewModel::class.java]
         binding.viewModel = viewModel
 
         viewModel.authListener = this

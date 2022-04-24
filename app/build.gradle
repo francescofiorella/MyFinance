@@ -53,13 +53,10 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
     implementation 'androidx.activity:activity-ktx:1.4.0'
+    implementation 'androidx.fragment:fragment-ktx:1.4.1'
 
     // SplashScreen API
     implementation 'androidx.core:core-splashscreen:1.0.0-beta02'
-
-    // Kodein Dependency Injection
-    implementation 'org.kodein.di:kodein-di-generic-jvm:6.5.5'
-    implementation 'org.kodein.di:kodein-di-framework-android-x:6.5.5'
 
     // Firebase libraries
     implementation platform('com.google.firebase:firebase-bom:27.1.0')

@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.PurchaseResult
@@ -18,14 +18,11 @@ import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.setValueLineChartData
-import org.kodein.di.generic.instance
 
 class MenuFragment : BaseFragment(), MenuListener {
 
-    private lateinit var viewModel: MenuViewModel
+    private val viewModel by viewModels<MenuViewModel>()
     private lateinit var binding: FragmentMenuBinding
-
-    private val factory: MenuViewModelFactory by instance()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,7 +30,6 @@ class MenuFragment : BaseFragment(), MenuListener {
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_menu, container, false)
-        viewModel = ViewModelProvider(this, factory)[MenuViewModel::class.java]
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 

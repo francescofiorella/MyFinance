@@ -75,11 +75,6 @@ open class DatePickerButton(
         textView.setOnClickListener(listener)
     }
 
-    private fun removeOnClickListener() {
-        layout.setEndIconOnClickListener(listener)
-        textView.setOnClickListener(null)
-    }
-
     private fun showDatePicker(materialDatePicker: MaterialDatePicker<*>) {
         if (!materialDatePicker.isAdded) {
             materialDatePicker.show(context.supportFragmentManager, DATE_PICKER_TAG)

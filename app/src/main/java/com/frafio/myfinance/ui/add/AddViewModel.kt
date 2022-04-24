@@ -1,7 +1,9 @@
 package com.frafio.myfinance.ui.add
 
+import android.app.Application
 import android.view.View
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.DatePickerButton
@@ -11,10 +13,12 @@ import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 import java.time.LocalDate
 
-class AddViewModel(
-    private val userRepository: UserRepository,
-    private val purchaseRepository: PurchaseRepository
-) : ViewModel() {
+class AddViewModel(application: Application) : AndroidViewModel(application) {
+    private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
+    private val purchaseRepository = PurchaseRepository(
+        (application as MyFinanceApplication).purchaseManager
+    )
+
     var listener: AddListener? = null
 
     var name: String? = null
@@ -53,7 +57,8 @@ class AddViewModel(
         }
 
         if ((name == DbPurchases.NAMES.TOTAL.value_en || name == DbPurchases.NAMES.TOTAL.value_it)
-            && type != DbPurchases.TYPES.TOTAL.value) {
+            && type != DbPurchases.TYPES.TOTAL.value
+        ) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.WRONG_NAME_TOTAL))
             return
         }
