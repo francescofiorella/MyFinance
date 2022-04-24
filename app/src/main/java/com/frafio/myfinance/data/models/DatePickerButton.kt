@@ -27,12 +27,13 @@ open class DatePickerButton(
 
     val listener = View.OnClickListener {
         // date picker
-        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        calendar.clear()
-        val today = MaterialDatePicker.todayInUtcMilliseconds()
+        val calendar = Calendar.getInstance()
+        if (year != null && month != null && day != null) {
+            calendar.set(year!!, month!! - 1, day!!)
+        }
         val builder = MaterialDatePicker.Builder.datePicker()
         builder.setTitleText(DATE_PICKER_TITLE)
-        builder.setSelection(today)
+        builder.setSelection(calendar.timeInMillis)
         val materialDatePicker = builder.build()
 
         showDatePicker(materialDatePicker)
