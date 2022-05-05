@@ -29,6 +29,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
 
     override fun onAuthStarted() {
         binding.signupProgressIndicator.show()
+        binding.signupButton.isEnabled = false
 
         binding.signupNameInputLayout.isErrorEnabled = false
         binding.signupEmailInputLayout.isErrorEnabled = false
@@ -40,6 +41,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
         response.observe(this) { authResult ->
             if (authResult.code != AuthCode.SIGNUP_SUCCESS.code) {
                 binding.signupProgressIndicator.hide()
+                binding.signupButton.isEnabled = true
             }
 
             when (authResult.code) {
@@ -69,6 +71,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
 
     override fun onAuthFailure(authResult: AuthResult) {
         binding.signupProgressIndicator.hide()
+        binding.signupButton.isEnabled = true
 
         when (authResult.code) {
             AuthCode.EMPTY_NAME.code -> binding.signupNameInputLayout.error = authResult.message

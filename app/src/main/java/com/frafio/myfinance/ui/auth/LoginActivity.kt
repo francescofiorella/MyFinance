@@ -59,6 +59,9 @@ class LoginActivity : AppCompatActivity(), AuthListener {
     fun onGoogleButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         binding.loginProgressIndicator.show()
 
+        binding.googleButton.isEnabled = false
+        binding.loginButton.isEnabled = false
+
         mGoogleSignInClient = getGoogleClient()
 
         // SignIn Intent
@@ -88,6 +91,9 @@ class LoginActivity : AppCompatActivity(), AuthListener {
     override fun onAuthStarted() {
         binding.loginProgressIndicator.show()
 
+        binding.googleButton.isEnabled = false
+        binding.loginButton.isEnabled = false
+
         binding.loginEmailInputLayout.isErrorEnabled = false
         binding.loginPasswordInputLayout.isErrorEnabled = false
     }
@@ -96,6 +102,9 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         response.observe(this) { authResult ->
             if (authResult.code != AuthCode.LOGIN_SUCCESS.code) {
                 binding.loginProgressIndicator.hide()
+
+                binding.googleButton.isEnabled = true
+                binding.loginButton.isEnabled = true
             }
 
             when (authResult.code) {
@@ -125,6 +134,9 @@ class LoginActivity : AppCompatActivity(), AuthListener {
 
     override fun onAuthFailure(authResult: AuthResult) {
         binding.loginProgressIndicator.hide()
+
+        binding.googleButton.isEnabled = true
+        binding.loginButton.isEnabled = true
 
         when (authResult.code) {
             AuthCode.EMPTY_EMAIL.code ->

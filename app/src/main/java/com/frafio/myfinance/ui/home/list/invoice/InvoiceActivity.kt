@@ -91,6 +91,7 @@ class InvoiceActivity : AppCompatActivity(), InvoiceItemLongClickListener, Invoi
         binding.invoiceProgressIndicator.show()
         binding.invoiceNameEditText.isEnabled = false
         binding.invoicePriceEditText.isEnabled = false
+        binding.invoiceAddBtn.isEnabled = false
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -109,7 +110,6 @@ class InvoiceActivity : AppCompatActivity(), InvoiceItemLongClickListener, Invoi
                         it.clearText()
                         it.isEnabled = true
                     }
-                    binding.invoiceProgressIndicator.hide()
                 }
 
                 PurchaseCode.INVOICE_DELETE_SUCCESS.code -> {
@@ -117,11 +117,11 @@ class InvoiceActivity : AppCompatActivity(), InvoiceItemLongClickListener, Invoi
                     (binding.invoiceRecView.adapter as InvoiceItemAdapter).notifyDataSetChanged()
                 }
 
-                else -> {
-                    snackBar(result.message, binding.invoiceNameEditText)
-                    binding.invoiceProgressIndicator.hide()
-                }
+                else -> snackBar(result.message, binding.invoiceNameEditText)
             }
+
+            binding.invoiceProgressIndicator.hide()
+            binding.invoiceAddBtn.isEnabled = true
         }
     }
 
@@ -134,6 +134,7 @@ class InvoiceActivity : AppCompatActivity(), InvoiceItemLongClickListener, Invoi
 
         binding.invoiceNameEditText.isEnabled = true
         binding.invoicePriceEditText.isEnabled = true
+        binding.invoiceAddBtn.isEnabled = true
 
         binding.invoiceProgressIndicator.hide()
     }

@@ -219,12 +219,15 @@ class AddActivity : AppCompatActivity(), AddListener {
 
         binding.nameTextInputLayout.isErrorEnabled = false
         binding.priceTextInputLayout.isErrorEnabled = false
+
+        binding.addAddButton.isEnabled = false
     }
 
     override fun onAddSuccess(response: LiveData<PurchaseResult>) {
         response.observe(this) { result ->
             if (result.code != PurchaseCode.TOTAL_ADD_SUCCESS.code) {
                 binding.addProgressIndicator.hide()
+                binding.addAddButton.isEnabled = true
             }
 
             when (result.code) {
@@ -247,6 +250,7 @@ class AddActivity : AppCompatActivity(), AddListener {
 
     override fun onAddFailure(result: PurchaseResult) {
         binding.addProgressIndicator.hide()
+        binding.addAddButton.isEnabled = true
 
         when (result.code) {
             PurchaseCode.EMPTY_NAME.code,
