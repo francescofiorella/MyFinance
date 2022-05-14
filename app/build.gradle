@@ -7,15 +7,15 @@ plugins {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.frafio.myfinance"
         minSdkVersion 28
-        targetSdkVersion 31
+        targetSdkVersion 32
         versionCode 1
-        versionName "3.13.2"
+        versionName "3.13.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,6 +37,7 @@ android {
     buildFeatures {
         dataBinding = true
     }
+    namespace 'com.frafio.myfinance'
 }
 
 dependencies {
