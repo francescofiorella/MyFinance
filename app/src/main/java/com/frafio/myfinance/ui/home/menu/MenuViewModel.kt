@@ -7,6 +7,7 @@ import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.google.android.material.color.DynamicColors
+import kotlin.concurrent.thread
 
 class MenuViewModel(application: Application) : AndroidViewModel(application) {
     private val purchaseRepository = PurchaseRepository(
@@ -40,7 +41,9 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun setDynamicColor(active: Boolean) {
-        purchaseRepository.setDynamicColorActive(active)
+        thread {
+            purchaseRepository.setDynamicColorActive(active)
+        }
     }
 
     private fun getDynamicColorCheck(): Boolean {

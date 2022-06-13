@@ -321,7 +321,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             showFragment(R.id.dashboardFragment)
         } else {
             super.onBackPressed()
-            finish()
         }
     }
 

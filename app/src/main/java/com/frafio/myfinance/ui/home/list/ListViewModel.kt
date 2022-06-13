@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.repositories.PurchaseRepository
+import kotlin.concurrent.thread
 
 class ListViewModel(application: Application) : AndroidViewModel(application) {
     private val purchaseRepository = PurchaseRepository(
@@ -22,8 +23,10 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
         get() = _purchases
 
     fun getPurchases() {
-        val purchases = purchaseRepository.getPurchaseList()
-        _purchases.value = purchases
+        thread {
+            val purchases = purchaseRepository.getPurchaseList()
+            _purchases.postValue(purchases)
+        }
     }
 
     fun getPurchaseList(): List<Purchase> {
