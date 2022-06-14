@@ -12,7 +12,6 @@ import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 import java.time.LocalDate
-import kotlin.concurrent.thread
 
 class AddViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
@@ -40,12 +39,10 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
     var requestCode: Int? = null
 
     fun updateTime(datePickerBtn: DatePickerButton) {
-        thread {
-            year = datePickerBtn.year
-            month = datePickerBtn.month
-            day = datePickerBtn.day
-            dateString = datePickerBtn.dateString
-        }
+        year = datePickerBtn.year
+        month = datePickerBtn.month
+        day = datePickerBtn.day
+        dateString = datePickerBtn.dateString
     }
 
     fun onAddButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
