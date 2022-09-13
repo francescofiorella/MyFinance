@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentMenuBinding
@@ -18,6 +19,7 @@ import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.setValueLineChartData
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class MenuFragment : BaseFragment(), MenuListener {
 
@@ -35,12 +37,39 @@ class MenuFragment : BaseFragment(), MenuListener {
 
         viewModel.listener = this
 
-        binding.collectionSwitch.also {
-            it.isChecked = viewModel.isSwitchCollectionChecked
+        val yearArray = resources.getStringArray(R.array.years)
+        val selectedCollection = when (viewModel.getSelectedCollection()) {
+            DbPurchases.COLLECTIONS.ZERO_ONE.value -> 0
+            DbPurchases.COLLECTIONS.ONE_TWO.value -> 1
+            DbPurchases.COLLECTIONS.TWO_THREE.value -> 2
+            else -> 0 // error, do not select a default option
+        }
+        binding.collectionTV.text = getString(R.string.year, yearArray[selectedCollection])
 
-            it.setOnCheckedChangeListener { _, isChecked ->
-                viewModel.setCollection(isChecked)
+        binding.collectionCard.setOnClickListener {
+            val builder = MaterialAlertDialogBuilder(requireContext())
+            builder.setIcon(R.drawable.ic_visibility)
+            builder.setTitle(getString(R.string.year, ""))
+            builder.setSingleChoiceItems(
+                yearArray,
+                when (viewModel.getSelectedCollection()) {
+                    DbPurchases.COLLECTIONS.ZERO_ONE.value -> 0
+                    DbPurchases.COLLECTIONS.ONE_TWO.value -> 1
+                    DbPurchases.COLLECTIONS.TWO_THREE.value -> 2
+                    else -> -1 // error, do not select a default option
+                }
+            ) { dialog, selectedItem ->
+                val collection = when (selectedItem) {
+                    0 -> DbPurchases.COLLECTIONS.ZERO_ONE.value
+                    1 -> DbPurchases.COLLECTIONS.ONE_TWO.value
+                    2 -> DbPurchases.COLLECTIONS.TWO_THREE.value
+                    else -> DbPurchases.COLLECTIONS.ZERO_ONE.value
+                }
+                viewModel.setCollection(collection)
+                binding.collectionTV.text = getString(R.string.year, yearArray[selectedItem])
+                dialog.dismiss()
             }
+            builder.show()
         }
 
         binding.dynamicColorSwitch.also {
@@ -65,13 +94,11 @@ class MenuFragment : BaseFragment(), MenuListener {
 
     override fun onStarted() {
         (activity as HomeActivity).showProgressIndicator()
-        binding.collectionSwitch.isEnabled = false
     }
 
     override fun onCompleted(result: LiveData<PurchaseResult>) {
         result.observe(this) { purchaseResult ->
             (activity as HomeActivity).hideProgressIndicator()
-            binding.collectionSwitch.isEnabled = true
 
             when (purchaseResult.code) {
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {

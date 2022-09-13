@@ -221,8 +221,8 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return ChronoUnit.DAYS.between(startDate, endDate) >= 7
     }
 
-    fun setCollection(isOldYear: Boolean): LiveData<PurchaseResult> {
-        return purchaseManager.updateListByCollection(isOldYear)
+    fun setCollection(collection: String): LiveData<PurchaseResult> {
+        return purchaseManager.updateListByCollection(collection)
     }
 
     fun getSelectedCollection(): String {

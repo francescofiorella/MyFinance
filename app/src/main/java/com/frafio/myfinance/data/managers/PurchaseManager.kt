@@ -277,12 +277,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun updateListByCollection(isOldYear: Boolean): LiveData<PurchaseResult> {
-        val collection: String = if (isOldYear) {
-            DbPurchases.COLLECTIONS.ZERO_ONE.value
-        } else {
-            DbPurchases.COLLECTIONS.ONE_TWO.value
-        }
+    fun updateListByCollection(collection: String): LiveData<PurchaseResult> {
         setSharedCollection(sharedPreferences, collection)
         return updateList()
     }

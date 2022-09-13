@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.BuildConfig
 import com.frafio.myfinance.MyFinanceApplication
-import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.google.android.material.color.DynamicColors
 
@@ -14,8 +13,6 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
     )
 
     var listener: MenuListener? = null
-
-    var isSwitchCollectionChecked: Boolean = getCollectionCheck()
 
     var isDynamicColorAvailable: Boolean = DynamicColors.isDynamicColorAvailable()
     var isSwitchDynamicColorChecked: Boolean = getDynamicColorCheck()
@@ -29,14 +26,14 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
 
     val avgTrendListSize: Int = avgTrendList.size
 
-    fun setCollection(isOldYear: Boolean) {
+    fun setCollection(collection: String) {
         listener?.onStarted()
-        val response = purchaseRepository.setCollection(isOldYear)
+        val response = purchaseRepository.setCollection(collection)
         listener?.onCompleted(response)
     }
 
-    private fun getCollectionCheck(): Boolean {
-        return purchaseRepository.getSelectedCollection() == DbPurchases.COLLECTIONS.ZERO_ONE.value
+    fun getSelectedCollection(): String {
+        return purchaseRepository.getSelectedCollection()
     }
 
     fun setDynamicColor(active: Boolean) {

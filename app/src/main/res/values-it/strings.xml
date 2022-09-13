@@ -53,7 +53,7 @@
     <string name="profile_picture">Immagine di profilo</string>
 
     <string name="trend_avg_day">Trend Media Giornaliera</string>
-    <string name="show_2020_2021">Mostra 2020/2021</string>
+    <string name="year">Anno %1$s</string>
     <string name="language">Lingua</string>
 
     <string name="type">Tipo</string>

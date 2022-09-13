@@ -55,7 +55,7 @@
 
     <string name="back_arrow" translatable="false">Back Arrow</string>
     <string name="trend_avg_day">Daily Average Trend</string>
-    <string name="show_2020_2021">Show 2020/2021</string>
+    <string name="year">Year %1$s</string>
     <string name="language">Language</string>
     <string name="dashboard_empty" translatable="false">dashboard_empty</string>
     <string name="list_empty" translatable="false">list_empty</string>
@@ -92,5 +92,11 @@
         <item>@string/transport</item>
         <item>@string/rent</item>
         <item>@string/no_purchase</item>
+    </string-array>
+
+    <string-array name="years">
+        <item>2020/2021</item>
+        <item>2021/2022</item>
+        <item>2022/2023</item>
     </string-array>
 </resources>
