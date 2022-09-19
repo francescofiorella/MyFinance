@@ -7,8 +7,8 @@ import com.frafio.myfinance.MyFinanceApplication.Companion.DYNAMIC_COLOR_KEY
 import com.frafio.myfinance.data.enums.db.DbPurchases
 
 fun getSharedCollection(sharedPreferences: SharedPreferences): String {
-    return sharedPreferences.getString(COLLECTION_KEY, DbPurchases.COLLECTIONS.ONE_TWO.value)
-        ?: DbPurchases.COLLECTIONS.ONE_TWO.value
+    return sharedPreferences.getString(COLLECTION_KEY, DbPurchases.COLLECTIONS.TWO_THREE.value)
+        ?: DbPurchases.COLLECTIONS.TWO_THREE.value
 }
 
 @SuppressLint("ApplySharedPref")
