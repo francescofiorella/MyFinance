@@ -3,6 +3,7 @@ package com.frafio.myfinance.ui.home
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -115,6 +116,14 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         binding.navBar?.setOnItemSelectedListener(navBarListener)
         binding.navRail?.setOnItemSelectedListener(navBarListener)
         binding.navDrawer?.setNavigationItemSelectedListener(navDrawerListener)
+
+        onBackPressedDispatcher.addCallback {
+            if (activeFragment != dashboardFragment) {
+                showFragment(R.id.dashboardFragment)
+            } else {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -139,18 +148,22 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     activeFragment = dashboardFragment
                     showFragment(R.id.dashboardFragment)
                 }
+
                 LIST_FRAGMENT_TAG -> {
                     activeFragment = listFragment
                     showFragment(R.id.listFragment)
                 }
+
                 PROFILE_FRAGMENT_TAG -> {
                     activeFragment = profileFragment
                     showFragment(R.id.profileFragment)
                 }
+
                 MENU_FRAGMENT_TAG -> {
                     activeFragment = menuFragment
                     showFragment(R.id.menuFragment)
                 }
+
                 else -> {
                     activeFragment = dashboardFragment
                     showFragment(R.id.dashboardFragment)
@@ -174,7 +187,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             R.id.dashboardFragment -> {
                 dashboardFragment.scrollUp()
                 binding.fragmentTitle.text = getString(R.string.nav_1)
-                binding.logoutCard.instantHide()
+                binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -185,7 +198,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             R.id.listFragment -> {
                 listFragment.scrollUp()
                 binding.fragmentTitle.text = getString(R.string.nav_2_extended)
-                binding.logoutCard.instantHide()
+                binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -195,7 +208,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
             R.id.profileFragment -> {
                 binding.fragmentTitle.text = getString(R.string.nav_3)
-                binding.logoutCard.instantShow()
+                binding.logoutBtn.instantShow()
                 binding.propicImageView.instantHide()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -206,7 +219,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             R.id.menuFragment -> {
                 menuFragment.scrollUp()
                 binding.fragmentTitle.text = getString(R.string.nav_4)
-                binding.logoutCard.instantHide()
+                binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -316,14 +329,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         binding.homeProgressIndicator.hide()
     }
 
-    override fun onBackPressed() {
-        if (activeFragment != dashboardFragment) {
-            showFragment(R.id.dashboardFragment)
-        } else {
-            super.onBackPressed()
-        }
-    }
-
     private fun initFragments() {
         dashboardFragment = DashboardFragment()
         listFragment = ListFragment()
@@ -352,20 +357,14 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         list: Boolean = false,
         menu: Boolean = false
     ) {
-        if (!(dashboard && list && menu)) {
+        if (dashboard) {
             dashboardFragment.refreshStatsData()
+        }
+        if (list) {
             listFragment.refreshListData()
+        }
+        if (menu) {
             menuFragment.refreshPlotData()
-        } else {
-            if (dashboard) {
-                dashboardFragment.refreshStatsData()
-            }
-            if (list) {
-                listFragment.refreshListData()
-            }
-            if (menu) {
-                menuFragment.refreshPlotData()
-            }
         }
     }
 }

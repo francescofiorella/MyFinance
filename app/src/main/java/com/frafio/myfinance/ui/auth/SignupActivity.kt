@@ -92,6 +92,6 @@ class SignupActivity : AppCompatActivity(), AuthListener {
     }
 
     fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
     }
 }

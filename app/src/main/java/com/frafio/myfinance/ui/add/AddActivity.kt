@@ -211,7 +211,7 @@ class AddActivity : AppCompatActivity(), AddListener {
     }
 
     fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
     }
 
     override fun onAddStart() {
