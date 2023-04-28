@@ -82,7 +82,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:layout_marginTop="20dp"
-                            app:data="@{viewModel.avgTrendList}"
                             app:egAnimationTime="1000"
                             app:egCurveSmoothness="0.4"
                             app:egIndicatorLineColor="@color/md_theme_onSecondaryContainer"

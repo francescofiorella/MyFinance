@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Theme.MyFinance" parent="Theme.Material3.Light.NoActionBar">
         <!-- Material You theme. -->
@@ -30,7 +30,7 @@
         <item name="colorPrimaryInverse">@color/md_theme_light_primaryInverse</item>
 
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
 
         <!--Custom widgets theme. -->

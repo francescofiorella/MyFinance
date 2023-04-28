@@ -17,8 +17,7 @@ class MyFinanceApplication : Application() {
         const val DYNAMIC_COLOR_KEY = "DYNAMIC_COLOR_OPTIONS"
     }
 
-    private lateinit var sharedPreferences: SharedPreferences
-
+    lateinit var sharedPreferences: SharedPreferences
     lateinit var authManager: AuthManager
     lateinit var purchaseManager: PurchaseManager
     lateinit var invoiceManager: InvoiceManager

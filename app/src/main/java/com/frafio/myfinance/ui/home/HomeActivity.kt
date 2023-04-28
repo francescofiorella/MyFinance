@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
+import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.models.AuthResult
@@ -24,6 +25,7 @@ import com.frafio.myfinance.ui.home.dashboard.DashboardFragment
 import com.frafio.myfinance.ui.home.list.ListFragment
 import com.frafio.myfinance.ui.home.menu.MenuFragment
 import com.frafio.myfinance.ui.home.profile.ProfileFragment
+import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.snackBar
@@ -87,10 +89,16 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                         )
                         splashScreenViewProvider.remove()
                     }
+                    if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
+                        DynamicColors.applyToActivityIfAvailable(this)
+                    }
                 }
             }
         } else {
             setTheme(R.style.Theme_MyFinance)
+            if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
+                DynamicColors.applyToActivityIfAvailable(this)
+            }
         }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)

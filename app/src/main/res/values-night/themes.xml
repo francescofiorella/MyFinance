@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Theme.MyFinance" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Material You theme. -->
@@ -30,7 +30,7 @@
         <item name="colorPrimaryInverse">@color/md_theme_dark_primaryInverse</item>
 
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
 
         <!--Custom widgets theme. -->
         <item name="materialCalendarTheme">@style/ThemeOverlay.MyFinance.DatePicker</item>

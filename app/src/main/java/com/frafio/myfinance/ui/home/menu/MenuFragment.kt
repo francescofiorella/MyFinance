@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
+import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
@@ -16,6 +17,7 @@ import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentMenuBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.setValueLineChartData
@@ -89,6 +91,11 @@ class MenuFragment : BaseFragment(), MenuListener {
                 }
             }
         }
+
+        val dynamicColors = getSharedDynamicColor(
+            (requireActivity().application as MyFinanceApplication).sharedPreferences
+        )
+        binding.lineChart.setValueLineChartData(viewModel.avgTrendList, dynamicColors)
         return binding.root
     }
 
@@ -135,7 +142,10 @@ class MenuFragment : BaseFragment(), MenuListener {
             }
 
             lineChart.clearChart()
-            setValueLineChartData(lineChart, list)
+            val dynamicColors = getSharedDynamicColor(
+                (requireActivity().application as MyFinanceApplication).sharedPreferences
+            )
+            binding.lineChart.setValueLineChartData(list, dynamicColors)
         }
     }
 

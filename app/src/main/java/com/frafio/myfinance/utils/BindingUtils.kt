@@ -37,25 +37,3 @@ fun setBottomAppBarCornerRadius(view: BottomAppBar, cornerSize: Float) {
             .build()
     }
 }
-
-@BindingAdapter("data")
-fun setValueLineChartData(view: ValueLineChart, list: List<Pair<String, Double>>) {
-    ValueLineSeries().also { series ->
-        series.color = ColorUtils
-            .setAlphaComponent(
-                ContextCompat.getColor(
-                    view.context,
-                    R.color.md_theme_primaryContainer
-                ), 200
-            )
-
-        list.forEach { pair ->
-            val date: String = pair.first
-            // convert to Float e round the the second decimal figure
-            val value: Float = pair.second.toFloat().round(2)
-            series.addPoint(ValueLinePoint(date, value))
-        }
-
-        view.addSeries(series)
-    }
-}
