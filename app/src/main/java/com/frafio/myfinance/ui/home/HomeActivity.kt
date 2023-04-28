@@ -129,7 +129,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             if (activeFragment != dashboardFragment) {
                 showFragment(R.id.dashboardFragment)
             } else {
-                onBackPressedDispatcher.onBackPressed()
+                finish()
             }
         }
     }

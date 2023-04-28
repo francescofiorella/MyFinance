@@ -75,7 +75,7 @@
     <string name="date">Date</string>
 
     <string name="translation_warning">Restart the app for the changes to take effect</string>
-    <string name="use_dynamic_color">Use Dynamic Color</string>
+    <string name="use_dynamic_color">Dynamic Colors</string>
     <string name="restart_app_changes">Restart the app to apply the changes.</string>
 
     <string name="total_purchase">Total</string>

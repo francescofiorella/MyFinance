@@ -27,7 +27,7 @@ open class DatePickerButton(
 
     val listener = View.OnClickListener {
         // date picker
-        val calendar = Calendar.getInstance()
+        val calendar = Calendar.getInstance(TimeZone.getDefault())
         if (year != null && month != null && day != null) {
             calendar.set(year!!, month!! - 1, day!!)
         }
