@@ -27,9 +27,13 @@ open class DatePickerButton(
 
     val listener = View.OnClickListener {
         // date picker
-        val calendar = Calendar.getInstance(TimeZone.getDefault())
+        val calendar = Calendar.getInstance()
         if (year != null && month != null && day != null) {
             calendar.set(year!!, month!! - 1, day!!)
+        } else {
+            LocalDate.now().apply {
+                calendar.set(year, monthValue, dayOfMonth)
+            }
         }
         val builder = MaterialDatePicker.Builder.datePicker()
         builder.setTitleText(DATE_PICKER_TITLE)
@@ -63,9 +67,11 @@ open class DatePickerButton(
         }
 
     init {
-        year = LocalDate.now().year
-        month = LocalDate.now().monthValue
-        day = LocalDate.now().dayOfMonth
+        LocalDate.now().let {
+            year = it.year
+            month = it.monthValue
+            day = it.dayOfMonth
+        }
 
         setOnClickListener()
     }
