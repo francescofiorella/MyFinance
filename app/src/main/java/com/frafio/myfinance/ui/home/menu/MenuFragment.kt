@@ -44,7 +44,8 @@ class MenuFragment : BaseFragment(), MenuListener {
             DbPurchases.COLLECTIONS.ZERO_ONE.value -> 0
             DbPurchases.COLLECTIONS.ONE_TWO.value -> 1
             DbPurchases.COLLECTIONS.TWO_THREE.value -> 2
-            else -> 0 // error, do not select a default option
+            DbPurchases.COLLECTIONS.THREE_FOUR.value -> 3
+            else -> 2 // error, do not select a default option
         }
         binding.collectionTV.text = getString(R.string.year, yearArray[selectedCollection])
 
@@ -58,6 +59,7 @@ class MenuFragment : BaseFragment(), MenuListener {
                     DbPurchases.COLLECTIONS.ZERO_ONE.value -> 0
                     DbPurchases.COLLECTIONS.ONE_TWO.value -> 1
                     DbPurchases.COLLECTIONS.TWO_THREE.value -> 2
+                    DbPurchases.COLLECTIONS.THREE_FOUR.value -> 3
                     else -> -1 // error, do not select a default option
                 }
             ) { dialog, selectedItem ->
@@ -65,7 +67,8 @@ class MenuFragment : BaseFragment(), MenuListener {
                     0 -> DbPurchases.COLLECTIONS.ZERO_ONE.value
                     1 -> DbPurchases.COLLECTIONS.ONE_TWO.value
                     2 -> DbPurchases.COLLECTIONS.TWO_THREE.value
-                    else -> DbPurchases.COLLECTIONS.ZERO_ONE.value
+                    3 -> DbPurchases.COLLECTIONS.THREE_FOUR.value
+                    else -> DbPurchases.COLLECTIONS.TWO_THREE.value
                 }
                 viewModel.setCollection(collection)
                 binding.collectionTV.text = getString(R.string.year, yearArray[selectedItem])

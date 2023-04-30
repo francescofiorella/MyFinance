@@ -245,7 +245,16 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.ZERO_ONE.value)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
-                PurchaseStorage.existLastYear = !queryDocumentSnapshots.isEmpty
+                if (queryDocumentSnapshots.isEmpty) {
+                    fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+                        .document(UserStorage.user!!.email!!)
+                        .collection(DbPurchases.COLLECTIONS.ONE_TWO.value)
+                        .get().addOnSuccessListener { qds ->
+                            PurchaseStorage.existLastYear = !qds.isEmpty
+                        }
+                } else {
+                    PurchaseStorage.existLastYear = true
+                }
             }
     }
 

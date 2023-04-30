@@ -15,7 +15,9 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
 
     var listener: DeleteListener? = null
 
-    val purchaseListSize = purchaseRepository.purchaseListSize()
+    private val _purchaseListSize = MutableLiveData<Int>()
+    val purchaseListSize: LiveData<Int>
+        get() = _purchaseListSize
 
     private val _purchases = MutableLiveData<List<Purchase>>()
     val purchases: LiveData<List<Purchase>>
@@ -33,5 +35,9 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
     fun deletePurchaseAt(position: Int) {
         val response = purchaseRepository.deletePurchaseAt(position)
         listener?.onDeleteComplete(response)
+    }
+
+    fun updateListSize() {
+        _purchaseListSize.value = purchaseRepository.purchaseListSize()
     }
 }

@@ -126,6 +126,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
                 (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(newList)
                 (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
             }
+            viewModel.updateListSize()
 
             (activity as HomeActivity).showSnackBar(result.message)
         }
@@ -133,7 +134,8 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
 
     fun refreshListData() {
         (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(viewModel.getPurchaseList())
-        binding.listRecyclerView.scrollToPosition(0)
+        viewModel.updateListSize()
+        scrollUp()
     }
 
     override fun scrollUp() {

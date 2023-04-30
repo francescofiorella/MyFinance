@@ -43,6 +43,7 @@ object DbPurchases {
     enum class COLLECTIONS(val value: String) {
         ZERO_ONE("2020_2021"),
         ONE_TWO("2021_2022"),
-        TWO_THREE("2022_2023")
+        TWO_THREE("2022_2023"),
+        THREE_FOUR("2023_2024")
     }
 }
