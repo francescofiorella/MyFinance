@@ -56,6 +56,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         viewModel.listener = this
 
         viewModel.getPurchases()
+        viewModel.updateListSize()
         viewModel.purchases.observe(viewLifecycleOwner) { purchases ->
             binding.listRecyclerView.also {
                 it.setHasFixedSize(true)
