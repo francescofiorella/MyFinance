@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.home.list.ListFragment">
+    tools:context=".ui.home.payments.PaymentsFragment">
 
     <data>
 
@@ -10,7 +10,7 @@
 
         <variable
             name="viewModel"
-            type="com.frafio.myfinance.ui.home.list.ListViewModel" />
+            type="com.frafio.myfinance.ui.home.payments.PaymentsViewModel" />
 
     </data>
 
@@ -19,21 +19,22 @@
         android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:visibility="@{viewModel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.20"
             tools:visibility="gone">
 
             <ImageView
                 android:id="@+id/list_empty_imageView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginHorizontal="20dp"
+                android:layout_marginHorizontal="50dp"
+                android:layout_marginTop="50dp"
                 android:contentDescription="@string/list_empty"
                 android:src="@drawable/image_empty_list"
                 app:layout_constraintDimensionRatio="1:1"
@@ -45,7 +46,7 @@
                 android:id="@+id/list_emptyTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="50dp"
                 android:fontFamily="@font/nunito_semibold"
                 android:text="@string/warning_home"
                 android:textAlignment="center"

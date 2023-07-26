@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home.list.invoice
+package com.frafio.myfinance.ui.home.payments.invoice
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

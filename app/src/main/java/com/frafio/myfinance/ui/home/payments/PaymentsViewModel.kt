@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home.list
+package com.frafio.myfinance.ui.home.payments
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -8,7 +8,7 @@ import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 
-class ListViewModel(application: Application) : AndroidViewModel(application) {
+class PaymentsViewModel(application: Application) : AndroidViewModel(application) {
     private val purchaseRepository = PurchaseRepository(
         (application as MyFinanceApplication).purchaseManager
     )

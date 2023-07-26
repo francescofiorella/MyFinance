@@ -113,7 +113,7 @@ class MenuFragment : BaseFragment(), MenuListener {
             when (purchaseResult.code) {
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
                     refreshPlotData(animate = true)
-                    (activity as HomeActivity).refreshFragmentData(dashboard = true, list = true)
+                    (activity as HomeActivity).refreshFragmentData(dashboard = true, payments = true)
                 }
 
                 else -> {

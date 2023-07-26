@@ -41,45 +41,69 @@
             app:layout_constraintTop_toTopOf="parent"
             app:menu="@menu/navigation_menu" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/fragmentTitle"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/titleLayout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/title_margin_start"
-            android:layout_marginTop="@dimen/title_margin_top"
-            android:fontFamily="@font/nunito_bold"
-            android:padding="@dimen/title_padding"
-            android:text="@string/nav_1"
-            android:textColor="@color/primary_text"
-            android:textSize="@dimen/title_size"
+            android:paddingTop="@dimen/title_margin_top"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/nav_drawer"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/propic_image_view"
-            android:layout_width="@dimen/profile_picture_size"
-            android:layout_height="@dimen/profile_picture_size"
-            android:layout_marginEnd="@dimen/profile_picture_margin_end"
-            android:contentDescription="@string/profile_picture"
-            android:onClick="onProPicClick"
-            app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/fragmentTitle"
-            app:srcCompat="@drawable/ic_user"
-            app:srcRound="@{viewModel.getProPic()}" />
+            <ImageView
+                android:id="@+id/back_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/arrow_margin_start"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/back_arrow"
+                android:onClick="onBackClick"
+                android:padding="@dimen/arrow_padding"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_west" />
 
-        <Button
-            android:id="@+id/logout_btn"
-            style="?attr/materialIconButtonFilledTonalStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:onClick="@{viewModel::onLogoutButtonClick}"
-            android:visibility="gone"
-            app:icon="@drawable/ic_logout"
-            app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/fragmentTitle" />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/fragmentTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/title_margin_start"
+                android:fontFamily="@font/nunito_bold"
+                android:padding="@dimen/title_padding"
+                android:text="@string/nav_1"
+                android:textColor="@color/primary_text"
+                android:textSize="@dimen/title_size"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/back_arrow" />
+
+            <ImageView
+                android:id="@+id/propic_image_view"
+                android:layout_width="@dimen/profile_picture_size"
+                android:layout_height="@dimen/profile_picture_size"
+                android:layout_marginEnd="@dimen/profile_picture_margin_end"
+                android:contentDescription="@string/profile_picture"
+                android:onClick="onProPicClick"
+                app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/fragmentTitle"
+                app:srcCompat="@drawable/ic_user"
+                app:srcRound="@{viewModel.getProPic()}" />
+
+            <Button
+                android:id="@+id/logout_btn"
+                style="?attr/materialIconButtonFilledTonalStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:onClick="@{viewModel::onLogoutButtonClick}"
+                android:visibility="gone"
+                app:icon="@drawable/ic_logout"
+                app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/fragmentTitle" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/home_fragmentContainerView"
@@ -89,7 +113,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/nav_drawer"
-            app:layout_constraintTop_toBottomOf="@+id/fragmentTitle"
+            app:layout_constraintTop_toBottomOf="@+id/titleLayout"
             tools:layout="@layout/fragment_dashboard" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home.list
+package com.frafio.myfinance.ui.home.payments
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
@@ -14,20 +14,20 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
-import com.frafio.myfinance.databinding.FragmentListBinding
+import com.frafio.myfinance.databinding.FragmentPaymentsBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_CLICK
-import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_LONG_CLICK
-import com.frafio.myfinance.ui.home.list.invoice.InvoiceActivity
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_CLICK
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.ui.home.payments.invoice.InvoiceActivity
 import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener {
+class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener {
 
-    private lateinit var binding: FragmentListBinding
-    private val viewModel by viewModels<ListViewModel>()
+    private lateinit var binding: FragmentPaymentsBinding
+    private val viewModel by viewModels<PaymentsViewModel>()
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -48,7 +48,7 @@ class ListFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_payments, container, false)
 
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner

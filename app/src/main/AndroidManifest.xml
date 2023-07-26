@@ -14,7 +14,7 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.home.list.invoice.InvoiceActivity"
+            android:name=".ui.home.payments.invoice.InvoiceActivity"
             android:exported="false" />
         <activity
             android:name=".ui.auth.SignupActivity"

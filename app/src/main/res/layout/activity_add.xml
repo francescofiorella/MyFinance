@@ -36,27 +36,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/arrow_margin_start"
+            android:layout_marginTop="@dimen/title_margin_top"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/back_arrow"
             android:onClick="onBackClick"
             android:padding="@dimen/arrow_padding"
-            app:layout_constraintBottom_toBottomOf="@+id/add_purchaseTitle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/add_purchaseTitle"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_west" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/add_purchaseTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/title_distance_from_arrow"
-            android:layout_marginTop="@dimen/title_margin_top"
-            android:fontFamily="@font/nunito_semibold"
+            android:layout_marginStart="@dimen/title_margin_start"
+            android:fontFamily="@font/nunito_bold"
             android:padding="@dimen/title_padding"
             android:text="@string/add_purchase"
             android:textSize="@dimen/title_size"
-            app:layout_constraintStart_toEndOf="@+id/back_arrow"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/back_arrow" />
 
         <ScrollView
             android:id="@+id/scrollView2"

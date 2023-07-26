@@ -9,18 +9,18 @@
         android:title="@string/nav_1" />
 
     <item
-        android:id="@+id/listFragment"
+        android:id="@+id/paymentsFragment"
         android:checkable="true"
         android:contentDescription="@string/nav_2"
         android:icon="@drawable/ic_format_list_bulleted"
         android:title="@string/nav_2" />
 
     <item
-        android:id="@+id/profileFragment"
+        android:id="@+id/budgetFragment"
         android:checkable="true"
-        android:contentDescription="@string/nav_3"
-        android:icon="@drawable/ic_account_circle"
-        android:title="@string/nav_3" />
+        android:contentDescription="@string/nav_5"
+        android:icon="@drawable/ic_savings"
+        android:title="@string/nav_5" />
 
     <item
         android:id="@+id/menuFragment"
@@ -28,5 +28,13 @@
         android:contentDescription="@string/nav_4"
         android:icon="@drawable/ic_menu"
         android:title="@string/nav_4" />
+
+    <item
+        android:id="@+id/profileFragment"
+        android:checkable="true"
+        android:contentDescription="@string/nav_3"
+        android:icon="@drawable/ic_account_circle"
+        android:title="@string/nav_3"
+        android:visible="false" />
 
 </menu>

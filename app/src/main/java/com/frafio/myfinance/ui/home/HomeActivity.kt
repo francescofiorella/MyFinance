@@ -21,8 +21,9 @@ import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
+import com.frafio.myfinance.ui.home.budget.BudgetFragment
 import com.frafio.myfinance.ui.home.dashboard.DashboardFragment
-import com.frafio.myfinance.ui.home.list.ListFragment
+import com.frafio.myfinance.ui.home.payments.PaymentsFragment
 import com.frafio.myfinance.ui.home.menu.MenuFragment
 import com.frafio.myfinance.ui.home.profile.ProfileFragment
 import com.frafio.myfinance.utils.getSharedDynamicColor
@@ -40,9 +41,10 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private val viewModel by viewModels<HomeViewModel>()
 
     private lateinit var dashboardFragment: DashboardFragment
-    private lateinit var listFragment: ListFragment
-    private lateinit var profileFragment: ProfileFragment
+    private lateinit var paymentsFragment: PaymentsFragment
+    private lateinit var budgetFragment: BudgetFragment
     private lateinit var menuFragment: MenuFragment
+    private lateinit var profileFragment: ProfileFragment
     private var activeFragment: Fragment? = null
 
     private var userRequest: Boolean = false
@@ -51,9 +53,10 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     companion object {
         private const val ACTIVE_FRAGMENT_KEY = "active_fragment_key"
         private const val DASHBOARD_FRAGMENT_TAG = "dashboard_fragment_tag"
-        private const val LIST_FRAGMENT_TAG = "list_fragment_tag"
-        private const val PROFILE_FRAGMENT_TAG = "profile_fragment_tag"
+        private const val PAYMENTS_FRAGMENT_TAG = "payments_fragment_tag"
+        private const val BUDGET_FRAGMENT_TAG = "budget_fragment_tag"
         private const val MENU_FRAGMENT_TAG = "menu_fragment_tag"
+        private const val PROFILE_FRAGMENT_TAG = "profile_fragment_tag"
     }
 
     private var addResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -62,8 +65,8 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             val purchaseRequest =
                 data!!.getBooleanExtra(AddActivity.PURCHASE_REQUEST_KEY, false)
             if (purchaseRequest) {
-                showFragment(R.id.listFragment)
-                refreshFragmentData(dashboard = true, list = true, menu = true)
+                showFragment(R.id.paymentsFragment)
+                refreshFragmentData(dashboard = true, payments = true, menu = true)
                 showSnackBar(getString(R.string.purchase_added))
             }
         }
@@ -134,6 +137,10 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         }
     }
 
+    fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        onBackPressedDispatcher.onBackPressed()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         activeFragment?.let { outState.putString(ACTIVE_FRAGMENT_KEY, it.tag) }
@@ -143,12 +150,14 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         super.onRestoreInstanceState(savedInstanceState)
         dashboardFragment = supportFragmentManager
             .findFragmentByTag(DASHBOARD_FRAGMENT_TAG)!! as DashboardFragment
-        listFragment = supportFragmentManager
-            .findFragmentByTag(LIST_FRAGMENT_TAG)!! as ListFragment
-        profileFragment = supportFragmentManager
-            .findFragmentByTag(PROFILE_FRAGMENT_TAG)!! as ProfileFragment
+        paymentsFragment = supportFragmentManager
+            .findFragmentByTag(PAYMENTS_FRAGMENT_TAG)!! as PaymentsFragment
+        budgetFragment = supportFragmentManager
+            .findFragmentByTag(BUDGET_FRAGMENT_TAG)!! as BudgetFragment
         menuFragment = supportFragmentManager
             .findFragmentByTag(MENU_FRAGMENT_TAG)!! as MenuFragment
+        profileFragment = supportFragmentManager
+            .findFragmentByTag(PROFILE_FRAGMENT_TAG)!! as ProfileFragment
 
         savedInstanceState.getString(ACTIVE_FRAGMENT_KEY).also { tag ->
             when (tag) {
@@ -157,19 +166,24 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     showFragment(R.id.dashboardFragment)
                 }
 
-                LIST_FRAGMENT_TAG -> {
-                    activeFragment = listFragment
-                    showFragment(R.id.listFragment)
+                PAYMENTS_FRAGMENT_TAG -> {
+                    activeFragment = paymentsFragment
+                    showFragment(R.id.paymentsFragment)
                 }
 
-                PROFILE_FRAGMENT_TAG -> {
-                    activeFragment = profileFragment
-                    showFragment(R.id.profileFragment)
+                BUDGET_FRAGMENT_TAG -> {
+                    activeFragment = budgetFragment
+                    showFragment(R.id.budgetFragment)
                 }
 
                 MENU_FRAGMENT_TAG -> {
                     activeFragment = menuFragment
                     showFragment(R.id.menuFragment)
+                }
+
+                PROFILE_FRAGMENT_TAG -> {
+                    activeFragment = profileFragment
+                    showFragment(R.id.profileFragment)
                 }
 
                 else -> {
@@ -193,6 +207,12 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private fun navigateTo(itemId: Int) {
         when (itemId) {
             R.id.dashboardFragment -> {
+                binding.backArrow.instantHide()
+                binding.homeAddBtn?.instantShow()
+                binding.homeAddExtBtn?.instantShow()
+                binding.navBar?.instantShow()
+                binding.navRail?.instantShow()
+                binding.navDrawer?.instantShow()
                 dashboardFragment.scrollUp()
                 binding.fragmentTitle.text = getString(R.string.nav_1)
                 binding.logoutBtn.instantHide()
@@ -203,28 +223,46 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 activeFragment = dashboardFragment
             }
 
-            R.id.listFragment -> {
-                listFragment.scrollUp()
-                binding.fragmentTitle.text = getString(R.string.nav_2_extended)
+            R.id.paymentsFragment -> {
+                binding.backArrow.instantHide()
+                binding.homeAddBtn?.instantShow()
+                binding.homeAddExtBtn?.instantShow()
+                binding.navBar?.instantShow()
+                binding.navRail?.instantShow()
+                binding.navDrawer?.instantShow()
+                paymentsFragment.scrollUp()
+                binding.fragmentTitle.text = getString(R.string.nav_2)
                 binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(listFragment).commit()
-                activeFragment = listFragment
+                    .hide(activeFragment!!).show(paymentsFragment).commit()
+                activeFragment = paymentsFragment
             }
 
-            R.id.profileFragment -> {
-                binding.fragmentTitle.text = getString(R.string.nav_3)
-                binding.logoutBtn.instantShow()
-                binding.propicImageView.instantHide()
+            R.id.budgetFragment -> {
+                binding.backArrow.instantHide()
+                binding.homeAddBtn?.instantShow()
+                binding.homeAddExtBtn?.instantShow()
+                binding.navBar?.instantShow()
+                binding.navRail?.instantShow()
+                binding.navDrawer?.instantShow()
+                binding.fragmentTitle.text = getString(R.string.nav_5)
+                binding.logoutBtn.instantHide()
+                binding.propicImageView.instantShow()
                 supportFragmentManager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(profileFragment).commit()
-                activeFragment = profileFragment
+                    .hide(activeFragment!!).show(budgetFragment).commit()
+                activeFragment = budgetFragment
             }
 
             R.id.menuFragment -> {
+                binding.backArrow.instantHide()
+                binding.homeAddBtn?.instantShow()
+                binding.homeAddExtBtn?.instantShow()
+                binding.navBar?.instantShow()
+                binding.navRail?.instantShow()
+                binding.navDrawer?.instantShow()
                 menuFragment.scrollUp()
                 binding.fragmentTitle.text = getString(R.string.nav_4)
                 binding.logoutBtn.instantHide()
@@ -233,6 +271,22 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment!!).show(menuFragment).commit()
                 activeFragment = menuFragment
+            }
+
+            R.id.profileFragment -> {
+                binding.backArrow.instantShow()
+                binding.homeAddBtn?.instantHide()
+                binding.homeAddExtBtn?.instantHide()
+                binding.navBar?.instantHide()
+                binding.navRail?.instantHide()
+                binding.navDrawer?.instantHide()
+                binding.fragmentTitle.text = getString(R.string.nav_3)
+                binding.logoutBtn.instantShow()
+                binding.propicImageView.instantHide()
+                supportFragmentManager.beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .hide(activeFragment!!).show(profileFragment).commit()
+                activeFragment = profileFragment
             }
 
             else -> Unit // should not be possible
@@ -339,16 +393,22 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
     private fun initFragments() {
         dashboardFragment = DashboardFragment()
-        listFragment = ListFragment()
-        profileFragment = ProfileFragment()
+        paymentsFragment = PaymentsFragment()
+        budgetFragment = BudgetFragment()
         menuFragment = MenuFragment()
+        profileFragment = ProfileFragment()
         activeFragment = dashboardFragment
         supportFragmentManager.beginTransaction()
-            .add(R.id.home_fragmentContainerView, menuFragment, MENU_FRAGMENT_TAG)
             .add(R.id.home_fragmentContainerView, profileFragment, PROFILE_FRAGMENT_TAG)
-            .add(R.id.home_fragmentContainerView, listFragment, LIST_FRAGMENT_TAG)
+            .add(R.id.home_fragmentContainerView, menuFragment, MENU_FRAGMENT_TAG)
+            .add(R.id.home_fragmentContainerView, budgetFragment, BUDGET_FRAGMENT_TAG)
+            .add(R.id.home_fragmentContainerView, paymentsFragment, PAYMENTS_FRAGMENT_TAG)
             .add(R.id.home_fragmentContainerView, dashboardFragment, DASHBOARD_FRAGMENT_TAG)
-            .hide(menuFragment).hide(profileFragment).hide(listFragment).commit()
+            .hide(profileFragment)
+            .hide(menuFragment)
+            .hide(budgetFragment)
+            .hide(paymentsFragment)
+            .commit()
     }
 
     private fun showFragment(fragmentId: Int) {
@@ -362,14 +422,14 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
     fun refreshFragmentData(
         dashboard: Boolean = false,
-        list: Boolean = false,
+        payments: Boolean = false,
         menu: Boolean = false
     ) {
         if (dashboard) {
             dashboardFragment.refreshStatsData()
         }
-        if (list) {
-            listFragment.refreshListData()
+        if (payments) {
+            paymentsFragment.refreshListData()
         }
         if (menu) {
             menuFragment.refreshPlotData()

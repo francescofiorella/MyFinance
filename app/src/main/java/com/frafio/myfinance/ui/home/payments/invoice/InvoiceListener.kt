@@ -1,7 +1,6 @@
-package com.frafio.myfinance.ui.home.list.invoice
+package com.frafio.myfinance.ui.home.payments.invoice
 
 import androidx.lifecycle.LiveData
-import com.frafio.myfinance.data.models.InvoiceItem
 import com.frafio.myfinance.data.models.PurchaseResult
 
 interface InvoiceListener {

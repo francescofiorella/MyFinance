@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home.list
+package com.frafio.myfinance.ui.home.payments
 
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -10,8 +10,8 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.LayoutPurchaseItemRvBinding
-import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_CLICK
-import com.frafio.myfinance.ui.home.list.PurchaseInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_CLICK
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 
 class PurchaseAdapter(
     private var purchases: List<Purchase>,

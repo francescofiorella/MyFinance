@@ -2,25 +2,24 @@
     <string name="app_name">MyFinance</string>
 
     <string name="nav_1">Dashboard</string>
-    <string name="nav_2">Lista</string>
-    <string name="nav_2_extended">Lista Acquisti</string>
+    <string name="nav_2">Pagamenti</string>
     <string name="nav_3">Profilo</string>
     <string name="nav_4">Menu</string>
-    <string name="add_purchase">Nuovo Acquisto</string>
+    <string name="add_purchase">Nuovo Pagamento</string>
 
-    <string name="addBtnContentDescription">Aggiungi un acquisto</string>
+    <string name="addBtnContentDescription">Aggiungi un pagamento</string>
 
     <string name="add">Aggiungi</string>
     <string name="edit">Modifica</string>
     <string name="delete">Elimina</string>
     <string name="cancel">Annulla</string>
 
-    <string name="purchase_added">Acquisto aggiunto!</string>
+    <string name="purchase_added">Pagamento aggiunto!</string>
 
     <string name="login_successful">Hai effettuato l\'accesso come</string>
 
-    <string name="purchase_delete_dialog">Vuoi eliminare l\'acquisto selezionato?</string>
-    <string name="purchase_edit_delete_dialog">Vuoi modificare o eliminare l\'acquisto selezionato?</string>
+    <string name="purchase_delete_dialog">Vuoi eliminare il pagamento selezionato?</string>
+    <string name="purchase_edit_delete_dialog">Vuoi modificare o eliminare il pagamento selezionato?</string>
 
     <string name="invoice_delete_dialog">Vuoi eliminare la voce selezionata?</string>
 
@@ -38,7 +37,7 @@
     <string name="signup_password_confirm">Inserisci nuovamente la password</string>
     <string name="signup">Registrati</string>
     <string name="signup_login">Hai già un account? Accedi</string>
-    <string name="warning_home">Aggiungi il tuo primo acquisto!</string>
+    <string name="warning_home">Aggiungi il tuo primo pagamento!</string>
 
     <string name="avg_day">Media \nGiornaliera</string>
     <string name="avg_month">Media \nMensile</string>
@@ -61,7 +60,7 @@
     <string name="shopping">Spesa</string>
     <string name="transport">Trasporti</string>
     <string name="rent">Affitto</string>
-    <string name="no_purchase">Nessun acquisto</string>
+    <string name="no_purchase">Nessun pagamento</string>
     <string name="date">Data</string>
 
     <string name="translation_warning">Riavvia l\'app per rendere le modifiche effettive</string>

@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.home.list.invoice.InvoiceActivity">
+    tools:context=".ui.home.payments.invoice.InvoiceActivity">
 
     <data>
 
         <variable
             name="viewModel"
-            type="com.frafio.myfinance.ui.home.list.invoice.InvoiceViewModel" />
+            type="com.frafio.myfinance.ui.home.payments.invoice.InvoiceViewModel" />
 
     </data>
 

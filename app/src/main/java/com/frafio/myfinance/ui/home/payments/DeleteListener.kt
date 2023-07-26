@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home.list
+package com.frafio.myfinance.ui.home.payments
 
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.data.models.Purchase
