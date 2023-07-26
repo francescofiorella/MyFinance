@@ -14,6 +14,51 @@
       },
       "oauth_client": [
         {
+          "client_id": "1063741670571-8698jdmg6qjb2qumcjsocnhh8q75jhgi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.frafio.myfinance",
+            "certificate_hash": "b9fb51bec003e61d8781946c87bad915491c082e"
+          }
+        },
+        {
+          "client_id": "1063741670571-8414gdgksppspg2d1l6ribelsd648lek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjJ36DPsMcRZMYpskMKVyKQpuj1QWw5nI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1063741670571-8414gdgksppspg2d1l6ribelsd648lek.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1063741670571:android:e885113cdd9fdb1a62a3ee",
+        "android_client_info": {
+          "package_name": "com.frafio.myfinanceserviceapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1063741670571-t53jqe18hg8al0guca4ptk5imiflrnl5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.frafio.myfinanceserviceapp",
+            "certificate_hash": "3a6c504d62910052858ad9325fcb93b549a94fcd"
+          }
+        },
+        {
           "client_id": "1063741670571-8414gdgksppspg2d1l6ribelsd648lek.apps.googleusercontent.com",
           "client_type": 3
         }
