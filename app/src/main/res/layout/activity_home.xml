@@ -35,7 +35,7 @@
             android:id="@+id/titleLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/title_margin_top"
+            android:layout_marginStart="5dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -44,28 +44,30 @@
                 android:id="@+id/back_arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/arrow_margin_start"
+                android:layout_marginStart="@dimen/title_distance_from_arrow"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/back_arrow"
                 android:onClick="onBackClick"
                 android:padding="@dimen/arrow_padding"
                 android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/fragmentTitle"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toTopOf="@id/fragmentTitle"
                 app:srcCompat="@drawable/ic_west" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/fragmentTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/title_margin_start"
+                android:layout_marginStart="@dimen/title_distance_from_arrow"
+                android:layout_marginTop="@dimen/title_margin_top"
                 android:fontFamily="@font/nunito_bold"
                 android:padding="@dimen/title_padding"
                 android:text="@string/nav_1"
                 android:textColor="@color/primary_text"
                 android:textSize="@dimen/title_size"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/back_arrow" />
+                app:layout_constraintStart_toEndOf="@id/back_arrow"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/propic_image_view"
