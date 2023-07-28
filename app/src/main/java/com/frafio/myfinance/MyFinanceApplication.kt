@@ -3,6 +3,7 @@ package com.frafio.myfinance
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.managers.AuthManager
 import com.frafio.myfinance.data.managers.InvoiceManager
 import com.frafio.myfinance.data.managers.PurchaseManager
@@ -15,6 +16,8 @@ class MyFinanceApplication : Application() {
         const val PREFERENCES_KEY = "COLLECTION_PREFERENCES"
         const val COLLECTION_KEY = "COLLECTION_OPTIONS"
         const val DYNAMIC_COLOR_KEY = "DYNAMIC_COLOR_OPTIONS"
+        val LAST_YEAR = DbPurchases.COLLECTIONS.THREE_FOUR.value
+        val CURRENT_YEAR = DbPurchases.COLLECTIONS.THREE_FOUR.value
     }
 
     lateinit var sharedPreferences: SharedPreferences

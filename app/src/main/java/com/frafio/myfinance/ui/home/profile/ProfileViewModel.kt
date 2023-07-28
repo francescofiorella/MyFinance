@@ -8,4 +8,5 @@ import com.frafio.myfinance.data.repositories.UserRepository
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
     val user = userRepository.getUser()
+    val googleSignIn = user?.provider == "Google"
 }

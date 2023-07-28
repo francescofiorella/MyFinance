@@ -45,7 +45,7 @@ class MenuFragment : BaseFragment(), MenuListener {
             DbPurchases.COLLECTIONS.ONE_TWO.value -> 1
             DbPurchases.COLLECTIONS.TWO_THREE.value -> 2
             DbPurchases.COLLECTIONS.THREE_FOUR.value -> 3
-            else -> 2 // error, do not select a default option
+            else -> 3 // error, do not select a default option
         }
         binding.collectionTV.text = getString(R.string.year, yearArray[selectedCollection])
 
@@ -68,7 +68,7 @@ class MenuFragment : BaseFragment(), MenuListener {
                     1 -> DbPurchases.COLLECTIONS.ONE_TWO.value
                     2 -> DbPurchases.COLLECTIONS.TWO_THREE.value
                     3 -> DbPurchases.COLLECTIONS.THREE_FOUR.value
-                    else -> DbPurchases.COLLECTIONS.TWO_THREE.value
+                    else -> MyFinanceApplication.CURRENT_YEAR
                 }
                 viewModel.setCollection(collection)
                 binding.collectionTV.text = getString(R.string.year, yearArray[selectedItem])

@@ -71,6 +71,9 @@
 
     <string name="restart">Riavvia</string>
 
+    <string name="sign_up_provider">Registrato con Google</string>
+    <string name="signUpDate">Account creato il %1$s</string>
+
     <string-array name="types">
         <item>@string/generic</item>
         <item>@string/shopping</item>

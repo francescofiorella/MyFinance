@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.auth.SignupException
 import com.frafio.myfinance.data.enums.db.DbPurchases
@@ -199,7 +200,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         PurchaseStorage.resetPurchaseList()
         PurchaseStorage.existLastYear = false
         UserStorage.resetUser()
-        setSharedCollection(sharedPreferences, DbPurchases.COLLECTIONS.ONE_TWO.value)
+        setSharedCollection(sharedPreferences, MyFinanceApplication.CURRENT_YEAR)
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
         return (response)
@@ -243,12 +244,12 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
 
     private fun checkLastYear() {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.ZERO_ONE.value)
+            .document(UserStorage.user!!.email!!).collection(MyFinanceApplication.LAST_YEAR)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
                 if (queryDocumentSnapshots.isEmpty) {
                     fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
                         .document(UserStorage.user!!.email!!)
-                        .collection(DbPurchases.COLLECTIONS.ONE_TWO.value)
+                        .collection(MyFinanceApplication.LAST_YEAR)
                         .get().addOnSuccessListener { qds ->
                             PurchaseStorage.existLastYear = !qds.isEmpty
                         }

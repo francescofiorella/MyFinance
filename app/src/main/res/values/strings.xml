@@ -85,6 +85,8 @@
 
     <string name="empty" translatable="false">"   "</string>
     <string name="nav_5" translatable="false">Budget</string>
+    <string name="sign_up_provider">Signed up with Google</string>
+    <string name="signUpDate">Account created in %1$s</string>
 
     <string-array name="types">
         <item>@string/generic</item>
