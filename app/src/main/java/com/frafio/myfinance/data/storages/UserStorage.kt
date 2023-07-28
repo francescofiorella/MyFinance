@@ -3,7 +3,6 @@ package com.frafio.myfinance.data.storages
 import com.frafio.myfinance.data.models.User
 import com.google.firebase.auth.FirebaseUser
 import java.util.Calendar
-import java.util.Date
 
 
 object UserStorage {
@@ -17,10 +16,10 @@ object UserStorage {
         fUser.photoUrl?.let { uri ->
             userPic = uri.toString()
         }
-        var provider = "Password"
+        var provider = User.EMAIL_PROVIDER
         for (user in fUser.providerData) {
             if (user.providerId.contains("google.com"))
-                provider = "Google"
+                provider = User.GOOGLE_PROVIDER
         }
         var day: Int? = null
         var month: Int? = null

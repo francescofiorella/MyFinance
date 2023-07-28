@@ -27,6 +27,14 @@ class SignupActivity : AppCompatActivity(), AuthListener {
         viewModel.authListener = this
     }
 
+    override fun onStart() {
+        super.onStart()
+        binding.signupNameInputLayout.isErrorEnabled = false
+        binding.signupEmailInputLayout.isErrorEnabled = false
+        binding.signupPasswordInputLayout.isErrorEnabled = false
+        binding.signupPasswordConfirmInputLayout.isErrorEnabled = false
+    }
+
     override fun onAuthStarted() {
         binding.signupProgressIndicator.show()
         binding.signupButton.isEnabled = false

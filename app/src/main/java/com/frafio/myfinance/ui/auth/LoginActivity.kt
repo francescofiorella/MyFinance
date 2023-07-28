@@ -56,6 +56,12 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         viewModel.authListener = this
     }
 
+    override fun onStart() {
+        super.onStart()
+        binding.loginEmailInputLayout.isErrorEnabled = false
+        binding.loginPasswordInputLayout.isErrorEnabled = false
+    }
+
     fun onGoogleButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         binding.loginProgressIndicator.show()
 

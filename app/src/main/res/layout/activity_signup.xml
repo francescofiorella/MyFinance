@@ -28,20 +28,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:showAnimationBehavior="inward" />
 
-        <ImageView
-            android:id="@+id/back_arrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/arrow_margin_start"
-            android:layout_marginTop="21dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/back_arrow"
-            android:onClick="onBackClick"
-            android:padding="@dimen/arrow_padding"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_west" />
-
         <ScrollView
             android:id="@+id/signup_layout"
             android:layout_width="match_parent"
@@ -51,24 +37,30 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/back_arrow">
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.2"/>
+
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/signupTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="95dp"
                     android:fontFamily="casual"
                     android:text="@string/app_name"
                     android:textColor="?attr/colorPrimary"
                     android:textSize="45sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/guideline" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/signup_nameInputLayout"
@@ -196,11 +188,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="15dp"
                     app:layout_constraintBottom_toTopOf="@id/sLogintextView"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/signupButton"
+                    app:layout_constraintVertical_bias="1.0" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/sLogintextView"
@@ -216,8 +211,21 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-
         </ScrollView>
+
+        <ImageView
+            android:id="@+id/back_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/arrow_margin_start"
+            android:layout_marginTop="21dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/back_arrow"
+            android:onClick="onBackClick"
+            android:padding="@dimen/arrow_padding"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_west" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
