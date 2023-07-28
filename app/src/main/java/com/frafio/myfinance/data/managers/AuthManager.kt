@@ -244,14 +244,23 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
 
     private fun checkLastYear() {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).collection(MyFinanceApplication.LAST_YEAR)
-            .get().addOnSuccessListener { queryDocumentSnapshots ->
-                if (queryDocumentSnapshots.isEmpty) {
+            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.TWO_THREE.value)
+            .get().addOnSuccessListener { qds1 ->
+                if (qds1.isEmpty) {
                     fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
                         .document(UserStorage.user!!.email!!)
-                        .collection(MyFinanceApplication.LAST_YEAR)
-                        .get().addOnSuccessListener { qds ->
-                            PurchaseStorage.existLastYear = !qds.isEmpty
+                        .collection(DbPurchases.COLLECTIONS.ONE_TWO.value)
+                        .get().addOnSuccessListener { qds2 ->
+                            if (qds2.isEmpty) {
+                                fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+                                    .document(UserStorage.user!!.email!!)
+                                    .collection(DbPurchases.COLLECTIONS.ZERO_ONE.value)
+                                    .get().addOnSuccessListener { qds3 ->
+                                        PurchaseStorage.existLastYear = !qds3.isEmpty
+                                    }
+                            } else {
+                                PurchaseStorage.existLastYear = true
+                            }
                         }
                 } else {
                     PurchaseStorage.existLastYear = true

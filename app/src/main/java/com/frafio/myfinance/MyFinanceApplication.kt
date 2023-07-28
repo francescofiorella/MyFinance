@@ -16,7 +16,6 @@ class MyFinanceApplication : Application() {
         const val PREFERENCES_KEY = "COLLECTION_PREFERENCES"
         const val COLLECTION_KEY = "COLLECTION_OPTIONS"
         const val DYNAMIC_COLOR_KEY = "DYNAMIC_COLOR_OPTIONS"
-        val LAST_YEAR = DbPurchases.COLLECTIONS.THREE_FOUR.value
         val CURRENT_YEAR = DbPurchases.COLLECTIONS.THREE_FOUR.value
     }
 
