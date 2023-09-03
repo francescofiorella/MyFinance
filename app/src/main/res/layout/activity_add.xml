@@ -118,7 +118,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/name_textInputLayout"
-                    app:startIconDrawable="@drawable/ic_euro">
+                    app:startIconDrawable="@drawable/ic_attach_money">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/price_edit_text"

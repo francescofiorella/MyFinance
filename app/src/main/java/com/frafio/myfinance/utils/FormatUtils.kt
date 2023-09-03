@@ -24,11 +24,11 @@ fun doubleToStringWithoutDecimals(double: Double): String {
 }
 
 fun doubleToPrice(double: Double): String {
-    return "€ ${doubleToString(double)}"
+    return "$ ${doubleToString(double)}" // € edited to $
 }
 
 fun doubleToPriceWithoutDecimals(double: Double): String {
-    return "€ ${doubleToStringWithoutDecimals(double)}"
+    return "$ ${doubleToStringWithoutDecimals(double)}" // € edited to $
 }
 
 
