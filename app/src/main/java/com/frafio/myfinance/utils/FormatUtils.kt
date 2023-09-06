@@ -2,6 +2,10 @@ package com.frafio.myfinance.utils
 
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.*
 import kotlin.math.round
 
@@ -68,3 +72,7 @@ fun Float.round(decimals: Int): Float {
 fun getCurrentLanguage(): String {
     return Locale.getDefault().language
 }
+
+fun Long.toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
+
+fun Long.toUTCLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.ofOffset("UTC", ZoneOffset.UTC))

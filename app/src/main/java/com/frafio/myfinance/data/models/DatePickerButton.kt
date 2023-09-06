@@ -6,9 +6,13 @@ import androidx.fragment.app.FragmentActivity
 import com.frafio.myfinance.data.enums.db.Languages
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.getCurrentLanguage
+import com.frafio.myfinance.utils.toLocalDateTime
+import com.frafio.myfinance.utils.toUTCLocalDateTime
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputLayout
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.*
 
 open class DatePickerButton(
@@ -37,7 +41,7 @@ open class DatePickerButton(
         }
         val builder = MaterialDatePicker.Builder.datePicker()
         builder.setTitleText(DATE_PICKER_TITLE)
-        builder.setSelection(calendar.timeInMillis)
+        builder.setSelection(calendar.timeInMillis.toLocalDateTime().atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toInstant().toEpochMilli())
         val materialDatePicker = builder.build()
 
         showDatePicker(materialDatePicker)
@@ -86,7 +90,7 @@ open class DatePickerButton(
             materialDatePicker.show(context.supportFragmentManager, DATE_PICKER_TAG)
             materialDatePicker.addOnPositiveButtonClickListener { selection ->
                 // get selected date
-                val date = Date(selection.toString().toLong())
+                val date = Date(selection.toString().toLong().toUTCLocalDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
                 val calendar = Calendar.getInstance()
 
                 calendar.time = date
