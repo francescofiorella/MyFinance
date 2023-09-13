@@ -53,6 +53,14 @@ class AddActivity : AppCompatActivity(), AddListener {
             viewModel.requestCode = code
             initLayout(code)
         }
+
+        binding.priceTextInputLayout.setStartIconDrawable(
+            when (getString(R.string.currency)) {
+                "€" -> R.drawable.ic_euro
+                "$" -> R.drawable.ic_attach_money
+                else -> R.drawable.ic_euro
+            }
+        )
     }
 
     private val typeViewListener = View.OnClickListener {
@@ -86,7 +94,8 @@ class AddActivity : AppCompatActivity(), AddListener {
             binding.priceEditText.clearText()
             binding.priceTextInputLayout.isEnabled = true
         } else if (binding.nameEditText.text.toString() == DbPurchases.NAMES.RENT.value_en
-            || binding.nameEditText.text.toString() == DbPurchases.NAMES.RENT.value_it) {
+            || binding.nameEditText.text.toString() == DbPurchases.NAMES.RENT.value_it
+        ) {
             binding.nameEditText.clearText()
         }
 

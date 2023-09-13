@@ -88,6 +88,8 @@
     <string name="sign_up_provider">Signed up with Google</string>
     <string name="signUpDate">Account created in %1$s</string>
 
+    <string name="currency" translatable="false">$</string>
+
     <string-array name="types">
         <item>@string/generic</item>
         <item>@string/shopping</item>

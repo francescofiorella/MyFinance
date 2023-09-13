@@ -86,7 +86,7 @@
                             app:egCurveSmoothness="0.4"
                             app:egIndicatorLineColor="?attr/colorOnSecondaryContainer"
                             app:egIndicatorTextColor="?attr/colorOnSecondaryContainer"
-                            app:egIndicatorTextUnit="€"
+                            app:egIndicatorTextUnit="@string/currency"
                             app:egLegendHeight="0dp"
                             app:egShowDecimal="true"
                             app:egShowLegendBeneathIndicator="true"

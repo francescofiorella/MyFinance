@@ -1,5 +1,7 @@
 package com.frafio.myfinance.utils
 
+import com.frafio.myfinance.R
+import com.frafio.myfinance.Strings
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.Instant
@@ -28,13 +30,12 @@ fun doubleToStringWithoutDecimals(double: Double): String {
 }
 
 fun doubleToPrice(double: Double): String {
-    return "$ ${doubleToString(double)}" // € edited to $
+    return "${Strings.get(R.string.currency)} ${doubleToString(double)}" // € edited to $
 }
 
 fun doubleToPriceWithoutDecimals(double: Double): String {
-    return "$ ${doubleToStringWithoutDecimals(double)}" // € edited to $
+    return "${Strings.get(R.string.currency)} ${doubleToStringWithoutDecimals(double)}" // € edited to $
 }
-
 
 fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?): String? {
     var formattedDate: String? = null
@@ -73,6 +74,8 @@ fun getCurrentLanguage(): String {
     return Locale.getDefault().language
 }
 
-fun Long.toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
+fun Long.toLocalDateTime(): LocalDateTime =
+    LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
 
-fun Long.toUTCLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.ofOffset("UTC", ZoneOffset.UTC))
+fun Long.toUTCLocalDateTime(): LocalDateTime =
+    LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.ofOffset("UTC", ZoneOffset.UTC))
