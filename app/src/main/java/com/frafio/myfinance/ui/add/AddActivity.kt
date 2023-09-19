@@ -65,7 +65,7 @@ class AddActivity : AppCompatActivity(), AddListener {
 
     private val typeViewListener = View.OnClickListener {
         val builder = MaterialAlertDialogBuilder(this)
-        builder.setIcon(R.drawable.ic_numbers)
+        builder.setIcon(R.drawable.ic_tag)
         builder.setTitle(getString(R.string.type))
         builder.setSingleChoiceItems(
             resources.getStringArray(R.array.types),

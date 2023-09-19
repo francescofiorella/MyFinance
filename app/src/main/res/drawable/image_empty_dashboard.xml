@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@drawable/ic_audit_amico" />
+    <item android:drawable="@drawable/image_audit_amico" />
 
 </selector>

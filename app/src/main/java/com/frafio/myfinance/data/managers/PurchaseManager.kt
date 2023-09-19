@@ -26,6 +26,29 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
     private val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
 
+    fun getCategories(): LiveData<Pair<PurchaseResult, List<String>>> {
+        val response = MutableLiveData<Pair<PurchaseResult, List<String>>>()
+
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .get().addOnSuccessListener {docSnap ->
+                val categories = (docSnap.data?.get(DbPurchases.FIELDS.CATEGORIES.value) as List<*>).map { value ->
+                    value.toString()
+                }
+                response.value = Pair(
+                    PurchaseResult(PurchaseCode.PURCHASE_GET_CATEGORIES_SUCCESS),
+                    categories
+                )
+            }.addOnFailureListener {
+                response.value = Pair(
+                    PurchaseResult(PurchaseCode.PURCHASE_GET_CATEGORIES_FAILURE),
+                    listOf()
+                )
+            }
+
+        return response
+    }
+
     fun updateList(): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 

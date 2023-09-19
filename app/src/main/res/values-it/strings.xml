@@ -73,6 +73,11 @@
 
     <string name="sign_up_provider">Registrato con Google</string>
     <string name="signUpDate">Account creato il %1$s</string>
+    <string name="categories">Categorie</string>
+    <string name="create">Crea</string>
+    <string name="create_category">Crea categoria</string>
+
+    <string name="generic_error">Errore generico!</string>
 
     <string-array name="types">
         <item>@string/generic</item>

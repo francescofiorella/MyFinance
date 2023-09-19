@@ -127,29 +127,41 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:contentDescription="@string/collection_icon"
-                        android:paddingVertical="15dp"
-                        android:src="@drawable/ic_visibility"
-                        app:layout_constraintBottom_toBottomOf="@+id/collection_TV"
+                        android:src="@drawable/ic_label"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/collection_TV" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/collection_TV"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
                         android:fontFamily="@font/nunito"
-                        android:text="@string/year"
+                        android:text="@string/categories"
                         android:textColor="@color/primary_text"
                         android:textSize="18sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@id/collection_icon"
                         app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/actual_collection_TV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:fontFamily="@font/nunito"
+                        android:text="Categoria attuale"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/collection_icon"
+                        app:layout_constraintTop_toBottomOf="@id/collection_TV" />
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/year"
+                        android:contentDescription="@string/categories"
                         android:src="@drawable/ic_arrow_drop_down"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"

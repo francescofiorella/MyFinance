@@ -47,34 +47,10 @@ class MenuFragment : BaseFragment(), MenuListener {
             DbPurchases.COLLECTIONS.THREE_FOUR.value -> 3
             else -> 3 // error, do not select a default option
         }
-        binding.collectionTV.text = getString(R.string.year, yearArray[selectedCollection])
+        binding.actualCollectionTV.text = viewModel.getSelectedCollection()
 
         binding.collectionCard.setOnClickListener {
-            val builder = MaterialAlertDialogBuilder(requireContext())
-            builder.setIcon(R.drawable.ic_visibility)
-            builder.setTitle(getString(R.string.year, ""))
-            builder.setSingleChoiceItems(
-                yearArray,
-                when (viewModel.getSelectedCollection()) {
-                    DbPurchases.COLLECTIONS.ZERO_ONE.value -> 0
-                    DbPurchases.COLLECTIONS.ONE_TWO.value -> 1
-                    DbPurchases.COLLECTIONS.TWO_THREE.value -> 2
-                    DbPurchases.COLLECTIONS.THREE_FOUR.value -> 3
-                    else -> -1 // error, do not select a default option
-                }
-            ) { dialog, selectedItem ->
-                val collection = when (selectedItem) {
-                    0 -> DbPurchases.COLLECTIONS.ZERO_ONE.value
-                    1 -> DbPurchases.COLLECTIONS.ONE_TWO.value
-                    2 -> DbPurchases.COLLECTIONS.TWO_THREE.value
-                    3 -> DbPurchases.COLLECTIONS.THREE_FOUR.value
-                    else -> MyFinanceApplication.CURRENT_YEAR
-                }
-                viewModel.setCollection(collection)
-                binding.collectionTV.text = getString(R.string.year, yearArray[selectedItem])
-                dialog.dismiss()
-            }
-            builder.show()
+            viewModel.getCategories()
         }
 
         binding.dynamicColorSwitch.also {
@@ -106,19 +82,42 @@ class MenuFragment : BaseFragment(), MenuListener {
         (activity as HomeActivity).showProgressIndicator()
     }
 
-    override fun onCompleted(result: LiveData<PurchaseResult>) {
-        result.observe(this) { purchaseResult ->
+    override fun <T> onCompleted(result: LiveData<T>) {
+        result.observe(this) { value ->
             (activity as HomeActivity).hideProgressIndicator()
 
-            when (purchaseResult.code) {
-                PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
-                    refreshPlotData(animate = true)
-                    (activity as HomeActivity).refreshFragmentData(dashboard = true, payments = true)
-                }
+            if (value is PurchaseCode) {
+                when (value.code) {
+                    PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
+                        refreshPlotData(animate = true)
+                        (activity as HomeActivity).refreshFragmentData(
+                            dashboard = true,
+                            payments = true
+                        )
+                    }
 
-                else -> {
-                    (activity as HomeActivity).showSnackBar(purchaseResult.message)
+                    else -> {
+                        (activity as HomeActivity).showSnackBar(value.message)
+                    }
                 }
+            } else if (value is Pair<*, *>) {
+                val purchaseResult = value.first
+                val categories = value.second
+                if (purchaseResult is PurchaseResult && categories is List<*>) {
+                    when (purchaseResult.code) {
+                        PurchaseCode.PURCHASE_GET_CATEGORIES_SUCCESS.code -> {
+                            showCategoriesDialog(categories as List<String>)
+                        }
+
+                        else -> {
+                            (activity as HomeActivity).showSnackBar(purchaseResult.message)
+                        }
+                    }
+                } else {
+                    (activity as HomeActivity).showSnackBar(getString(R.string.generic_error))
+                }
+            } else {
+                (activity as HomeActivity).showSnackBar(getString(R.string.generic_error))
             }
         }
     }
@@ -155,5 +154,45 @@ class MenuFragment : BaseFragment(), MenuListener {
     override fun scrollUp() {
         super.scrollUp()
         binding.menuScrollView.scrollTo(0, 0)
+    }
+
+    private fun showCategoriesDialog(categories : List<String>) {
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        builder.setIcon(R.drawable.ic_label)
+        builder.setTitle(getString(R.string.categories))
+        builder.setSingleChoiceItems(
+            categories.toTypedArray(),
+            when (viewModel.getSelectedCollection()) {
+                DbPurchases.COLLECTIONS.ZERO_ONE.value -> 0
+                DbPurchases.COLLECTIONS.ONE_TWO.value -> 1
+                DbPurchases.COLLECTIONS.TWO_THREE.value -> 2
+                DbPurchases.COLLECTIONS.THREE_FOUR.value -> 3
+                else -> -1 // error, do not select a default option
+            }
+        ) { dialog, selectedItem ->
+            /*val collection = when (selectedItem) {
+                0 -> DbPurchases.COLLECTIONS.ZERO_ONE.value
+                1 -> DbPurchases.COLLECTIONS.ONE_TWO.value
+                2 -> DbPurchases.COLLECTIONS.TWO_THREE.value
+                3 -> DbPurchases.COLLECTIONS.THREE_FOUR.value
+                else -> MyFinanceApplication.CURRENT_YEAR
+            }
+            viewModel.setCollection(collection)
+            binding.collectionTV.text = getString(R.string.year, yearArray[selectedItem])*/
+            dialog.dismiss()
+        }
+        builder.setPositiveButton(getString(R.string.create)) { upperDialog, _ ->
+            upperDialog.dismiss()
+            val builder = MaterialAlertDialogBuilder(requireContext())
+            builder.setIcon(R.drawable.ic_label)
+            builder.setTitle(getString(R.string.create_category))
+            builder.setNegativeButton(getString(R.string.cancel), null)
+            builder.setPositiveButton(getString(R.string.create)) { lowerDialog, _ ->
+                lowerDialog.dismiss()
+            }
+            builder.show()
+        }
+        builder.setNegativeButton(getString(R.string.cancel), null)
+        builder.show()
     }
 }

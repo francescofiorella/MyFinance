@@ -11,7 +11,8 @@ object DbPurchases {
         MONTH("month"),
         DAY("day"),
         TYPE("type"),
-        PRICE("price")
+        PRICE("price"),
+        CATEGORIES("categories")
     }
 
     enum class NAMES(val value: String, val value_en: String, val value_it: String) {

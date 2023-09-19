@@ -26,6 +26,11 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
 
     val avgTrendListSize: Int = avgTrendList.size
 
+    fun getCategories() {
+        val response = purchaseRepository.getCategories()
+        listener?.onCompleted(response)
+    }
+
     fun setCollection(collection: String) {
         listener?.onStarted()
         val response = purchaseRepository.setCollection(collection)

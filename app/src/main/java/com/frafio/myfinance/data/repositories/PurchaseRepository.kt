@@ -17,6 +17,10 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
     val avgTrendList: List<Pair<String, Double>>
         get() = calculateAvgTrend()
 
+    fun getCategories(): LiveData<Pair<PurchaseResult, List<String>>> {
+        return purchaseManager.getCategories()
+    }
+
     fun updatePurchaseList(): LiveData<PurchaseResult> {
         return purchaseManager.updateList()
     }

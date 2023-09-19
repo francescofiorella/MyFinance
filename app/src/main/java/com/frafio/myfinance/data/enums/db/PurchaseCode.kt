@@ -106,6 +106,22 @@ enum class PurchaseCode(val code: Int, val message: String) {
         }
     ),
 
+    PURCHASE_GET_CATEGORIES_SUCCESS(
+        50, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Categories list received!"
+            Languages.ITALIANO.value -> "Lista categorie ricevuta!"
+            else -> "Categories list received!" // english
+        }
+    ),
+
+    PURCHASE_GET_CATEGORIES_FAILURE(
+        51, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Categories list not received!"
+            Languages.ITALIANO.value -> "Lista categorie non ricevuta!"
+            else -> "Categories list not received!" // english
+        }
+    ),
+
     INVOICE_ADD_SUCCESS(
         100, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Item added!"

@@ -89,6 +89,11 @@
     <string name="signUpDate">Account created in %1$s</string>
 
     <string name="currency" translatable="false">$</string>
+    <string name="categories">Categories</string>
+    <string name="create">Create</string>
+    <string name="create_category">Create category</string>
+
+    <string name="generic_error">Generic error!</string>
 
     <string-array name="types">
         <item>@string/generic</item>

@@ -6,5 +6,5 @@ import com.frafio.myfinance.data.models.PurchaseResult
 interface MenuListener {
     fun onStarted()
 
-    fun onCompleted(result: LiveData<PurchaseResult>)
+    fun <T> onCompleted(result: LiveData<T>)
 }

@@ -20,7 +20,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:contentDescription="Coming Soon!"
-            android:src="@drawable/ic_coming_soon"
+            android:src="@drawable/image_coming_soon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
