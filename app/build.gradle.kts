@@ -16,7 +16,7 @@ android {
         minSdk = 29
         targetSdk = 33
         versionCode = 4
-        versionName = "4.0.3-beta"
+        versionName = "4.0.4-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -69,7 +69,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Firebase libraries
-    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
@@ -77,15 +77,15 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     // Glide library
-    implementation("com.github.bumptech.glide:glide:4.15.1")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
-    ksp("com.github.bumptech.glide:ksp:4.15.1")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    ksp("com.github.bumptech.glide:ksp:4.16.0")
 
     // Chart and graph library
     implementation("com.github.blackfizz:eazegraph:1.2.2@aar")
     implementation("com.nineoldandroids:library:2.4.0")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }
