@@ -8,7 +8,8 @@ data class Purchase(
     val month: Int? = null,
     val day: Int? = null,
     val type: Int? = null,
-    var id: String? = null
+    var id: String? = null,
+    var category: String? = null
 ) {
     fun updateID(id: String) {
         this.id = id

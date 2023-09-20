@@ -79,3 +79,11 @@ fun Long.toLocalDateTime(): LocalDateTime =
 
 fun Long.toUTCLocalDateTime(): LocalDateTime =
     LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.ofOffset("UTC", ZoneOffset.UTC))
+
+fun slashToUnderscore(string: String) : String {
+    return string.replace('/', '_')
+}
+
+fun underscoreToSlash(string: String) : String {
+    return string.replace('_', '/')
+}

@@ -17,8 +17,6 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
     var isDynamicColorAvailable: Boolean = DynamicColors.isDynamicColorAvailable()
     var isSwitchDynamicColorChecked: Boolean = getDynamicColorCheck()
 
-    var isLastYearOk: Boolean = purchaseRepository.existLastYear()
-
     val versionName: String = "MyFinance ${BuildConfig.VERSION_NAME}"
 
     val avgTrendList: List<Pair<String, Double>>

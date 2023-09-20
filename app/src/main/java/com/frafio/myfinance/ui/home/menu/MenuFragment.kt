@@ -21,6 +21,8 @@ import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.setValueLineChartData
+import com.frafio.myfinance.utils.slashToUnderscore
+import com.frafio.myfinance.utils.underscoreToSlash
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class MenuFragment : BaseFragment(), MenuListener {
@@ -39,15 +41,7 @@ class MenuFragment : BaseFragment(), MenuListener {
 
         viewModel.listener = this
 
-        val yearArray = resources.getStringArray(R.array.years)
-        val selectedCollection = when (viewModel.getSelectedCollection()) {
-            DbPurchases.COLLECTIONS.ZERO_ONE.value -> 0
-            DbPurchases.COLLECTIONS.ONE_TWO.value -> 1
-            DbPurchases.COLLECTIONS.TWO_THREE.value -> 2
-            DbPurchases.COLLECTIONS.THREE_FOUR.value -> 3
-            else -> 3 // error, do not select a default option
-        }
-        binding.actualCollectionTV.text = viewModel.getSelectedCollection()
+        binding.actualCollectionTV.text = underscoreToSlash(viewModel.getSelectedCollection())
 
         binding.collectionCard.setOnClickListener {
             viewModel.getCategories()
@@ -86,7 +80,7 @@ class MenuFragment : BaseFragment(), MenuListener {
         result.observe(this) { value ->
             (activity as HomeActivity).hideProgressIndicator()
 
-            if (value is PurchaseCode) {
+            if (value is PurchaseResult) {
                 when (value.code) {
                     PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
                         refreshPlotData(animate = true)
@@ -157,34 +151,22 @@ class MenuFragment : BaseFragment(), MenuListener {
     }
 
     private fun showCategoriesDialog(categories : List<String>) {
-        val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setIcon(R.drawable.ic_label)
+        var builder = MaterialAlertDialogBuilder(requireContext())
+        builder.setIcon(R.drawable.ic_auto_awesome_motion)
         builder.setTitle(getString(R.string.categories))
         builder.setSingleChoiceItems(
             categories.toTypedArray(),
-            when (viewModel.getSelectedCollection()) {
-                DbPurchases.COLLECTIONS.ZERO_ONE.value -> 0
-                DbPurchases.COLLECTIONS.ONE_TWO.value -> 1
-                DbPurchases.COLLECTIONS.TWO_THREE.value -> 2
-                DbPurchases.COLLECTIONS.THREE_FOUR.value -> 3
-                else -> -1 // error, do not select a default option
-            }
+            categories.indexOf(underscoreToSlash(viewModel.getSelectedCollection()))
         ) { dialog, selectedItem ->
-            /*val collection = when (selectedItem) {
-                0 -> DbPurchases.COLLECTIONS.ZERO_ONE.value
-                1 -> DbPurchases.COLLECTIONS.ONE_TWO.value
-                2 -> DbPurchases.COLLECTIONS.TWO_THREE.value
-                3 -> DbPurchases.COLLECTIONS.THREE_FOUR.value
-                else -> MyFinanceApplication.CURRENT_YEAR
-            }
+            val collection = slashToUnderscore(categories[selectedItem])
             viewModel.setCollection(collection)
-            binding.collectionTV.text = getString(R.string.year, yearArray[selectedItem])*/
+            binding.actualCollectionTV.text = underscoreToSlash(collection)
             dialog.dismiss()
         }
         builder.setPositiveButton(getString(R.string.create)) { upperDialog, _ ->
             upperDialog.dismiss()
-            val builder = MaterialAlertDialogBuilder(requireContext())
-            builder.setIcon(R.drawable.ic_label)
+            builder = MaterialAlertDialogBuilder(requireContext())
+            builder.setIcon(R.drawable.ic_auto_awesome_motion)
             builder.setTitle(getString(R.string.create_category))
             builder.setNegativeButton(getString(R.string.cancel), null)
             builder.setPositiveButton(getString(R.string.create)) { lowerDialog, _ ->

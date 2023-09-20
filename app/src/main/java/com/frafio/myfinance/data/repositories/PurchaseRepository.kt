@@ -240,8 +240,4 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
     fun getDynamicColorActive(): Boolean {
         return purchaseManager.getDynamicColorActive()
     }
-
-    fun existLastYear(): Boolean {
-        return PurchaseStorage.existLastYear
-    }
 }

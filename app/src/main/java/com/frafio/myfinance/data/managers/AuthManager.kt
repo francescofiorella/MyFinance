@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.auth.SignupException
 import com.frafio.myfinance.data.enums.db.DbPurchases
@@ -20,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
@@ -198,9 +198,8 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         fAuth.signOut()
 
         PurchaseStorage.resetPurchaseList()
-        PurchaseStorage.existLastYear = false
         UserStorage.resetUser()
-        setSharedCollection(sharedPreferences, MyFinanceApplication.CURRENT_YEAR)
+        setSharedCollection(sharedPreferences, DbPurchases.COLLECTIONS.DEFAULT.value)
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
         return (response)
@@ -209,30 +208,67 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
     fun updateUserData(): LiveData<AuthResult> {
         val response = MutableLiveData<AuthResult>()
 
-        checkLastYear()
-
+        // set the current collection
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).collection(getSharedCollection(sharedPreferences))
-            .whereEqualTo(DbPurchases.FIELDS.EMAIL.value, UserStorage.user!!.email)
-            .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.TYPE.value)
-            .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
-            .get().addOnSuccessListener { queryDocumentSnapshots ->
-                PurchaseStorage.resetPurchaseList()
+            .document(UserStorage.user!!.email!!)
+            .get().addOnSuccessListener { docSnap ->
+                val categories =
+                    (docSnap.data?.get(DbPurchases.FIELDS.CATEGORIES.value) as List<*>).map { value ->
+                        value.toString()
+                    }
+                if (categories.isEmpty()) {
+                    setSharedCollection(sharedPreferences, DbPurchases.COLLECTIONS.DEFAULT.value)
 
-                queryDocumentSnapshots.forEach { document ->
-                    val purchase = document.toObject(Purchase::class.java)
+                    // initialize the categories vector
+                    fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+                        .document(UserStorage.user!!.email!!)
+                        .update(
+                            "categories",
+                            FieldValue.arrayUnion(DbPurchases.COLLECTIONS.DEFAULT.value)
+                        )
+                        .addOnFailureListener { e ->
+                            setSharedCollection(
+                                sharedPreferences,
+                                DbPurchases.COLLECTIONS.DEFAULT.value
+                            )
+                            val error = "Error! ${e.localizedMessage}"
+                            Log.e(TAG, error)
 
-                    // set id
-                    purchase.updateID(document.id)
-
-                    PurchaseStorage.purchaseList.add(purchase)
+                            response.value = AuthResult(AuthCode.USER_DATA_NOT_UPDATED)
+                        }
+                } else {
+                    setSharedCollection(sharedPreferences, categories.last())
                 }
 
-                response.value = AuthResult(AuthCode.USER_DATA_UPDATED)
+                fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+                    .document(UserStorage.user!!.email!!).collection(getSharedCollection(sharedPreferences))
+                    .whereEqualTo(DbPurchases.FIELDS.EMAIL.value, UserStorage.user!!.email)
+                    .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
+                    .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
+                    .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
+                    .orderBy(DbPurchases.FIELDS.TYPE.value)
+                    .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
+                    .get().addOnSuccessListener { queryDocumentSnapshots ->
+                        PurchaseStorage.resetPurchaseList()
+
+                        queryDocumentSnapshots.forEach { document ->
+                            val purchase = document.toObject(Purchase::class.java)
+
+                            // set id
+                            purchase.updateID(document.id)
+
+                            PurchaseStorage.purchaseList.add(purchase)
+                        }
+
+                        response.value = AuthResult(AuthCode.USER_DATA_UPDATED)
+                    }.addOnFailureListener { e ->
+                        val error = "Error! ${e.localizedMessage}"
+                        Log.e(TAG, error)
+
+                        response.value = AuthResult(AuthCode.USER_DATA_NOT_UPDATED)
+                    }
             }.addOnFailureListener { e ->
+                setSharedCollection(sharedPreferences, DbPurchases.COLLECTIONS.DEFAULT.value)
                 val error = "Error! ${e.localizedMessage}"
                 Log.e(TAG, error)
 
@@ -240,32 +276,6 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
             }
 
         return response
-    }
-
-    private fun checkLastYear() {
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).collection(DbPurchases.COLLECTIONS.TWO_THREE.value)
-            .get().addOnSuccessListener { qds1 ->
-                if (qds1.isEmpty) {
-                    fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                        .document(UserStorage.user!!.email!!)
-                        .collection(DbPurchases.COLLECTIONS.ONE_TWO.value)
-                        .get().addOnSuccessListener { qds2 ->
-                            if (qds2.isEmpty) {
-                                fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                                    .document(UserStorage.user!!.email!!)
-                                    .collection(DbPurchases.COLLECTIONS.ZERO_ONE.value)
-                                    .get().addOnSuccessListener { qds3 ->
-                                        PurchaseStorage.existLastYear = !qds3.isEmpty
-                                    }
-                            } else {
-                                PurchaseStorage.existLastYear = true
-                            }
-                        }
-                } else {
-                    PurchaseStorage.existLastYear = true
-                }
-            }
     }
 
     fun isDynamicColorOn(): Boolean {
