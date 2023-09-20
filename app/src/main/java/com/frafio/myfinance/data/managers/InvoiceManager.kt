@@ -27,7 +27,7 @@ class InvoiceManager(private val sharedPreferences: SharedPreferences) {
         val response = MutableLiveData<List<InvoiceItem>>()
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(getSharedCategory(sharedPreferences))
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchaseID).collection(DbReceipt.FIELDS.RECEIPT.value)
             .orderBy(DbReceipt.FIELDS.NAME.value)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
@@ -54,7 +54,7 @@ class InvoiceManager(private val sharedPreferences: SharedPreferences) {
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(getSharedCategory(sharedPreferences))
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchaseID).collection(DbReceipt.FIELDS.RECEIPT.value)
             .add(invoiceItem).addOnSuccessListener { document ->
                 invoiceItem.id = document.id
@@ -76,7 +76,7 @@ class InvoiceManager(private val sharedPreferences: SharedPreferences) {
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(getSharedCategory(sharedPreferences))
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchaseID).collection(DbReceipt.FIELDS.RECEIPT.value)
             .document(invoiceItem.id!!).delete().addOnSuccessListener {
                 InvoiceItemStorage.removeFromList(invoiceItem)
