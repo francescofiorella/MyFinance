@@ -160,7 +160,7 @@ class MenuFragment : BaseFragment(), MenuListener {
             binding.actualCollectionTV.text = collection
             dialog.dismiss()
         }
-        builder.setPositiveButton(getString(R.string.create)) { upperDialog, _ ->
+        /*builder.setPositiveButton(getString(R.string.create)) { upperDialog, _ ->
             upperDialog.dismiss()
             builder = MaterialAlertDialogBuilder(requireContext())
             builder.setIcon(R.drawable.ic_auto_awesome_motion)
@@ -171,7 +171,7 @@ class MenuFragment : BaseFragment(), MenuListener {
             }
             builder.show()
         }
-        builder.setNegativeButton(getString(R.string.cancel), null)
+        builder.setNegativeButton(getString(R.string.cancel), null)*/
         builder.show()
     }
 }
