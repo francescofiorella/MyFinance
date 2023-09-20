@@ -65,7 +65,10 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
 
         if (type == DbPurchases.TYPES.TOTAL.value) {
             val purchase =
-                Purchase(userEmail, name, 0.0, year, month, day, DbPurchases.TYPES.TOTAL.value)
+                Purchase(
+                    userEmail, name, 0.0, year, month, day, DbPurchases.TYPES.TOTAL.value,
+                    category = purchaseRepository.getSelectedCategory()
+                )
             val response = purchaseRepository.addTotal(purchase)
             listener?.onAddSuccess(response)
         } else {
@@ -77,12 +80,14 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             val price = priceString!!.toDouble()
 
             if (requestCode == AddActivity.REQUEST_ADD_CODE) {
-                val purchase = Purchase(userEmail, name, price, year, month, day, type)
+                val purchase = Purchase(userEmail, name, price, year, month, day, type,
+                    category = purchaseRepository.getSelectedCategory())
                 val response = purchaseRepository.addPurchase(purchase)
                 listener?.onAddSuccess(response)
             } else if (requestCode == AddActivity.REQUEST_EDIT_CODE) {
                 val purchase =
-                    Purchase(userEmail, name, price, year, month, day, purchaseType, purchaseID)
+                    Purchase(userEmail, name, price, year, month, day, purchaseType, purchaseID,
+                        category = purchaseRepository.getSelectedCategory())
 
                 val response =
                     purchaseRepository.editPurchase(purchase, purchasePosition!!, purchasePrice!!)

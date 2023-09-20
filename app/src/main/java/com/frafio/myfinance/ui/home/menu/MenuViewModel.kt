@@ -35,8 +35,8 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
         listener?.onCompleted(response)
     }
 
-    fun getSelectedCollection(): String {
-        return purchaseRepository.getSelectedCollection()
+    fun getSelectedCategory(): String {
+        return purchaseRepository.getSelectedCategory()
     }
 
     fun setDynamicColor(active: Boolean) {

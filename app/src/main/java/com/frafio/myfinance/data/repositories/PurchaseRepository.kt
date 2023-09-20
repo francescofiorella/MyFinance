@@ -229,8 +229,8 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return purchaseManager.updateListByCollection(collection)
     }
 
-    fun getSelectedCollection(): String {
-        return purchaseManager.getSelectedCollection()
+    fun getSelectedCategory(): String {
+        return purchaseManager.getSelectedCategory()
     }
 
     fun setDynamicColorActive(active: Boolean) {

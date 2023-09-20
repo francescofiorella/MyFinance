@@ -15,7 +15,7 @@ fun doubleToString(double: Double): String {
     val locale = Locale("en", "UK")
     val nf = NumberFormat.getInstance(locale)
     val formatter = nf as DecimalFormat
-    formatter.applyPattern("###,###,##0.00")
+    formatter.applyPattern("########0.00")
 
     return formatter.format(double)
 }
@@ -24,7 +24,7 @@ fun doubleToStringWithoutDecimals(double: Double): String {
     val locale = Locale("en", "UK")
     val nf = NumberFormat.getInstance(locale)
     val formatter = nf as DecimalFormat
-    formatter.applyPattern("###,###,##0")
+    formatter.applyPattern("########0")
 
     return formatter.format(double)
 }
@@ -79,11 +79,3 @@ fun Long.toLocalDateTime(): LocalDateTime =
 
 fun Long.toUTCLocalDateTime(): LocalDateTime =
     LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.ofOffset("UTC", ZoneOffset.UTC))
-
-fun slashToUnderscore(string: String) : String {
-    return string.replace('/', '_')
-}
-
-fun underscoreToSlash(string: String) : String {
-    return string.replace('_', '/')
-}

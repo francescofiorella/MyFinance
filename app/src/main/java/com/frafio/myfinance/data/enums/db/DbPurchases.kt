@@ -5,6 +5,7 @@ import com.frafio.myfinance.utils.getCurrentLanguage
 object DbPurchases {
     enum class FIELDS(val value: String) {
         PURCHASES("purchases"),
+        PAYMENTS("payments"),
         NAME("name"),
         EMAIL("email"),
         YEAR("year"),
@@ -12,6 +13,7 @@ object DbPurchases {
         DAY("day"),
         TYPE("type"),
         PRICE("price"),
+        CATEGORY("category"),
         CATEGORIES("categories")
     }
 
@@ -41,7 +43,7 @@ object DbPurchases {
         RENT(4)
     }
 
-    enum class COLLECTIONS(val value: String) {
+    enum class CATEGORIES(val value: String) {
         DEFAULT(when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "First category"
             Languages.ITALIANO.value -> "Prima categoria"

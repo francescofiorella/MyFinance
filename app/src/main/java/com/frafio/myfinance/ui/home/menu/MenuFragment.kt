@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentMenuBinding
@@ -21,8 +20,6 @@ import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.setValueLineChartData
-import com.frafio.myfinance.utils.slashToUnderscore
-import com.frafio.myfinance.utils.underscoreToSlash
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class MenuFragment : BaseFragment(), MenuListener {
@@ -41,7 +38,7 @@ class MenuFragment : BaseFragment(), MenuListener {
 
         viewModel.listener = this
 
-        binding.actualCollectionTV.text = underscoreToSlash(viewModel.getSelectedCollection())
+        binding.actualCollectionTV.text = viewModel.getSelectedCategory()
 
         binding.collectionCard.setOnClickListener {
             viewModel.getCategories()
@@ -156,11 +153,11 @@ class MenuFragment : BaseFragment(), MenuListener {
         builder.setTitle(getString(R.string.categories))
         builder.setSingleChoiceItems(
             categories.toTypedArray(),
-            categories.indexOf(underscoreToSlash(viewModel.getSelectedCollection()))
+            categories.indexOf(viewModel.getSelectedCategory())
         ) { dialog, selectedItem ->
-            val collection = slashToUnderscore(categories[selectedItem])
+            val collection = categories[selectedItem]
             viewModel.setCollection(collection)
-            binding.actualCollectionTV.text = underscoreToSlash(collection)
+            binding.actualCollectionTV.text = collection
             dialog.dismiss()
         }
         builder.setPositiveButton(getString(R.string.create)) { upperDialog, _ ->

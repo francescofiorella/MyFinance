@@ -11,7 +11,7 @@ import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.models.InvoiceItem
 import com.frafio.myfinance.data.storages.InvoiceItemStorage
 import com.frafio.myfinance.data.storages.UserStorage
-import com.frafio.myfinance.utils.getSharedCollection
+import com.frafio.myfinance.utils.getSharedCategory
 import com.google.firebase.firestore.FirebaseFirestore
 
 class InvoiceManager(private val sharedPreferences: SharedPreferences) {
@@ -27,7 +27,7 @@ class InvoiceManager(private val sharedPreferences: SharedPreferences) {
         val response = MutableLiveData<List<InvoiceItem>>()
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(getSharedCollection(sharedPreferences))
+            .collection(getSharedCategory(sharedPreferences))
             .document(purchaseID).collection(DbReceipt.FIELDS.RECEIPT.value)
             .orderBy(DbReceipt.FIELDS.NAME.value)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
@@ -54,7 +54,7 @@ class InvoiceManager(private val sharedPreferences: SharedPreferences) {
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(getSharedCollection(sharedPreferences))
+            .collection(getSharedCategory(sharedPreferences))
             .document(purchaseID).collection(DbReceipt.FIELDS.RECEIPT.value)
             .add(invoiceItem).addOnSuccessListener { document ->
                 invoiceItem.id = document.id
@@ -76,7 +76,7 @@ class InvoiceManager(private val sharedPreferences: SharedPreferences) {
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(getSharedCollection(sharedPreferences))
+            .collection(getSharedCategory(sharedPreferences))
             .document(purchaseID).collection(DbReceipt.FIELDS.RECEIPT.value)
             .document(invoiceItem.id!!).delete().addOnSuccessListener {
                 InvoiceItemStorage.removeFromList(invoiceItem)

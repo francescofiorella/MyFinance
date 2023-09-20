@@ -10,9 +10,9 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
-import com.frafio.myfinance.utils.getSharedCollection
+import com.frafio.myfinance.utils.getSharedCategory
 import com.frafio.myfinance.utils.getSharedDynamicColor
-import com.frafio.myfinance.utils.setSharedCollection
+import com.frafio.myfinance.utils.setSharedCategory
 import com.frafio.myfinance.utils.setSharedDynamicColor
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -54,8 +54,9 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(getSharedCollection(sharedPreferences))
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .whereEqualTo(DbPurchases.FIELDS.EMAIL.value, UserStorage.user!!.email)
+            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
             .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
@@ -92,7 +93,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(getSharedCollection(sharedPreferences))
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchaseList[position].id!!).delete()
             .addOnSuccessListener {
                 if (purchaseList[position].type == DbPurchases.TYPES.TOTAL.value) {
@@ -121,7 +122,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
                             fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
                                 .document(UserStorage.user!!.email!!)
-                                .collection(getSharedCollection(sharedPreferences))
+                                .collection(DbPurchases.FIELDS.PAYMENTS.value)
                                 .document(purchaseList[i].id!!)
                                 .set(purchaseList[i]).addOnSuccessListener {
                                     PurchaseStorage.purchaseList = purchaseList
@@ -169,7 +170,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         purchase.id = "${purchase.year}${purchase.month}${purchase.day}"
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(getSharedCollection(sharedPreferences))
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchase.id!!).set(purchase).addOnSuccessListener {
                 response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
             }.addOnFailureListener { e ->
@@ -187,7 +188,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(getSharedCollection(sharedPreferences))
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .add(purchase).addOnSuccessListener {
                 var sum =
                     if (purchase.type != DbPurchases.TYPES.TRANSPORT.value
@@ -216,12 +217,13 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                     purchase.year,
                     purchase.month,
                     purchase.day,
-                    DbPurchases.TYPES.TOTAL.value
+                    DbPurchases.TYPES.TOTAL.value,
+                    category = PurchaseStorage.currentCategory
                 )
                 totalP.id = "${purchase.year}${purchase.month}${purchase.day}"
                 fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
                     .document(UserStorage.user!!.email!!)
-                    .collection(getSharedCollection(sharedPreferences))
+                    .collection(DbPurchases.FIELDS.PAYMENTS.value)
                     .document(totalP.id!!).set(totalP)
                     .addOnSuccessListener {
                         response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
@@ -248,7 +250,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(getSharedCollection(sharedPreferences))
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchase.id!!).set(purchase).addOnSuccessListener {
                 PurchaseStorage.purchaseList[position] = purchase
                 if (purchase.price != purchasePrice) {
@@ -274,12 +276,13 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                         purchase.month,
                         purchase.day,
                         DbPurchases.TYPES.TOTAL.value,
-                        totID
+                        totID,
+                        category = PurchaseStorage.currentCategory
                     )
 
                     fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
                         .document(UserStorage.user!!.email!!)
-                        .collection(getSharedCollection(sharedPreferences))
+                        .collection(DbPurchases.FIELDS.PAYMENTS.value)
                         .document(totID).set(totalP)
                         .addOnSuccessListener {
                             response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
@@ -301,12 +304,12 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
     }
 
     fun updateListByCollection(collection: String): LiveData<PurchaseResult> {
-        setSharedCollection(sharedPreferences, collection)
+        setSharedCategory(sharedPreferences, collection)
         return updateList()
     }
 
-    fun getSelectedCollection(): String {
-        return getSharedCollection(sharedPreferences)
+    fun getSelectedCategory(): String {
+        return getSharedCategory(sharedPreferences)
     }
 
     fun setDynamicColorActive(active: Boolean) {

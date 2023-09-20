@@ -6,14 +6,14 @@ import com.frafio.myfinance.MyFinanceApplication.Companion.COLLECTION_KEY
 import com.frafio.myfinance.MyFinanceApplication.Companion.DYNAMIC_COLOR_KEY
 import com.frafio.myfinance.data.enums.db.DbPurchases
 
-fun getSharedCollection(sharedPreferences: SharedPreferences): String {
-    return sharedPreferences.getString(COLLECTION_KEY, DbPurchases.COLLECTIONS.DEFAULT.value)
-        ?: DbPurchases.COLLECTIONS.DEFAULT.value
+fun getSharedCategory(sharedPreferences: SharedPreferences): String {
+    return sharedPreferences.getString(COLLECTION_KEY, DbPurchases.CATEGORIES.DEFAULT.value)
+        ?: DbPurchases.CATEGORIES.DEFAULT.value
 }
 
 @SuppressLint("ApplySharedPref")
-fun setSharedCollection(sharedPreferences: SharedPreferences, collection: String) {
-    sharedPreferences.edit().putString(COLLECTION_KEY, slashToUnderscore(collection)).commit()
+fun setSharedCategory(sharedPreferences: SharedPreferences, collection: String) {
+    sharedPreferences.edit().putString(COLLECTION_KEY, collection).commit()
 }
 
 fun getSharedDynamicColor(sharedPreferences: SharedPreferences): Boolean {
