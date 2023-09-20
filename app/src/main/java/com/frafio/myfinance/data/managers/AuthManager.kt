@@ -200,7 +200,6 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         PurchaseStorage.resetPurchaseList()
         UserStorage.resetUser()
         setSharedCategory(sharedPreferences, DbPurchases.CATEGORIES.DEFAULT.value)
-        PurchaseStorage.currentCategory = DbPurchases.CATEGORIES.DEFAULT.value
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
         return (response)
@@ -219,7 +218,6 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
                     } ?: listOf()
                 if (categories.isEmpty()) {
                     setSharedCategory(sharedPreferences, DbPurchases.CATEGORIES.DEFAULT.value)
-                    PurchaseStorage.currentCategory = DbPurchases.CATEGORIES.DEFAULT.value
 
                     // initialize the categories vector
                     fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
@@ -233,7 +231,6 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
                                 sharedPreferences,
                                 DbPurchases.CATEGORIES.DEFAULT.value
                             )
-                            PurchaseStorage.currentCategory = DbPurchases.CATEGORIES.DEFAULT.value
                             val error = "Error! ${e.localizedMessage}"
                             Log.e(TAG, error)
 
@@ -242,7 +239,6 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
                 } else {
                     val cat = categories.last()
                     setSharedCategory(sharedPreferences, cat)
-                    PurchaseStorage.currentCategory = cat
                 }
 
                 fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
@@ -276,7 +272,6 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
                     }
             }.addOnFailureListener { e ->
                 setSharedCategory(sharedPreferences, DbPurchases.CATEGORIES.DEFAULT.value)
-                PurchaseStorage.currentCategory = DbPurchases.CATEGORIES.DEFAULT.value
                 val error = "Error! ${e.localizedMessage}"
                 Log.e(TAG, error)
 
