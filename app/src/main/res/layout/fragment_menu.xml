@@ -160,7 +160,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/categories"
+                        android:contentDescription="@string/category"
                         android:src="@drawable/ic_arrow_drop_down"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"

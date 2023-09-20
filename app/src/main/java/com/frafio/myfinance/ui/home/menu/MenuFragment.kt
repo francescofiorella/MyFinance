@@ -150,7 +150,7 @@ class MenuFragment : BaseFragment(), MenuListener {
     private fun showCategoriesDialog(categories : List<String>) {
         var builder = MaterialAlertDialogBuilder(requireContext())
         builder.setIcon(R.drawable.ic_auto_awesome_motion)
-        builder.setTitle(getString(R.string.categories))
+        builder.setTitle(getString(R.string.category))
         builder.setSingleChoiceItems(
             categories.toTypedArray(),
             categories.indexOf(viewModel.getSelectedCategory())
