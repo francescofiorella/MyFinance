@@ -4,14 +4,13 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.DbReceipt
-import com.frafio.myfinance.data.models.PurchaseResult
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.InvoiceItem
+import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.InvoiceItemStorage
 import com.frafio.myfinance.data.storages.UserStorage
-import com.frafio.myfinance.utils.getSharedCategory
 import com.google.firebase.firestore.FirebaseFirestore
 
 class InvoiceManager(private val sharedPreferences: SharedPreferences) {

@@ -2,7 +2,6 @@ package com.frafio.myfinance.utils
 
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -10,9 +9,6 @@ import com.frafio.myfinance.R
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
-import org.eazegraph.lib.charts.ValueLineChart
-import org.eazegraph.lib.models.ValueLinePoint
-import org.eazegraph.lib.models.ValueLineSeries
 
 @BindingAdapter("srcRound")
 fun setImageViewRoundDrawable(view: ImageView, url: String?) {

@@ -151,11 +151,11 @@
                         android:layout_marginStart="10dp"
                         android:layout_marginBottom="10dp"
                         android:fontFamily="@font/nunito"
-                        android:text="Categoria attuale"
                         android:textSize="13sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@id/collection_icon"
-                        app:layout_constraintTop_toBottomOf="@id/collection_TV" />
+                        app:layout_constraintTop_toBottomOf="@id/collection_TV"
+                        tools:text="Current category" />
 
                     <ImageView
                         android:layout_width="wrap_content"

@@ -36,9 +36,9 @@ fun ValueLineChart.setValueLineChartData(list: List<Pair<String, Double>>, dynam
                 R.attr.colorPrimaryContainer, // 0
             )
             // now resolve them
-            val ta = dynamicColorContext.obtainStyledAttributes(attrsToResolve);
+            val ta = dynamicColorContext.obtainStyledAttributes(attrsToResolve)
             colorPrimaryContainer = ta.getColor(0, 0)
-            ta.recycle();   // recycle TypedArray
+            ta.recycle() // recycle TypedArray
         } else {
             colorPrimaryContainer = ContextCompat.getColor(
                 context,

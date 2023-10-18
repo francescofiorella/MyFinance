@@ -10,13 +10,14 @@ plugins {
 android {
     namespace = "com.frafio.myfinance"
     compileSdk = 34
+    buildToolsVersion = "34.0.0"
 
     defaultConfig {
         applicationId = "com.frafio.myfinance"
         minSdk = 29
         targetSdk = 33
         versionCode = 4
-        versionName = "4.1.4-beta"
+        versionName = "4.1.5-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -69,7 +70,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Firebase libraries
-    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+    implementation(platform("com.google.firebase:firebase-bom:32.4.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
@@ -78,8 +79,6 @@ dependencies {
 
     // Glide library
     implementation("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
-    ksp("com.github.bumptech.glide:ksp:4.16.0")
 
     // Chart and graph library
     implementation("com.github.blackfizz:eazegraph:1.2.2@aar")

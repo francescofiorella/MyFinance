@@ -95,6 +95,8 @@
 
     <string name="generic_error">Generic error!</string>
 
+    <string name="coming_soon" translatable="false">Coming Soon!</string>
+
     <string-array name="types">
         <item>@string/generic</item>
         <item>@string/shopping</item>
