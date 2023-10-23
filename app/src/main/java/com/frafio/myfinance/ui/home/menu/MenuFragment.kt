@@ -21,11 +21,13 @@ import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.setValueLineChartData
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
 
 class MenuFragment : BaseFragment(), MenuListener {
 
     private val viewModel by viewModels<MenuViewModel>()
     private lateinit var binding: FragmentMenuBinding
+    private var newCat: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -85,6 +87,14 @@ class MenuFragment : BaseFragment(), MenuListener {
                             dashboard = true,
                             payments = true
                         )
+                    }
+
+                    PurchaseCode.PURCHASE_CREATE_CATEGORY_SUCCESS.code -> {
+                        newCat?.let {
+                            viewModel.setCollection(it)
+                            binding.actualCollectionTV.text = it
+                            newCat = null
+                        }
                     }
 
                     else -> {
@@ -148,30 +158,40 @@ class MenuFragment : BaseFragment(), MenuListener {
     }
 
     private fun showCategoriesDialog(categories : List<String>) {
-        var builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setIcon(R.drawable.ic_auto_awesome_motion)
-        builder.setTitle(getString(R.string.category))
-        builder.setSingleChoiceItems(
+        val upperBuilder = MaterialAlertDialogBuilder(requireContext())
+        upperBuilder.setIcon(R.drawable.ic_auto_awesome_motion)
+        upperBuilder.setTitle(getString(R.string.category))
+        upperBuilder.setSingleChoiceItems(
             categories.toTypedArray(),
             categories.indexOf(viewModel.getSelectedCategory())
-        ) { dialog, selectedItem ->
+        ) { upperDialog, selectedItem ->
             val collection = categories[selectedItem]
             viewModel.setCollection(collection)
             binding.actualCollectionTV.text = collection
-            dialog.dismiss()
-        }
-        /*builder.setPositiveButton(getString(R.string.create)) { upperDialog, _ ->
             upperDialog.dismiss()
-            builder = MaterialAlertDialogBuilder(requireContext())
-            builder.setIcon(R.drawable.ic_auto_awesome_motion)
-            builder.setTitle(getString(R.string.create_category))
-            builder.setNegativeButton(getString(R.string.cancel), null)
-            builder.setPositiveButton(getString(R.string.create)) { lowerDialog, _ ->
+        }
+        upperBuilder.setPositiveButton(getString(R.string.create)) { upperDialog, _ ->
+            upperDialog.dismiss()
+            val lowerBuilder = MaterialAlertDialogBuilder(requireContext())
+            lowerBuilder.setIcon(R.drawable.ic_auto_awesome_motion)
+            lowerBuilder.setTitle(getString(R.string.create_category))
+            val rootView = layoutInflater.inflate(R.layout.layout_category_text_input, null)
+            val inputLayout = rootView.findViewById<TextInputEditText>(R.id.category_edit_text)
+            lowerBuilder.setView(rootView)
+            lowerBuilder.setNegativeButton(getString(R.string.cancel), null)
+            lowerBuilder.setPositiveButton(getString(R.string.create)) { lowerDialog, _ ->
+                val catName = inputLayout.text.toString()
+                if (catName.isNotEmpty()) {
+                    newCat = catName
+                    viewModel.createCategory(catName)
+                } else {
+                    (activity as HomeActivity).showSnackBar(getString(R.string.empty_category))
+                }
                 lowerDialog.dismiss()
             }
-            builder.show()
+            lowerBuilder.show()
         }
-        builder.setNegativeButton(getString(R.string.cancel), null)*/
-        builder.show()
+        upperBuilder.setNegativeButton(getString(R.string.cancel), null)
+        upperBuilder.show()
     }
 }

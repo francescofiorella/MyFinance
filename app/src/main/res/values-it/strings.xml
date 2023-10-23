@@ -76,6 +76,7 @@
     <string name="category">Categoria</string>
     <string name="create">Crea</string>
     <string name="create_category">Crea categoria</string>
+    <string name="empty_category">Inserisci il nome della categoria!</string>
 
     <string name="generic_error">Errore generico!</string>
 

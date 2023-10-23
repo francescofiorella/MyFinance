@@ -21,6 +21,10 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return purchaseManager.getCategories()
     }
 
+    fun createCategory(name: String): LiveData<PurchaseResult> {
+        return purchaseManager.createCategory(name)
+    }
+
     fun updatePurchaseList(): LiveData<PurchaseResult> {
         return purchaseManager.updateList()
     }

@@ -92,6 +92,7 @@
     <string name="category">Category</string>
     <string name="create">Create</string>
     <string name="create_category">Create category</string>
+    <string name="empty_category">Please insert a category name!</string>
 
     <string name="generic_error">Generic error!</string>
 

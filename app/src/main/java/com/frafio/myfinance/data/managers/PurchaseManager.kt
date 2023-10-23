@@ -50,6 +50,33 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
+    fun createCategory(name: String): LiveData<PurchaseResult> {
+        val response = MutableLiveData<PurchaseResult>()
+
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .get().addOnSuccessListener { docSnap ->
+                val categories =
+                    (docSnap.data?.get(DbPurchases.FIELDS.CATEGORIES.value) as List<*>).map { value ->
+                        value.toString()
+                    }
+                val mutCat = categories.toMutableList()
+                mutCat.add(name)
+                fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+                    .document(UserStorage.user!!.email!!)
+                    .update(DbPurchases.FIELDS.CATEGORIES.value, mutCat).addOnSuccessListener {
+                        response.value =
+                            PurchaseResult(PurchaseCode.PURCHASE_CREATE_CATEGORY_SUCCESS)
+                    }.addOnFailureListener {
+                        response.value =
+                            PurchaseResult(PurchaseCode.PURCHASE_CREATE_CATEGORY_FAILURE)
+                    }
+            }.addOnFailureListener {
+                response.value = PurchaseResult(PurchaseCode.PURCHASE_CREATE_CATEGORY_FAILURE)
+            }
+        return response
+    }
+
     fun updateList(): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 

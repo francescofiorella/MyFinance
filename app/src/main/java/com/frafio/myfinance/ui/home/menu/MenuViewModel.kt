@@ -29,6 +29,11 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
         listener?.onCompleted(response)
     }
 
+    fun createCategory(name: String) {
+        val response = purchaseRepository.createCategory(name)
+        listener?.onCompleted(response)
+    }
+
     fun setCollection(collection: String) {
         listener?.onStarted()
         val response = purchaseRepository.setCollection(collection)

@@ -122,6 +122,22 @@ enum class PurchaseCode(val code: Int, val message: String) {
         }
     ),
 
+    PURCHASE_CREATE_CATEGORY_SUCCESS(
+        52, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Category created!"
+            Languages.ITALIANO.value -> "Categoria creata!"
+            else -> "Category created!" // english
+        }
+    ),
+
+    PURCHASE_CREATE_CATEGORY_FAILURE(
+        52, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Category not created!"
+            Languages.ITALIANO.value -> "Categoria non creata!"
+            else -> "Category not created!" // english
+        }
+    ),
+
     INVOICE_ADD_SUCCESS(
         100, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Item added!"
