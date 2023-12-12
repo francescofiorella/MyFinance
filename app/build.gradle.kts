@@ -43,6 +43,7 @@ android {
     }
     buildFeatures {
         dataBinding = true
+        buildConfig = true
     }
     packaging {
         resources {
@@ -63,8 +64,8 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
-    implementation("androidx.activity:activity-ktx:1.8.0")
-    implementation("androidx.fragment:fragment-ktx:1.6.1")
+    implementation("androidx.activity:activity-ktx:1.8.1")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
 
     // SplashScreen API
     implementation("androidx.core:core-splashscreen:1.0.1")
