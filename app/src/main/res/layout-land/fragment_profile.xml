@@ -30,14 +30,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent=".37" />
+                app:layout_constraintGuide_percent=".4" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/right_pic_guide"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent=".63" />
+                app:layout_constraintGuide_percent=".6" />
 
             <ImageView
                 android:id="@+id/profile_propic_iv"

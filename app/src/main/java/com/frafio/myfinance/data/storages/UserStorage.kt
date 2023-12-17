@@ -14,7 +14,8 @@ object UserStorage {
         var userPic = ""
         fUser.providerId
         fUser.photoUrl?.let { uri ->
-            userPic = uri.toString()
+            userPic = uri.toString().replace("s96-c", "s400-c")
+
         }
         var provider = User.EMAIL_PROVIDER
         for (user in fUser.providerData) {
