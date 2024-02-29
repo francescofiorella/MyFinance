@@ -88,7 +88,7 @@
     <string name="sign_up_provider">Signed up with Google</string>
     <string name="signUpDate">Account created in %1$s</string>
 
-    <string name="currency" translatable="false">$</string>
+    <string name="currency" translatable="false">€</string>
     <string name="category">Category</string>
     <string name="create">Create</string>
     <string name="create_category">Create category</string>
@@ -104,12 +104,5 @@
         <item>@string/transport</item>
         <item>@string/rent</item>
         <item>@string/no_purchase</item>
-    </string-array>
-
-    <string-array name="years">
-        <item>2020/2021</item>
-        <item>2021/2022</item>
-        <item>2022/2023</item>
-        <item>2023/2024</item>
     </string-array>
 </resources>
