@@ -27,6 +27,7 @@
     <color name="md_theme_inverseOnSurface">@color/md_theme_dark_inverseOnSurface</color>
     <color name="md_theme_inverseSurface">@color/md_theme_dark_inverseSurface</color>
     <color name="md_theme_primaryInverse">@color/md_theme_dark_primaryInverse</color>
+    <color name="md_theme_surfaceContainerLow">@color/md_theme_dark_surfaceContainerLow</color>
 
     <!--Theme-related custom colors. -->
     <color name="primary_text">@color/white</color>
