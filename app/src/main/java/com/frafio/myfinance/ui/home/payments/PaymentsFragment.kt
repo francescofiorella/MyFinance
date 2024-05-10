@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
@@ -21,8 +23,10 @@ import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.ui.home.payments.invoice.InvoiceActivity
+import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.textview.MaterialTextView
 
 class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener {
 
@@ -83,33 +87,9 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
             }
 
             ON_LONG_CLICK -> {
-                val builder = MaterialAlertDialogBuilder(requireContext())
-                builder.setTitle(purchase.name)
-                if (purchase.type == 0 && purchase.price == 0.0) {
-                    builder.setIcon(R.drawable.ic_delete)
-                    builder.setMessage(getString(R.string.purchase_delete_dialog))
-                } else if (purchase.type != 0) {
-                    builder.setIcon(R.drawable.ic_create)
-                    builder.setMessage(getString(R.string.purchase_edit_delete_dialog))
-                    builder.setNegativeButton(getString(R.string.edit)) { _, _ ->
-                        Intent(context, AddActivity::class.java).also {
-                            it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
-                            it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
-                            it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
-                            it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
-                            it.putExtra(AddActivity.PURCHASE_TYPE_KEY, purchase.type)
-                            it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
-                            it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
-                            it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)
-                            it.putExtra(AddActivity.PURCHASE_DAY_KEY, purchase.day)
-                            editResultLauncher.launch(it)
-                        }
-                    }
-                }
-                builder.setPositiveButton(getString(R.string.delete)) { _, _ ->
-                    viewModel.deletePurchaseAt(position)
-                }
-                builder.show()
+                val modalBottomSheet =
+                    ModalBottomSheet(purchase, position, editResultLauncher, viewModel)
+                modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
             }
         }
     }
@@ -142,5 +122,56 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
     override fun scrollUp() {
         super.scrollUp()
         binding.listRecyclerView.scrollToPosition(0)
+    }
+
+    class ModalBottomSheet(
+        private val purchase: Purchase,
+        private val position: Int,
+        private val editResultLauncher: ActivityResultLauncher<Intent>,
+        private val viewModel: PaymentsViewModel
+    ) : BottomSheetDialogFragment() {
+
+        companion object {
+            const val TAG = "ModalBottomSheet"
+        }
+
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            val layout = inflater.inflate(R.layout.layout_menu_bottom_sheet, container, false)
+            val editLayout = layout.findViewById<ConstraintLayout>(R.id.edit_layout)
+            val deleteLayout = layout.findViewById<ConstraintLayout>(R.id.delete_layout)
+            layout.findViewById<MaterialTextView>(R.id.nameTV).text = purchase.name
+            layout.findViewById<MaterialTextView>(R.id.dateTV).text =
+                dateToString(purchase.day, purchase.month, purchase.year)
+            layout.findViewById<MaterialTextView>(R.id.priceTV).text =
+                doubleToPrice(purchase.price ?: 0.0)
+            if (purchase.type == 0 && purchase.price == 0.0) {
+                editLayout.visibility = View.GONE
+            } else if (purchase.type != 0) {
+                editLayout.setOnClickListener {
+                    Intent(context, AddActivity::class.java).also {
+                        it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
+                        it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
+                        it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
+                        it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
+                        it.putExtra(AddActivity.PURCHASE_TYPE_KEY, purchase.type)
+                        it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
+                        it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
+                        it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)
+                        it.putExtra(AddActivity.PURCHASE_DAY_KEY, purchase.day)
+                        editResultLauncher.launch(it)
+                    }
+                    this.dismiss()
+                }
+            }
+            deleteLayout.setOnClickListener {
+                viewModel.deletePurchaseAt(position)
+                this.dismiss()
+            }
+            return layout
+        }
     }
 }
