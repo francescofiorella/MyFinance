@@ -26,6 +26,8 @@ import com.frafio.myfinance.ui.home.payments.invoice.InvoiceActivity
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
 
 class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteListener {
@@ -87,9 +89,51 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
             }
 
             ON_LONG_CLICK -> {
-                val modalBottomSheet =
-                    ModalBottomSheet(purchase, position, editResultLauncher, viewModel)
-                modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+                if (requireActivity().findViewById<NavigationView?>(R.id.nav_drawer) != null) {
+                    val sideSheetDialog = SideSheetDialog(requireContext())
+                    sideSheetDialog.setContentView(R.layout.layout_menu_bottom_sheet)
+                    sideSheetDialog.show()
+                    val editLayout =
+                        sideSheetDialog.findViewById<ConstraintLayout>(R.id.edit_layout)
+                    val deleteLayout =
+                        sideSheetDialog.findViewById<ConstraintLayout>(R.id.delete_layout)
+                    sideSheetDialog.findViewById<MaterialTextView>(R.id.nameTV)?.text =
+                        purchase.name
+                    sideSheetDialog.findViewById<MaterialTextView>(R.id.dateTV)?.text =
+                        dateToString(purchase.day, purchase.month, purchase.year)
+                    sideSheetDialog.findViewById<MaterialTextView>(R.id.priceTV)?.text =
+                        doubleToPrice(purchase.price ?: 0.0)
+                    if (purchase.type == 0 && purchase.price == 0.0) {
+                        editLayout?.visibility = View.GONE
+                    } else if (purchase.type != 0) {
+                        editLayout?.setOnClickListener {
+                            Intent(context, AddActivity::class.java).also {
+                                it.putExtra(
+                                    AddActivity.REQUEST_CODE_KEY,
+                                    AddActivity.REQUEST_EDIT_CODE
+                                )
+                                it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
+                                it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
+                                it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
+                                it.putExtra(AddActivity.PURCHASE_TYPE_KEY, purchase.type)
+                                it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
+                                it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
+                                it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)
+                                it.putExtra(AddActivity.PURCHASE_DAY_KEY, purchase.day)
+                                editResultLauncher.launch(it)
+                            }
+                            sideSheetDialog.hide()
+                        }
+                    }
+                    deleteLayout?.setOnClickListener {
+                        viewModel.deletePurchaseAt(position)
+                        sideSheetDialog.hide()
+                    }
+                } else {
+                    val modalBottomSheet =
+                        ModalBottomSheet(purchase, position, editResultLauncher, viewModel)
+                    modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+                }
             }
         }
     }
