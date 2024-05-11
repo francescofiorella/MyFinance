@@ -124,6 +124,7 @@
             android:id="@+id/nav_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:backgroundTint="?attr/colorSurfaceContainerLow"
             app:itemRippleColor="@android:color/transparent"
             app:itemTextAppearanceActive="@style/TextAppearance.MyFinance.Caption"
             app:itemTextAppearanceInactive="@style/TextAppearance.MyFinance.Caption"

@@ -7,7 +7,8 @@
     <dimen name="card_text_space">20dp</dimen>
 
     <dimen name="card_elevation">2dp</dimen>
-    <dimen name="card_corner_radius">30dp</dimen>
+    <dimen name="card_corner_radius">24dp</dimen>
+    <dimen name="drawer_corner_radius">24dp</dimen>
 
     <dimen name="card_title_size">16sp</dimen>
     <dimen name="card_price_size">26sp</dimen>

@@ -34,6 +34,7 @@
             android:id="@+id/nav_rail"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:background="@drawable/bg_drawer"
             app:itemRippleColor="@android:color/transparent"
             app:itemTextAppearanceActive="@style/TextAppearance.MyFinance.Caption"
             app:itemTextAppearanceInactive="@style/TextAppearance.MyFinance.Caption"
