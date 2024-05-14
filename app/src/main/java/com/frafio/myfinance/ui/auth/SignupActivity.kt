@@ -62,7 +62,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
                 AuthCode.EMAIL_ALREADY_ASSOCIATED.code ->
                     binding.signupEmailInputLayout.error = authResult.message
 
-                AuthCode.PROFILE_NOT_UPDATED.code,
+                AuthCode.SIGNUP_PROFILE_NOT_UPDATED.code,
                 AuthCode.SIGNUP_FAILURE.code,
                 AuthCode.USER_DATA_NOT_UPDATED.code -> snackBar(authResult.message)
 

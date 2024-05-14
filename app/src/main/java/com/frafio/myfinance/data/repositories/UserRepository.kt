@@ -10,6 +10,10 @@ import com.frafio.myfinance.data.storages.UserStorage
 
 class UserRepository(private val authManager: AuthManager) {
 
+    fun updateProfile(fullName: String?, propicUri: String?): LiveData<AuthResult> {
+        return authManager.updateUserProfile(fullName, propicUri)
+    }
+
     fun userLogin(email: String, password: String): LiveData<AuthResult> {
         return authManager.defaultLogin(email, password)
     }

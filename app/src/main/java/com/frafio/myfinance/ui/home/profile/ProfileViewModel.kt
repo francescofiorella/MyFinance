@@ -8,6 +8,25 @@ import com.frafio.myfinance.data.repositories.UserRepository
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
-    val user = userRepository.getUser()
+    var user = userRepository.getUser()
     val googleSignIn = user?.provider == User.GOOGLE_PROVIDER
+
+    var listener: ProfileListener? = null
+
+    fun uploadPropic() {
+        listener?.onStarted()
+        val propicUri = ""
+        val response = userRepository.updateProfile(null, propicUri)
+        listener?.onProfileUpdateComplete(response)
+    }
+
+    fun editFullName(fullName: String) {
+        listener?.onStarted()
+        val response = userRepository.updateProfile(fullName, null)
+        listener?.onProfileUpdateComplete(response)
+    }
+
+    fun updateLocalUser() {
+        user = userRepository.getUser()
+    }
 }

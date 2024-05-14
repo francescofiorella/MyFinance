@@ -2,6 +2,7 @@ package com.frafio.myfinance.data.managers
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,7 +19,15 @@ import com.frafio.myfinance.utils.setSharedCategory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
-import com.google.firebase.auth.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -40,6 +49,33 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
     // FirebaseUser
     private val fUser: FirebaseUser?
         get() = fAuth.currentUser
+
+    fun updateUserProfile(fullName: String?, propicUri: String?): LiveData<AuthResult> {
+        val response = MutableLiveData<AuthResult>()
+        val profileUpdates = userProfileChangeRequest {
+            fullName?.let {
+                displayName = it
+            }
+            propicUri?.let {
+                if (it.isNotEmpty()) {
+                    photoUri = Uri.parse(it)
+                }
+            }
+        }
+
+        fUser!!.updateProfile(profileUpdates)
+            .addOnCompleteListener { task ->
+                response.value = if (task.isSuccessful) {
+                    UserStorage.updateUser(fUser!!)
+                    AuthResult(AuthCode.USER_DATA_UPDATED)
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.e(TAG, "Error! ${task.exception?.localizedMessage}")
+                    AuthResult(AuthCode.USER_DATA_NOT_UPDATED)
+                }
+            }
+        return response
+    }
 
     fun isUserLogged(): AuthResult {
         fUser.also {
@@ -171,7 +207,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
                     response.value = AuthResult(AuthCode.SIGNUP_SUCCESS)
                 }?.addOnFailureListener { e ->
                     Log.e(TAG, "Error! ${e.localizedMessage}")
-                    response.value = AuthResult(AuthCode.PROFILE_NOT_UPDATED)
+                    response.value = AuthResult(AuthCode.SIGNUP_PROFILE_NOT_UPDATED)
                 }
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")

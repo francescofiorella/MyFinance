@@ -91,7 +91,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
             ON_LONG_CLICK -> {
                 if (requireActivity().findViewById<NavigationView?>(R.id.nav_drawer) != null) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
-                    sideSheetDialog.setContentView(R.layout.layout_menu_bottom_sheet)
+                    sideSheetDialog.setContentView(R.layout.layout_edit_purchase_bottom_sheet)
                     sideSheetDialog.show()
                     val editLayout =
                         sideSheetDialog.findViewById<ConstraintLayout>(R.id.edit_layout)
@@ -184,7 +184,8 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
             container: ViewGroup?,
             savedInstanceState: Bundle?
         ): View? {
-            val layout = inflater.inflate(R.layout.layout_menu_bottom_sheet, container, false)
+            val layout =
+                inflater.inflate(R.layout.layout_edit_purchase_bottom_sheet, container, false)
             val editLayout = layout.findViewById<ConstraintLayout>(R.id.edit_layout)
             val deleteLayout = layout.findViewById<ConstraintLayout>(R.id.delete_layout)
             layout.findViewById<MaterialTextView>(R.id.nameTV).text = purchase.name

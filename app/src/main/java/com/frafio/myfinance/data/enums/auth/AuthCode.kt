@@ -92,7 +92,7 @@ enum class AuthCode(val code: Int, val message: String) {
         }
     ),
 
-    PROFILE_NOT_UPDATED(
+    SIGNUP_PROFILE_NOT_UPDATED(
         14, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Sign up failed! Contact the administrator."
             Languages.ITALIANO.value -> "Registrazione non avvenuta correttamente! Contatta l'amministratore."

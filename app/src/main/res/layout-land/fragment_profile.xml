@@ -14,30 +14,38 @@
 
     </data>
 
-    <ScrollView
-        android:id="@+id/profile_scrollView"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:scrollbars="none">
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/half_guide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent=".4" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/half_guide"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/left_pic_guide"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent=".4" />
+                app:layout_constraintGuide_percent=".3" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/right_pic_guide"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent=".6" />
+                app:layout_constraintGuide_percent=".7" />
 
             <ImageView
                 android:id="@+id/profile_propic_iv"
@@ -81,102 +89,176 @@
                 app:layout_constraintTop_toBottomOf="@id/profile_username_tv"
                 tools:text="user@email.com" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/provider_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/card_full_margin"
-                android:layout_marginTop="10dp"
-                android:visibility="@{viewModel.googleSignIn ? View.VISIBLE : View.GONE}"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/profile_email_tv">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingHorizontal="25dp"
-                    android:paddingVertical="15dp">
-
-                    <ImageView
-                        android:id="@+id/provider_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/version_icon"
-                        android:src="@drawable/ic_google"
-                        app:layout_constraintBottom_toBottomOf="@id/provider_TV"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/provider_TV" />
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/provider_TV"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:fontFamily="@font/nunito"
-                        android:text="@string/sign_up_provider"
-                        android:textColor="@color/primary_text"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/provider_icon"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="Signed up with Google" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/signup_date_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/card_full_margin"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="@dimen/dashboard_bottom_margin"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/provider_card"
-                app:layout_constraintVertical_bias="0.0">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingHorizontal="25dp"
-                    android:paddingVertical="15dp">
-
-                    <ImageView
-                        android:id="@+id/signup_date_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/version_icon"
-                        android:src="@drawable/ic_today"
-                        app:layout_constraintBottom_toBottomOf="@id/signup_date_TV"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/signup_date_TV" />
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/signup_date_TV"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:fontFamily="@font/nunito"
-                        android:text="@string/signUpDate"
-                        android:textColor="@color/primary_text"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/signup_date_icon"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="Account created in 01/01/1970" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </ScrollView>
+        <ScrollView
+            android:id="@+id/profile_scrollView"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/half_guide"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/profile_edit_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/card_full_margin"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="@dimen/dashboard_bottom_margin"
+                    android:background="?attr/selectableItemBackground"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="15dp">
+
+                        <ImageView
+                            android:id="@+id/profile_edit_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/edit"
+                            android:src="@drawable/ic_baseline_account_circle"
+                            app:layout_constraintBottom_toBottomOf="@id/profile_edit_TV"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/profile_edit_TV" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/profile_edit_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/edit_profile"
+                            android:textColor="@color/primary_text"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/profile_edit_icon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/edit"
+                            android:src="@drawable/ic_arrow_drop_down"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/provider_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/card_full_margin"
+                    android:layout_marginTop="10dp"
+                    android:visibility="@{viewModel.googleSignIn ? View.VISIBLE : View.GONE}"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/profile_edit_card">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="15dp">
+
+                        <ImageView
+                            android:id="@+id/provider_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/version_icon"
+                            android:src="@drawable/ic_google"
+                            app:layout_constraintBottom_toBottomOf="@id/provider_TV"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/provider_TV" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/provider_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/sign_up_provider"
+                            android:textColor="@color/primary_text"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/provider_icon"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="Signed up with Google" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/signup_date_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/card_full_margin"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="@dimen/dashboard_bottom_margin"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/provider_card"
+                    app:layout_constraintVertical_bias="0.0">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="15dp">
+
+                        <ImageView
+                            android:id="@+id/signup_date_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/version_icon"
+                            android:src="@drawable/ic_today"
+                            app:layout_constraintBottom_toBottomOf="@id/signup_date_TV"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/signup_date_TV" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/signup_date_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/signUpDate"
+                            android:textColor="@color/primary_text"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/signup_date_icon"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="Account created in 01/01/1970" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

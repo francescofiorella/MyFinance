@@ -79,6 +79,9 @@
     <string name="empty_category">Inserisci il nome della categoria!</string>
 
     <string name="generic_error">Errore generico!</string>
+    <string name="edit_profile">Modifica il tuo profilo</string>
+    <string name="edit_propic">Carica la tua foto profilo</string>
+    <string name="edit_full_name">Modifica il tuo nome</string>
 
     <string-array name="types">
         <item>@string/generic</item>

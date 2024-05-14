@@ -30,14 +30,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent=".37" />
+                app:layout_constraintGuide_percent=".35" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/right_pic_guide"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent=".63" />
+                app:layout_constraintGuide_percent=".65" />
 
             <ImageView
                 android:id="@+id/profile_propic_iv"
@@ -82,6 +82,61 @@
                 tools:text="user@email.com" />
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/profile_edit_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/card_full_margin"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="@dimen/dashboard_bottom_margin"
+                android:background="?attr/selectableItemBackground"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/profile_email_tv">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingHorizontal="25dp"
+                    android:paddingVertical="15dp">
+
+                    <ImageView
+                        android:id="@+id/profile_edit_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/edit"
+                        android:src="@drawable/ic_baseline_account_circle"
+                        app:layout_constraintBottom_toBottomOf="@id/profile_edit_TV"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/profile_edit_TV" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/profile_edit_TV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:fontFamily="@font/nunito"
+                        android:text="@string/edit_profile"
+                        android:textColor="@color/primary_text"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/profile_edit_icon"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/edit"
+                        android:src="@drawable/ic_arrow_drop_down"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/provider_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -91,7 +146,7 @@
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/profile_email_tv">
+                app:layout_constraintTop_toBottomOf="@id/profile_edit_card">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
