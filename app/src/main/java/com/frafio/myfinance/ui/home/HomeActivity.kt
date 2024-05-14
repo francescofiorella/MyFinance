@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -23,8 +24,8 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.ui.home.budget.BudgetFragment
 import com.frafio.myfinance.ui.home.dashboard.DashboardFragment
-import com.frafio.myfinance.ui.home.payments.PaymentsFragment
 import com.frafio.myfinance.ui.home.menu.MenuFragment
+import com.frafio.myfinance.ui.home.payments.PaymentsFragment
 import com.frafio.myfinance.ui.home.profile.ProfileFragment
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
@@ -321,9 +322,13 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
     // method for children
     fun showSnackBar(message: String, show: Boolean = true): Snackbar {
-        val view = when {
+        var view = when {
             binding.homeAddBtn != null -> binding.homeAddBtn
             else -> binding.homeAddExtBtn
+        }
+
+        if (view?.isVisible == false) {
+            view = null
         }
 
         return snackBar(message, view, show)

@@ -81,6 +81,7 @@ class ProfileFragment : BaseFragment(), ProfileListener {
             fullNameET.setText(fullName)
             propicLayout.setOnClickListener {
                 viewModel.uploadPropic()
+                this.dismiss()
             }
             fullNameLayout.setOnClickListener {
                 layout.findViewById<MaterialTextView>(R.id.full_nameTV).visibility = View.GONE
