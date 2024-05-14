@@ -97,9 +97,9 @@
     <string name="generic_error">Generic error!</string>
 
     <string name="coming_soon" translatable="false">Coming Soon!</string>
-    <string name="edit_profile">Edit your profile</string>
-    <string name="edit_propic">Upload your profile picture</string>
-    <string name="edit_full_name">Edit your full name</string>
+    <string name="edit_profile">Edit the profile</string>
+    <string name="edit_propic">Upload the profile picture</string>
+    <string name="edit_full_name">Edit the full name</string>
 
     <string-array name="types">
         <item>@string/generic</item>

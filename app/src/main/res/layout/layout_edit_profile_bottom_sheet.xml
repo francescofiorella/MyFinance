@@ -74,7 +74,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="5dp"
-            android:background="@android:color/transparent"
             android:fontFamily="@font/nunito"
             android:hint="@string/signup_name"
             android:textSize="16sp"

@@ -80,7 +80,8 @@ class ProfileFragment : BaseFragment(), ProfileListener {
 
             fullNameET.setText(fullName)
             propicLayout.setOnClickListener {
-                viewModel.uploadPropic()
+                (activity as HomeActivity).showSnackBar("Cooming soon!")
+                //viewModel.uploadPropic()
                 this.dismiss()
             }
             fullNameLayout.setOnClickListener {
