@@ -38,7 +38,7 @@ class PurchaseAdapter(
 
         if (currentPurchase.type == DbPurchases.TYPES.SHOPPING.value) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener {
-                listener.onItemInteraction(ON_CLICK, currentPurchase, position)
+                listener.onItemInteraction(ON_CLICK, currentPurchase, holder.getAdapterPosition())
             }
         } else {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
@@ -48,7 +48,11 @@ class PurchaseAdapter(
         if (!(currentPurchase.type == DbPurchases.TYPES.TOTAL.value && currentPurchase.price != 0.0)) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener {
-                    listener.onItemInteraction(ON_LONG_CLICK, currentPurchase, position)
+                    listener.onItemInteraction(
+                        ON_LONG_CLICK,
+                        currentPurchase,
+                        holder.getAdapterPosition()
+                    )
                     true
                 }
         } else {
