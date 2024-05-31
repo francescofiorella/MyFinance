@@ -92,46 +92,23 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
                 if (requireActivity().findViewById<NavigationView?>(R.id.nav_drawer) != null) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
                     sideSheetDialog.setContentView(R.layout.layout_edit_purchase_bottom_sheet)
+                    defineSheetInterface(
+                        sideSheetDialog.findViewById(android.R.id.content)!!,
+                        purchase,
+                        position,
+                        editResultLauncher,
+                        viewModel,
+                        sideSheetDialog::hide
+                    )
                     sideSheetDialog.show()
-                    val editLayout =
-                        sideSheetDialog.findViewById<ConstraintLayout>(R.id.edit_layout)
-                    val deleteLayout =
-                        sideSheetDialog.findViewById<ConstraintLayout>(R.id.delete_layout)
-                    sideSheetDialog.findViewById<MaterialTextView>(R.id.nameTV)?.text =
-                        purchase.name
-                    sideSheetDialog.findViewById<MaterialTextView>(R.id.dateTV)?.text =
-                        dateToString(purchase.day, purchase.month, purchase.year)
-                    sideSheetDialog.findViewById<MaterialTextView>(R.id.priceTV)?.text =
-                        doubleToPrice(purchase.price ?: 0.0)
-                    if (purchase.type == 0 && purchase.price == 0.0) {
-                        editLayout?.visibility = View.GONE
-                    } else if (purchase.type != 0) {
-                        editLayout?.setOnClickListener {
-                            Intent(context, AddActivity::class.java).also {
-                                it.putExtra(
-                                    AddActivity.REQUEST_CODE_KEY,
-                                    AddActivity.REQUEST_EDIT_CODE
-                                )
-                                it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
-                                it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
-                                it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
-                                it.putExtra(AddActivity.PURCHASE_TYPE_KEY, purchase.type)
-                                it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
-                                it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
-                                it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)
-                                it.putExtra(AddActivity.PURCHASE_DAY_KEY, purchase.day)
-                                editResultLauncher.launch(it)
-                            }
-                            sideSheetDialog.hide()
-                        }
-                    }
-                    deleteLayout?.setOnClickListener {
-                        viewModel.deletePurchaseAt(position)
-                        sideSheetDialog.hide()
-                    }
                 } else {
-                    val modalBottomSheet =
-                        ModalBottomSheet(purchase, position, editResultLauncher, viewModel)
+                    val modalBottomSheet = ModalBottomSheet(
+                        this,
+                        purchase,
+                        position,
+                        editResultLauncher,
+                        viewModel
+                    )
                     modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
                 }
             }
@@ -169,6 +146,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
     }
 
     class ModalBottomSheet(
+        private val fragment: PaymentsFragment,
         private val purchase: Purchase,
         private val position: Int,
         private val editResultLauncher: ActivityResultLauncher<Intent>,
@@ -186,37 +164,55 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
         ): View? {
             val layout =
                 inflater.inflate(R.layout.layout_edit_purchase_bottom_sheet, container, false)
-            val editLayout = layout.findViewById<ConstraintLayout>(R.id.edit_layout)
-            val deleteLayout = layout.findViewById<ConstraintLayout>(R.id.delete_layout)
-            layout.findViewById<MaterialTextView>(R.id.nameTV).text = purchase.name
-            layout.findViewById<MaterialTextView>(R.id.dateTV).text =
-                dateToString(purchase.day, purchase.month, purchase.year)
-            layout.findViewById<MaterialTextView>(R.id.priceTV).text =
-                doubleToPrice(purchase.price ?: 0.0)
-            if (purchase.type == 0 && purchase.price == 0.0) {
-                editLayout.visibility = View.GONE
-            } else if (purchase.type != 0) {
-                editLayout.setOnClickListener {
-                    Intent(context, AddActivity::class.java).also {
-                        it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
-                        it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
-                        it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
-                        it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
-                        it.putExtra(AddActivity.PURCHASE_TYPE_KEY, purchase.type)
-                        it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
-                        it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
-                        it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)
-                        it.putExtra(AddActivity.PURCHASE_DAY_KEY, purchase.day)
-                        editResultLauncher.launch(it)
-                    }
-                    this.dismiss()
-                }
-            }
-            deleteLayout.setOnClickListener {
-                viewModel.deletePurchaseAt(position)
-                this.dismiss()
-            }
+            fragment.defineSheetInterface(
+                layout,
+                purchase,
+                position,
+                editResultLauncher,
+                viewModel,
+                this::dismiss
+            )
             return layout
+        }
+    }
+
+    fun defineSheetInterface(
+        layout: View,
+        purchase: Purchase,
+        position: Int,
+        editResultLauncher: ActivityResultLauncher<Intent>,
+        viewModel: PaymentsViewModel,
+        dismissFun: () -> Unit
+    ) {
+        val editLayout = layout.findViewById<ConstraintLayout>(R.id.edit_layout)
+        val deleteLayout = layout.findViewById<ConstraintLayout>(R.id.delete_layout)
+        layout.findViewById<MaterialTextView>(R.id.nameTV).text = purchase.name
+        layout.findViewById<MaterialTextView>(R.id.dateTV).text =
+            dateToString(purchase.day, purchase.month, purchase.year)
+        layout.findViewById<MaterialTextView>(R.id.priceTV).text =
+            doubleToPrice(purchase.price ?: 0.0)
+        if (purchase.type == 0 && purchase.price == 0.0) {
+            editLayout.visibility = View.GONE
+        } else if (purchase.type != 0) {
+            editLayout.setOnClickListener {
+                Intent(context, AddActivity::class.java).also {
+                    it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
+                    it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
+                    it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
+                    it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
+                    it.putExtra(AddActivity.PURCHASE_TYPE_KEY, purchase.type)
+                    it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
+                    it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
+                    it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)
+                    it.putExtra(AddActivity.PURCHASE_DAY_KEY, purchase.day)
+                    editResultLauncher.launch(it)
+                }
+                dismissFun()
+            }
+        }
+        deleteLayout.setOnClickListener {
+            viewModel.deletePurchaseAt(position)
+            dismissFun()
         }
     }
 }

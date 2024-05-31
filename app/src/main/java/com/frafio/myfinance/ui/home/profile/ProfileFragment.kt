@@ -19,6 +19,8 @@ import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.dateToString
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
 
 class ProfileFragment : BaseFragment(), ProfileListener {
@@ -45,8 +47,24 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         }
 
         binding.profileEditCard.setOnClickListener {
-            val modalBottomSheet = ModalBottomSheet(viewModel.user?.fullName ?: "", viewModel)
-            modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+            if (requireActivity().findViewById<NavigationView?>(R.id.nav_drawer) != null) {
+                val sideSheetDialog = SideSheetDialog(requireContext())
+                sideSheetDialog.setContentView(R.layout.layout_edit_profile_bottom_sheet)
+                defineSheetInterface(
+                    sideSheetDialog.findViewById(android.R.id.content)!!,
+                    viewModel.user?.fullName ?: "",
+                    viewModel,
+                    sideSheetDialog::hide
+                )
+                sideSheetDialog.show()
+            } else {
+                val modalBottomSheet = ModalBottomSheet(
+                    this,
+                    viewModel.user?.fullName ?: "",
+                    viewModel
+                )
+                modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+            }
         }
 
         return binding.root
@@ -58,6 +76,7 @@ class ProfileFragment : BaseFragment(), ProfileListener {
     }
 
     class ModalBottomSheet(
+        private val fragment: ProfileFragment,
         private val fullName: String,
         private val viewModel: ProfileViewModel
     ) : BottomSheetDialogFragment() {
@@ -73,35 +92,7 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         ): View? {
             val layout =
                 inflater.inflate(R.layout.layout_edit_profile_bottom_sheet, container, false)
-            val propicLayout = layout.findViewById<ConstraintLayout>(R.id.propic_layout)
-            val fullNameLayout = layout.findViewById<ConstraintLayout>(R.id.full_name_layout)
-            val fullNameET = layout.findViewById<AppCompatEditText>(R.id.full_nameET)
-            val fullNameBtn = layout.findViewById<Button>(R.id.full_name_btn)
-
-            fullNameET.setText(fullName)
-            propicLayout.setOnClickListener {
-                (activity as HomeActivity).showSnackBar("Cooming soon!")
-                //viewModel.uploadPropic()
-                this.dismiss()
-            }
-            fullNameLayout.setOnClickListener {
-                layout.findViewById<MaterialTextView>(R.id.full_nameTV).visibility = View.GONE
-                fullNameBtn.visibility = View.VISIBLE
-                fullNameET.visibility = View.VISIBLE
-                fullNameLayout.isClickable = false
-                fullNameET.isFocusableInTouchMode = true
-                fullNameET.requestFocus()
-                fullNameET.setSelection(fullName.length)
-            }
-            fullNameET.doOnTextChanged { text, _, _, _ ->
-                val currentText = text?.trim()
-                fullNameBtn.isEnabled =
-                    currentText.toString().isNotEmpty() && currentText.toString() != fullName
-            }
-            fullNameBtn.setOnClickListener {
-                viewModel.editFullName(fullNameET.text.toString().trim())
-                this.dismiss()
-            }
+            fragment.defineSheetInterface(layout, fullName, viewModel, this::dismiss)
             return layout
         }
     }
@@ -127,6 +118,43 @@ class ProfileFragment : BaseFragment(), ProfileListener {
 
                 else -> Unit
             }
+        }
+    }
+
+    fun defineSheetInterface(
+        layout: View,
+        fullName: String,
+        viewModel: ProfileViewModel,
+        dismissFun: () -> Unit
+    ) {
+        val propicLayout = layout.findViewById<ConstraintLayout>(R.id.propic_layout)
+        val fullNameLayout = layout.findViewById<ConstraintLayout>(R.id.full_name_layout)
+        val fullNameET = layout.findViewById<AppCompatEditText>(R.id.full_nameET)
+        val fullNameBtn = layout.findViewById<Button>(R.id.full_name_btn)
+
+        fullNameET?.setText(fullName)
+        propicLayout?.setOnClickListener {
+            (activity as HomeActivity).showSnackBar("Cooming soon!")
+            //viewModel.uploadPropic()
+            dismissFun()
+        }
+        fullNameLayout?.setOnClickListener {
+            layout.findViewById<MaterialTextView>(R.id.full_nameTV)?.visibility = View.GONE
+            fullNameBtn?.visibility = View.VISIBLE
+            fullNameET?.visibility = View.VISIBLE
+            fullNameLayout.isClickable = false
+            fullNameET?.isFocusableInTouchMode = true
+            fullNameET?.requestFocus()
+            fullNameET?.setSelection(fullName.length)
+        }
+        fullNameET?.doOnTextChanged { text, _, _, _ ->
+            val currentText = text?.trim()
+            fullNameBtn?.isEnabled =
+                currentText.toString().isNotEmpty() && currentText.toString() != fullName
+        }
+        fullNameBtn?.setOnClickListener {
+            viewModel.editFullName(fullNameET?.text.toString().trim())
+            dismissFun()
         }
     }
 }
