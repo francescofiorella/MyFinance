@@ -18,6 +18,7 @@ import androidx.lifecycle.LiveData
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.add.AddActivity
@@ -68,7 +69,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             if (purchaseRequest) {
                 showFragment(R.id.paymentsFragment)
                 refreshFragmentData(dashboard = true, payments = true, menu = true)
-                showSnackBar(getString(R.string.purchase_added))
+                showSnackBar(PurchaseCode.PURCHASE_ADD_SUCCESS.message)
             }
         }
     }

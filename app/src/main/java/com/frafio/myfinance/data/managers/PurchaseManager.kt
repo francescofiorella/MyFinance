@@ -16,6 +16,8 @@ import com.frafio.myfinance.utils.setSharedCategory
 import com.frafio.myfinance.utils.setSharedDynamicColor
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
@@ -83,23 +85,145 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .whereEqualTo(DbPurchases.FIELDS.EMAIL.value, UserStorage.user!!.email)
-            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
+            .whereEqualTo(
+                DbPurchases.FIELDS.CATEGORY.value,
+                getSharedCategory(sharedPreferences)
+            )
             .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.TYPE.value)
             .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
                 PurchaseStorage.resetPurchaseList()
+                // Create total for the local list
+                var total: Purchase? = null
+                // Used to keep the order
+                var currentPurchases = mutableListOf<Purchase>()
 
                 queryDocumentSnapshots.forEach { document ->
                     val purchase = document.toObject(Purchase::class.java)
+                    if (purchase.type != DbPurchases.TYPES.TOTAL.value) {
+                        // set id
+                        purchase.updateID(document.id)
 
-                    // set id and update formattedThings
-                    purchase.updateID(document.id)
+                        var todayDate = LocalDate.now()
+                        val purchaseDate =
+                            LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
+                        var prevDate: LocalDate? = if (total == null)
+                            null
+                        else
+                            LocalDate.of(total!!.year!!, total!!.month!!, total!!.day!!)
 
-                    PurchaseStorage.purchaseList.add(purchase)
+                        // se è < today and non hai fatto today
+                        // quindi se purchase < today and (totale == null or
+                        // totale > today)
+                        if (prevDate == null &&
+                            ChronoUnit.DAYS.between(purchaseDate, todayDate) > 0
+                        ) {
+                            // Aggiungi totali a 0 per ogni giorno tra oggi e purchase
+                            val totToAdd = ChronoUnit.DAYS.between(purchaseDate, todayDate)
+                            for (i in 0..<totToAdd) {
+                                val totId =
+                                    "${todayDate.dayOfMonth}_${todayDate.monthValue}_${todayDate.year}"
+                                total = Purchase(
+                                    email = UserStorage.user!!.email,
+                                    name = DbPurchases.NAMES.TOTAL.value,
+                                    price = 0.0,
+                                    year = todayDate.year,
+                                    month = todayDate.monthValue,
+                                    day = todayDate.dayOfMonth,
+                                    type = 0,
+                                    id = totId,
+                                    category = purchase.category
+                                )
+                                PurchaseStorage.purchaseList.add(total!!)
+                                prevDate =
+                                    LocalDate.of(total!!.year!!, total!!.month!!, total!!.day!!)
+                                todayDate = todayDate.minusDays(1)
+                            }
+                            todayDate = LocalDate.now()
+                        }
+
+                        var totId = "${purchase.day}_${purchase.month}_${purchase.year}"
+                        if (prevDate == null) { // If is the first total
+                            currentPurchases.add(purchase)
+                            total = Purchase(
+                                email = UserStorage.user!!.email,
+                                name = DbPurchases.NAMES.TOTAL.value,
+                                price = if (purchase.type != DbPurchases.TYPES.RENT.value)
+                                    purchase.price else 0.0,
+                                year = purchase.year,
+                                month = purchase.month,
+                                day = purchase.day,
+                                type = 0,
+                                id = totId,
+                                category = purchase.category
+                            )
+                        } else if (total!!.id == totId) { // If the total should be updated
+                            currentPurchases.add(purchase)
+                            if (purchase.type != DbPurchases.TYPES.RENT.value) {
+                                total!!.price = total!!.price!!.plus(purchase.price ?: 0.0)
+                            }
+                        } else { // If we need a new total
+                            // Update the local list with previous day purchases
+                            if (currentPurchases.isNotEmpty()) {
+                                PurchaseStorage.purchaseList.add(total!!)
+                                currentPurchases.forEach { cPurchase ->
+                                    PurchaseStorage.purchaseList.add(cPurchase)
+                                }
+                            }
+                            // aggiungi 0 anche se totale - purchase > 1,
+                            // aggiungi uno 0 per ogni differenza tra totale e purchase
+                            val startFromToday =
+                                ChronoUnit.DAYS.between(purchaseDate, todayDate) > 0 &&
+                                        ChronoUnit.DAYS.between(todayDate, prevDate) > 0
+                            val totToAdd = if (startFromToday)
+                                ChronoUnit.DAYS.between(purchaseDate, todayDate) + 1
+                            else
+                                ChronoUnit.DAYS.between(purchaseDate, prevDate)
+                            if (ChronoUnit.DAYS.between(purchaseDate, todayDate) > 0 &&
+                                totToAdd > 1
+                            ) {
+                                if (startFromToday) {
+                                    prevDate = LocalDate.now().plusDays(1)
+                                }
+                                for (i in 1..<totToAdd) {
+                                    prevDate = prevDate!!.minusDays(1)
+                                    totId =
+                                        "${prevDate.dayOfMonth}_${prevDate.monthValue}_${prevDate.year}"
+                                    total = Purchase(
+                                        email = UserStorage.user!!.email,
+                                        name = DbPurchases.NAMES.TOTAL.value,
+                                        price = 0.0,
+                                        year = prevDate.year,
+                                        month = prevDate.monthValue,
+                                        day = prevDate.dayOfMonth,
+                                        type = 0,
+                                        id = totId,
+                                        category = purchase.category
+                                    )
+                                    PurchaseStorage.purchaseList.add(total!!)
+                                }
+                            }
+
+                            // Create new total
+                            currentPurchases = mutableListOf()
+                            currentPurchases.add(purchase)
+                            totId = "${purchase.day}_${purchase.month}_${purchase.year}"
+                            total = Purchase(
+                                email = UserStorage.user!!.email,
+                                name = DbPurchases.NAMES.TOTAL.value,
+                                price = if (purchase.type != DbPurchases.TYPES.RENT.value)
+                                    purchase.price else 0.0,
+                                year = purchase.year,
+                                month = purchase.month,
+                                day = purchase.day,
+                                type = 0,
+                                id = totId,
+                                category = purchase.category
+                            )
+                        }
+                    }
                 }
 
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS)
@@ -124,16 +248,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchaseList[position].id!!).delete()
             .addOnSuccessListener {
-                if (purchaseList[position].type == DbPurchases.TYPES.TOTAL.value) {
-                    purchaseList.removeAt(position)
-                    PurchaseStorage.purchaseList = purchaseList
-
-                    response.value = Triple(
-                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
-                        purchaseList,
-                        null
-                    )
-                } else if (purchaseList[position].type != DbPurchases.TYPES.TRANSPORT.value
+                if (purchaseList[position].type != DbPurchases.TYPES.TRANSPORT.value
                     && purchaseList[position].type != DbPurchases.TYPES.RENT.value
                 ) {
                     for (i in position - 1 downTo 0) {
@@ -145,30 +260,20 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                                 purchaseList[position].price!!
                             )
 
-                            purchaseList[totPosition] = newPurchase
                             purchaseList.removeAt(position)
+                            if (newPurchase.price != 0.0) {
+                                purchaseList[totPosition] = newPurchase
+                            } else {
+                                purchaseList.removeAt(totPosition)
+                            }
 
-                            fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                                .document(UserStorage.user!!.email!!)
-                                .collection(DbPurchases.FIELDS.PAYMENTS.value)
-                                .document(purchaseList[i].id!!)
-                                .set(purchaseList[i]).addOnSuccessListener {
-                                    PurchaseStorage.purchaseList = purchaseList
+                            PurchaseStorage.purchaseList = purchaseList
 
-                                    response.value = Triple(
-                                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
-                                        purchaseList,
-                                        totPosition
-                                    )
-                                }.addOnFailureListener { e ->
-                                    Log.e(TAG, "Error! ${e.localizedMessage}")
-
-                                    response.value = Triple(
-                                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE),
-                                        purchaseList,
-                                        totPosition
-                                    )
-                                }
+                            response.value = Triple(
+                                PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
+                                purchaseList,
+                                totPosition
+                            )
                             break
                         }
                     }
@@ -192,106 +297,14 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun addTotal(purchase: Purchase): LiveData<PurchaseResult> {
-        val response = MutableLiveData<PurchaseResult>()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .add(purchase).addOnSuccessListener {
-                response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_FAILURE)
-            }
-
-        return response
-    }
-
     fun addPurchase(purchase: Purchase): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
-        val userEmail = UserStorage.user!!.email
-
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .add(purchase).addOnSuccessListener {
-                var sum =
-                    if (purchase.type != DbPurchases.TYPES.TRANSPORT.value
-                        && purchase.type != DbPurchases.TYPES.RENT.value
-                    ) {
-                        purchase.price ?: 0.0
-                    } else {
-                        0.0
-                    }
-                for (item in PurchaseStorage.purchaseList) {
-                    if (item.email == userEmail
-                        && item.type != DbPurchases.TYPES.TOTAL.value
-                        && item.type != DbPurchases.TYPES.TRANSPORT.value
-                        && item.type != DbPurchases.TYPES.RENT.value
-                        && item.year == purchase.year
-                        && item.month == purchase.month
-                        && item.day == purchase.day
-                    ) {
-                        sum += item.price ?: 0.0
-                    }
-                }
-                fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                    .document(UserStorage.user!!.email!!)
-                    .collection(DbPurchases.FIELDS.PAYMENTS.value)
-                    .whereEqualTo(DbPurchases.FIELDS.TYPE.value, DbPurchases.TYPES.TOTAL.value)
-                    .whereEqualTo(
-                        DbPurchases.FIELDS.CATEGORY.value,
-                        getSharedCategory(sharedPreferences)
-                    )
-                    .whereEqualTo(DbPurchases.FIELDS.DAY.value, purchase.day)
-                    .whereEqualTo(DbPurchases.FIELDS.MONTH.value, purchase.month)
-                    .whereEqualTo(DbPurchases.FIELDS.YEAR.value, purchase.year)
-                    .get().addOnSuccessListener { queryDocumentSnapshots ->
-                        if (queryDocumentSnapshots.size() == 1) {
-                            val totalP = queryDocumentSnapshots.documents[0]
-                                .toObject(Purchase::class.java)!!
-                            totalP.updateID(queryDocumentSnapshots.documents[0].id)
-                            totalP.price = sum
-                            fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                                .document(UserStorage.user!!.email!!)
-                                .collection(DbPurchases.FIELDS.PAYMENTS.value)
-                                .document(totalP.id!!).set(totalP)
-                                .addOnSuccessListener {
-                                    response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
-                                }
-                                .addOnFailureListener { e ->
-                                    Log.e(TAG, "Error! ${e.localizedMessage}")
-                                    response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_ERROR)
-                                }
-                        } else if (queryDocumentSnapshots.size() == 0) {
-                            val totalP = Purchase(
-                                userEmail,
-                                DbPurchases.NAMES.TOTAL.value,
-                                sum,
-                                purchase.year,
-                                purchase.month,
-                                purchase.day,
-                                DbPurchases.TYPES.TOTAL.value,
-                                category = getSharedCategory(sharedPreferences)
-                            )
-                            fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                                .document(UserStorage.user!!.email!!)
-                                .collection(DbPurchases.FIELDS.PAYMENTS.value)
-                                .add(totalP).addOnSuccessListener {
-                                    response.value = PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
-                                }
-                                .addOnFailureListener { e ->
-                                    Log.e(TAG, "Error! ${e.localizedMessage}")
-                                    response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_ERROR)
-                                }
-                        } else {
-                            response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_FAILURE)
-                        }
-                    }.addOnFailureListener { e ->
-                        Log.e(TAG, "Error! ${e.localizedMessage}")
-                        response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_FAILURE)
-                    }
+                response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_FAILURE)
@@ -302,8 +315,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
     fun editPurchase(
         purchase: Purchase,
-        position: Int,
-        purchasePrice: Double
+        position: Int
     ): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
@@ -312,59 +324,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchase.id!!).set(purchase).addOnSuccessListener {
                 PurchaseStorage.purchaseList[position] = purchase
-                if (purchase.price != purchasePrice) {
-                    var sum = 0.0
-                    for (item in PurchaseStorage.purchaseList) {
-                        if (item.email == purchase.email
-                            && item.type != DbPurchases.TYPES.TOTAL.value
-                            && item.type != DbPurchases.TYPES.TRANSPORT.value
-                            && item.type != DbPurchases.TYPES.RENT.value
-                            && item.year == purchase.year
-                            && item.month == purchase.month
-                            && item.day == purchase.day
-                        ) {
-                            sum += item.price ?: 0.0
-                        }
-                    }
-
-                    fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                        .document(UserStorage.user!!.email!!)
-                        .collection(DbPurchases.FIELDS.PAYMENTS.value)
-                        .whereEqualTo(DbPurchases.FIELDS.TYPE.value, DbPurchases.TYPES.TOTAL.value)
-                        .whereEqualTo(
-                            DbPurchases.FIELDS.CATEGORY.value,
-                            getSharedCategory(sharedPreferences)
-                        )
-                        .whereEqualTo(DbPurchases.FIELDS.DAY.value, purchase.day)
-                        .whereEqualTo(DbPurchases.FIELDS.MONTH.value, purchase.month)
-                        .whereEqualTo(DbPurchases.FIELDS.YEAR.value, purchase.year)
-                        .get().addOnSuccessListener { queryDocumentSnapshots ->
-                            if (queryDocumentSnapshots.size() == 1) {
-                                val totalP: Purchase = queryDocumentSnapshots.documents[0]
-                                    .toObject(Purchase::class.java)!!
-                                totalP.updateID(queryDocumentSnapshots.documents[0].id)
-                                totalP.price = sum
-                                fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                                    .document(UserStorage.user!!.email!!)
-                                    .collection(DbPurchases.FIELDS.PAYMENTS.value)
-                                    .document(totalP.id!!).set(totalP)
-                                    .addOnSuccessListener {
-                                        response.value =
-                                            PurchaseResult(PurchaseCode.TOTAL_ADD_SUCCESS)
-                                    }
-                                    .addOnFailureListener { e ->
-                                        Log.e(TAG, "Error! ${e.localizedMessage}")
-                                        response.value =
-                                            PurchaseResult(PurchaseCode.PURCHASE_ADD_ERROR)
-                                    }
-                            }
-                        }.addOnFailureListener { e ->
-                            Log.e(TAG, "Error! ${e.localizedMessage}")
-                            response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_ERROR)
-                        }
-                } else {
-                    response.value = PurchaseResult(PurchaseCode.PURCHASE_EDIT_SUCCESS)
-                }
+                response.value = PurchaseResult(PurchaseCode.PURCHASE_EDIT_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_EDIT_FAILURE)

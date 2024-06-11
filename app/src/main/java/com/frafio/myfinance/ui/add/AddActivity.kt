@@ -74,7 +74,6 @@ class AddActivity : AppCompatActivity(), AddListener {
                 DbPurchases.TYPES.SHOPPING.value -> 1
                 DbPurchases.TYPES.TRANSPORT.value -> 2
                 DbPurchases.TYPES.RENT.value -> 3
-                DbPurchases.TYPES.TOTAL.value -> 4
                 else -> -1 // error, do not select a default option
             },
             typeListener
@@ -83,17 +82,7 @@ class AddActivity : AppCompatActivity(), AddListener {
     }
 
     private val typeListener = DialogInterface.OnClickListener { dialog, selectedItem ->
-        if ((binding.nameEditText.text.toString() == DbPurchases.NAMES.TOTAL.value_en
-                    || binding.nameEditText.text.toString() == DbPurchases.NAMES.TOTAL.value_it)
-            && (binding.priceEditText.text.toString() == DbPurchases.NAMES.TOTAL_PRICE.value_en
-                    || binding.priceEditText.text.toString() == DbPurchases.NAMES.TOTAL_PRICE.value_it)
-        ) {
-            binding.nameEditText.clearText()
-            binding.nameTextInputLayout.isEnabled = true
-
-            binding.priceEditText.clearText()
-            binding.priceTextInputLayout.isEnabled = true
-        } else if (binding.nameEditText.text.toString() == DbPurchases.NAMES.RENT.value_en
+        if (binding.nameEditText.text.toString() == DbPurchases.NAMES.RENT.value_en
             || binding.nameEditText.text.toString() == DbPurchases.NAMES.RENT.value_it
         ) {
             binding.nameEditText.clearText()
@@ -119,23 +108,6 @@ class AddActivity : AppCompatActivity(), AddListener {
                 binding.typeAutoCompleteTV.setText(getString(R.string.rent))
                 binding.nameEditText.setText(DbPurchases.NAMES.RENT.value)
                 viewModel.type = DbPurchases.TYPES.RENT.value
-            }
-
-            4 -> {
-                binding.typeAutoCompleteTV.setText(getString(R.string.no_purchase))
-                binding.nameEditText.setText(DbPurchases.NAMES.TOTAL.value)
-                binding.nameTextInputLayout.isEnabled = false
-
-                binding.priceEditText.setText(DbPurchases.NAMES.TOTAL_PRICE.value)
-                binding.priceTextInputLayout.isEnabled = false
-
-                binding.nameTextInputLayout.isErrorEnabled = false
-                binding.nameTextInputLayout.error = null
-
-                binding.priceTextInputLayout.isErrorEnabled = false
-                binding.priceTextInputLayout.error = null
-
-                viewModel.type = DbPurchases.TYPES.TOTAL.value
             }
         }
 
@@ -234,13 +206,13 @@ class AddActivity : AppCompatActivity(), AddListener {
 
     override fun onAddSuccess(response: LiveData<PurchaseResult>) {
         response.observe(this) { result ->
-            if (result.code != PurchaseCode.TOTAL_ADD_SUCCESS.code) {
+            if (result.code != PurchaseCode.PURCHASE_ADD_SUCCESS.code) {
                 binding.addProgressIndicator.hide()
                 binding.addAddButton.isEnabled = true
             }
 
             when (result.code) {
-                PurchaseCode.TOTAL_ADD_SUCCESS.code -> viewModel.updateLocalList()
+                PurchaseCode.PURCHASE_ADD_SUCCESS.code -> viewModel.updateLocalList()
 
                 PurchaseCode.PURCHASE_EDIT_SUCCESS.code,
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {

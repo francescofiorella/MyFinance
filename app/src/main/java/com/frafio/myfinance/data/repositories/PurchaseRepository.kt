@@ -57,49 +57,53 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         var lastMonth = 0
         var lastYear = 0
 
+        val todayDate = LocalDate.now()
         PurchaseStorage.purchaseList.forEach { purchase ->
-            when (purchase.type) {
-                DbPurchases.TYPES.TOTAL.value -> {
-                    // today total
-                    val year = LocalDate.now().year
-                    val month = LocalDate.now().monthValue
-                    val day = LocalDate.now().dayOfMonth
-                    if (purchase.year == year && purchase.month == month) {
-                        values[4] += purchase.price ?: 0.0
+            val purchaseDate = LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
+            if (ChronoUnit.DAYS.between(purchaseDate, todayDate) >= 0) {
+                when (purchase.type) {
+                    DbPurchases.TYPES.TOTAL.value -> {
+                        // today total
+                        val year = LocalDate.now().year
+                        val month = LocalDate.now().monthValue
+                        val day = LocalDate.now().dayOfMonth
+                        if (purchase.year == year && purchase.month == month) {
+                            values[4] += purchase.price ?: 0.0
 
-                        if (purchase.day == day) {
-                            values[2] = purchase.price ?: 0.0
+                            if (purchase.day == day) {
+                                values[2] = purchase.price ?: 0.0
+                            }
+                        }
+
+                        // increment tot
+                        values[3] += purchase.price ?: 0.0
+
+                        // count the day number
+                        nDays++
+
+                        // count the month number
+                        if (purchase.year != lastYear) {
+                            lastYear = purchase.year ?: 0
+                            lastMonth = purchase.month ?: 0
+                        } else if (purchase.month != lastMonth) {
+                            lastMonth = purchase.month ?: 0
                         }
                     }
 
-                    // increment tot
-                    values[3] += purchase.price ?: 0.0
-
-                    // count the day number
-                    nDays++
-
-                    // count the month number
-                    if (purchase.year != lastYear) {
-                        lastYear = purchase.year ?: 0
-                        lastMonth = purchase.month ?: 0
-                    } else if (purchase.month != lastMonth) {
-                        lastMonth = purchase.month ?: 0
+                    DbPurchases.TYPES.TRANSPORT.value -> {
+                        // transportTot
+                        values[7] += purchase.price ?: 0.0
                     }
-                }
 
-                DbPurchases.TYPES.TRANSPORT.value -> {
-                    // transportTot
-                    values[7] += purchase.price ?: 0.0
-                }
+                    DbPurchases.TYPES.RENT.value -> {
+                        // rentTot
+                        values[5] += purchase.price ?: 0.0
+                    }
 
-                DbPurchases.TYPES.RENT.value -> {
-                    // rentTot
-                    values[5] += purchase.price ?: 0.0
-                }
-
-                DbPurchases.TYPES.SHOPPING.value -> {
-                    // shoppingTot
-                    values[6] += purchase.price ?: 0.0
+                    DbPurchases.TYPES.SHOPPING.value -> {
+                        // shoppingTot
+                        values[6] += purchase.price ?: 0.0
+                    }
                 }
             }
         }
@@ -146,20 +150,15 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return purchaseManager.deleteAt(position)
     }
 
-    fun addTotal(purchase: Purchase): LiveData<PurchaseResult> {
-        return purchaseManager.addTotal(purchase)
-    }
-
     fun addPurchase(purchase: Purchase): LiveData<PurchaseResult> {
         return purchaseManager.addPurchase(purchase)
     }
 
     fun editPurchase(
         purchase: Purchase,
-        position: Int,
-        purchasePrice: Double
+        position: Int
     ): LiveData<PurchaseResult> {
-        return purchaseManager.editPurchase(purchase, position, purchasePrice)
+        return purchaseManager.editPurchase(purchase, position)
     }
 
     private fun calculateAvgTrend(): List<Pair<String, Double>> {
@@ -179,17 +178,22 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         var purchaseCount = 0
 
         var lastCount = 0
-        val lastDate = dateToString(
-            PurchaseStorage.purchaseList.first().day!!,
-            PurchaseStorage.purchaseList.first().month!!,
-            PurchaseStorage.purchaseList.first().year!!
-        )
+        var lastDate: String? = null
 
         // purchaseList is inverted -> loop in reverse
+        val todayDate = LocalDate.now()
         for (i in PurchaseStorage.purchaseList.size - 1 downTo 0) {
             PurchaseStorage.purchaseList[i].also { purchase ->
+                val purchaseDate = LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
                 // consider just the totals
-                if (purchase.type == DbPurchases.TYPES.TOTAL.value) {
+                if (ChronoUnit.DAYS.between(purchaseDate, todayDate) >= 0 &&
+                    purchase.type == DbPurchases.TYPES.TOTAL.value
+                ) {
+                    lastDate = dateToString(
+                        purchase.day!!,
+                        purchase.month!!,
+                        purchase.year!!
+                    )
                     // increment sum and count
                     priceSum += purchase.price!!
                     purchaseCount++

@@ -60,7 +60,6 @@
     <string name="shopping">Spesa</string>
     <string name="transport">Trasporti</string>
     <string name="rent">Affitto</string>
-    <string name="no_purchase">Nessun pagamento</string>
     <string name="date">Data</string>
 
     <string name="translation_warning">Riavvia l\'app per rendere le modifiche effettive</string>
@@ -88,6 +87,5 @@
         <item>@string/shopping</item>
         <item>@string/transport</item>
         <item>@string/rent</item>
-        <item>@string/no_purchase</item>
     </string-array>
 </resources>

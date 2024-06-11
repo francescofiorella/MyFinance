@@ -70,7 +70,6 @@
     <string name="shopping">Shopping</string>
     <string name="transport">Transport</string>
     <string name="rent">Rent</string>
-    <string name="no_purchase">No payment</string>
     <string name="date">Date</string>
 
     <string name="translation_warning">Restart the app for the changes to take effect</string>
@@ -106,6 +105,5 @@
         <item>@string/shopping</item>
         <item>@string/transport</item>
         <item>@string/rent</item>
-        <item>@string/no_purchase</item>
     </string-array>
 </resources>

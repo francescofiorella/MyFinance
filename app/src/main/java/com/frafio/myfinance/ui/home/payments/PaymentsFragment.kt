@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.Purchase
@@ -142,7 +143,11 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
 
     override fun scrollUp() {
         super.scrollUp()
-        binding.listRecyclerView.scrollToPosition(0)
+        val todayId = (binding.listRecyclerView.adapter as PurchaseAdapter).getTodayId()
+        (binding.listRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
+            todayId,
+            0
+        )
     }
 
     class ModalBottomSheet(
@@ -191,24 +196,20 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
             dateToString(purchase.day, purchase.month, purchase.year)
         layout.findViewById<MaterialTextView>(R.id.priceTV).text =
             doubleToPrice(purchase.price ?: 0.0)
-        if (purchase.type == 0 && purchase.price == 0.0) {
-            editLayout.visibility = View.GONE
-        } else if (purchase.type != 0) {
-            editLayout.setOnClickListener {
-                Intent(context, AddActivity::class.java).also {
-                    it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
-                    it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
-                    it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
-                    it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
-                    it.putExtra(AddActivity.PURCHASE_TYPE_KEY, purchase.type)
-                    it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
-                    it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
-                    it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)
-                    it.putExtra(AddActivity.PURCHASE_DAY_KEY, purchase.day)
-                    editResultLauncher.launch(it)
-                }
-                dismissFun()
+        editLayout.setOnClickListener {
+            Intent(context, AddActivity::class.java).also {
+                it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
+                it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
+                it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
+                it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
+                it.putExtra(AddActivity.PURCHASE_TYPE_KEY, purchase.type)
+                it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
+                it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
+                it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)
+                it.putExtra(AddActivity.PURCHASE_DAY_KEY, purchase.day)
+                editResultLauncher.launch(it)
             }
+            dismissFun()
         }
         deleteLayout.setOnClickListener {
             viewModel.deletePurchaseAt(position)

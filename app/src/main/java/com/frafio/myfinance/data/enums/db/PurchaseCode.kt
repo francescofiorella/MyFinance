@@ -27,34 +27,19 @@ enum class PurchaseCode(val code: Int, val message: String) {
         }
     ),
 
-    TOTAL_ADD_SUCCESS(
+    PURCHASE_ADD_SUCCESS(
         10, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Total added!"
-            Languages.ITALIANO.value -> "Totale aggiunto!"
-            else -> "Total added!" // english
-        }
-    ),
-
-    TOTAL_ADD_FAILURE(
-        11, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Total not added!"
-            Languages.ITALIANO.value -> "Totale non aggiunto!"
-            else -> "Total not added!" // english
+            Languages.ENGLISH.value -> "Purchase added!"
+            Languages.ITALIANO.value -> "Acquisto aggiunto!"
+            else -> "Purchase added!" // english
         }
     ),
 
     PURCHASE_ADD_FAILURE(
-        12, when (getCurrentLanguage()) {
+        11, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Purchase not added!"
             Languages.ITALIANO.value -> "Acquisto non aggiunto!"
             else -> "Purchase not added!" // english
-        }
-    ),
-    PURCHASE_ADD_ERROR(
-        13, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Purchase not added correctly!"
-            Languages.ITALIANO.value -> "Acquisto non aggiunto correttamente!"
-            else -> "Purchase not added correctly!" // english
         }
     ),
 

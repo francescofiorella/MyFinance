@@ -12,6 +12,8 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.LayoutPurchaseItemRvBinding
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 class PurchaseAdapter(
     private var purchases: List<Purchase>,
@@ -45,7 +47,7 @@ class PurchaseAdapter(
                 .setOnClickListener(null)
         }
 
-        if (!(currentPurchase.type == DbPurchases.TYPES.TOTAL.value && currentPurchase.price != 0.0)) {
+        if (currentPurchase.type != DbPurchases.TYPES.TOTAL.value) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener {
                     listener.onItemInteraction(
@@ -72,6 +74,17 @@ class PurchaseAdapter(
 
     override fun getItemCount(): Int {
         return purchases.size
+    }
+
+    fun getTodayId(): Int {
+        val todayDate = LocalDate.now()
+        for ((i, p) in purchases.withIndex()) {
+            val purchaseDate = LocalDate.of(p.year!!, p.month!!, p.day!!)
+            if (ChronoUnit.DAYS.between(purchaseDate, todayDate) >= 0) {
+                return i
+            }
+        }
+        return 0
     }
 
     fun updateData(newPurchaseList: List<Purchase>) {
