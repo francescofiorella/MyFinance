@@ -17,7 +17,7 @@ android {
         minSdk = 29
         targetSdk = 34
         versionCode = 4
-        versionName = "4.1.13"
+        versionName = "4.1.14"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -62,10 +62,10 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
     implementation("androidx.activity:activity-ktx:1.9.0")
-    implementation("androidx.fragment:fragment-ktx:1.7.1")
+    implementation("androidx.fragment:fragment-ktx:1.8.0")
 
     // SplashScreen API
     implementation("androidx.core:core-splashscreen:1.0.1")
