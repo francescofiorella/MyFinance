@@ -6,15 +6,26 @@
     android:layout_height="wrap_content"
     android:paddingVertical="30dp">
 
+    <ImageView
+        android:id="@+id/purchaseTypeIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:contentDescription="@string/purchase_type_icon"
+        app:layout_constraintBottom_toBottomOf="@id/dateTV"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/nameTV"
+        tools:src="@drawable/ic_restaurant" />
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/nameTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
+        android:layout_marginStart="20dp"
         android:fontFamily="@font/nunito"
         android:textColor="@color/primary_text"
         android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/purchaseTypeIcon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Acquisto" />
 
@@ -22,10 +33,10 @@
         android:id="@+id/dateTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
+        android:layout_marginStart="20dp"
         android:fontFamily="@font/nunito"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/purchaseTypeIcon"
         app:layout_constraintTop_toBottomOf="@id/nameTV"
         tools:text="01/01/2000" />
 

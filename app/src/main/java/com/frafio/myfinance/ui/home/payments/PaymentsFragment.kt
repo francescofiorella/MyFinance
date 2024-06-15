@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -14,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
@@ -42,7 +44,8 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
             val editRequest = data!!.getBooleanExtra(AddActivity.PURCHASE_REQUEST_KEY, false)
 
             if (editRequest) {
-                viewModel.getPurchases()
+                val positionChanged = data.getIntExtra(AddActivity.PURCHASE_POSITION_KEY, 0)
+                binding.listRecyclerView.adapter?.notifyItemChanged(positionChanged)
                 (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
                 (activity as HomeActivity).showSnackBar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
             }
@@ -188,6 +191,19 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
             dateToString(purchase.day, purchase.month, purchase.year)
         layout.findViewById<MaterialTextView>(R.id.priceTV).text =
             doubleToPrice(purchase.price ?: 0.0)
+        layout.findViewById<ImageView>(R.id.purchaseTypeIcon).setImageResource(
+            when (purchase.type) {
+                DbPurchases.TYPES.HOUSING.value -> R.drawable.ic_baseline_home
+                DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_restaurant
+                DbPurchases.TYPES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                DbPurchases.TYPES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                DbPurchases.TYPES.EDUCATION.value -> R.drawable.ic_school
+                DbPurchases.TYPES.HEALTH.value -> R.drawable.ic_vaccines
+                DbPurchases.TYPES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                DbPurchases.TYPES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                else -> R.drawable.ic_tag
+            }
+        )
         editLayout.setOnClickListener {
             Intent(context, AddActivity::class.java).also {
                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)

@@ -184,7 +184,16 @@ class AddActivity : AppCompatActivity(), AddListener {
             when (result.code) {
                 PurchaseCode.PURCHASE_ADD_SUCCESS.code -> viewModel.updateLocalList()
 
-                PurchaseCode.PURCHASE_EDIT_SUCCESS.code,
+                PurchaseCode.PURCHASE_EDIT_SUCCESS.code -> {
+                    // go back to the homepage
+                    Intent().also {
+                        it.putExtra(PURCHASE_REQUEST_KEY, true)
+                        it.putExtra(PURCHASE_POSITION_KEY, viewModel.purchasePosition)
+                        setResult(RESULT_OK, it)
+                        finish()
+                    }
+                }
+
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {

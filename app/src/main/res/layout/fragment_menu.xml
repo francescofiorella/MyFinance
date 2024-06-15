@@ -73,7 +73,7 @@
                             android:paddingBottom="5dp"
                             android:text="@string/trend_avg_day"
                             android:textColor="@color/primary_text"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             app:layout_constraintStart_toEndOf="@id/chart_icon"
                             app:layout_constraintTop_toTopOf="parent" />
 

@@ -99,6 +99,8 @@
     <string name="edit_profile">Edit the profile</string>
     <string name="edit_propic">Upload the profile picture</string>
     <string name="edit_full_name">Edit the full name</string>
+    <string name="purchase_type_icon">Purchase Type Icon</string>
+    <string name="no_purchases">No purchases</string>
 
     <string-array name="types">
         <item>Housing</item>

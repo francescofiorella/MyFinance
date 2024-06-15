@@ -49,11 +49,24 @@
                 android:id="@+id/recView_purchaseItem_divider"
                 android:layout_width="0dp"
                 android:layout_height="0.1dp"
-                android:layout_marginStart="10dp"
-                app:layout_constraintBottom_toBottomOf="@+id/recView_purchaseItem_dataTextView"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginHorizontal="10dp"
+                app:layout_constraintBottom_toBottomOf="@id/recView_purchaseItem_dataTextView"
+                app:layout_constraintEnd_toStartOf="@id/recView_purchaseItem_priceTotalTextView"
                 app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_dataTextView"
                 app:layout_constraintTop_toTopOf="@id/recView_purchaseItem_dataTextView" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/recView_purchaseItem_priceTotalTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="5dp"
+                android:fontFamily="@font/nunito"
+                android:text="@{FormatUtilsKt.doubleToPrice(purchase.price)}"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="€ 0.00" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -71,17 +84,57 @@
             app:layout_constraintTop_toBottomOf="@id/recView_purchaseItem_dataLayout">
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/recView_purchaseItem_nomeTextView"
+                android:id="@+id/recView_purchaseItem_totalTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
                 android:fontFamily="@font/nunito"
-                android:text="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? purchase.name : @string/empty + purchase.name}"
-                android:textColor="@color/primary_text"
+                android:text="@string/no_purchases"
+                android:textSize="16sp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                tools:text="Total" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/recView_purchaseItem_purchaseTypeIcon"
+                style="?attr/materialIconButtonFilledTonalStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="5dp"
+                android:contentDescription="@string/purchase_type_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:icon="@drawable/ic_restaurant" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/recView_purchaseItem_nomeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/nunito"
+                android:text="@{purchase.name}"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_purchaseTypeIcon"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:text="Acquisto" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/recView_purchaseItem_typeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/nunito"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_purchaseTypeIcon"
+                app:layout_constraintTop_toBottomOf="@id/recView_purchaseItem_nomeTextView"
+                tools:text="@string/type" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/recView_purchaseItem_priceTextView"
@@ -89,10 +142,10 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/nunito"
                 android:text="@{FormatUtilsKt.doubleToPrice(purchase.price)}"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toBottomOf="@id/recView_purchaseItem_nomeTextView"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/recView_purchaseItem_nomeTextView"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:text="€ 0.00" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

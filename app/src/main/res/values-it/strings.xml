@@ -81,6 +81,8 @@
     <string name="edit_profile">Modifica il profilo</string>
     <string name="edit_propic">Carica la foto profilo</string>
     <string name="edit_full_name">Modifica il nome</string>
+    <string name="purchase_type_icon">Icona di tipo acquisto</string>
+    <string name="no_purchases">Nessun acquisto</string>
 
     <string-array name="types">
         <item>Abitazioni</item>
