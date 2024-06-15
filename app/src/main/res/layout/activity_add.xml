@@ -168,7 +168,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="5dp"
-                    android:enabled="@{viewModel.requestCode == 1 ? true : false}"
                     android:hint="@string/type"
                     android:labelFor="@id/type_auto_complete_TV"
                     android:paddingBottom="70dp"
@@ -187,8 +186,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
-                        android:inputType="none"
-                        android:text="@string/generic" />
+                        android:inputType="none" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 

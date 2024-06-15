@@ -14,7 +14,6 @@ import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.DatePickerButton
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
-import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -70,10 +69,14 @@ class AddActivity : AppCompatActivity(), AddListener {
         builder.setSingleChoiceItems(
             resources.getStringArray(R.array.types),
             when (viewModel.type) {
-                DbPurchases.TYPES.GENERIC.value -> 0
-                DbPurchases.TYPES.SHOPPING.value -> 1
-                DbPurchases.TYPES.TRANSPORT.value -> 2
-                DbPurchases.TYPES.RENT.value -> 3
+                DbPurchases.TYPES.HOUSING.value -> 0
+                DbPurchases.TYPES.GROCERIES.value -> 1
+                DbPurchases.TYPES.PERSONAL_CARE.value -> 2
+                DbPurchases.TYPES.ENTERTAINMENT.value -> 3
+                DbPurchases.TYPES.EDUCATION.value -> 4
+                DbPurchases.TYPES.HEALTH.value -> 5
+                DbPurchases.TYPES.TRANSPORTATION.value -> 6
+                DbPurchases.TYPES.MISCELLANEOUS.value -> 7
                 else -> -1 // error, do not select a default option
             },
             typeListener
@@ -82,33 +85,12 @@ class AddActivity : AppCompatActivity(), AddListener {
     }
 
     private val typeListener = DialogInterface.OnClickListener { dialog, selectedItem ->
-        if (binding.nameEditText.text.toString() == DbPurchases.NAMES.RENT.value_en
-            || binding.nameEditText.text.toString() == DbPurchases.NAMES.RENT.value_it
-        ) {
-            binding.nameEditText.clearText()
-        }
-
-        when (selectedItem) {
-            0 -> {
-                binding.typeAutoCompleteTV.setText(getString(R.string.generic))
-                viewModel.type = DbPurchases.TYPES.GENERIC.value
-            }
-
-            1 -> {
-                binding.typeAutoCompleteTV.setText(getString(R.string.shopping))
-                viewModel.type = DbPurchases.TYPES.SHOPPING.value
-            }
-
-            2 -> {
-                binding.typeAutoCompleteTV.setText(getString(R.string.transport))
-                viewModel.type = DbPurchases.TYPES.TRANSPORT.value
-            }
-
-            3 -> {
-                binding.typeAutoCompleteTV.setText(getString(R.string.rent))
-                binding.nameEditText.setText(DbPurchases.NAMES.RENT.value)
-                viewModel.type = DbPurchases.TYPES.RENT.value
-            }
+        val types = resources.getStringArray(R.array.types)
+        if (selectedItem >= 0 && selectedItem < types.size) {
+            binding.typeAutoCompleteTV.setText(types[selectedItem])
+            viewModel.type = selectedItem
+        } else {
+            viewModel.type = -1
         }
 
         dialog.dismiss()
@@ -134,7 +116,7 @@ class AddActivity : AppCompatActivity(), AddListener {
 
         when (code) {
             REQUEST_ADD_CODE -> {
-                viewModel.type = DbPurchases.TYPES.GENERIC.value
+                viewModel.type = -1
             }
 
             REQUEST_EDIT_CODE -> {
@@ -151,7 +133,7 @@ class AddActivity : AppCompatActivity(), AddListener {
                             viewModel.purchasePrice = it
                         }
                     intent.getIntExtra(PURCHASE_TYPE_KEY, 0).also {
-                        viewModel.purchaseType = it
+                        viewModel.type = it
                     }
                     intent.getIntExtra(PURCHASE_POSITION_KEY, 0)
                         .also {
@@ -168,22 +150,9 @@ class AddActivity : AppCompatActivity(), AddListener {
                     }
                 }
 
-                when (viewModel.purchaseType) {
-                    DbPurchases.TYPES.GENERIC.value -> {
-                        binding.typeAutoCompleteTV.setText(getString(R.string.generic))
-                    }
-
-                    DbPurchases.TYPES.SHOPPING.value -> {
-                        binding.typeAutoCompleteTV.setText(getString(R.string.shopping))
-                    }
-
-                    DbPurchases.TYPES.TRANSPORT.value -> {
-                        binding.typeAutoCompleteTV.setText(getString(R.string.transport))
-                    }
-
-                    DbPurchases.TYPES.RENT.value -> {
-                        binding.typeAutoCompleteTV.setText(getString(R.string.rent))
-                    }
+                val types = resources.getStringArray(R.array.types)
+                if (viewModel.type != null && viewModel.type!! >= 0 && viewModel.type!! < types.size) {
+                    binding.typeAutoCompleteTV.setText(types[viewModel.type!!])
                 }
             }
         }
@@ -200,6 +169,7 @@ class AddActivity : AppCompatActivity(), AddListener {
 
         binding.nameTextInputLayout.isErrorEnabled = false
         binding.priceTextInputLayout.isErrorEnabled = false
+        binding.typeTextInputLayout.isErrorEnabled = false
 
         binding.addAddButton.isEnabled = false
     }
@@ -238,7 +208,11 @@ class AddActivity : AppCompatActivity(), AddListener {
             PurchaseCode.WRONG_NAME_TOTAL.code ->
                 binding.nameTextInputLayout.error = result.message
 
-            PurchaseCode.EMPTY_PRICE.code -> binding.priceTextInputLayout.error = result.message
+            PurchaseCode.EMPTY_PRICE.code ->
+                binding.priceTextInputLayout.error = result.message
+
+            PurchaseCode.EMPTY_TYPE.code ->
+                binding.typeTextInputLayout.error = result.message
         }
     }
 }

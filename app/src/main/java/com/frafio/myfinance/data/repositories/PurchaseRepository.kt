@@ -90,18 +90,18 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                         }
                     }
 
-                    DbPurchases.TYPES.TRANSPORT.value -> {
-                        // transportTot
+                    DbPurchases.TYPES.TRANSPORTATION.value -> {
+                        // transportationTot
                         values[7] += purchase.price ?: 0.0
                     }
 
-                    DbPurchases.TYPES.RENT.value -> {
-                        // rentTot
+                    DbPurchases.TYPES.HOUSING.value -> {
+                        // housingTot
                         values[5] += purchase.price ?: 0.0
                     }
 
-                    DbPurchases.TYPES.SHOPPING.value -> {
-                        // shoppingTot
+                    DbPurchases.TYPES.GROCERIES.value -> {
+                        // groceriesTot
                         values[6] += purchase.price ?: 0.0
                     }
                 }

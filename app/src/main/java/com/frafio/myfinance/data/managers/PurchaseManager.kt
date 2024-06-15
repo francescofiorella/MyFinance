@@ -117,50 +117,37 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchaseList[position].id!!).delete()
             .addOnSuccessListener {
-                if (purchaseList[position].type != DbPurchases.TYPES.TRANSPORT.value
-                    && purchaseList[position].type != DbPurchases.TYPES.RENT.value
-                ) {
-                    for (i in position - 1 downTo 0) {
-                        if (purchaseList[i].type == DbPurchases.TYPES.TOTAL.value) {
-                            totPosition = i
+                for (i in position - 1 downTo 0) {
+                    if (purchaseList[i].type == DbPurchases.TYPES.TOTAL.value) {
+                        totPosition = i
 
-                            val newTotal = purchaseList[totPosition]
-                            newTotal.price = newTotal.price?.minus(
-                                purchaseList[position].price!!
-                            )
+                        val newTotal = purchaseList[totPosition]
+                        newTotal.price = newTotal.price?.minus(
+                            purchaseList[position].price!!
+                        )
 
-                            purchaseList.removeAt(position)
-                            val todayDate = LocalDate.now()
-                            val totalDate = LocalDate.of(
-                                newTotal.year!!,
-                                newTotal.month!!,
-                                newTotal.day!!
-                            )
-                            if (ChronoUnit.DAYS.between(totalDate, todayDate) >= 0) {
-                                purchaseList[totPosition] = newTotal
-                            } else if (newTotal.price == 0.0) {
-                                purchaseList.removeAt(totPosition)
-                            }
-
-                            PurchaseStorage.purchaseList = purchaseList
-
-                            response.value = Triple(
-                                PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
-                                purchaseList,
-                                totPosition
-                            )
-                            break
+                        purchaseList.removeAt(position)
+                        val todayDate = LocalDate.now()
+                        val totalDate = LocalDate.of(
+                            newTotal.year!!,
+                            newTotal.month!!,
+                            newTotal.day!!
+                        )
+                        if (ChronoUnit.DAYS.between(totalDate, todayDate) >= 0) {
+                            purchaseList[totPosition] = newTotal
+                        } else if (newTotal.price == 0.0) {
+                            purchaseList.removeAt(totPosition)
                         }
-                    }
-                } else {
-                    purchaseList.removeAt(position)
-                    PurchaseStorage.purchaseList = purchaseList
 
-                    response.value = Triple(
-                        PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
-                        purchaseList,
-                        null
-                    )
+                        PurchaseStorage.purchaseList = purchaseList
+
+                        response.value = Triple(
+                            PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
+                            purchaseList,
+                            totPosition
+                        )
+                        break
+                    }
                 }
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")

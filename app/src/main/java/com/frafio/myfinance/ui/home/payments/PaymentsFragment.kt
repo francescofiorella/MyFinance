@@ -23,7 +23,6 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
-import com.frafio.myfinance.ui.home.payments.invoice.InvoiceActivity
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -80,14 +79,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
         position: Int
     ) {
         when (interactionID) {
-            ON_CLICK -> {
-                Intent(context, InvoiceActivity::class.java).also {
-                    it.putExtra(InvoiceActivity.PURCHASE_ID_KEY, purchase.id)
-                    it.putExtra(InvoiceActivity.PURCHASE_NAME_KEY, purchase.name)
-                    it.putExtra(InvoiceActivity.PURCHASE_PRICE_KEY, doubleToPrice(purchase.price!!))
-                    activity?.startActivity(it)
-                }
-            }
+            ON_CLICK -> Unit
 
             ON_LONG_CLICK -> {
                 if (requireActivity().findViewById<NavigationView?>(R.id.nav_drawer) != null) {

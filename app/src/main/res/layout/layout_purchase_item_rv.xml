@@ -13,6 +13,8 @@
 
         <import type="com.frafio.myfinance.utils.FormatUtilsKt" />
 
+        <import type="com.frafio.myfinance.data.enums.db.DbPurchases" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingHorizontal="20dp"
-            android:visibility="@{purchase.type == 0 ? View.VISIBLE : View.GONE}"
+            android:visibility="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -74,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
                 android:fontFamily="@font/nunito"
-                android:text="@{purchase.type == 0 ? purchase.name : @string/empty + purchase.name}"
+                android:text="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? purchase.name : @string/empty + purchase.name}"
                 android:textColor="@color/primary_text"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

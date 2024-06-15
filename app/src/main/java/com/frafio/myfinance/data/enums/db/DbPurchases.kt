@@ -18,29 +18,25 @@ object DbPurchases {
     }
 
     enum class NAMES(val value: String, val value_en: String, val value_it: String) {
-        RENT(
-            when (getCurrentLanguage()) {
-                Languages.ENGLISH.value -> "Rent"
-                Languages.ITALIANO.value -> "Affitto"
-                else -> "Rent" // english
-            }, "Rent", "Affitto"
-        ),
         TOTAL(
             when (getCurrentLanguage()) {
                 Languages.ENGLISH.value -> "Total"
                 Languages.ITALIANO.value -> "Totale"
                 else -> "Total" // english
             }, "Total", "Totale"
-        ),
-        TOTAL_PRICE("0.00", "0.00", "0.00")
+        )
     }
 
     enum class TYPES(val value: Int) {
-        TOTAL(0),
-        SHOPPING(1),
-        GENERIC(2),
-        TRANSPORT(3),
-        RENT(4)
+        TOTAL(100),
+        HOUSING(0),
+        GROCERIES(1),
+        PERSONAL_CARE(2),
+        ENTERTAINMENT(3),
+        EDUCATION(4),
+        HEALTH(5),
+        TRANSPORTATION(6),
+        MISCELLANEOUS(7)
     }
 
     enum class CATEGORIES(val value: String) {

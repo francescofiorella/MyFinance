@@ -27,6 +27,14 @@ enum class PurchaseCode(val code: Int, val message: String) {
         }
     ),
 
+    EMPTY_TYPE(
+        4, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Enter the purchase type."
+            Languages.ITALIANO.value -> "Inserisci il tipo di acquisto."
+            else -> "Enter the purchase type." // english
+        }
+    ),
+
     PURCHASE_ADD_SUCCESS(
         10, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Purchase added!"
@@ -120,38 +128,6 @@ enum class PurchaseCode(val code: Int, val message: String) {
             Languages.ENGLISH.value -> "Category not created!"
             Languages.ITALIANO.value -> "Categoria non creata!"
             else -> "Category not created!" // english
-        }
-    ),
-
-    INVOICE_ADD_SUCCESS(
-        100, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Item added!"
-            Languages.ITALIANO.value -> "Voce aggiunta!"
-            else -> "Item added!" // english
-        }
-    ),
-
-    INVOICE_ADD_FAILURE(
-        102, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Item not added!"
-            Languages.ITALIANO.value -> "Voce non aggiunta!"
-            else -> "Item not added!" // english
-        }
-    ),
-
-    INVOICE_DELETE_SUCCESS(
-        103, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Item deleted!"
-            Languages.ITALIANO.value -> "Voce eliminata!"
-            else -> "Item deleted!" // english
-        }
-    ),
-
-    INVOICE_DELETE_FAILURE(
-        104, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Item not deleted!"
-            Languages.ITALIANO.value -> "Voce non eliminata!"
-            else -> "Item not deleted!" // english
         }
     )
 }

@@ -83,9 +83,13 @@
     <string name="edit_full_name">Modifica il nome</string>
 
     <string-array name="types">
-        <item>@string/generic</item>
-        <item>@string/shopping</item>
-        <item>@string/transport</item>
-        <item>@string/rent</item>
+        <item>Abitazioni</item>
+        <item>Alimentari</item>
+        <item>Cura personale</item>
+        <item>Divertimento</item>
+        <item>Formazione</item>
+        <item>Salute</item>
+        <item>Trasporti</item>
+        <item>Varie</item>
     </string-array>
 </resources>

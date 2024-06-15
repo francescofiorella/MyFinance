@@ -33,7 +33,6 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
 
     var purchaseID: String? = null
     var purchasePrice: Double? = null
-    var purchaseType: Int? = null
     var purchasePosition: Int? = null
 
     var requestCode: Int? = null
@@ -56,15 +55,18 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        if ((name == DbPurchases.NAMES.TOTAL.value_en || name == DbPurchases.NAMES.TOTAL.value_it)
-            && type != DbPurchases.TYPES.TOTAL.value
-        ) {
+        if ((name == DbPurchases.NAMES.TOTAL.value_en || name == DbPurchases.NAMES.TOTAL.value_it)) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.WRONG_NAME_TOTAL))
             return
         }
 
         if (priceString.isNullOrEmpty()) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_PRICE))
+            return
+        }
+
+        if (type == -1) {
+            listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_TYPE))
             return
         }
 
@@ -80,7 +82,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
         } else if (requestCode == AddActivity.REQUEST_EDIT_CODE) {
             val purchase =
                 Purchase(
-                    userEmail, name, price, year, month, day, purchaseType, purchaseID,
+                    userEmail, name, price, year, month, day, type, purchaseID,
                     category = purchaseRepository.getSelectedCategory()
                 )
 

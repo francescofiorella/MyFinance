@@ -101,9 +101,13 @@
     <string name="edit_full_name">Edit the full name</string>
 
     <string-array name="types">
-        <item>@string/generic</item>
-        <item>@string/shopping</item>
-        <item>@string/transport</item>
-        <item>@string/rent</item>
+        <item>Housing</item>
+        <item>Groceries</item>
+        <item>Personal Care</item>
+        <item>Entertainment</item>
+        <item>Education</item>
+        <item>Health</item>
+        <item>Transportation</item>
+        <item>Miscellaneous</item>
     </string-array>
 </resources>

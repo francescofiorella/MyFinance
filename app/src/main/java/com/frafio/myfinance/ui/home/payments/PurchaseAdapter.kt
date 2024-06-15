@@ -10,7 +10,6 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.LayoutPurchaseItemRvBinding
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -37,15 +36,6 @@ class PurchaseAdapter(
     override fun onBindViewHolder(holder: PurchaseViewHolder, position: Int) {
         val currentPurchase = purchases[position]
         holder.recyclerViewPurchaseItemBinding.purchase = currentPurchase
-
-        if (currentPurchase.type == DbPurchases.TYPES.SHOPPING.value) {
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.setOnClickListener {
-                listener.onItemInteraction(ON_CLICK, currentPurchase, holder.getAdapterPosition())
-            }
-        } else {
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
-                .setOnClickListener(null)
-        }
 
         if (currentPurchase.type != DbPurchases.TYPES.TOTAL.value) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
