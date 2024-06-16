@@ -91,11 +91,12 @@
                 android:fontFamily="@font/nunito"
                 android:text="@string/no_purchases"
                 android:textSize="16sp"
-                android:visibility="gone"
+                android:visibility="@{purchase.type != DbPurchases.TYPES.TOTAL.value || purchase.price != 0.0 ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Total" />
+                tools:text="Total"
+                tools:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/recView_purchaseItem_purchaseTypeIcon"
@@ -104,6 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="5dp"
                 android:contentDescription="@string/purchase_type_icon"
+                android:visibility="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -119,6 +121,7 @@
                 android:text="@{purchase.name}"
                 android:textColor="@color/primary_text"
                 android:textSize="16sp"
+                android:visibility="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_purchaseTypeIcon"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Acquisto" />
@@ -131,6 +134,7 @@
                 android:layout_marginBottom="10dp"
                 android:fontFamily="@font/nunito"
                 android:textSize="14sp"
+                android:visibility="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_purchaseTypeIcon"
                 app:layout_constraintTop_toBottomOf="@id/recView_purchaseItem_nomeTextView"
@@ -143,6 +147,7 @@
                 android:fontFamily="@font/nunito"
                 android:text="@{FormatUtilsKt.doubleToPrice(purchase.price)}"
                 android:textSize="16sp"
+                android:visibility="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

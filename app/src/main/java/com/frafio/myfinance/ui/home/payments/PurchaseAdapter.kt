@@ -1,7 +1,6 @@
 package com.frafio.myfinance.ui.home.payments
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -44,16 +43,21 @@ class PurchaseAdapter(
                     holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseTypeIcon.context,
                     when (purchases[position].type) {
                         DbPurchases.TYPES.HOUSING.value -> R.drawable.ic_baseline_home
-                        DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_restaurant
+                        DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_shopping_cart
                         DbPurchases.TYPES.PERSONAL_CARE.value -> R.drawable.ic_self_care
                         DbPurchases.TYPES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
                         DbPurchases.TYPES.EDUCATION.value -> R.drawable.ic_school
+                        DbPurchases.TYPES.DINING.value -> R.drawable.ic_restaurant
                         DbPurchases.TYPES.HEALTH.value -> R.drawable.ic_vaccines
                         DbPurchases.TYPES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
                         DbPurchases.TYPES.MISCELLANEOUS.value -> R.drawable.ic_tag
                         else -> R.drawable.ic_tag
                     }
                 )
+            val types = holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemTypeTextView
+                .context.resources.getStringArray(R.array.types)
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemTypeTextView
+                .text = types[currentPurchase.type ?: DbPurchases.TYPES.MISCELLANEOUS.value]
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener {
                     listener.onItemInteraction(
@@ -63,35 +67,7 @@ class PurchaseAdapter(
                     )
                     true
                 }
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemTotalTextView
-                .visibility = View.GONE
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseTypeIcon
-                .visibility = View.VISIBLE
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemNomeTextView
-                .visibility = View.VISIBLE
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemTypeTextView
-                .visibility = View.VISIBLE
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPriceTextView
-                .visibility = View.VISIBLE
-            val types = holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemTypeTextView
-                .context.resources.getStringArray(R.array.types)
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemTypeTextView
-                .text = types[currentPurchase.type ?: DbPurchases.TYPES.MISCELLANEOUS.value]
         } else {
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemTotalTextView
-                .visibility = if (currentPurchase.price == 0.0) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseTypeIcon
-                .visibility = View.GONE
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemNomeTextView
-                .visibility = View.GONE
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemTypeTextView
-                .visibility = View.GONE
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPriceTextView
-                .visibility = View.GONE
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener(null)
         }

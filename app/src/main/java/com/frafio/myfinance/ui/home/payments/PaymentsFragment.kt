@@ -194,10 +194,11 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, DeleteList
         layout.findViewById<ImageView>(R.id.purchaseTypeIcon).setImageResource(
             when (purchase.type) {
                 DbPurchases.TYPES.HOUSING.value -> R.drawable.ic_baseline_home
-                DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_restaurant
+                DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_shopping_cart
                 DbPurchases.TYPES.PERSONAL_CARE.value -> R.drawable.ic_self_care
                 DbPurchases.TYPES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
                 DbPurchases.TYPES.EDUCATION.value -> R.drawable.ic_school
+                DbPurchases.TYPES.DINING.value -> R.drawable.ic_restaurant
                 DbPurchases.TYPES.HEALTH.value -> R.drawable.ic_vaccines
                 DbPurchases.TYPES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
                 DbPurchases.TYPES.MISCELLANEOUS.value -> R.drawable.ic_tag

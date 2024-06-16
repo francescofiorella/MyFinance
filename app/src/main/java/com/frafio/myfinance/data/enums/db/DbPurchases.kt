@@ -34,9 +34,10 @@ object DbPurchases {
         PERSONAL_CARE(2),
         ENTERTAINMENT(3),
         EDUCATION(4),
-        HEALTH(5),
-        TRANSPORTATION(6),
-        MISCELLANEOUS(7)
+        DINING(5),
+        HEALTH(6),
+        TRANSPORTATION(7),
+        MISCELLANEOUS(8)
     }
 
     enum class CATEGORIES(val value: String) {

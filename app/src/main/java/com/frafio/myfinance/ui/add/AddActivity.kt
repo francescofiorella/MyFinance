@@ -74,9 +74,10 @@ class AddActivity : AppCompatActivity(), AddListener {
                 DbPurchases.TYPES.PERSONAL_CARE.value -> 2
                 DbPurchases.TYPES.ENTERTAINMENT.value -> 3
                 DbPurchases.TYPES.EDUCATION.value -> 4
-                DbPurchases.TYPES.HEALTH.value -> 5
-                DbPurchases.TYPES.TRANSPORTATION.value -> 6
-                DbPurchases.TYPES.MISCELLANEOUS.value -> 7
+                DbPurchases.TYPES.DINING.value -> 5
+                DbPurchases.TYPES.HEALTH.value -> 6
+                DbPurchases.TYPES.TRANSPORTATION.value -> 7
+                DbPurchases.TYPES.MISCELLANEOUS.value -> 8
                 else -> -1 // error, do not select a default option
             },
             typeListener
@@ -88,6 +89,20 @@ class AddActivity : AppCompatActivity(), AddListener {
         val types = resources.getStringArray(R.array.types)
         if (selectedItem >= 0 && selectedItem < types.size) {
             binding.typeAutoCompleteTV.setText(types[selectedItem])
+            binding.typeTextInputLayout.setStartIconDrawable(
+                when (selectedItem) {
+                    DbPurchases.TYPES.HOUSING.value -> R.drawable.ic_baseline_home
+                    DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                    DbPurchases.TYPES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                    DbPurchases.TYPES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                    DbPurchases.TYPES.EDUCATION.value -> R.drawable.ic_school
+                    DbPurchases.TYPES.DINING.value -> R.drawable.ic_restaurant
+                    DbPurchases.TYPES.HEALTH.value -> R.drawable.ic_vaccines
+                    DbPurchases.TYPES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                    DbPurchases.TYPES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                    else -> R.drawable.ic_tag
+                }
+            )
             viewModel.type = selectedItem
         } else {
             viewModel.type = -1
@@ -153,6 +168,20 @@ class AddActivity : AppCompatActivity(), AddListener {
                 val types = resources.getStringArray(R.array.types)
                 if (viewModel.type != null && viewModel.type!! >= 0 && viewModel.type!! < types.size) {
                     binding.typeAutoCompleteTV.setText(types[viewModel.type!!])
+                    binding.typeTextInputLayout.setStartIconDrawable(
+                        when (viewModel.type) {
+                            DbPurchases.TYPES.HOUSING.value -> R.drawable.ic_baseline_home
+                            DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                            DbPurchases.TYPES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                            DbPurchases.TYPES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                            DbPurchases.TYPES.EDUCATION.value -> R.drawable.ic_school
+                            DbPurchases.TYPES.DINING.value -> R.drawable.ic_restaurant
+                            DbPurchases.TYPES.HEALTH.value -> R.drawable.ic_vaccines
+                            DbPurchases.TYPES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                            DbPurchases.TYPES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                            else -> R.drawable.ic_tag
+                        }
+                    )
                 }
             }
         }
