@@ -48,14 +48,17 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
 
         val values = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
-        var nDays = 0
+        val todayDate = LocalDate.now()
+        val lastPurchase = PurchaseStorage.purchaseList.last()
+        var purchaseDate =
+            LocalDate.of(lastPurchase.year!!, lastPurchase.month!!, lastPurchase.day!!)
+        val nDays = ChronoUnit.DAYS.between(purchaseDate, todayDate) + 1
         var nMonth: Long
         var lastMonth = 0
         var lastYear = 0
 
-        val todayDate = LocalDate.now()
         PurchaseStorage.purchaseList.forEach { purchase ->
-            val purchaseDate = LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
+            purchaseDate = LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
             if (ChronoUnit.DAYS.between(purchaseDate, todayDate) >= 0) {
                 when (purchase.type) {
                     DbPurchases.TYPES.TOTAL.value -> {
@@ -74,15 +77,12 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                         // increment tot
                         values[3] += purchase.price ?: 0.0
 
-                        // count the day number
-                        nDays++
-
                         // count the month number
                         if (purchase.year != lastYear) {
-                            lastYear = purchase.year ?: 0
-                            lastMonth = purchase.month ?: 0
+                            lastYear = purchase.year
+                            lastMonth = purchase.month
                         } else if (purchase.month != lastMonth) {
-                            lastMonth = purchase.month ?: 0
+                            lastMonth = purchase.month
                         }
                     }
 
@@ -186,16 +186,16 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                     purchase.type == DbPurchases.TYPES.TOTAL.value
                 ) {
                     lastDate = dateToString(
-                        purchase.day!!,
-                        purchase.month!!,
-                        purchase.year!!
+                        purchase.day,
+                        purchase.month,
+                        purchase.year
                     )
                     // increment sum and count
                     priceSum += purchase.price!!
                     purchaseCount++
 
                     // calculate the new date
-                    val newDate = LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
+                    val newDate = LocalDate.of(purchase.year, purchase.month, purchase.day)
 
                     // if has passed a week, update
                     if (hasPassedAWeekBetween(startDate, newDate)) {
