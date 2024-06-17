@@ -24,8 +24,8 @@ object PurchaseStorage {
             val purchase = document.toObject(Purchase::class.java)
             // set id
             purchase.updateID(document.id)
-
             var todayDate = LocalDate.now()
+
             val purchaseDate =
                 LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
             var prevDate: LocalDate? = if (total == null)
@@ -148,6 +148,12 @@ object PurchaseStorage {
                     id = purchase.getTotalId(),
                     category = purchase.category
                 )
+            }
+        }
+        if (currentPurchases.isNotEmpty()) {
+            purchaseList.add(total!!)
+            currentPurchases.forEach { cPurchase ->
+                purchaseList.add(cPurchase)
             }
         }
     }
