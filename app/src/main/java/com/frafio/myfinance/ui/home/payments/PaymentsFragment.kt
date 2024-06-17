@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
@@ -30,6 +30,7 @@ import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Compani
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
@@ -262,7 +263,8 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             dateToString(purchase.day, purchase.month, purchase.year)
         layout.findViewById<MaterialTextView>(R.id.priceTV).text =
             doubleToPrice(purchase.price ?: 0.0)
-        layout.findViewById<ImageView>(R.id.purchaseTypeIcon).setImageResource(
+        layout.findViewById<MaterialButton>(R.id.purchaseTypeIcon).icon = ContextCompat.getDrawable(
+            requireContext(),
             when (purchase.type) {
                 DbPurchases.TYPES.HOUSING.value -> R.drawable.ic_baseline_home
                 DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_shopping_cart
