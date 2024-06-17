@@ -130,8 +130,11 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .add(purchase).addOnSuccessListener {
                 purchase.updateID(it.id)
-                PurchaseStorage.addPurchase(purchase)
-                response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_SUCCESS)
+                val totalIndex = PurchaseStorage.addPurchase(purchase)
+                response.value = PurchaseResult(
+                    PurchaseCode.PURCHASE_ADD_SUCCESS,
+                    "${PurchaseCode.PURCHASE_ADD_SUCCESS.message}&$totalIndex"
+                )
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_FAILURE)

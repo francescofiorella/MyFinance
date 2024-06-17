@@ -152,7 +152,8 @@ object PurchaseStorage {
         }
     }
 
-    fun addPurchase(purchase: Purchase) {
+    fun addPurchase(purchase: Purchase): Int {
+        val totalIndex: Int
         val purchaseDate = LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
         var i = 0
         var iDate =
@@ -176,6 +177,7 @@ object PurchaseStorage {
                 category = purchaseList[i].category
             )
             purchaseList[i] = total
+            totalIndex = i
             // Scorri per trovare posizione giusta
             i++
             while (i < purchaseList.size) {
@@ -201,8 +203,10 @@ object PurchaseStorage {
                 category = purchase.category
             )
             purchaseList.add(i, total)
+            totalIndex = i
             purchaseList.add(i + 1, purchase)
         }
+        return totalIndex
     }
 
     fun deletePurchaseAt(position: Int) {

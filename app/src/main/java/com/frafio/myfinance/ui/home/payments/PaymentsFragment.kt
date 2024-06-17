@@ -183,7 +183,8 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 viewModel.updatePurchaseList()
                 (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
                 viewModel.updateListSize()
-                (activity as HomeActivity).showSnackBar(result.message)
+                val payload = result.message.split("&")
+                (activity as HomeActivity).showSnackBar(payload[0])
             } else {
                 (activity as HomeActivity).showSnackBar(result.message)
             }
@@ -201,6 +202,13 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         val todayId = (binding.listRecyclerView.adapter as PurchaseAdapter).getTodayId()
         (binding.listRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
             todayId,
+            0
+        )
+    }
+
+    fun scrollTo(position: Int) {
+        (binding.listRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
+            position,
             0
         )
     }

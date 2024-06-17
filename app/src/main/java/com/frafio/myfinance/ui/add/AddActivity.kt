@@ -33,6 +33,7 @@ class AddActivity : AppCompatActivity(), AddListener {
         const val PURCHASE_YEAR_KEY: String = "com.frafio.myfinance.PURCHASE_YEAR"
         const val PURCHASE_MONTH_KEY: String = "com.frafio.myfinance.PURCHASE_MONTH"
         const val PURCHASE_DAY_KEY: String = "com.frafio.myfinance.PURCHASE_DAY"
+        const val ADD_RESULT_MESSAGE: String = "com.frafio.myfinance.ADD_RESULT_MESSAGE"
     }
 
     private lateinit var binding: ActivityAddBinding
@@ -214,7 +215,10 @@ class AddActivity : AppCompatActivity(), AddListener {
                 PurchaseCode.PURCHASE_ADD_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
+                        val payload = result.message.split("&")
                         it.putExtra(PURCHASE_REQUEST_KEY, true)
+                        it.putExtra(ADD_RESULT_MESSAGE, payload[0])
+                        it.putExtra(PURCHASE_POSITION_KEY, payload[1].toInt())
                         setResult(RESULT_OK, it)
                         finish()
                     }
