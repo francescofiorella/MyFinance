@@ -1,5 +1,6 @@
 package com.frafio.myfinance.data.storages
 
+import android.util.Log
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Purchase
 import com.google.firebase.firestore.QuerySnapshot
@@ -24,47 +25,47 @@ object PurchaseStorage {
             val purchase = document.toObject(Purchase::class.java)
             // set id
             purchase.updateID(document.id)
-            var todayDate = LocalDate.now()
-
-            val purchaseDate =
-                LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
-            var prevDate: LocalDate? = if (total == null)
+            Log.i("Purhcase", purchase.toString())
+            val todayDate = LocalDate.now()
+            val purchaseDate = LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
+            var prevDate: LocalDate? = if (total == null) // se primo acquisto
                 null
             else
-                LocalDate.of(total!!.year!!, total!!.month!!, total!!.day!!)
+                LocalDate.of(total!!.year!!, total!!.month!!, total!!.day!!) // ultimo totale
 
             // se è < today and non hai fatto today
-            // quindi se purchase < today and (totale == null or
-            // totale > today)
-            if (prevDate == null &&
+            // quindi se purchase < today and (totale == null or totale > today)
+            // se prevDate > today and purchase < today
+            if ((prevDate == null || ChronoUnit.DAYS.between(prevDate, todayDate) < 0) &&
                 ChronoUnit.DAYS.between(purchaseDate, todayDate) > 0
             ) {
-                // Aggiungi totali a 0 per ogni giorno tra oggi e purchase
-                val totToAdd = ChronoUnit.DAYS.between(purchaseDate, todayDate)
-                for (i in 0..<totToAdd) {
-                    val totId =
-                        "${todayDate.dayOfMonth}_${todayDate.monthValue}_${todayDate.year}"
-                    total = Purchase(
-                        email = UserStorage.user!!.email,
-                        name = DbPurchases.NAMES.TOTAL.value,
-                        price = 0.0,
-                        year = todayDate.year,
-                        month = todayDate.monthValue,
-                        day = todayDate.dayOfMonth,
-                        type = DbPurchases.TYPES.TOTAL.value,
-                        id = totId,
-                        category = purchase.category
-                    )
+                if (currentPurchases.isNotEmpty()) {
                     purchaseList.add(total!!)
-                    prevDate =
-                        LocalDate.of(
-                            total!!.year!!,
-                            total!!.month!!,
-                            total!!.day!!
-                        )
-                    todayDate = todayDate.minusDays(1)
+                    currentPurchases.forEach { cPurchase ->
+                        purchaseList.add(cPurchase)
+                    }
+                    currentPurchases = mutableListOf()
                 }
-                todayDate = LocalDate.now()
+                // Aggiungi totale a 0 per oggi
+                val totId = "${todayDate.dayOfMonth}_${todayDate.monthValue}_${todayDate.year}"
+                total = Purchase(
+                    email = UserStorage.user!!.email,
+                    name = DbPurchases.NAMES.TOTAL.value,
+                    price = 0.0,
+                    year = todayDate.year,
+                    month = todayDate.monthValue,
+                    day = todayDate.dayOfMonth,
+                    type = DbPurchases.TYPES.TOTAL.value,
+                    id = totId,
+                    category = purchase.category
+                )
+                purchaseList.add(total!!)
+                prevDate =
+                    LocalDate.of(
+                        total!!.year!!,
+                        total!!.month!!,
+                        total!!.day!!
+                    )
             }
 
             if (prevDate == null) { // If is the first total
@@ -100,43 +101,10 @@ object PurchaseStorage {
                     currentPurchases.forEach { cPurchase ->
                         purchaseList.add(cPurchase)
                     }
+                    currentPurchases = mutableListOf()
                 }
-                // aggiungi 0 anche se totale - purchase > 1,
-                // aggiungi uno 0 per ogni differenza tra totale e purchase
-                val startFromToday =
-                    ChronoUnit.DAYS.between(purchaseDate, todayDate) > 0 &&
-                            ChronoUnit.DAYS.between(todayDate, prevDate) > 0
-                val totToAdd = if (startFromToday)
-                    ChronoUnit.DAYS.between(purchaseDate, todayDate) + 1
-                else
-                    ChronoUnit.DAYS.between(purchaseDate, prevDate)
-                if (ChronoUnit.DAYS.between(purchaseDate, todayDate) > 0 &&
-                    totToAdd > 1
-                ) {
-                    if (startFromToday) {
-                        prevDate = LocalDate.now().plusDays(1)
-                    }
-                    for (i in 1..<totToAdd) {
-                        prevDate = prevDate!!.minusDays(1)
-                        val totId = "${prevDate.dayOfMonth}_${prevDate.monthValue}_${prevDate.year}"
-                        total = Purchase(
-                            email = UserStorage.user!!.email,
-                            name = DbPurchases.NAMES.TOTAL.value,
-                            price = 0.0,
-                            year = prevDate.year,
-                            month = prevDate.monthValue,
-                            day = prevDate.dayOfMonth,
-                            type = DbPurchases.TYPES.TOTAL.value,
-                            id = totId,
-                            category = purchase.category
-                        )
-                        purchaseList.add(total!!)
-                    }
-                }
-
-                // Create new total
-                currentPurchases = mutableListOf()
                 currentPurchases.add(purchase)
+                // Create new total
                 total = Purchase(
                     email = UserStorage.user!!.email,
                     name = DbPurchases.NAMES.TOTAL.value,
@@ -155,6 +123,7 @@ object PurchaseStorage {
             currentPurchases.forEach { cPurchase ->
                 purchaseList.add(cPurchase)
             }
+            currentPurchases = mutableListOf()
         }
     }
 
@@ -231,15 +200,9 @@ object PurchaseStorage {
                 )
 
                 purchaseList.removeAt(position)
-                val todayDate = LocalDate.now()
-                val totalDate = LocalDate.of(
-                    newTotal.year!!,
-                    newTotal.month!!,
-                    newTotal.day!!
-                )
-                if (ChronoUnit.DAYS.between(totalDate, todayDate) >= 0) {
+                if (newTotal.price != 0.0) {
                     purchaseList[i] = newTotal
-                } else if (newTotal.price == 0.0) {
+                } else {
                     purchaseList.removeAt(i)
                 }
 
