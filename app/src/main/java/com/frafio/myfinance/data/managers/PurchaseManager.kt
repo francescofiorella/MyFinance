@@ -16,8 +16,6 @@ import com.frafio.myfinance.utils.setSharedCategory
 import com.frafio.myfinance.utils.setSharedDynamicColor
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
@@ -79,7 +77,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun updateList(): LiveData<PurchaseResult> {
+    private fun updateList(): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
@@ -106,54 +104,19 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun deleteAt(position: Int): LiveData<Triple<PurchaseResult, List<Purchase>, Int?>> {
-        val response = MutableLiveData<Triple<PurchaseResult, List<Purchase>, Int?>>()
-        var totPosition: Int
-
-        val purchaseList = PurchaseStorage.purchaseList.toMutableList()
-
+    fun deleteAt(position: Int): LiveData<PurchaseResult> {
+        val response = MutableLiveData<PurchaseResult>()
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .document(purchaseList[position].id!!).delete()
+            .document(PurchaseStorage.purchaseList[position].id!!).delete()
             .addOnSuccessListener {
-                for (i in position - 1 downTo 0) {
-                    if (purchaseList[i].type == DbPurchases.TYPES.TOTAL.value) {
-                        totPosition = i
-
-                        val newTotal = purchaseList[totPosition]
-                        newTotal.price = newTotal.price?.minus(
-                            purchaseList[position].price!!
-                        )
-
-                        purchaseList.removeAt(position)
-                        val todayDate = LocalDate.now()
-                        val totalDate = LocalDate.of(
-                            newTotal.year!!,
-                            newTotal.month!!,
-                            newTotal.day!!
-                        )
-                        if (ChronoUnit.DAYS.between(totalDate, todayDate) >= 0) {
-                            purchaseList[totPosition] = newTotal
-                        } else if (newTotal.price == 0.0) {
-                            purchaseList.removeAt(totPosition)
-                        }
-
-                        PurchaseStorage.purchaseList = purchaseList
-
-                        response.value = Triple(
-                            PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS),
-                            purchaseList,
-                            totPosition
-                        )
-                        break
-                    }
-                }
+                PurchaseStorage.deletePurchaseAt(position)
+                response.value = PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
 
-                response.value =
-                    Triple(PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE), purchaseList, null)
+                response.value = PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE)
             }
 
         return response
@@ -166,6 +129,8 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .add(purchase).addOnSuccessListener {
+                purchase.updateID(it.id)
+                PurchaseStorage.addPurchase(purchase)
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -185,7 +150,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchase.id!!).set(purchase).addOnSuccessListener {
-                PurchaseStorage.purchaseList[position] = purchase
+                PurchaseStorage.editPurchaseAt(position, purchase)
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_EDIT_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")

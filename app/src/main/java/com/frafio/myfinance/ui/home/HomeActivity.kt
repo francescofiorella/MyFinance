@@ -322,7 +322,12 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     }
 
     // method for children
-    fun showSnackBar(message: String, show: Boolean = true): Snackbar {
+    fun showSnackBar(
+        message: String,
+        show: Boolean = true,
+        actionText: String? = null,
+        actionFun: () -> Unit = {}
+    ): Snackbar {
         var view = when {
             binding.homeAddBtn != null -> binding.homeAddBtn
             else -> binding.homeAddExtBtn
@@ -332,7 +337,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             view = null
         }
 
-        return snackBar(message, view, show)
+        return snackBar(message, view, show, actionText, actionFun)
     }
 
     override fun onLogOutSuccess(response: LiveData<AuthResult>) {

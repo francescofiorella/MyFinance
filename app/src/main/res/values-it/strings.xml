@@ -84,15 +84,13 @@
     <string name="purchase_type_icon">Icona di tipo acquisto</string>
     <string name="no_purchases">Nessun acquisto</string>
 
-    <string-array name="types">
-        <item>Abitazioni</item>
-        <item>Alimentari</item>
-        <item>Cura personale</item>
-        <item>Divertimento</item>
-        <item>Formazione</item>
-        <item>Ristorazione</item>
-        <item>Salute</item>
-        <item>Trasporti</item>
-        <item>Varie</item>
-    </string-array>
+    <string name="housing">Abitazioni</string>
+    <string name="groceries">Alimentari</string>
+    <string name="personal_care">Cura personale</string>
+    <string name="entertainment">Intrattenimento</string>
+    <string name="education">Formazione</string>
+    <string name="dining">Ristorazione</string>
+    <string name="health">Salute</string>
+    <string name="transportation">Trasporti</string>
+    <string name="miscellaneous">Varie</string>
 </resources>

@@ -102,15 +102,25 @@
     <string name="purchase_type_icon">Purchase Type Icon</string>
     <string name="no_purchases">No purchases</string>
 
-    <string-array name="types">
-        <item>Housing</item>
-        <item>Groceries</item>
-        <item>Personal Care</item>
-        <item>Entertainment</item>
-        <item>Education</item>
-        <item>Dining</item>
-        <item>Health</item>
-        <item>Transportation</item>
-        <item>Miscellaneous</item>
+    <string name="housing">Housing</string>
+    <string name="groceries">Groceries</string>
+    <string name="personal_care">Personal Care</string>
+    <string name="entertainment">Entertainment</string>
+    <string name="education">Education</string>
+    <string name="dining">Dining</string>
+    <string name="health">Health</string>
+    <string name="transportation">Transportation</string>
+    <string name="miscellaneous">Miscellaneous</string>
+
+    <string-array name="types" translatable="false">
+        <item>@string/housing</item>
+        <item>@string/groceries</item>
+        <item>@string/personal_care</item>
+        <item>@string/entertainment</item>
+        <item>@string/education</item>
+        <item>@string/dining</item>
+        <item>@string/health</item>
+        <item>@string/transportation</item>
+        <item>@string/miscellaneous</item>
     </string-array>
 </resources>

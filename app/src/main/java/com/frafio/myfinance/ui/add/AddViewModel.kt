@@ -91,9 +91,4 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             listener?.onAddSuccess(response)
         }
     }
-
-    fun updateLocalList() {
-        val response = purchaseRepository.updatePurchaseList()
-        listener?.onAddSuccess(response)
-    }
 }

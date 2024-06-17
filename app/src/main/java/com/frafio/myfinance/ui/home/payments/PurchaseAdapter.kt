@@ -10,6 +10,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.LayoutPurchaseItemRvBinding
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_BUTTON_CLICK
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -67,9 +68,20 @@ class PurchaseAdapter(
                     )
                     true
                 }
+
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseTypeIcon
+                .setOnClickListener {
+                    listener.onItemInteraction(
+                        ON_BUTTON_CLICK,
+                        currentPurchase,
+                        holder.getAdapterPosition()
+                    )
+                }
         } else {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener(null)
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseTypeIcon
+                .setOnClickListener(null)
         }
     }
 

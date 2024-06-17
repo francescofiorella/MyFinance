@@ -67,7 +67,6 @@ object PurchaseStorage {
                 todayDate = LocalDate.now()
             }
 
-            var totId = "${purchase.day}_${purchase.month}_${purchase.year}"
             if (prevDate == null) { // If is the first total
                 currentPurchases.add(purchase)
                 total = Purchase(
@@ -78,12 +77,22 @@ object PurchaseStorage {
                     month = purchase.month,
                     day = purchase.day,
                     type = DbPurchases.TYPES.TOTAL.value,
-                    id = totId,
+                    id = purchase.getTotalId(),
                     category = purchase.category
                 )
-            } else if (total!!.id == totId) { // If the total should be updated
+            } else if (total!!.id == purchase.getTotalId()) { // If the total should be updated
                 currentPurchases.add(purchase)
-                total!!.price = total!!.price!!.plus(purchase.price ?: 0.0)
+                total = Purchase(
+                    email = UserStorage.user!!.email,
+                    name = DbPurchases.NAMES.TOTAL.value,
+                    price = total!!.price!! + purchase.price!!,
+                    year = total!!.year,
+                    month = total!!.month,
+                    day = total!!.day,
+                    type = DbPurchases.TYPES.TOTAL.value,
+                    id = total!!.getTotalId(),
+                    category = total!!.category
+                )
             } else { // If we need a new total
                 // Update the local list with previous day purchases
                 if (currentPurchases.isNotEmpty()) {
@@ -109,8 +118,7 @@ object PurchaseStorage {
                     }
                     for (i in 1..<totToAdd) {
                         prevDate = prevDate!!.minusDays(1)
-                        totId =
-                            "${prevDate.dayOfMonth}_${prevDate.monthValue}_${prevDate.year}"
+                        val totId = "${prevDate.dayOfMonth}_${prevDate.monthValue}_${prevDate.year}"
                         total = Purchase(
                             email = UserStorage.user!!.email,
                             name = DbPurchases.NAMES.TOTAL.value,
@@ -129,7 +137,6 @@ object PurchaseStorage {
                 // Create new total
                 currentPurchases = mutableListOf()
                 currentPurchases.add(purchase)
-                totId = "${purchase.day}_${purchase.month}_${purchase.year}"
                 total = Purchase(
                     email = UserStorage.user!!.email,
                     name = DbPurchases.NAMES.TOTAL.value,
@@ -138,9 +145,123 @@ object PurchaseStorage {
                     month = purchase.month,
                     day = purchase.day,
                     type = DbPurchases.TYPES.TOTAL.value,
-                    id = totId,
+                    id = purchase.getTotalId(),
                     category = purchase.category
                 )
+            }
+        }
+    }
+
+    fun addPurchase(purchase: Purchase) {
+        val purchaseDate = LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
+        var i = 0
+        var iDate =
+            LocalDate.of(purchaseList[i].year!!, purchaseList[i].month!!, purchaseList[i].day!!)
+        while (i < purchaseList.size && ChronoUnit.DAYS.between(purchaseDate, iDate) > 0) {
+            i++
+            iDate =
+                LocalDate.of(purchaseList[i].year!!, purchaseList[i].month!!, purchaseList[i].day!!)
+        }
+        if (purchaseList[i].getDateString() == purchase.getDateString()) {
+            // Totale trovato
+            val total = Purchase(
+                email = UserStorage.user!!.email,
+                name = DbPurchases.NAMES.TOTAL.value,
+                price = purchaseList[i].price!! + purchase.price!!,
+                year = purchaseList[i].year,
+                month = purchaseList[i].month,
+                day = purchaseList[i].day,
+                type = DbPurchases.TYPES.TOTAL.value,
+                id = purchaseList[i].getTotalId(),
+                category = purchaseList[i].category
+            )
+            purchaseList[i] = total
+            // Scorri per trovare posizione giusta
+            i++
+            while (i < purchaseList.size) {
+                if (purchaseList[i].getDateString() != purchase.getDateString() ||
+                    purchaseList[i].price!! < purchase.price
+                ) {
+                    break
+                }
+                i++
+            }
+            purchaseList.add(i, purchase)
+        } else {
+            // Giorno non esistente, aggiungi totale
+            val total = Purchase(
+                email = UserStorage.user!!.email,
+                name = DbPurchases.NAMES.TOTAL.value,
+                price = purchase.price,
+                year = purchase.year,
+                month = purchase.month,
+                day = purchase.day,
+                type = DbPurchases.TYPES.TOTAL.value,
+                id = purchase.getTotalId(),
+                category = purchase.category
+            )
+            purchaseList.add(i, total)
+            purchaseList.add(i + 1, purchase)
+        }
+    }
+
+    fun deletePurchaseAt(position: Int) {
+        for (i in position - 1 downTo 0) {
+            if (purchaseList[i].type == DbPurchases.TYPES.TOTAL.value) {
+                val newTotal = Purchase(
+                    email = UserStorage.user!!.email,
+                    name = DbPurchases.NAMES.TOTAL.value,
+                    price = purchaseList[i].price!! - purchaseList[position].price!!,
+                    year = purchaseList[i].year,
+                    month = purchaseList[i].month,
+                    day = purchaseList[i].day,
+                    type = DbPurchases.TYPES.TOTAL.value,
+                    id = purchaseList[i].getTotalId(),
+                    category = purchaseList[i].category
+                )
+
+                purchaseList.removeAt(position)
+                val todayDate = LocalDate.now()
+                val totalDate = LocalDate.of(
+                    newTotal.year!!,
+                    newTotal.month!!,
+                    newTotal.day!!
+                )
+                if (ChronoUnit.DAYS.between(totalDate, todayDate) >= 0) {
+                    purchaseList[i] = newTotal
+                } else if (newTotal.price == 0.0) {
+                    purchaseList.removeAt(i)
+                }
+
+                break
+            }
+        }
+    }
+
+    fun editPurchaseAt(position: Int, purchase: Purchase) {
+        val previous = purchaseList[position]
+        purchaseList[position] = purchase
+        if (previous.price == purchase.price) {
+            return
+        } else {
+            var i = position - 1
+            while (i >= 0) {
+                if (purchaseList[i].type == DbPurchases.TYPES.TOTAL.value) {
+                    val total = Purchase(
+                        email = purchaseList[i].email,
+                        name = purchaseList[i].name,
+                        price = purchaseList[i].price!! - previous.price!! + purchase.price!!,
+                        year = purchaseList[i].year,
+                        month = purchaseList[i].month,
+                        day = purchaseList[i].day,
+                        type = purchaseList[i].type,
+                        id = purchaseList[i].id,
+                        category = purchaseList[i].category
+                    )
+                    purchaseList[i] = total
+                    break
+                }
+                i--
             }
         }
     }

@@ -25,10 +25,6 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return purchaseManager.createCategory(name)
     }
 
-    fun updatePurchaseList(): LiveData<PurchaseResult> {
-        return purchaseManager.updateList()
-    }
-
     fun purchaseListSize(): Int {
         return PurchaseStorage.purchaseList.size
     }
@@ -146,7 +142,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return stats
     }
 
-    fun deletePurchaseAt(position: Int): LiveData<Triple<PurchaseResult, List<Purchase>, Int?>> {
+    fun deletePurchaseAt(position: Int): LiveData<PurchaseResult> {
         return purchaseManager.deleteAt(position)
     }
 

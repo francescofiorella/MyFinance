@@ -35,6 +35,8 @@ class PurchaseDiffUtil(
 
             oldPurchaseList[oldItemPosition].type != newPurchaseList[newItemPosition].type -> false
 
+            oldPurchaseList[oldItemPosition].category != newPurchaseList[newItemPosition].category -> false
+
             else -> true
         }
     }
