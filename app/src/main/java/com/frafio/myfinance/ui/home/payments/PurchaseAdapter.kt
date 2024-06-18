@@ -1,7 +1,6 @@
 package com.frafio.myfinance.ui.home.payments
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -12,8 +11,8 @@ import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.LayoutPurchaseItemRvBinding
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_BUTTON_CLICK
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_HALF_LIST_PASSED
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_PROGRESS_INDICATOR_SHOWN
 
 class PurchaseAdapter(
     private var purchases: List<Purchase>,
@@ -40,17 +39,8 @@ class PurchaseAdapter(
         val currentPurchase = purchases[position]
         holder.recyclerViewPurchaseItemBinding.purchase = currentPurchase
 
-        if (currentPurchase.id == "progressIndicator") {
-            listener.onItemInteraction(ON_PROGRESS_INDICATOR_SHOWN, currentPurchase, position)
-            holder.recyclerViewPurchaseItemBinding.loadProgressIndicator.visibility = View.VISIBLE
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemDataLayout.visibility =
-                View.GONE
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.visibility =
-                View.GONE
-        } else {
-            holder.recyclerViewPurchaseItemBinding.loadProgressIndicator.visibility = View.GONE
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.visibility =
-                View.VISIBLE
+        if (position > purchases.size / 2) {
+            listener.onItemInteraction(ON_HALF_LIST_PASSED, currentPurchase, position)
         }
 
         if (currentPurchase.type != DbPurchases.TYPES.TOTAL.value) {

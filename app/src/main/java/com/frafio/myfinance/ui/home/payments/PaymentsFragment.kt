@@ -26,8 +26,8 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_BUTTON_CLICK
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_CLICK
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_HALF_LIST_PASSED
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_PROGRESS_INDICATOR_SHOWN
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -74,30 +74,8 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         viewModel.updatePurchaseNumber()
         viewModel.purchases.observe(viewLifecycleOwner) { purchases ->
             viewModel.updateListSize()
+            val nl = purchases.map { p -> p.copy() }
             binding.listRecyclerView.also {
-                val limit = if (it.adapter == null) {
-                    30
-                } else {
-                    (it.adapter as PurchaseAdapter).getLimit()
-                }
-                val addProgressBar = limit < maxPurchaseNumber
-                var nl = purchases.map { p -> p.copy() }
-                if (addProgressBar) {
-                    nl = nl.toMutableList()
-                    nl.add(
-                        Purchase(
-                            email = "",
-                            name = "",
-                            price = 0.0,
-                            year = 0,
-                            month = 0,
-                            day = 0,
-                            type = 0,
-                            id = "progressIndicator",
-                            category = ""
-                        )
-                    )
-                }
                 if (it.adapter == null) {
                     it.adapter = PurchaseAdapter(nl, this)
                 } else {
@@ -169,7 +147,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 }
             }
 
-            ON_PROGRESS_INDICATOR_SHOWN -> {
+            ON_HALF_LIST_PASSED -> {
                 // Increment elements limit on scroll
                 if (!isListBlocked) {
                     viewModel.updatePurchaseList(
