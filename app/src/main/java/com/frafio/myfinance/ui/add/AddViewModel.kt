@@ -75,7 +75,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
         if (requestCode == AddActivity.REQUEST_ADD_CODE) {
             val purchase = Purchase(
                 userEmail, name, price, year, month, day, type,
-                category = purchaseRepository.getSelectedCategory()
+                category = ""
             )
             val response = purchaseRepository.addPurchase(purchase)
             listener?.onAddSuccess(response)
@@ -83,7 +83,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             val purchase =
                 Purchase(
                     userEmail, name, price, year, month, day, type, purchaseID,
-                    category = purchaseRepository.getSelectedCategory()
+                    category = ""
                 )
 
             val response =

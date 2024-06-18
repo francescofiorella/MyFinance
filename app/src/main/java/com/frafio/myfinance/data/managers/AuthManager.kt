@@ -9,12 +9,11 @@ import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.auth.SignupException
 import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
-import com.frafio.myfinance.utils.getSharedCategory
 import com.frafio.myfinance.utils.getSharedDynamicColor
-import com.frafio.myfinance.utils.setSharedCategory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -27,7 +26,6 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.userProfileChangeRequest
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
@@ -234,7 +232,6 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
 
         PurchaseStorage.resetPurchaseList()
         UserStorage.resetUser()
-        setSharedCategory(sharedPreferences, DbPurchases.CATEGORIES.DEFAULT.value)
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
         return (response)
@@ -243,59 +240,18 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
     fun updateUserData(): LiveData<AuthResult> {
         val response = MutableLiveData<AuthResult>()
 
-        // set the current collection
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .get().addOnSuccessListener { docSnap ->
-                val categories =
-                    (docSnap.data?.get(DbPurchases.FIELDS.CATEGORIES.value) as List<*>?)?.map { value ->
-                        value.toString()
-                    } ?: listOf()
-                if (categories.isEmpty()) {
-                    setSharedCategory(sharedPreferences, DbPurchases.CATEGORIES.DEFAULT.value)
-
-                    // initialize the categories vector
-                    fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                        .document(UserStorage.user!!.email!!)
-                        .update(
-                            DbPurchases.FIELDS.CATEGORIES.value,
-                            FieldValue.arrayUnion(DbPurchases.CATEGORIES.DEFAULT.value)
-                        )
-                        .addOnFailureListener { e ->
-                            setSharedCategory(
-                                sharedPreferences,
-                                DbPurchases.CATEGORIES.DEFAULT.value
-                            )
-                            val error = "Error! ${e.localizedMessage}"
-                            Log.e(TAG, error)
-
-                            response.value = AuthResult(AuthCode.USER_DATA_NOT_UPDATED)
-                        }
-                }
-
-                fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                    .document(UserStorage.user!!.email!!)
-                    .collection(DbPurchases.FIELDS.PAYMENTS.value)
-                    .whereEqualTo(
-                        DbPurchases.FIELDS.CATEGORY.value,
-                        getSharedCategory(sharedPreferences)
-                    )
-                    .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
-                    .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
-                    .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
-                    .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
-                    .limit(30)
-                    .get().addOnSuccessListener { queryDocumentSnapshots ->
-                        PurchaseStorage.populateListFromSnapshot(queryDocumentSnapshots)
-                        response.value = AuthResult(AuthCode.USER_DATA_UPDATED)
-                    }.addOnFailureListener { e ->
-                        val error = "Error! ${e.localizedMessage}"
-                        Log.e(TAG, error)
-
-                        response.value = AuthResult(AuthCode.USER_DATA_NOT_UPDATED)
-                    }
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
+            .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
+            .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
+            .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
+            .limit(DEFAULT_LIMIT).get()
+            .addOnSuccessListener { queryDocumentSnapshots ->
+                PurchaseStorage.populateListFromSnapshot(queryDocumentSnapshots)
+                response.value = AuthResult(AuthCode.USER_DATA_UPDATED)
             }.addOnFailureListener { e ->
-                setSharedCategory(sharedPreferences, DbPurchases.CATEGORIES.DEFAULT.value)
                 val error = "Error! ${e.localizedMessage}"
                 Log.e(TAG, error)
 

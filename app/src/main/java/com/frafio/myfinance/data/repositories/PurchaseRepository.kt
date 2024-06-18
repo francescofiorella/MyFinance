@@ -19,14 +19,6 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
     val avgTrendList: List<Pair<String, Double>>
         get() = calculateAvgTrend()
 
-    fun getCategories(): LiveData<Pair<PurchaseResult, List<String>>> {
-        return purchaseManager.getCategories()
-    }
-
-    fun createCategory(name: String): LiveData<PurchaseResult> {
-        return purchaseManager.createCategory(name)
-    }
-
     fun purchaseListSize(): Int {
         return PurchaseStorage.purchaseList.size
     }
@@ -83,14 +75,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         val todayDate = LocalDate.now()
         val lastPurchase = PurchaseStorage.purchaseList.last()
         var purchaseDate = lastPurchase.getLocalDate()
-        val nDays =
-            if (purchaseManager.getSelectedCategory() == DbPurchases.CATEGORIES.DEFAULT.value) {
-                ChronoUnit.DAYS.between(purchaseDate, todayDate) + 1
-            } else {
-                // The first purchase is today! Skip it
-                val firstDate = PurchaseStorage.purchaseList[1].getLocalDate()
-                ChronoUnit.DAYS.between(purchaseDate, firstDate) + 1
-            }
+        val nDays = ChronoUnit.DAYS.between(purchaseDate, todayDate) + 1
         var nMonth: Long
         var lastMonth = 0
         var lastYear = 0
@@ -246,14 +231,6 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         }
 
         return avgList
-    }
-
-    fun setCollection(collection: String): LiveData<PurchaseResult> {
-        return purchaseManager.updateListByCollection(collection)
-    }
-
-    fun getSelectedCategory(): String {
-        return purchaseManager.getSelectedCategory()
     }
 
     fun setDynamicColorActive(active: Boolean) {

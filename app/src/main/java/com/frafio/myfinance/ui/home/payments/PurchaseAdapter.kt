@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.LayoutPurchaseItemRvBinding
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_BUTTON_CLICK
@@ -19,7 +20,7 @@ class PurchaseAdapter(
     private val listener: PurchaseInteractionListener
 ) : RecyclerView.Adapter<PurchaseAdapter.PurchaseViewHolder>() {
 
-    private var currentLimit: Long = 30
+    private var currentLimit: Long = DEFAULT_LIMIT
 
     inner class PurchaseViewHolder(
         val recyclerViewPurchaseItemBinding: LayoutPurchaseItemRvBinding
@@ -102,7 +103,7 @@ class PurchaseAdapter(
     }
 
     fun getLimit(increment: Boolean = false): Long {
-        if (increment) currentLimit += 30
+        if (increment) currentLimit += DEFAULT_LIMIT
         return currentLimit
     }
 }

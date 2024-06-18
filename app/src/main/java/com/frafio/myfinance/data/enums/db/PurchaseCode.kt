@@ -99,40 +99,8 @@ enum class PurchaseCode(val code: Int, val message: String) {
         }
     ),
 
-    PURCHASE_GET_CATEGORIES_SUCCESS(
-        50, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Categories list received!"
-            Languages.ITALIANO.value -> "Lista categorie ricevuta!"
-            else -> "Categories list received!" // english
-        }
-    ),
-
-    PURCHASE_GET_CATEGORIES_FAILURE(
-        51, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Categories list not received!"
-            Languages.ITALIANO.value -> "Lista categorie non ricevuta!"
-            else -> "Categories list not received!" // english
-        }
-    ),
-
-    PURCHASE_CREATE_CATEGORY_SUCCESS(
-        52, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Category created!"
-            Languages.ITALIANO.value -> "Categoria creata!"
-            else -> "Category created!" // english
-        }
-    ),
-
-    PURCHASE_CREATE_CATEGORY_FAILURE(
-        53, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Category not created!"
-            Languages.ITALIANO.value -> "Categoria non creata!"
-            else -> "Category not created!" // english
-        }
-    ),
-
     PURCHASE_AGGREGATE_SUCCESS(
-        100, when (getCurrentLanguage()) {
+        50, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Aggregation query successful!"
             Languages.ITALIANO.value -> "Query di aggregazione riuscita!"
             else -> "Aggregation query successful!" // english
@@ -140,7 +108,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     PURCHASE_AGGREGATE_FAILURE(
-        101, when (getCurrentLanguage()) {
+        51, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Aggregation query failed!"
             Languages.ITALIANO.value -> "Query di aggregazione non riuscita!"
             else -> "Aggregation query failed!" // english
@@ -148,7 +116,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     PURCHASE_COUNT_SUCCESS(
-        102, when (getCurrentLanguage()) {
+        52, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Count query successful!"
             Languages.ITALIANO.value -> "Query di conteggio riuscita!"
             else -> "Count query successful!" // english
@@ -156,7 +124,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     PURCHASE_COUNT_FAILURE(
-        103, when (getCurrentLanguage()) {
+        53, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Count query failed!"
             Languages.ITALIANO.value -> "Query di conteggio non riuscita!"
             else -> "Count query failed!" // english

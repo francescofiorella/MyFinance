@@ -20,14 +20,11 @@ import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.setValueLineChartData
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
 
 class MenuFragment : BaseFragment(), MenuListener {
 
     private val viewModel by viewModels<MenuViewModel>()
     private lateinit var binding: FragmentMenuBinding
-    private var newCat: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,12 +36,6 @@ class MenuFragment : BaseFragment(), MenuListener {
         binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.listener = this
-
-        binding.actualCollectionTV.text = viewModel.getSelectedCategory()
-
-        binding.collectionCard.setOnClickListener {
-            viewModel.getCategories()
-        }
 
         binding.dynamicColorSwitch.also {
             it.isChecked = viewModel.isSwitchDynamicColorChecked
@@ -75,50 +66,21 @@ class MenuFragment : BaseFragment(), MenuListener {
         (activity as HomeActivity).showProgressIndicator()
     }
 
-    override fun <T> onCompleted(result: LiveData<T>) {
+    override fun onCompleted(result: LiveData<PurchaseResult>) {
         result.observe(this) { value ->
             (activity as HomeActivity).hideProgressIndicator()
-
-            if (value is PurchaseResult) {
-                when (value.code) {
-                    PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
-                        refreshPlotData(animate = true)
-                        (activity as HomeActivity).refreshFragmentData(
-                            dashboard = true,
-                            payments = true
-                        )
-                    }
-
-                    PurchaseCode.PURCHASE_CREATE_CATEGORY_SUCCESS.code -> {
-                        newCat?.let {
-                            viewModel.setCollection(it)
-                            binding.actualCollectionTV.text = it
-                            newCat = null
-                        }
-                    }
-
-                    else -> {
-                        (activity as HomeActivity).showSnackBar(value.message)
-                    }
+            when (value.code) {
+                PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
+                    refreshPlotData(animate = true)
+                    (activity as HomeActivity).refreshFragmentData(
+                        dashboard = true,
+                        payments = true
+                    )
                 }
-            } else if (value is Pair<*, *>) {
-                val purchaseResult = value.first
-                val categories = value.second
-                if (purchaseResult is PurchaseResult && categories is List<*>) {
-                    when (purchaseResult.code) {
-                        PurchaseCode.PURCHASE_GET_CATEGORIES_SUCCESS.code -> {
-                            showCategoriesDialog(categories as List<String>)
-                        }
 
-                        else -> {
-                            (activity as HomeActivity).showSnackBar(purchaseResult.message)
-                        }
-                    }
-                } else {
-                    (activity as HomeActivity).showSnackBar(getString(R.string.generic_error))
+                else -> {
+                    (activity as HomeActivity).showSnackBar(value.message)
                 }
-            } else {
-                (activity as HomeActivity).showSnackBar(getString(R.string.generic_error))
             }
         }
     }
@@ -155,43 +117,5 @@ class MenuFragment : BaseFragment(), MenuListener {
     override fun scrollUp() {
         super.scrollUp()
         binding.menuScrollView.scrollTo(0, 0)
-    }
-
-    private fun showCategoriesDialog(categories : List<String>) {
-        val upperBuilder = MaterialAlertDialogBuilder(requireContext())
-        upperBuilder.setIcon(R.drawable.ic_auto_awesome_motion)
-        upperBuilder.setTitle(getString(R.string.category))
-        upperBuilder.setSingleChoiceItems(
-            categories.toTypedArray(),
-            categories.indexOf(viewModel.getSelectedCategory())
-        ) { upperDialog, selectedItem ->
-            val collection = categories[selectedItem]
-            viewModel.setCollection(collection)
-            binding.actualCollectionTV.text = collection
-            upperDialog.dismiss()
-        }
-        upperBuilder.setPositiveButton(getString(R.string.create)) { upperDialog, _ ->
-            upperDialog.dismiss()
-            val lowerBuilder = MaterialAlertDialogBuilder(requireContext())
-            lowerBuilder.setIcon(R.drawable.ic_auto_awesome_motion)
-            lowerBuilder.setTitle(getString(R.string.create_category))
-            val rootView = layoutInflater.inflate(R.layout.layout_category_text_input, null)
-            val inputLayout = rootView.findViewById<TextInputEditText>(R.id.category_edit_text)
-            lowerBuilder.setView(rootView)
-            lowerBuilder.setNegativeButton(getString(R.string.cancel), null)
-            lowerBuilder.setPositiveButton(getString(R.string.create)) { lowerDialog, _ ->
-                val catName = inputLayout.text.toString()
-                if (catName.isNotEmpty()) {
-                    newCat = catName
-                    viewModel.createCategory(catName)
-                } else {
-                    (activity as HomeActivity).showSnackBar(getString(R.string.empty_category))
-                }
-                lowerDialog.dismiss()
-            }
-            lowerBuilder.show()
-        }
-        upperBuilder.setNegativeButton(getString(R.string.cancel), null)
-        upperBuilder.show()
     }
 }

@@ -10,9 +10,7 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
-import com.frafio.myfinance.utils.getSharedCategory
 import com.frafio.myfinance.utils.getSharedDynamicColor
-import com.frafio.myfinance.utils.setSharedCategory
 import com.frafio.myfinance.utils.setSharedDynamicColor
 import com.google.firebase.firestore.AggregateField
 import com.google.firebase.firestore.AggregateSource
@@ -24,69 +22,18 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
     companion object {
         private val TAG = PurchaseManager::class.java.simpleName
+        val DEFAULT_LIMIT: Long = 30
     }
 
     private val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
 
-    fun getCategories(): LiveData<Pair<PurchaseResult, List<String>>> {
-        val response = MutableLiveData<Pair<PurchaseResult, List<String>>>()
-
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .get().addOnSuccessListener { docSnap ->
-                val categories =
-                    (docSnap.data?.get(DbPurchases.FIELDS.CATEGORIES.value) as List<*>).map { value ->
-                        value.toString()
-                    }
-                response.value = Pair(
-                    PurchaseResult(PurchaseCode.PURCHASE_GET_CATEGORIES_SUCCESS),
-                    categories
-                )
-            }.addOnFailureListener {
-                response.value = Pair(
-                    PurchaseResult(PurchaseCode.PURCHASE_GET_CATEGORIES_FAILURE),
-                    listOf()
-                )
-            }
-
-        return response
-    }
-
-    fun createCategory(name: String): LiveData<PurchaseResult> {
-        val response = MutableLiveData<PurchaseResult>()
-
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .get().addOnSuccessListener { docSnap ->
-                val categories =
-                    (docSnap.data?.get(DbPurchases.FIELDS.CATEGORIES.value) as List<*>).map { value ->
-                        value.toString()
-                    }
-                val mutCat = categories.toMutableList()
-                mutCat.add(name)
-                fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-                    .document(UserStorage.user!!.email!!)
-                    .update(DbPurchases.FIELDS.CATEGORIES.value, mutCat).addOnSuccessListener {
-                        response.value =
-                            PurchaseResult(PurchaseCode.PURCHASE_CREATE_CATEGORY_SUCCESS)
-                    }.addOnFailureListener {
-                        response.value =
-                            PurchaseResult(PurchaseCode.PURCHASE_CREATE_CATEGORY_FAILURE)
-                    }
-            }.addOnFailureListener {
-                response.value = PurchaseResult(PurchaseCode.PURCHASE_CREATE_CATEGORY_FAILURE)
-            }
-        return response
-    }
-
-    fun updateList(limit: Long = 30): LiveData<PurchaseResult> {
+    fun updateList(limit: Long = DEFAULT_LIMIT): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
             .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
@@ -111,7 +58,6 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
             .count()
             .get(AggregateSource.SERVER)
             .addOnSuccessListener { snapshot ->
@@ -195,7 +141,6 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
             .aggregate(AggregateField.sum(DbPurchases.FIELDS.PRICE.value))
             .get(AggregateSource.SERVER)
             .addOnSuccessListener { snapshot ->
@@ -216,7 +161,6 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
             .whereEqualTo(DbPurchases.FIELDS.DAY.value, todayDate.dayOfMonth)
             .whereEqualTo(DbPurchases.FIELDS.MONTH.value, todayDate.monthValue)
             .whereEqualTo(DbPurchases.FIELDS.YEAR.value, todayDate.year)
@@ -240,7 +184,6 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
             .whereEqualTo(DbPurchases.FIELDS.MONTH.value, todayDate.monthValue)
             .whereEqualTo(DbPurchases.FIELDS.YEAR.value, todayDate.year)
             .aggregate(AggregateField.sum(DbPurchases.FIELDS.PRICE.value))
@@ -254,15 +197,6 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                 response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_FAILURE, 0.0)
             }
         return response
-    }
-
-    fun updateListByCollection(collection: String): LiveData<PurchaseResult> {
-        setSharedCategory(sharedPreferences, collection)
-        return updateList()
-    }
-
-    fun getSelectedCategory(): String {
-        return getSharedCategory(sharedPreferences)
     }
 
     fun setDynamicColorActive(active: Boolean) {

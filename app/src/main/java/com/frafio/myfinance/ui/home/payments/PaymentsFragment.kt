@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentPaymentsBinding
@@ -42,7 +43,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
     private lateinit var binding: FragmentPaymentsBinding
     private val viewModel by viewModels<PaymentsViewModel>()
     private var isListBlocked = false
-    private var maxPurchaseNumber = 31
+    private var maxPurchaseNumber = DEFAULT_LIMIT + 1
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -163,7 +164,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         response.observe(viewLifecycleOwner) { result ->
             when (result.code) {
                 PurchaseCode.PURCHASE_COUNT_SUCCESS.code -> {
-                    maxPurchaseNumber = result.message.toInt()
+                    maxPurchaseNumber = result.message.toLong()
                     val limit = (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
                     isListBlocked = limit >= maxPurchaseNumber
                 }

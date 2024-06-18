@@ -14,7 +14,6 @@ object DbPurchases {
         TYPE("type"),
         PRICE("price"),
         CATEGORY("category"),
-        CATEGORIES("categories")
     }
 
     enum class NAMES(val value: String, val value_en: String, val value_it: String) {
@@ -38,13 +37,5 @@ object DbPurchases {
         HEALTH(6),
         TRANSPORTATION(7),
         MISCELLANEOUS(8)
-    }
-
-    enum class CATEGORIES(val value: String) {
-        DEFAULT(when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "First category"
-            Languages.ITALIANO.value -> "Prima categoria"
-            else -> "First category" // english
-        })
     }
 }
