@@ -178,6 +178,7 @@ object PurchaseStorage {
     }
 
     fun deletePurchaseAt(position: Int) {
+        val todayDate = LocalDate.now()
         for (i in position - 1 downTo 0) {
             if (purchaseList[i].type == DbPurchases.TYPES.TOTAL.value) {
                 val newTotal = Purchase(
@@ -193,7 +194,12 @@ object PurchaseStorage {
                 )
 
                 purchaseList.removeAt(position)
-                if (newTotal.price != 0.0) {
+                if (
+                    newTotal.day == todayDate.dayOfMonth
+                    && newTotal.month == todayDate.monthValue
+                    && newTotal.year == todayDate.year
+                    || newTotal.price != 0.0
+                ) {
                     purchaseList[i] = newTotal
                 } else {
                     purchaseList.removeAt(i)

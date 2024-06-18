@@ -27,6 +27,7 @@ import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_BUTTON_CLICK
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_PROGRESS_INDICATOR_SHOWN
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -35,10 +36,13 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
 
+
 class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentListener {
 
     private lateinit var binding: FragmentPaymentsBinding
     private val viewModel by viewModels<PaymentsViewModel>()
+    private var isListBlocked = false
+    private var maxPurchaseNumber = 31
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -47,7 +51,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             val editRequest = data!!.getBooleanExtra(AddActivity.PURCHASE_REQUEST_KEY, false)
 
             if (editRequest) {
-                viewModel.updatePurchaseList()
+                viewModel.updateLocalPurchaseList()
                 (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
                 (activity as HomeActivity).showSnackBar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
             }
@@ -66,11 +70,34 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
         viewModel.listener = this
 
-        viewModel.updatePurchaseList()
-        viewModel.updateListSize()
+        viewModel.updateLocalPurchaseList()
+        viewModel.updatePurchaseNumber()
         viewModel.purchases.observe(viewLifecycleOwner) { purchases ->
+            viewModel.updateListSize()
             binding.listRecyclerView.also {
-                val nl = purchases.map { p -> p.copy() }
+                val limit = if (it.adapter == null) {
+                    30
+                } else {
+                    (it.adapter as PurchaseAdapter).getLimit()
+                }
+                val addProgressBar = limit < maxPurchaseNumber
+                var nl = purchases.map { p -> p.copy() }
+                if (addProgressBar) {
+                    nl = nl.toMutableList()
+                    nl.add(
+                        Purchase(
+                            email = "",
+                            name = "",
+                            price = 0.0,
+                            year = 0,
+                            month = 0,
+                            day = 0,
+                            type = 0,
+                            id = "progressIndicator",
+                            category = ""
+                        )
+                    )
+                }
                 if (it.adapter == null) {
                     it.adapter = PurchaseAdapter(nl, this)
                 } else {
@@ -141,15 +168,49 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                     modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
                 }
             }
+
+            ON_PROGRESS_INDICATOR_SHOWN -> {
+                // Increment elements limit on scroll
+                if (!isListBlocked) {
+                    viewModel.updatePurchaseList(
+                        (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit(true)
+                    )
+                    isListBlocked = true
+                }
+            }
         }
     }
 
-    override fun onUpdateTypeComplete(response: LiveData<PurchaseResult>) {
+    override fun onUpdateComplete(response: LiveData<PurchaseResult>) {
         response.observe(viewLifecycleOwner) { result ->
-            if (result.code == PurchaseCode.PURCHASE_EDIT_SUCCESS.code) {
-                viewModel.updatePurchaseList()
-            } else {
-                (activity as HomeActivity).showSnackBar(result.message)
+            when (result.code) {
+                PurchaseCode.PURCHASE_COUNT_SUCCESS.code -> {
+                    maxPurchaseNumber = result.message.toInt()
+                    val limit = (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
+                    isListBlocked = limit >= maxPurchaseNumber
+                }
+
+                PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
+                    viewModel.updateLocalPurchaseList()
+                    val limit = (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
+                    isListBlocked = limit >= maxPurchaseNumber
+                }
+
+                PurchaseCode.PURCHASE_EDIT_SUCCESS.code -> {
+                    viewModel.updateLocalPurchaseList()
+                }
+
+                PurchaseCode.PURCHASE_ADD_SUCCESS.code -> {
+                    viewModel.updateLocalPurchaseList()
+                    (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
+                    viewModel.updateListSize()
+                    val payload = result.message.split("&")
+                    (activity as HomeActivity).showSnackBar(payload[0])
+                }
+
+                else -> {
+                    (activity as HomeActivity).showSnackBar(result.message)
+                }
             }
         }
     }
@@ -160,7 +221,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
     ) {
         response.observe(viewLifecycleOwner) { result ->
             if (result.code != PurchaseCode.PURCHASE_DELETE_FAILURE.code) {
-                viewModel.updatePurchaseList()
+                viewModel.updateLocalPurchaseList()
                 (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
                 viewModel.updateListSize()
 
@@ -177,33 +238,16 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         }
     }
 
-    override fun onDeleteCancelComplete(response: LiveData<PurchaseResult>) {
-        response.observe(viewLifecycleOwner) { result ->
-            if (result.code == PurchaseCode.PURCHASE_ADD_SUCCESS.code) {
-                viewModel.updatePurchaseList()
-                (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
-                viewModel.updateListSize()
-                val payload = result.message.split("&")
-                (activity as HomeActivity).showSnackBar(payload[0])
-            } else {
-                (activity as HomeActivity).showSnackBar(result.message)
-            }
-        }
-    }
-
     fun refreshListData() {
-        viewModel.updatePurchaseList()
+        viewModel.updateLocalPurchaseList()
         viewModel.updateListSize()
         scrollUp()
     }
 
     override fun scrollUp() {
         super.scrollUp()
-        val todayId = (binding.listRecyclerView.adapter as PurchaseAdapter).getTodayId()
-        (binding.listRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
-            todayId,
-            0
-        )
+        (binding.listRecyclerView.layoutManager as LinearLayoutManager)
+            .scrollToPositionWithOffset(0, 0)
     }
 
     fun scrollTo(position: Int) {

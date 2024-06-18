@@ -258,7 +258,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
                     fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
                         .document(UserStorage.user!!.email!!)
                         .update(
-                            "categories",
+                            DbPurchases.FIELDS.CATEGORIES.value,
                             FieldValue.arrayUnion(DbPurchases.CATEGORIES.DEFAULT.value)
                         )
                         .addOnFailureListener { e ->
@@ -284,6 +284,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
                     .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
                     .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
                     .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
+                    .limit(30)
                     .get().addOnSuccessListener { queryDocumentSnapshots ->
                         PurchaseStorage.populateListFromSnapshot(queryDocumentSnapshots)
                         response.value = AuthResult(AuthCode.USER_DATA_UPDATED)

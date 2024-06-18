@@ -14,8 +14,11 @@ import com.frafio.myfinance.utils.getSharedCategory
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedCategory
 import com.frafio.myfinance.utils.setSharedDynamicColor
+import com.google.firebase.firestore.AggregateField
+import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import java.time.LocalDate
 
 class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
@@ -77,20 +80,18 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    private fun updateList(): LiveData<PurchaseResult> {
+    fun updateList(limit: Long = 30): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .whereEqualTo(
-                DbPurchases.FIELDS.CATEGORY.value,
-                getSharedCategory(sharedPreferences)
-            )
+            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
             .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
+            .limit(limit)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
                 PurchaseStorage.populateListFromSnapshot(queryDocumentSnapshots)
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS)
@@ -99,6 +100,30 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                 Log.e(TAG, error)
 
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_FAILURE)
+            }
+
+        return response
+    }
+
+    fun getPurchaseNumber(): LiveData<PurchaseResult> {
+        val response = MutableLiveData<PurchaseResult>()
+
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
+            .count()
+            .get(AggregateSource.SERVER)
+            .addOnSuccessListener { snapshot ->
+                response.value = PurchaseResult(
+                    PurchaseCode.PURCHASE_COUNT_SUCCESS,
+                    snapshot.count.toString()
+                )
+            }.addOnFailureListener { e ->
+                val error = "Error! ${e.localizedMessage}"
+                Log.e(TAG, error)
+
+                response.value = PurchaseResult(PurchaseCode.PURCHASE_COUNT_FAILURE)
             }
 
         return response
@@ -161,6 +186,73 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             }
 
 
+        return response
+    }
+
+    fun getSumPrices(
+        response: MutableLiveData<Pair<PurchaseCode, Double>> = MutableLiveData()
+    ): MutableLiveData<Pair<PurchaseCode, Double>> {
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
+            .aggregate(AggregateField.sum(DbPurchases.FIELDS.PRICE.value))
+            .get(AggregateSource.SERVER)
+            .addOnSuccessListener { snapshot ->
+                val priceSum = snapshot
+                    .get(AggregateField.sum(DbPurchases.FIELDS.PRICE.value)) as? Double ?: 0.0
+                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_SUCCESS, priceSum)
+            }.addOnFailureListener { e ->
+                Log.e(TAG, "Error! ${e.localizedMessage}")
+                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_FAILURE, 0.0)
+            }
+        return response
+    }
+
+    fun getTodayTotal(
+        response: MutableLiveData<Pair<PurchaseCode, Double>> = MutableLiveData()
+    ): MutableLiveData<Pair<PurchaseCode, Double>> {
+        val todayDate = LocalDate.now()
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
+            .whereEqualTo(DbPurchases.FIELDS.DAY.value, todayDate.dayOfMonth)
+            .whereEqualTo(DbPurchases.FIELDS.MONTH.value, todayDate.monthValue)
+            .whereEqualTo(DbPurchases.FIELDS.YEAR.value, todayDate.year)
+            .aggregate(AggregateField.sum(DbPurchases.FIELDS.PRICE.value))
+            .get(AggregateSource.SERVER)
+            .addOnSuccessListener { snapshot ->
+                val priceSum = snapshot
+                    .get(AggregateField.sum(DbPurchases.FIELDS.PRICE.value)) as? Double ?: 0.0
+                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_SUCCESS, priceSum)
+            }.addOnFailureListener { e ->
+                Log.e(TAG, "Error! ${e.localizedMessage}")
+                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_FAILURE, 0.0)
+            }
+        return response
+    }
+
+    fun getThisMonthTotal(
+        response: MutableLiveData<Pair<PurchaseCode, Double>> = MutableLiveData()
+    ): MutableLiveData<Pair<PurchaseCode, Double>> {
+        val todayDate = LocalDate.now()
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .whereEqualTo(DbPurchases.FIELDS.CATEGORY.value, getSharedCategory(sharedPreferences))
+            .whereEqualTo(DbPurchases.FIELDS.MONTH.value, todayDate.monthValue)
+            .whereEqualTo(DbPurchases.FIELDS.YEAR.value, todayDate.year)
+            .aggregate(AggregateField.sum(DbPurchases.FIELDS.PRICE.value))
+            .get(AggregateSource.SERVER)
+            .addOnSuccessListener { snapshot ->
+                val priceSum = snapshot
+                    .get(AggregateField.sum(DbPurchases.FIELDS.PRICE.value)) as? Double ?: 0.0
+                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_SUCCESS, priceSum)
+            }.addOnFailureListener { e ->
+                Log.e(TAG, "Error! ${e.localizedMessage}")
+                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_FAILURE, 0.0)
+            }
         return response
     }
 

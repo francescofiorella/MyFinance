@@ -124,10 +124,42 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     PURCHASE_CREATE_CATEGORY_FAILURE(
-        52, when (getCurrentLanguage()) {
+        53, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Category not created!"
             Languages.ITALIANO.value -> "Categoria non creata!"
             else -> "Category not created!" // english
+        }
+    ),
+
+    PURCHASE_AGGREGATE_SUCCESS(
+        100, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Aggregation query successful!"
+            Languages.ITALIANO.value -> "Query di aggregazione riuscita!"
+            else -> "Aggregation query successful!" // english
+        }
+    ),
+
+    PURCHASE_AGGREGATE_FAILURE(
+        101, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Aggregation query failed!"
+            Languages.ITALIANO.value -> "Query di aggregazione non riuscita!"
+            else -> "Aggregation query failed!" // english
+        }
+    ),
+
+    PURCHASE_COUNT_SUCCESS(
+        102, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Count query successful!"
+            Languages.ITALIANO.value -> "Query di conteggio riuscita!"
+            else -> "Count query successful!" // english
+        }
+    ),
+
+    PURCHASE_COUNT_FAILURE(
+        103, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Count query failed!"
+            Languages.ITALIANO.value -> "Query di conteggio non riuscita!"
+            else -> "Count query failed!" // english
         }
     )
 }

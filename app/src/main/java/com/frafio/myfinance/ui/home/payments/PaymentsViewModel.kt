@@ -23,7 +23,7 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
     val purchases: LiveData<List<Purchase>>
         get() = _purchases
 
-    fun updatePurchaseList() {
+    fun updateLocalPurchaseList() {
         val purchases = purchaseRepository.getPurchaseList()
         _purchases.postValue(purchases)
     }
@@ -50,11 +50,21 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
             category = purchase.category
         )
         val response = purchaseRepository.editPurchase(updated, position)
-        listener?.onUpdateTypeComplete(response)
+        listener?.onUpdateComplete(response)
     }
 
     fun addPurchase(purchase: Purchase) {
         val response = purchaseRepository.addPurchase(purchase)
-        listener?.onDeleteCancelComplete(response)
+        listener?.onUpdateComplete(response)
+    }
+
+    fun updatePurchaseList(limit: Long) {
+        val response = purchaseRepository.updatePurchaseList(limit)
+        listener?.onUpdateComplete(response)
+    }
+
+    fun updatePurchaseNumber() {
+        val response = purchaseRepository.getPurchaseNumber()
+        listener?.onUpdateComplete(response)
     }
 }

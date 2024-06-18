@@ -5,7 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.MyFinanceApplication
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.frafio.myfinance.utils.doubleToPrice
+import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
     private val purchaseRepository = PurchaseRepository(
@@ -48,16 +51,56 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     val transportTotString: LiveData<String>
         get() = _transportTotString
 
-    fun getStats() {
+    private val _totalSumResult = MutableLiveData<Pair<PurchaseCode, Double>>()
+    val totalSumResult: LiveData<Pair<PurchaseCode, Double>>
+        get() = _totalSumResult
+
+    private val _todayTotalResult = MutableLiveData<Pair<PurchaseCode, Double>>()
+    val todayTotalResult: LiveData<Pair<PurchaseCode, Double>>
+        get() = _todayTotalResult
+
+    private val _thisMonthTotalResult = MutableLiveData<Pair<PurchaseCode, Double>>()
+    val thisMonthTotalResult: LiveData<Pair<PurchaseCode, Double>>
+        get() = _thisMonthTotalResult
+
+    fun updateStats() {
         val stats = purchaseRepository.calculateStats()
         _purchaseListSize.value = purchaseRepository.purchaseListSize()
         _dayAvgString.value = stats[0]
         _monthAvgString.value = stats[1]
-        _todayTotString.value = stats[2]
-        _totString.value = stats[3]
-        _lastMonthString.value = stats[4]
         _rentTotString.value = stats[5]
         _shoppingTotString.value = stats[6]
         _transportTotString.value = stats[7]
+        purchaseRepository.getSumPrices(_totalSumResult)
+        purchaseRepository.getTodayTotal(_todayTotalResult)
+        purchaseRepository.getThisMonthTotal(_thisMonthTotalResult)
+    }
+
+    fun updateStats(
+        totalSum: Double? = null,
+        todayTot: Double? = null,
+        thisMonthTotal: Double? = null
+    ) {
+        totalSum?.let {
+            _totString.value = if (totalSum < 1000.0) {
+                doubleToPrice(totalSum)
+            } else {
+                doubleToPriceWithoutDecimals(totalSum)
+            }
+        }
+        todayTot?.let {
+            _todayTotString.value = if (todayTot < 1000.0) {
+                doubleToPrice(todayTot)
+            } else {
+                doubleToPriceWithoutDecimals(todayTot)
+            }
+        }
+        thisMonthTotal?.let {
+            _lastMonthString.value = if (thisMonthTotal < 1000.0) {
+                doubleToPrice(thisMonthTotal)
+            } else {
+                doubleToPriceWithoutDecimals(thisMonthTotal)
+            }
+        }
     }
 }

@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
 import com.frafio.myfinance.ui.BaseFragment
+import com.frafio.myfinance.ui.home.HomeActivity
 
 class DashboardFragment : BaseFragment() {
     private lateinit var binding: FragmentDashboardBinding
@@ -21,7 +23,37 @@ class DashboardFragment : BaseFragment() {
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
 
-        viewModel.getStats()
+        viewModel.updateStats()
+
+        viewModel.totalSumResult.observe(viewLifecycleOwner) { value ->
+            val result = value.first
+            val price = value.second
+            if (result.code == PurchaseCode.PURCHASE_AGGREGATE_SUCCESS.code) {
+                viewModel.updateStats(totalSum = price)
+            } else {
+                (activity as HomeActivity).showSnackBar(result.message)
+            }
+        }
+
+        viewModel.todayTotalResult.observe(viewLifecycleOwner) { value ->
+            val result = value.first
+            val price = value.second
+            if (result.code == PurchaseCode.PURCHASE_AGGREGATE_SUCCESS.code) {
+                viewModel.updateStats(todayTot = price)
+            } else {
+                (activity as HomeActivity).showSnackBar(result.message)
+            }
+        }
+
+        viewModel.thisMonthTotalResult.observe(viewLifecycleOwner) { value ->
+            val result = value.first
+            val price = value.second
+            if (result.code == PurchaseCode.PURCHASE_AGGREGATE_SUCCESS.code) {
+                viewModel.updateStats(thisMonthTotal = price)
+            } else {
+                (activity as HomeActivity).showSnackBar(result.message)
+            }
+        }
 
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
@@ -30,7 +62,7 @@ class DashboardFragment : BaseFragment() {
     }
 
     fun refreshStatsData() {
-        viewModel.getStats()
+        viewModel.updateStats()
     }
 
     override fun scrollUp() {

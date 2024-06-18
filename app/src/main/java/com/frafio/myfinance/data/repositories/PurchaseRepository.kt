@@ -1,7 +1,9 @@
 package com.frafio.myfinance.data.repositories
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.managers.PurchaseManager
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
@@ -31,6 +33,32 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
 
     fun getPurchaseList(): List<Purchase> {
         return PurchaseStorage.purchaseList
+    }
+
+    fun updatePurchaseList(limit: Long): LiveData<PurchaseResult> {
+        return purchaseManager.updateList(limit)
+    }
+
+    fun getPurchaseNumber(): LiveData<PurchaseResult> {
+        return purchaseManager.getPurchaseNumber()
+    }
+
+    fun getSumPrices(
+        result: MutableLiveData<Pair<PurchaseCode, Double>> = MutableLiveData()
+    ): MutableLiveData<Pair<PurchaseCode, Double>> {
+        return purchaseManager.getSumPrices(result)
+    }
+
+    fun getTodayTotal(
+        result: MutableLiveData<Pair<PurchaseCode, Double>> = MutableLiveData()
+    ): MutableLiveData<Pair<PurchaseCode, Double>> {
+        return purchaseManager.getTodayTotal(result)
+    }
+
+    fun getThisMonthTotal(
+        result: MutableLiveData<Pair<PurchaseCode, Double>> = MutableLiveData()
+    ): MutableLiveData<Pair<PurchaseCode, Double>> {
+        return purchaseManager.getThisMonthTotal(result)
     }
 
     fun calculateStats(): List<String> {

@@ -1,6 +1,7 @@
 package com.frafio.myfinance.ui.home.payments
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -12,13 +13,14 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.LayoutPurchaseItemRvBinding
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_BUTTON_CLICK
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_PROGRESS_INDICATOR_SHOWN
 
 class PurchaseAdapter(
     private var purchases: List<Purchase>,
     private val listener: PurchaseInteractionListener
 ) : RecyclerView.Adapter<PurchaseAdapter.PurchaseViewHolder>() {
+
+    private var currentLimit: Long = 30
 
     inner class PurchaseViewHolder(
         val recyclerViewPurchaseItemBinding: LayoutPurchaseItemRvBinding
@@ -37,6 +39,19 @@ class PurchaseAdapter(
     override fun onBindViewHolder(holder: PurchaseViewHolder, position: Int) {
         val currentPurchase = purchases[position]
         holder.recyclerViewPurchaseItemBinding.purchase = currentPurchase
+
+        if (currentPurchase.id == "progressIndicator") {
+            listener.onItemInteraction(ON_PROGRESS_INDICATOR_SHOWN, currentPurchase, position)
+            holder.recyclerViewPurchaseItemBinding.loadProgressIndicator.visibility = View.VISIBLE
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemDataLayout.visibility =
+                View.GONE
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.visibility =
+                View.GONE
+        } else {
+            holder.recyclerViewPurchaseItemBinding.loadProgressIndicator.visibility = View.GONE
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout.visibility =
+                View.VISIBLE
+        }
 
         if (currentPurchase.type != DbPurchases.TYPES.TOTAL.value) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseTypeIcon.icon =
@@ -89,21 +104,15 @@ class PurchaseAdapter(
         return purchases.size
     }
 
-    fun getTodayId(): Int {
-        val todayDate = LocalDate.now()
-        for ((i, p) in purchases.withIndex()) {
-            val purchaseDate = p.getLocalDate()
-            if (ChronoUnit.DAYS.between(purchaseDate, todayDate) >= 0) {
-                return i
-            }
-        }
-        return 0
-    }
-
     fun updateData(newPurchaseList: List<Purchase>) {
         val diffUtil = PurchaseDiffUtil(purchases, newPurchaseList)
         val diffResult = DiffUtil.calculateDiff(diffUtil)
         purchases = newPurchaseList
         diffResult.dispatchUpdatesTo(this)
+    }
+
+    fun getLimit(increment: Boolean = false): Long {
+        if (increment) currentLimit += 30
+        return currentLimit
     }
 }

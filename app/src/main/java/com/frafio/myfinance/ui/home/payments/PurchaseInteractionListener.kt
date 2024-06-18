@@ -8,6 +8,7 @@ interface PurchaseInteractionListener {
         const val ON_CLICK: Int = 1
         const val ON_LONG_CLICK: Int = 2
         const val ON_BUTTON_CLICK: Int = 3
+        const val ON_PROGRESS_INDICATOR_SHOWN: Int = 4
     }
 
     fun onItemInteraction(interactionID: Int, purchase: Purchase, position: Int)
