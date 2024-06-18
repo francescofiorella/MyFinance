@@ -1,6 +1,7 @@
 package com.frafio.myfinance.data.models
 
 import com.frafio.myfinance.utils.dateToString
+import java.time.LocalDate
 
 data class Purchase(
     val email: String? = null,
@@ -23,5 +24,9 @@ data class Purchase(
 
     fun getDateString(): String {
         return dateToString(day, month, year) ?: ""
+    }
+
+    fun getLocalDate(): LocalDate {
+        return LocalDate.of(year!!, month!!, day!!)
     }
 }

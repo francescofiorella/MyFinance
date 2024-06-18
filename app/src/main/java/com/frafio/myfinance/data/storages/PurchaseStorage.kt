@@ -27,11 +27,11 @@ object PurchaseStorage {
             purchase.updateID(document.id)
             Log.i("Purhcase", purchase.toString())
             val todayDate = LocalDate.now()
-            val purchaseDate = LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
+            val purchaseDate = purchase.getLocalDate()
             var prevDate: LocalDate? = if (total == null) // se primo acquisto
                 null
             else
-                LocalDate.of(total!!.year!!, total!!.month!!, total!!.day!!) // ultimo totale
+                total!!.getLocalDate() // ultimo totale
 
             // se è < today and non hai fatto today
             // quindi se purchase < today and (totale == null or totale > today)
@@ -60,12 +60,7 @@ object PurchaseStorage {
                     category = purchase.category
                 )
                 purchaseList.add(total!!)
-                prevDate =
-                    LocalDate.of(
-                        total!!.year!!,
-                        total!!.month!!,
-                        total!!.day!!
-                    )
+                prevDate = total!!.getLocalDate()
             }
 
             if (prevDate == null) { // If is the first total
@@ -129,14 +124,12 @@ object PurchaseStorage {
 
     fun addPurchase(purchase: Purchase): Int {
         val totalIndex: Int
-        val purchaseDate = LocalDate.of(purchase.year!!, purchase.month!!, purchase.day!!)
+        val purchaseDate = purchase.getLocalDate()
         var i = 0
-        var iDate =
-            LocalDate.of(purchaseList[i].year!!, purchaseList[i].month!!, purchaseList[i].day!!)
+        var iDate = purchaseList[i].getLocalDate()
         while (i < purchaseList.size && ChronoUnit.DAYS.between(purchaseDate, iDate) > 0) {
             i++
-            iDate =
-                LocalDate.of(purchaseList[i].year!!, purchaseList[i].month!!, purchaseList[i].day!!)
+            iDate = purchaseList[i].getLocalDate()
         }
         if (purchaseList[i].getDateString() == purchase.getDateString()) {
             // Totale trovato

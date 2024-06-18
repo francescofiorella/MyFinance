@@ -92,7 +92,7 @@ class PurchaseAdapter(
     fun getTodayId(): Int {
         val todayDate = LocalDate.now()
         for ((i, p) in purchases.withIndex()) {
-            val purchaseDate = LocalDate.of(p.year!!, p.month!!, p.day!!)
+            val purchaseDate = p.getLocalDate()
             if (ChronoUnit.DAYS.between(purchaseDate, todayDate) >= 0) {
                 return i
             }
