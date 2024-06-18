@@ -271,9 +271,6 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
 
                             response.value = AuthResult(AuthCode.USER_DATA_NOT_UPDATED)
                         }
-                } else {
-                    val cat = categories.last()
-                    setSharedCategory(sharedPreferences, cat)
                 }
 
                 fStore.collection(DbPurchases.FIELDS.PURCHASES.value)

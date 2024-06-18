@@ -70,7 +70,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         viewModel.updateListSize()
         viewModel.purchases.observe(viewLifecycleOwner) { purchases ->
             binding.listRecyclerView.also {
-                it.setHasFixedSize(true)
                 val nl = purchases.map { p -> p.copy() }
                 if (it.adapter == null) {
                     it.adapter = PurchaseAdapter(nl, this)

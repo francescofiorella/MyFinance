@@ -46,6 +46,10 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         7: transportTot
         */
 
+        if (PurchaseStorage.purchaseList.isEmpty()) {
+            return mutableListOf("0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0")
+        }
+
         val values = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
         val todayDate = LocalDate.now()
