@@ -37,7 +37,7 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
         _purchaseListSize.value = purchaseRepository.purchaseListSize()
     }
 
-    fun updateType(purchase: Purchase, newType: Int, position: Int) {
+    fun updateCategory(purchase: Purchase, newCategory: Int, position: Int) {
         val updated = Purchase(
             email = purchase.email,
             name = purchase.name,
@@ -45,7 +45,7 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
             year = purchase.year,
             month = purchase.month,
             day = purchase.day,
-            type = newType,
+            type = newCategory,
             id = purchase.id,
             category = purchase.category
         )

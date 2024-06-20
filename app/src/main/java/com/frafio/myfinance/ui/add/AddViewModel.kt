@@ -23,7 +23,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
 
     var name: String? = null
     var priceString: String? = null
-    var type: Int? = null
+    var category: Int? = null
 
     var dateString: String? = null
 
@@ -65,8 +65,8 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        if (type == -1) {
-            listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_TYPE))
+        if (category == -1) {
+            listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_CATEGORY))
             return
         }
 
@@ -74,7 +74,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
 
         if (requestCode == AddActivity.REQUEST_ADD_CODE) {
             val purchase = Purchase(
-                userEmail, name, price, year, month, day, type,
+                userEmail, name, price, year, month, day, category,
                 category = ""
             )
             val response = purchaseRepository.addPurchase(purchase)
@@ -82,7 +82,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
         } else if (requestCode == AddActivity.REQUEST_EDIT_CODE) {
             val purchase =
                 Purchase(
-                    userEmail, name, price, year, month, day, type, purchaseID,
+                    userEmail, name, price, year, month, day, category, purchaseID,
                     category = ""
                 )
 

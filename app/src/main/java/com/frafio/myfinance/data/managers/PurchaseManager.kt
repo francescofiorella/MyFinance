@@ -22,7 +22,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
     companion object {
         private val TAG = PurchaseManager::class.java.simpleName
-        val DEFAULT_LIMIT: Long = 30
+        const val DEFAULT_LIMIT: Long = 50
     }
 
     private val fStore: FirebaseFirestore

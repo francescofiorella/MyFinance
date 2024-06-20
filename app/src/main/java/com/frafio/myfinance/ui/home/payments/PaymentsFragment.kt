@@ -27,7 +27,7 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_BUTTON_CLICK
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_CLICK
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_HALF_LIST_PASSED
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
@@ -148,7 +148,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 }
             }
 
-            ON_HALF_LIST_PASSED -> {
+            ON_LOAD_MORE_REQUEST -> {
                 // Increment elements limit on scroll
                 if (!isListBlocked) {
                     viewModel.updatePurchaseList(
@@ -242,7 +242,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         private val position: Int,
         private val editResultLauncher: ActivityResultLauncher<Intent>,
         private val viewModel: PaymentsViewModel,
-        private val fromTypeIcon: Boolean = false
+        private val fromCategoryIcon: Boolean = false
     ) : BottomSheetDialogFragment() {
 
         companion object {
@@ -263,7 +263,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 editResultLauncher,
                 viewModel,
                 this::dismiss,
-                fromTypeIcon
+                fromCategoryIcon
             )
             return layout
         }
@@ -276,7 +276,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         editResultLauncher: ActivityResultLauncher<Intent>,
         viewModel: PaymentsViewModel,
         dismissFun: () -> Unit,
-        fromTypeIcon: Boolean = false
+        fromCategoryIcon: Boolean = false
     ) {
         val editLayout = layout.findViewById<ConstraintLayout>(R.id.edit_layout)
         val deleteLayout = layout.findViewById<ConstraintLayout>(R.id.delete_layout)
@@ -285,73 +285,90 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             dateToString(purchase.day, purchase.month, purchase.year)
         layout.findViewById<MaterialTextView>(R.id.priceTV).text =
             doubleToPrice(purchase.price ?: 0.0)
-        layout.findViewById<MaterialButton>(R.id.purchaseTypeIcon).icon = ContextCompat.getDrawable(
+        layout.findViewById<MaterialButton>(R.id.purchaseCategoryIcon).icon =
+            ContextCompat.getDrawable(
             requireContext(),
             when (purchase.type) {
-                DbPurchases.TYPES.HOUSING.value -> R.drawable.ic_baseline_home
-                DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                DbPurchases.TYPES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                DbPurchases.TYPES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                DbPurchases.TYPES.EDUCATION.value -> R.drawable.ic_school
-                DbPurchases.TYPES.DINING.value -> R.drawable.ic_restaurant
-                DbPurchases.TYPES.HEALTH.value -> R.drawable.ic_vaccines
-                DbPurchases.TYPES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                DbPurchases.TYPES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
                 else -> R.drawable.ic_tag
             }
         )
 
-        if (fromTypeIcon) {
+        if (fromCategoryIcon) {
             layout.findViewById<LinearLayout>(R.id.editPurchaseLayout).visibility = View.GONE
-            layout.findViewById<ConstraintLayout>(R.id.editTypeLayout).visibility = View.VISIBLE
+            layout.findViewById<ConstraintLayout>(R.id.editCategoryLayout).visibility = View.VISIBLE
             layout.findViewById<ConstraintLayout>(R.id.housing_layout).setOnClickListener {
-                viewModel.updateType(purchase, DbPurchases.TYPES.HOUSING.value, position)
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.HOUSING.value, position)
                 dismissFun()
             }
             layout.findViewById<ConstraintLayout>(R.id.groceries_layout).setOnClickListener {
-                viewModel.updateType(purchase, DbPurchases.TYPES.GROCERIES.value, position)
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.GROCERIES.value, position)
                 dismissFun()
             }
             layout.findViewById<ConstraintLayout>(R.id.personal_care_layout).setOnClickListener {
-                viewModel.updateType(purchase, DbPurchases.TYPES.PERSONAL_CARE.value, position)
+                viewModel.updateCategory(
+                    purchase,
+                    DbPurchases.CATEGORIES.PERSONAL_CARE.value,
+                    position
+                )
                 dismissFun()
             }
             layout.findViewById<ConstraintLayout>(R.id.entertainment_layout).setOnClickListener {
-                viewModel.updateType(purchase, DbPurchases.TYPES.ENTERTAINMENT.value, position)
+                viewModel.updateCategory(
+                    purchase,
+                    DbPurchases.CATEGORIES.ENTERTAINMENT.value,
+                    position
+                )
                 dismissFun()
             }
             layout.findViewById<ConstraintLayout>(R.id.education_layout).setOnClickListener {
-                viewModel.updateType(purchase, DbPurchases.TYPES.EDUCATION.value, position)
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.EDUCATION.value, position)
                 dismissFun()
             }
             layout.findViewById<ConstraintLayout>(R.id.dining_layout).setOnClickListener {
-                viewModel.updateType(purchase, DbPurchases.TYPES.DINING.value, position)
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.DINING.value, position)
                 dismissFun()
             }
             layout.findViewById<ConstraintLayout>(R.id.health_layout).setOnClickListener {
-                viewModel.updateType(purchase, DbPurchases.TYPES.HEALTH.value, position)
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.HEALTH.value, position)
                 dismissFun()
             }
             layout.findViewById<ConstraintLayout>(R.id.transportation_layout).setOnClickListener {
-                viewModel.updateType(purchase, DbPurchases.TYPES.TRANSPORTATION.value, position)
+                viewModel.updateCategory(
+                    purchase,
+                    DbPurchases.CATEGORIES.TRANSPORTATION.value,
+                    position
+                )
                 dismissFun()
             }
             layout.findViewById<ConstraintLayout>(R.id.miscellaneous_layout).setOnClickListener {
-                viewModel.updateType(purchase, DbPurchases.TYPES.MISCELLANEOUS.value, position)
+                viewModel.updateCategory(
+                    purchase,
+                    DbPurchases.CATEGORIES.MISCELLANEOUS.value,
+                    position
+                )
                 dismissFun()
             }
             return
         }
 
         layout.findViewById<LinearLayout>(R.id.editPurchaseLayout).visibility = View.VISIBLE
-        layout.findViewById<ConstraintLayout>(R.id.editTypeLayout).visibility = View.GONE
+        layout.findViewById<ConstraintLayout>(R.id.editCategoryLayout).visibility = View.GONE
         editLayout.setOnClickListener {
             Intent(context, AddActivity::class.java).also {
                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
                 it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
                 it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
                 it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
-                it.putExtra(AddActivity.PURCHASE_TYPE_KEY, purchase.type)
+                it.putExtra(AddActivity.PURCHASE_CATEGORY_KEY, purchase.type)
                 it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
                 it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
                 it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)

@@ -26,7 +26,7 @@ object DbPurchases {
         )
     }
 
-    enum class TYPES(val value: Int) {
+    enum class CATEGORIES(val value: Int) {
         TOTAL(100),
         HOUSING(0),
         GROCERIES(1),

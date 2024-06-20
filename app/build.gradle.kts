@@ -17,7 +17,7 @@ android {
         minSdk = 29
         targetSdk = 34
         versionCode = 4
-        versionName = "4.3.1"
+        versionName = "4.3.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -82,10 +82,10 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     // Chart and graph library
-    implementation("com.github.blackfizz:eazegraph:1.2.2@aar")
+    implementation("com.github.blackfizz:eazegraph:1.2.3@aar")
     implementation("com.nineoldandroids:library:2.4.0")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 }

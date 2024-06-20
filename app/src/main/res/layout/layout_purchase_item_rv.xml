@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingHorizontal="20dp"
-            android:visibility="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? View.VISIBLE : View.GONE}"
+            android:visibility="@{purchase.type == DbPurchases.CATEGORIES.TOTAL.value ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -75,9 +75,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:clickable="@{purchase.type != DbPurchases.TYPES.TOTAL.value ? true : false}"
-            android:focusable="@{purchase.type != DbPurchases.TYPES.TOTAL.value ? true : false}"
-            android:longClickable="@{purchase.type != DbPurchases.TYPES.TOTAL.value ? true : false}"
+            android:clickable="@{purchase.type != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
+            android:focusable="@{purchase.type != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
+            android:longClickable="@{purchase.type != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
             android:paddingHorizontal="20dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/recView_purchaseItem_dataLayout">
@@ -90,7 +90,7 @@
                 android:fontFamily="@font/nunito"
                 android:text="@string/no_purchases"
                 android:textSize="16sp"
-                android:visibility="@{purchase.type != DbPurchases.TYPES.TOTAL.value || purchase.price != 0.0 ? View.GONE : View.VISIBLE}"
+                android:visibility="@{purchase.type != DbPurchases.CATEGORIES.TOTAL.value || purchase.price != 0.0 ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -98,13 +98,13 @@
                 tools:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/recView_purchaseItem_purchaseTypeIcon"
+                android:id="@+id/recView_purchaseItem_purchaseCategoryIcon"
                 style="?attr/materialIconButtonFilledTonalStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="5dp"
-                android:contentDescription="@string/purchase_type_icon"
-                android:visibility="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? View.GONE : View.VISIBLE}"
+                android:contentDescription="@string/purchase_category_icon"
+                android:visibility="@{purchase.type == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -120,24 +120,24 @@
                 android:text="@{purchase.name}"
                 android:textColor="@color/primary_text"
                 android:textSize="16sp"
-                android:visibility="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? View.GONE : View.VISIBLE}"
-                app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_purchaseTypeIcon"
+                android:visibility="@{purchase.type == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
+                app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_purchaseCategoryIcon"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Acquisto" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/recView_purchaseItem_typeTextView"
+                android:id="@+id/recView_purchaseItem_categoryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginBottom="10dp"
                 android:fontFamily="@font/nunito"
                 android:textSize="14sp"
-                android:visibility="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? View.GONE : View.VISIBLE}"
+                android:visibility="@{purchase.type == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_purchaseTypeIcon"
+                app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_purchaseCategoryIcon"
                 app:layout_constraintTop_toBottomOf="@id/recView_purchaseItem_nomeTextView"
-                tools:text="@string/type" />
+                tools:text="@string/category" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/recView_purchaseItem_priceTextView"
@@ -146,7 +146,7 @@
                 android:fontFamily="@font/nunito"
                 android:text="@{FormatUtilsKt.doubleToPrice(purchase.price)}"
                 android:textSize="16sp"
-                android:visibility="@{purchase.type == DbPurchases.TYPES.TOTAL.value ? View.GONE : View.VISIBLE}"
+                android:visibility="@{purchase.type == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

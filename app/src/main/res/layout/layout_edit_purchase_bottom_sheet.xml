@@ -7,13 +7,13 @@
     android:paddingVertical="30dp">
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/purchaseTypeIcon"
+        android:id="@+id/purchaseCategoryIcon"
         style="?attr/materialIconButtonFilledTonalStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:clickable="false"
-        android:contentDescription="@string/purchase_type_icon"
+        android:contentDescription="@string/purchase_category_icon"
         android:focusable="false"
         android:longClickable="false"
         app:layout_constraintBottom_toBottomOf="@id/dateTV"
@@ -30,7 +30,7 @@
         android:textColor="@color/primary_text"
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@id/priceTV"
-        app:layout_constraintStart_toEndOf="@id/purchaseTypeIcon"
+        app:layout_constraintStart_toEndOf="@id/purchaseCategoryIcon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Acquisto" />
 
@@ -41,7 +41,7 @@
         android:layout_marginStart="10dp"
         android:fontFamily="@font/nunito"
         android:textSize="14sp"
-        app:layout_constraintStart_toEndOf="@id/purchaseTypeIcon"
+        app:layout_constraintStart_toEndOf="@id/purchaseCategoryIcon"
         app:layout_constraintTop_toBottomOf="@id/nameTV"
         tools:text="01/01/2000" />
 
@@ -146,7 +146,7 @@
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/editTypeLayout"
+        android:id="@+id/editCategoryLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"

@@ -12,7 +12,7 @@ import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMI
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.databinding.LayoutPurchaseItemRvBinding
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_BUTTON_CLICK
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_HALF_LIST_PASSED
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 
 class PurchaseAdapter(
@@ -40,31 +40,31 @@ class PurchaseAdapter(
         val currentPurchase = purchases[position]
         holder.recyclerViewPurchaseItemBinding.purchase = currentPurchase
 
-        if (position > purchases.size / 2) {
-            listener.onItemInteraction(ON_HALF_LIST_PASSED, currentPurchase, position)
+        if (purchases.size - position < DEFAULT_LIMIT) {
+            listener.onItemInteraction(ON_LOAD_MORE_REQUEST, currentPurchase, position)
         }
 
-        if (currentPurchase.type != DbPurchases.TYPES.TOTAL.value) {
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseTypeIcon.icon =
+        if (currentPurchase.type != DbPurchases.CATEGORIES.TOTAL.value) {
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon.icon =
                 ContextCompat.getDrawable(
-                    holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseTypeIcon.context,
+                    holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon.context,
                     when (purchases[position].type) {
-                        DbPurchases.TYPES.HOUSING.value -> R.drawable.ic_baseline_home
-                        DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                        DbPurchases.TYPES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                        DbPurchases.TYPES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                        DbPurchases.TYPES.EDUCATION.value -> R.drawable.ic_school
-                        DbPurchases.TYPES.DINING.value -> R.drawable.ic_restaurant
-                        DbPurchases.TYPES.HEALTH.value -> R.drawable.ic_vaccines
-                        DbPurchases.TYPES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                        DbPurchases.TYPES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                        DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                        DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                        DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                        DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                        DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                        DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                        DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                        DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                        DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
                         else -> R.drawable.ic_tag
                     }
                 )
-            val types = holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemTypeTextView
-                .context.resources.getStringArray(R.array.types)
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemTypeTextView
-                .text = types[currentPurchase.type ?: DbPurchases.TYPES.MISCELLANEOUS.value]
+            val types = holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemCategoryTextView
+                .context.resources.getStringArray(R.array.categories)
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemCategoryTextView
+                .text = types[currentPurchase.type ?: DbPurchases.CATEGORIES.MISCELLANEOUS.value]
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener {
                     listener.onItemInteraction(
@@ -75,7 +75,7 @@ class PurchaseAdapter(
                     true
                 }
 
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseTypeIcon
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon
                 .setOnClickListener {
                     listener.onItemInteraction(
                         ON_BUTTON_CLICK,
@@ -86,7 +86,7 @@ class PurchaseAdapter(
         } else {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener(null)
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseTypeIcon
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon
                 .setOnClickListener(null)
         }
     }

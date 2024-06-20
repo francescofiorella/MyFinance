@@ -27,11 +27,11 @@ enum class PurchaseCode(val code: Int, val message: String) {
         }
     ),
 
-    EMPTY_TYPE(
+    EMPTY_CATEGORY(
         4, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Enter the purchase type."
-            Languages.ITALIANO.value -> "Inserisci il tipo di acquisto."
-            else -> "Enter the purchase type." // english
+            Languages.ENGLISH.value -> "Enter the purchase category."
+            Languages.ITALIANO.value -> "Inserisci la categoria dell'acquisto."
+            else -> "Enter the purchase category." // english
         }
     ),
 

@@ -9,8 +9,6 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.utils.dateToString
-import com.frafio.myfinance.utils.doubleToPrice
-import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -66,92 +64,16 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         7: transportationTot
         */
 
-        if (PurchaseStorage.purchaseList.isEmpty()) {
-            return mutableListOf("0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0")
-        }
-
-        val values = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-
-        val todayDate = LocalDate.now()
-        val lastPurchase = PurchaseStorage.purchaseList.last()
-        var purchaseDate = lastPurchase.getLocalDate()
-        val nDays = ChronoUnit.DAYS.between(purchaseDate, todayDate) + 1
-        var nMonth: Long
-        var lastMonth = 0
-        var lastYear = 0
-
-        PurchaseStorage.purchaseList.forEach { purchase ->
-            purchaseDate = purchase.getLocalDate()
-            if (ChronoUnit.DAYS.between(purchaseDate, todayDate) >= 0) {
-                when (purchase.type) {
-                    DbPurchases.TYPES.TOTAL.value -> {
-                        // today total
-                        if (purchase.year == todayDate.year && purchase.month == todayDate.monthValue) {
-                            values[4] += purchase.price ?: 0.0
-
-                            if (purchase.day == todayDate.dayOfMonth) {
-                                values[2] = purchase.price ?: 0.0
-                            }
-                        }
-
-                        // increment tot
-                        values[3] += purchase.price ?: 0.0
-
-                        // count the month number
-                        if (purchase.year != lastYear) {
-                            lastYear = purchase.year!!
-                            lastMonth = purchase.month!!
-                        } else if (purchase.month != lastMonth) {
-                            lastMonth = purchase.month!!
-                        }
-                    }
-
-                    DbPurchases.TYPES.HOUSING.value -> {
-                        // housingTot
-                        values[5] += purchase.price ?: 0.0
-                    }
-
-                    DbPurchases.TYPES.GROCERIES.value -> {
-                        // groceriesTot
-                        values[6] += purchase.price ?: 0.0
-                    }
-
-                    DbPurchases.TYPES.TRANSPORTATION.value -> {
-                        // transportationTot
-                        values[7] += purchase.price ?: 0.0
-                    }
-                }
-            }
-        }
-
-        if (PurchaseStorage.purchaseList.isNotEmpty()) {
-            PurchaseStorage.purchaseList.first().also { first ->
-                val endDate = first.getLocalDate()
-                PurchaseStorage.purchaseList.last().also { last ->
-                    val startDate = last.getLocalDate()
-
-                    nMonth = ChronoUnit.MONTHS.between(startDate, endDate) + 1
-                }
-            }
-        } else {
-            nMonth = 1 // should not be executed
-        }
-
-        values[0] = values[3] / nDays
-        values[1] = values[3] / nMonth
-
-        val stats = mutableListOf<String>()
-
-        values.forEach { value ->
-            val string = if (value < 1000.0) {
-                doubleToPrice(value)
-            } else {
-                doubleToPriceWithoutDecimals(value)
-            }
-            stats.add(string)
-        }
-
-        return stats
+        return mutableListOf(
+            "€ 0.00",
+            "€ 0.00",
+            "€ 0.00",
+            "€ 0.00",
+            "€ 0.00",
+            "€ 0.00",
+            "€ 0.00",
+            "€ 0.00"
+        )
     }
 
     fun deletePurchaseAt(position: Int): LiveData<PurchaseResult> {
@@ -191,7 +113,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                 val purchaseDate = purchase.getLocalDate()
                 // consider just the totals
                 if (ChronoUnit.DAYS.between(purchaseDate, todayDate) >= 0 &&
-                    purchase.type == DbPurchases.TYPES.TOTAL.value
+                    purchase.type == DbPurchases.CATEGORIES.TOTAL.value
                 ) {
                     lastDate = dateToString(
                         purchase.day,

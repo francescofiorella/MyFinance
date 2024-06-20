@@ -1,6 +1,5 @@
 package com.frafio.myfinance.data.storages
 
-import android.util.Log
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Purchase
 import com.google.firebase.firestore.QuerySnapshot
@@ -25,7 +24,6 @@ object PurchaseStorage {
             val purchase = document.toObject(Purchase::class.java)
             // set id
             purchase.updateID(document.id)
-            Log.i("Purhcase", purchase.toString())
             val todayDate = LocalDate.now()
             val purchaseDate = purchase.getLocalDate()
             var prevDate: LocalDate? = if (total == null) // se primo acquisto
@@ -55,7 +53,7 @@ object PurchaseStorage {
                     year = todayDate.year,
                     month = todayDate.monthValue,
                     day = todayDate.dayOfMonth,
-                    type = DbPurchases.TYPES.TOTAL.value,
+                    type = DbPurchases.CATEGORIES.TOTAL.value,
                     id = totId,
                     category = purchase.category
                 )
@@ -72,7 +70,7 @@ object PurchaseStorage {
                     year = purchase.year,
                     month = purchase.month,
                     day = purchase.day,
-                    type = DbPurchases.TYPES.TOTAL.value,
+                    type = DbPurchases.CATEGORIES.TOTAL.value,
                     id = purchase.getTotalId(),
                     category = purchase.category
                 )
@@ -85,7 +83,7 @@ object PurchaseStorage {
                     year = total!!.year,
                     month = total!!.month,
                     day = total!!.day,
-                    type = DbPurchases.TYPES.TOTAL.value,
+                    type = DbPurchases.CATEGORIES.TOTAL.value,
                     id = total!!.getTotalId(),
                     category = total!!.category
                 )
@@ -107,7 +105,7 @@ object PurchaseStorage {
                     year = purchase.year,
                     month = purchase.month,
                     day = purchase.day,
-                    type = DbPurchases.TYPES.TOTAL.value,
+                    type = DbPurchases.CATEGORIES.TOTAL.value,
                     id = purchase.getTotalId(),
                     category = purchase.category
                 )
@@ -140,7 +138,7 @@ object PurchaseStorage {
                 year = purchaseList[i].year,
                 month = purchaseList[i].month,
                 day = purchaseList[i].day,
-                type = DbPurchases.TYPES.TOTAL.value,
+                type = DbPurchases.CATEGORIES.TOTAL.value,
                 id = purchaseList[i].getTotalId(),
                 category = purchaseList[i].category
             )
@@ -166,7 +164,7 @@ object PurchaseStorage {
                 year = purchase.year,
                 month = purchase.month,
                 day = purchase.day,
-                type = DbPurchases.TYPES.TOTAL.value,
+                type = DbPurchases.CATEGORIES.TOTAL.value,
                 id = purchase.getTotalId(),
                 category = purchase.category
             )
@@ -180,7 +178,7 @@ object PurchaseStorage {
     fun deletePurchaseAt(position: Int) {
         val todayDate = LocalDate.now()
         for (i in position - 1 downTo 0) {
-            if (purchaseList[i].type == DbPurchases.TYPES.TOTAL.value) {
+            if (purchaseList[i].type == DbPurchases.CATEGORIES.TOTAL.value) {
                 val newTotal = Purchase(
                     email = UserStorage.user!!.email,
                     name = DbPurchases.NAMES.TOTAL.value,
@@ -188,7 +186,7 @@ object PurchaseStorage {
                     year = purchaseList[i].year,
                     month = purchaseList[i].month,
                     day = purchaseList[i].day,
-                    type = DbPurchases.TYPES.TOTAL.value,
+                    type = DbPurchases.CATEGORIES.TOTAL.value,
                     id = purchaseList[i].getTotalId(),
                     category = purchaseList[i].category
                 )
@@ -218,7 +216,7 @@ object PurchaseStorage {
         } else {
             var i = position - 1
             while (i >= 0) {
-                if (purchaseList[i].type == DbPurchases.TYPES.TOTAL.value) {
+                if (purchaseList[i].type == DbPurchases.CATEGORIES.TOTAL.value) {
                     val total = Purchase(
                         email = purchaseList[i].email,
                         name = purchaseList[i].name,

@@ -65,11 +65,6 @@
     <string name="dynamic_color_icon" translatable="false">Dynamic Color Icon</string>
     <string name="total_icon" translatable="false">Total Icon</string>
 
-    <string name="type">Type</string>
-    <string name="generic">Generic</string>
-    <string name="shopping">Shopping</string>
-    <string name="transport">Transport</string>
-    <string name="rent">Rent</string>
     <string name="date">Date</string>
 
     <string name="translation_warning">Restart the app for the changes to take effect</string>
@@ -99,7 +94,7 @@
     <string name="edit_profile">Edit the profile</string>
     <string name="edit_propic">Upload the profile picture</string>
     <string name="edit_full_name">Edit the full name</string>
-    <string name="purchase_type_icon">Purchase Type Icon</string>
+    <string name="purchase_category_icon">Purchase Category Icon</string>
     <string name="no_purchases">No purchases</string>
 
     <string name="housing">Housing</string>
@@ -112,7 +107,7 @@
     <string name="transportation">Transportation</string>
     <string name="miscellaneous">Miscellaneous</string>
 
-    <string-array name="types" translatable="false">
+    <string-array name="categories" translatable="false">
         <item>@string/housing</item>
         <item>@string/groceries</item>
         <item>@string/personal_care</item>

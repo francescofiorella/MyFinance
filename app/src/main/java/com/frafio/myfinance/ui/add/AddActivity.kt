@@ -28,7 +28,7 @@ class AddActivity : AppCompatActivity(), AddListener {
         const val PURCHASE_ID_KEY: String = "com.frafio.myfinance.PURCHASE_ID"
         const val PURCHASE_NAME_KEY: String = "com.frafio.myfinance.PURCHASE_NAME"
         const val PURCHASE_PRICE_KEY: String = "com.frafio.myfinance.PURCHASE_PRICE"
-        const val PURCHASE_TYPE_KEY: String = "com.frafio.myfinance.PURCHASE_TYPE"
+        const val PURCHASE_CATEGORY_KEY: String = "com.frafio.myfinance.PURCHASE_CATEGORY"
         const val PURCHASE_POSITION_KEY: String = "com.frafio.myfinance.PURCHASE_POSITION"
         const val PURCHASE_YEAR_KEY: String = "com.frafio.myfinance.PURCHASE_YEAR"
         const val PURCHASE_MONTH_KEY: String = "com.frafio.myfinance.PURCHASE_MONTH"
@@ -63,50 +63,50 @@ class AddActivity : AppCompatActivity(), AddListener {
         )
     }
 
-    private val typeViewListener = View.OnClickListener {
+    private val categoryViewListener = View.OnClickListener {
         val builder = MaterialAlertDialogBuilder(this)
         builder.setIcon(R.drawable.ic_tag)
-        builder.setTitle(getString(R.string.type))
+        builder.setTitle(getString(R.string.category))
         builder.setSingleChoiceItems(
-            resources.getStringArray(R.array.types),
-            when (viewModel.type) {
-                DbPurchases.TYPES.HOUSING.value -> 0
-                DbPurchases.TYPES.GROCERIES.value -> 1
-                DbPurchases.TYPES.PERSONAL_CARE.value -> 2
-                DbPurchases.TYPES.ENTERTAINMENT.value -> 3
-                DbPurchases.TYPES.EDUCATION.value -> 4
-                DbPurchases.TYPES.DINING.value -> 5
-                DbPurchases.TYPES.HEALTH.value -> 6
-                DbPurchases.TYPES.TRANSPORTATION.value -> 7
-                DbPurchases.TYPES.MISCELLANEOUS.value -> 8
+            resources.getStringArray(R.array.categories),
+            when (viewModel.category) {
+                DbPurchases.CATEGORIES.HOUSING.value -> 0
+                DbPurchases.CATEGORIES.GROCERIES.value -> 1
+                DbPurchases.CATEGORIES.PERSONAL_CARE.value -> 2
+                DbPurchases.CATEGORIES.ENTERTAINMENT.value -> 3
+                DbPurchases.CATEGORIES.EDUCATION.value -> 4
+                DbPurchases.CATEGORIES.DINING.value -> 5
+                DbPurchases.CATEGORIES.HEALTH.value -> 6
+                DbPurchases.CATEGORIES.TRANSPORTATION.value -> 7
+                DbPurchases.CATEGORIES.MISCELLANEOUS.value -> 8
                 else -> -1 // error, do not select a default option
             },
-            typeListener
+            categoryListener
         )
         builder.show()
     }
 
-    private val typeListener = DialogInterface.OnClickListener { dialog, selectedItem ->
-        val types = resources.getStringArray(R.array.types)
-        if (selectedItem >= 0 && selectedItem < types.size) {
-            binding.typeAutoCompleteTV.setText(types[selectedItem])
-            binding.typeTextInputLayout.setStartIconDrawable(
+    private val categoryListener = DialogInterface.OnClickListener { dialog, selectedItem ->
+        val categories = resources.getStringArray(R.array.categories)
+        if (selectedItem >= 0 && selectedItem < categories.size) {
+            binding.categoryAutoCompleteTV.setText(categories[selectedItem])
+            binding.categoryTextInputLayout.setStartIconDrawable(
                 when (selectedItem) {
-                    DbPurchases.TYPES.HOUSING.value -> R.drawable.ic_baseline_home
-                    DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                    DbPurchases.TYPES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                    DbPurchases.TYPES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                    DbPurchases.TYPES.EDUCATION.value -> R.drawable.ic_school
-                    DbPurchases.TYPES.DINING.value -> R.drawable.ic_restaurant
-                    DbPurchases.TYPES.HEALTH.value -> R.drawable.ic_vaccines
-                    DbPurchases.TYPES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                    DbPurchases.TYPES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                    DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                    DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                    DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                    DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                    DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                    DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                    DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                    DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                    DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
                     else -> R.drawable.ic_tag
                 }
             )
-            viewModel.type = selectedItem
+            viewModel.category = selectedItem
         } else {
-            viewModel.type = -1
+            viewModel.category = -1
         }
 
         dialog.dismiss()
@@ -127,12 +127,12 @@ class AddActivity : AppCompatActivity(), AddListener {
             }
         }
 
-        binding.typeAutoCompleteTV.setOnClickListener(typeViewListener)
-        binding.typeTextInputLayout.setEndIconOnClickListener(typeViewListener)
+        binding.categoryAutoCompleteTV.setOnClickListener(categoryViewListener)
+        binding.categoryTextInputLayout.setEndIconOnClickListener(categoryViewListener)
 
         when (code) {
             REQUEST_ADD_CODE -> {
-                viewModel.type = -1
+                viewModel.category = -1
             }
 
             REQUEST_EDIT_CODE -> {
@@ -148,8 +148,8 @@ class AddActivity : AppCompatActivity(), AddListener {
                             viewModel.priceString = doubleToString(it)
                             viewModel.purchasePrice = it
                         }
-                    intent.getIntExtra(PURCHASE_TYPE_KEY, 0).also {
-                        viewModel.type = it
+                    intent.getIntExtra(PURCHASE_CATEGORY_KEY, 0).also {
+                        viewModel.category = it
                     }
                     intent.getIntExtra(PURCHASE_POSITION_KEY, 0)
                         .also {
@@ -166,20 +166,20 @@ class AddActivity : AppCompatActivity(), AddListener {
                     }
                 }
 
-                val types = resources.getStringArray(R.array.types)
-                if (viewModel.type != null && viewModel.type!! >= 0 && viewModel.type!! < types.size) {
-                    binding.typeAutoCompleteTV.setText(types[viewModel.type!!])
-                    binding.typeTextInputLayout.setStartIconDrawable(
-                        when (viewModel.type) {
-                            DbPurchases.TYPES.HOUSING.value -> R.drawable.ic_baseline_home
-                            DbPurchases.TYPES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                            DbPurchases.TYPES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                            DbPurchases.TYPES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                            DbPurchases.TYPES.EDUCATION.value -> R.drawable.ic_school
-                            DbPurchases.TYPES.DINING.value -> R.drawable.ic_restaurant
-                            DbPurchases.TYPES.HEALTH.value -> R.drawable.ic_vaccines
-                            DbPurchases.TYPES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                            DbPurchases.TYPES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                val categories = resources.getStringArray(R.array.categories)
+                if (viewModel.category != null && viewModel.category!! >= 0 && viewModel.category!! < categories.size) {
+                    binding.categoryAutoCompleteTV.setText(categories[viewModel.category!!])
+                    binding.categoryTextInputLayout.setStartIconDrawable(
+                        when (viewModel.category) {
+                            DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                            DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                            DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                            DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                            DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                            DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                            DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                            DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                            DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
                             else -> R.drawable.ic_tag
                         }
                     )
@@ -199,7 +199,7 @@ class AddActivity : AppCompatActivity(), AddListener {
 
         binding.nameTextInputLayout.isErrorEnabled = false
         binding.priceTextInputLayout.isErrorEnabled = false
-        binding.typeTextInputLayout.isErrorEnabled = false
+        binding.categoryTextInputLayout.isErrorEnabled = false
 
         binding.addAddButton.isEnabled = false
     }
@@ -250,8 +250,8 @@ class AddActivity : AppCompatActivity(), AddListener {
             PurchaseCode.EMPTY_PRICE.code ->
                 binding.priceTextInputLayout.error = result.message
 
-            PurchaseCode.EMPTY_TYPE.code ->
-                binding.typeTextInputLayout.error = result.message
+            PurchaseCode.EMPTY_CATEGORY.code ->
+                binding.categoryTextInputLayout.error = result.message
         }
     }
 }

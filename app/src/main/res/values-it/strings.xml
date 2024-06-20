@@ -55,11 +55,6 @@
     <string name="year">Anno %1$s</string>
     <string name="language">Lingua</string>
 
-    <string name="type">Tipo</string>
-    <string name="generic">Generico</string>
-    <string name="shopping">Spesa</string>
-    <string name="transport">Trasporti</string>
-    <string name="rent">Affitto</string>
     <string name="date">Data</string>
 
     <string name="translation_warning">Riavvia l\'app per rendere le modifiche effettive</string>
@@ -81,7 +76,7 @@
     <string name="edit_profile">Modifica il profilo</string>
     <string name="edit_propic">Carica la foto profilo</string>
     <string name="edit_full_name">Modifica il nome</string>
-    <string name="purchase_type_icon">Icona di tipo acquisto</string>
+    <string name="purchase_category_icon">Icona di categoria acquisto</string>
     <string name="no_purchases">Nessun acquisto</string>
 
     <string name="housing">Abitazioni</string>

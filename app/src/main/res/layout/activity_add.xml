@@ -162,14 +162,14 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/type_textInputLayout"
+                    android:id="@+id/category_textInputLayout"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="5dp"
-                    android:hint="@string/type"
-                    android:labelFor="@id/type_auto_complete_TV"
+                    android:hint="@string/category"
+                    android:labelFor="@id/category_auto_complete_TV"
                     android:paddingBottom="70dp"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
@@ -182,7 +182,7 @@
                     app:startIconDrawable="@drawable/ic_tag">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/type_auto_complete_TV"
+                        android:id="@+id/category_auto_complete_TV"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
