@@ -44,13 +44,9 @@ class MenuFragment : BaseFragment(), MenuListener {
                 viewModel.setDynamicColor(isChecked)
                 (activity as HomeActivity).showSnackBar(
                     getString(R.string.restart_app_changes),
-                    false
-                ).also { snackBar ->
-                    snackBar.setAction(getString(R.string.restart)) {
-                        (activity as HomeActivity).finish()
-                    }
-
-                    snackBar.show()
+                    getString(R.string.restart)
+                ) {
+                    (activity as HomeActivity).finish()
                 }
             }
         }

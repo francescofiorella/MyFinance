@@ -206,11 +206,10 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
                 (activity as HomeActivity).showSnackBar(
                     result.message,
-                    actionText = getString(R.string.cancel),
-                    actionFun = {
-                        viewModel.addPurchase(purchase)
-                    }
-                )
+                    getString(R.string.cancel)
+                ) {
+                    viewModel.addPurchase(purchase)
+                }
             } else {
                 (activity as HomeActivity).showSnackBar(result.message)
             }
@@ -287,20 +286,20 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             doubleToPrice(purchase.price ?: 0.0)
         layout.findViewById<MaterialButton>(R.id.purchaseCategoryIcon).icon =
             ContextCompat.getDrawable(
-            requireContext(),
-            when (purchase.type) {
-                DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
-                else -> R.drawable.ic_tag
-            }
-        )
+                requireContext(),
+                when (purchase.type) {
+                    DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                    DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                    DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                    DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                    DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                    DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                    DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                    DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                    DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                    else -> R.drawable.ic_tag
+                }
+            )
 
         if (fromCategoryIcon) {
             layout.findViewById<LinearLayout>(R.id.editPurchaseLayout).visibility = View.GONE

@@ -43,8 +43,7 @@ fun Activity.setFullScreenEnabled(enable: Boolean) {
 
 fun Activity.snackBar(
     message: String,
-    anchor: View? = null,
-    show: Boolean = true,
+    anchorView: View? = null,
     actionText: String? = null,
     actionFun: () -> Unit = {}
 ): Snackbar {
@@ -52,7 +51,7 @@ fun Activity.snackBar(
     val nunito = ResourcesCompat.getFont(applicationContext, R.font.nunito)
 
     Snackbar.make(root, message, BaseTransientBottomBar.LENGTH_SHORT).also { snackBar ->
-        anchor?.let {
+        anchorView?.let {
             snackBar.setAnchorView(it)
         }
 
@@ -61,14 +60,13 @@ fun Activity.snackBar(
         val tv = snackBar.view.findViewById<TextView>(R.id.snackbar_text)
         tv.typeface = nunito
 
-        if (show)
-            snackBar.show()
-
         actionText?.also { text ->
             snackBar.setAction(text) {
                 actionFun()
             }
         }
+
+        snackBar.show()
 
         return snackBar
     }
