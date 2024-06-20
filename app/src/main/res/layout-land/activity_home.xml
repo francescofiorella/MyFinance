@@ -48,7 +48,7 @@
             android:id="@+id/titleLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_marginHorizontal="5dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/nav_rail"
             app:layout_constraintTop_toTopOf="parent">
@@ -63,24 +63,39 @@
                 android:onClick="onBackClick"
                 android:padding="@dimen/arrow_padding"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/fragmentTitle"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/fragmentTitle"
+                app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_west" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/myFinanceTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/title_distance_from_arrow"
+                android:layout_marginTop="@dimen/title_margin_top"
+                android:fontFamily="@font/nunito_bold"
+                android:paddingHorizontal="@dimen/title_padding"
+                android:paddingTop="@dimen/title_padding"
+                android:text="@string/app_name"
+                android:textColor="@color/primary_text"
+                android:textSize="@dimen/title_size"
+                app:layout_constraintStart_toEndOf="@id/back_arrow"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/fragmentTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/title_distance_from_arrow"
-                android:layout_marginTop="@dimen/title_margin_top"
-                android:fontFamily="@font/nunito_bold"
-                android:padding="@dimen/title_padding"
+                android:fontFamily="@font/nunito"
+                android:paddingHorizontal="@dimen/title_padding"
+                android:paddingBottom="@dimen/title_padding"
                 android:text="@string/nav_1"
                 android:textColor="@color/primary_text"
-                android:textSize="@dimen/title_size"
+                android:textSize="16sp"
                 app:layout_constraintStart_toEndOf="@id/back_arrow"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/myFinanceTitle" />
 
             <ImageView
                 android:id="@+id/propic_image_view"
@@ -89,9 +104,9 @@
                 android:layout_marginEnd="@dimen/profile_picture_margin_end"
                 android:contentDescription="@string/profile_picture"
                 android:onClick="onProPicClick"
-                app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
+                app:layout_constraintBottom_toBottomOf="@id/fragmentTitle"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/fragmentTitle"
+                app:layout_constraintTop_toTopOf="@id/myFinanceTitle"
                 app:srcCompat="@drawable/ic_user"
                 app:srcRound="@{viewModel.getProPic()}" />
 
@@ -100,15 +115,16 @@
                 style="?attr/materialIconButtonFilledTonalStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="11dp"
                 android:onClick="@{viewModel::onLogoutButtonClick}"
                 android:visibility="gone"
                 app:icon="@drawable/ic_logout"
-                app:layout_constraintBottom_toBottomOf="@+id/fragmentTitle"
+                app:layout_constraintBottom_toBottomOf="@id/fragmentTitle"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/fragmentTitle" />
+                app:layout_constraintTop_toTopOf="@id/myFinanceTitle" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/home_fragmentContainerView"

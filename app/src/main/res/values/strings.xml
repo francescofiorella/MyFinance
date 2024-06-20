@@ -5,6 +5,7 @@
     <string name="nav_2">Payments</string>
     <string name="nav_3">Profile</string>
     <string name="nav_4">Menu</string>
+    <string name="nav_5">Budget</string>
     <string name="add_purchase">New Payment</string>
 
     <string name="addBtnContentDescription">Add a payment</string>
@@ -78,7 +79,6 @@
     <string name="month_of_total" translatable="false">%1$s %2$d</string>
 
     <string name="empty" translatable="false">"   "</string>
-    <string name="nav_5" translatable="false">Budget</string>
     <string name="sign_up_provider">Signed up with Google</string>
     <string name="signUpDate">Account created in %1$s</string>
 
