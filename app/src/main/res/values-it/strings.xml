@@ -6,7 +6,7 @@
     <string name="nav_3">Profilo</string>
     <string name="nav_4">Menu</string>
     <string name="nav_5">Budget</string>
-    <string name="add_purchase">Nuovo Pagamento</string>
+    <string name="add_purchase">Nuovo pagamento</string>
 
     <string name="addBtnContentDescription">Aggiungi un pagamento</string>
 
