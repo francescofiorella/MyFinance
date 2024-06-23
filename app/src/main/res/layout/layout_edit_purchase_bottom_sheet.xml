@@ -79,69 +79,65 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/edit_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground">
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
 
             <ImageView
                 android:id="@+id/edit_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
                 android:contentDescription="@string/edit"
                 android:paddingVertical="15dp"
-                android:src="@drawable/ic_outline_create"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/ic_outline_create" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/editTV"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginStart="20dp"
+                android:layout_weight="1"
                 android:fontFamily="@font/nunito"
                 android:text="@string/edit"
                 android:textColor="@color/primary_text"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="@id/edit_icon"
-                app:layout_constraintStart_toEndOf="@id/edit_icon"
-                app:layout_constraintTop_toTopOf="@id/edit_icon" />
+                android:textSize="16sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/delete_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground">
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
 
             <ImageView
                 android:id="@+id/delete_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
                 android:contentDescription="@string/delete"
                 android:paddingVertical="15dp"
-                android:src="@drawable/ic_outline_delete"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/ic_outline_delete" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/deleteTV"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginStart="20dp"
+                android:layout_weight="1"
                 android:fontFamily="@font/nunito"
                 android:text="@string/delete"
                 android:textColor="@color/primary_text"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="@id/delete_icon"
-                app:layout_constraintStart_toEndOf="@id/delete_icon"
-                app:layout_constraintTop_toTopOf="@id/delete_icon" />
+                android:textSize="16sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -150,6 +146,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider">
@@ -168,11 +165,12 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent=".67" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/housing_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
+            android:orientation="vertical"
             android:paddingVertical="15dp"
             app:layout_constraintEnd_toStartOf="@id/start_guide"
             app:layout_constraintStart_toStartOf="parent"
@@ -182,31 +180,28 @@
                 android:id="@+id/housing_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/housing"
-                android:src="@drawable/ic_baseline_home"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/ic_baseline_home" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/housingTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/nunito"
                 android:text="@string/housing"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/housing_icon" />
+                android:textSize="14sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/groceries_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
+            android:orientation="vertical"
             android:paddingVertical="15dp"
             app:layout_constraintEnd_toStartOf="@id/end_guide"
             app:layout_constraintStart_toEndOf="@id/start_guide"
@@ -216,31 +211,28 @@
                 android:id="@+id/groceries_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/groceries"
-                android:src="@drawable/ic_shopping_cart"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/ic_shopping_cart" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/groceriesTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/nunito"
                 android:text="@string/groceries"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/groceries_icon" />
+                android:textSize="14sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/personal_care_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
+            android:orientation="vertical"
             android:paddingVertical="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/end_guide"
@@ -250,31 +242,28 @@
                 android:id="@+id/personal_care_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/personal_care"
-                android:src="@drawable/ic_self_care"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/ic_self_care" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/personal_careTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/nunito"
                 android:text="@string/personal_care"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/personal_care_icon" />
+                android:textSize="14sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/entertainment_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
+            android:orientation="vertical"
             android:paddingVertical="15dp"
             app:layout_constraintEnd_toStartOf="@id/start_guide"
             app:layout_constraintStart_toStartOf="parent"
@@ -284,31 +273,28 @@
                 android:id="@+id/entertainment_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/entertainment"
-                android:src="@drawable/ic_theater_comedy"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/ic_theater_comedy" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/entertainmentTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/nunito"
                 android:text="@string/entertainment"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/entertainment_icon" />
+                android:textSize="14sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/education_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
+            android:orientation="vertical"
             android:paddingVertical="15dp"
             app:layout_constraintEnd_toStartOf="@id/end_guide"
             app:layout_constraintStart_toEndOf="@id/start_guide"
@@ -318,31 +304,28 @@
                 android:id="@+id/education_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/education"
-                android:src="@drawable/ic_school"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/ic_school" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/educationTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/nunito"
                 android:text="@string/education"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/education_icon" />
+                android:textSize="14sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/dining_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
+            android:orientation="vertical"
             android:paddingVertical="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/end_guide"
@@ -352,31 +335,28 @@
                 android:id="@+id/dining_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/dining"
-                android:src="@drawable/ic_restaurant"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/ic_restaurant" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/diningTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/nunito"
                 android:text="@string/dining"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/dining_icon" />
+                android:textSize="14sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/health_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
+            android:orientation="vertical"
             android:paddingVertical="15dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/start_guide"
@@ -387,31 +367,28 @@
                 android:id="@+id/health_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/health"
-                android:src="@drawable/ic_vaccines"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/ic_vaccines" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/healthTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/nunito"
                 android:text="@string/health"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/health_icon" />
+                android:textSize="14sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/transportation_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
+            android:orientation="vertical"
             android:paddingVertical="15dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/end_guide"
@@ -422,31 +399,28 @@
                 android:id="@+id/transportation_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/transportation"
-                android:src="@drawable/ic_directions_transit"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/ic_directions_transit" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/transportationTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/nunito"
                 android:text="@string/transportation"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/transportation_icon" />
+                android:textSize="14sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/miscellaneous_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
+            android:orientation="vertical"
             android:paddingVertical="15dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -457,25 +431,21 @@
                 android:id="@+id/miscellaneous_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/miscellaneous"
-                android:src="@drawable/ic_tag"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/ic_tag" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/miscellaneousTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/nunito"
                 android:text="@string/miscellaneous"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/miscellaneous_icon" />
+                android:textSize="14sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

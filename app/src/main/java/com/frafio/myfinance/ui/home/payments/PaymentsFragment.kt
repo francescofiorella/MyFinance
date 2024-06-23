@@ -277,8 +277,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         dismissFun: () -> Unit,
         fromCategoryIcon: Boolean = false
     ) {
-        val editLayout = layout.findViewById<ConstraintLayout>(R.id.edit_layout)
-        val deleteLayout = layout.findViewById<ConstraintLayout>(R.id.delete_layout)
         layout.findViewById<MaterialTextView>(R.id.nameTV).text = purchase.name
         layout.findViewById<MaterialTextView>(R.id.dateTV).text =
             dateToString(purchase.day, purchase.month, purchase.year)
@@ -304,15 +302,15 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         if (fromCategoryIcon) {
             layout.findViewById<LinearLayout>(R.id.editPurchaseLayout).visibility = View.GONE
             layout.findViewById<ConstraintLayout>(R.id.editCategoryLayout).visibility = View.VISIBLE
-            layout.findViewById<ConstraintLayout>(R.id.housing_layout).setOnClickListener {
+            layout.findViewById<LinearLayout>(R.id.housing_layout).setOnClickListener {
                 viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.HOUSING.value, position)
                 dismissFun()
             }
-            layout.findViewById<ConstraintLayout>(R.id.groceries_layout).setOnClickListener {
+            layout.findViewById<LinearLayout>(R.id.groceries_layout).setOnClickListener {
                 viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.GROCERIES.value, position)
                 dismissFun()
             }
-            layout.findViewById<ConstraintLayout>(R.id.personal_care_layout).setOnClickListener {
+            layout.findViewById<LinearLayout>(R.id.personal_care_layout).setOnClickListener {
                 viewModel.updateCategory(
                     purchase,
                     DbPurchases.CATEGORIES.PERSONAL_CARE.value,
@@ -320,7 +318,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 )
                 dismissFun()
             }
-            layout.findViewById<ConstraintLayout>(R.id.entertainment_layout).setOnClickListener {
+            layout.findViewById<LinearLayout>(R.id.entertainment_layout).setOnClickListener {
                 viewModel.updateCategory(
                     purchase,
                     DbPurchases.CATEGORIES.ENTERTAINMENT.value,
@@ -328,19 +326,19 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 )
                 dismissFun()
             }
-            layout.findViewById<ConstraintLayout>(R.id.education_layout).setOnClickListener {
+            layout.findViewById<LinearLayout>(R.id.education_layout).setOnClickListener {
                 viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.EDUCATION.value, position)
                 dismissFun()
             }
-            layout.findViewById<ConstraintLayout>(R.id.dining_layout).setOnClickListener {
+            layout.findViewById<LinearLayout>(R.id.dining_layout).setOnClickListener {
                 viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.DINING.value, position)
                 dismissFun()
             }
-            layout.findViewById<ConstraintLayout>(R.id.health_layout).setOnClickListener {
+            layout.findViewById<LinearLayout>(R.id.health_layout).setOnClickListener {
                 viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.HEALTH.value, position)
                 dismissFun()
             }
-            layout.findViewById<ConstraintLayout>(R.id.transportation_layout).setOnClickListener {
+            layout.findViewById<LinearLayout>(R.id.transportation_layout).setOnClickListener {
                 viewModel.updateCategory(
                     purchase,
                     DbPurchases.CATEGORIES.TRANSPORTATION.value,
@@ -348,7 +346,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 )
                 dismissFun()
             }
-            layout.findViewById<ConstraintLayout>(R.id.miscellaneous_layout).setOnClickListener {
+            layout.findViewById<LinearLayout>(R.id.miscellaneous_layout).setOnClickListener {
                 viewModel.updateCategory(
                     purchase,
                     DbPurchases.CATEGORIES.MISCELLANEOUS.value,
@@ -359,6 +357,8 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             return
         }
 
+        val editLayout = layout.findViewById<LinearLayout>(R.id.edit_layout)
+        val deleteLayout = layout.findViewById<LinearLayout>(R.id.delete_layout)
         layout.findViewById<LinearLayout>(R.id.editPurchaseLayout).visibility = View.VISIBLE
         layout.findViewById<ConstraintLayout>(R.id.editCategoryLayout).visibility = View.GONE
         editLayout.setOnClickListener {

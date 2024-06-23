@@ -14,19 +14,16 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:visibility="@{viewModel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.20"
             tools:visibility="gone">
 
             <ImageView
@@ -62,13 +59,9 @@
         <ScrollView
             android:id="@+id/dashboard_scrollView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:fillViewport="true"
             android:scrollbars="none"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible">
 
             <GridLayout
@@ -94,9 +87,10 @@
                     android:clipToPadding="false"
                     app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="vertical"
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
 
@@ -104,28 +98,25 @@
                             android:id="@+id/dayAvg_TV_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
                             android:text="@string/avg_day"
-                            android:textSize="@dimen/card_title_size"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/dayAvg_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
                             android:text="@{viewModel.dayAvgString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/dayAvg_TV_title"
                             tools:text="€ 0.00" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -143,9 +134,10 @@
                     android:clipToPadding="false"
                     app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="vertical"
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
 
@@ -153,28 +145,25 @@
                             android:id="@+id/monthAvg_TV_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
                             android:text="@string/avg_month"
-                            android:textSize="@dimen/card_title_size"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/monthAvg_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
                             android:text="@{viewModel.monthAvgString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/monthAvg_TV_title"
                             tools:text="€ 0.00" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -191,9 +180,10 @@
                     android:layout_marginBottom="@dimen/card_half_margin"
                     app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="vertical"
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
 
@@ -201,28 +191,25 @@
                             android:id="@+id/todayTot_TV_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
                             android:text="@string/today"
-                            android:textSize="@dimen/card_title_size"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/todayTot_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
                             android:text="@{viewModel.todayTotString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/todayTot_TV_title"
                             tools:text="€ 0.00" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -239,9 +226,10 @@
                     android:layout_marginBottom="@dimen/card_half_margin"
                     app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="vertical"
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
 
@@ -249,28 +237,25 @@
                             android:id="@+id/numTot_TV_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
                             android:text="@string/this_month"
-                            android:textSize="@dimen/card_title_size"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/numTot_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
                             android:text="@{viewModel.lastMonthString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/numTot_TV_title"
                             tools:text="€ 0.00" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -287,9 +272,10 @@
                     android:layout_marginBottom="@dimen/card_half_margin"
                     app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="vertical"
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
 
@@ -297,28 +283,25 @@
                             android:id="@+id/tot_TV_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
                             android:text="@string/total"
-                            android:textSize="@dimen/card_title_size"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/tot_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
                             android:text="@{viewModel.totString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/tot_TV_title"
                             tools:text="€ 0.00" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -335,9 +318,10 @@
                     android:layout_marginBottom="@dimen/card_half_margin"
                     app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="vertical"
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
 
@@ -345,28 +329,25 @@
                             android:id="@+id/ticketTot_TV_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
                             android:text="@string/total_rent"
-                            android:textSize="@dimen/card_title_size"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/ticketTot_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
                             android:text="@{viewModel.rentTotString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/ticketTot_TV_title"
                             tools:text="€ 0.00" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -383,9 +364,10 @@
                     android:layout_marginBottom="@dimen/dashboard_bottom_margin"
                     app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="vertical"
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
 
@@ -393,28 +375,25 @@
                             android:id="@+id/trenTot_TV_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
                             android:text="@string/total_shopping"
-                            android:textSize="@dimen/card_title_size"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/trenTot_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
                             android:text="@{viewModel.shoppingTotString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/trenTot_TV_title"
                             tools:text="€ 0.00" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -431,9 +410,10 @@
                     android:layout_marginBottom="@dimen/dashboard_bottom_margin"
                     app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="vertical"
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
 
@@ -441,28 +421,25 @@
                             android:id="@+id/amTot_TV_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
                             android:text="@string/total_transport"
-                            android:textSize="@dimen/card_title_size"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/amTot_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="start"
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
                             android:text="@{viewModel.transportTotString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/amTot_TV_title"
                             tools:text="€ 0.00" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -470,7 +447,7 @@
 
         </ScrollView>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </layout>
 

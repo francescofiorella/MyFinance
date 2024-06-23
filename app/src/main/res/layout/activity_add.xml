@@ -69,10 +69,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/add_purchaseTitle">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
+                android:orientation="vertical"
                 android:paddingTop="@dimen/title_margin_bottom">
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -87,9 +88,6 @@
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
                     app:endIconMode="clear_text"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
                     app:startIconDrawable="@drawable/ic_payments_myfinance">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -115,9 +113,6 @@
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
                     app:endIconMode="clear_text"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/name_textInputLayout"
                     app:startIconDrawable="@drawable/ic_attach_money">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -145,9 +140,6 @@
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
                     app:endIconDrawable="@drawable/ic_arrow_drop_down"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/price_textInputLayout"
                     app:startIconDrawable="@drawable/ic_today">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -176,9 +168,6 @@
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
                     app:endIconDrawable="@drawable/ic_arrow_drop_down"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/date_picker_textInputLayout"
                     app:startIconDrawable="@drawable/ic_tag">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -190,7 +179,7 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
 
         </ScrollView>
 

@@ -55,7 +55,6 @@
 
     <string name="back_arrow" translatable="false">Back Arrow</string>
     <string name="trend_avg_day">Daily Average Trend</string>
-    <string name="year">Year %1$s</string>
     <string name="language">Language</string>
     <string name="dashboard_empty" translatable="false">dashboard_empty</string>
     <string name="list_empty" translatable="false">list_empty</string>
@@ -96,6 +95,8 @@
     <string name="edit_full_name">Edit the full name</string>
     <string name="purchase_category_icon">Purchase Category Icon</string>
     <string name="no_purchases">No purchases</string>
+
+    <string name="monthly_budget">Monthly budget</string>
 
     <string name="housing">Housing</string>
     <string name="groceries">Groceries</string>

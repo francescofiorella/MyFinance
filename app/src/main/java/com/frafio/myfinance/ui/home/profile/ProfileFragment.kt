@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatEditText
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
@@ -127,8 +127,8 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         viewModel: ProfileViewModel,
         dismissFun: () -> Unit
     ) {
-        val propicLayout = layout.findViewById<ConstraintLayout>(R.id.propic_layout)
-        val fullNameLayout = layout.findViewById<ConstraintLayout>(R.id.full_name_layout)
+        val propicLayout = layout.findViewById<LinearLayout>(R.id.propic_layout)
+        val fullNameLayout = layout.findViewById<LinearLayout>(R.id.full_name_layout)
         val fullNameET = layout.findViewById<AppCompatEditText>(R.id.full_nameET)
         val fullNameBtn = layout.findViewById<Button>(R.id.full_name_btn)
 

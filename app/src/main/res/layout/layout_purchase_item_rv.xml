@@ -17,19 +17,18 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/recView_purchaseItem_dataLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:paddingHorizontal="20dp"
             android:visibility="@{purchase.category == DbPurchases.CATEGORIES.TOTAL.value ? View.VISIBLE : View.GONE}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible">
 
             <com.google.android.material.textview.MaterialTextView
@@ -40,20 +39,15 @@
                 android:fontFamily="@font/nunito"
                 android:text="@{FormatUtilsKt.dateToString(purchase.day, purchase.month, purchase.year)}"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 tools:text="01/01/2000" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/recView_purchaseItem_divider"
                 android:layout_width="0dp"
-                android:layout_height="0.1dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginHorizontal="10dp"
-                app:layout_constraintBottom_toBottomOf="@id/recView_purchaseItem_dataTextView"
-                app:layout_constraintEnd_toStartOf="@id/recView_purchaseItem_priceTotalTextView"
-                app:layout_constraintStart_toEndOf="@id/recView_purchaseItem_dataTextView"
-                app:layout_constraintTop_toTopOf="@id/recView_purchaseItem_dataTextView" />
+                android:layout_weight="1" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/recView_purchaseItem_priceTotalTextView"
@@ -63,12 +57,9 @@
                 android:fontFamily="@font/nunito"
                 android:text="@{FormatUtilsKt.doubleToPrice(purchase.price)}"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 tools:text="€ 0.00" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/recView_purchaseItem_constraintLayout"
@@ -78,9 +69,7 @@
             android:clickable="@{purchase.category != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
             android:focusable="@{purchase.category != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
             android:longClickable="@{purchase.category != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
-            android:paddingHorizontal="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recView_purchaseItem_dataLayout">
+            android:paddingHorizontal="20dp">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/recView_purchaseItem_totalTextView"
@@ -154,6 +143,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </layout>

@@ -53,7 +53,6 @@
     <string name="profile_picture">Immagine di profilo</string>
 
     <string name="trend_avg_day">Trend Media Giornaliera</string>
-    <string name="year">Anno %1$s</string>
     <string name="language">Lingua</string>
 
     <string name="date">Data</string>
@@ -79,6 +78,8 @@
     <string name="edit_full_name">Modifica il nome</string>
     <string name="purchase_category_icon">Icona di categoria acquisto</string>
     <string name="no_purchases">Nessun acquisto</string>
+
+    <string name="monthly_budget">Budget mensile</string>
 
     <string name="housing">Abitazioni</string>
     <string name="groceries">Alimentari</string>

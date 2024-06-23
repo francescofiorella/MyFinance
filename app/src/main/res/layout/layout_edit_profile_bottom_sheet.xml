@@ -6,97 +6,88 @@
     android:orientation="vertical"
     android:paddingVertical="30dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/propic_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground">
+        android:background="?attr/selectableItemBackground"
+        android:orientation="horizontal"
+        android:paddingHorizontal="30dp">
 
         <ImageView
             android:id="@+id/propic_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
             android:contentDescription="@string/profile_picture"
             android:paddingVertical="15dp"
-            android:src="@drawable/ic_upload"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:src="@drawable/ic_outline_file_upload" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/propicTV"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginStart="20dp"
+            android:layout_weight="1"
             android:fontFamily="@font/nunito"
             android:text="@string/edit_propic"
             android:textColor="@color/primary_text"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@id/propic_icon"
-            app:layout_constraintStart_toEndOf="@id/propic_icon"
-            app:layout_constraintTop_toTopOf="@id/propic_icon" />
+            android:textSize="16sp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/full_name_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground">
+        android:background="?attr/selectableItemBackground"
+        android:orientation="horizontal"
+        android:paddingHorizontal="30dp">
 
         <ImageView
             android:id="@+id/full_name_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
             android:contentDescription="@string/name"
             android:paddingVertical="15dp"
-            android:src="@drawable/ic_create"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:src="@drawable/ic_outline_create" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/full_nameTV"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginStart="20dp"
+            android:layout_weight="1"
             android:fontFamily="@font/nunito"
             android:text="@string/edit_full_name"
             android:textColor="@color/primary_text"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@id/full_name_icon"
-            app:layout_constraintStart_toEndOf="@id/full_name_icon"
-            app:layout_constraintTop_toTopOf="@id/full_name_icon" />
+            android:textSize="16sp" />
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/full_nameET"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="5dp"
+            android:layout_weight="1"
             android:fontFamily="@font/nunito"
             android:hint="@string/signup_name"
             android:textSize="16sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/full_name_icon"
-            app:layout_constraintEnd_toStartOf="@id/full_name_btn"
-            app:layout_constraintStart_toEndOf="@id/full_name_icon"
-            app:layout_constraintTop_toTopOf="@id/full_name_icon" />
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/full_name_btn"
             style="?attr/materialIconButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="30dp"
+            android:layout_gravity="center"
             android:contentDescription="@string/edit_full_name"
             android:enabled="false"
             android:visibility="gone"
-            app:icon="@drawable/ic_check"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:icon="@drawable/ic_check" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </LinearLayout>

@@ -7,13 +7,13 @@ object DbPurchases {
         PURCHASES("purchases"),
         PAYMENTS("payments"),
         NAME("name"),
-        EMAIL("email"),
         YEAR("year"),
         MONTH("month"),
         DAY("day"),
-        TYPE("type"),
+        TIMESTAMP("timestamp"),
         PRICE("price"),
         CATEGORY("category"),
+        ID("id")
     }
 
     enum class NAMES(val value: String, val value_en: String, val value_it: String) {
