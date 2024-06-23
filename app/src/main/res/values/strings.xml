@@ -97,6 +97,8 @@
     <string name="no_purchases">No purchases</string>
 
     <string name="monthly_budget">Monthly budget</string>
+    <string name="annual_budget">Annual budget</string>
+    <string name="incomes">Incomes</string>
 
     <string name="housing">Housing</string>
     <string name="groceries">Groceries</string>
