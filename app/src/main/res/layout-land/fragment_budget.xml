@@ -27,11 +27,9 @@
             android:id="@+id/comingSoonImage"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginVertical="20dp"
             android:layout_marginStart="40dp"
             android:contentDescription="@string/coming_soon"
             android:src="@drawable/image_coming_soon"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@id/guideline"
             app:layout_constraintHorizontal_bias="1.0"
@@ -49,10 +47,10 @@
             android:textAlignment="textStart"
             android:textColor="@color/primary_text"
             android:textSize="21sp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/comingSoonImage"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/guideline"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/comingSoonImage" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
