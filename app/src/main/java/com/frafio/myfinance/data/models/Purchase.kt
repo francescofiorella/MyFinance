@@ -1,31 +1,32 @@
 package com.frafio.myfinance.data.models
 
 import com.frafio.myfinance.utils.dateToString
+import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.IgnoreExtraProperties
 import java.time.LocalDate
 
+@IgnoreExtraProperties
 data class Purchase(
-    val email: String? = null,
     val name: String? = null,
     val price: Double? = null,
     val year: Int? = null,
     val month: Int? = null,
     val day: Int? = null,
-    val type: Int? = null,
-    var id: String? = null,
-    val category: String? = null
+    var timestamp: Long? = null,
+    val category: Int? = null,
+    @Exclude var id: String? = null
 ) {
-    fun updateID(id: String) {
-        this.id = id
-    }
-
+    @Exclude
     fun getTotalId(): String {
         return "${day}_${month}_${year}"
     }
 
+    @Exclude
     fun getDateString(): String {
         return dateToString(day, month, year) ?: ""
     }
 
+    @Exclude
     fun getLocalDate(): LocalDate {
         return LocalDate.of(year!!, month!!, day!!)
     }

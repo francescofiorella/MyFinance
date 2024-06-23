@@ -100,7 +100,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .add(purchase).addOnSuccessListener {
-                purchase.updateID(it.id)
+                purchase.id = it.id
                 val totalIndex = PurchaseStorage.addPurchase(purchase)
                 response.value = PurchaseResult(
                     PurchaseCode.PURCHASE_ADD_SUCCESS,

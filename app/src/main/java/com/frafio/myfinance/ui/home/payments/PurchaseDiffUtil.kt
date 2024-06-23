@@ -21,8 +21,6 @@ class PurchaseDiffUtil(
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return when {
-            oldPurchaseList[oldItemPosition].email != newPurchaseList[newItemPosition].email -> false
-
             oldPurchaseList[oldItemPosition].name != newPurchaseList[newItemPosition].name -> false
 
             oldPurchaseList[oldItemPosition].price != newPurchaseList[newItemPosition].price -> false
@@ -33,7 +31,7 @@ class PurchaseDiffUtil(
 
             oldPurchaseList[oldItemPosition].day != newPurchaseList[newItemPosition].day -> false
 
-            oldPurchaseList[oldItemPosition].type != newPurchaseList[newItemPosition].type -> false
+            oldPurchaseList[oldItemPosition].timestamp != newPurchaseList[newItemPosition].timestamp -> false
 
             oldPurchaseList[oldItemPosition].category != newPurchaseList[newItemPosition].category -> false
 

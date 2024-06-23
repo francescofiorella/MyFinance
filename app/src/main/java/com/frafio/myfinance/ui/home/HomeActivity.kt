@@ -3,6 +3,7 @@ package com.frafio.myfinance.ui.home
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
@@ -27,6 +28,7 @@ import com.frafio.myfinance.ui.home.dashboard.DashboardFragment
 import com.frafio.myfinance.ui.home.menu.MenuFragment
 import com.frafio.myfinance.ui.home.payments.PaymentsFragment
 import com.frafio.myfinance.ui.home.profile.ProfileFragment
+import com.frafio.myfinance.utils.animateRoot
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
@@ -208,6 +210,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     }
 
     private fun navigateTo(itemId: Int) {
+        if (activeFragment is ProfileFragment) {
+            (binding.root as ViewGroup).animateRoot()
+        }
         when (itemId) {
             R.id.dashboardFragment -> {
                 binding.backArrow.instantHide()
@@ -277,6 +282,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             }
 
             R.id.profileFragment -> {
+                (binding.root as ViewGroup).animateRoot()
                 binding.backArrow.instantShow()
                 binding.homeAddBtn?.instantHide()
                 binding.homeAddExtBtn?.instantHide()

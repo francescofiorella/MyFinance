@@ -1,6 +1,9 @@
 package com.frafio.myfinance.utils
 
+import android.transition.AutoTransition
+import android.transition.TransitionManager
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -20,6 +23,12 @@ fun View.instantHide() {
 
 fun TextView.clearText() {
     text = ""
+}
+
+fun ViewGroup.animateRoot(duration: Long = 100) {
+    val transition = AutoTransition()
+    transition.duration = duration
+    TransitionManager.beginDelayedTransition(this, transition)
 }
 
 fun ValueLineChart.setValueLineChartData(list: List<Pair<String, Double>>, dynamicColors: Boolean) {

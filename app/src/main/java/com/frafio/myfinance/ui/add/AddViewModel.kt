@@ -10,11 +10,10 @@ import com.frafio.myfinance.data.models.DatePickerButton
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.repositories.PurchaseRepository
-import com.frafio.myfinance.data.repositories.UserRepository
+import com.frafio.myfinance.utils.dateToUTCTimestamp
 import java.time.LocalDate
 
 class AddViewModel(application: Application) : AndroidViewModel(application) {
-    private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
     private val purchaseRepository = PurchaseRepository(
         (application as MyFinanceApplication).purchaseManager
     )
@@ -47,8 +46,6 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
     fun onAddButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         listener?.onAddStart()
 
-        val userEmail = userRepository.getUser()!!.email
-
         // check info
         if (name.isNullOrEmpty()) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_NAME))
@@ -74,16 +71,27 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
 
         if (requestCode == AddActivity.REQUEST_ADD_CODE) {
             val purchase = Purchase(
-                userEmail, name, price, year, month, day, category,
-                category = ""
+                name,
+                price,
+                year,
+                month,
+                day,
+                dateToUTCTimestamp(year!!, month!!, day!!),
+                category
             )
             val response = purchaseRepository.addPurchase(purchase)
             listener?.onAddSuccess(response)
         } else if (requestCode == AddActivity.REQUEST_EDIT_CODE) {
             val purchase =
                 Purchase(
-                    userEmail, name, price, year, month, day, category, purchaseID,
-                    category = ""
+                    name,
+                    price,
+                    year,
+                    month,
+                    day,
+                    dateToUTCTimestamp(year!!, month!!, day!!),
+                    category,
+                    purchaseID
                 )
 
             val response =

@@ -44,11 +44,11 @@ class PurchaseAdapter(
             listener.onItemInteraction(ON_LOAD_MORE_REQUEST, currentPurchase, position)
         }
 
-        if (currentPurchase.type != DbPurchases.CATEGORIES.TOTAL.value) {
+        if (currentPurchase.category != DbPurchases.CATEGORIES.TOTAL.value) {
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon.icon =
                 ContextCompat.getDrawable(
                     holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon.context,
-                    when (purchases[position].type) {
+                    when (purchases[position].category) {
                         DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
                         DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
                         DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
@@ -64,7 +64,8 @@ class PurchaseAdapter(
             val types = holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemCategoryTextView
                 .context.resources.getStringArray(R.array.categories)
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemCategoryTextView
-                .text = types[currentPurchase.type ?: DbPurchases.CATEGORIES.MISCELLANEOUS.value]
+                .text =
+                types[currentPurchase.category ?: DbPurchases.CATEGORIES.MISCELLANEOUS.value]
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener {
                     listener.onItemInteraction(

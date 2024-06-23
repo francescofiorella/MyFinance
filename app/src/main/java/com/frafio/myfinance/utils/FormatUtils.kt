@@ -2,13 +2,15 @@ package com.frafio.myfinance.utils
 
 import com.frafio.myfinance.R
 import com.frafio.myfinance.Strings
+import java.sql.Timestamp
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import java.util.*
+import java.util.Locale
 import kotlin.math.round
 
 fun doubleToString(double: Double): String {
@@ -79,3 +81,9 @@ fun Long.toLocalDateTime(): LocalDateTime =
 
 fun Long.toUTCLocalDateTime(): LocalDateTime =
     LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.ofOffset("UTC", ZoneOffset.UTC))
+
+fun dateToUTCTimestamp(year: Int, month: Int, day: Int): Long {
+    val localDate = LocalDate.of(year, month, day)
+    val instant = localDate.atStartOfDay().toInstant(ZoneOffset.UTC)
+    return Timestamp.from(instant).time
+}

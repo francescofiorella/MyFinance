@@ -1,8 +1,6 @@
 package com.frafio.myfinance.ui.home.menu
 
 import android.os.Bundle
-import android.transition.AutoTransition
-import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +14,7 @@ import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentMenuBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.utils.animateRoot
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
@@ -81,19 +80,12 @@ class MenuFragment : BaseFragment(), MenuListener {
         }
     }
 
-    private fun animateRoot() {
-        TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
-        val transition = AutoTransition()
-        transition.duration = 2000
-        TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
-    }
-
     fun refreshPlotData(animate: Boolean = false) {
         binding.lineChart.also { lineChart ->
             val list = viewModel.avgTrendList
 
             if (animate) {
-                animateRoot()
+                (binding.root as ViewGroup).animateRoot()
             }
 
             if (list.size < 2) {

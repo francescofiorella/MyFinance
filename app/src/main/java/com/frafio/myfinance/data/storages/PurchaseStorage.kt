@@ -23,7 +23,7 @@ object PurchaseStorage {
         queryDocumentSnapshots.forEach { document ->
             val purchase = document.toObject(Purchase::class.java)
             // set id
-            purchase.updateID(document.id)
+            purchase.id = document.id
             val todayDate = LocalDate.now()
             val purchaseDate = purchase.getLocalDate()
             var prevDate: LocalDate? = if (total == null) // se primo acquisto
@@ -47,15 +47,13 @@ object PurchaseStorage {
                 // Aggiungi totale a 0 per oggi
                 val totId = "${todayDate.dayOfMonth}_${todayDate.monthValue}_${todayDate.year}"
                 total = Purchase(
-                    email = UserStorage.user!!.email,
                     name = DbPurchases.NAMES.TOTAL.value,
                     price = 0.0,
                     year = todayDate.year,
                     month = todayDate.monthValue,
                     day = todayDate.dayOfMonth,
-                    type = DbPurchases.CATEGORIES.TOTAL.value,
-                    id = totId,
-                    category = purchase.category
+                    category = DbPurchases.CATEGORIES.TOTAL.value,
+                    id = totId
                 )
                 purchaseList.add(total!!)
                 prevDate = total!!.getLocalDate()
@@ -64,28 +62,24 @@ object PurchaseStorage {
             if (prevDate == null) { // If is the first total
                 currentPurchases.add(purchase)
                 total = Purchase(
-                    email = UserStorage.user!!.email,
                     name = DbPurchases.NAMES.TOTAL.value,
                     price = purchase.price,
                     year = purchase.year,
                     month = purchase.month,
                     day = purchase.day,
-                    type = DbPurchases.CATEGORIES.TOTAL.value,
-                    id = purchase.getTotalId(),
-                    category = purchase.category
+                    category = DbPurchases.CATEGORIES.TOTAL.value,
+                    id = purchase.getTotalId()
                 )
             } else if (total!!.id == purchase.getTotalId()) { // If the total should be updated
                 currentPurchases.add(purchase)
                 total = Purchase(
-                    email = UserStorage.user!!.email,
                     name = DbPurchases.NAMES.TOTAL.value,
                     price = total!!.price!! + purchase.price!!,
                     year = total!!.year,
                     month = total!!.month,
                     day = total!!.day,
-                    type = DbPurchases.CATEGORIES.TOTAL.value,
-                    id = total!!.getTotalId(),
-                    category = total!!.category
+                    category = DbPurchases.CATEGORIES.TOTAL.value,
+                    id = total!!.getTotalId()
                 )
             } else { // If we need a new total
                 // Update the local list with previous day purchases
@@ -99,15 +93,13 @@ object PurchaseStorage {
                 currentPurchases.add(purchase)
                 // Create new total
                 total = Purchase(
-                    email = UserStorage.user!!.email,
                     name = DbPurchases.NAMES.TOTAL.value,
                     price = purchase.price,
                     year = purchase.year,
                     month = purchase.month,
                     day = purchase.day,
-                    type = DbPurchases.CATEGORIES.TOTAL.value,
-                    id = purchase.getTotalId(),
-                    category = purchase.category
+                    category = DbPurchases.CATEGORIES.TOTAL.value,
+                    id = purchase.getTotalId()
                 )
             }
         }
@@ -132,15 +124,13 @@ object PurchaseStorage {
         if (purchaseList[i].getDateString() == purchase.getDateString()) {
             // Totale trovato
             val total = Purchase(
-                email = UserStorage.user!!.email,
                 name = DbPurchases.NAMES.TOTAL.value,
                 price = purchaseList[i].price!! + purchase.price!!,
                 year = purchaseList[i].year,
                 month = purchaseList[i].month,
                 day = purchaseList[i].day,
-                type = DbPurchases.CATEGORIES.TOTAL.value,
-                id = purchaseList[i].getTotalId(),
-                category = purchaseList[i].category
+                category = DbPurchases.CATEGORIES.TOTAL.value,
+                id = purchaseList[i].getTotalId()
             )
             purchaseList[i] = total
             totalIndex = i
@@ -158,15 +148,13 @@ object PurchaseStorage {
         } else {
             // Giorno non esistente, aggiungi totale
             val total = Purchase(
-                email = UserStorage.user!!.email,
                 name = DbPurchases.NAMES.TOTAL.value,
                 price = purchase.price,
                 year = purchase.year,
                 month = purchase.month,
                 day = purchase.day,
-                type = DbPurchases.CATEGORIES.TOTAL.value,
-                id = purchase.getTotalId(),
-                category = purchase.category
+                category = DbPurchases.CATEGORIES.TOTAL.value,
+                id = purchase.getTotalId()
             )
             purchaseList.add(i, total)
             totalIndex = i
@@ -178,17 +166,15 @@ object PurchaseStorage {
     fun deletePurchaseAt(position: Int) {
         val todayDate = LocalDate.now()
         for (i in position - 1 downTo 0) {
-            if (purchaseList[i].type == DbPurchases.CATEGORIES.TOTAL.value) {
+            if (purchaseList[i].category == DbPurchases.CATEGORIES.TOTAL.value) {
                 val newTotal = Purchase(
-                    email = UserStorage.user!!.email,
                     name = DbPurchases.NAMES.TOTAL.value,
                     price = purchaseList[i].price!! - purchaseList[position].price!!,
                     year = purchaseList[i].year,
                     month = purchaseList[i].month,
                     day = purchaseList[i].day,
-                    type = DbPurchases.CATEGORIES.TOTAL.value,
-                    id = purchaseList[i].getTotalId(),
-                    category = purchaseList[i].category
+                    category = DbPurchases.CATEGORIES.TOTAL.value,
+                    id = purchaseList[i].getTotalId()
                 )
 
                 purchaseList.removeAt(position)
@@ -216,17 +202,15 @@ object PurchaseStorage {
         } else {
             var i = position - 1
             while (i >= 0) {
-                if (purchaseList[i].type == DbPurchases.CATEGORIES.TOTAL.value) {
+                if (purchaseList[i].category == DbPurchases.CATEGORIES.TOTAL.value) {
                     val total = Purchase(
-                        email = purchaseList[i].email,
                         name = purchaseList[i].name,
                         price = purchaseList[i].price!! - previous.price!! + purchase.price!!,
                         year = purchaseList[i].year,
                         month = purchaseList[i].month,
                         day = purchaseList[i].day,
-                        type = purchaseList[i].type,
-                        id = purchaseList[i].id,
-                        category = purchaseList[i].category
+                        category = purchaseList[i].category,
+                        id = purchaseList[i].id
                     )
                     purchaseList[i] = total
                     break

@@ -113,7 +113,7 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
                 val purchaseDate = purchase.getLocalDate()
                 // consider just the totals
                 if (ChronoUnit.DAYS.between(purchaseDate, todayDate) >= 0 &&
-                    purchase.type == DbPurchases.CATEGORIES.TOTAL.value
+                    purchase.category == DbPurchases.CATEGORIES.TOTAL.value
                 ) {
                     lastDate = dateToString(
                         purchase.day,

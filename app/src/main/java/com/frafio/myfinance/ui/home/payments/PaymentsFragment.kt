@@ -287,7 +287,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         layout.findViewById<MaterialButton>(R.id.purchaseCategoryIcon).icon =
             ContextCompat.getDrawable(
                 requireContext(),
-                when (purchase.type) {
+                when (purchase.category) {
                     DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
                     DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
                     DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
@@ -367,7 +367,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
                 it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
                 it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
-                it.putExtra(AddActivity.PURCHASE_CATEGORY_KEY, purchase.type)
+                it.putExtra(AddActivity.PURCHASE_CATEGORY_KEY, purchase.category)
                 it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
                 it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
                 it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)

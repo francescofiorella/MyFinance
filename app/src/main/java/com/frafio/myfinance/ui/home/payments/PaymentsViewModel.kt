@@ -39,15 +39,13 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
 
     fun updateCategory(purchase: Purchase, newCategory: Int, position: Int) {
         val updated = Purchase(
-            email = purchase.email,
             name = purchase.name,
             price = purchase.price,
             year = purchase.year,
             month = purchase.month,
             day = purchase.day,
-            type = newCategory,
-            id = purchase.id,
-            category = purchase.category
+            category = newCategory,
+            id = purchase.id
         )
         val response = purchaseRepository.editPurchase(updated, position)
         listener?.onUpdateComplete(response)
