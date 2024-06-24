@@ -20,18 +20,29 @@
         android:fillViewport="true"
         android:scrollbars="none">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingTop="@dimen/fragment_margin_top">
 
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/half_guide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent=".5" />
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/monthly_budget_card"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/card_full_margin"
-                app:cardCornerRadius="@dimen/card_corner_radius">
+                android:layout_marginStart="@dimen/card_full_margin"
+                android:layout_marginEnd="@dimen/card_half_margin"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:layout_constraintEnd_toStartOf="@id/half_guide"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -133,11 +144,18 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/annual_budget_card"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/card_full_margin"
+                android:layout_marginStart="@dimen/card_full_margin"
                 android:layout_marginTop="10dp"
-                app:cardCornerRadius="@dimen/card_corner_radius">
+                android:layout_marginEnd="@dimen/card_half_margin"
+                android:layout_marginBottom="@dimen/dashboard_bottom_margin"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/half_guide"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/monthly_budget_card"
+                app:layout_constraintVertical_bias="0.0">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -185,14 +203,15 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginHorizontal="@dimen/card_full_margin"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="@dimen/dashboard_bottom_margin"
-                android:layout_weight="1"
-                android:minHeight="150dp"
-                app:cardCornerRadius="@dimen/card_corner_radius">
+                android:layout_marginStart="@dimen/card_half_margin"
+                android:layout_marginEnd="@dimen/card_full_margin"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:layout_constraintBottom_toBottomOf="@id/annual_budget_card"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/half_guide"
+                app:layout_constraintTop_toTopOf="@id/monthly_budget_card">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -226,7 +245,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
 

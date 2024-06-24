@@ -121,4 +121,9 @@ class BudgetFragment : BaseFragment(), BudgetListener {
             }
         }
     }
+
+    override fun scrollUp() {
+        super.scrollUp()
+        binding.budgetScrollView.scrollTo(0, 0)
+    }
 }

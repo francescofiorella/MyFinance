@@ -1,7 +1,7 @@
 <resources>
     <dimen name="field_corner_radius">@dimen/card_corner_radius</dimen>
 
-    <dimen name="dashboard_bottom_margin">40dp</dimen>
+    <dimen name="dashboard_bottom_margin">80dp</dimen>
     <dimen name="card_full_margin">20dp</dimen>
     <dimen name="card_half_margin">10dp</dimen>
     <dimen name="card_text_space">20dp</dimen>
