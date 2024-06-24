@@ -29,14 +29,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingHorizontal="25dp"
-                android:paddingVertical="20dp">
+                android:paddingTop="20dp">
 
                 <ImageView
                     android:id="@+id/monthly_budget_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/monthly_budget"
-                    android:src="@drawable/ic_baseline_savings"
+                    android:src="@drawable/ic_account_balance_wallet"
                     app:layout_constraintBottom_toBottomOf="@+id/textView1"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/textView1" />
@@ -57,10 +57,12 @@
                     android:id="@+id/currency_TV"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
                     android:layout_marginTop="20dp"
                     android:fontFamily="@font/nunito"
                     android:text="@string/currency"
                     android:textSize="@dimen/card_price_size"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textView1" />
 
@@ -89,7 +91,7 @@
                     android:inputType="numberDecimal"
                     android:textColor="?attr/colorControlNormal"
                     android:textSize="@dimen/card_price_size"
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@id/currency_TV"
                     app:layout_constraintEnd_toStartOf="@id/monthly_budget_edit_btn"
                     app:layout_constraintStart_toEndOf="@id/currency_TV"
@@ -156,6 +158,19 @@
                     app:layout_constraintStart_toEndOf="@id/annual_budget_icon"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/annual_budget_TV"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/nunito"
+                    android:text="@{FormatUtilsKt.doubleToPrice(viewModel.annualBudget)}"
+                    android:textSize="@dimen/card_price_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textView2"
+                    tools:text="€ 0.00" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.card.MaterialCardView>
@@ -179,7 +194,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/incomes"
-                    android:src="@drawable/ic_account_balance_wallet"
+                    android:src="@drawable/ic_account_balance"
                     app:layout_constraintBottom_toBottomOf="@+id/textView3"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/textView3" />

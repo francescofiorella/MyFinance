@@ -28,6 +28,37 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
     private val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
 
+    fun getMonthlyBudget(): LiveData<PurchaseResult> {
+        val response = MutableLiveData<PurchaseResult>()
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!).get()
+            .addOnSuccessListener {
+                PurchaseStorage.monthlyBudget =
+                    it.data?.get(DbPurchases.FIELDS.MONTHLY_BUDGET.value).toString()
+                        .toDoubleOrNull() ?: 0.0
+                response.value = PurchaseResult(PurchaseCode.BUDGET_UPDATE_SUCCESS)
+            }
+            .addOnFailureListener {
+                response.value = PurchaseResult(PurchaseCode.BUDGET_UPDATE_FAILURE)
+            }
+        return response
+    }
+
+    fun updateMonthlyBudget(budget: Double): LiveData<PurchaseResult> {
+        val response = MutableLiveData<PurchaseResult>()
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .set(hashMapOf(DbPurchases.FIELDS.MONTHLY_BUDGET.value to budget))
+            .addOnSuccessListener {
+                PurchaseStorage.monthlyBudget = budget
+                response.value = PurchaseResult(PurchaseCode.BUDGET_UPDATE_SUCCESS)
+            }
+            .addOnFailureListener {
+                response.value = PurchaseResult(PurchaseCode.BUDGET_UPDATE_FAILURE)
+            }
+        return response
+    }
+
     fun updateList(limit: Long = DEFAULT_LIMIT): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 

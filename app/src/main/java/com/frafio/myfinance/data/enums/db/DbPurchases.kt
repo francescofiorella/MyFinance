@@ -5,6 +5,7 @@ import com.frafio.myfinance.utils.getCurrentLanguage
 object DbPurchases {
     enum class FIELDS(val value: String) {
         PURCHASES("purchases"),
+        MONTHLY_BUDGET("monthly_budget"),
         PAYMENTS("payments"),
         NAME("name"),
         YEAR("year"),

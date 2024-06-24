@@ -85,7 +85,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
 
     PURCHASE_LIST_UPDATE_SUCCESS(
         40, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "List Updated!"
+            Languages.ENGLISH.value -> "List updated!"
             Languages.ITALIANO.value -> "Lista aggiornata!"
             else -> "List Updated!" // english
         }
@@ -128,6 +128,22 @@ enum class PurchaseCode(val code: Int, val message: String) {
             Languages.ENGLISH.value -> "Count query failed!"
             Languages.ITALIANO.value -> "Query di conteggio non riuscita!"
             else -> "Count query failed!" // english
+        }
+    ),
+
+    BUDGET_UPDATE_SUCCESS(
+        62, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Budget updated!"
+            Languages.ITALIANO.value -> "Budget aggiornato"
+            else -> "Budget updated!" // english
+        }
+    ),
+
+    BUDGET_UPDATE_FAILURE(
+        63, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Budget not updated!"
+            Languages.ITALIANO.value -> "Budget non aggiornato"
+            else -> "Budget not updated!" // english
         }
     )
 }
