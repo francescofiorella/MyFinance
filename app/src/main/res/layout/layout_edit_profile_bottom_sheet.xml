@@ -83,7 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:contentDescription="@string/edit_full_name"
+            android:contentDescription="@string/confirm"
             android:enabled="false"
             android:visibility="gone"
             app:icon="@drawable/ic_check" />

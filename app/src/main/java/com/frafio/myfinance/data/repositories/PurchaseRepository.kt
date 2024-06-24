@@ -162,4 +162,8 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
     fun getDynamicColorActive(): Boolean {
         return purchaseManager.getDynamicColorActive()
     }
+
+    fun getMonthlyBudget(): Double {
+        return PurchaseStorage.monthlyBudget
+    }
 }

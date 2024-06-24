@@ -1,9 +1,12 @@
 package com.frafio.myfinance.utils
 
+import android.app.Activity
+import android.content.Context
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -68,4 +71,10 @@ fun ValueLineChart.setValueLineChartData(list: List<Pair<String, Double>>, dynam
 
         addSeries(series)
     }
+}
+
+fun Context.hideSoftKeyboard(view: View) {
+    val inputMethodManager =
+        (this.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager)
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
 }

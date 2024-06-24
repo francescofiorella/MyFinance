@@ -14,6 +14,7 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
 
     <string name="purchase_added">Payment added!</string>
 
@@ -95,6 +96,8 @@
     <string name="edit_full_name">Edit the full name</string>
     <string name="purchase_category_icon">Purchase Category Icon</string>
     <string name="no_purchases">No purchases</string>
+
+    <string name="zero_double" translatable="false">0.00</string>
 
     <string name="monthly_budget">Monthly budget</string>
     <string name="annual_budget">Annual budget</string>

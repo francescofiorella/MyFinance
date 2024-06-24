@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit
 
 object PurchaseStorage {
     var purchaseList: MutableList<Purchase> = mutableListOf()
+    var monthlyBudget: Double = 0.0
 
     fun resetPurchaseList() {
         purchaseList = mutableListOf()
