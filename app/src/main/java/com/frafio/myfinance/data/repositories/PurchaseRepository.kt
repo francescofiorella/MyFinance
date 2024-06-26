@@ -87,7 +87,11 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
     }
 
     fun deletePurchaseAt(position: Int): LiveData<PurchaseResult> {
-        return purchaseManager.deleteAt(position)
+        return purchaseManager.deletePurchaseAt(position)
+    }
+
+    fun deleteIncomeAt(position: Int): LiveData<PurchaseResult> {
+        return purchaseManager.deleteIncomeAt(position)
     }
 
     fun addPurchase(purchase: Purchase): LiveData<PurchaseResult> {

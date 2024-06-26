@@ -21,6 +21,7 @@ import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.payments.PurchaseAdapter
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.hideSoftKeyboard
@@ -155,9 +156,32 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                     }
                 }
 
+                PurchaseCode.INCOME_ADD_SUCCESS.code -> {
+                    viewModel.updateLocalIncomeList()
+                    val payload = result.message.split("&")
+                    (activity as HomeActivity).showSnackBar(payload[0])
+                }
+
                 else -> {
                     (activity as HomeActivity).showSnackBar(result.message)
                 }
+            }
+        }
+    }
+
+    override fun onDeleteCompleted(response: LiveData<PurchaseResult>, income: Purchase) {
+        response.observe(viewLifecycleOwner) { result ->
+            if (result.code == PurchaseCode.INCOME_DELETE_SUCCESS.code) {
+                viewModel.updateLocalIncomeList()
+
+                (activity as HomeActivity).showSnackBar(
+                    result.message,
+                    getString(R.string.cancel)
+                ) {
+                    viewModel.addIncome(income)
+                }
+            } else {
+                (activity as HomeActivity).showSnackBar(result.message)
             }
         }
     }
@@ -167,8 +191,12 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         binding.budgetScrollView.scrollTo(0, 0)
     }
 
-    override fun onItemInteraction(interactionID: Int, purchase: Purchase, position: Int) {
+    override fun onItemInteraction(interactionID: Int, income: Purchase, position: Int) {
         when (interactionID) {
+            ON_LONG_CLICK -> {
+                viewModel.deleteIncomeAt(position, income)
+            }
+
             ON_LOAD_MORE_REQUEST -> {
                 // Increment elements limit on scroll
                 if (!isListBlocked) {

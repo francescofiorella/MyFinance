@@ -63,4 +63,14 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
         val response = purchaseRepository.updateMonthlyBudget(budget)
         listener?.onCompleted(response, previousBudget)
     }
+
+    fun deleteIncomeAt(position: Int, income: Purchase) {
+        val response = purchaseRepository.deleteIncomeAt(position)
+        listener?.onDeleteCompleted(response, income)
+    }
+
+    fun addIncome(income: Purchase) {
+        val response = purchaseRepository.addPurchase(income)
+        listener?.onCompleted(response, null)
+    }
 }

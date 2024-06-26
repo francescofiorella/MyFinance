@@ -31,7 +31,7 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
 
     fun deletePurchaseAt(position: Int, purchase: Purchase) {
         val response = purchaseRepository.deletePurchaseAt(position)
-        listener?.onDeleteComplete(response, purchase)
+        listener?.onDeleteCompleted(response, purchase)
     }
 
     fun updateCategory(purchase: Purchase, newCategory: Int, position: Int) {
@@ -45,21 +45,21 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
             id = purchase.id
         )
         val response = purchaseRepository.editPurchase(updated, position)
-        listener?.onUpdateComplete(response)
+        listener?.onCompleted(response)
     }
 
     fun addPurchase(purchase: Purchase) {
         val response = purchaseRepository.addPurchase(purchase)
-        listener?.onUpdateComplete(response)
+        listener?.onCompleted(response)
     }
 
     fun updatePurchaseList(limit: Long) {
         val response = purchaseRepository.updatePurchaseList(limit)
-        listener?.onUpdateComplete(response)
+        listener?.onCompleted(response)
     }
 
     fun updatePurchaseNumber() {
         val response = purchaseRepository.getPurchaseNumber()
-        listener?.onUpdateComplete(response)
+        listener?.onCompleted(response)
     }
 }

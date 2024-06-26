@@ -178,4 +178,20 @@ enum class PurchaseCode(val code: Int, val message: String) {
             else -> "Income not added!" // english
         }
     ),
+
+    INCOME_DELETE_SUCCESS(
+        74, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Income deleted!"
+            Languages.ITALIANO.value -> "Entrata eliminata!"
+            else -> "Income deleted!" // english
+        }
+    ),
+
+    INCOME_DELETE_FAILURE(
+        75, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Income not deleted correctly!"
+            Languages.ITALIANO.value -> "Entrata non eliminata correttamente!"
+            else -> "Income not deleted correctly!" // english
+        }
+    )
 }

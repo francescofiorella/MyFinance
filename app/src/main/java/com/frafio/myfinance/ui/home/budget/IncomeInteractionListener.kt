@@ -10,5 +10,5 @@ interface IncomeInteractionListener {
         const val ON_LOAD_MORE_REQUEST: Int = 3
     }
 
-    fun onItemInteraction(interactionID: Int, purchase: Purchase, position: Int)
+    fun onItemInteraction(interactionID: Int, income: Purchase, position: Int)
 }

@@ -202,7 +202,8 @@ object PurchaseStorage {
 
                 purchaseList.removeAt(position)
                 if (
-                    newTotal.day == todayDate.dayOfMonth
+                    incomeList.size > 1
+                    && newTotal.day == todayDate.dayOfMonth
                     && newTotal.month == todayDate.monthValue
                     && newTotal.year == todayDate.year
                     || newTotal.price != 0.0
@@ -355,5 +356,31 @@ object PurchaseStorage {
             incomeList.add(i + 1, income)
         }
         return totalIndex
+    }
+
+    fun deleteIncomeAt(position: Int) {
+        val todayYear = LocalDate.now().year
+        for (i in position - 1 downTo 0) {
+            if (incomeList[i].category == DbPurchases.CATEGORIES.TOTAL.value) {
+                val newTotal = Purchase(
+                    name = incomeList[i].name,
+                    price = incomeList[i].price!! - incomeList[position].price!!,
+                    year = incomeList[i].year,
+                    month = incomeList[i].month,
+                    day = incomeList[i].day,
+                    category = incomeList[i].category,
+                    id = incomeList[i].id
+                )
+
+                incomeList.removeAt(position)
+                if (incomeList.size > 1 && newTotal.year == todayYear || newTotal.price != 0.0) {
+                    incomeList[i] = newTotal
+                } else {
+                    incomeList.removeAt(i)
+                }
+
+                break
+            }
+        }
     }
 }

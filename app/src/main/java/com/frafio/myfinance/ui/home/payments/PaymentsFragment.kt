@@ -159,7 +159,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         }
     }
 
-    override fun onUpdateComplete(response: LiveData<PurchaseResult>) {
+    override fun onCompleted(response: LiveData<PurchaseResult>) {
         response.observe(viewLifecycleOwner) { result ->
             when (result.code) {
                 PurchaseCode.PURCHASE_COUNT_SUCCESS.code -> {
@@ -200,12 +200,12 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         }
     }
 
-    override fun onDeleteComplete(
+    override fun onDeleteCompleted(
         response: LiveData<PurchaseResult>,
         purchase: Purchase
     ) {
         response.observe(viewLifecycleOwner) { result ->
-            if (result.code != PurchaseCode.PURCHASE_DELETE_FAILURE.code) {
+            if (result.code == PurchaseCode.PURCHASE_DELETE_SUCCESS.code) {
                 viewModel.updateLocalPurchaseList()
                 (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
 

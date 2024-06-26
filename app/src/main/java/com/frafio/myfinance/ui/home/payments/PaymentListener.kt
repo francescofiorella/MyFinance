@@ -5,7 +5,7 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 
 interface PaymentListener {
-    fun onUpdateComplete(response: LiveData<PurchaseResult>)
+    fun onCompleted(response: LiveData<PurchaseResult>)
 
-    fun onDeleteComplete(response: LiveData<PurchaseResult>, purchase: Purchase)
+    fun onDeleteCompleted(response: LiveData<PurchaseResult>, purchase: Purchase)
 }
