@@ -10,8 +10,10 @@ import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentBudgetBinding
 import com.frafio.myfinance.ui.BaseFragment
@@ -20,7 +22,7 @@ import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.hideSoftKeyboard
 
-class BudgetFragment : BaseFragment(), BudgetListener {
+class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener {
     private lateinit var binding: FragmentBudgetBinding
     private val viewModel by viewModels<BudgetViewModel>()
 
@@ -36,7 +38,19 @@ class BudgetFragment : BaseFragment(), BudgetListener {
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
+        viewModel.updateLocalIncomeList()
         viewModel.getMonthlyBudgetFromDb()
+
+        viewModel.incomes.observe(viewLifecycleOwner) { incomes ->
+            val nl = incomes.map { i -> i.copy() }
+            binding.budgetRecycleView.also {
+                if (it.adapter == null) {
+                    it.adapter = IncomeAdapter(nl, this)
+                } else {
+                    (it.adapter as IncomeAdapter).updateData(nl)
+                }
+            }
+        }
 
         viewModel.monthlyBudget.observe(viewLifecycleOwner) { budget ->
             binding.monthlyBudgetDeleteBtn.isEnabled = budget != 0.0
@@ -125,5 +139,20 @@ class BudgetFragment : BaseFragment(), BudgetListener {
     override fun scrollUp() {
         super.scrollUp()
         binding.budgetScrollView.scrollTo(0, 0)
+    }
+
+    override fun onItemInteraction(interactionID: Int, purchase: Purchase, position: Int) {}
+
+    fun scrollIncomesTo(position: Int) {
+        (binding.budgetRecycleView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
+            position,
+            0
+        )
+    }
+
+    fun refreshData() {
+        viewModel.updateLocalIncomeList()
+        viewModel.getMonthlyBudgetFromDb()
+        scrollUp()
     }
 }

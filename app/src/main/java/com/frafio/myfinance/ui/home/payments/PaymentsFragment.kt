@@ -80,7 +80,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 if (it.adapter == null) {
                     it.adapter = PurchaseAdapter(nl, this)
                 } else {
-                    (binding.listRecyclerView.adapter as PurchaseAdapter).updateData(nl)
+                    (it.adapter as PurchaseAdapter).updateData(nl)
                 }
             }
         }

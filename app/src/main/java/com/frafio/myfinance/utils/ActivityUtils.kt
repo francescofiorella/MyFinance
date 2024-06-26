@@ -1,10 +1,12 @@
 package com.frafio.myfinance.utils
 
 import android.app.Activity
+import android.content.Context
 import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
@@ -70,4 +72,10 @@ fun Activity.snackBar(
 
         return snackBar
     }
+}
+
+fun Context.hideSoftKeyboard(view: View) {
+    val inputMethodManager =
+        (this.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager)
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
 }

@@ -72,16 +72,47 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
                 android:clipToPadding="false"
                 android:orientation="vertical"
-                android:paddingTop="@dimen/title_margin_bottom">
+                android:paddingTop="@dimen/title_margin_bottom"
+                android:paddingBottom="@dimen/dashboard_bottom_margin">
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggleButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="5dp"
+                    app:checkedButton="@id/payments_btn"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/payments_btn"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/nav_2"
+                        app:icon="@drawable/ic_swap_horizontal_circle" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/incomes_btn"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/incomes"
+                        app:icon="@drawable/ic_account_balance" />
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/name_textInputLayout"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
                     android:hint="@string/name"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
@@ -105,7 +136,6 @@
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="5dp"
                     android:hint="@string/price"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
@@ -130,7 +160,6 @@
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="5dp"
                     android:enabled="@{viewModel.requestCode == 1 ? true : false}"
                     android:hint="@string/date"
@@ -158,11 +187,9 @@
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="5dp"
                     android:hint="@string/category"
                     android:labelFor="@id/category_auto_complete_TV"
-                    android:paddingBottom="70dp"
                     app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
                     app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
                     app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"

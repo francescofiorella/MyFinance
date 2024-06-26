@@ -21,12 +21,16 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return PurchaseStorage.purchaseList.size
     }
 
+    fun getIncomeList(): List<Purchase> {
+        return PurchaseStorage.incomeList
+    }
+
     fun getPurchaseList(): List<Purchase> {
         return PurchaseStorage.purchaseList
     }
 
     fun updatePurchaseList(limit: Long): LiveData<PurchaseResult> {
-        return purchaseManager.updateList(limit)
+        return purchaseManager.updatePurchaseList(limit)
     }
 
     fun getPurchaseNumber(): LiveData<PurchaseResult> {
@@ -82,6 +86,10 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
 
     fun addPurchase(purchase: Purchase): LiveData<PurchaseResult> {
         return purchaseManager.addPurchase(purchase)
+    }
+
+    fun addIncome(income: Purchase): LiveData<PurchaseResult> {
+        return purchaseManager.addIncome(income)
     }
 
     fun editPurchase(

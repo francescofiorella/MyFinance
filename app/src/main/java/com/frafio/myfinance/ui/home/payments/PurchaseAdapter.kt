@@ -48,7 +48,7 @@ class PurchaseAdapter(
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon.icon =
                 ContextCompat.getDrawable(
                     holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon.context,
-                    when (purchases[position].category) {
+                    when (currentPurchase.category) {
                         DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
                         DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
                         DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
@@ -85,6 +85,8 @@ class PurchaseAdapter(
                     )
                 }
         } else {
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemDataTextView.text =
+                currentPurchase.getDateString()
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener(null)
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon

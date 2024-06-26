@@ -65,14 +65,28 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private var addResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data!!
-            val purchaseRequest = data.getBooleanExtra(AddActivity.PURCHASE_REQUEST_KEY, false)
+            val purchaseRequest = data.getIntExtra(AddActivity.PURCHASE_REQUEST_KEY, -1)
             val message = data.getStringExtra(AddActivity.ADD_RESULT_MESSAGE) ?: ""
             val position = data.getIntExtra(AddActivity.PURCHASE_POSITION_KEY, 0)
-            if (purchaseRequest) {
-                showFragment(R.id.paymentsFragment)
-                refreshFragmentData(dashboard = true, payments = true, menu = true)
-                paymentsFragment.scrollTo(position)
-                showSnackBar(message)
+            when (purchaseRequest) {
+                AddActivity.REQUEST_PAYMENT_CODE -> {
+                    showFragment(R.id.paymentsFragment)
+                    refreshFragmentData(dashboard = true, payments = true, menu = true)
+                    paymentsFragment.scrollTo(position)
+                    showSnackBar(message)
+                }
+
+                AddActivity.REQUEST_INCOME_CODE -> {
+                    showFragment(R.id.budgetFragment)
+                    refreshFragmentData(
+                        dashboard = true,
+                        payments = true,
+                        budget = true,
+                        menu = true
+                    )
+                    budgetFragment.scrollIncomesTo(position)
+                    showSnackBar(message)
+                }
             }
         }
     }
@@ -440,6 +454,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     fun refreshFragmentData(
         dashboard: Boolean = false,
         payments: Boolean = false,
+        budget: Boolean = false,
         menu: Boolean = false
     ) {
         if (dashboard) {
@@ -447,6 +462,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         }
         if (payments) {
             paymentsFragment.refreshListData()
+        }
+        if (budget) {
+            budgetFragment.refreshData()
         }
         if (menu) {
             menuFragment.refreshPlotData()

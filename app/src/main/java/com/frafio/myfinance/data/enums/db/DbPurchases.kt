@@ -7,6 +7,7 @@ object DbPurchases {
         PURCHASES("purchases"),
         MONTHLY_BUDGET("monthly_budget"),
         PAYMENTS("payments"),
+        INCOMES("incomes"),
         NAME("name"),
         YEAR("year"),
         MONTH("month"),

@@ -23,6 +23,8 @@ class AddActivity : AppCompatActivity(), AddListener {
     companion object {
         const val REQUEST_ADD_CODE: Int = 1
         const val REQUEST_EDIT_CODE: Int = 2
+        const val REQUEST_PAYMENT_CODE: Int = 10
+        const val REQUEST_INCOME_CODE: Int = 11
         const val REQUEST_CODE_KEY: String = "com.frafio.myfinance.REQUEST_CODE"
         const val PURCHASE_REQUEST_KEY: String = "com.frafio.myfinance.PURCHASE_REQUEST"
         const val PURCHASE_ID_KEY: String = "com.frafio.myfinance.PURCHASE_ID"
@@ -133,9 +135,26 @@ class AddActivity : AppCompatActivity(), AddListener {
         when (code) {
             REQUEST_ADD_CODE -> {
                 viewModel.category = -1
+                binding.toggleButton.addOnButtonCheckedListener { toggleButton, checkedId, isChecked ->
+                    when (toggleButton.checkedButtonId) {
+                        R.id.payments_btn -> {
+                            viewModel.addCode = REQUEST_PAYMENT_CODE
+                            binding.addPurchaseTitle.text = getString(R.string.add_purchase)
+                            binding.categoryTextInputLayout.visibility = View.VISIBLE
+                        }
+
+                        R.id.incomes_btn -> {
+                            viewModel.addCode = REQUEST_INCOME_CODE
+                            binding.addPurchaseTitle.text = getString(R.string.add_income)
+                            binding.categoryTextInputLayout.visibility = View.GONE
+                        }
+                    }
+                }
             }
 
             REQUEST_EDIT_CODE -> {
+                binding.toggleButton.visibility = View.GONE
+                binding.addPurchaseTitle.text = getString(R.string.edit_purchase)
                 intent.also { intent ->
                     intent.getStringExtra(PURCHASE_ID_KEY)?.let {
                         viewModel.purchaseID = it
@@ -216,7 +235,7 @@ class AddActivity : AppCompatActivity(), AddListener {
                     // go back to the homepage
                     Intent().also {
                         val payload = result.message.split("&")
-                        it.putExtra(PURCHASE_REQUEST_KEY, true)
+                        it.putExtra(PURCHASE_REQUEST_KEY, REQUEST_PAYMENT_CODE)
                         it.putExtra(ADD_RESULT_MESSAGE, payload[0])
                         it.putExtra(PURCHASE_POSITION_KEY, payload[1].toInt())
                         setResult(RESULT_OK, it)
@@ -227,7 +246,17 @@ class AddActivity : AppCompatActivity(), AddListener {
                 PurchaseCode.PURCHASE_EDIT_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
-                        it.putExtra(PURCHASE_REQUEST_KEY, true)
+                        setResult(RESULT_OK, it)
+                        finish()
+                    }
+                }
+
+                PurchaseCode.INCOME_ADD_SUCCESS.code -> {
+                    Intent().also {
+                        val payload = result.message.split("&")
+                        it.putExtra(PURCHASE_REQUEST_KEY, REQUEST_INCOME_CODE)
+                        it.putExtra(ADD_RESULT_MESSAGE, payload[0])
+                        it.putExtra(PURCHASE_POSITION_KEY, payload[1].toInt())
                         setResult(RESULT_OK, it)
                         finish()
                     }

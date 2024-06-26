@@ -7,6 +7,8 @@
     <string name="nav_4">Menu</string>
     <string name="nav_5">Budget</string>
     <string name="add_purchase">Nuovo pagamento</string>
+    <string name="edit_purchase">Modifica pagamento</string>
+    <string name="add_income">Nuova entrata</string>
 
     <string name="addBtnContentDescription">Aggiungi un pagamento</string>
 
@@ -40,6 +42,7 @@
     <string name="signup">Registrati</string>
     <string name="signup_login">Hai già un account? Accedi</string>
     <string name="warning_home">Aggiungi il tuo primo pagamento!</string>
+    <string name="warning_budget">Nessuna entrata da mostrare</string>
 
     <string name="avg_day">Media \nGiornaliera</string>
     <string name="avg_month">Media \nMensile</string>

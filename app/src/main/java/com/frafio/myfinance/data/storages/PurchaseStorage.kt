@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit
 
 object PurchaseStorage {
     var purchaseList: MutableList<Purchase> = mutableListOf()
+    var incomeList: MutableList<Purchase> = mutableListOf()
     var monthlyBudget: Double = 0.0
 
     fun resetPurchaseList() {
@@ -116,14 +117,21 @@ object PurchaseStorage {
     fun addPurchase(purchase: Purchase): Int {
         val totalIndex: Int
         val purchaseDate = purchase.getLocalDate()
+        val totalFound: Boolean
         var i = 0
-        var iDate = purchaseList[i].getLocalDate()
-        while (i < purchaseList.size && ChronoUnit.DAYS.between(purchaseDate, iDate) > 0) {
-            i++
-            iDate = purchaseList[i].getLocalDate()
+        if (purchaseList.size != 0) {
+            var iDate = purchaseList[i].getLocalDate()
+            while (i < purchaseList.size && ChronoUnit.DAYS.between(purchaseDate, iDate) > 0) {
+                i++
+                iDate = purchaseList[i].getLocalDate()
+            }
+            totalFound = purchaseList[i].getDateString() == purchase.getDateString()
+        } else {
+            totalFound = false
         }
-        if (purchaseList[i].getDateString() == purchase.getDateString()) {
-            // Totale trovato
+
+        if (totalFound) {
+            // Aggiorna totale
             val total = Purchase(
                 name = DbPurchases.NAMES.TOTAL.value,
                 price = purchaseList[i].price!! + purchase.price!!,
@@ -195,29 +203,59 @@ object PurchaseStorage {
         }
     }
 
-    fun editPurchaseAt(position: Int, purchase: Purchase) {
-        val previous = purchaseList[position]
-        purchaseList[position] = purchase
-        if (previous.price == purchase.price) {
-            return
+    fun addIncome(income: Purchase): Int {
+        val totalIndex: Int
+
+        val totalFound: Boolean
+        var i = 0
+        if (incomeList.size != 0) {
+            while (i < incomeList.size && incomeList[i].year!! < income.year!!) {
+                i++
+            }
+            totalFound = incomeList[i].year == income.year
         } else {
-            var i = position - 1
-            while (i >= 0) {
-                if (purchaseList[i].category == DbPurchases.CATEGORIES.TOTAL.value) {
-                    val total = Purchase(
-                        name = purchaseList[i].name,
-                        price = purchaseList[i].price!! - previous.price!! + purchase.price!!,
-                        year = purchaseList[i].year,
-                        month = purchaseList[i].month,
-                        day = purchaseList[i].day,
-                        category = purchaseList[i].category,
-                        id = purchaseList[i].id
-                    )
-                    purchaseList[i] = total
+            totalFound = false
+        }
+
+        if (totalFound) {
+            // Aggiorna totale
+            val total = Purchase(
+                name = DbPurchases.NAMES.TOTAL.value,
+                price = incomeList[i].price!! + income.price!!,
+                year = incomeList[i].year,
+                month = incomeList[i].month,
+                day = incomeList[i].day,
+                category = DbPurchases.CATEGORIES.TOTAL.value,
+                id = incomeList[i].getTotalId()
+            )
+            incomeList[i] = total
+            totalIndex = i
+            // Scorri per trovare posizione giusta
+            i++
+            while (i < incomeList.size) {
+                if (incomeList[i].year != income.year ||
+                    incomeList[i].price!! < income.price
+                ) {
                     break
                 }
-                i--
+                i++
             }
+            incomeList.add(i, income)
+        } else {
+            // Giorno non esistente, aggiungi totale
+            val total = Purchase(
+                name = DbPurchases.NAMES.TOTAL.value,
+                price = income.price,
+                year = income.year,
+                month = income.month,
+                day = income.day,
+                category = DbPurchases.CATEGORIES.TOTAL.value,
+                id = income.getTotalId()
+            )
+            incomeList.add(i, total)
+            totalIndex = i
+            incomeList.add(i + 1, income)
         }
+        return totalIndex
     }
 }

@@ -59,7 +59,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun updateList(limit: Long = DEFAULT_LIMIT): LiveData<PurchaseResult> {
+    fun updatePurchaseList(limit: Long = DEFAULT_LIMIT): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
@@ -155,7 +155,8 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchase.id!!).set(purchase).addOnSuccessListener {
-                PurchaseStorage.editPurchaseAt(position, purchase)
+                PurchaseStorage.deletePurchaseAt(position)
+                PurchaseStorage.addPurchase(purchase)
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_EDIT_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -236,5 +237,26 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
     fun getDynamicColorActive(): Boolean {
         return getSharedDynamicColor(sharedPreferences)
+    }
+
+    fun addIncome(income: Purchase): LiveData<PurchaseResult> {
+        val response = MutableLiveData<PurchaseResult>()
+
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(DbPurchases.FIELDS.INCOMES.value)
+            .add(income).addOnSuccessListener {
+                income.id = it.id
+                val totalIndex = PurchaseStorage.addIncome(income)
+                response.value = PurchaseResult(
+                    PurchaseCode.INCOME_ADD_SUCCESS,
+                    "${PurchaseCode.INCOME_ADD_SUCCESS.message}&$totalIndex"
+                )
+            }.addOnFailureListener { e ->
+                Log.e(TAG, "Error! ${e.localizedMessage}")
+                response.value = PurchaseResult(PurchaseCode.INCOME_ADD_FAILURE)
+            }
+
+        return response
     }
 }

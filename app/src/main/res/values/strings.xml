@@ -7,6 +7,8 @@
     <string name="nav_4">Menu</string>
     <string name="nav_5">Budget</string>
     <string name="add_purchase">New payment</string>
+    <string name="edit_purchase">Edit payment</string>
+    <string name="add_income">New income</string>
 
     <string name="addBtnContentDescription">Add a payment</string>
 
@@ -41,6 +43,7 @@
     <string name="signup">Sign up</string>
     <string name="signup_login">Do you already have an account? Log In</string>
     <string name="warning_home">Add your first payment!</string>
+    <string name="warning_budget">No income to show</string>
 
     <string name="avg_day">Daily \nAverage</string>
     <string name="avg_month">Monthly \nAverage</string>

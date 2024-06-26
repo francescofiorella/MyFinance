@@ -145,5 +145,21 @@ enum class PurchaseCode(val code: Int, val message: String) {
             Languages.ITALIANO.value -> "Budget non aggiornato"
             else -> "Budget not updated!" // english
         }
-    )
+    ),
+
+    INCOME_ADD_SUCCESS(
+        70, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Income added!"
+            Languages.ITALIANO.value -> "Entrata aggiunta!"
+            else -> "Income added!" // english
+        }
+    ),
+
+    INCOME_ADD_FAILURE(
+        71, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Income not added!"
+            Languages.ITALIANO.value -> "Entrata non aggiunta!"
+            else -> "Income not added!" // english
+        }
+    ),
 }

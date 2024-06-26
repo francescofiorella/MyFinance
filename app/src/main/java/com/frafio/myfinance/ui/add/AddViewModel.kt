@@ -35,6 +35,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
     var purchasePosition: Int? = null
 
     var requestCode: Int? = null
+    var addCode: Int? = null
 
     fun updateTime(datePickerBtn: DatePickerButton) {
         year = datePickerBtn.year
@@ -62,41 +63,52 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        if (category == -1) {
+        if (addCode == AddActivity.REQUEST_INCOME_CODE) {
+            category = 0
+        } else if (category == -1) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_CATEGORY))
             return
         }
 
         val price = priceString!!.toDouble()
 
-        if (requestCode == AddActivity.REQUEST_ADD_CODE) {
-            val purchase = Purchase(
-                name,
-                price,
-                year,
-                month,
-                day,
-                dateToUTCTimestamp(year!!, month!!, day!!),
-                category
-            )
-            val response = purchaseRepository.addPurchase(purchase)
-            listener?.onAddSuccess(response)
-        } else if (requestCode == AddActivity.REQUEST_EDIT_CODE) {
-            val purchase =
-                Purchase(
+        when (requestCode) {
+            AddActivity.REQUEST_ADD_CODE -> {
+                val purchase = Purchase(
                     name,
                     price,
                     year,
                     month,
                     day,
                     dateToUTCTimestamp(year!!, month!!, day!!),
-                    category,
-                    purchaseID
+                    category
                 )
+                if (addCode == AddActivity.REQUEST_PAYMENT_CODE) {
+                    val response = purchaseRepository.addPurchase(purchase)
+                    listener?.onAddSuccess(response)
+                } else {
+                    val response = purchaseRepository.addIncome(purchase)
+                    listener?.onAddSuccess(response)
+                }
+            }
 
-            val response =
-                purchaseRepository.editPurchase(purchase, purchasePosition!!)
-            listener?.onAddSuccess(response)
+            AddActivity.REQUEST_EDIT_CODE -> {
+                val purchase =
+                    Purchase(
+                        name,
+                        price,
+                        year,
+                        month,
+                        day,
+                        dateToUTCTimestamp(year!!, month!!, day!!),
+                        category,
+                        purchaseID
+                    )
+
+                val response =
+                    purchaseRepository.editPurchase(purchase, purchasePosition!!)
+                listener?.onAddSuccess(response)
+            }
         }
     }
 }

@@ -37,7 +37,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="5dp"
                 android:fontFamily="@font/nunito"
-                android:text="@{FormatUtilsKt.dateToString(purchase.day, purchase.month, purchase.year)}"
                 android:textSize="14sp"
                 tools:text="01/01/2000" />
 
