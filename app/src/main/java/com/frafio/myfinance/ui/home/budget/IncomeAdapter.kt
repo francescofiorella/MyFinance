@@ -44,6 +44,8 @@ class IncomeAdapter(
             listener.onItemInteraction(ON_LOAD_MORE_REQUEST, currentIncome, position)
         }
 
+        holder.binding.recViewPurchaseItemTotalTextView.text =
+            holder.binding.recViewPurchaseItemTotalTextView.context.getString(R.string.no_incomes)
         holder.binding.recViewPurchaseItemPurchaseCategoryIcon.isClickable = false
 
         if (currentIncome.category != DbPurchases.CATEGORIES.TOTAL.value) {

@@ -231,6 +231,8 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         fAuth.signOut()
 
         PurchaseStorage.resetPurchaseList()
+        PurchaseStorage.resetIncomeList()
+        PurchaseStorage.resetBudget()
         UserStorage.resetUser()
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
@@ -249,7 +251,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
             .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
             .limit(DEFAULT_LIMIT).get()
             .addOnSuccessListener { queryDocumentSnapshots ->
-                PurchaseStorage.populateListFromSnapshot(queryDocumentSnapshots)
+                PurchaseStorage.populatePaymentsFromSnapshot(queryDocumentSnapshots)
                 response.value = AuthResult(AuthCode.USER_DATA_UPDATED)
             }.addOnFailureListener { e ->
                 val error = "Error! ${e.localizedMessage}"

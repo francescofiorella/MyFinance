@@ -13,11 +13,14 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentBudgetBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.ui.home.payments.PurchaseAdapter
+import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.hideSoftKeyboard
@@ -25,6 +28,8 @@ import com.frafio.myfinance.utils.hideSoftKeyboard
 class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener {
     private lateinit var binding: FragmentBudgetBinding
     private val viewModel by viewModels<BudgetViewModel>()
+    private var isListBlocked = false
+    private var maxIncomeNumber: Long = DEFAULT_LIMIT + 1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,7 +43,8 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.updateLocalIncomeList()
+        viewModel.updateIncomeNumber()
+        viewModel.updateIncomeList(DEFAULT_LIMIT)
         viewModel.getMonthlyBudgetFromDb()
 
         viewModel.incomes.observe(viewLifecycleOwner) { incomes ->
@@ -108,6 +114,26 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     override fun onCompleted(response: LiveData<PurchaseResult>, previousBudget: Double?) {
         response.observe(viewLifecycleOwner) { result ->
             when (result.code) {
+                PurchaseCode.PURCHASE_COUNT_SUCCESS.code -> {
+                    maxIncomeNumber = result.message.toLong()
+                    val limit = if (binding.budgetRecycleView.adapter != null) {
+                        (binding.budgetRecycleView.adapter as IncomeAdapter).getLimit()
+                    } else {
+                        DEFAULT_LIMIT
+                    }
+                    isListBlocked = limit >= maxIncomeNumber
+                }
+
+                PurchaseCode.INCOME_LIST_UPDATE_SUCCESS.code -> {
+                    viewModel.updateLocalIncomeList()
+                    val limit = if (binding.budgetRecycleView.adapter != null) {
+                        (binding.budgetRecycleView.adapter as IncomeAdapter).getLimit()
+                    } else {
+                        DEFAULT_LIMIT
+                    }
+                    isListBlocked = limit >= maxIncomeNumber
+                }
+
                 PurchaseCode.BUDGET_UPDATE_SUCCESS.code -> {
                     viewModel.updateMonthlyBudgetFromStorage()
                     if (!binding.monthlyBudgetTV.isVisible) {
@@ -141,7 +167,19 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         binding.budgetScrollView.scrollTo(0, 0)
     }
 
-    override fun onItemInteraction(interactionID: Int, purchase: Purchase, position: Int) {}
+    override fun onItemInteraction(interactionID: Int, purchase: Purchase, position: Int) {
+        when (interactionID) {
+            ON_LOAD_MORE_REQUEST -> {
+                // Increment elements limit on scroll
+                if (!isListBlocked) {
+                    viewModel.updateIncomeList(
+                        (binding.budgetRecycleView.adapter as PurchaseAdapter).getLimit(true)
+                    )
+                    isListBlocked = true
+                }
+            }
+        }
+    }
 
     fun scrollIncomesTo(position: Int) {
         (binding.budgetRecycleView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(

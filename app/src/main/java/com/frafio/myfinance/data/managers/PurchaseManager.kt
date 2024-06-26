@@ -71,7 +71,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
             .limit(limit)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
-                PurchaseStorage.populateListFromSnapshot(queryDocumentSnapshots)
+                PurchaseStorage.populatePaymentsFromSnapshot(queryDocumentSnapshots)
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS)
             }.addOnFailureListener { e ->
                 val error = "Error! ${e.localizedMessage}"
@@ -83,12 +83,14 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun getPurchaseNumber(): LiveData<PurchaseResult> {
+    fun getPurchaseNumber(
+        collection: String = DbPurchases.FIELDS.PAYMENTS.value
+    ): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .collection(collection)
             .count()
             .get(AggregateSource.SERVER)
             .addOnSuccessListener { snapshot ->
@@ -237,6 +239,27 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
     fun getDynamicColorActive(): Boolean {
         return getSharedDynamicColor(sharedPreferences)
+    }
+
+    fun updateIncomeList(limit: Long = DEFAULT_LIMIT): LiveData<PurchaseResult> {
+        val response = MutableLiveData<PurchaseResult>()
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(DbPurchases.FIELDS.INCOMES.value)
+            .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
+            .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
+            .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
+            .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
+            .limit(limit).get()
+            .addOnSuccessListener { incomesSnapshot ->
+                PurchaseStorage.populateIncomesFromSnapshot(incomesSnapshot)
+                response.value = PurchaseResult(PurchaseCode.INCOME_LIST_UPDATE_SUCCESS)
+            }.addOnFailureListener { e ->
+                val error = "Error! ${e.localizedMessage}"
+                Log.e(TAG, error)
+                response.value = PurchaseResult(PurchaseCode.INCOME_LIST_UPDATE_FAILURE)
+            }
+        return response
     }
 
     fun addIncome(income: Purchase): LiveData<PurchaseResult> {

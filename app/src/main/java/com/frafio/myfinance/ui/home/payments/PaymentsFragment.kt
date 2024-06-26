@@ -70,8 +70,8 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
         viewModel.listener = this
 
-        viewModel.updateLocalPurchaseList()
         viewModel.updatePurchaseNumber()
+        viewModel.updateLocalPurchaseList()
 
         viewModel.purchases.observe(viewLifecycleOwner) { purchases ->
             val nl = purchases.map { p -> p.copy() }
@@ -164,7 +164,11 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             when (result.code) {
                 PurchaseCode.PURCHASE_COUNT_SUCCESS.code -> {
                     maxPurchaseNumber = result.message.toLong()
-                    val limit = (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
+                    val limit = if (binding.listRecyclerView.adapter != null) {
+                        (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
+                    } else {
+                        DEFAULT_LIMIT
+                    }
                     isListBlocked = limit >= maxPurchaseNumber
                 }
 

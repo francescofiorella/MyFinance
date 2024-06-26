@@ -15,7 +15,15 @@ object PurchaseStorage {
         purchaseList = mutableListOf()
     }
 
-    fun populateListFromSnapshot(queryDocumentSnapshots: QuerySnapshot) {
+    fun resetIncomeList() {
+        incomeList = mutableListOf()
+    }
+
+    fun resetBudget() {
+        monthlyBudget = 0.0
+    }
+
+    fun populatePaymentsFromSnapshot(queryDocumentSnapshots: QuerySnapshot) {
         resetPurchaseList()
         // Create total for the local list
         var total: Purchase? = null
@@ -123,9 +131,15 @@ object PurchaseStorage {
             var iDate = purchaseList[i].getLocalDate()
             while (i < purchaseList.size && ChronoUnit.DAYS.between(purchaseDate, iDate) > 0) {
                 i++
-                iDate = purchaseList[i].getLocalDate()
+                if (i < purchaseList.size) {
+                    iDate = purchaseList[i].getLocalDate()
+                }
             }
-            totalFound = purchaseList[i].getDateString() == purchase.getDateString()
+            totalFound = if (i < purchaseList.size) {
+                purchaseList[i].getDateString() == purchase.getDateString()
+            } else {
+                false
+            }
         } else {
             totalFound = false
         }
@@ -203,16 +217,100 @@ object PurchaseStorage {
         }
     }
 
+    fun populateIncomesFromSnapshot(queryDocumentSnapshots: QuerySnapshot) {
+        resetIncomeList()
+
+        val todayYear = LocalDate.now().year
+        var total = Purchase(
+            name = DbPurchases.NAMES.TOTAL.value,
+            price = 0.0,
+            year = todayYear,
+            month = 0,
+            day = 0,
+            category = DbPurchases.CATEGORIES.TOTAL.value,
+            id = todayYear.toString()
+        )
+        var currentIncomes = mutableListOf<Purchase>()
+
+        var isFirstIncome = true
+        queryDocumentSnapshots.forEach { document ->
+            val income = document.toObject(Purchase::class.java)
+            // set id
+            income.id = document.id
+
+            if (isFirstIncome && todayYear > income.year!!) {
+                // Inserisci totale a 0.0 per oggi
+                incomeList.add(
+                    total
+                )
+                total = Purchase(
+                    name = DbPurchases.NAMES.TOTAL.value,
+                    price = 0.0,
+                    year = income.year,
+                    month = 0,
+                    day = 0,
+                    category = DbPurchases.CATEGORIES.TOTAL.value,
+                    id = income.year.toString()
+                )
+            }
+
+            isFirstIncome = false
+
+            // Popola lista
+            if (total.year!! == income.year) { // Se totale corrisponde, aggiorna
+                total = Purchase(
+                    name = total.name,
+                    price = total.price!! + income.price!!,
+                    year = total.year,
+                    month = total.month,
+                    day = total.day,
+                    category = total.category,
+                    id = total.id
+                )
+                currentIncomes.add(income)
+            } else { // Crea nuovo totale
+                if (currentIncomes.isNotEmpty()) {
+                    incomeList.add(total)
+                    currentIncomes.forEach { cIncome ->
+                        incomeList.add(cIncome)
+                    }
+                    currentIncomes = mutableListOf()
+                }
+                total = Purchase(
+                    name = DbPurchases.NAMES.TOTAL.value,
+                    price = income.price,
+                    year = income.year,
+                    month = 0,
+                    day = 0,
+                    category = DbPurchases.CATEGORIES.TOTAL.value,
+                    id = income.year.toString()
+                )
+                currentIncomes.add(income)
+            }
+        }
+        if (currentIncomes.isNotEmpty()) {
+            incomeList.add(total)
+            currentIncomes.forEach { cIncome ->
+                incomeList.add(cIncome)
+            }
+            currentIncomes = mutableListOf()
+        }
+    }
+
     fun addIncome(income: Purchase): Int {
         val totalIndex: Int
 
         val totalFound: Boolean
         var i = 0
         if (incomeList.size != 0) {
-            while (i < incomeList.size && incomeList[i].year!! < income.year!!) {
+            while (i < incomeList.size && incomeList[i].year!! > income.year!!) {
                 i++
             }
-            totalFound = incomeList[i].year == income.year
+            totalFound = if (i < incomeList.size) {
+                incomeList[i].year == income.year
+            } else {
+                false
+            }
         } else {
             totalFound = false
         }

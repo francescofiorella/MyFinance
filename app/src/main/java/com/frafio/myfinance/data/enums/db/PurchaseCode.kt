@@ -147,8 +147,24 @@ enum class PurchaseCode(val code: Int, val message: String) {
         }
     ),
 
-    INCOME_ADD_SUCCESS(
+    INCOME_LIST_UPDATE_SUCCESS(
         70, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Income list updated!"
+            Languages.ITALIANO.value -> "Lista delle entrate aggiornata!"
+            else -> "Income list updated!" // english
+        }
+    ),
+
+    INCOME_LIST_UPDATE_FAILURE(
+        71, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Income list not updated!"
+            Languages.ITALIANO.value -> "Lista delle entrate non aggiornata!"
+            else -> "Income list not updated!" // english
+        }
+    ),
+
+    INCOME_ADD_SUCCESS(
+        72, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Income added!"
             Languages.ITALIANO.value -> "Entrata aggiunta!"
             else -> "Income added!" // english
@@ -156,7 +172,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     INCOME_ADD_FAILURE(
-        71, when (getCurrentLanguage()) {
+        73, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Income not added!"
             Languages.ITALIANO.value -> "Entrata non aggiunta!"
             else -> "Income not added!" // english

@@ -99,6 +99,7 @@
     <string name="edit_full_name">Edit the full name</string>
     <string name="purchase_category_icon">Purchase Category Icon</string>
     <string name="no_purchases">No purchases</string>
+    <string name="no_incomes">No incomes</string>
 
     <string name="zero_double" translatable="false">0.00</string>
 

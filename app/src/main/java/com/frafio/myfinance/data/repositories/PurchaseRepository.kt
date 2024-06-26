@@ -33,8 +33,14 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return purchaseManager.updatePurchaseList(limit)
     }
 
-    fun getPurchaseNumber(): LiveData<PurchaseResult> {
-        return purchaseManager.getPurchaseNumber()
+    fun updateIncomeList(limit: Long): LiveData<PurchaseResult> {
+        return purchaseManager.updateIncomeList(limit)
+    }
+
+    fun getPurchaseNumber(
+        collection: String = DbPurchases.FIELDS.PAYMENTS.value
+    ): LiveData<PurchaseResult> {
+        return purchaseManager.getPurchaseNumber(collection)
     }
 
     fun getSumPrices(

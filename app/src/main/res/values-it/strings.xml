@@ -82,6 +82,7 @@
     <string name="edit_full_name">Modifica il nome</string>
     <string name="purchase_category_icon">Icona di categoria acquisto</string>
     <string name="no_purchases">Nessun acquisto</string>
+    <string name="no_incomes">Nessuna entrata</string>
 
     <string name="monthly_budget">Budget mensile</string>
     <string name="annual_budget">Budget annuale</string>

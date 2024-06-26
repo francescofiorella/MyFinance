@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.MyFinanceApplication
+import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 
@@ -30,6 +31,16 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     private val _annualBudget = MutableLiveData<Double>()
     val annualBudget: LiveData<Double>
         get() = _annualBudget
+
+    fun updateIncomeList(limit: Long) {
+        val response = purchaseRepository.updateIncomeList(limit)
+        listener?.onCompleted(response, null)
+    }
+
+    fun updateIncomeNumber() {
+        val response = purchaseRepository.getPurchaseNumber(DbPurchases.FIELDS.INCOMES.value)
+        listener?.onCompleted(response, null)
+    }
 
     fun updateLocalIncomeList() {
         val incomes = purchaseRepository.getIncomeList()
