@@ -30,6 +30,7 @@ object DbPurchases {
 
     enum class CATEGORIES(val value: Int) {
         TOTAL(100),
+        INCOME(101),
         HOUSING(0),
         GROCERIES(1),
         PERSONAL_CARE(2),

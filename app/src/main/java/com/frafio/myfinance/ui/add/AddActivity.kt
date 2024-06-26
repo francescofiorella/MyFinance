@@ -134,8 +134,9 @@ class AddActivity : AppCompatActivity(), AddListener {
 
         when (code) {
             REQUEST_ADD_CODE -> {
+                viewModel.addCode = REQUEST_PAYMENT_CODE
                 viewModel.category = -1
-                binding.toggleButton.addOnButtonCheckedListener { toggleButton, checkedId, isChecked ->
+                binding.toggleButton.addOnButtonCheckedListener { toggleButton, _, _ ->
                     when (toggleButton.checkedButtonId) {
                         R.id.payments_btn -> {
                             viewModel.addCode = REQUEST_PAYMENT_CODE
@@ -165,7 +166,6 @@ class AddActivity : AppCompatActivity(), AddListener {
                     intent.getDoubleExtra(PURCHASE_PRICE_KEY, 0.0)
                         .also {
                             viewModel.priceString = doubleToString(it)
-                            viewModel.purchasePrice = it
                         }
                     intent.getIntExtra(PURCHASE_CATEGORY_KEY, 0).also {
                         viewModel.category = it
@@ -246,6 +246,7 @@ class AddActivity : AppCompatActivity(), AddListener {
                 PurchaseCode.PURCHASE_EDIT_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
+                        it.putExtra(PURCHASE_REQUEST_KEY, true)
                         setResult(RESULT_OK, it)
                         finish()
                     }

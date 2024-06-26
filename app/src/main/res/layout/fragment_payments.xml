@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="@{viewModel.purchaseListSize == 0 ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.isPurchasesEmpty ? View.VISIBLE : View.GONE}"
             tools:visibility="gone">
 
             <ImageView
@@ -62,7 +62,7 @@
             android:layout_height="match_parent"
             android:paddingTop="@dimen/fragment_margin_top"
             android:scrollbars="vertical"
-            android:visibility="@{viewModel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
+            android:visibility="@{viewModel.isPurchasesEmpty ? View.GONE : View.VISIBLE}"
             app:backgroundTint="?android:colorBackground"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/layout_purchase_item_rv"

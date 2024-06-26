@@ -15,9 +15,9 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
 
     var listener: PaymentListener? = null
 
-    private val _purchaseListSize = MutableLiveData<Int>()
-    val purchaseListSize: LiveData<Int>
-        get() = _purchaseListSize
+    private val _isPurchasesEmpty = MutableLiveData<Boolean>()
+    val isPurchasesEmpty: LiveData<Boolean>
+        get() = _isPurchasesEmpty
 
     private val _purchases = MutableLiveData<List<Purchase>>()
     val purchases: LiveData<List<Purchase>>
@@ -26,15 +26,12 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
     fun updateLocalPurchaseList() {
         val purchases = purchaseRepository.getPurchaseList()
         _purchases.postValue(purchases)
+        _isPurchasesEmpty.postValue(purchases.isEmpty())
     }
 
     fun deletePurchaseAt(position: Int, purchase: Purchase) {
         val response = purchaseRepository.deletePurchaseAt(position)
         listener?.onDeleteComplete(response, purchase)
-    }
-
-    fun updateListSize() {
-        _purchaseListSize.value = purchaseRepository.purchaseListSize()
     }
 
     fun updateCategory(purchase: Purchase, newCategory: Int, position: Int) {

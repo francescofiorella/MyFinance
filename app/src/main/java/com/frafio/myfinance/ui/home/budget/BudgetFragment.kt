@@ -153,6 +153,5 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     fun refreshData() {
         viewModel.updateLocalIncomeList()
         viewModel.getMonthlyBudgetFromDb()
-        scrollUp()
     }
 }

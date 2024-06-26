@@ -37,7 +37,6 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
 
-
 class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentListener {
 
     private lateinit var binding: FragmentPaymentsBinding
@@ -73,8 +72,8 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
         viewModel.updateLocalPurchaseList()
         viewModel.updatePurchaseNumber()
+
         viewModel.purchases.observe(viewLifecycleOwner) { purchases ->
-            viewModel.updateListSize()
             val nl = purchases.map { p -> p.copy() }
             binding.listRecyclerView.also {
                 if (it.adapter == null) {
@@ -171,7 +170,11 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
                     viewModel.updateLocalPurchaseList()
-                    val limit = (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
+                    val limit = if (binding.listRecyclerView.adapter != null) {
+                        (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
+                    } else {
+                        DEFAULT_LIMIT
+                    }
                     isListBlocked = limit >= maxPurchaseNumber
                 }
 
@@ -182,7 +185,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 PurchaseCode.PURCHASE_ADD_SUCCESS.code -> {
                     viewModel.updateLocalPurchaseList()
                     (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
-                    viewModel.updateListSize()
                     val payload = result.message.split("&")
                     (activity as HomeActivity).showSnackBar(payload[0])
                 }
@@ -202,7 +204,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             if (result.code != PurchaseCode.PURCHASE_DELETE_FAILURE.code) {
                 viewModel.updateLocalPurchaseList()
                 (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
-                viewModel.updateListSize()
 
                 (activity as HomeActivity).showSnackBar(
                     result.message,
@@ -218,8 +219,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
     fun refreshListData() {
         viewModel.updateLocalPurchaseList()
-        viewModel.updateListSize()
-        scrollUp()
     }
 
     override fun scrollUp() {

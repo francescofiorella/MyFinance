@@ -31,7 +31,6 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
     var day: Int? = LocalDate.now().dayOfMonth
 
     var purchaseID: String? = null
-    var purchasePrice: Double? = null
     var purchasePosition: Int? = null
 
     var requestCode: Int? = null
@@ -64,7 +63,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         if (addCode == AddActivity.REQUEST_INCOME_CODE) {
-            category = 0
+            category = DbPurchases.CATEGORIES.INCOME.value
         } else if (category == -1) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_CATEGORY))
             return
