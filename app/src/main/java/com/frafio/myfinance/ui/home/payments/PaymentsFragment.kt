@@ -48,9 +48,9 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
 
-            val editRequest = data!!.getBooleanExtra(AddActivity.PURCHASE_REQUEST_KEY, false)
+            val editRequest = data!!.getIntExtra(AddActivity.PURCHASE_REQUEST_KEY, -1)
 
-            if (editRequest) {
+            if (editRequest == AddActivity.REQUEST_PAYMENT_CODE) {
                 viewModel.updateLocalPurchaseList()
                 (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
                 (activity as HomeActivity).showSnackBar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
@@ -367,6 +367,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         editLayout.setOnClickListener {
             Intent(context, AddActivity::class.java).also {
                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
+                it.putExtra(AddActivity.PURCHASE_REQUEST_KEY, AddActivity.REQUEST_PAYMENT_CODE)
                 it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
                 it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
                 it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)

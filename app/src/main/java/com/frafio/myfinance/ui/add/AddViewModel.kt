@@ -34,7 +34,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
     var purchasePosition: Int? = null
 
     var requestCode: Int? = null
-    var addCode: Int? = null
+    var purchaseCode: Int? = null
 
     fun updateTime(datePickerBtn: DatePickerButton) {
         year = datePickerBtn.year
@@ -62,7 +62,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        if (addCode == AddActivity.REQUEST_INCOME_CODE) {
+        if (purchaseCode == AddActivity.REQUEST_INCOME_CODE) {
             category = DbPurchases.CATEGORIES.INCOME.value
         } else if (category == -1) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_CATEGORY))
@@ -82,13 +82,12 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                     dateToUTCTimestamp(year!!, month!!, day!!),
                     category
                 )
-                if (addCode == AddActivity.REQUEST_PAYMENT_CODE) {
-                    val response = purchaseRepository.addPurchase(purchase)
-                    listener?.onAddSuccess(response)
+                val response = if (purchaseCode == AddActivity.REQUEST_PAYMENT_CODE) {
+                    purchaseRepository.addPurchase(purchase)
                 } else {
-                    val response = purchaseRepository.addIncome(purchase)
-                    listener?.onAddSuccess(response)
+                    purchaseRepository.addIncome(purchase)
                 }
+                listener?.onAddSuccess(response)
             }
 
             AddActivity.REQUEST_EDIT_CODE -> {
@@ -104,8 +103,11 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                         purchaseID
                     )
 
-                val response =
+                val response = if (purchaseCode == AddActivity.REQUEST_PAYMENT_CODE) {
                     purchaseRepository.editPurchase(purchase, purchasePosition!!)
+                } else {
+                    purchaseRepository.editIncome(purchase, purchasePosition!!)
+                }
                 listener?.onAddSuccess(response)
             }
         }

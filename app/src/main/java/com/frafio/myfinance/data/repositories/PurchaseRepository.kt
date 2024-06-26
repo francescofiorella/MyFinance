@@ -109,6 +109,13 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return purchaseManager.editPurchase(purchase, position)
     }
 
+    fun editIncome(
+        income: Purchase,
+        position: Int
+    ): LiveData<PurchaseResult> {
+        return purchaseManager.editIncome(income, position)
+    }
+
     private fun calculateAvgTrend(): List<Pair<String, Double>> {
         val avgList = mutableListOf<Pair<String, Double>>()
 

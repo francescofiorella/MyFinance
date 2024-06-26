@@ -9,6 +9,7 @@
     <string name="add_purchase">Nuovo pagamento</string>
     <string name="edit_purchase">Modifica pagamento</string>
     <string name="add_income">Nuova entrata</string>
+    <string name="edit_income">Modifica entrata</string>
 
     <string name="addBtnContentDescription">Aggiungi un pagamento</string>
 
@@ -87,6 +88,7 @@
     <string name="monthly_budget">Budget mensile</string>
     <string name="annual_budget">Budget annuale</string>
     <string name="incomes">Entrate</string>
+    <string name="amount">Importo</string>
 
     <string name="housing">Abitazioni</string>
     <string name="groceries">Alimentari</string>

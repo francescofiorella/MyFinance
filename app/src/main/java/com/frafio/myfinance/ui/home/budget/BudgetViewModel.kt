@@ -70,7 +70,7 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun addIncome(income: Purchase) {
-        val response = purchaseRepository.addPurchase(income)
+        val response = purchaseRepository.addIncome(income)
         listener?.onCompleted(response, null)
     }
 }

@@ -134,18 +134,18 @@ class AddActivity : AppCompatActivity(), AddListener {
 
         when (code) {
             REQUEST_ADD_CODE -> {
-                viewModel.addCode = REQUEST_PAYMENT_CODE
+                viewModel.purchaseCode = REQUEST_PAYMENT_CODE
                 viewModel.category = -1
                 binding.toggleButton.addOnButtonCheckedListener { toggleButton, _, _ ->
                     when (toggleButton.checkedButtonId) {
                         R.id.payments_btn -> {
-                            viewModel.addCode = REQUEST_PAYMENT_CODE
+                            viewModel.purchaseCode = REQUEST_PAYMENT_CODE
                             binding.addPurchaseTitle.text = getString(R.string.add_purchase)
                             binding.categoryTextInputLayout.visibility = View.VISIBLE
                         }
 
                         R.id.incomes_btn -> {
-                            viewModel.addCode = REQUEST_INCOME_CODE
+                            viewModel.purchaseCode = REQUEST_INCOME_CODE
                             binding.addPurchaseTitle.text = getString(R.string.add_income)
                             binding.categoryTextInputLayout.visibility = View.GONE
                         }
@@ -156,52 +156,58 @@ class AddActivity : AppCompatActivity(), AddListener {
             REQUEST_EDIT_CODE -> {
                 binding.toggleButton.visibility = View.GONE
                 binding.addPurchaseTitle.text = getString(R.string.edit_purchase)
-                intent.also { intent ->
-                    intent.getStringExtra(PURCHASE_ID_KEY)?.let {
+                intent.apply {
+                    getIntExtra(REQUEST_CODE_KEY, -1).also {
+                        viewModel.purchaseCode = it
+                    }
+                    getStringExtra(PURCHASE_ID_KEY)?.let {
                         viewModel.purchaseID = it
                     }
-                    intent.getStringExtra(PURCHASE_NAME_KEY)?.let {
+                    getStringExtra(PURCHASE_NAME_KEY)?.let {
                         viewModel.name = it
                     }
-                    intent.getDoubleExtra(PURCHASE_PRICE_KEY, 0.0)
-                        .also {
-                            viewModel.priceString = doubleToString(it)
-                        }
-                    intent.getIntExtra(PURCHASE_CATEGORY_KEY, 0).also {
+                    getDoubleExtra(PURCHASE_PRICE_KEY, 0.0).also {
+                        viewModel.priceString = doubleToString(it)
+                    }
+                    getIntExtra(PURCHASE_CATEGORY_KEY, 0).also {
                         viewModel.category = it
                     }
-                    intent.getIntExtra(PURCHASE_POSITION_KEY, 0)
-                        .also {
-                            viewModel.purchasePosition = it
-                        }
-                    intent.getIntExtra(PURCHASE_YEAR_KEY, 0).also {
+                    getIntExtra(PURCHASE_POSITION_KEY, 0).also {
+                        viewModel.purchasePosition = it
+                    }
+                    getIntExtra(PURCHASE_YEAR_KEY, 0).also {
                         datePickerBtn.year = it
                     }
-                    intent.getIntExtra(PURCHASE_MONTH_KEY, 0).also {
+                    getIntExtra(PURCHASE_MONTH_KEY, 0).also {
                         datePickerBtn.month = it
                     }
-                    intent.getIntExtra(PURCHASE_DAY_KEY, 0).also {
+                    getIntExtra(PURCHASE_DAY_KEY, 0).also {
                         datePickerBtn.day = it
                     }
                 }
 
-                val categories = resources.getStringArray(R.array.categories)
-                if (viewModel.category != null && viewModel.category!! >= 0 && viewModel.category!! < categories.size) {
-                    binding.categoryAutoCompleteTV.setText(categories[viewModel.category!!])
-                    binding.categoryTextInputLayout.setStartIconDrawable(
-                        when (viewModel.category) {
-                            DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                            DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                            DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                            DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                            DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                            DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                            DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                            DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                            DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
-                            else -> R.drawable.ic_tag
-                        }
-                    )
+                if (viewModel.purchaseCode == REQUEST_PAYMENT_CODE) {
+                    val categories = resources.getStringArray(R.array.categories)
+                    if (viewModel.category != null && viewModel.category!! >= 0 && viewModel.category!! < categories.size) {
+                        binding.categoryAutoCompleteTV.setText(categories[viewModel.category!!])
+                        binding.categoryTextInputLayout.setStartIconDrawable(
+                            when (viewModel.category) {
+                                DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                                DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                                DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                                DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                                DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                                DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                                DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                                DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                                DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                                else -> R.drawable.ic_tag
+                            }
+                        )
+                    }
+                } else {
+                    binding.addPurchaseTitle.text = getString(R.string.edit_income)
+                    binding.categoryTextInputLayout.visibility = View.GONE
                 }
             }
         }
@@ -246,7 +252,7 @@ class AddActivity : AppCompatActivity(), AddListener {
                 PurchaseCode.PURCHASE_EDIT_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
-                        it.putExtra(PURCHASE_REQUEST_KEY, true)
+                        it.putExtra(PURCHASE_REQUEST_KEY, REQUEST_PAYMENT_CODE)
                         setResult(RESULT_OK, it)
                         finish()
                     }
@@ -258,6 +264,15 @@ class AddActivity : AppCompatActivity(), AddListener {
                         it.putExtra(PURCHASE_REQUEST_KEY, REQUEST_INCOME_CODE)
                         it.putExtra(ADD_RESULT_MESSAGE, payload[0])
                         it.putExtra(PURCHASE_POSITION_KEY, payload[1].toInt())
+                        setResult(RESULT_OK, it)
+                        finish()
+                    }
+                }
+
+                PurchaseCode.INCOME_EDIT_SUCCESS.code -> {
+                    // go back to the homepage
+                    Intent().also {
+                        it.putExtra(PURCHASE_REQUEST_KEY, REQUEST_INCOME_CODE)
                         setResult(RESULT_OK, it)
                         finish()
                     }

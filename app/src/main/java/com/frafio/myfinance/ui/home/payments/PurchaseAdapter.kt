@@ -63,8 +63,7 @@ class PurchaseAdapter(
                 )
             val types = holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemCategoryTextView
                 .context.resources.getStringArray(R.array.categories)
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemCategoryTextView
-                .text =
+            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemCategoryTextView.text =
                 types[currentPurchase.category ?: DbPurchases.CATEGORIES.MISCELLANEOUS.value]
             holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
                 .setOnLongClickListener {

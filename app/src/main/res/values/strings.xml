@@ -9,6 +9,7 @@
     <string name="add_purchase">New payment</string>
     <string name="edit_purchase">Edit payment</string>
     <string name="add_income">New income</string>
+    <string name="edit_income">Edit income</string>
 
     <string name="addBtnContentDescription">Add a payment</string>
 
@@ -106,6 +107,7 @@
     <string name="monthly_budget">Monthly budget</string>
     <string name="annual_budget">Annual budget</string>
     <string name="incomes">Incomes</string>
+    <string name="amount">Amount</string>
 
     <string name="housing">Housing</string>
     <string name="groceries">Groceries</string>

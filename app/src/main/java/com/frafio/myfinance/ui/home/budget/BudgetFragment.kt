@@ -1,9 +1,15 @@
 package com.frafio.myfinance.ui.home.budget
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -18,19 +24,40 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentBudgetBinding
 import com.frafio.myfinance.ui.BaseFragment
+import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.ui.home.payments.PurchaseAdapter
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LOAD_MORE_REQUEST
+import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.utils.clearText
+import com.frafio.myfinance.utils.createTextDrawable
+import com.frafio.myfinance.utils.dateToString
+import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.hideSoftKeyboard
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.sidesheet.SideSheetDialog
+import com.google.android.material.textview.MaterialTextView
 
 class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener {
     private lateinit var binding: FragmentBudgetBinding
     private val viewModel by viewModels<BudgetViewModel>()
     private var isListBlocked = false
     private var maxIncomeNumber: Long = DEFAULT_LIMIT + 1
+
+    private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data: Intent? = result.data
+
+            val editRequest = data!!.getIntExtra(AddActivity.PURCHASE_REQUEST_KEY, -1)
+
+            if (editRequest == AddActivity.REQUEST_INCOME_CODE) {
+                viewModel.updateLocalIncomeList()
+                (activity as HomeActivity).showSnackBar(PurchaseCode.INCOME_EDIT_SUCCESS.message)
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -194,14 +221,35 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     override fun onItemInteraction(interactionID: Int, income: Purchase, position: Int) {
         when (interactionID) {
             ON_LONG_CLICK -> {
-                viewModel.deleteIncomeAt(position, income)
+                if (requireActivity().findViewById<NavigationView?>(R.id.nav_drawer) != null) {
+                    val sideSheetDialog = SideSheetDialog(requireContext())
+                    sideSheetDialog.setContentView(R.layout.layout_edit_purchase_bottom_sheet)
+                    defineSheetInterface(
+                        sideSheetDialog.findViewById(android.R.id.content)!!,
+                        income,
+                        position,
+                        editResultLauncher,
+                        viewModel,
+                        sideSheetDialog::hide
+                    )
+                    sideSheetDialog.show()
+                } else {
+                    val modalBottomSheet = ModalBottomSheet(
+                        this,
+                        income,
+                        position,
+                        editResultLauncher,
+                        viewModel
+                    )
+                    modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+                }
             }
 
             ON_LOAD_MORE_REQUEST -> {
                 // Increment elements limit on scroll
                 if (!isListBlocked) {
                     viewModel.updateIncomeList(
-                        (binding.budgetRecycleView.adapter as PurchaseAdapter).getLimit(true)
+                        (binding.budgetRecycleView.adapter as IncomeAdapter).getLimit(true)
                     )
                     isListBlocked = true
                 }
@@ -219,5 +267,78 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     fun refreshData() {
         viewModel.updateLocalIncomeList()
         viewModel.getMonthlyBudgetFromDb()
+    }
+
+    class ModalBottomSheet(
+        private val fragment: BudgetFragment,
+        private val income: Purchase,
+        private val position: Int,
+        private val editResultLauncher: ActivityResultLauncher<Intent>,
+        private val viewModel: BudgetViewModel
+    ) : BottomSheetDialogFragment() {
+
+        companion object {
+            const val TAG = "ModalBottomSheet"
+        }
+
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            val layout =
+                inflater.inflate(R.layout.layout_edit_purchase_bottom_sheet, container, false)
+            fragment.defineSheetInterface(
+                layout,
+                income,
+                position,
+                editResultLauncher,
+                viewModel,
+                this::dismiss
+            )
+            return layout
+        }
+    }
+
+    fun defineSheetInterface(
+        layout: View,
+        income: Purchase,
+        position: Int,
+        editResultLauncher: ActivityResultLauncher<Intent>,
+        viewModel: BudgetViewModel,
+        dismissFun: () -> Unit
+    ) {
+        layout.findViewById<MaterialTextView>(R.id.nameTV).text = income.name
+        layout.findViewById<MaterialTextView>(R.id.dateTV).text =
+            dateToString(income.day, income.month, income.year)
+        layout.findViewById<MaterialTextView>(R.id.priceTV).text =
+            doubleToPrice(income.price ?: 0.0)
+        layout.findViewById<MaterialButton>(R.id.purchaseCategoryIcon).icon =
+            createTextDrawable(layout.context, income.name!![0].uppercase())
+
+        val editLayout = layout.findViewById<LinearLayout>(R.id.edit_layout)
+        val deleteLayout = layout.findViewById<LinearLayout>(R.id.delete_layout)
+        layout.findViewById<LinearLayout>(R.id.editPurchaseLayout).visibility = View.VISIBLE
+        layout.findViewById<ConstraintLayout>(R.id.editCategoryLayout).visibility = View.GONE
+        editLayout.setOnClickListener {
+            Intent(context, AddActivity::class.java).also {
+                it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
+                it.putExtra(AddActivity.PURCHASE_REQUEST_KEY, AddActivity.REQUEST_INCOME_CODE)
+                it.putExtra(AddActivity.PURCHASE_ID_KEY, income.id)
+                it.putExtra(AddActivity.PURCHASE_NAME_KEY, income.name)
+                it.putExtra(AddActivity.PURCHASE_PRICE_KEY, income.price)
+                it.putExtra(AddActivity.PURCHASE_CATEGORY_KEY, income.category)
+                it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
+                it.putExtra(AddActivity.PURCHASE_YEAR_KEY, income.year)
+                it.putExtra(AddActivity.PURCHASE_MONTH_KEY, income.month)
+                it.putExtra(AddActivity.PURCHASE_DAY_KEY, income.day)
+                editResultLauncher.launch(it)
+            }
+            dismissFun()
+        }
+        deleteLayout.setOnClickListener {
+            viewModel.deleteIncomeAt(position, income)
+            dismissFun()
+        }
     }
 }

@@ -253,6 +253,16 @@ object PurchaseStorage {
                     category = DbPurchases.CATEGORIES.TOTAL.value,
                     id = income.year.toString()
                 )
+            } else if (isFirstIncome && income.year!! > todayYear) {
+                total = Purchase(
+                    name = DbPurchases.NAMES.TOTAL.value,
+                    price = 0.0,
+                    year = income.year,
+                    month = 0,
+                    day = 0,
+                    category = DbPurchases.CATEGORIES.TOTAL.value,
+                    id = income.year.toString()
+                )
             }
 
             isFirstIncome = false
@@ -332,8 +342,13 @@ object PurchaseStorage {
             // Scorri per trovare posizione giusta
             i++
             while (i < incomeList.size) {
-                if (incomeList[i].year != income.year ||
-                    incomeList[i].price!! < income.price
+                if (incomeList[i].year != income.year
+                    || incomeList[i].month!! < income.month!!
+                    || (incomeList[i].month == income.month
+                            && incomeList[i].day!! < income.day!!)
+                    || (incomeList[i].month == income.month
+                            && incomeList[i].day == income.day
+                            && incomeList[i].price!! < income.price)
                 ) {
                     break
                 }

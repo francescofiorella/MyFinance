@@ -147,10 +147,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun editPurchase(
-        purchase: Purchase,
-        position: Int
-    ): LiveData<PurchaseResult> {
+    fun editPurchase(purchase: Purchase, position: Int): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
@@ -297,6 +294,25 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
                 response.value = PurchaseResult(PurchaseCode.INCOME_DELETE_FAILURE)
             }
+
+        return response
+    }
+
+    fun editIncome(income: Purchase, position: Int): LiveData<PurchaseResult> {
+        val response = MutableLiveData<PurchaseResult>()
+
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(DbPurchases.FIELDS.INCOMES.value)
+            .document(income.id!!).set(income).addOnSuccessListener {
+                PurchaseStorage.deleteIncomeAt(position)
+                PurchaseStorage.addIncome(income)
+                response.value = PurchaseResult(PurchaseCode.INCOME_EDIT_SUCCESS)
+            }.addOnFailureListener { e ->
+                Log.e(TAG, "Error! ${e.localizedMessage}")
+                response.value = PurchaseResult(PurchaseCode.INCOME_EDIT_FAILURE)
+            }
+
 
         return response
     }
