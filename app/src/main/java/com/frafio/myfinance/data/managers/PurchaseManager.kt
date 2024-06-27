@@ -166,12 +166,14 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun getSumPrices(
+    fun getThisYearTotal(
         response: MutableLiveData<Pair<PurchaseCode, Double>> = MutableLiveData()
     ): MutableLiveData<Pair<PurchaseCode, Double>> {
+        val todayDate = LocalDate.now()
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .whereEqualTo(DbPurchases.FIELDS.YEAR.value, todayDate.year)
             .aggregate(AggregateField.sum(DbPurchases.FIELDS.PRICE.value))
             .get(AggregateSource.SERVER)
             .addOnSuccessListener { snapshot ->

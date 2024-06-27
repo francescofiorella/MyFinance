@@ -74,7 +74,7 @@
                 android:rowCount="4">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/materialCardView5"
+                    android:id="@+id/materialCardView1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="0"
@@ -94,8 +94,18 @@
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
 
+                        <ImageView
+                            android:id="@+id/change_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/change_content"
+                            android:src="@drawable/ic_swap_horiz"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/numTot_TV_title"
+                            android:id="@+id/thisMonth_TV_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
@@ -105,17 +115,16 @@
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/numTot_TV"
+                            android:id="@+id/thisMonth_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
-                            android:text="@{viewModel.lastMonthString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/numTot_TV_title"
+                            app:layout_constraintTop_toBottomOf="@id/thisMonth_TV_title"
                             tools:text="€ 0.00" />
 
                         <com.google.android.material.textview.MaterialTextView
@@ -128,19 +137,18 @@
                             android:textSize="20sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/numTot_TV" />
+                            app:layout_constraintTop_toBottomOf="@id/thisMonth_TV" />
 
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/monthlyBudget_TV"
+                            android:id="@+id/budget_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
-                            android:text="@{viewModel.monthlyBudget}"
                             android:textSize="20sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toEndOf="@id/slash_TV"
-                            app:layout_constraintTop_toBottomOf="@id/numTot_TV"
+                            app:layout_constraintTop_toBottomOf="@id/thisMonth_TV"
                             tools:text="0.00" />
 
                         <androidx.constraintlayout.widget.Guideline
@@ -187,6 +195,8 @@
                             android:background="@drawable/bg_round_corners"
                             android:backgroundTint="?attr/colorPrimary"
                             app:layout_constraintBottom_toBottomOf="@id/progress_bar_back"
+                            app:layout_constraintEnd_toEndOf="@id/progress_bar_back"
+                            app:layout_constraintHorizontal_bias="0.0"
                             app:layout_constraintStart_toStartOf="@id/progress_bar_back"
                             app:layout_constraintTop_toTopOf="@id/progress_bar_back"
                             tools:layout_width="60dp" />
@@ -197,6 +207,52 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/materialCardView2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="1"
+                    android:layout_column="0"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="@dimen/card_full_margin"
+                    android:layout_marginTop="@dimen/card_half_margin"
+                    android:layout_marginEnd="@dimen/card_half_margin"
+                    android:layout_marginBottom="@dimen/card_half_margin"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/todayTot_TV_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/today"
+                            android:textSize="@dimen/card_title_size" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/todayTot_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_marginTop="@dimen/card_text_space"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:text="@{viewModel.todayTotString}"
+                            android:textColor="@color/primary_text"
+                            android:textSize="@dimen/card_price_size"
+                            tools:text="€ 0.00" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView3"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="1"
@@ -243,52 +299,6 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/materialCardView3"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_row="1"
-                    android:layout_column="0"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="@dimen/card_full_margin"
-                    android:layout_marginTop="@dimen/card_half_margin"
-                    android:layout_marginEnd="@dimen/card_half_margin"
-                    android:layout_marginBottom="@dimen/card_half_margin"
-                    app:cardCornerRadius="@dimen/card_corner_radius">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="25dp"
-                        android:paddingVertical="20dp">
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/todayTot_TV_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:fontFamily="@font/nunito"
-                            android:text="@string/today"
-                            android:textSize="@dimen/card_title_size" />
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/todayTot_TV"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_marginTop="@dimen/card_text_space"
-                            android:fontFamily="@font/nunito_semibold"
-                            android:maxLines="1"
-                            android:text="@{viewModel.todayTotString}"
-                            android:textColor="@color/primary_text"
-                            android:textSize="@dimen/card_price_size"
-                            tools:text="€ 0.00" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/materialCardView4"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -309,23 +319,22 @@
                         android:paddingVertical="20dp">
 
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/tot_TV_title"
+                            android:id="@+id/thisYear_TV_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
-                            android:text="@string/total"
+                            android:text="@string/this_year_next"
                             android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/tot_TV"
+                            android:id="@+id/thisYear_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start"
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
-                            android:text="@{viewModel.totString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
                             tools:text="€ 0.00" />
@@ -335,7 +344,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/materialCardView6"
+                    android:id="@+id/materialCardView5"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="2"
@@ -381,7 +390,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/materialCardView7"
+                    android:id="@+id/materialCardView6"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="3"
@@ -427,7 +436,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/materialCardView8"
+                    android:id="@+id/materialCardView7"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="3"

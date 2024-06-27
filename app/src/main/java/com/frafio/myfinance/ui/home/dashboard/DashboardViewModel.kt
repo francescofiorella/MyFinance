@@ -16,6 +16,8 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         (application as MyFinanceApplication).purchaseManager
     )
 
+    var monthShown = true
+
     private val _purchaseListSize = MutableLiveData<Int>()
     val purchaseListSize: LiveData<Int>
         get() = _purchaseListSize
@@ -32,13 +34,13 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     val todayTotString: LiveData<String>
         get() = _todayTotString
 
-    private val _totString = MutableLiveData<String>()
-    val totString: LiveData<String>
-        get() = _totString
+    private val _thisYearString = MutableLiveData<String>()
+    val thisYearString: LiveData<String>
+        get() = _thisYearString
 
-    private val _lastMonthString = MutableLiveData<String>()
-    val lastMonthString: LiveData<String>
-        get() = _lastMonthString
+    private val _thisMonthString = MutableLiveData<String>()
+    val thisMonthString: LiveData<String>
+        get() = _thisMonthString
 
     private val _rentTotString = MutableLiveData<String>()
     val rentTotString: LiveData<String>
@@ -52,17 +54,17 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     val transportTotString: LiveData<String>
         get() = _transportTotString
 
-    private val _totalSumResult = MutableLiveData<Pair<PurchaseCode, Double>>()
-    val totalSumResult: LiveData<Pair<PurchaseCode, Double>>
-        get() = _totalSumResult
+    private val _thisYearResult = MutableLiveData<Pair<PurchaseCode, Double>>()
+    val thisYearResult: LiveData<Pair<PurchaseCode, Double>>
+        get() = _thisYearResult
 
     private val _todayTotalResult = MutableLiveData<Pair<PurchaseCode, Double>>()
     val todayTotalResult: LiveData<Pair<PurchaseCode, Double>>
         get() = _todayTotalResult
 
-    private val _thisMonthTotalResult = MutableLiveData<Pair<PurchaseCode, Double>>()
-    val thisMonthTotalResult: LiveData<Pair<PurchaseCode, Double>>
-        get() = _thisMonthTotalResult
+    private val _thisMonthResult = MutableLiveData<Pair<PurchaseCode, Double>>()
+    val thisMonthResult: LiveData<Pair<PurchaseCode, Double>>
+        get() = _thisMonthResult
 
     fun updateStats() {
         val stats = purchaseRepository.calculateStats()
@@ -71,22 +73,22 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         _rentTotString.value = stats[5]
         _shoppingTotString.value = stats[6]
         _transportTotString.value = stats[7]
-        purchaseRepository.getSumPrices(_totalSumResult)
+        purchaseRepository.getThisYearTotal(_thisYearResult)
         purchaseRepository.getTodayTotal(_todayTotalResult)
-        purchaseRepository.getThisMonthTotal(_thisMonthTotalResult)
+        purchaseRepository.getThisMonthTotal(_thisMonthResult)
         _monthlyBudget.value = doubleToString(purchaseRepository.getMonthlyBudgetFromStorage())
     }
 
     fun updateStats(
-        totalSum: Double? = null,
+        thisYearTot: Double? = null,
         todayTot: Double? = null,
-        thisMonthTotal: Double? = null
+        thisMonthTot: Double? = null
     ) {
-        totalSum?.let {
-            _totString.value = if (totalSum < 1000.0) {
-                doubleToPrice(totalSum)
+        thisYearTot?.let {
+            _thisYearString.value = if (thisYearTot < 1000.0) {
+                doubleToPrice(thisYearTot)
             } else {
-                doubleToPriceWithoutDecimals(totalSum)
+                doubleToPriceWithoutDecimals(thisYearTot)
             }
         }
         todayTot?.let {
@@ -96,8 +98,12 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                 doubleToPriceWithoutDecimals(todayTot)
             }
         }
-        thisMonthTotal?.let {
-            _lastMonthString.value = doubleToPrice(thisMonthTotal)
+        thisMonthTot?.let {
+            _thisMonthString.value = if (thisMonthTot < 1000.0) {
+                doubleToPrice(thisMonthTot)
+            } else {
+                doubleToPriceWithoutDecimals(thisMonthTot)
+            }
         }
     }
 }

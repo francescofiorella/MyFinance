@@ -46,14 +46,15 @@
     <string name="warning_home">Add your first payment!</string>
     <string name="warning_budget">No income to show</string>
 
-    <string name="avg_day">Daily \nAverage</string>
-    <string name="avg_month">Monthly \nAverage</string>
-    <string name="today">Today \nPayment</string>
-    <string name="this_month">Last month</string>
-    <string name="total">Payment \nTotal</string>
-    <string name="total_transport">Transport \nTotal</string>
-    <string name="total_rent">Rent \nTotal</string>
-    <string name="total_shopping">Shopping \nTotal</string>
+    <string name="avg_month">Monthly \naverage</string>
+    <string name="today">Today \npayment</string>
+    <string name="this_month">This month</string>
+    <string name="this_year">This year</string>
+    <string name="this_month_next">This \nmonth</string>
+    <string name="this_year_next">This \nyear</string>
+    <string name="total_transport">Transport \ntotal</string>
+    <string name="total_rent">Rent \ntotal</string>
+    <string name="total_shopping">Shopping \ntotal</string>
 
     <string name="logout">Log Out</string>
     <string name="profile_picture">Profile Picture</string>
@@ -103,6 +104,7 @@
     <string name="no_incomes">No incomes</string>
 
     <string name="zero_double" translatable="false">0.00</string>
+    <string name="zero_price" translatable="false">€ 0.00</string>
 
     <string name="monthly_budget">Monthly budget</string>
     <string name="annual_budget">Annual budget</string>
@@ -118,6 +120,7 @@
     <string name="health">Health</string>
     <string name="transportation">Transportation</string>
     <string name="miscellaneous">Miscellaneous</string>
+    <string name="change_content">Change content</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>

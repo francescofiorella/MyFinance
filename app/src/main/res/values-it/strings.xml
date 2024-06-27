@@ -45,14 +45,15 @@
     <string name="warning_home">Aggiungi il tuo primo pagamento!</string>
     <string name="warning_budget">Nessuna entrata da mostrare</string>
 
-    <string name="avg_day">Media \nGiornaliera</string>
-    <string name="avg_month">Media \nMensile</string>
-    <string name="today">Acquisti \nOggi</string>
-    <string name="this_month">Ultimo mese</string>
-    <string name="total">Totale \nAcquisti</string>
-    <string name="total_transport">Totale \nTrasporti</string>
-    <string name="total_rent">Totale \nAffitto</string>
-    <string name="total_shopping">Totale \nSpesa</string>
+    <string name="avg_month">Media \nmensile</string>
+    <string name="today">Acquisti \noggi</string>
+    <string name="this_month">Questo mese</string>
+    <string name="this_year">Quest\'anno</string>
+    <string name="this_month_next">Questo \nmese</string>
+    <string name="this_year_next">Questo \nanno</string>
+    <string name="total_transport">Totale \ntrasporti</string>
+    <string name="total_rent">Totale \naffitto</string>
+    <string name="total_shopping">Totale \nspesa</string>
 
     <string name="logout">Log Out</string>
     <string name="profile_picture">Immagine di profilo</string>

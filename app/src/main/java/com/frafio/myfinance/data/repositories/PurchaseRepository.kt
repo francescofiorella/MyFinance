@@ -43,10 +43,10 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return purchaseManager.getPurchaseNumber(collection)
     }
 
-    fun getSumPrices(
+    fun getThisYearTotal(
         result: MutableLiveData<Pair<PurchaseCode, Double>> = MutableLiveData()
     ): MutableLiveData<Pair<PurchaseCode, Double>> {
-        return purchaseManager.getSumPrices(result)
+        return purchaseManager.getThisYearTotal(result)
     }
 
     fun getTodayTotal(

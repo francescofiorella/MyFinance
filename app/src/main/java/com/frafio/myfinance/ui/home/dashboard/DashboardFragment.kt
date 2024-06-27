@@ -15,6 +15,8 @@ import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.utils.animateRoot
+import com.frafio.myfinance.utils.doubleToPrice
 
 class DashboardFragment : BaseFragment() {
     private lateinit var binding: FragmentDashboardBinding
@@ -30,7 +32,12 @@ class DashboardFragment : BaseFragment() {
         viewModel.updateStats()
 
         viewModel.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
-            if (viewModel.thisMonthTotalResult.value == null) {
+            if (viewModel.monthShown) {
+                binding.budgetTV.text = doubleToPrice(monthlyBudget.toDouble())
+            } else {
+                binding.budgetTV.text = doubleToPrice(monthlyBudget.toDouble() * 12)
+            }
+            if (viewModel.thisMonthResult.value == null) {
                 updatePriceProgressBar(
                     binding.progressBarFront,
                     binding.progressBarBack,
@@ -39,23 +46,83 @@ class DashboardFragment : BaseFragment() {
                     0.0
                 )
             } else {
-                updatePriceProgressBar(
-                    binding.progressBarFront,
-                    binding.progressBarBack,
-                    binding.percentageTV,
-                    viewModel.thisMonthTotalResult.value!!.second,
-                    monthlyBudget.toDouble()
-                )
+                if (viewModel.monthShown) {
+                    updatePriceProgressBar(
+                        binding.progressBarFront,
+                        binding.progressBarBack,
+                        binding.percentageTV,
+                        viewModel.thisMonthResult.value!!.second,
+                        monthlyBudget.toDouble()
+                    )
+                } else {
+                    updatePriceProgressBar(
+                        binding.progressBarFront,
+                        binding.progressBarBack,
+                        binding.percentageTV,
+                        viewModel.thisYearResult.value!!.second,
+                        monthlyBudget.toDouble() * 12
+                    )
+                }
             }
         }
 
-        viewModel.totalSumResult.observe(viewLifecycleOwner) { value ->
+        viewModel.thisYearResult.observe(viewLifecycleOwner) { value ->
             val result = value.first
             val price = value.second
             if (result.code == PurchaseCode.PURCHASE_AGGREGATE_SUCCESS.code) {
-                viewModel.updateStats(totalSum = price)
+                viewModel.updateStats(thisYearTot = price)
             } else {
                 (activity as HomeActivity).showSnackBar(result.message)
+            }
+            if (viewModel.monthShown) {
+                binding.thisYearTVTitle.text = getString(R.string.this_year_next)
+                binding.thisYearTV.text = viewModel.thisYearString.value
+            } else {
+                binding.thisMonthTVTitle.text = getString(R.string.this_year)
+                binding.thisMonthTV.text = doubleToPrice(price)
+            }
+
+            // Update annual budget bar
+            if (!viewModel.monthShown) {
+                viewModel.monthlyBudget.value?.let { monthlyBudget ->
+                    updatePriceProgressBar(
+                        binding.progressBarFront,
+                        binding.progressBarBack,
+                        binding.percentageTV,
+                        price,
+                        monthlyBudget.toDouble() * 12
+                    )
+                }
+            }
+        }
+
+        viewModel.thisMonthResult.observe(viewLifecycleOwner) { value ->
+            val result = value.first
+            val price = value.second
+            if (result.code == PurchaseCode.PURCHASE_AGGREGATE_SUCCESS.code) {
+                viewModel.updateStats(thisMonthTot = price)
+            } else {
+                (activity as HomeActivity).showSnackBar(result.message)
+            }
+            if (viewModel.monthShown) {
+                binding.thisMonthTVTitle.text = getString(R.string.this_month)
+                binding.thisMonthTV.text = doubleToPrice(price)
+            } else {
+                binding.thisYearTVTitle.text = getString(R.string.this_month_next)
+                binding.thisYearTV.text = viewModel.thisMonthString.value
+            }
+
+            // Update monthly budget bar
+            if (viewModel.monthShown) {
+                viewModel.monthlyBudget.value?.let { monthlyBudget ->
+                    updatePriceProgressBar(
+                        binding.progressBarFront,
+                        binding.progressBarBack,
+                        binding.percentageTV,
+                        price,
+                        monthlyBudget.toDouble()
+                    )
+                }
             }
         }
 
@@ -69,25 +136,70 @@ class DashboardFragment : BaseFragment() {
             }
         }
 
-        viewModel.thisMonthTotalResult.observe(viewLifecycleOwner) { value ->
-            val result = value.first
-            val price = value.second
-            if (result.code == PurchaseCode.PURCHASE_AGGREGATE_SUCCESS.code) {
-                viewModel.updateStats(thisMonthTotal = price)
+        binding.changeBtn.setOnClickListener {
+            viewModel.monthShown = !viewModel.monthShown
+            if (viewModel.thisMonthResult.value != null
+                && viewModel.thisYearResult.value != null
+                && viewModel.monthlyBudget.value != null
+            ) {
+                if (viewModel.monthShown) {
+                    binding.thisMonthTVTitle.text = getString(R.string.this_month)
+                    binding.thisMonthTV.text = doubleToPrice(
+                        viewModel.thisMonthResult.value!!.second
+                    )
+                    binding.thisYearTVTitle.text = getString(R.string.this_year_next)
+                    binding.thisYearTV.text = viewModel.thisYearString.value
+                    binding.budgetTV.text = doubleToPrice(
+                        viewModel.monthlyBudget.value!!.toDouble()
+                    )
+                    updatePriceProgressBar(
+                        binding.progressBarFront,
+                        binding.progressBarBack,
+                        binding.percentageTV,
+                        viewModel.thisMonthResult.value!!.second,
+                        viewModel.monthlyBudget.value!!.toDouble()
+                    )
+                } else {
+                    binding.thisMonthTVTitle.text = getString(R.string.this_year)
+                    binding.thisMonthTV.text = doubleToPrice(
+                        viewModel.thisYearResult.value!!.second
+                    )
+                    binding.thisYearTVTitle.text = getString(R.string.this_month_next)
+                    binding.thisYearTV.text = viewModel.thisMonthString.value
+                    binding.budgetTV.text = doubleToPrice(
+                        viewModel.monthlyBudget.value!!.toDouble() * 12
+                    )
+                    updatePriceProgressBar(
+                        binding.progressBarFront,
+                        binding.progressBarBack,
+                        binding.percentageTV,
+                        viewModel.thisYearResult.value!!.second,
+                        viewModel.monthlyBudget.value!!.toDouble() * 12
+                    )
+                }
             } else {
-                (activity as HomeActivity).showSnackBar(result.message)
-            }
-
-            // Update monthly budget bar
-            viewModel.monthlyBudget.value?.let { monthlyBudget ->
+                if (viewModel.monthShown) {
+                    binding.thisMonthTVTitle.text = getString(R.string.this_month)
+                    binding.thisMonthTV.text = getString(R.string.zero_price)
+                    binding.thisYearTVTitle.text = getString(R.string.this_year_next)
+                    binding.thisYearTV.text = getString(R.string.zero_price)
+                    binding.budgetTV.text = getString(R.string.zero_price)
+                } else {
+                    binding.thisMonthTVTitle.text = getString(R.string.this_year)
+                    binding.thisMonthTV.text = getString(R.string.zero_price)
+                    binding.thisYearTVTitle.text = getString(R.string.this_month_next)
+                    binding.thisYearTV.text = getString(R.string.zero_price)
+                    binding.budgetTV.text = getString(R.string.zero_price)
+                }
                 updatePriceProgressBar(
                     binding.progressBarFront,
                     binding.progressBarBack,
                     binding.percentageTV,
-                    price,
-                    monthlyBudget.toDouble()
+                    1.0,
+                    0.0
                 )
             }
+            (binding.root as ViewGroup).animateRoot()
         }
 
         binding.viewModel = viewModel
