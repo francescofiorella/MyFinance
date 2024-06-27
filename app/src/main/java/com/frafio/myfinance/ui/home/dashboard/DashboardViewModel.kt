@@ -9,6 +9,7 @@ import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
+import com.frafio.myfinance.utils.doubleToString
 
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
     private val purchaseRepository = PurchaseRepository(
@@ -19,9 +20,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     val purchaseListSize: LiveData<Int>
         get() = _purchaseListSize
 
-    private val _dayAvgString = MutableLiveData<String>()
-    val dayAvgString: LiveData<String>
-        get() = _dayAvgString
+    private val _monthlyBudget = MutableLiveData<String>()
+    val monthlyBudget: LiveData<String>
+        get() = _monthlyBudget
 
     private val _monthAvgString = MutableLiveData<String>()
     val monthAvgString: LiveData<String>
@@ -66,7 +67,6 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     fun updateStats() {
         val stats = purchaseRepository.calculateStats()
         _purchaseListSize.value = purchaseRepository.purchaseListSize()
-        _dayAvgString.value = stats[0]
         _monthAvgString.value = stats[1]
         _rentTotString.value = stats[5]
         _shoppingTotString.value = stats[6]
@@ -74,6 +74,7 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         purchaseRepository.getSumPrices(_totalSumResult)
         purchaseRepository.getTodayTotal(_todayTotalResult)
         purchaseRepository.getThisMonthTotal(_thisMonthTotalResult)
+        _monthlyBudget.value = doubleToString(purchaseRepository.getMonthlyBudgetFromStorage())
     }
 
     fun updateStats(
@@ -96,11 +97,7 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
             }
         }
         thisMonthTotal?.let {
-            _lastMonthString.value = if (thisMonthTotal < 1000.0) {
-                doubleToPrice(thisMonthTotal)
-            } else {
-                doubleToPriceWithoutDecimals(thisMonthTotal)
-            }
+            _lastMonthString.value = doubleToPrice(thisMonthTotal)
         }
     }
 }

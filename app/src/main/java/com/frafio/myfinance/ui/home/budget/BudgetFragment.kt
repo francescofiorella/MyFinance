@@ -173,12 +173,14 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                         binding.monthlyBudgetDeleteBtn.icon =
                             ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
                     }
+                    (activity as HomeActivity).refreshFragmentData(dashboard = true)
                     previousBudget?.let {
                         (activity as HomeActivity).showSnackBar(
                             result.message,
                             getString(R.string.cancel)
                         ) {
                             viewModel.updateMonthlyBudget(previousBudget)
+                            (activity as HomeActivity).refreshFragmentData(dashboard = true)
                         }
                     }
                 }

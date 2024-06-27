@@ -17,6 +17,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/fragment_margin_top"
         android:orientation="horizontal">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -62,6 +63,7 @@
             android:layout_height="match_parent"
             android:fillViewport="true"
             android:scrollbars="none"
+            android:visibility="@{viewModel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
             tools:visibility="visible">
 
             <GridLayout
@@ -69,54 +71,127 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
-                android:rowCount="4"
-                android:visibility="@{viewModel.purchaseListSize == 0 ? View.GONE : View.VISIBLE}"
-                tools:visibility="visible">
+                android:rowCount="4">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/materialCardView"
+                    android:id="@+id/materialCardView5"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="0"
                     android:layout_column="0"
+                    android:layout_columnSpan="2"
                     android:layout_columnWeight="1"
                     android:layout_marginStart="@dimen/card_full_margin"
-                    android:layout_marginTop="@dimen/fragment_margin_top"
-                    android:layout_marginEnd="@dimen/card_half_margin"
+                    android:layout_marginEnd="@dimen/card_full_margin"
                     android:layout_marginBottom="@dimen/card_half_margin"
-                    android:clipToPadding="false"
                     app:cardCornerRadius="@dimen/card_corner_radius">
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:clipToPadding="false"
                         android:orientation="vertical"
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
 
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/dayAvg_TV_title"
+                            android:id="@+id/numTot_TV_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
-                            android:text="@string/avg_day"
-                            android:textSize="@dimen/card_title_size" />
+                            android:text="@string/this_month"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/dayAvg_TV"
+                            android:id="@+id/numTot_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="start"
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
-                            android:text="@{viewModel.dayAvgString}"
+                            android:text="@{viewModel.lastMonthString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/numTot_TV_title"
                             tools:text="€ 0.00" />
 
-                    </LinearLayout>
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/slash_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/card_half_margin"
+                            android:fontFamily="@font/nunito"
+                            android:text="/ "
+                            android:textSize="20sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/numTot_TV" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/monthlyBudget_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:text="@{viewModel.monthlyBudget}"
+                            android:textSize="20sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/slash_TV"
+                            app:layout_constraintTop_toBottomOf="@id/numTot_TV"
+                            tools:text="0.00" />
+
+                        <androidx.constraintlayout.widget.Guideline
+                            android:id="@+id/monthly_guideline"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintGuide_percent="0.5" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/percentageTV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dp"
+                            android:background="@drawable/bg_round_custom"
+                            android:backgroundTint="?attr/colorSecondaryContainer"
+                            android:fontFamily="@font/nunito"
+                            android:paddingHorizontal="5dp"
+                            android:paddingVertical="3dp"
+                            android:textColor="?attr/colorOnSecondaryContainer"
+                            android:textSize="12sp"
+                            app:layout_constraintBottom_toTopOf="@id/progress_bar_back"
+                            app:layout_constraintEnd_toEndOf="@id/progress_bar_front"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_chainStyle="packed"
+                            tools:text="0%" />
+
+                        <View
+                            android:id="@+id/progress_bar_back"
+                            android:layout_width="0dp"
+                            android:layout_height="10dp"
+                            android:layout_marginStart="25dp"
+                            android:background="@drawable/bg_round_corners"
+                            android:backgroundTint="?attr/colorSecondaryContainer"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/monthly_guideline"
+                            app:layout_constraintTop_toBottomOf="@id/percentageTV" />
+
+                        <View
+                            android:id="@+id/progress_bar_front"
+                            android:layout_width="1dp"
+                            android:layout_height="10dp"
+                            android:background="@drawable/bg_round_corners"
+                            android:backgroundTint="?attr/colorPrimary"
+                            app:layout_constraintBottom_toBottomOf="@id/progress_bar_back"
+                            app:layout_constraintStart_toStartOf="@id/progress_bar_back"
+                            app:layout_constraintTop_toTopOf="@id/progress_bar_back"
+                            tools:layout_width="60dp" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -124,11 +199,11 @@
                     android:id="@+id/materialCardView2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_row="0"
+                    android:layout_row="1"
                     android:layout_column="1"
                     android:layout_columnWeight="1"
                     android:layout_marginStart="@dimen/card_half_margin"
-                    android:layout_marginTop="@dimen/fragment_margin_top"
+                    android:layout_marginTop="@dimen/card_half_margin"
                     android:layout_marginEnd="@dimen/card_full_margin"
                     android:layout_marginBottom="@dimen/card_half_margin"
                     android:clipToPadding="false"
@@ -205,52 +280,6 @@
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
                             android:text="@{viewModel.todayTotString}"
-                            android:textColor="@color/primary_text"
-                            android:textSize="@dimen/card_price_size"
-                            tools:text="€ 0.00" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/materialCardView5"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_row="1"
-                    android:layout_column="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="@dimen/card_half_margin"
-                    android:layout_marginTop="@dimen/card_half_margin"
-                    android:layout_marginEnd="@dimen/card_full_margin"
-                    android:layout_marginBottom="@dimen/card_half_margin"
-                    app:cardCornerRadius="@dimen/card_corner_radius">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="25dp"
-                        android:paddingVertical="20dp">
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/numTot_TV_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:fontFamily="@font/nunito"
-                            android:text="@string/this_month"
-                            android:textSize="@dimen/card_title_size" />
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/numTot_TV"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_marginTop="@dimen/card_text_space"
-                            android:fontFamily="@font/nunito_semibold"
-                            android:maxLines="1"
-                            android:text="@{viewModel.lastMonthString}"
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
                             tools:text="€ 0.00" />

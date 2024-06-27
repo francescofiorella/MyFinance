@@ -48,7 +48,7 @@
     <string name="avg_day">Media \nGiornaliera</string>
     <string name="avg_month">Media \nMensile</string>
     <string name="today">Acquisti \nOggi</string>
-    <string name="this_month">Ultimo \nMese</string>
+    <string name="this_month">Ultimo mese</string>
     <string name="total">Totale \nAcquisti</string>
     <string name="total_transport">Totale \nTrasporti</string>
     <string name="total_rent">Totale \nAffitto</string>

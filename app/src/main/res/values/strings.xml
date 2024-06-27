@@ -49,7 +49,7 @@
     <string name="avg_day">Daily \nAverage</string>
     <string name="avg_month">Monthly \nAverage</string>
     <string name="today">Today \nPayment</string>
-    <string name="this_month">Last \nMonth</string>
+    <string name="this_month">Last month</string>
     <string name="total">Payment \nTotal</string>
     <string name="total_transport">Transport \nTotal</string>
     <string name="total_rent">Rent \nTotal</string>

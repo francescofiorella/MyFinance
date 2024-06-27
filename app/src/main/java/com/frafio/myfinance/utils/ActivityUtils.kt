@@ -57,7 +57,7 @@ fun Activity.snackBar(
             snackBar.setAnchorView(it)
         }
 
-        snackBar.view.background = AppCompatResources.getDrawable(this, R.drawable.bg_snack_bar)
+        snackBar.view.background = AppCompatResources.getDrawable(this, R.drawable.bg_round_corners)
 
         val tv = snackBar.view.findViewById<TextView>(R.id.snackbar_text)
         tv.typeface = nunito
