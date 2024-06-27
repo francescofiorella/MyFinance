@@ -157,7 +157,7 @@ class AddActivity : AppCompatActivity(), AddListener {
                 binding.toggleButton.visibility = View.GONE
                 binding.addPurchaseTitle.text = getString(R.string.edit_purchase)
                 intent.apply {
-                    getIntExtra(REQUEST_CODE_KEY, -1).also {
+                    getIntExtra(PURCHASE_REQUEST_KEY, -1).also {
                         viewModel.purchaseCode = it
                     }
                     getStringExtra(PURCHASE_ID_KEY)?.let {
