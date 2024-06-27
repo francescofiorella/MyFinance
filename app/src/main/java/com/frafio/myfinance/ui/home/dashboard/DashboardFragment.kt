@@ -17,6 +17,7 @@ import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.animateRoot
 import com.frafio.myfinance.utils.doubleToPrice
+import com.frafio.myfinance.utils.doubleToString
 
 class DashboardFragment : BaseFragment() {
     private lateinit var binding: FragmentDashboardBinding
@@ -33,9 +34,9 @@ class DashboardFragment : BaseFragment() {
 
         viewModel.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
             if (viewModel.monthShown) {
-                binding.budgetTV.text = doubleToPrice(monthlyBudget.toDouble())
+                binding.budgetTV.text = doubleToString(monthlyBudget.toDouble())
             } else {
-                binding.budgetTV.text = doubleToPrice(monthlyBudget.toDouble() * 12)
+                binding.budgetTV.text = doubleToString(monthlyBudget.toDouble() * 12)
             }
             if (viewModel.thisMonthResult.value == null) {
                 updatePriceProgressBar(
@@ -149,7 +150,7 @@ class DashboardFragment : BaseFragment() {
                     )
                     binding.thisYearTVTitle.text = getString(R.string.this_year_next)
                     binding.thisYearTV.text = viewModel.thisYearString.value
-                    binding.budgetTV.text = doubleToPrice(
+                    binding.budgetTV.text = doubleToString(
                         viewModel.monthlyBudget.value!!.toDouble()
                     )
                     updatePriceProgressBar(
@@ -166,7 +167,7 @@ class DashboardFragment : BaseFragment() {
                     )
                     binding.thisYearTVTitle.text = getString(R.string.this_month_next)
                     binding.thisYearTV.text = viewModel.thisMonthString.value
-                    binding.budgetTV.text = doubleToPrice(
+                    binding.budgetTV.text = doubleToString(
                         viewModel.monthlyBudget.value!!.toDouble() * 12
                     )
                     updatePriceProgressBar(
@@ -183,13 +184,13 @@ class DashboardFragment : BaseFragment() {
                     binding.thisMonthTV.text = getString(R.string.zero_price)
                     binding.thisYearTVTitle.text = getString(R.string.this_year_next)
                     binding.thisYearTV.text = getString(R.string.zero_price)
-                    binding.budgetTV.text = getString(R.string.zero_price)
+                    binding.budgetTV.text = getString(R.string.zero_double)
                 } else {
                     binding.thisMonthTVTitle.text = getString(R.string.this_year)
                     binding.thisMonthTV.text = getString(R.string.zero_price)
                     binding.thisYearTVTitle.text = getString(R.string.this_month_next)
                     binding.thisYearTV.text = getString(R.string.zero_price)
-                    binding.budgetTV.text = getString(R.string.zero_price)
+                    binding.budgetTV.text = getString(R.string.zero_double)
                 }
                 updatePriceProgressBar(
                     binding.progressBarFront,
