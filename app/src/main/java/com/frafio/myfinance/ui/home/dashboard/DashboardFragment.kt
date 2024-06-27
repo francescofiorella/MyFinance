@@ -138,6 +138,9 @@ class DashboardFragment : BaseFragment() {
         }
 
         binding.changeBtn.setOnClickListener {
+            binding.changeBtn.animate().rotationBy(
+                if (viewModel.monthShown) 180f else -180f
+            ).setDuration(200).start()
             viewModel.monthShown = !viewModel.monthShown
             if (viewModel.thisMonthResult.value != null
                 && viewModel.thisYearResult.value != null
