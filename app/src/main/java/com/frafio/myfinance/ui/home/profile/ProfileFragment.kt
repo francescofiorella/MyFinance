@@ -67,6 +67,20 @@ class ProfileFragment : BaseFragment(), ProfileListener {
             }
         }
 
+        binding.dynamicColorSwitch.also {
+            it.isChecked = viewModel.isSwitchDynamicColorChecked
+
+            it.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.setDynamicColor(isChecked)
+                (activity as HomeActivity).showSnackBar(
+                    getString(R.string.restart_app_changes),
+                    getString(R.string.restart)
+                ) {
+                    (activity as HomeActivity).finish()
+                }
+            }
+        }
+
         return binding.root
     }
 

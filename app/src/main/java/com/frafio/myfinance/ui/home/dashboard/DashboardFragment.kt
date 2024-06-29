@@ -18,6 +18,8 @@ import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.animateRoot
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToString
+import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
 
 class DashboardFragment : BaseFragment() {
     private lateinit var binding: FragmentDashboardBinding
@@ -31,6 +33,84 @@ class DashboardFragment : BaseFragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
 
         viewModel.updateStats()
+
+        updateBarChartLabels(
+            listOf(
+                binding.bar0Label,
+                binding.bar1Label,
+                binding.bar2Label,
+                binding.bar3Label,
+                binding.bar4Label,
+                binding.bar5Label,
+                binding.bar6Label,
+                binding.bar7Label,
+                binding.bar8Label,
+                binding.bar9Label,
+                binding.bar10Label,
+                binding.bar11Label,
+            )
+        )
+
+        viewModel.lastYearPurchases.observe(viewLifecycleOwner) { purchases ->
+            if (purchases.isEmpty()) {
+                return@observe
+            }
+            val values = mutableListOf<Double>()
+            val labels = mutableListOf<String>()
+            var currentDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth())
+            var currentLabel = "${currentDate.monthValue}/${currentDate.year}"
+            var monthsPassed = 1
+            var currentValue = 0.0
+            for (p in purchases) {
+                val pLabel = "${p.month}/${p.year}"
+                if (currentLabel != pLabel) {
+                    labels.add(currentLabel)
+                    values.add(currentValue)
+                    currentDate = currentDate.minusMonths(1)
+                    monthsPassed += 1
+                    var newLabel = "${currentDate.monthValue}/${currentDate.year}"
+                    while (newLabel != pLabel) {
+                        labels.add(newLabel)
+                        values.add(0.0)
+                        currentDate = currentDate.minusMonths(1)
+                        monthsPassed += 1
+                        newLabel = "${currentDate.monthValue}/${currentDate.year}"
+                    }
+                    currentLabel = pLabel
+                    currentValue = p.price!!
+                } else {
+                    currentValue += p.price!!
+                }
+            }
+            labels.add(currentLabel)
+            values.add(currentValue)
+            while (monthsPassed != 12) {
+                currentDate = currentDate.minusMonths(1)
+                monthsPassed += 1
+                val newLabel = "${currentDate.monthValue}/${currentDate.year}"
+                labels.add(newLabel)
+                values.add(0.0)
+            }
+            updateBarChart(
+                binding.barPlaceHolder,
+                listOf(
+                    binding.bar0,
+                    binding.bar1,
+                    binding.bar2,
+                    binding.bar3,
+                    binding.bar4,
+                    binding.bar5,
+                    binding.bar6,
+                    binding.bar7,
+                    binding.bar8,
+                    binding.bar9,
+                    binding.bar10,
+                    binding.bar11,
+                ),
+                binding.indicatorTV,
+                values
+            )
+        }
 
         viewModel.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
             if (viewModel.monthShown) {
@@ -203,7 +283,6 @@ class DashboardFragment : BaseFragment() {
                     0.0
                 )
             }
-            (binding.root as ViewGroup).animateRoot()
         }
 
         binding.viewModel = viewModel
@@ -272,5 +351,47 @@ class DashboardFragment : BaseFragment() {
         layoutParams.width = newWidth
         frontView.layoutParams = layoutParams
         frontView.backgroundTintList = ColorStateList.valueOf(color)
+
+        (binding.materialCardView1 as ViewGroup).animateRoot()
+    }
+
+    private fun updateBarChartLabels(labelViews: List<TextView>) {
+        var currentDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth())
+        for (view in labelViews) {
+            var label = if (currentDate.monthValue > 9) {
+                "${currentDate.monthValue}"
+            } else {
+                "0${currentDate.monthValue}"
+            }
+            if (view == labelViews[0]) {
+                label = "${label}/${currentDate.year - 2000}"
+            }
+            view.text = label
+            currentDate = currentDate.minusMonths(1)
+        }
+    }
+
+    private fun updateBarChart(
+        holderBar: View,
+        barViews: List<View>,
+        indicatorTV: TextView,
+        values: List<Double>
+    ) {
+        val maxValue = values.max()
+        for (i in values.indices) {
+            val height = if (values[i] != 0.0) {
+                barViews[i].visibility = View.VISIBLE
+                (values[i] * holderBar.height / maxValue).toInt()
+            } else {
+                barViews[i].visibility = View.INVISIBLE
+                1
+            }
+            val layoutParams = barViews[i].layoutParams
+            layoutParams.height = height
+            barViews[i].layoutParams = layoutParams
+        }
+        indicatorTV.text = doubleToPrice(values[0])
+
+        (binding.materialCardView4 as ViewGroup).animateRoot()
     }
 }

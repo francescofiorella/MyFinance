@@ -199,7 +199,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/card_full_margin"
                     android:layout_marginTop="10dp"
-                    android:layout_marginBottom="@dimen/dashboard_bottom_margin"
                     app:cardCornerRadius="@dimen/card_corner_radius">
 
                     <LinearLayout
@@ -227,6 +226,91 @@
                             android:textColor="@color/primary_text"
                             android:textSize="16sp"
                             tools:text="Account created in 01/01/1970" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/dynamicColor_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/card_full_margin"
+                    android:layout_marginTop="10dp"
+                    android:visibility="@{viewModel.isDynamicColorAvailable ? View.VISIBLE : View.GONE}"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="25dp">
+
+                        <ImageView
+                            android:id="@+id/dynamicColor_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/dynamic_color_icon"
+                            android:paddingVertical="15dp"
+                            android:src="@drawable/ic_color_lens" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/dynamicColor_TV"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginHorizontal="10dp"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/use_dynamic_color"
+                            android:textColor="@color/primary_text"
+                            android:textSize="18sp" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/dynamicColor_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/version_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/card_full_margin"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="@dimen/dashboard_bottom_margin"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="25dp">
+
+                        <ImageView
+                            android:id="@+id/version_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/version_icon"
+                            android:paddingVertical="15dp"
+                            android:src="@drawable/ic_android" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/version_TV"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/nunito"
+                            android:text="@{viewModel.versionName}"
+                            android:textColor="@color/primary_text"
+                            android:textSize="18sp"
+                            tools:text="MyFinance 1.0.0" />
 
                     </LinearLayout>
 

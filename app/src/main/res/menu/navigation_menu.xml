@@ -23,18 +23,10 @@
         android:title="@string/nav_5" />
 
     <item
-        android:id="@+id/menuFragment"
-        android:checkable="true"
-        android:contentDescription="@string/nav_4"
-        android:icon="@drawable/ic_menu"
-        android:title="@string/nav_4" />
-
-    <item
         android:id="@+id/profileFragment"
         android:checkable="true"
         android:contentDescription="@string/nav_3"
         android:icon="@drawable/ic_account_circle"
-        android:title="@string/nav_3"
-        android:visible="false" />
+        android:title="@string/nav_3" />
 
 </menu>

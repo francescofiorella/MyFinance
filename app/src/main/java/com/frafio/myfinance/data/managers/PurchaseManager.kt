@@ -10,6 +10,7 @@ import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
+import com.frafio.myfinance.utils.dateToUTCTimestamp
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedDynamicColor
 import com.google.firebase.firestore.AggregateField
@@ -17,6 +18,7 @@ import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
 
 class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
@@ -316,6 +318,35 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             }
 
 
+        return response
+    }
+
+    fun getLastYearPurchases(
+        response: MutableLiveData<List<Purchase>> = MutableLiveData()
+    ): LiveData<List<Purchase>> {
+        val date = LocalDate.now()
+            .minusYears(1)
+            .with(TemporalAdjusters.firstDayOfMonth())
+            .plusMonths(1)
+        val timestamp = dateToUTCTimestamp(date.year, date.monthValue, date.dayOfMonth)
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .whereGreaterThanOrEqualTo(DbPurchases.FIELDS.TIMESTAMP.value, timestamp)
+            .orderBy(DbPurchases.FIELDS.TIMESTAMP.value, Query.Direction.DESCENDING)
+            .get().addOnSuccessListener { queryDocumentSnapshots ->
+                val list = mutableListOf<Purchase>()
+                queryDocumentSnapshots.forEach { document ->
+                    val purchase = document.toObject(Purchase::class.java)
+                    // set id
+                    purchase.id = document.id
+                    list.add(purchase)
+                }
+                response.value = list
+            }.addOnFailureListener { e ->
+                val error = "Error! ${e.localizedMessage}"
+                Log.e(TAG, error)
+            }
         return response
     }
 }

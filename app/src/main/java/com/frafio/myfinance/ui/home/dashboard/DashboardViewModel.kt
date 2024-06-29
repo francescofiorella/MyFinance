@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
@@ -18,6 +19,10 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     var monthShown = true
 
+    private val _lastYearPurchases = MutableLiveData<List<Purchase>>()
+    val lastYearPurchases: LiveData<List<Purchase>>
+        get() = _lastYearPurchases
+
     private val _purchaseListSize = MutableLiveData<Int>()
     val purchaseListSize: LiveData<Int>
         get() = _purchaseListSize
@@ -25,10 +30,6 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _monthlyBudget = MutableLiveData<String>()
     val monthlyBudget: LiveData<String>
         get() = _monthlyBudget
-
-    private val _monthAvgString = MutableLiveData<String>()
-    val monthAvgString: LiveData<String>
-        get() = _monthAvgString
 
     private val _todayTotString = MutableLiveData<String>()
     val todayTotString: LiveData<String>
@@ -41,18 +42,6 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _thisMonthString = MutableLiveData<String>()
     val thisMonthString: LiveData<String>
         get() = _thisMonthString
-
-    private val _rentTotString = MutableLiveData<String>()
-    val rentTotString: LiveData<String>
-        get() = _rentTotString
-
-    private val _shoppingTotString = MutableLiveData<String>()
-    val shoppingTotString: LiveData<String>
-        get() = _shoppingTotString
-
-    private val _transportTotString = MutableLiveData<String>()
-    val transportTotString: LiveData<String>
-        get() = _transportTotString
 
     private val _thisYearResult = MutableLiveData<Pair<PurchaseCode, Double>>()
     val thisYearResult: LiveData<Pair<PurchaseCode, Double>>
@@ -67,12 +56,8 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         get() = _thisMonthResult
 
     fun updateStats() {
-        val stats = purchaseRepository.calculateStats()
         _purchaseListSize.value = purchaseRepository.purchaseListSize()
-        _monthAvgString.value = stats[1]
-        _rentTotString.value = stats[5]
-        _shoppingTotString.value = stats[6]
-        _transportTotString.value = stats[7]
+        purchaseRepository.getLastYearPurchases(_lastYearPurchases)
         purchaseRepository.getThisYearTotal(_thisYearResult)
         purchaseRepository.getTodayTotal(_todayTotalResult)
         purchaseRepository.getThisMonthTotal(_thisMonthResult)

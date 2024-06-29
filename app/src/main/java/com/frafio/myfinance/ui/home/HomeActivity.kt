@@ -3,7 +3,6 @@ package com.frafio.myfinance.ui.home
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
@@ -25,10 +24,8 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.ui.home.budget.BudgetFragment
 import com.frafio.myfinance.ui.home.dashboard.DashboardFragment
-import com.frafio.myfinance.ui.home.menu.MenuFragment
 import com.frafio.myfinance.ui.home.payments.PaymentsFragment
 import com.frafio.myfinance.ui.home.profile.ProfileFragment
-import com.frafio.myfinance.utils.animateRoot
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
@@ -46,7 +43,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private lateinit var dashboardFragment: DashboardFragment
     private lateinit var paymentsFragment: PaymentsFragment
     private lateinit var budgetFragment: BudgetFragment
-    private lateinit var menuFragment: MenuFragment
     private lateinit var profileFragment: ProfileFragment
     private var activeFragment: Fragment? = null
 
@@ -58,7 +54,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         private const val DASHBOARD_FRAGMENT_TAG = "dashboard_fragment_tag"
         private const val PAYMENTS_FRAGMENT_TAG = "payments_fragment_tag"
         private const val BUDGET_FRAGMENT_TAG = "budget_fragment_tag"
-        private const val MENU_FRAGMENT_TAG = "menu_fragment_tag"
         private const val PROFILE_FRAGMENT_TAG = "profile_fragment_tag"
     }
 
@@ -71,19 +66,14 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             when (purchaseRequest) {
                 AddActivity.REQUEST_PAYMENT_CODE -> {
                     showFragment(R.id.paymentsFragment)
-                    refreshFragmentData(dashboard = true, payments = true, menu = true)
+                    refreshFragmentData(dashboard = true, payments = true)
                     paymentsFragment.scrollTo(position)
                     showSnackBar(message)
                 }
 
                 AddActivity.REQUEST_INCOME_CODE -> {
                     showFragment(R.id.budgetFragment)
-                    refreshFragmentData(
-                        dashboard = true,
-                        payments = true,
-                        budget = true,
-                        menu = true
-                    )
+                    refreshFragmentData(dashboard = true, payments = true, budget = true)
                     budgetFragment.scrollIncomesTo(position)
                     showSnackBar(message)
                 }
@@ -148,7 +138,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         binding.navDrawer?.setNavigationItemSelectedListener(navDrawerListener)
 
         onBackPressedDispatcher.addCallback {
-            if (activeFragment != dashboardFragment) {
+            if (activeFragment !is DashboardFragment) {
                 showFragment(R.id.dashboardFragment)
             } else {
                 finish()
@@ -173,8 +163,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             .findFragmentByTag(PAYMENTS_FRAGMENT_TAG)!! as PaymentsFragment
         budgetFragment = supportFragmentManager
             .findFragmentByTag(BUDGET_FRAGMENT_TAG)!! as BudgetFragment
-        menuFragment = supportFragmentManager
-            .findFragmentByTag(MENU_FRAGMENT_TAG)!! as MenuFragment
         profileFragment = supportFragmentManager
             .findFragmentByTag(PROFILE_FRAGMENT_TAG)!! as ProfileFragment
 
@@ -193,11 +181,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 BUDGET_FRAGMENT_TAG -> {
                     activeFragment = budgetFragment
                     showFragment(R.id.budgetFragment)
-                }
-
-                MENU_FRAGMENT_TAG -> {
-                    activeFragment = menuFragment
-                    showFragment(R.id.menuFragment)
                 }
 
                 PROFILE_FRAGMENT_TAG -> {
@@ -224,17 +207,8 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     }
 
     private fun navigateTo(itemId: Int) {
-        if (activeFragment is ProfileFragment) {
-            (binding.root as ViewGroup).animateRoot()
-        }
         when (itemId) {
             R.id.dashboardFragment -> {
-                binding.backArrow.instantHide()
-                binding.homeAddBtn?.instantShow()
-                binding.homeAddExtBtn?.instantShow()
-                binding.navBar?.instantShow()
-                binding.navRail?.instantShow()
-                binding.navDrawer?.instantShow()
                 dashboardFragment.scrollUp()
                 binding.fragmentTitle.text = getString(R.string.nav_1)
                 binding.logoutBtn.instantHide()
@@ -246,12 +220,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             }
 
             R.id.paymentsFragment -> {
-                binding.backArrow.instantHide()
-                binding.homeAddBtn?.instantShow()
-                binding.homeAddExtBtn?.instantShow()
-                binding.navBar?.instantShow()
-                binding.navRail?.instantShow()
-                binding.navDrawer?.instantShow()
                 paymentsFragment.scrollUp()
                 binding.fragmentTitle.text = getString(R.string.nav_2)
                 binding.logoutBtn.instantHide()
@@ -263,12 +231,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             }
 
             R.id.budgetFragment -> {
-                binding.backArrow.instantHide()
-                binding.homeAddBtn?.instantShow()
-                binding.homeAddExtBtn?.instantShow()
-                binding.navBar?.instantShow()
-                binding.navRail?.instantShow()
-                binding.navDrawer?.instantShow()
                 binding.fragmentTitle.text = getString(R.string.nav_5)
                 binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()
@@ -278,31 +240,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 activeFragment = budgetFragment
             }
 
-            R.id.menuFragment -> {
-                binding.backArrow.instantHide()
-                binding.homeAddBtn?.instantShow()
-                binding.homeAddExtBtn?.instantShow()
-                binding.navBar?.instantShow()
-                binding.navRail?.instantShow()
-                binding.navDrawer?.instantShow()
-                menuFragment.scrollUp()
-                binding.fragmentTitle.text = getString(R.string.nav_4)
-                binding.logoutBtn.instantHide()
-                binding.propicImageView.instantShow()
-                supportFragmentManager.beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(menuFragment).commit()
-                activeFragment = menuFragment
-            }
-
             R.id.profileFragment -> {
-                (binding.root as ViewGroup).animateRoot()
-                binding.backArrow.instantShow()
-                binding.homeAddBtn?.instantHide()
-                binding.homeAddExtBtn?.instantHide()
-                binding.navBar?.instantHide()
-                binding.navRail?.instantHide()
-                binding.navDrawer?.instantHide()
                 binding.fragmentTitle.text = getString(R.string.nav_3)
                 binding.logoutBtn.instantShow()
                 binding.propicImageView.instantHide()
@@ -426,17 +364,14 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         dashboardFragment = DashboardFragment()
         paymentsFragment = PaymentsFragment()
         budgetFragment = BudgetFragment()
-        menuFragment = MenuFragment()
         profileFragment = ProfileFragment()
         activeFragment = dashboardFragment
         supportFragmentManager.beginTransaction()
             .add(R.id.home_fragmentContainerView, profileFragment, PROFILE_FRAGMENT_TAG)
-            .add(R.id.home_fragmentContainerView, menuFragment, MENU_FRAGMENT_TAG)
             .add(R.id.home_fragmentContainerView, budgetFragment, BUDGET_FRAGMENT_TAG)
             .add(R.id.home_fragmentContainerView, paymentsFragment, PAYMENTS_FRAGMENT_TAG)
             .add(R.id.home_fragmentContainerView, dashboardFragment, DASHBOARD_FRAGMENT_TAG)
             .hide(profileFragment)
-            .hide(menuFragment)
             .hide(budgetFragment)
             .hide(paymentsFragment)
             .commit()
@@ -454,8 +389,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     fun refreshFragmentData(
         dashboard: Boolean = false,
         payments: Boolean = false,
-        budget: Boolean = false,
-        menu: Boolean = false
+        budget: Boolean = false
     ) {
         if (dashboard) {
             dashboardFragment.refreshStatsData()
@@ -465,9 +399,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         }
         if (budget) {
             budgetFragment.refreshData()
-        }
-        if (menu) {
-            menuFragment.refreshPlotData()
         }
     }
 }

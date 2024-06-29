@@ -51,9 +51,7 @@
     <string name="this_year">Quest\'anno</string>
     <string name="this_month_next">Questo \nmese</string>
     <string name="this_year_next">Questo \nanno</string>
-    <string name="total_transport">Totale \ntrasporti</string>
-    <string name="total_rent">Totale \naffitto</string>
-    <string name="total_shopping">Totale \nspesa</string>
+    <string name="monthly_payments">Pagamenti mensili</string>
 
     <string name="logout">Log Out</string>
     <string name="profile_picture">Immagine di profilo</string>

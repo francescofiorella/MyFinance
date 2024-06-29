@@ -52,7 +52,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
             if (editRequest == AddActivity.REQUEST_PAYMENT_CODE) {
                 viewModel.updateLocalPurchaseList()
-                (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
+                (activity as HomeActivity).refreshFragmentData(dashboard = true)
                 (activity as HomeActivity).showSnackBar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
             }
         }
@@ -188,7 +188,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
                 PurchaseCode.PURCHASE_ADD_SUCCESS.code -> {
                     viewModel.updateLocalPurchaseList()
-                    (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
+                    (activity as HomeActivity).refreshFragmentData(dashboard = true)
                     val payload = result.message.split("&")
                     (activity as HomeActivity).showSnackBar(payload[0])
                 }
@@ -207,7 +207,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         response.observe(viewLifecycleOwner) { result ->
             if (result.code == PurchaseCode.PURCHASE_DELETE_SUCCESS.code) {
                 viewModel.updateLocalPurchaseList()
-                (activity as HomeActivity).refreshFragmentData(dashboard = true, menu = true)
+                (activity as HomeActivity).refreshFragmentData(dashboard = true)
 
                 (activity as HomeActivity).showSnackBar(
                     result.message,

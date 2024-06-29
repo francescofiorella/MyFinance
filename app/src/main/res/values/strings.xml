@@ -52,9 +52,7 @@
     <string name="this_year">This year</string>
     <string name="this_month_next">This \nmonth</string>
     <string name="this_year_next">This \nyear</string>
-    <string name="total_transport">Transport \ntotal</string>
-    <string name="total_rent">Rent \ntotal</string>
-    <string name="total_shopping">Shopping \ntotal</string>
+    <string name="monthly_payments">Monthly payments</string>
 
     <string name="logout">Log Out</string>
     <string name="profile_picture">Profile Picture</string>
@@ -94,6 +92,7 @@
     <string name="empty_category">Please insert a category name!</string>
 
     <string name="generic_error">Generic error!</string>
+    <string name="change_content" translatable="false">Swap content</string>
 
     <string name="coming_soon" translatable="false">Coming Soon!</string>
     <string name="edit_profile">Edit the profile</string>
@@ -120,7 +119,6 @@
     <string name="health">Health</string>
     <string name="transportation">Transportation</string>
     <string name="miscellaneous">Miscellaneous</string>
-    <string name="change_content">Change content</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>

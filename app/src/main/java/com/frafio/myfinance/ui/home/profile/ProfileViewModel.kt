@@ -2,12 +2,17 @@ package com.frafio.myfinance.ui.home.profile
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.frafio.myfinance.BuildConfig
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.models.User
+import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
+import com.google.android.material.color.DynamicColors
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
+    private val purchaseRepository =
+        PurchaseRepository((application as MyFinanceApplication).purchaseManager)
     var user = userRepository.getUser()
     val googleSignIn = user?.provider == User.GOOGLE_PROVIDER
 
@@ -28,5 +33,18 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     fun updateLocalUser() {
         user = userRepository.getUser()
+    }
+
+    val versionName: String = "MyFinance ${BuildConfig.VERSION_NAME}"
+
+    var isDynamicColorAvailable: Boolean = DynamicColors.isDynamicColorAvailable()
+    var isSwitchDynamicColorChecked: Boolean = getDynamicColorCheck()
+
+    fun setDynamicColor(active: Boolean) {
+        purchaseRepository.setDynamicColorActive(active)
+    }
+
+    private fun getDynamicColorCheck(): Boolean {
+        return purchaseRepository.getDynamicColorActive()
     }
 }
