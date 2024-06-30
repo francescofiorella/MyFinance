@@ -53,7 +53,10 @@ class SignupActivity : AppCompatActivity(), AuthListener {
             }
 
             when (authResult.code) {
-                AuthCode.SIGNUP_SUCCESS.code -> viewModel.updateUserData()
+                AuthCode.SIGNUP_SUCCESS.code -> Intent().also {
+                    setResult(RESULT_OK, it)
+                    finish()
+                }
 
                 AuthCode.WEAK_PASSWORD.code ->
                     binding.signupPasswordConfirmInputLayout.error = authResult.message
@@ -63,14 +66,7 @@ class SignupActivity : AppCompatActivity(), AuthListener {
                     binding.signupEmailInputLayout.error = authResult.message
 
                 AuthCode.SIGNUP_PROFILE_NOT_UPDATED.code,
-                AuthCode.SIGNUP_FAILURE.code,
-                AuthCode.USER_DATA_NOT_UPDATED.code -> snackBar(authResult.message)
-
-                AuthCode.USER_DATA_UPDATED.code ->
-                    Intent().also {
-                        setResult(RESULT_OK, it)
-                        finish()
-                    }
+                AuthCode.SIGNUP_FAILURE.code -> snackBar(authResult.message)
 
                 else -> snackBar(authResult.message)
             }

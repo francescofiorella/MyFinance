@@ -14,10 +14,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         listener?.onSplashOperationComplete(userRepository.isUserLogged())
     }
 
-    fun updateUserData() {
-        listener?.onSplashOperationComplete(userRepository.updateUserData())
-    }
-
     fun getProPic(): String? {
         return userRepository.getProPic()
     }

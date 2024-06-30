@@ -172,7 +172,7 @@
                             android:paddingVertical="3dp"
                             android:text="@string/zero_perc"
                             android:textColor="?attr/colorOnSecondaryContainer"
-                            android:textSize="12sp"
+                            android:textSize="13sp"
                             app:layout_constraintBottom_toTopOf="@id/progress_bar_back"
                             app:layout_constraintEnd_toEndOf="@id/progress_bar_front"
                             app:layout_constraintTop_toTopOf="parent"
@@ -355,14 +355,14 @@
                                 android:paddingVertical="3dp"
                                 android:text="@string/zero_price"
                                 android:textColor="?attr/colorOnSecondaryContainer"
-                                android:textSize="12sp"
+                                android:textSize="13sp"
                                 android:visibility="invisible"
                                 app:layout_constraintStart_toStartOf="@id/bar_place_holder"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_place_holder"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="0dp"
                                 android:layout_marginTop="5dp"
                                 android:background="@drawable/bg_round_corners"
@@ -374,7 +374,7 @@
 
                             <View
                                 android:id="@+id/bar_0"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -387,7 +387,7 @@
 
                             <View
                                 android:id="@+id/bar_1"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -400,7 +400,7 @@
 
                             <View
                                 android:id="@+id/bar_2"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -413,7 +413,7 @@
 
                             <View
                                 android:id="@+id/bar_3"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -426,7 +426,7 @@
 
                             <View
                                 android:id="@+id/bar_4"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -439,7 +439,7 @@
 
                             <View
                                 android:id="@+id/bar_5"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -452,7 +452,7 @@
 
                             <View
                                 android:id="@+id/bar_6"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -465,7 +465,7 @@
 
                             <View
                                 android:id="@+id/bar_7"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -478,7 +478,7 @@
 
                             <View
                                 android:id="@+id/bar_8"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -491,7 +491,7 @@
 
                             <View
                                 android:id="@+id/bar_9"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -504,7 +504,7 @@
 
                             <View
                                 android:id="@+id/bar_10"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -517,7 +517,7 @@
 
                             <View
                                 android:id="@+id/bar_11"
-                                android:layout_width="10dp"
+                                android:layout_width="15dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -539,7 +539,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_0"
                                 app:layout_constraintStart_toStartOf="@id/bar_0"
@@ -553,7 +553,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_1"
                                 app:layout_constraintStart_toStartOf="@id/bar_1"
@@ -565,7 +565,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_2"
                                 app:layout_constraintStart_toStartOf="@id/bar_2"
@@ -577,7 +577,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_3"
                                 app:layout_constraintStart_toStartOf="@id/bar_3"
@@ -589,7 +589,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_4"
                                 app:layout_constraintStart_toStartOf="@id/bar_4"
@@ -601,7 +601,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_5"
                                 app:layout_constraintStart_toStartOf="@id/bar_5"
@@ -613,7 +613,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_6"
                                 app:layout_constraintStart_toStartOf="@id/bar_6"
@@ -625,7 +625,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_7"
                                 app:layout_constraintStart_toStartOf="@id/bar_7"
@@ -637,7 +637,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_8"
                                 app:layout_constraintStart_toStartOf="@id/bar_8"
@@ -649,7 +649,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_9"
                                 app:layout_constraintStart_toStartOf="@id/bar_9"
@@ -661,7 +661,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_10"
                                 app:layout_constraintStart_toStartOf="@id/bar_10"
@@ -673,7 +673,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
                                 android:text="@string/space"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_11"
                                 app:layout_constraintStart_toStartOf="@id/bar_11"
@@ -692,7 +692,7 @@
                                 android:paddingVertical="3dp"
                                 android:text="@string/zero_price"
                                 android:textColor="?attr/colorOnSecondaryContainer"
-                                android:textSize="12sp"
+                                android:textSize="13sp"
                                 android:visibility="gone"
                                 app:layout_constraintBottom_toTopOf="@id/bar_0"
                                 app:layout_constraintEnd_toEndOf="@id/bar_0"

@@ -71,7 +71,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         viewModel.listener = this
 
         viewModel.updatePurchaseNumber()
-        viewModel.updateLocalPurchaseList()
+        viewModel.updatePurchaseList(DEFAULT_LIMIT)
 
         viewModel.purchases.observe(viewLifecycleOwner) { purchases ->
             val nl = purchases.map { p -> p.copy() }

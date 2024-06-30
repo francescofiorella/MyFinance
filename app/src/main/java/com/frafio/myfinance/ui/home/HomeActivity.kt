@@ -124,7 +124,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
             if (userRequest) {
                 showProgressIndicator()
-                viewModel.updateUserData()
             } else {
                 // import db data
                 viewModel.checkUser()
@@ -256,14 +255,27 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
     // called only one time, when the activity is loaded for the first time
     private val dashboardCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentCreated(
+        override fun onFragmentViewCreated(
             fm: FragmentManager,
             f: Fragment,
+            v: View,
             savedInstanceState: Bundle?
         ) {
-            super.onFragmentCreated(fm, f, savedInstanceState)
-            isLayoutReady = true
+            super.onFragmentViewCreated(fm, f, v, savedInstanceState)
+            if (f is DashboardFragment) {
+                f.isLayoutReady.observe(f.viewLifecycleOwner) { value ->
+                    isLayoutReady = value
+                }
+            }
         }
+//        override fun onFragmentCreated(
+//            fm: FragmentManager,
+//            f: Fragment,
+//            savedInstanceState: Bundle?
+//        ) {
+//            super.onFragmentCreated(fm, f, savedInstanceState)
+//            isLayoutReady = true
+//        }
     }
 
     fun onAddButtonClick(view: View) {
@@ -310,15 +322,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         response.observe(this) { authResult ->
             when (authResult.code) {
                 AuthCode.USER_LOGGED.code -> {
-                    viewModel.updateUserData()
                     isLayoutReady = false
-                }
-
-                AuthCode.USER_NOT_LOGGED.code -> {
-                    goToLoginActivity()
-                }
-
-                AuthCode.USER_DATA_UPDATED.code -> {
                     initFragments()
                     if (!userRequest) {
                         supportFragmentManager.registerFragmentLifecycleCallbacks(
@@ -334,7 +338,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     }
                 }
 
-                AuthCode.USER_DATA_NOT_UPDATED.code -> showSnackBar(authResult.message)
+                AuthCode.USER_NOT_LOGGED.code -> {
+                    goToLoginActivity()
+                }
 
                 else -> Unit
             }

@@ -114,12 +114,11 @@ class LoginActivity : AppCompatActivity(), AuthListener {
             }
 
             when (authResult.code) {
-                AuthCode.LOGIN_SUCCESS.code -> viewModel.updateUserData()
+                AuthCode.LOGIN_SUCCESS.code -> goToHomeActivity()
 
                 AuthCode.GOOGLE_LOGIN_FAILURE.code,
                 AuthCode.USER_DISABLED.code,
-                AuthCode.LOGIN_FAILURE.code,
-                AuthCode.USER_DATA_NOT_UPDATED.code ->
+                AuthCode.LOGIN_FAILURE.code ->
                     snackBar(authResult.message)
 
                 AuthCode.INVALID_EMAIL.code,
@@ -128,10 +127,6 @@ class LoginActivity : AppCompatActivity(), AuthListener {
 
                 AuthCode.WRONG_PASSWORD.code ->
                     binding.loginPasswordInputLayout.error = authResult.message
-
-                AuthCode.USER_DATA_UPDATED.code -> {
-                    goToHomeActivity()
-                }
 
                 else -> snackBar(authResult.message)
             }

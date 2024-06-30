@@ -11,10 +11,6 @@ import com.frafio.myfinance.data.storages.PurchaseStorage
 
 class PurchaseRepository(private val purchaseManager: PurchaseManager) {
 
-    fun purchaseListSize(): Int {
-        return PurchaseStorage.purchaseList.size
-    }
-
     fun getIncomeList(): List<Purchase> {
         return PurchaseStorage.incomeList
     }

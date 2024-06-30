@@ -49,10 +49,6 @@ class UserRepository(private val authManager: AuthManager) {
         return UserStorage.user?.photoUrl
     }
 
-    fun updateUserData(): LiveData<AuthResult> {
-        return authManager.updateUserData()
-    }
-
     fun isDynamicColorOn(): Boolean {
         return authManager.isDynamicColorOn()
     }

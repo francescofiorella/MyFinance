@@ -99,11 +99,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         authListener?.onAuthSuccess(signupResponse)
     }
 
-    fun updateUserData() {
-        val response = userRepository.updateUserData()
-        authListener?.onAuthSuccess(response)
-    }
-
     fun getUserName(): String {
         return userRepository.getUser()!!.fullName!!
     }

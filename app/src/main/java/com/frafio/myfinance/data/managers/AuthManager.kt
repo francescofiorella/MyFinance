@@ -8,8 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.auth.SignupException
-import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
@@ -27,7 +25,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 
 class AuthManager(private val sharedPreferences: SharedPreferences) {
 
@@ -237,30 +234,6 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
         return (response)
-    }
-
-    fun updateUserData(): LiveData<AuthResult> {
-        val response = MutableLiveData<AuthResult>()
-
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
-            .limit(DEFAULT_LIMIT).get()
-            .addOnSuccessListener { queryDocumentSnapshots ->
-                PurchaseStorage.populatePaymentsFromSnapshot(queryDocumentSnapshots)
-                response.value = AuthResult(AuthCode.USER_DATA_UPDATED)
-            }.addOnFailureListener { e ->
-                val error = "Error! ${e.localizedMessage}"
-                Log.e(TAG, error)
-
-                response.value = AuthResult(AuthCode.USER_DATA_NOT_UPDATED)
-            }
-
-        return response
     }
 
     fun isDynamicColorOn(): Boolean {
