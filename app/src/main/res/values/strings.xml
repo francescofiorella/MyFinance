@@ -104,9 +104,7 @@
 
     <string name="zero_double" translatable="false">0.00</string>
     <string name="zero_price" translatable="false">€ 0.00</string>
-    <string name="space" translatable="false"> </string>
     <string name="zero_perc" translatable="false">0%</string>
-    <string name="on_slash" translatable="false">/ </string>
 
     <string name="monthly_budget">Monthly budget</string>
     <string name="annual_budget">Annual budget</string>

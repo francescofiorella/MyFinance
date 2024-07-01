@@ -124,6 +124,10 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
             if (userRequest) {
                 showProgressIndicator()
+                initFragments()
+                intent.extras?.getString(LoginActivity.INTENT_USER_NAME).also { userName ->
+                    showSnackBar("${getString(R.string.login_successful)} $userName")
+                }
             } else {
                 // import db data
                 viewModel.checkUser()
@@ -268,14 +272,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 }
             }
         }
-//        override fun onFragmentCreated(
-//            fm: FragmentManager,
-//            f: Fragment,
-//            savedInstanceState: Bundle?
-//        ) {
-//            super.onFragmentCreated(fm, f, savedInstanceState)
-//            isLayoutReady = true
-//        }
     }
 
     fun onAddButtonClick(view: View) {

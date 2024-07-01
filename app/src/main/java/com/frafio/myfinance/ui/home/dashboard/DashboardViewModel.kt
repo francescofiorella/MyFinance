@@ -21,6 +21,8 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     val isLayoutReady = MutableLiveData(false)
 
+    val isListEmpty = MutableLiveData<Boolean?>(null)
+
     private val _lastYearPurchases = MutableLiveData<List<Purchase>>()
     val lastYearPurchases: LiveData<List<Purchase>>
         get() = _lastYearPurchases

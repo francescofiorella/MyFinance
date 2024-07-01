@@ -50,7 +50,9 @@ class BarChart(
         layout.findViewById(R.id.bar_11_label)
     )
     private val indicatorTextView = layout.findViewById<TextView>(R.id.indicatorTV)
-    private val barPlaceHolder = layout.findViewById<View>(R.id.bar_place_holder)
+
+    //private val barPlaceHolder = layout.findViewById<View>(R.id.bar_place_holder)
+    private val placeHolderHeight = 294
 
     private var labels = listOf<String>()
     private var values = listOf<Double>()
@@ -86,13 +88,14 @@ class BarChart(
         values = newValues
         val maxValue = values.max()
         for (i in values.indices) {
-            val newHeight = if (values[i] != 0.0) {
+            var newHeight = if (values[i] != 0.0) {
                 barViews[i].visibility = View.VISIBLE
-                (values[i] * barPlaceHolder.height / maxValue).toInt()
+                (values[i] * placeHolderHeight / maxValue).toInt()
             } else {
                 barViews[i].visibility = View.INVISIBLE
                 1
             }
+            if (newHeight == 0) newHeight = 1
             barViews[i].updateLayoutParams<ViewGroup.LayoutParams> {
                 height = newHeight
             }

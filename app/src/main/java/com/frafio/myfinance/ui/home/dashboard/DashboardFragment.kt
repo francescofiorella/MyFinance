@@ -12,6 +12,7 @@ import com.frafio.myfinance.data.models.BarChart
 import com.frafio.myfinance.data.models.ProgressBar
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
 import com.frafio.myfinance.ui.BaseFragment
+import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.utils.doubleToString
@@ -40,10 +41,15 @@ class DashboardFragment : BaseFragment() {
         budgetProgressBar = ProgressBar(binding.budgetLayout, requireContext())
         monthlyBarChart = BarChart(binding.monthlyChart, requireContext())
 
+        var firstTime = true
+
         viewModel.lastYearPurchases.observe(viewLifecycleOwner) { purchases ->
-            if (purchases.isEmpty()) {
+            if (firstTime) {
+                firstTime = false
                 return@observe
             }
+            (activity as HomeActivity).hideProgressIndicator()
+            viewModel.isListEmpty.value = purchases.isEmpty()
             if (!viewModel.isLayoutReady.value!!)
                 viewModel.isLayoutReady.value = true
 

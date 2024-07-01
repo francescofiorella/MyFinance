@@ -132,7 +132,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     BUDGET_UPDATE_SUCCESS(
-        62, when (getCurrentLanguage()) {
+        60, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Budget updated!"
             Languages.ITALIANO.value -> "Budget aggiornato"
             else -> "Budget updated!" // english
@@ -140,7 +140,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     BUDGET_UPDATE_FAILURE(
-        63, when (getCurrentLanguage()) {
+        61, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Budget not updated!"
             Languages.ITALIANO.value -> "Budget non aggiornato"
             else -> "Budget not updated!" // english
