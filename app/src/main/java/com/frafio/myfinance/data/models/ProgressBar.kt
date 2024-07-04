@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Guideline
 import androidx.core.content.ContextCompat
-import androidx.core.view.updateLayoutParams
 import com.frafio.myfinance.R
 import com.frafio.myfinance.utils.animateRoot
 
@@ -19,6 +19,7 @@ class ProgressBar(
     private val frontView = layout.findViewById<View>(R.id.progress_bar_front)
     private val backView = layout.findViewById<View>(R.id.progress_bar_back)
     private val labelTextView = layout.findViewById<TextView>(R.id.percentageTV)
+    private val percGuideline = layout.findViewById<Guideline>(R.id.bar_guideline)
 
     fun updateValue(
         value: Double,
@@ -26,47 +27,26 @@ class ProgressBar(
     ) {
         if (maxValue == 0.0) {
             frontView.visibility = View.GONE
+            backView.visibility = View.GONE
             labelTextView.visibility = View.GONE
             return
         }
 
-        val newWidth: Int
-        val color: Int
-
         frontView.visibility = View.VISIBLE
+        backView.visibility = View.VISIBLE
         labelTextView.visibility = View.VISIBLE
 
         val percentage = value / maxValue
         val percString = "${(percentage * 100).toInt()}%"
         labelTextView.text = percString
-        if (percentage <= 1) {
-            val nw = (backView.width * percentage).toInt()
-            newWidth = if (nw == 0) {
-                frontView.visibility = View.INVISIBLE
-                1
-            } else {
-                nw
-            }
-            val typedValue = TypedValue()
-            context.theme.resolveAttribute(
-                android.R.attr.colorPrimary,
-                typedValue,
-                true
-            )
-            color = ContextCompat.getColor(context, typedValue.resourceId)
-        } else {
-            newWidth = backView.width
-            val typedValue = TypedValue()
-            context.theme.resolveAttribute(
-                android.R.attr.colorError,
-                typedValue,
-                true
-            )
-            color = ContextCompat.getColor(context, typedValue.resourceId)
-        }
-        frontView.updateLayoutParams<ViewGroup.LayoutParams> {
-            width = newWidth
-        }
+        percGuideline.setGuidelinePercent(percentage.toFloat())
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(
+            if (percentage <= 1) android.R.attr.colorPrimary else android.R.attr.colorError,
+            typedValue,
+            true
+        )
+        val color = ContextCompat.getColor(context, typedValue.resourceId)
         frontView.backgroundTintList = ColorStateList.valueOf(color)
 
         (layout as ViewGroup).animateRoot()

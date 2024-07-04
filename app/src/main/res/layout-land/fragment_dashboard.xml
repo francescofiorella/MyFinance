@@ -159,50 +159,66 @@
                             android:orientation="vertical"
                             app:layout_constraintGuide_percent="0.5" />
 
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/percentageTV"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="5dp"
-                            android:alpha="0.7"
-                            android:background="@drawable/bg_round_popup_right"
-                            android:backgroundTint="?attr/colorSecondaryContainer"
-                            android:fontFamily="@font/nunito"
-                            android:paddingHorizontal="5dp"
-                            android:paddingVertical="3dp"
-                            android:text="@string/zero_perc"
-                            android:textColor="?attr/colorOnSecondaryContainer"
-                            android:textSize="13sp"
-                            app:layout_constraintBottom_toTopOf="@id/progress_bar_back"
-                            app:layout_constraintEnd_toEndOf="@id/progress_bar_front"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_chainStyle="packed"
-                            tools:text="0%" />
-
-                        <View
-                            android:id="@+id/progress_bar_back"
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/bar_chart_layout"
                             android:layout_width="0dp"
-                            android:layout_height="10dp"
+                            android:layout_height="0dp"
                             android:layout_marginStart="25dp"
-                            android:background="@drawable/bg_round_corners"
-                            android:backgroundTint="?attr/colorSecondaryContainer"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="@id/monthly_guideline"
-                            app:layout_constraintTop_toBottomOf="@id/percentageTV" />
+                            app:layout_constraintStart_toEndOf="@id/monthly_guideline"
+                            app:layout_constraintTop_toTopOf="parent">
 
-                        <View
-                            android:id="@+id/progress_bar_front"
-                            android:layout_width="1dp"
-                            android:layout_height="10dp"
-                            android:background="@drawable/bg_round_corners"
-                            android:backgroundTint="?attr/colorPrimary"
-                            app:layout_constraintBottom_toBottomOf="@id/progress_bar_back"
-                            app:layout_constraintEnd_toEndOf="@id/progress_bar_back"
-                            app:layout_constraintHorizontal_bias="0.0"
-                            app:layout_constraintStart_toStartOf="@id/progress_bar_back"
-                            app:layout_constraintTop_toTopOf="@id/progress_bar_back"
-                            tools:layout_width="60dp" />
+                            <androidx.constraintlayout.widget.Guideline
+                                android:id="@+id/bar_guideline"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                app:layout_constraintGuide_percent=".6" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/percentageTV"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="5dp"
+                                android:alpha="0.7"
+                                android:background="@drawable/bg_round_popup_right"
+                                android:backgroundTint="?attr/colorSecondaryContainer"
+                                android:fontFamily="@font/nunito"
+                                android:paddingHorizontal="5dp"
+                                android:paddingVertical="3dp"
+                                android:text="@string/zero_perc"
+                                android:textColor="?attr/colorOnSecondaryContainer"
+                                android:textSize="13sp"
+                                app:layout_constraintBottom_toTopOf="@id/progress_bar_back"
+                                app:layout_constraintEnd_toEndOf="@id/progress_bar_front"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintVertical_chainStyle="packed"
+                                tools:text="0%" />
+
+                            <View
+                                android:id="@+id/progress_bar_back"
+                                android:layout_width="0dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/bg_round_corners"
+                                android:backgroundTint="?attr/colorSecondaryContainer"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/percentageTV" />
+
+                            <View
+                                android:id="@+id/progress_bar_front"
+                                android:layout_width="0dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/bg_round_corners"
+                                android:backgroundTint="?attr/colorPrimary"
+                                app:layout_constraintBottom_toBottomOf="@id/progress_bar_back"
+                                app:layout_constraintEnd_toEndOf="@id/bar_guideline"
+                                app:layout_constraintStart_toStartOf="@id/progress_bar_back"
+                                app:layout_constraintTop_toTopOf="@id/progress_bar_back" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

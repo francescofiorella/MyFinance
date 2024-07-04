@@ -38,7 +38,7 @@ class DashboardFragment : BaseFragment() {
 
         viewModel.updateStats()
 
-        budgetProgressBar = ProgressBar(binding.budgetLayout, requireContext())
+        budgetProgressBar = ProgressBar(binding.barChartLayout, requireContext())
         monthlyBarChart = BarChart(binding.monthlyChart, requireContext())
 
         var firstTime = true
