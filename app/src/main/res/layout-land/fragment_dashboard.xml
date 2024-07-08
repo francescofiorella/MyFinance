@@ -215,6 +215,7 @@
                                 android:backgroundTint="?attr/colorPrimary"
                                 app:layout_constraintBottom_toBottomOf="@id/progress_bar_back"
                                 app:layout_constraintEnd_toEndOf="@id/bar_guideline"
+                                app:layout_constraintHorizontal_bias="0.0"
                                 app:layout_constraintStart_toStartOf="@id/progress_bar_back"
                                 app:layout_constraintTop_toTopOf="@id/progress_bar_back" />
 
@@ -360,33 +361,14 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/textView10">
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/indicatorTV_place_holder"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/bg_round_popup_right"
-                                android:backgroundTint="?attr/colorSecondaryContainer"
-                                android:fontFamily="@font/nunito"
-                                android:paddingHorizontal="5dp"
-                                android:paddingVertical="3dp"
-                                android:text="@string/zero_price"
-                                android:textColor="?attr/colorOnSecondaryContainer"
-                                android:textSize="13sp"
-                                android:visibility="invisible"
-                                app:layout_constraintStart_toStartOf="@id/bar_place_holder"
-                                app:layout_constraintTop_toTopOf="parent" />
-
                             <View
-                                android:id="@+id/bar_place_holder"
-                                android:layout_width="15dp"
+                                android:id="@+id/bar_0_layout"
+                                android:layout_width="0dp"
                                 android:layout_height="0dp"
-                                android:layout_marginTop="5dp"
-                                android:background="@drawable/bg_round_corners"
-                                android:backgroundTint="?attr/colorPrimary"
-                                android:visibility="invisible"
                                 app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/indicatorTV_place_holder" />
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/bar_1_layout"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_0"
@@ -395,11 +377,21 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_0_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_0_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_0_layout"
                                 tools:backgroundTint="?attr/colorPrimary"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
+
+                            <View
+                                android:id="@+id/bar_1_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintBottom_toTopOf="@id/x_axis"
+                                app:layout_constraintEnd_toStartOf="@id/bar_0_layout"
+                                app:layout_constraintStart_toEndOf="@id/bar_2_layout"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_1"
@@ -408,11 +400,20 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintEnd_toStartOf="@id/bar_0"
-                                app:layout_constraintStart_toEndOf="@id/bar_2"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_1_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_1_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_1_layout"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
+
+                            <View
+                                android:id="@+id/bar_2_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintBottom_toTopOf="@id/x_axis"
+                                app:layout_constraintEnd_toStartOf="@id/bar_1_layout"
+                                app:layout_constraintStart_toEndOf="@id/bar_3_layout"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_2"
@@ -421,11 +422,20 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintEnd_toStartOf="@id/bar_1"
-                                app:layout_constraintStart_toEndOf="@id/bar_3"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_2_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_2_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_2_layout"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
+
+                            <View
+                                android:id="@+id/bar_3_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintBottom_toTopOf="@id/x_axis"
+                                app:layout_constraintEnd_toStartOf="@id/bar_2_layout"
+                                app:layout_constraintStart_toEndOf="@id/bar_4_layout"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_3"
@@ -434,11 +444,20 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintEnd_toStartOf="@id/bar_2"
-                                app:layout_constraintStart_toEndOf="@id/bar_4"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_3_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_3_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_3_layout"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
+
+                            <View
+                                android:id="@+id/bar_4_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintBottom_toTopOf="@id/x_axis"
+                                app:layout_constraintEnd_toStartOf="@id/bar_3_layout"
+                                app:layout_constraintStart_toEndOf="@id/bar_5_layout"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_4"
@@ -447,11 +466,20 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintEnd_toStartOf="@id/bar_3"
-                                app:layout_constraintStart_toEndOf="@id/bar_5"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_4_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_4_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_4_layout"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
+
+                            <View
+                                android:id="@+id/bar_5_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintBottom_toTopOf="@id/x_axis"
+                                app:layout_constraintEnd_toStartOf="@id/bar_4_layout"
+                                app:layout_constraintStart_toEndOf="@id/bar_6_layout"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_5"
@@ -460,11 +488,20 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintEnd_toStartOf="@id/bar_4"
-                                app:layout_constraintStart_toEndOf="@id/bar_6"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_5_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_5_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_5_layout"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
+
+                            <View
+                                android:id="@+id/bar_6_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintBottom_toTopOf="@id/x_axis"
+                                app:layout_constraintEnd_toStartOf="@id/bar_5_layout"
+                                app:layout_constraintStart_toEndOf="@id/bar_7_layout"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_6"
@@ -473,11 +510,20 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintEnd_toStartOf="@id/bar_5"
-                                app:layout_constraintStart_toEndOf="@id/bar_7"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_6_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_6_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_6_layout"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
+
+                            <View
+                                android:id="@+id/bar_7_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintBottom_toTopOf="@id/x_axis"
+                                app:layout_constraintEnd_toStartOf="@id/bar_6_layout"
+                                app:layout_constraintStart_toEndOf="@id/bar_8_layout"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_7"
@@ -486,11 +532,20 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintEnd_toStartOf="@id/bar_6"
-                                app:layout_constraintStart_toEndOf="@id/bar_8"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_7_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_7_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_7_layout"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
+
+                            <View
+                                android:id="@+id/bar_8_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintBottom_toTopOf="@id/x_axis"
+                                app:layout_constraintEnd_toStartOf="@id/bar_7_layout"
+                                app:layout_constraintStart_toEndOf="@id/bar_9_layout"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_8"
@@ -499,11 +554,20 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintEnd_toStartOf="@id/bar_7"
-                                app:layout_constraintStart_toEndOf="@id/bar_9"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_8_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_8_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_8_layout"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
+
+                            <View
+                                android:id="@+id/bar_9_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintBottom_toTopOf="@id/x_axis"
+                                app:layout_constraintEnd_toStartOf="@id/bar_8_layout"
+                                app:layout_constraintStart_toEndOf="@id/bar_10_layout"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_9"
@@ -512,11 +576,20 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintEnd_toStartOf="@id/bar_8"
-                                app:layout_constraintStart_toEndOf="@id/bar_10"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_9_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_9_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_9_layout"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
+
+                            <View
+                                android:id="@+id/bar_10_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintBottom_toTopOf="@id/x_axis"
+                                app:layout_constraintEnd_toStartOf="@id/bar_9_layout"
+                                app:layout_constraintStart_toEndOf="@id/bar_11_layout"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_10"
@@ -525,11 +598,20 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintEnd_toStartOf="@id/bar_9"
-                                app:layout_constraintStart_toEndOf="@id/bar_11"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_10_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_10_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_10_layout"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
+
+                            <View
+                                android:id="@+id/bar_11_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintBottom_toTopOf="@id/x_axis"
+                                app:layout_constraintEnd_toStartOf="@id/bar_10_layout"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <View
                                 android:id="@+id/bar_11"
@@ -538,8 +620,9 @@
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
                                 android:visibility="gone"
-                                app:layout_constraintBottom_toTopOf="@id/x_axis"
-                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintBottom_toBottomOf="@id/bar_11_layout"
+                                app:layout_constraintEnd_toEndOf="@id/bar_11_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_11_layout"
                                 tools:layout_height="50dp"
                                 tools:visibility="visible" />
 
@@ -557,8 +640,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_0"
-                                app:layout_constraintStart_toStartOf="@id/bar_0"
+                                app:layout_constraintEnd_toEndOf="@id/bar_0_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_0_layout"
                                 tools:fontFamily="@font/nunito_semibold"
                                 tools:text="06/24"
                                 tools:textColor="@color/primary_text" />
@@ -571,8 +654,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_1"
-                                app:layout_constraintStart_toStartOf="@id/bar_1"
+                                app:layout_constraintEnd_toEndOf="@id/bar_1_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_1_layout"
                                 tools:text="05" />
 
                             <com.google.android.material.textview.MaterialTextView
@@ -583,8 +666,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_2"
-                                app:layout_constraintStart_toStartOf="@id/bar_2"
+                                app:layout_constraintEnd_toEndOf="@id/bar_2_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_2_layout"
                                 tools:text="04" />
 
                             <com.google.android.material.textview.MaterialTextView
@@ -595,8 +678,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_3"
-                                app:layout_constraintStart_toStartOf="@id/bar_3"
+                                app:layout_constraintEnd_toEndOf="@id/bar_3_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_3_layout"
                                 tools:text="03" />
 
                             <com.google.android.material.textview.MaterialTextView
@@ -607,8 +690,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_4"
-                                app:layout_constraintStart_toStartOf="@id/bar_4"
+                                app:layout_constraintEnd_toEndOf="@id/bar_4_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_4_layout"
                                 tools:text="02" />
 
                             <com.google.android.material.textview.MaterialTextView
@@ -619,8 +702,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_5"
-                                app:layout_constraintStart_toStartOf="@id/bar_5"
+                                app:layout_constraintEnd_toEndOf="@id/bar_5_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_5_layout"
                                 tools:text="01" />
 
                             <com.google.android.material.textview.MaterialTextView
@@ -631,8 +714,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_6"
-                                app:layout_constraintStart_toStartOf="@id/bar_6"
+                                app:layout_constraintEnd_toEndOf="@id/bar_6_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_6_layout"
                                 tools:text="12" />
 
                             <com.google.android.material.textview.MaterialTextView
@@ -643,8 +726,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_7"
-                                app:layout_constraintStart_toStartOf="@id/bar_7"
+                                app:layout_constraintEnd_toEndOf="@id/bar_7_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_7_layout"
                                 tools:text="11" />
 
                             <com.google.android.material.textview.MaterialTextView
@@ -655,8 +738,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_8"
-                                app:layout_constraintStart_toStartOf="@id/bar_8"
+                                app:layout_constraintEnd_toEndOf="@id/bar_8_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_8_layout"
                                 tools:text="10" />
 
                             <com.google.android.material.textview.MaterialTextView
@@ -667,8 +750,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_9"
-                                app:layout_constraintStart_toStartOf="@id/bar_9"
+                                app:layout_constraintEnd_toEndOf="@id/bar_9_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_9_layout"
                                 tools:text="09" />
 
                             <com.google.android.material.textview.MaterialTextView
@@ -679,8 +762,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_10"
-                                app:layout_constraintStart_toStartOf="@id/bar_10"
+                                app:layout_constraintEnd_toEndOf="@id/bar_10_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_10_layout"
                                 tools:text="08" />
 
                             <com.google.android.material.textview.MaterialTextView
@@ -691,8 +774,8 @@
                                 android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="@id/bar_11"
-                                app:layout_constraintStart_toStartOf="@id/bar_11"
+                                app:layout_constraintEnd_toEndOf="@id/bar_11_layout"
+                                app:layout_constraintStart_toStartOf="@id/bar_11_layout"
                                 tools:text="07" />
 
                             <com.google.android.material.textview.MaterialTextView
@@ -727,4 +810,3 @@
     </LinearLayout>
 
 </layout>
-

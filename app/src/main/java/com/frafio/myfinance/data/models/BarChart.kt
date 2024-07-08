@@ -21,6 +21,22 @@ class BarChart(
 ) {
     private var selectedBarIndex = 0
 
+    private val barLayouts: List<View> = mutableListOf(
+        layout.findViewById(R.id.bar_0_layout),
+        layout.findViewById(R.id.bar_1_layout),
+        layout.findViewById(R.id.bar_2_layout),
+        layout.findViewById(R.id.bar_3_layout),
+        layout.findViewById(R.id.bar_4_layout),
+        layout.findViewById(R.id.bar_5_layout),
+        layout.findViewById(R.id.bar_6_layout),
+        layout.findViewById(R.id.bar_7_layout),
+        layout.findViewById(R.id.bar_8_layout),
+        layout.findViewById(R.id.bar_9_layout),
+        layout.findViewById(R.id.bar_10_layout),
+        layout.findViewById(R.id.bar_11_layout)
+
+    )
+
     private val barViews: List<View> = mutableListOf(
         layout.findViewById(R.id.bar_0),
         layout.findViewById(R.id.bar_1),
@@ -33,7 +49,7 @@ class BarChart(
         layout.findViewById(R.id.bar_8),
         layout.findViewById(R.id.bar_9),
         layout.findViewById(R.id.bar_10),
-        layout.findViewById(R.id.bar_11),
+        layout.findViewById(R.id.bar_11)
     )
     private val labelsTextViews: List<TextView> = mutableListOf(
         layout.findViewById(R.id.bar_0_label),
@@ -51,7 +67,6 @@ class BarChart(
     )
     private val indicatorTextView = layout.findViewById<TextView>(R.id.indicatorTV)
 
-    //private val barPlaceHolder = layout.findViewById<View>(R.id.bar_place_holder)
     private val placeHolderHeight = 294
 
     private var labels = listOf<String>()
@@ -72,8 +87,8 @@ class BarChart(
             view.text = label
             currentDate = currentDate.minusMonths(1)
         }
-        for (i in barViews.indices) {
-            barViews[i].setOnClickListener {
+        for (i in barLayouts.indices) {
+            barLayouts[i].setOnClickListener {
                 selectBar(i)
             }
         }
