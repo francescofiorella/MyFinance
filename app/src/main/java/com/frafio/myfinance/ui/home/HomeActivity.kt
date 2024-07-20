@@ -171,11 +171,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
         savedInstanceState.getString(ACTIVE_FRAGMENT_KEY).also { tag ->
             when (tag) {
-                DASHBOARD_FRAGMENT_TAG -> {
-                    activeFragment = dashboardFragment
-                    showFragment(R.id.dashboardFragment)
-                }
-
                 PAYMENTS_FRAGMENT_TAG -> {
                     activeFragment = paymentsFragment
                     showFragment(R.id.paymentsFragment)
@@ -192,6 +187,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 }
 
                 else -> {
+                    // Either tag is DASHBOARD_FRAGMENT_TAG or set Dashboard as default
                     activeFragment = dashboardFragment
                     showFragment(R.id.dashboardFragment)
                 }

@@ -18,7 +18,7 @@ object DbPurchases {
         ID("id")
     }
 
-    enum class NAMES(val value: String, val value_en: String, val value_it: String) {
+    enum class NAMES(val value: String, val valueEn: String, val valueIt: String) {
         TOTAL(
             when (getCurrentLanguage()) {
                 Languages.ENGLISH.value -> "Total"

@@ -52,7 +52,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        if ((name == DbPurchases.NAMES.TOTAL.value_en || name == DbPurchases.NAMES.TOTAL.value_it)) {
+        if ((name == DbPurchases.NAMES.TOTAL.valueEn || name == DbPurchases.NAMES.TOTAL.valueIt)) {
             listener?.onAddFailure(PurchaseResult(PurchaseCode.WRONG_NAME_TOTAL))
             return
         }
