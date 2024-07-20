@@ -13,7 +13,8 @@ import com.google.android.material.textfield.TextInputLayout
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 open class DatePickerButton(
     private val layout: TextInputLayout,
@@ -104,5 +105,7 @@ open class DatePickerButton(
         }
     }
 
-    open fun onPositiveBtnClickListener() {}
+    open fun onPositiveBtnClickListener() {
+        // Should override this method to get the selected date
+    }
 }

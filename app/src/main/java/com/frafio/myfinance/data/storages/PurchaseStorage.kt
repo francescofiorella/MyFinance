@@ -4,7 +4,6 @@ import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Purchase
 import com.google.firebase.firestore.QuerySnapshot
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 object PurchaseStorage {
     var purchaseList: MutableList<Purchase> = mutableListOf()
@@ -30,30 +29,23 @@ object PurchaseStorage {
         // Used to keep the order
         var currentPurchases = mutableListOf<Purchase>()
 
+        var prevDate: LocalDate? = null
+
         queryDocumentSnapshots.forEach { document ->
             val purchase = document.toObject(Purchase::class.java)
             // set id
             purchase.id = document.id
             val todayDate = LocalDate.now()
             val purchaseDate = purchase.getLocalDate()
-            var prevDate: LocalDate? = if (total == null) // se primo acquisto
-                null
-            else
-                total!!.getLocalDate() // ultimo totale
+            total?.let {
+                prevDate = total!!.getLocalDate()
+            }
 
-            // se è < today and non hai fatto today
-            // quindi se purchase < today and (totale == null or totale > today)
-            // se prevDate > today and purchase < today
-            if ((prevDate == null || ChronoUnit.DAYS.between(prevDate, todayDate) < 0) &&
-                ChronoUnit.DAYS.between(purchaseDate, todayDate) > 0
+            if ((prevDate == null || prevDate!!.isAfter(todayDate)) &&
+                purchaseDate.isBefore(todayDate)
             ) {
-                if (currentPurchases.isNotEmpty()) {
-                    purchaseList.add(total!!)
-                    currentPurchases.forEach { cPurchase ->
-                        purchaseList.add(cPurchase)
-                    }
-                    currentPurchases = mutableListOf()
-                }
+                addToListFrom(false, currentPurchases, total!!)
+                currentPurchases = mutableListOf()
                 // Aggiungi totale a 0 per oggi
                 val totId = "${todayDate.dayOfMonth}_${todayDate.monthValue}_${todayDate.year}"
                 total = Purchase(
@@ -93,13 +85,8 @@ object PurchaseStorage {
                 )
             } else { // If we need a new total
                 // Update the local list with previous day purchases
-                if (currentPurchases.isNotEmpty()) {
-                    purchaseList.add(total!!)
-                    currentPurchases.forEach { cPurchase ->
-                        purchaseList.add(cPurchase)
-                    }
-                    currentPurchases = mutableListOf()
-                }
+                addToListFrom(false, currentPurchases, total!!)
+                currentPurchases = mutableListOf()
                 currentPurchases.add(purchase)
                 // Create new total
                 total = Purchase(
@@ -113,35 +100,30 @@ object PurchaseStorage {
                 )
             }
         }
-        if (currentPurchases.isNotEmpty()) {
-            purchaseList.add(total!!)
-            currentPurchases.forEach { cPurchase ->
-                purchaseList.add(cPurchase)
+        addToListFrom(false, currentPurchases, total!!)
+    }
+
+    private fun addToListFrom(income: Boolean = false, list: List<Purchase>, total: Purchase) {
+        // income is True for purchaseList, False for incomeList
+        if (list.isNotEmpty()) {
+            if (income) incomeList.add(total) else purchaseList.add(total)
+            list.forEach { p ->
+                if (income) incomeList.add(p) else purchaseList.add(p)
             }
-            currentPurchases = mutableListOf()
         }
     }
 
     fun addPurchase(purchase: Purchase): Int {
         val totalIndex: Int
         val purchaseDate = purchase.getLocalDate()
-        val totalFound: Boolean
         var i = 0
-        if (purchaseList.size != 0) {
-            var iDate = purchaseList[i].getLocalDate()
-            while (i < purchaseList.size && ChronoUnit.DAYS.between(purchaseDate, iDate) > 0) {
+        val totalFound = purchaseList.any { it.getDateString() == purchase.getDateString() }
+        for (p in purchaseList) {
+            if (purchaseDate.isBefore(p.getLocalDate())) {
                 i++
-                if (i < purchaseList.size) {
-                    iDate = purchaseList[i].getLocalDate()
-                }
-            }
-            totalFound = if (i < purchaseList.size) {
-                purchaseList[i].getDateString() == purchase.getDateString()
             } else {
-                false
+                break
             }
-        } else {
-            totalFound = false
         }
 
         if (totalFound) {
@@ -280,13 +262,8 @@ object PurchaseStorage {
                 )
                 currentIncomes.add(income)
             } else { // Crea nuovo totale
-                if (currentIncomes.isNotEmpty()) {
-                    incomeList.add(total)
-                    currentIncomes.forEach { cIncome ->
-                        incomeList.add(cIncome)
-                    }
-                    currentIncomes = mutableListOf()
-                }
+                addToListFrom(true, currentIncomes, total)
+                currentIncomes = mutableListOf()
                 total = Purchase(
                     name = DbPurchases.NAMES.TOTAL.value,
                     price = income.price,
@@ -299,31 +276,19 @@ object PurchaseStorage {
                 currentIncomes.add(income)
             }
         }
-        if (currentIncomes.isNotEmpty()) {
-            incomeList.add(total)
-            currentIncomes.forEach { cIncome ->
-                incomeList.add(cIncome)
-            }
-            currentIncomes = mutableListOf()
-        }
+        addToListFrom(true, currentIncomes, total)
     }
 
     fun addIncome(income: Purchase): Int {
         val totalIndex: Int
-
-        val totalFound: Boolean
         var i = 0
-        if (incomeList.size != 0) {
-            while (i < incomeList.size && incomeList[i].year!! > income.year!!) {
+        val totalFound = incomeList.any { it.year == income.year }
+        for (p in incomeList) {
+            if (incomeList[i].year!! > income.year!!) {
                 i++
-            }
-            totalFound = if (i < incomeList.size) {
-                incomeList[i].year == income.year
             } else {
-                false
+                break
             }
-        } else {
-            totalFound = false
         }
 
         if (totalFound) {
