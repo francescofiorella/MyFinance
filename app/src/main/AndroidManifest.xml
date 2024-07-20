@@ -3,19 +3,19 @@
 
     <application
         android:name=".MyFinanceApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MyFinance">
+        android:theme="@style/Theme.MyFinance"
+        android:usesCleartextTraffic="false">
         <activity
             android:name=".ui.add.AddActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".ui.home.payments.invoice.InvoiceActivity"
-            android:exported="false" />
         <activity
             android:name=".ui.auth.SignupActivity"
             android:exported="false" />
