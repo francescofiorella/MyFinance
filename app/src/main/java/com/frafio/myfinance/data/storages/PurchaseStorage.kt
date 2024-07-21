@@ -44,7 +44,7 @@ object PurchaseStorage {
             if ((prevDate == null || prevDate!!.isAfter(todayDate)) &&
                 purchaseDate.isBefore(todayDate)
             ) {
-                addToListFrom(false, currentPurchases, total!!)
+                addToListFrom(false, currentPurchases, total)
                 currentPurchases = mutableListOf()
                 // Aggiungi totale a 0 per oggi
                 val totId = "${todayDate.dayOfMonth}_${todayDate.monthValue}_${todayDate.year}"
@@ -85,7 +85,7 @@ object PurchaseStorage {
                 )
             } else { // If we need a new total
                 // Update the local list with previous day purchases
-                addToListFrom(false, currentPurchases, total!!)
+                addToListFrom(false, currentPurchases, total)
                 currentPurchases = mutableListOf()
                 currentPurchases.add(purchase)
                 // Create new total
@@ -100,15 +100,17 @@ object PurchaseStorage {
                 )
             }
         }
-        addToListFrom(false, currentPurchases, total!!)
+        addToListFrom(false, currentPurchases, total)
     }
 
-    private fun addToListFrom(income: Boolean = false, list: List<Purchase>, total: Purchase) {
+    private fun addToListFrom(income: Boolean = false, list: List<Purchase>, total: Purchase?) {
         // income is True for purchaseList, False for incomeList
-        if (list.isNotEmpty()) {
-            if (income) incomeList.add(total) else purchaseList.add(total)
-            list.forEach { p ->
-                if (income) incomeList.add(p) else purchaseList.add(p)
+        total?.let {
+            if (list.isNotEmpty()) {
+                if (income) incomeList.add(total) else purchaseList.add(total)
+                list.forEach { p ->
+                    if (income) incomeList.add(p) else purchaseList.add(p)
+                }
             }
         }
     }
