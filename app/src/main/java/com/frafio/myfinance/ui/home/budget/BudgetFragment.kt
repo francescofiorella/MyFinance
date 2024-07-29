@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
-import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.models.Income
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.FragmentBudgetBinding
 import com.frafio.myfinance.ui.BaseFragment
@@ -198,7 +198,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         }
     }
 
-    override fun onDeleteCompleted(response: LiveData<PurchaseResult>, income: Purchase) {
+    override fun onDeleteCompleted(response: LiveData<PurchaseResult>, income: Income) {
         response.observe(viewLifecycleOwner) { result ->
             if (result.code == PurchaseCode.INCOME_DELETE_SUCCESS.code) {
                 viewModel.updateLocalIncomeList()
@@ -220,7 +220,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         binding.budgetScrollView.scrollTo(0, 0)
     }
 
-    override fun onItemInteraction(interactionID: Int, income: Purchase, position: Int) {
+    override fun onItemInteraction(interactionID: Int, income: Income, position: Int) {
         when (interactionID) {
             ON_LONG_CLICK -> {
                 if (requireActivity().findViewById<NavigationView?>(R.id.nav_drawer) != null) {
@@ -273,7 +273,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
 
     class ModalBottomSheet(
         private val fragment: BudgetFragment,
-        private val income: Purchase,
+        private val income: Income,
         private val position: Int,
         private val editResultLauncher: ActivityResultLauncher<Intent>,
         private val viewModel: BudgetViewModel
@@ -304,7 +304,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
 
     fun defineSheetInterface(
         layout: View,
-        income: Purchase,
+        income: Income,
         position: Int,
         editResultLauncher: ActivityResultLauncher<Intent>,
         viewModel: BudgetViewModel,

@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.BarChart
 import com.frafio.myfinance.data.models.ProgressBar
+import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
@@ -22,9 +22,6 @@ import java.time.temporal.TemporalAdjusters
 class DashboardFragment : BaseFragment() {
     private lateinit var binding: FragmentDashboardBinding
     private val viewModel by viewModels<DashboardViewModel>()
-
-    val isLayoutReady: LiveData<Boolean>
-        get() = viewModel.isLayoutReady
 
     private lateinit var monthlyBarChart: BarChart
     private lateinit var budgetProgressBar: ProgressBar
@@ -41,23 +38,63 @@ class DashboardFragment : BaseFragment() {
         budgetProgressBar = ProgressBar(binding.barChartLayout, requireContext())
         monthlyBarChart = BarChart(binding.monthlyChart, requireContext())
 
-        var firstTime = true
+        viewModel.getPurchaseNumber().observe(viewLifecycleOwner) {
+            if (PurchaseStorage.isTableBusy) return@observe
+            viewModel.isListEmpty.value = it == 0
+        }
+
+        viewModel.getPriceSumFromToday().observe(viewLifecycleOwner) {
+            if (PurchaseStorage.isTableBusy) return@observe
+            val todaySum = it ?: 0.0
+            // Update today TV
+            binding.todayTotTV.text = if (todaySum < 1000)
+                doubleToPrice(todaySum)
+            else
+                doubleToPriceWithoutDecimals(todaySum)
+        }
+
+        viewModel.getPriceSumFromThisMonth().observe(viewLifecycleOwner) {
+            if (PurchaseStorage.isTableBusy) return@observe
+            viewModel.thisMonthSum = it ?: 0.0
+            if (viewModel.monthShown) {
+                binding.thisMonthTVTitle.text = getString(R.string.this_month)
+                binding.thisMonthTV.text = doubleToPrice(viewModel.thisMonthSum)
+            } else {
+                binding.thisYearTVTitle.text = getString(R.string.this_month_next)
+                binding.thisYearTV.text = if (viewModel.thisMonthSum < 1000)
+                    doubleToPrice(viewModel.thisMonthSum)
+                else
+                    doubleToPriceWithoutDecimals(viewModel.thisMonthSum)
+            }
+        }
+
+        viewModel.getPriceSumFromThisYear().observe(viewLifecycleOwner) {
+            if (PurchaseStorage.isTableBusy) return@observe
+            viewModel.thisYearSum = it ?: 0.0
+            if (viewModel.monthShown) {
+                binding.thisYearTVTitle.text = getString(R.string.this_year_next)
+                binding.thisYearTV.text = if (viewModel.thisYearSum < 1000)
+                    doubleToPrice(viewModel.thisYearSum)
+                else
+                    doubleToPriceWithoutDecimals(viewModel.thisYearSum)
+            } else {
+                binding.thisMonthTVTitle.text = getString(R.string.this_year)
+                binding.thisMonthTV.text = doubleToPrice(viewModel.thisYearSum)
+            }
+        }
+
+        viewModel.getPricesList().observe(viewLifecycleOwner) {
+            if (PurchaseStorage.isTableBusy) return@observe
+            var string = ""
+            for (item in it) {
+                string += item.toString()
+            }
+            (activity as HomeActivity).showSnackBar(string)
+        }
 
         viewModel.lastYearPurchases.observe(viewLifecycleOwner) { purchases ->
-            if (firstTime) {
-                firstTime = false
-                return@observe
-            }
             (activity as HomeActivity).hideProgressIndicator()
-            viewModel.isListEmpty.value = purchases.isEmpty()
-            if (!viewModel.isLayoutReady.value!!)
-                viewModel.isLayoutReady.value = true
 
-            viewModel.thisYearSum = 0.0
-            viewModel.thisMonthSum = 0.0
-            viewModel.todaySum = 0.0
-
-            val today = LocalDate.now()
             val values = mutableListOf<Double>()
             val labels = mutableListOf<String>()
             var currentDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth())
@@ -70,15 +107,6 @@ class DashboardFragment : BaseFragment() {
             var monthsPassed = 1
             var currentValue = 0.0
             for (p in purchases) {
-                if (p.year == today.year && p.price != null) {
-                    viewModel.thisYearSum += p.price
-                    if (p.month == today.monthValue) {
-                        viewModel.thisMonthSum += p.price
-                        if (p.day == today.dayOfMonth) {
-                            viewModel.todaySum += p.price
-                        }
-                    }
-                }
                 monthString = if (p.month!! > 9) {
                     "${p.month}"
                 } else {
@@ -130,29 +158,7 @@ class DashboardFragment : BaseFragment() {
             }
 
             monthlyBarChart.updateValues(labels, values)
-            // Update today TV
-            binding.todayTotTV.text = if (viewModel.todaySum < 1000)
-                doubleToPrice(viewModel.todaySum)
-            else
-                doubleToPriceWithoutDecimals(viewModel.todaySum)
             // Update this month and this year TV
-            if (viewModel.monthShown) {
-                binding.thisMonthTVTitle.text = getString(R.string.this_month)
-                binding.thisMonthTV.text = doubleToPrice(viewModel.thisMonthSum)
-                binding.thisYearTVTitle.text = getString(R.string.this_year_next)
-                binding.thisYearTV.text = if (viewModel.thisYearSum < 1000)
-                    doubleToPrice(viewModel.thisYearSum)
-                else
-                    doubleToPriceWithoutDecimals(viewModel.thisYearSum)
-            } else {
-                binding.thisMonthTVTitle.text = getString(R.string.this_year)
-                binding.thisMonthTV.text = doubleToPrice(viewModel.thisYearSum)
-                binding.thisYearTVTitle.text = getString(R.string.this_month_next)
-                binding.thisYearTV.text = if (viewModel.thisMonthSum < 1000)
-                    doubleToPrice(viewModel.thisMonthSum)
-                else
-                    doubleToPriceWithoutDecimals(viewModel.thisMonthSum)
-            }
             val monthlyBudget = viewModel.monthlyBudget.value
             if (monthlyBudget != null) {
                 if (viewModel.monthShown) {

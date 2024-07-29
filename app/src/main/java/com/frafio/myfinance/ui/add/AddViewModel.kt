@@ -7,8 +7,10 @@ import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.DatePickerButton
+import com.frafio.myfinance.data.models.Income
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
+import com.frafio.myfinance.data.repositories.IncomeRepository
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.utils.dateToUTCTimestamp
 import java.time.LocalDate
@@ -16,6 +18,9 @@ import java.time.LocalDate
 class AddViewModel(application: Application) : AndroidViewModel(application) {
     private val purchaseRepository = PurchaseRepository(
         (application as MyFinanceApplication).purchaseManager
+    )
+    private val incomeRepository = IncomeRepository(
+        (application as MyFinanceApplication).incomeManager
     )
 
     var listener: AddListener? = null
@@ -73,26 +78,35 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
 
         when (requestCode) {
             AddActivity.REQUEST_ADD_CODE -> {
-                val purchase = Purchase(
-                    name,
-                    price,
-                    year,
-                    month,
-                    day,
-                    dateToUTCTimestamp(year!!, month!!, day!!),
-                    category
-                )
                 val response = if (purchaseCode == AddActivity.REQUEST_PAYMENT_CODE) {
+                    val purchase = Purchase(
+                        name,
+                        price,
+                        year,
+                        month,
+                        day,
+                        dateToUTCTimestamp(year!!, month!!, day!!),
+                        category
+                    )
                     purchaseRepository.addPurchase(purchase)
                 } else {
-                    purchaseRepository.addIncome(purchase)
+                    val income = Income(
+                        name,
+                        price,
+                        year,
+                        month,
+                        day,
+                        dateToUTCTimestamp(year!!, month!!, day!!),
+                        category
+                    )
+                    incomeRepository.addIncome(income)
                 }
                 listener?.onAddSuccess(response)
             }
 
             AddActivity.REQUEST_EDIT_CODE -> {
-                val purchase =
-                    Purchase(
+                val response = if (purchaseCode == AddActivity.REQUEST_PAYMENT_CODE) {
+                    val purchase = Purchase(
                         name,
                         price,
                         year,
@@ -100,13 +114,21 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                         day,
                         dateToUTCTimestamp(year!!, month!!, day!!),
                         category,
-                        purchaseID
+                        purchaseID!!
                     )
-
-                val response = if (purchaseCode == AddActivity.REQUEST_PAYMENT_CODE) {
-                    purchaseRepository.editPurchase(purchase, purchasePosition!!)
+                    purchaseRepository.editPurchase(purchase)
                 } else {
-                    purchaseRepository.editIncome(purchase, purchasePosition!!)
+                    val income = Income(
+                        name,
+                        price,
+                        year,
+                        month,
+                        day,
+                        dateToUTCTimestamp(year!!, month!!, day!!),
+                        category,
+                        purchaseID!!
+                    )
+                    incomeRepository.editIncome(income, purchasePosition!!)
                 }
                 listener?.onAddSuccess(response)
             }

@@ -240,10 +240,8 @@ class AddActivity : AppCompatActivity(), AddListener {
                 PurchaseCode.PURCHASE_ADD_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
-                        val payload = result.message.split("&")
                         it.putExtra(PURCHASE_REQUEST_KEY, REQUEST_PAYMENT_CODE)
-                        it.putExtra(ADD_RESULT_MESSAGE, payload[0])
-                        it.putExtra(PURCHASE_POSITION_KEY, payload[1].toInt())
+                        it.putExtra(ADD_RESULT_MESSAGE, result.message)
                         setResult(RESULT_OK, it)
                         finish()
                     }

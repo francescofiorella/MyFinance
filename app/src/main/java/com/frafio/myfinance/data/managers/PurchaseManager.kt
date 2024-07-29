@@ -8,15 +8,18 @@ import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
+import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
 import com.frafio.myfinance.utils.dateToUTCTimestamp
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedDynamicColor
-import com.google.firebase.firestore.AggregateField
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 
@@ -24,11 +27,12 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
     companion object {
         private val TAG = PurchaseManager::class.java.simpleName
-        const val DEFAULT_LIMIT: Long = 50
+        const val DEFAULT_LIMIT: Long = 100
     }
 
     private val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
+    private val localPurchaseRepository = LocalPurchaseRepository()
 
     fun getMonthlyBudget(): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
@@ -61,26 +65,37 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun updatePurchaseList(limit: Long = DEFAULT_LIMIT): LiveData<PurchaseResult> {
+    fun updatePurchaseList(): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        val query = fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
             .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
-            .limit(limit)
-            .get().addOnSuccessListener { queryDocumentSnapshots ->
-                PurchaseStorage.populatePaymentsFromSnapshot(queryDocumentSnapshots)
-                response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS)
-            }.addOnFailureListener { e ->
-                val error = "Error! ${e.localizedMessage}"
-                Log.e(TAG, error)
-
-                response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_FAILURE)
+        query.get().addOnSuccessListener { queryDocumentSnapshots ->
+            val purchaseList = mutableListOf<Purchase>()
+            queryDocumentSnapshots.forEach { document ->
+                val purchase = document.toObject(Purchase::class.java)
+                // set id
+                purchase.id = document.id
+                purchaseList.add(purchase)
             }
+            CoroutineScope(Dispatchers.IO).launch {
+                PurchaseStorage.isTableBusy = true
+                localPurchaseRepository.deleteAll()
+                PurchaseStorage.isTableBusy = false
+                localPurchaseRepository.insertAll(purchaseList)
+            }
+            response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS)
+        }.addOnFailureListener { e ->
+            val error = "Error! ${e.localizedMessage}"
+            Log.e(TAG, error)
+
+            response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_FAILURE)
+        }
 
         return response
     }
@@ -110,14 +125,16 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun deletePurchaseAt(position: Int): LiveData<PurchaseResult> {
+    fun deletePurchase(purchase: Purchase): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .document(PurchaseStorage.purchaseList[position].id!!).delete()
+            .document(purchase.id).delete()
             .addOnSuccessListener {
-                PurchaseStorage.deletePurchaseAt(position)
+                CoroutineScope(Dispatchers.IO).launch {
+                    localPurchaseRepository.deletePurchase(purchase)
+                }
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -136,11 +153,10 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .add(purchase).addOnSuccessListener {
                 purchase.id = it.id
-                val totalIndex = PurchaseStorage.addPurchase(purchase)
-                response.value = PurchaseResult(
-                    PurchaseCode.PURCHASE_ADD_SUCCESS,
-                    "${PurchaseCode.PURCHASE_ADD_SUCCESS.message}&$totalIndex"
-                )
+                CoroutineScope(Dispatchers.IO).launch {
+                    localPurchaseRepository.insertPurchase(purchase)
+                }
+                response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_ADD_FAILURE)
@@ -149,15 +165,17 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun editPurchase(purchase: Purchase, position: Int): LiveData<PurchaseResult> {
+    fun editPurchase(purchase: Purchase): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .document(purchase.id!!).set(purchase).addOnSuccessListener {
-                PurchaseStorage.deletePurchaseAt(position)
-                PurchaseStorage.addPurchase(purchase)
+            .document(purchase.id).set(purchase).addOnSuccessListener {
+                // Check if today empty works
+                CoroutineScope(Dispatchers.IO).launch {
+                    localPurchaseRepository.updatePurchase(purchase)
+                }
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_EDIT_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -168,157 +186,12 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun getThisYearTotal(
-        response: MutableLiveData<Pair<PurchaseCode, Double>> = MutableLiveData()
-    ): MutableLiveData<Pair<PurchaseCode, Double>> {
-        val todayDate = LocalDate.now()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .whereEqualTo(DbPurchases.FIELDS.YEAR.value, todayDate.year)
-            .aggregate(AggregateField.sum(DbPurchases.FIELDS.PRICE.value))
-            .get(AggregateSource.SERVER)
-            .addOnSuccessListener { snapshot ->
-                val priceSum = snapshot
-                    .get(AggregateField.sum(DbPurchases.FIELDS.PRICE.value)) as? Double ?: 0.0
-                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_SUCCESS, priceSum)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_FAILURE, 0.0)
-            }
-        return response
-    }
-
-    fun getTodayTotal(
-        response: MutableLiveData<Pair<PurchaseCode, Double>> = MutableLiveData()
-    ): MutableLiveData<Pair<PurchaseCode, Double>> {
-        val todayDate = LocalDate.now()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .whereEqualTo(DbPurchases.FIELDS.DAY.value, todayDate.dayOfMonth)
-            .whereEqualTo(DbPurchases.FIELDS.MONTH.value, todayDate.monthValue)
-            .whereEqualTo(DbPurchases.FIELDS.YEAR.value, todayDate.year)
-            .aggregate(AggregateField.sum(DbPurchases.FIELDS.PRICE.value))
-            .get(AggregateSource.SERVER)
-            .addOnSuccessListener { snapshot ->
-                val priceSum = snapshot
-                    .get(AggregateField.sum(DbPurchases.FIELDS.PRICE.value)) as? Double ?: 0.0
-                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_SUCCESS, priceSum)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_FAILURE, 0.0)
-            }
-        return response
-    }
-
-    fun getThisMonthTotal(
-        response: MutableLiveData<Pair<PurchaseCode, Double>> = MutableLiveData()
-    ): MutableLiveData<Pair<PurchaseCode, Double>> {
-        val todayDate = LocalDate.now()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .whereEqualTo(DbPurchases.FIELDS.MONTH.value, todayDate.monthValue)
-            .whereEqualTo(DbPurchases.FIELDS.YEAR.value, todayDate.year)
-            .aggregate(AggregateField.sum(DbPurchases.FIELDS.PRICE.value))
-            .get(AggregateSource.SERVER)
-            .addOnSuccessListener { snapshot ->
-                val priceSum = snapshot
-                    .get(AggregateField.sum(DbPurchases.FIELDS.PRICE.value)) as? Double ?: 0.0
-                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_SUCCESS, priceSum)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = Pair(PurchaseCode.PURCHASE_AGGREGATE_FAILURE, 0.0)
-            }
-        return response
-    }
-
     fun setDynamicColorActive(active: Boolean) {
         setSharedDynamicColor(sharedPreferences, active)
     }
 
     fun getDynamicColorActive(): Boolean {
         return getSharedDynamicColor(sharedPreferences)
-    }
-
-    fun updateIncomeList(limit: Long = DEFAULT_LIMIT): LiveData<PurchaseResult> {
-        val response = MutableLiveData<PurchaseResult>()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.INCOMES.value)
-            .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
-            .limit(limit).get()
-            .addOnSuccessListener { incomesSnapshot ->
-                PurchaseStorage.populateIncomesFromSnapshot(incomesSnapshot)
-                response.value = PurchaseResult(PurchaseCode.INCOME_LIST_UPDATE_SUCCESS)
-            }.addOnFailureListener { e ->
-                val error = "Error! ${e.localizedMessage}"
-                Log.e(TAG, error)
-                response.value = PurchaseResult(PurchaseCode.INCOME_LIST_UPDATE_FAILURE)
-            }
-        return response
-    }
-
-    fun addIncome(income: Purchase): LiveData<PurchaseResult> {
-        val response = MutableLiveData<PurchaseResult>()
-
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.INCOMES.value)
-            .add(income).addOnSuccessListener {
-                income.id = it.id
-                val totalIndex = PurchaseStorage.addIncome(income)
-                response.value = PurchaseResult(
-                    PurchaseCode.INCOME_ADD_SUCCESS,
-                    "${PurchaseCode.INCOME_ADD_SUCCESS.message}&$totalIndex"
-                )
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = PurchaseResult(PurchaseCode.INCOME_ADD_FAILURE)
-            }
-
-        return response
-    }
-
-    fun deleteIncomeAt(position: Int): LiveData<PurchaseResult> {
-        val response = MutableLiveData<PurchaseResult>()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.INCOMES.value)
-            .document(PurchaseStorage.incomeList[position].id!!).delete()
-            .addOnSuccessListener {
-                PurchaseStorage.deleteIncomeAt(position)
-                response.value = PurchaseResult(PurchaseCode.INCOME_DELETE_SUCCESS)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-
-                response.value = PurchaseResult(PurchaseCode.INCOME_DELETE_FAILURE)
-            }
-
-        return response
-    }
-
-    fun editIncome(income: Purchase, position: Int): LiveData<PurchaseResult> {
-        val response = MutableLiveData<PurchaseResult>()
-
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.INCOMES.value)
-            .document(income.id!!).set(income).addOnSuccessListener {
-                PurchaseStorage.deleteIncomeAt(position)
-                PurchaseStorage.addIncome(income)
-                response.value = PurchaseResult(PurchaseCode.INCOME_EDIT_SUCCESS)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = PurchaseResult(PurchaseCode.INCOME_EDIT_FAILURE)
-            }
-
-
-        return response
     }
 
     fun getLastYearPurchases(

@@ -8,8 +8,8 @@
         <import type="android.view.View" />
 
         <variable
-            name="purchase"
-            type="com.frafio.myfinance.data.models.Purchase" />
+            name="income"
+            type="com.frafio.myfinance.data.models.Income" />
 
         <import type="com.frafio.myfinance.utils.FormatUtilsKt" />
 
@@ -23,23 +23,23 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/dateLayout"
+            android:id="@+id/dataLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
-            android:visibility="@{purchase.category == DbPurchases.CATEGORIES.TOTAL.value ? View.VISIBLE : View.GONE}"
+            android:visibility="@{income.category == DbPurchases.CATEGORIES.TOTAL.value ? View.VISIBLE : View.GONE}"
             tools:visibility="visible">
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/dateTextView"
+                android:id="@+id/yearTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="5dp"
                 android:fontFamily="@font/nunito"
-                android:text="@{purchase.getDateString()}"
+                android:text="@{income.year.toString()}"
                 android:textSize="14sp"
-                tools:text="01/01/2000" />
+                tools:text="2000" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider"
@@ -55,20 +55,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="5dp"
                 android:fontFamily="@font/nunito"
-                android:text="@{FormatUtilsKt.doubleToPrice(purchase.price)}"
+                android:text="@{FormatUtilsKt.doubleToPrice(income.price)}"
                 android:textSize="14sp"
                 tools:text="€ 0.00" />
 
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/purchaseLayout"
+            android:id="@+id/incomeLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:clickable="@{purchase.category != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
-            android:focusable="@{purchase.category != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
-            android:longClickable="@{purchase.category != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
+            android:clickable="@{income.category != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
+            android:focusable="@{income.category != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
+            android:longClickable="@{income.category != DbPurchases.CATEGORIES.TOTAL.value ? true : false}"
             android:paddingHorizontal="20dp">
 
             <com.google.android.material.textview.MaterialTextView
@@ -77,9 +77,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
                 android:fontFamily="@font/nunito"
-                android:text="@string/no_purchases"
+                android:text="@string/no_incomes"
                 android:textSize="16sp"
-                android:visibility="@{purchase.category != DbPurchases.CATEGORIES.TOTAL.value || purchase.price != 0.0 ? View.GONE : View.VISIBLE}"
+                android:visibility="@{income.category != DbPurchases.CATEGORIES.TOTAL.value || income.price != 0.0 ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -92,8 +92,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="5dp"
+                android:clickable="false"
                 android:contentDescription="@string/purchase_category_icon"
-                android:visibility="@{purchase.category == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
+                android:visibility="@{income.category == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -106,36 +107,37 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/nunito"
-                android:text="@{purchase.name}"
+                android:text="@{income.name}"
                 android:textColor="@color/primary_text"
                 android:textSize="16sp"
-                android:visibility="@{purchase.category == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
+                android:visibility="@{income.category == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintStart_toEndOf="@id/categoryIcon"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Payment" />
+                tools:text="@string/incomes" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/categoryTextView"
+                android:id="@+id/dateTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginBottom="10dp"
                 android:fontFamily="@font/nunito"
+                android:text="@{income.getDateString()}"
                 android:textSize="14sp"
-                android:visibility="@{purchase.category == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
+                android:visibility="@{income.category == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/categoryIcon"
                 app:layout_constraintTop_toBottomOf="@id/nameTextView"
-                tools:text="@string/category" />
+                tools:text="01/01/2000" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/priceTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/nunito"
-                android:text="@{FormatUtilsKt.doubleToPrice(purchase.price)}"
+                android:text="@{FormatUtilsKt.doubleToPrice(income.price)}"
                 android:textSize="16sp"
-                android:visibility="@{purchase.category == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
+                android:visibility="@{income.category == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

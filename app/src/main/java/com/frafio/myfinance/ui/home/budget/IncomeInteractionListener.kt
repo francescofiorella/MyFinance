@@ -1,6 +1,6 @@
 package com.frafio.myfinance.ui.home.budget
 
-import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.models.Income
 
 interface IncomeInteractionListener {
 
@@ -10,5 +10,5 @@ interface IncomeInteractionListener {
         const val ON_LOAD_MORE_REQUEST: Int = 3
     }
 
-    fun onItemInteraction(interactionID: Int, income: Purchase, position: Int)
+    fun onItemInteraction(interactionID: Int, income: Income, position: Int)
 }

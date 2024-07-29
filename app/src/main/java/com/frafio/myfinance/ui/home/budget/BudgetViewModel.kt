@@ -6,12 +6,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.models.Income
+import com.frafio.myfinance.data.repositories.IncomeRepository
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 
 class BudgetViewModel(application: Application) : AndroidViewModel(application) {
     private val purchaseRepository = PurchaseRepository(
         (application as MyFinanceApplication).purchaseManager
+    )
+    private val incomeRepository = IncomeRepository(
+        (application as MyFinanceApplication).incomeManager
     )
 
     var listener: BudgetListener? = null
@@ -20,8 +24,8 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     val isIncomesEmpty: LiveData<Boolean>
         get() = _isIncomesEmpty
 
-    private val _incomes = MutableLiveData<List<Purchase>>()
-    val incomes: LiveData<List<Purchase>>
+    private val _incomes = MutableLiveData<List<Income>>()
+    val incomes: LiveData<List<Income>>
         get() = _incomes
 
     private val _monthlyBudget = MutableLiveData<Double>()
@@ -33,7 +37,7 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
         get() = _annualBudget
 
     fun updateIncomeList(limit: Long) {
-        val response = purchaseRepository.updateIncomeList(limit)
+        val response = incomeRepository.updateIncomeList(limit)
         listener?.onCompleted(response, null)
     }
 
@@ -43,7 +47,7 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun updateLocalIncomeList() {
-        val incomes = purchaseRepository.getIncomeList()
+        val incomes = incomeRepository.getIncomeList()
         _incomes.postValue(incomes)
         _isIncomesEmpty.postValue(incomes.isEmpty())
     }
@@ -64,13 +68,13 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
         listener?.onCompleted(response, previousBudget)
     }
 
-    fun deleteIncomeAt(position: Int, income: Purchase) {
-        val response = purchaseRepository.deleteIncomeAt(position)
+    fun deleteIncomeAt(position: Int, income: Income) {
+        val response = incomeRepository.deleteIncomeAt(position)
         listener?.onDeleteCompleted(response, income)
     }
 
-    fun addIncome(income: Purchase) {
-        val response = purchaseRepository.addIncome(income)
+    fun addIncome(income: Income) {
+        val response = incomeRepository.addIncome(income)
         listener?.onCompleted(response, null)
     }
 }

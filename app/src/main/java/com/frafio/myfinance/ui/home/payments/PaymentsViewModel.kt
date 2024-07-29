@@ -6,12 +6,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
 import com.frafio.myfinance.data.repositories.PurchaseRepository
 
 class PaymentsViewModel(application: Application) : AndroidViewModel(application) {
     private val purchaseRepository = PurchaseRepository(
         (application as MyFinanceApplication).purchaseManager
     )
+    private val localPurchaseRepository = LocalPurchaseRepository()
 
     var listener: PaymentListener? = null
 
@@ -19,22 +21,20 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
     val isPurchasesEmpty: LiveData<Boolean>
         get() = _isPurchasesEmpty
 
-    private val _purchases = MutableLiveData<List<Purchase>>()
-    val purchases: LiveData<List<Purchase>>
-        get() = _purchases
-
-    fun updateLocalPurchaseList() {
-        val purchases = purchaseRepository.getPurchaseList()
-        _purchases.postValue(purchases)
-        _isPurchasesEmpty.postValue(purchases.isEmpty())
+    fun getLocalPurchases(): LiveData<List<Purchase>> {
+        return localPurchaseRepository.getAll()
     }
 
-    fun deletePurchaseAt(position: Int, purchase: Purchase) {
-        val response = purchaseRepository.deletePurchaseAt(position)
+    fun updatePurchasesEmpty(isListEmpty: Boolean) {
+        _isPurchasesEmpty.postValue(isListEmpty)
+    }
+
+    fun deletePurchase(purchase: Purchase) {
+        val response = purchaseRepository.deletePurchase(purchase)
         listener?.onDeleteCompleted(response, purchase)
     }
 
-    fun updateCategory(purchase: Purchase, newCategory: Int, position: Int) {
+    fun updateCategory(purchase: Purchase, newCategory: Int) {
         val updated = Purchase(
             name = purchase.name,
             price = purchase.price,
@@ -44,22 +44,12 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
             category = newCategory,
             id = purchase.id
         )
-        val response = purchaseRepository.editPurchase(updated, position)
+        val response = purchaseRepository.editPurchase(updated)
         listener?.onCompleted(response)
     }
 
     fun addPurchase(purchase: Purchase) {
         val response = purchaseRepository.addPurchase(purchase)
-        listener?.onCompleted(response)
-    }
-
-    fun updatePurchaseList(limit: Long) {
-        val response = purchaseRepository.updatePurchaseList(limit)
-        listener?.onCompleted(response)
-    }
-
-    fun updatePurchaseNumber() {
-        val response = purchaseRepository.getPurchaseNumber()
         listener?.onCompleted(response)
     }
 }

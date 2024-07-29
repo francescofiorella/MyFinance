@@ -4,10 +4,16 @@ import android.app.Application
 import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.MyFinanceApplication
+import com.frafio.myfinance.data.repositories.PurchaseRepository
 import com.frafio.myfinance.data.repositories.UserRepository
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
-    private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
+    private val userRepository = UserRepository(
+        (application as MyFinanceApplication).authManager
+    )
+    private val purchaseRepository = PurchaseRepository(
+        (application as MyFinanceApplication).purchaseManager
+    )
     var listener: HomeListener? = null
 
     fun checkUser() {
@@ -25,5 +31,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun isDynamicColorOn(): Boolean {
         return userRepository.isDynamicColorOn()
+    }
+
+    fun updateUserPurchases() {
+        listener?.onUserDataUpdated(purchaseRepository.updatePurchaseList())
     }
 }

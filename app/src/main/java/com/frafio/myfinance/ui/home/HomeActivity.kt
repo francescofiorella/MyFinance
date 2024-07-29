@@ -12,13 +12,14 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
+import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.AuthResult
+import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
@@ -47,7 +48,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private var activeFragment: Fragment? = null
 
     private var userRequest: Boolean = false
-    var isLayoutReady: Boolean = false
 
     companion object {
         private const val ACTIVE_FRAGMENT_KEY = "active_fragment_key"
@@ -67,7 +67,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 AddActivity.REQUEST_PAYMENT_CODE -> {
                     showFragment(R.id.paymentsFragment)
                     refreshFragmentData(dashboard = true, payments = true)
-                    paymentsFragment.scrollTo(position)
                     showSnackBar(message)
                 }
 
@@ -90,20 +89,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             if (userRequest) {
                 setTheme(R.style.Theme_MyFinance)
             } else {
-                installSplashScreen().also {
-                    it.setKeepOnScreenCondition {
-                        // keep if the layout is not ready
-                        !isLayoutReady
-                    }
-                    it.setOnExitAnimationListener { splashScreenViewProvider ->
-                        supportFragmentManager.unregisterFragmentLifecycleCallbacks(
-                            dashboardCallback
-                        )
-                        splashScreenViewProvider.remove()
-                    }
-                    if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
-                        DynamicColors.applyToActivityIfAvailable(this)
-                    }
+                installSplashScreen()
+                if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
+                    DynamicColors.applyToActivityIfAvailable(this)
                 }
             }
         } else {
@@ -124,6 +112,8 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
             if (userRequest) {
                 showProgressIndicator()
+                viewModel.updateUserPurchases()
+                //viewModel.updateUserIncomes()
                 initFragments()
                 intent.extras?.getString(LoginActivity.INTENT_USER_NAME).also { userName ->
                     showSnackBar("${getString(R.string.login_successful)} $userName")
@@ -253,23 +243,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         }
     }
 
-    // called only one time, when the activity is loaded for the first time
-    private val dashboardCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentViewCreated(
-            fm: FragmentManager,
-            f: Fragment,
-            v: View,
-            savedInstanceState: Bundle?
-        ) {
-            super.onFragmentViewCreated(fm, f, v, savedInstanceState)
-            if (f is DashboardFragment) {
-                f.isLayoutReady.observe(f.viewLifecycleOwner) { value ->
-                    isLayoutReady = value
-                }
-            }
-        }
-    }
-
     fun onAddButtonClick(view: View) {
         ActivityOptionsCompat.makeClipRevealAnimation(
             view, 0, 0, view.measuredWidth, view.measuredHeight
@@ -314,13 +287,11 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         response.observe(this) { authResult ->
             when (authResult.code) {
                 AuthCode.USER_LOGGED.code -> {
-                    isLayoutReady = false
+                    showProgressIndicator()
+                    viewModel.updateUserPurchases()
+                    //viewModel.updateUserIncomes()
                     initFragments()
                     if (!userRequest) {
-                        supportFragmentManager.registerFragmentLifecycleCallbacks(
-                            dashboardCallback,
-                            true
-                        )
                         userRequest = false
                     } else {
                         hideProgressIndicator()
@@ -332,6 +303,21 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
                 AuthCode.USER_NOT_LOGGED.code -> {
                     goToLoginActivity()
+                }
+
+                else -> Unit
+            }
+        }
+    }
+
+    override fun onUserDataUpdated(response: LiveData<PurchaseResult>) {
+        response.observe(this) { result ->
+            when (result.code) {
+                PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
+                    refreshFragmentData(
+                        dashboard = true,
+                        payments = true
+                    )
                 }
 
                 else -> Unit
@@ -391,9 +377,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     ) {
         if (dashboard) {
             dashboardFragment.refreshStatsData()
-        }
-        if (payments) {
-            paymentsFragment.refreshListData()
         }
         if (budget) {
             budgetFragment.refreshData()

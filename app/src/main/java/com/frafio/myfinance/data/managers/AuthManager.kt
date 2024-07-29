@@ -9,6 +9,8 @@ import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.auth.SignupException
 import com.frafio.myfinance.data.models.AuthResult
+import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
+import com.frafio.myfinance.data.storages.IncomeStorage
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
 import com.frafio.myfinance.utils.getSharedDynamicColor
@@ -24,17 +26,12 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.userProfileChangeRequest
-import com.google.firebase.firestore.FirebaseFirestore
 
 class AuthManager(private val sharedPreferences: SharedPreferences) {
 
     companion object {
         private val TAG = AuthManager::class.java.simpleName
     }
-
-    // FirebaseFirestore
-    private val fStore: FirebaseFirestore
-        get() = FirebaseFirestore.getInstance()
 
     // FirebaseAuth
     private val fAuth: FirebaseAuth
@@ -43,6 +40,8 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
     // FirebaseUser
     private val fUser: FirebaseUser?
         get() = fAuth.currentUser
+
+    private val localPurchaseRepository = LocalPurchaseRepository()
 
     fun updateUserProfile(fullName: String?, propicUri: String?): LiveData<AuthResult> {
         val response = MutableLiveData<AuthResult>()
@@ -227,8 +226,8 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
 
         fAuth.signOut()
 
-        PurchaseStorage.resetPurchaseList()
-        PurchaseStorage.resetIncomeList()
+        localPurchaseRepository.deleteAll()
+        IncomeStorage.resetIncomeList()
         PurchaseStorage.resetBudget()
         UserStorage.resetUser()
 

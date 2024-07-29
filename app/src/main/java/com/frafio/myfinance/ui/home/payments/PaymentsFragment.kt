@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
@@ -21,6 +22,7 @@ import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.models.PurchaseResult
+import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.databinding.FragmentPaymentsBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
@@ -43,6 +45,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
     private val viewModel by viewModels<PaymentsViewModel>()
     private var isListBlocked = false
     private var maxPurchaseNumber = DEFAULT_LIMIT + 1
+    private val mediatorLiveDataForLocalPurchases = MediatorLiveData<List<Purchase>>()
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -51,7 +54,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             val editRequest = data!!.getIntExtra(AddActivity.PURCHASE_REQUEST_KEY, -1)
 
             if (editRequest == AddActivity.REQUEST_PAYMENT_CODE) {
-                viewModel.updateLocalPurchaseList()
                 (activity as HomeActivity).refreshFragmentData(dashboard = true)
                 (activity as HomeActivity).showSnackBar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
             }
@@ -70,18 +72,34 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
         viewModel.listener = this
 
-        viewModel.updatePurchaseNumber()
-        viewModel.updatePurchaseList(DEFAULT_LIMIT)
-
-        viewModel.purchases.observe(viewLifecycleOwner) { purchases ->
-            val nl = purchases.map { p -> p.copy() }
+        mediatorLiveDataForLocalPurchases.apply {
+            addSource(viewModel.getLocalPurchases()) {
+                value = it
+            }
+        }
+        mediatorLiveDataForLocalPurchases.observe(viewLifecycleOwner) { purchases ->
+            if (PurchaseStorage.isTableBusy) return@observe
+            // Evaluate limit and decide if new items can be retrieved
+            val limit = if (binding.listRecyclerView.adapter != null) {
+                (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
+            } else {
+                DEFAULT_LIMIT
+            }
+            // Get list with limit and update recList
+            var nl = purchases.take(limit.toInt()).map { p -> p.copy() }
+            nl = PurchaseStorage.addTotals(nl)
+            viewModel.updatePurchasesEmpty(nl.isEmpty())
             binding.listRecyclerView.also {
                 if (it.adapter == null) {
                     it.adapter = PurchaseAdapter(nl, this)
                 } else {
-                    (it.adapter as PurchaseAdapter).updateData(nl)
+                    it.post {
+                        (it.adapter as PurchaseAdapter).updateData(nl)
+                    }
                 }
             }
+            maxPurchaseNumber = purchases.size.toLong()
+            isListBlocked = limit >= maxPurchaseNumber
         }
 
         return binding.root
@@ -150,10 +168,12 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             ON_LOAD_MORE_REQUEST -> {
                 // Increment elements limit on scroll
                 if (!isListBlocked) {
-                    viewModel.updatePurchaseList(
-                        (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit(true)
-                    )
                     isListBlocked = true
+                    binding.listRecyclerView.adapter?.let {
+                        (it as PurchaseAdapter).getLimit(true)
+                    }
+                    mediatorLiveDataForLocalPurchases.value =
+                        mediatorLiveDataForLocalPurchases.value
                 }
             }
         }
@@ -162,18 +182,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
     override fun onCompleted(response: LiveData<PurchaseResult>) {
         response.observe(viewLifecycleOwner) { result ->
             when (result.code) {
-                PurchaseCode.PURCHASE_COUNT_SUCCESS.code -> {
-                    maxPurchaseNumber = result.message.toLong()
-                    val limit = if (binding.listRecyclerView.adapter != null) {
-                        (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
-                    } else {
-                        DEFAULT_LIMIT
-                    }
-                    isListBlocked = limit >= maxPurchaseNumber
-                }
-
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
-                    viewModel.updateLocalPurchaseList()
                     val limit = if (binding.listRecyclerView.adapter != null) {
                         (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
                     } else {
@@ -183,11 +192,10 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 }
 
                 PurchaseCode.PURCHASE_EDIT_SUCCESS.code -> {
-                    viewModel.updateLocalPurchaseList()
+                    Unit
                 }
 
                 PurchaseCode.PURCHASE_ADD_SUCCESS.code -> {
-                    viewModel.updateLocalPurchaseList()
                     (activity as HomeActivity).refreshFragmentData(dashboard = true)
                     val payload = result.message.split("&")
                     (activity as HomeActivity).showSnackBar(payload[0])
@@ -206,7 +214,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
     ) {
         response.observe(viewLifecycleOwner) { result ->
             if (result.code == PurchaseCode.PURCHASE_DELETE_SUCCESS.code) {
-                viewModel.updateLocalPurchaseList()
                 (activity as HomeActivity).refreshFragmentData(dashboard = true)
 
                 (activity as HomeActivity).showSnackBar(
@@ -219,10 +226,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 (activity as HomeActivity).showSnackBar(result.message)
             }
         }
-    }
-
-    fun refreshListData() {
-        viewModel.updateLocalPurchaseList()
     }
 
     override fun scrollUp() {
@@ -306,55 +309,39 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             layout.findViewById<LinearLayout>(R.id.editPurchaseLayout).visibility = View.GONE
             layout.findViewById<ConstraintLayout>(R.id.editCategoryLayout).visibility = View.VISIBLE
             layout.findViewById<LinearLayout>(R.id.housing_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.HOUSING.value, position)
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.HOUSING.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.groceries_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.GROCERIES.value, position)
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.GROCERIES.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.personal_care_layout).setOnClickListener {
-                viewModel.updateCategory(
-                    purchase,
-                    DbPurchases.CATEGORIES.PERSONAL_CARE.value,
-                    position
-                )
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.PERSONAL_CARE.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.entertainment_layout).setOnClickListener {
-                viewModel.updateCategory(
-                    purchase,
-                    DbPurchases.CATEGORIES.ENTERTAINMENT.value,
-                    position
-                )
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.ENTERTAINMENT.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.education_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.EDUCATION.value, position)
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.EDUCATION.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.dining_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.DINING.value, position)
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.DINING.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.health_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.HEALTH.value, position)
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.HEALTH.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.transportation_layout).setOnClickListener {
-                viewModel.updateCategory(
-                    purchase,
-                    DbPurchases.CATEGORIES.TRANSPORTATION.value,
-                    position
-                )
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.TRANSPORTATION.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.miscellaneous_layout).setOnClickListener {
-                viewModel.updateCategory(
-                    purchase,
-                    DbPurchases.CATEGORIES.MISCELLANEOUS.value,
-                    position
-                )
+                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.MISCELLANEOUS.value)
                 dismissFun()
             }
             return
@@ -381,7 +368,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             dismissFun()
         }
         deleteLayout.setOnClickListener {
-            viewModel.deletePurchaseAt(position, purchase)
+            viewModel.deletePurchase(purchase)
             dismissFun()
         }
     }

@@ -23,8 +23,8 @@ class PurchaseAdapter(
     private var currentLimit: Long = DEFAULT_LIMIT
 
     inner class PurchaseViewHolder(
-        val recyclerViewPurchaseItemBinding: LayoutPurchaseItemRvBinding
-    ) : RecyclerView.ViewHolder(recyclerViewPurchaseItemBinding.root)
+        val binding: LayoutPurchaseItemRvBinding
+    ) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         PurchaseViewHolder(
@@ -38,58 +38,51 @@ class PurchaseAdapter(
 
     override fun onBindViewHolder(holder: PurchaseViewHolder, position: Int) {
         val currentPurchase = purchases[position]
-        holder.recyclerViewPurchaseItemBinding.purchase = currentPurchase
+        holder.binding.purchase = currentPurchase
 
-        if (purchases.size - position < DEFAULT_LIMIT) {
+        if (purchases.size - position < (DEFAULT_LIMIT / 2)) {
             listener.onItemInteraction(ON_LOAD_MORE_REQUEST, currentPurchase, position)
         }
 
         if (currentPurchase.category != DbPurchases.CATEGORIES.TOTAL.value) {
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon.icon =
-                ContextCompat.getDrawable(
-                    holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon.context,
-                    when (currentPurchase.category) {
-                        DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                        DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                        DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                        DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                        DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                        DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                        DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                        DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                        DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
-                        else -> R.drawable.ic_tag
-                    }
-                )
-            val types = holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemCategoryTextView
-                .context.resources.getStringArray(R.array.categories)
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemCategoryTextView.text =
+            holder.binding.categoryIcon.icon = ContextCompat.getDrawable(
+                holder.binding.categoryIcon.context,
+                when (currentPurchase.category) {
+                    DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                    DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                    DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                    DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                    DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                    DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                    DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                    DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                    DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                    else -> R.drawable.ic_tag
+                }
+            )
+            val types =
+                holder.binding.categoryTextView.context.resources.getStringArray(R.array.categories)
+            holder.binding.categoryTextView.text =
                 types[currentPurchase.category ?: DbPurchases.CATEGORIES.MISCELLANEOUS.value]
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
-                .setOnLongClickListener {
-                    listener.onItemInteraction(
-                        ON_LONG_CLICK,
-                        currentPurchase,
-                        holder.getAdapterPosition()
-                    )
-                    true
-                }
+            holder.binding.purchaseLayout.setOnLongClickListener {
+                listener.onItemInteraction(
+                    ON_LONG_CLICK,
+                    currentPurchase,
+                    holder.getAdapterPosition()
+                )
+                true
+            }
 
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon
-                .setOnClickListener {
-                    listener.onItemInteraction(
-                        ON_BUTTON_CLICK,
-                        currentPurchase,
-                        holder.getAdapterPosition()
-                    )
-                }
+            holder.binding.categoryIcon.setOnClickListener {
+                listener.onItemInteraction(
+                    ON_BUTTON_CLICK,
+                    currentPurchase,
+                    holder.getAdapterPosition()
+                )
+            }
         } else {
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemDataTextView.text =
-                currentPurchase.getDateString()
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemConstraintLayout
-                .setOnLongClickListener(null)
-            holder.recyclerViewPurchaseItemBinding.recViewPurchaseItemPurchaseCategoryIcon
-                .setOnClickListener(null)
+            holder.binding.purchaseLayout.setOnLongClickListener(null)
+            holder.binding.categoryIcon.setOnClickListener(null)
         }
     }
 
@@ -105,7 +98,7 @@ class PurchaseAdapter(
     }
 
     fun getLimit(increment: Boolean = false): Long {
-        if (increment) currentLimit += DEFAULT_LIMIT
+        if (increment) currentLimit += (DEFAULT_LIMIT / 2)
         return currentLimit
     }
 }

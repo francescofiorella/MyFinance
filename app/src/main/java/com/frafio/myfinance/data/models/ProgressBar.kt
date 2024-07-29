@@ -36,13 +36,14 @@ class ProgressBar(
         backView.visibility = View.VISIBLE
         labelTextView.visibility = View.VISIBLE
 
-        val percentage = value / maxValue
+        var percentage = value / maxValue
         val percString = "${(percentage * 100).toInt()}%"
+        if (percentage > 1) percentage = 1.0
         labelTextView.text = percString
         percGuideline.setGuidelinePercent(percentage.toFloat())
         val typedValue = TypedValue()
         context.theme.resolveAttribute(
-            if (percentage <= 1) android.R.attr.colorPrimary else android.R.attr.colorError,
+            if (percentage < 1) android.R.attr.colorPrimary else android.R.attr.colorError,
             typedValue,
             true
         )
