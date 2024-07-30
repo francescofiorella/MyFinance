@@ -2,6 +2,7 @@ package com.frafio.myfinance.data.repositories
 
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.MyFinanceApplication
+import com.frafio.myfinance.data.models.BarChartEntry
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.storages.MyFinanceDatabase
 
@@ -22,13 +23,8 @@ class LocalPurchaseRepository {
     fun getPriceSumFromYear(year: Int): LiveData<Double?> =
         purchaseDao.getPriceSumFromYear(year)
 
-    fun getPricesPerInterval(
-        startYear: Int,
-        endYear: Int,
-        startMonth: Int,
-        endMonth: Int
-    ): LiveData<List<Double?>> =
-        purchaseDao.getPricesPerInterval(startYear, endYear, startMonth, endMonth)
+    fun getPurchasesAfter(timestamp: Long): LiveData<List<BarChartEntry>> =
+        purchaseDao.getAfter(timestamp)
 
     fun insertAll(purchases: List<Purchase>) = purchaseDao.insertAll(*purchases.toTypedArray())
 
@@ -39,4 +35,6 @@ class LocalPurchaseRepository {
     fun deleteAll() = purchaseDao.deleteAll()
 
     fun deletePurchase(purchase: Purchase) = purchaseDao.deletePurchase(purchase)
+
+    fun updateTable(purchases: List<Purchase>) = purchaseDao.updateTable(*purchases.toTypedArray())
 }

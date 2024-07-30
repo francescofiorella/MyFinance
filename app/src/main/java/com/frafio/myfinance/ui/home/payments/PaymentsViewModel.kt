@@ -8,6 +8,7 @@ import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
 import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.frafio.myfinance.utils.dateToUTCTimestamp
 
 class PaymentsViewModel(application: Application) : AndroidViewModel(application) {
     private val purchaseRepository = PurchaseRepository(
@@ -41,6 +42,7 @@ class PaymentsViewModel(application: Application) : AndroidViewModel(application
             year = purchase.year,
             month = purchase.month,
             day = purchase.day,
+            timestamp = dateToUTCTimestamp(purchase.year!!, purchase.month!!, purchase.day!!),
             category = newCategory,
             id = purchase.id
         )

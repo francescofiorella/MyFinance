@@ -66,13 +66,12 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             when (purchaseRequest) {
                 AddActivity.REQUEST_PAYMENT_CODE -> {
                     showFragment(R.id.paymentsFragment)
-                    refreshFragmentData(dashboard = true, payments = true)
                     showSnackBar(message)
                 }
 
                 AddActivity.REQUEST_INCOME_CODE -> {
                     showFragment(R.id.budgetFragment)
-                    refreshFragmentData(dashboard = true, payments = true, budget = true)
+                    refreshFragmentData(budget = true)
                     budgetFragment.scrollIncomesTo(position)
                     showSnackBar(message)
                 }
@@ -314,10 +313,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         response.observe(this) { result ->
             when (result.code) {
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
-                    refreshFragmentData(
-                        dashboard = true,
-                        payments = true
-                    )
+                    hideProgressIndicator()
                 }
 
                 else -> Unit
@@ -371,13 +367,8 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     }
 
     fun refreshFragmentData(
-        dashboard: Boolean = false,
-        payments: Boolean = false,
         budget: Boolean = false
     ) {
-        if (dashboard) {
-            dashboardFragment.refreshStatsData()
-        }
         if (budget) {
             budgetFragment.refreshData()
         }

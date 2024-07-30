@@ -6,7 +6,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import com.frafio.myfinance.data.models.BarChartEntry
 import com.frafio.myfinance.data.models.Purchase
 
 @Dao
@@ -26,43 +28,8 @@ interface PurchaseDao {
     @Query("SELECT SUM(price) FROM purchase WHERE year=:year")
     fun getPriceSumFromYear(year: Int): LiveData<Double?>
 
-    @Query(
-        "WITH RECURSIVE MonthRange AS (\n" +
-                "    SELECT\n" +
-                "        :startYear AS year,\n" +
-                "        :startMonth AS month\n" +
-                "    UNION ALL\n" +
-                "    SELECT\n" +
-                "        CASE\n" +
-                "            WHEN month < 12 THEN year\n" +
-                "            ELSE year + 1\n" +
-                "        END,\n" +
-                "        CASE\n" +
-                "            WHEN month < 12 THEN month + 1\n" +
-                "            ELSE 1\n" +
-                "        END\n" +
-                "    FROM MonthRange\n" +
-                "    WHERE NOT (year = :endYear AND month = :endMonth)\n" +
-                ")\n" +
-                "SELECT\n" +
-                "    COALESCE(SUM(Purchase.price), 0) AS total_price\n" +
-                "FROM\n" +
-                "    MonthRange\n" +
-                "LEFT JOIN\n" +
-                "    Purchase ON Purchase.year = MonthRange.year AND Purchase.month = MonthRange.month\n" +
-                "GROUP BY\n" +
-                "    MonthRange.year,\n" +
-                "    MonthRange.month\n" +
-                "ORDER BY\n" +
-                "    MonthRange.year,\n" +
-                "    MonthRange.month;"
-    )
-    fun getPricesPerInterval(
-        startYear: Int,
-        endYear: Int,
-        startMonth: Int,
-        endMonth: Int
-    ): LiveData<List<Double?>>
+    @Query("SELECT SUM(price) as value, year, month FROM purchase WHERE timestamp>=:timestamp GROUP BY year, month ORDER BY year DESC, month DESC")
+    fun getAfter(timestamp: Long): LiveData<List<BarChartEntry>>
 
     @Insert
     fun insertPurchase(purchase: Purchase)
@@ -78,4 +45,10 @@ interface PurchaseDao {
 
     @Query("DELETE FROM purchase")
     fun deleteAll()
+
+    @Transaction
+    fun updateTable(vararg purchases: Purchase) {
+        deleteAll()
+        insertAll(*purchases)
+    }
 }

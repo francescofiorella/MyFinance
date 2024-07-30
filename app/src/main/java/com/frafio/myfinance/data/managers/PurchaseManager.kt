@@ -11,7 +11,6 @@ import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
-import com.frafio.myfinance.utils.dateToUTCTimestamp
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedDynamicColor
 import com.google.firebase.firestore.AggregateSource
@@ -20,8 +19,6 @@ import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.temporal.TemporalAdjusters
 
 class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
@@ -39,9 +36,10 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!).get()
             .addOnSuccessListener {
-                PurchaseStorage.monthlyBudget =
+                PurchaseStorage.updateBudget(
                     it.data?.get(DbPurchases.FIELDS.MONTHLY_BUDGET.value).toString()
                         .toDoubleOrNull() ?: 0.0
+                )
                 response.value = PurchaseResult(PurchaseCode.BUDGET_UPDATE_SUCCESS)
             }
             .addOnFailureListener {
@@ -56,7 +54,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .document(UserStorage.user!!.email!!)
             .set(hashMapOf(DbPurchases.FIELDS.MONTHLY_BUDGET.value to budget))
             .addOnSuccessListener {
-                PurchaseStorage.monthlyBudget = budget
+                PurchaseStorage.updateBudget(budget)
                 response.value = PurchaseResult(PurchaseCode.BUDGET_UPDATE_SUCCESS)
             }
             .addOnFailureListener {
@@ -84,10 +82,7 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                 purchaseList.add(purchase)
             }
             CoroutineScope(Dispatchers.IO).launch {
-                PurchaseStorage.isTableBusy = true
-                localPurchaseRepository.deleteAll()
-                PurchaseStorage.isTableBusy = false
-                localPurchaseRepository.insertAll(purchaseList)
+                localPurchaseRepository.updateTable(purchaseList)
             }
             response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS)
         }.addOnFailureListener { e ->
@@ -192,34 +187,5 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
     fun getDynamicColorActive(): Boolean {
         return getSharedDynamicColor(sharedPreferences)
-    }
-
-    fun getLastYearPurchases(
-        response: MutableLiveData<List<Purchase>> = MutableLiveData()
-    ): LiveData<List<Purchase>> {
-        val date = LocalDate.now()
-            .minusYears(1)
-            .with(TemporalAdjusters.firstDayOfMonth())
-            .plusMonths(1)
-        val timestamp = dateToUTCTimestamp(date.year, date.monthValue, date.dayOfMonth)
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .whereGreaterThanOrEqualTo(DbPurchases.FIELDS.TIMESTAMP.value, timestamp)
-            .orderBy(DbPurchases.FIELDS.TIMESTAMP.value, Query.Direction.DESCENDING)
-            .get().addOnSuccessListener { queryDocumentSnapshots ->
-                val list = mutableListOf<Purchase>()
-                queryDocumentSnapshots.forEach { document ->
-                    val purchase = document.toObject(Purchase::class.java)
-                    // set id
-                    purchase.id = document.id
-                    list.add(purchase)
-                }
-                response.value = list
-            }.addOnFailureListener { e ->
-                val error = "Error! ${e.localizedMessage}"
-                Log.e(TAG, error)
-            }
-        return response
     }
 }

@@ -4,17 +4,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.MyFinanceApplication
-import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.models.BarChartEntry
 import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
-import com.frafio.myfinance.data.repositories.PurchaseRepository
-import com.frafio.myfinance.utils.doubleToString
+import com.frafio.myfinance.utils.dateToUTCTimestamp
 import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
 
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
-    private val purchaseRepository = PurchaseRepository(
-        (application as MyFinanceApplication).purchaseManager
-    )
     private val localPurchaseRepository = LocalPurchaseRepository()
 
     var monthShown = true
@@ -22,14 +18,6 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     var thisYearSum = 0.0
 
     val isListEmpty = MutableLiveData<Boolean?>(null)
-
-    private val _lastYearPurchases = MutableLiveData<List<Purchase>>()
-    val lastYearPurchases: LiveData<List<Purchase>>
-        get() = _lastYearPurchases
-
-    private val _monthlyBudget = MutableLiveData<String>()
-    val monthlyBudget: LiveData<String>
-        get() = _monthlyBudget
 
     fun getPurchaseNumber(): LiveData<Int> {
         return localPurchaseRepository.getCount()
@@ -54,12 +42,12 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         return localPurchaseRepository.getPriceSumFromYear(today.year)
     }
 
-    fun getPricesList(): LiveData<List<Double?>> {
-        return localPurchaseRepository.getPricesPerInterval(2033, 2024, 8, 7)
-    }
-
-    fun updateStats() {
-        purchaseRepository.getLastYearPurchases(_lastYearPurchases)
-        _monthlyBudget.value = doubleToString(purchaseRepository.getMonthlyBudgetFromStorage())
+    fun getPricesList(): LiveData<List<BarChartEntry>> {
+        val date = LocalDate.now()
+            .minusYears(1)
+            .with(TemporalAdjusters.firstDayOfMonth())
+            .plusMonths(1)
+        val timestamp = dateToUTCTimestamp(date.year, date.monthValue, date.dayOfMonth)
+        return localPurchaseRepository.getPurchasesAfter(timestamp)
     }
 }

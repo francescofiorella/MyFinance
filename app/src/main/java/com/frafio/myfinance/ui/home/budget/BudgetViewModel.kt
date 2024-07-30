@@ -9,6 +9,7 @@ import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Income
 import com.frafio.myfinance.data.repositories.IncomeRepository
 import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.frafio.myfinance.data.storages.PurchaseStorage
 
 class BudgetViewModel(application: Application) : AndroidViewModel(application) {
     private val purchaseRepository = PurchaseRepository(
@@ -28,13 +29,13 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     val incomes: LiveData<List<Income>>
         get() = _incomes
 
-    private val _monthlyBudget = MutableLiveData<Double>()
-    val monthlyBudget: LiveData<Double>
-        get() = _monthlyBudget
-
     private val _annualBudget = MutableLiveData<Double>()
     val annualBudget: LiveData<Double>
         get() = _annualBudget
+
+    fun updateAnnualBudget(value: Double) {
+        _annualBudget.value = value
+    }
 
     fun updateIncomeList(limit: Long) {
         val response = incomeRepository.updateIncomeList(limit)
@@ -52,18 +53,13 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
         _isIncomesEmpty.postValue(incomes.isEmpty())
     }
 
-    fun updateMonthlyBudgetFromStorage() {
-        _monthlyBudget.value = purchaseRepository.getMonthlyBudgetFromStorage()
-        _annualBudget.value = purchaseRepository.getMonthlyBudgetFromStorage() * 12.0
-    }
-
     fun getMonthlyBudgetFromDb() {
         val response = purchaseRepository.getMonthlyBudget()
         listener?.onCompleted(response, null)
     }
 
     fun updateMonthlyBudget(budget: Double, getOldBudget: Boolean = false) {
-        val previousBudget = if (getOldBudget) monthlyBudget.value ?: 0.0 else null
+        val previousBudget = if (getOldBudget) PurchaseStorage.monthlyBudget.value ?: 0.0 else null
         val response = purchaseRepository.updateMonthlyBudget(budget)
         listener?.onCompleted(response, previousBudget)
     }

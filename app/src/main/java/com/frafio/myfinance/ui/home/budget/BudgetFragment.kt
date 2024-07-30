@@ -22,6 +22,7 @@ import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.models.Income
 import com.frafio.myfinance.data.models.PurchaseResult
+import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.databinding.FragmentBudgetBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
@@ -86,7 +87,8 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             }
         }
 
-        viewModel.monthlyBudget.observe(viewLifecycleOwner) { budget ->
+        PurchaseStorage.monthlyBudget.observe(viewLifecycleOwner) { budget ->
+            viewModel.updateAnnualBudget(budget * 12)
             binding.monthlyBudgetDeleteBtn.isEnabled = budget != 0.0
         }
 
@@ -163,7 +165,6 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                 }
 
                 PurchaseCode.BUDGET_UPDATE_SUCCESS.code -> {
-                    viewModel.updateMonthlyBudgetFromStorage()
                     if (!binding.monthlyBudgetTV.isVisible) {
                         binding.monthlyBudgetTV.visibility = View.VISIBLE
                         binding.monthlyBudgetET.visibility = View.GONE
@@ -173,14 +174,12 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                         binding.monthlyBudgetDeleteBtn.icon =
                             ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
                     }
-                    (activity as HomeActivity).refreshFragmentData(dashboard = true)
                     previousBudget?.let {
                         (activity as HomeActivity).showSnackBar(
                             result.message,
                             getString(R.string.cancel)
                         ) {
                             viewModel.updateMonthlyBudget(previousBudget)
-                            (activity as HomeActivity).refreshFragmentData(dashboard = true)
                         }
                     }
                 }

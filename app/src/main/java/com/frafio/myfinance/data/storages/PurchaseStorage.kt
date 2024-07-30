@@ -1,15 +1,22 @@
 package com.frafio.myfinance.data.storages
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.models.Purchase
 import java.time.LocalDate
 
 object PurchaseStorage {
-    var monthlyBudget: Double = 0.0
-    var isTableBusy = false
+    private val _monthlyBudget = MutableLiveData<Double>()
+    val monthlyBudget: LiveData<Double>
+        get() = _monthlyBudget
 
     fun resetBudget() {
-        monthlyBudget = 0.0
+        _monthlyBudget.value = 0.0
+    }
+
+    fun updateBudget(value: Double) {
+        _monthlyBudget.value = value
     }
 
     fun addTotals(purchases: List<Purchase>): List<Purchase> {

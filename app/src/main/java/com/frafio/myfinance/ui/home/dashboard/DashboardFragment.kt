@@ -12,7 +12,6 @@ import com.frafio.myfinance.data.models.ProgressBar
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
 import com.frafio.myfinance.ui.BaseFragment
-import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.utils.doubleToString
@@ -33,18 +32,14 @@ class DashboardFragment : BaseFragment() {
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
 
-        viewModel.updateStats()
-
         budgetProgressBar = ProgressBar(binding.barChartLayout, requireContext())
         monthlyBarChart = BarChart(binding.monthlyChart, requireContext())
 
         viewModel.getPurchaseNumber().observe(viewLifecycleOwner) {
-            if (PurchaseStorage.isTableBusy) return@observe
             viewModel.isListEmpty.value = it == 0
         }
 
         viewModel.getPriceSumFromToday().observe(viewLifecycleOwner) {
-            if (PurchaseStorage.isTableBusy) return@observe
             val todaySum = it ?: 0.0
             // Update today TV
             binding.todayTotTV.text = if (todaySum < 1000)
@@ -54,7 +49,6 @@ class DashboardFragment : BaseFragment() {
         }
 
         viewModel.getPriceSumFromThisMonth().observe(viewLifecycleOwner) {
-            if (PurchaseStorage.isTableBusy) return@observe
             viewModel.thisMonthSum = it ?: 0.0
             if (viewModel.monthShown) {
                 binding.thisMonthTVTitle.text = getString(R.string.this_month)
@@ -69,7 +63,6 @@ class DashboardFragment : BaseFragment() {
         }
 
         viewModel.getPriceSumFromThisYear().observe(viewLifecycleOwner) {
-            if (PurchaseStorage.isTableBusy) return@observe
             viewModel.thisYearSum = it ?: 0.0
             if (viewModel.monthShown) {
                 binding.thisYearTVTitle.text = getString(R.string.this_year_next)
@@ -83,119 +76,48 @@ class DashboardFragment : BaseFragment() {
             }
         }
 
-        viewModel.getPricesList().observe(viewLifecycleOwner) {
-            if (PurchaseStorage.isTableBusy) return@observe
-            var string = ""
-            for (item in it) {
-                string += item.toString()
-            }
-            (activity as HomeActivity).showSnackBar(string)
-        }
-
-        viewModel.lastYearPurchases.observe(viewLifecycleOwner) { purchases ->
-            (activity as HomeActivity).hideProgressIndicator()
-
-            val values = mutableListOf<Double>()
+        viewModel.getPricesList().observe(viewLifecycleOwner) { entries ->
             val labels = mutableListOf<String>()
+            val values = mutableListOf<Double>()
             var currentDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth())
-            var monthString = if (currentDate.monthValue > 9) {
-                "${currentDate.monthValue}"
-            } else {
-                "0${currentDate.monthValue}"
-            }
-            var currentLabel = "${monthString}/${currentDate.year - 2000}"
-            var monthsPassed = 1
-            var currentValue = 0.0
-            for (p in purchases) {
-                monthString = if (p.month!! > 9) {
-                    "${p.month}"
+            var j = 0
+            for (i in 0..<12) {
+                if (j < entries.size
+                    && entries[j].year == currentDate.year
+                    && entries[j].month == currentDate.monthValue
+                ) {
+                    val monthString = if (entries[j].month < 10)
+                        "0${entries[j].month}" else entries[j].month.toString()
+                    labels.add("$monthString/${entries[j].year - 2000}")
+                    values.add(entries[j].value)
+                    j++
                 } else {
-                    "0${p.month}"
+                    val monthString = if (currentDate.monthValue < 10)
+                        "0${currentDate.monthValue}" else currentDate.monthValue.toString()
+                    labels.add("$monthString/${currentDate.year - 2000}")
+                    values.add(0.0)
                 }
-                val pLabel = "${monthString}/${p.year!! - 2000}"
-                if (currentLabel != pLabel) {
-                    labels.add(currentLabel)
-                    values.add(currentValue)
-                    currentDate = currentDate.minusMonths(1)
-                    monthsPassed += 1
-                    monthString = if (currentDate.monthValue > 9) {
-                        "${currentDate.monthValue}"
-                    } else {
-                        "0${currentDate.monthValue}"
-                    }
-                    var newLabel = "${monthString}/${currentDate.year - 2000}"
-                    while (newLabel != pLabel) {
-                        labels.add(newLabel)
-                        values.add(0.0)
-                        currentDate = currentDate.minusMonths(1)
-                        monthsPassed += 1
-                        monthString = if (currentDate.monthValue > 9) {
-                            "${currentDate.monthValue}"
-                        } else {
-                            "0${currentDate.monthValue}"
-                        }
-                        newLabel = "${monthString}/${currentDate.year - 2000}"
-                    }
-                    currentLabel = pLabel
-                    currentValue = p.price!!
-                } else {
-                    currentValue += p.price!!
-                }
-            }
-            labels.add(currentLabel)
-            values.add(currentValue)
-            while (monthsPassed != 12) {
                 currentDate = currentDate.minusMonths(1)
-                monthsPassed += 1
-                monthString = if (currentDate.monthValue > 9) {
-                    "${currentDate.monthValue}"
-                } else {
-                    "0${currentDate.monthValue}"
-                }
-                val newLabel = "${monthString}/${currentDate.year - 2000}"
-                labels.add(newLabel)
-                values.add(0.0)
             }
-
             monthlyBarChart.updateValues(labels, values)
-            // Update this month and this year TV
-            val monthlyBudget = viewModel.monthlyBudget.value
-            if (monthlyBudget != null) {
-                if (viewModel.monthShown) {
-                    binding.budgetTV.text = doubleToString(monthlyBudget.toDouble())
-                    budgetProgressBar.updateValue(viewModel.thisMonthSum, monthlyBudget.toDouble())
-                } else {
-                    binding.budgetTV.text = doubleToString(monthlyBudget.toDouble() * 12)
-                    budgetProgressBar.updateValue(
-                        viewModel.thisYearSum,
-                        monthlyBudget.toDouble() * 12
-                    )
-                }
-            }
         }
 
-        viewModel.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
+        PurchaseStorage.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
+            if (monthlyBudget == null) return@observe
             if (viewModel.monthShown) {
                 binding.budgetTV.text = doubleToString(monthlyBudget.toDouble())
+                budgetProgressBar.updateValue(viewModel.thisMonthSum, monthlyBudget.toDouble())
             } else {
                 binding.budgetTV.text = doubleToString(monthlyBudget.toDouble() * 12)
-            }
-            if (viewModel.lastYearPurchases.value != null) {
-                if (viewModel.monthShown) {
-                    budgetProgressBar.updateValue(viewModel.thisMonthSum, monthlyBudget.toDouble())
-                } else {
-                    budgetProgressBar.updateValue(
-                        viewModel.thisYearSum,
-                        monthlyBudget.toDouble() * 12
-                    )
-                }
+                budgetProgressBar.updateValue(
+                    viewModel.thisYearSum,
+                    monthlyBudget.toDouble() * 12
+                )
             }
         }
 
         binding.changeBtn.setOnClickListener {
-            if (viewModel.lastYearPurchases.value != null
-                && viewModel.monthlyBudget.value != null
-            ) {
+            if (PurchaseStorage.monthlyBudget.value != null) {
                 binding.changeBtn.animate().rotationBy(
                     if (viewModel.monthShown) 180f else -180f
                 ).setDuration(200).start()
@@ -211,11 +133,11 @@ class DashboardFragment : BaseFragment() {
                     else
                         doubleToPriceWithoutDecimals(viewModel.thisYearSum)
                     binding.budgetTV.text = doubleToString(
-                        viewModel.monthlyBudget.value!!.toDouble()
+                        PurchaseStorage.monthlyBudget.value!!.toDouble()
                     )
                     budgetProgressBar.updateValue(
                         viewModel.thisMonthSum,
-                        viewModel.monthlyBudget.value!!.toDouble()
+                        PurchaseStorage.monthlyBudget.value!!.toDouble()
                     )
                 } else {
                     binding.thisMonthTVTitle.text = getString(R.string.this_year)
@@ -226,11 +148,11 @@ class DashboardFragment : BaseFragment() {
                     else
                         doubleToPriceWithoutDecimals(viewModel.thisMonthSum)
                     binding.budgetTV.text = doubleToString(
-                        viewModel.monthlyBudget.value!!.toDouble() * 12
+                        PurchaseStorage.monthlyBudget.value!!.toDouble() * 12
                     )
                     budgetProgressBar.updateValue(
                         viewModel.thisYearSum,
-                        viewModel.monthlyBudget.value!!.toDouble() * 12
+                        PurchaseStorage.monthlyBudget.value!!.toDouble() * 12
                     )
                 }
             }
@@ -240,10 +162,6 @@ class DashboardFragment : BaseFragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         return binding.root
-    }
-
-    fun refreshStatsData() {
-        viewModel.updateStats()
     }
 
     override fun scrollUp() {

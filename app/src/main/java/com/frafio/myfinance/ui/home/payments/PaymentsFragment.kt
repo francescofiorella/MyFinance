@@ -54,7 +54,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             val editRequest = data!!.getIntExtra(AddActivity.PURCHASE_REQUEST_KEY, -1)
 
             if (editRequest == AddActivity.REQUEST_PAYMENT_CODE) {
-                (activity as HomeActivity).refreshFragmentData(dashboard = true)
                 (activity as HomeActivity).showSnackBar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
             }
         }
@@ -78,7 +77,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             }
         }
         mediatorLiveDataForLocalPurchases.observe(viewLifecycleOwner) { purchases ->
-            if (PurchaseStorage.isTableBusy) return@observe
             // Evaluate limit and decide if new items can be retrieved
             val limit = if (binding.listRecyclerView.adapter != null) {
                 (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
@@ -196,9 +194,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 }
 
                 PurchaseCode.PURCHASE_ADD_SUCCESS.code -> {
-                    (activity as HomeActivity).refreshFragmentData(dashboard = true)
-                    val payload = result.message.split("&")
-                    (activity as HomeActivity).showSnackBar(payload[0])
+                    (activity as HomeActivity).showSnackBar(result.message)
                 }
 
                 else -> {
@@ -214,7 +210,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
     ) {
         response.observe(viewLifecycleOwner) { result ->
             if (result.code == PurchaseCode.PURCHASE_DELETE_SUCCESS.code) {
-                (activity as HomeActivity).refreshFragmentData(dashboard = true)
 
                 (activity as HomeActivity).showSnackBar(
                     result.message,
