@@ -53,14 +53,9 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
         _isIncomesEmpty.postValue(incomes.isEmpty())
     }
 
-    fun getMonthlyBudgetFromDb() {
-        val response = purchaseRepository.getMonthlyBudget()
-        listener?.onCompleted(response, null)
-    }
-
-    fun updateMonthlyBudget(budget: Double, getOldBudget: Boolean = false) {
+    fun setMonthlyBudget(budget: Double, getOldBudget: Boolean = false) {
         val previousBudget = if (getOldBudget) PurchaseStorage.monthlyBudget.value ?: 0.0 else null
-        val response = purchaseRepository.updateMonthlyBudget(budget)
+        val response = purchaseRepository.setMonthlyBudget(budget)
         listener?.onCompleted(response, previousBudget)
     }
 

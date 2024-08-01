@@ -14,8 +14,9 @@ class MyFinanceApplication : Application() {
 
     companion object {
         lateinit var instance: MyFinanceApplication private set
-        const val PREFERENCES_KEY = "COLLECTION_PREFERENCES"
+        const val PREFERENCES_KEY = "SHARED_PREFERENCES"
         const val DYNAMIC_COLOR_KEY = "DYNAMIC_COLOR_OPTIONS"
+        const val MONTHLY_BUDGET_KEY = "MONTHLY_BUDGET_KEY"
     }
 
     lateinit var sharedPreferences: SharedPreferences

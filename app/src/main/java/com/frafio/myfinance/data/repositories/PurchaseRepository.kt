@@ -41,7 +41,11 @@ class PurchaseRepository(private val purchaseManager: PurchaseManager) {
         return purchaseManager.getMonthlyBudget()
     }
 
-    fun updateMonthlyBudget(budget: Double): LiveData<PurchaseResult> {
-        return purchaseManager.updateMonthlyBudget(budget)
+    fun setMonthlyBudget(budget: Double): LiveData<PurchaseResult> {
+        return purchaseManager.setMonthlyBudget(budget)
+    }
+
+    fun updateLocalMonthlyBudget() {
+        purchaseManager.updateLocalMonthlyBudget()
     }
 }

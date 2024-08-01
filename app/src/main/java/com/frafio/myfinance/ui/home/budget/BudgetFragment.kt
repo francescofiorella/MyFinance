@@ -74,7 +74,6 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
 
         viewModel.updateIncomeNumber()
         viewModel.updateIncomeList(DEFAULT_LIMIT)
-        viewModel.getMonthlyBudgetFromDb()
 
         viewModel.incomes.observe(viewLifecycleOwner) { incomes ->
             val nl = incomes.map { i -> i.copy() }
@@ -123,11 +122,11 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         binding.monthlyBudgetDeleteBtn.setOnClickListener {
             if (binding.monthlyBudgetTV.isVisible) {
                 // delete budget
-                viewModel.updateMonthlyBudget(0.0, true)
+                viewModel.setMonthlyBudget(0.0, true)
             } else {
                 // confirm modifications
                 val budget = binding.monthlyBudgetET.text.toString().toDouble()
-                viewModel.updateMonthlyBudget(budget, true)
+                viewModel.setMonthlyBudget(budget, true)
             }
         }
 
@@ -174,12 +173,13 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                         binding.monthlyBudgetDeleteBtn.icon =
                             ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
                     }
+                    // Show snackbar for undoing the operation
                     previousBudget?.let {
                         (activity as HomeActivity).showSnackBar(
                             result.message,
                             getString(R.string.cancel)
                         ) {
-                            viewModel.updateMonthlyBudget(previousBudget)
+                            viewModel.setMonthlyBudget(previousBudget)
                         }
                     }
                 }
@@ -267,7 +267,6 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
 
     fun refreshData() {
         viewModel.updateLocalIncomeList()
-        viewModel.getMonthlyBudgetFromDb()
     }
 
     class ModalBottomSheet(

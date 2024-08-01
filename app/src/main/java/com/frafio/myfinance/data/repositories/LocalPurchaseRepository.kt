@@ -26,8 +26,6 @@ class LocalPurchaseRepository {
     fun getPurchasesAfter(timestamp: Long): LiveData<List<BarChartEntry>> =
         purchaseDao.getAfter(timestamp)
 
-    fun insertAll(purchases: List<Purchase>) = purchaseDao.insertAll(*purchases.toTypedArray())
-
     fun insertPurchase(purchase: Purchase) = purchaseDao.insertPurchase(purchase)
 
     fun updatePurchase(purchase: Purchase) = purchaseDao.updatePurchase(purchase)

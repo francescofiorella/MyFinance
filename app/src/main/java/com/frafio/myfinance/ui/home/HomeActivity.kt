@@ -12,6 +12,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.MyFinanceApplication
@@ -48,6 +49,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private var activeFragment: Fragment? = null
 
     private var userRequest: Boolean = false
+    var isLayoutReady: Boolean = false
 
     companion object {
         private const val ACTIVE_FRAGMENT_KEY = "active_fragment_key"
@@ -88,7 +90,18 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             if (userRequest) {
                 setTheme(R.style.Theme_MyFinance)
             } else {
-                installSplashScreen()
+                installSplashScreen().also {
+                    it.setKeepOnScreenCondition {
+                        // keep if the layout is not ready
+                        !isLayoutReady
+                    }
+                    it.setOnExitAnimationListener { splashScreenViewProvider ->
+                        supportFragmentManager.unregisterFragmentLifecycleCallbacks(
+                            dashboardCallback
+                        )
+                        splashScreenViewProvider.remove()
+                    }
+                }
                 if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
                     DynamicColors.applyToActivityIfAvailable(this)
                 }
@@ -113,6 +126,8 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 showProgressIndicator()
                 viewModel.updateUserPurchases()
                 //viewModel.updateUserIncomes()
+                viewModel.updateMonthlyBudget()
+                viewModel.updateLocalMonthlyBudget()
                 initFragments()
                 intent.extras?.getString(LoginActivity.INTENT_USER_NAME).also { userName ->
                     showSnackBar("${getString(R.string.login_successful)} $userName")
@@ -242,6 +257,18 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         }
     }
 
+    // called only one time, when the activity is loaded for the first time
+    private val dashboardCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
+        override fun onFragmentCreated(
+            fm: FragmentManager,
+            f: Fragment,
+            savedInstanceState: Bundle?
+        ) {
+            super.onFragmentCreated(fm, f, savedInstanceState)
+            isLayoutReady = true
+        }
+    }
+
     fun onAddButtonClick(view: View) {
         ActivityOptionsCompat.makeClipRevealAnimation(
             view, 0, 0, view.measuredWidth, view.measuredHeight
@@ -289,9 +316,14 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     showProgressIndicator()
                     viewModel.updateUserPurchases()
                     //viewModel.updateUserIncomes()
+                    viewModel.updateMonthlyBudget()
+                    viewModel.updateLocalMonthlyBudget()
                     initFragments()
                     if (!userRequest) {
-                        userRequest = false
+                        supportFragmentManager.registerFragmentLifecycleCallbacks(
+                            dashboardCallback,
+                            true
+                        )
                     } else {
                         hideProgressIndicator()
                         intent.extras?.getString(LoginActivity.INTENT_USER_NAME).also { userName ->
@@ -315,6 +347,8 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
                     hideProgressIndicator()
                 }
+
+                PurchaseCode.BUDGET_UPDATE_SUCCESS.code -> Unit
 
                 else -> Unit
             }

@@ -12,7 +12,9 @@ import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
 import com.frafio.myfinance.utils.getSharedDynamicColor
+import com.frafio.myfinance.utils.getSharedMonthlyBudget
 import com.frafio.myfinance.utils.setSharedDynamicColor
+import com.frafio.myfinance.utils.setSharedMonthlyBudget
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -36,10 +38,10 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!).get()
             .addOnSuccessListener {
-                PurchaseStorage.updateBudget(
-                    it.data?.get(DbPurchases.FIELDS.MONTHLY_BUDGET.value).toString()
-                        .toDoubleOrNull() ?: 0.0
-                )
+                val value = it.data?.get(DbPurchases.FIELDS.MONTHLY_BUDGET.value).toString()
+                    .toDoubleOrNull() ?: 0.0
+                setLocalMonthlyBudget(value)
+                PurchaseStorage.updateBudget(value)
                 response.value = PurchaseResult(PurchaseCode.BUDGET_UPDATE_SUCCESS)
             }
             .addOnFailureListener {
@@ -48,12 +50,13 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun updateMonthlyBudget(budget: Double): LiveData<PurchaseResult> {
+    fun setMonthlyBudget(budget: Double): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
         fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .set(hashMapOf(DbPurchases.FIELDS.MONTHLY_BUDGET.value to budget))
             .addOnSuccessListener {
+                setLocalMonthlyBudget(budget)
                 PurchaseStorage.updateBudget(budget)
                 response.value = PurchaseResult(PurchaseCode.BUDGET_UPDATE_SUCCESS)
             }
@@ -187,5 +190,13 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
     fun getDynamicColorActive(): Boolean {
         return getSharedDynamicColor(sharedPreferences)
+    }
+
+    private fun setLocalMonthlyBudget(value: Double) {
+        setSharedMonthlyBudget(sharedPreferences, value)
+    }
+
+    fun updateLocalMonthlyBudget() {
+        PurchaseStorage.updateBudget(getSharedMonthlyBudget(sharedPreferences))
     }
 }

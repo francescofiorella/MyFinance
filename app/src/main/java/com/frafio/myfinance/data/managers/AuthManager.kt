@@ -14,6 +14,7 @@ import com.frafio.myfinance.data.storages.IncomeStorage
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
 import com.frafio.myfinance.utils.getSharedDynamicColor
+import com.frafio.myfinance.utils.setSharedMonthlyBudget
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -228,6 +229,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
 
         localPurchaseRepository.deleteAll()
         IncomeStorage.resetIncomeList()
+        setSharedMonthlyBudget(sharedPreferences, 0.0)
         PurchaseStorage.resetBudget()
         UserStorage.resetUser()
 

@@ -105,13 +105,13 @@ class DashboardFragment : BaseFragment() {
         PurchaseStorage.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
             if (monthlyBudget == null) return@observe
             if (viewModel.monthShown) {
-                binding.budgetTV.text = doubleToString(monthlyBudget.toDouble())
-                budgetProgressBar.updateValue(viewModel.thisMonthSum, monthlyBudget.toDouble())
+                binding.budgetTV.text = doubleToString(monthlyBudget)
+                budgetProgressBar.updateValue(viewModel.thisMonthSum, monthlyBudget)
             } else {
-                binding.budgetTV.text = doubleToString(monthlyBudget.toDouble() * 12)
+                binding.budgetTV.text = doubleToString(monthlyBudget * 12)
                 budgetProgressBar.updateValue(
                     viewModel.thisYearSum,
-                    monthlyBudget.toDouble() * 12
+                    monthlyBudget * 12
                 )
             }
         }

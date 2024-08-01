@@ -91,6 +91,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:clipToPadding="false"
+                        android:clipChildren="false"
                         android:orientation="vertical"
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">
@@ -174,7 +175,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
-                                app:layout_constraintGuide_percent=".6" />
+                                app:layout_constraintGuide_percent="0.6" />
 
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/percentageTV"

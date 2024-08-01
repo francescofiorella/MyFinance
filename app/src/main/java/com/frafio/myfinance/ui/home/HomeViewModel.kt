@@ -36,4 +36,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun updateUserPurchases() {
         listener?.onUserDataUpdated(purchaseRepository.updatePurchaseList())
     }
+
+    fun updateMonthlyBudget() {
+        val response = purchaseRepository.getMonthlyBudget()
+        listener?.onUserDataUpdated(response)
+    }
+
+    fun updateLocalMonthlyBudget() {
+        purchaseRepository.updateLocalMonthlyBudget()
+    }
 }
