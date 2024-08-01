@@ -52,7 +52,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     PURCHASE_EDIT_SUCCESS(
-        20, when (getCurrentLanguage()) {
+        12, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Purchase edited!"
             Languages.ITALIANO.value -> "Acquisto modificato!"
             else -> "Purchase edited!" // english
@@ -60,7 +60,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     PURCHASE_EDIT_FAILURE(
-        21, when (getCurrentLanguage()) {
+        13, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Purchase not edited!"
             Languages.ITALIANO.value -> "Acquisto non modificato!"
             else -> "Purchase not edited!" // english
@@ -68,7 +68,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     PURCHASE_DELETE_SUCCESS(
-        30, when (getCurrentLanguage()) {
+        14, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Purchase deleted!"
             Languages.ITALIANO.value -> "Acquisto eliminato!"
             else -> "Purchase deleted!" // english
@@ -76,7 +76,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     PURCHASE_DELETE_FAILURE(
-        31, when (getCurrentLanguage()) {
+        15, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Purchase not deleted correctly!"
             Languages.ITALIANO.value -> "Acquisto non eliminato correttamente!"
             else -> "Purchase not deleted correctly!" // english
@@ -84,7 +84,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     PURCHASE_LIST_UPDATE_SUCCESS(
-        40, when (getCurrentLanguage()) {
+        16, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "List updated!"
             Languages.ITALIANO.value -> "Lista aggiornata!"
             else -> "List Updated!" // english
@@ -92,63 +92,15 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     PURCHASE_LIST_UPDATE_FAILURE(
-        41, when (getCurrentLanguage()) {
+        17, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "List not updated!"
             Languages.ITALIANO.value -> "Lista non aggiornata!"
             else -> "List not updated!" // english
         }
     ),
 
-    PURCHASE_AGGREGATE_SUCCESS(
-        50, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Aggregation query successful!"
-            Languages.ITALIANO.value -> "Query di aggregazione riuscita!"
-            else -> "Aggregation query successful!" // english
-        }
-    ),
-
-    PURCHASE_AGGREGATE_FAILURE(
-        51, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Aggregation query failed!"
-            Languages.ITALIANO.value -> "Query di aggregazione non riuscita!"
-            else -> "Aggregation query failed!" // english
-        }
-    ),
-
-    PURCHASE_COUNT_SUCCESS(
-        52, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Count query successful!"
-            Languages.ITALIANO.value -> "Query di conteggio riuscita!"
-            else -> "Count query successful!" // english
-        }
-    ),
-
-    PURCHASE_COUNT_FAILURE(
-        53, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Count query failed!"
-            Languages.ITALIANO.value -> "Query di conteggio non riuscita!"
-            else -> "Count query failed!" // english
-        }
-    ),
-
-    BUDGET_UPDATE_SUCCESS(
-        60, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Budget updated!"
-            Languages.ITALIANO.value -> "Budget aggiornato"
-            else -> "Budget updated!" // english
-        }
-    ),
-
-    BUDGET_UPDATE_FAILURE(
-        61, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Budget not updated!"
-            Languages.ITALIANO.value -> "Budget non aggiornato"
-            else -> "Budget not updated!" // english
-        }
-    ),
-
     INCOME_LIST_UPDATE_SUCCESS(
-        70, when (getCurrentLanguage()) {
+        20, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Income list updated!"
             Languages.ITALIANO.value -> "Lista delle entrate aggiornata!"
             else -> "Income list updated!" // english
@@ -156,7 +108,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     INCOME_LIST_UPDATE_FAILURE(
-        71, when (getCurrentLanguage()) {
+        21, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Income list not updated!"
             Languages.ITALIANO.value -> "Lista delle entrate non aggiornata!"
             else -> "Income list not updated!" // english
@@ -164,7 +116,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     INCOME_ADD_SUCCESS(
-        72, when (getCurrentLanguage()) {
+        22, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Income added!"
             Languages.ITALIANO.value -> "Entrata aggiunta!"
             else -> "Income added!" // english
@@ -172,7 +124,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     INCOME_ADD_FAILURE(
-        73, when (getCurrentLanguage()) {
+        23, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Income not added!"
             Languages.ITALIANO.value -> "Entrata non aggiunta!"
             else -> "Income not added!" // english
@@ -180,7 +132,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     INCOME_DELETE_SUCCESS(
-        74, when (getCurrentLanguage()) {
+        24, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Income deleted!"
             Languages.ITALIANO.value -> "Entrata eliminata!"
             else -> "Income deleted!" // english
@@ -188,7 +140,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     INCOME_DELETE_FAILURE(
-        75, when (getCurrentLanguage()) {
+        25, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Income not deleted correctly!"
             Languages.ITALIANO.value -> "Entrata non eliminata correttamente!"
             else -> "Income not deleted correctly!" // english
@@ -196,7 +148,7 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     INCOME_EDIT_SUCCESS(
-        76, when (getCurrentLanguage()) {
+        26, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Income edited!"
             Languages.ITALIANO.value -> "Entrata modificata!"
             else -> "Income edited!" // english
@@ -204,10 +156,26 @@ enum class PurchaseCode(val code: Int, val message: String) {
     ),
 
     INCOME_EDIT_FAILURE(
-        77, when (getCurrentLanguage()) {
+        27, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Income not edited!"
             Languages.ITALIANO.value -> "Entrata non modificata!"
             else -> "Income not edited!" // english
         }
     ),
+
+    BUDGET_UPDATE_SUCCESS(
+        30, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Budget updated!"
+            Languages.ITALIANO.value -> "Budget aggiornato"
+            else -> "Budget updated!" // english
+        }
+    ),
+
+    BUDGET_UPDATE_FAILURE(
+        31, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Budget not updated!"
+            Languages.ITALIANO.value -> "Budget non aggiornato"
+            else -> "Budget not updated!" // english
+        }
+    )
 }

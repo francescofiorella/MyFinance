@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.auth.SignupException
 import com.frafio.myfinance.data.models.AuthResult
+import com.frafio.myfinance.data.repositories.LocalIncomeRepository
 import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
 import com.frafio.myfinance.data.storages.IncomeStorage
 import com.frafio.myfinance.data.storages.PurchaseStorage
@@ -27,6 +28,9 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.userProfileChangeRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AuthManager(private val sharedPreferences: SharedPreferences) {
 
@@ -43,6 +47,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         get() = fAuth.currentUser
 
     private val localPurchaseRepository = LocalPurchaseRepository()
+    private val localIncomeRepository = LocalIncomeRepository()
 
     fun updateUserProfile(fullName: String?, propicUri: String?): LiveData<AuthResult> {
         val response = MutableLiveData<AuthResult>()
@@ -227,8 +232,10 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
 
         fAuth.signOut()
 
-        localPurchaseRepository.deleteAll()
-        IncomeStorage.resetIncomeList()
+        CoroutineScope(Dispatchers.IO).launch {
+            localPurchaseRepository.deleteAll()
+            localIncomeRepository.deleteAll()
+        }
         setSharedMonthlyBudget(sharedPreferences, 0.0)
         PurchaseStorage.resetBudget()
         UserStorage.resetUser()

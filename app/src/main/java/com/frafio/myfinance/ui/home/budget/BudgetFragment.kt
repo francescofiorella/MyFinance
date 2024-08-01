@@ -16,12 +16,14 @@ import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.models.Income
 import com.frafio.myfinance.data.models.PurchaseResult
+import com.frafio.myfinance.data.storages.IncomeStorage
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.databinding.FragmentBudgetBinding
 import com.frafio.myfinance.ui.BaseFragment
@@ -29,6 +31,7 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.ui.home.payments.PurchaseAdapter
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.createTextDrawable
 import com.frafio.myfinance.utils.dateToString
@@ -46,15 +49,14 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     private val viewModel by viewModels<BudgetViewModel>()
     private var isListBlocked = false
     private var maxIncomeNumber: Long = DEFAULT_LIMIT + 1
+    private val mediatorLiveDataForLocalIncomes = MediatorLiveData<List<Income>>()
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
-
             val editRequest = data!!.getIntExtra(AddActivity.PURCHASE_REQUEST_KEY, -1)
 
             if (editRequest == AddActivity.REQUEST_INCOME_CODE) {
-                viewModel.updateLocalIncomeList()
                 (activity as HomeActivity).showSnackBar(PurchaseCode.INCOME_EDIT_SUCCESS.message)
             }
         }
@@ -72,18 +74,33 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.updateIncomeNumber()
-        viewModel.updateIncomeList(DEFAULT_LIMIT)
-
-        viewModel.incomes.observe(viewLifecycleOwner) { incomes ->
-            val nl = incomes.map { i -> i.copy() }
-            binding.budgetRecycleView.also {
+        mediatorLiveDataForLocalIncomes.apply {
+            addSource(viewModel.getLocalIncomes()) {
+                value = it
+            }
+        }
+        mediatorLiveDataForLocalIncomes.observe(viewLifecycleOwner) { incomes ->
+            // Evaluate limit and decide if new items can be retrieved
+            val limit = if (binding.budgetRecyclerView.adapter != null) {
+                (binding.budgetRecyclerView.adapter as IncomeAdapter).getLimit()
+            } else {
+                DEFAULT_LIMIT
+            }
+            // Get list with limit and update recList
+            var nl = incomes.take(limit.toInt()).map { i -> i.copy() }
+            nl = IncomeStorage.addTotals(nl)
+            viewModel.updateIncomesEmpty(nl.isEmpty())
+            binding.budgetRecyclerView.also {
                 if (it.adapter == null) {
                     it.adapter = IncomeAdapter(nl, this)
                 } else {
-                    (it.adapter as IncomeAdapter).updateData(nl)
+                    it.post {
+                        (it.adapter as IncomeAdapter).updateData(nl)
+                    }
                 }
             }
+            maxIncomeNumber = incomes.size.toLong()
+            isListBlocked = limit >= maxIncomeNumber
         }
 
         PurchaseStorage.monthlyBudget.observe(viewLifecycleOwner) { budget ->
@@ -143,20 +160,9 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     override fun onCompleted(response: LiveData<PurchaseResult>, previousBudget: Double?) {
         response.observe(viewLifecycleOwner) { result ->
             when (result.code) {
-                PurchaseCode.PURCHASE_COUNT_SUCCESS.code -> {
-                    maxIncomeNumber = result.message.toLong()
-                    val limit = if (binding.budgetRecycleView.adapter != null) {
-                        (binding.budgetRecycleView.adapter as IncomeAdapter).getLimit()
-                    } else {
-                        DEFAULT_LIMIT
-                    }
-                    isListBlocked = limit >= maxIncomeNumber
-                }
-
                 PurchaseCode.INCOME_LIST_UPDATE_SUCCESS.code -> {
-                    viewModel.updateLocalIncomeList()
-                    val limit = if (binding.budgetRecycleView.adapter != null) {
-                        (binding.budgetRecycleView.adapter as IncomeAdapter).getLimit()
+                    val limit = if (binding.budgetRecyclerView.adapter != null) {
+                        (binding.budgetRecyclerView.adapter as IncomeAdapter).getLimit()
                     } else {
                         DEFAULT_LIMIT
                     }
@@ -185,9 +191,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                 }
 
                 PurchaseCode.INCOME_ADD_SUCCESS.code -> {
-                    viewModel.updateLocalIncomeList()
-                    val payload = result.message.split("&")
-                    (activity as HomeActivity).showSnackBar(payload[0])
+                    (activity as HomeActivity).showSnackBar(result.message)
                 }
 
                 else -> {
@@ -200,8 +204,6 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     override fun onDeleteCompleted(response: LiveData<PurchaseResult>, income: Income) {
         response.observe(viewLifecycleOwner) { result ->
             if (result.code == PurchaseCode.INCOME_DELETE_SUCCESS.code) {
-                viewModel.updateLocalIncomeList()
-
                 (activity as HomeActivity).showSnackBar(
                     result.message,
                     getString(R.string.cancel)
@@ -249,24 +251,21 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             ON_LOAD_MORE_REQUEST -> {
                 // Increment elements limit on scroll
                 if (!isListBlocked) {
-                    viewModel.updateIncomeList(
-                        (binding.budgetRecycleView.adapter as IncomeAdapter).getLimit(true)
-                    )
                     isListBlocked = true
+                    binding.budgetRecyclerView.adapter?.let {
+                        (it as PurchaseAdapter).getLimit(true)
+                    }
+                    mediatorLiveDataForLocalIncomes.value = mediatorLiveDataForLocalIncomes.value
                 }
             }
         }
     }
 
     fun scrollIncomesTo(position: Int) {
-        (binding.budgetRecycleView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
+        (binding.budgetRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
             position,
             0
         )
-    }
-
-    fun refreshData() {
-        viewModel.updateLocalIncomeList()
     }
 
     class ModalBottomSheet(
@@ -337,7 +336,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             dismissFun()
         }
         deleteLayout.setOnClickListener {
-            viewModel.deleteIncomeAt(position, income)
+            viewModel.deleteIncome(income)
             dismissFun()
         }
     }

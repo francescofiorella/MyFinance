@@ -15,9 +15,7 @@ import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.getSharedMonthlyBudget
 import com.frafio.myfinance.utils.setSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedMonthlyBudget
-import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -69,14 +67,10 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
     fun updatePurchaseList(): LiveData<PurchaseResult> {
         val response = MutableLiveData<PurchaseResult>()
 
-        val query = fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .orderBy(DbPurchases.FIELDS.YEAR.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.MONTH.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.DAY.value, Query.Direction.DESCENDING)
-            .orderBy(DbPurchases.FIELDS.PRICE.value, Query.Direction.DESCENDING)
-        query.get().addOnSuccessListener { queryDocumentSnapshots ->
+            .get().addOnSuccessListener { queryDocumentSnapshots ->
             val purchaseList = mutableListOf<Purchase>()
             queryDocumentSnapshots.forEach { document ->
                 val purchase = document.toObject(Purchase::class.java)
@@ -94,51 +88,6 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
 
             response.value = PurchaseResult(PurchaseCode.PURCHASE_LIST_UPDATE_FAILURE)
         }
-
-        return response
-    }
-
-    fun getPurchaseNumber(
-        collection: String = DbPurchases.FIELDS.PAYMENTS.value
-    ): LiveData<PurchaseResult> {
-        val response = MutableLiveData<PurchaseResult>()
-
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(collection)
-            .count()
-            .get(AggregateSource.SERVER)
-            .addOnSuccessListener { snapshot ->
-                response.value = PurchaseResult(
-                    PurchaseCode.PURCHASE_COUNT_SUCCESS,
-                    snapshot.count.toString()
-                )
-            }.addOnFailureListener { e ->
-                val error = "Error! ${e.localizedMessage}"
-                Log.e(TAG, error)
-
-                response.value = PurchaseResult(PurchaseCode.PURCHASE_COUNT_FAILURE)
-            }
-
-        return response
-    }
-
-    fun deletePurchase(purchase: Purchase): LiveData<PurchaseResult> {
-        val response = MutableLiveData<PurchaseResult>()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
-            .document(purchase.id).delete()
-            .addOnSuccessListener {
-                CoroutineScope(Dispatchers.IO).launch {
-                    localPurchaseRepository.deletePurchase(purchase)
-                }
-                response.value = PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-
-                response.value = PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE)
-            }
 
         return response
     }
@@ -170,7 +119,6 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
             .document(UserStorage.user!!.email!!)
             .collection(DbPurchases.FIELDS.PAYMENTS.value)
             .document(purchase.id).set(purchase).addOnSuccessListener {
-                // Check if today empty works
                 CoroutineScope(Dispatchers.IO).launch {
                     localPurchaseRepository.updatePurchase(purchase)
                 }
@@ -180,6 +128,26 @@ class PurchaseManager(private val sharedPreferences: SharedPreferences) {
                 response.value = PurchaseResult(PurchaseCode.PURCHASE_EDIT_FAILURE)
             }
 
+
+        return response
+    }
+
+    fun deletePurchase(purchase: Purchase): LiveData<PurchaseResult> {
+        val response = MutableLiveData<PurchaseResult>()
+        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+            .document(UserStorage.user!!.email!!)
+            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .document(purchase.id).delete()
+            .addOnSuccessListener {
+                CoroutineScope(Dispatchers.IO).launch {
+                    localPurchaseRepository.deletePurchase(purchase)
+                }
+                response.value = PurchaseResult(PurchaseCode.PURCHASE_DELETE_SUCCESS)
+            }.addOnFailureListener { e ->
+                Log.e(TAG, "Error! ${e.localizedMessage}")
+
+                response.value = PurchaseResult(PurchaseCode.PURCHASE_DELETE_FAILURE)
+            }
 
         return response
     }

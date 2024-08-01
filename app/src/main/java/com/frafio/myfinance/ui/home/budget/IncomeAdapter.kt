@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
+import com.frafio.myfinance.data.managers.IncomeManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.models.Income
 import com.frafio.myfinance.databinding.LayoutIncomeItemRvBinding
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LOAD_MORE_REQUEST
@@ -39,7 +39,7 @@ class IncomeAdapter(
         val currentIncome = incomes[position]
         holder.binding.income = currentIncome
 
-        if (incomes.size - position < DEFAULT_LIMIT) {
+        if (incomes.size - position < (DEFAULT_LIMIT / 2)) {
             listener.onItemInteraction(ON_LOAD_MORE_REQUEST, currentIncome, position)
         }
 
@@ -76,7 +76,7 @@ class IncomeAdapter(
     }
 
     fun getLimit(increment: Boolean = false): Long {
-        if (increment) currentLimit += DEFAULT_LIMIT
+        if (increment) currentLimit += (DEFAULT_LIMIT / 2)
         return currentLimit
     }
 

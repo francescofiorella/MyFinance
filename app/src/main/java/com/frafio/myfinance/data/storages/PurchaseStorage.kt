@@ -20,7 +20,7 @@ object PurchaseStorage {
     }
 
     fun addTotals(purchases: List<Purchase>): List<Purchase> {
-        val purchaseList: MutableList<Purchase> = mutableListOf()
+        val purchaseList = mutableListOf<Purchase>()
         // Create total for the local list
         var total: Purchase? = null
         // Used to keep the order

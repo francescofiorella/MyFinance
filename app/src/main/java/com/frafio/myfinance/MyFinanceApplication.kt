@@ -31,7 +31,7 @@ class MyFinanceApplication : Application() {
 
         authManager = AuthManager(sharedPreferences)
         purchaseManager = PurchaseManager(sharedPreferences)
-        incomeManager = IncomeManager(sharedPreferences)
+        incomeManager = IncomeManager()
 
         // if the user activated it, change the colors
         if (getSharedDynamicColor(sharedPreferences)) {

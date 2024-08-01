@@ -90,8 +90,8 @@
                         android:id="@+id/budget_layout"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:clipToPadding="false"
                         android:clipChildren="false"
+                        android:clipToPadding="false"
                         android:orientation="vertical"
                         android:paddingHorizontal="25dp"
                         android:paddingVertical="20dp">

@@ -128,7 +128,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                         category,
                         purchaseID!!
                     )
-                    incomeRepository.editIncome(income, purchasePosition!!)
+                    incomeRepository.editIncome(income)
                 }
                 listener?.onAddSuccess(response)
             }

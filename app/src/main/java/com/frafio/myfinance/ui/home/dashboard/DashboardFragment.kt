@@ -53,6 +53,7 @@ class DashboardFragment : BaseFragment() {
             if (viewModel.monthShown) {
                 binding.thisMonthTVTitle.text = getString(R.string.this_month)
                 binding.thisMonthTV.text = doubleToPrice(viewModel.thisMonthSum)
+                budgetProgressBar.updateValue(viewModel.thisMonthSum, viewModel.monthlyBudget)
             } else {
                 binding.thisYearTVTitle.text = getString(R.string.this_month_next)
                 binding.thisYearTV.text = if (viewModel.thisMonthSum < 1000)
@@ -73,6 +74,7 @@ class DashboardFragment : BaseFragment() {
             } else {
                 binding.thisMonthTVTitle.text = getString(R.string.this_year)
                 binding.thisMonthTV.text = doubleToPrice(viewModel.thisYearSum)
+                budgetProgressBar.updateValue(viewModel.thisYearSum, viewModel.monthlyBudget * 12)
             }
         }
 
@@ -104,6 +106,7 @@ class DashboardFragment : BaseFragment() {
 
         PurchaseStorage.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
             if (monthlyBudget == null) return@observe
+            viewModel.monthlyBudget = monthlyBudget
             if (viewModel.monthShown) {
                 binding.budgetTV.text = doubleToString(monthlyBudget)
                 budgetProgressBar.updateValue(viewModel.thisMonthSum, monthlyBudget)
@@ -117,44 +120,38 @@ class DashboardFragment : BaseFragment() {
         }
 
         binding.changeBtn.setOnClickListener {
-            if (PurchaseStorage.monthlyBudget.value != null) {
-                binding.changeBtn.animate().rotationBy(
-                    if (viewModel.monthShown) 180f else -180f
-                ).setDuration(200).start()
-                viewModel.monthShown = !viewModel.monthShown
-                if (viewModel.monthShown) {
-                    binding.thisMonthTVTitle.text = getString(R.string.this_month)
-                    binding.thisMonthTV.text = doubleToPrice(
-                        viewModel.thisMonthSum
-                    )
-                    binding.thisYearTVTitle.text = getString(R.string.this_year_next)
-                    binding.thisYearTV.text = if (viewModel.thisYearSum < 1000)
-                        doubleToPrice(viewModel.thisYearSum)
-                    else
-                        doubleToPriceWithoutDecimals(viewModel.thisYearSum)
-                    binding.budgetTV.text = doubleToString(
-                        PurchaseStorage.monthlyBudget.value!!.toDouble()
-                    )
-                    budgetProgressBar.updateValue(
-                        viewModel.thisMonthSum,
-                        PurchaseStorage.monthlyBudget.value!!.toDouble()
-                    )
-                } else {
-                    binding.thisMonthTVTitle.text = getString(R.string.this_year)
-                    binding.thisMonthTV.text = doubleToPrice(viewModel.thisYearSum)
-                    binding.thisYearTVTitle.text = getString(R.string.this_month_next)
-                    binding.thisYearTV.text = if (viewModel.thisMonthSum < 1000)
-                        doubleToPrice(viewModel.thisMonthSum)
-                    else
-                        doubleToPriceWithoutDecimals(viewModel.thisMonthSum)
-                    binding.budgetTV.text = doubleToString(
-                        PurchaseStorage.monthlyBudget.value!!.toDouble() * 12
-                    )
-                    budgetProgressBar.updateValue(
-                        viewModel.thisYearSum,
-                        PurchaseStorage.monthlyBudget.value!!.toDouble() * 12
-                    )
-                }
+            binding.changeBtn.animate().rotationBy(
+                if (viewModel.monthShown) 180f else -180f
+            ).setDuration(200).start()
+            viewModel.monthShown = !viewModel.monthShown
+            if (viewModel.monthShown) {
+                binding.thisMonthTVTitle.text = getString(R.string.this_month)
+                binding.thisMonthTV.text = doubleToPrice(viewModel.thisMonthSum)
+                binding.thisYearTVTitle.text = getString(R.string.this_year_next)
+                binding.thisYearTV.text = if (viewModel.thisYearSum < 1000)
+                    doubleToPrice(viewModel.thisYearSum)
+                else
+                    doubleToPriceWithoutDecimals(viewModel.thisYearSum)
+                binding.budgetTV.text = doubleToString(viewModel.monthlyBudget)
+                budgetProgressBar.updateValue(
+                    viewModel.thisMonthSum,
+                    viewModel.monthlyBudget
+                )
+            } else {
+                binding.thisMonthTVTitle.text = getString(R.string.this_year)
+                binding.thisMonthTV.text = doubleToPrice(viewModel.thisYearSum)
+                binding.thisYearTVTitle.text = getString(R.string.this_month_next)
+                binding.thisYearTV.text = if (viewModel.thisMonthSum < 1000)
+                    doubleToPrice(viewModel.thisMonthSum)
+                else
+                    doubleToPriceWithoutDecimals(viewModel.thisMonthSum)
+                binding.budgetTV.text = doubleToString(
+                    viewModel.monthlyBudget * 12
+                )
+                budgetProgressBar.updateValue(
+                    viewModel.thisYearSum,
+                    viewModel.monthlyBudget * 12
+                )
             }
         }
 

@@ -50,7 +50,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
-
             val editRequest = data!!.getIntExtra(AddActivity.PURCHASE_REQUEST_KEY, -1)
 
             if (editRequest == AddActivity.REQUEST_PAYMENT_CODE) {
@@ -210,7 +209,6 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
     ) {
         response.observe(viewLifecycleOwner) { result ->
             if (result.code == PurchaseCode.PURCHASE_DELETE_SUCCESS.code) {
-
                 (activity as HomeActivity).showSnackBar(
                     result.message,
                     getString(R.string.cancel)

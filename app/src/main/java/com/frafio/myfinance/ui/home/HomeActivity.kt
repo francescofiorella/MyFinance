@@ -64,7 +64,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             val data = result.data!!
             val purchaseRequest = data.getIntExtra(AddActivity.PURCHASE_REQUEST_KEY, -1)
             val message = data.getStringExtra(AddActivity.ADD_RESULT_MESSAGE) ?: ""
-            val position = data.getIntExtra(AddActivity.PURCHASE_POSITION_KEY, 0)
             when (purchaseRequest) {
                 AddActivity.REQUEST_PAYMENT_CODE -> {
                     showFragment(R.id.paymentsFragment)
@@ -73,8 +72,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
                 AddActivity.REQUEST_INCOME_CODE -> {
                     showFragment(R.id.budgetFragment)
-                    refreshFragmentData(budget = true)
-                    budgetFragment.scrollIncomesTo(position)
                     showSnackBar(message)
                 }
             }
@@ -125,7 +122,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             if (userRequest) {
                 showProgressIndicator()
                 viewModel.updateUserPurchases()
-                //viewModel.updateUserIncomes()
+                viewModel.updateUserIncomes()
                 viewModel.updateMonthlyBudget()
                 viewModel.updateLocalMonthlyBudget()
                 initFragments()
@@ -315,7 +312,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 AuthCode.USER_LOGGED.code -> {
                     showProgressIndicator()
                     viewModel.updateUserPurchases()
-                    //viewModel.updateUserIncomes()
+                    viewModel.updateUserIncomes()
                     viewModel.updateMonthlyBudget()
                     viewModel.updateLocalMonthlyBudget()
                     initFragments()
@@ -397,14 +394,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         binding.navDrawer?.let {
             it.setCheckedItem(fragmentId)
             navigateTo(fragmentId)
-        }
-    }
-
-    fun refreshFragmentData(
-        budget: Boolean = false
-    ) {
-        if (budget) {
-            budgetFragment.refreshData()
         }
     }
 }

@@ -258,10 +258,8 @@ class AddActivity : AppCompatActivity(), AddListener {
 
                 PurchaseCode.INCOME_ADD_SUCCESS.code -> {
                     Intent().also {
-                        val payload = result.message.split("&")
                         it.putExtra(PURCHASE_REQUEST_KEY, REQUEST_INCOME_CODE)
-                        it.putExtra(ADD_RESULT_MESSAGE, payload[0])
-                        it.putExtra(PURCHASE_POSITION_KEY, payload[1].toInt())
+                        it.putExtra(ADD_RESULT_MESSAGE, result.message)
                         setResult(RESULT_OK, it)
                         finish()
                     }
