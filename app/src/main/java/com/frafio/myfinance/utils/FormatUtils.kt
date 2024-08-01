@@ -54,7 +54,8 @@ fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?): String? {
     return formattedDate
 }
 
-/*fun timeToString(hour: Int?, minute: Int?): String? {
+@Suppress("UNUSED")
+fun timeToString(hour: Int?, minute: Int?): String? {
     var formattedTime: String? = null
     hour?.let {
         minute?.let {
@@ -64,8 +65,9 @@ fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?): String? {
         }
     }
     return formattedTime
-}*/
+}
 
+@Suppress("UNUSED")
 fun Float.round(decimals: Int): Float {
     var multiplier = 1.0f
     repeat(decimals) { multiplier *= 10 }

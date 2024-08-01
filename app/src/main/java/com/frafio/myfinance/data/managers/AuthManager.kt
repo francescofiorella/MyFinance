@@ -11,7 +11,6 @@ import com.frafio.myfinance.data.enums.auth.SignupException
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.repositories.LocalIncomeRepository
 import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
-import com.frafio.myfinance.data.storages.IncomeStorage
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.data.storages.UserStorage
 import com.frafio.myfinance.utils.getSharedDynamicColor
