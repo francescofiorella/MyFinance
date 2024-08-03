@@ -45,7 +45,8 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
     private val viewModel by viewModels<PaymentsViewModel>()
     private var isListBlocked = false
     private var maxPurchaseNumber = DEFAULT_LIMIT + 1
-    private val mediatorLiveDataForLocalPurchases = MediatorLiveData<List<Purchase>>()
+    private val recViewLiveData = MediatorLiveData<List<Purchase>>()
+    private lateinit var localPurchasesLiveData: LiveData<List<Purchase>>
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -70,12 +71,11 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
         viewModel.listener = this
 
-        mediatorLiveDataForLocalPurchases.apply {
-            addSource(viewModel.getLocalPurchases()) {
-                value = it
-            }
+        localPurchasesLiveData = viewModel.getLocalPurchases()
+        recViewLiveData.addSource(localPurchasesLiveData) { value ->
+            recViewLiveData.value = value
         }
-        mediatorLiveDataForLocalPurchases.observe(viewLifecycleOwner) { purchases ->
+        recViewLiveData.observe(viewLifecycleOwner) { purchases ->
             // Evaluate limit and decide if new items can be retrieved
             val limit = if (binding.listRecyclerView.adapter != null) {
                 (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
@@ -86,17 +86,18 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             var nl = purchases.take(limit.toInt()).map { p -> p.copy() }
             nl = PurchaseStorage.addTotals(nl)
             viewModel.updatePurchasesEmpty(nl.isEmpty())
+            maxPurchaseNumber = purchases.size.toLong()
             binding.listRecyclerView.also {
                 if (it.adapter == null) {
                     it.adapter = PurchaseAdapter(nl, this)
+                    isListBlocked = limit >= maxPurchaseNumber
                 } else {
                     it.post {
                         (it.adapter as PurchaseAdapter).updateData(nl)
+                        isListBlocked = limit >= maxPurchaseNumber
                     }
                 }
             }
-            maxPurchaseNumber = purchases.size.toLong()
-            isListBlocked = limit >= maxPurchaseNumber
         }
 
         return binding.root
@@ -169,8 +170,11 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                     binding.listRecyclerView.adapter?.let {
                         (it as PurchaseAdapter).getLimit(true)
                     }
-                    mediatorLiveDataForLocalPurchases.value =
-                        mediatorLiveDataForLocalPurchases.value
+                    // this trigger the observer
+                    recViewLiveData.removeSource(localPurchasesLiveData)
+                    recViewLiveData.addSource(localPurchasesLiveData) { value ->
+                        recViewLiveData.value = value
+                    }
                 }
             }
         }

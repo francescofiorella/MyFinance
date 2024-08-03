@@ -23,8 +23,8 @@ class LocalPurchaseRepository {
     fun getPriceSumFromYear(year: Int): LiveData<Double?> =
         purchaseDao.getPriceSumFromYear(year)
 
-    fun getPurchasesAfter(timestamp: Long): LiveData<List<BarChartEntry>> =
-        purchaseDao.getAfter(timestamp)
+    fun getPurchasesAfterAndBefore(firstTimestamp: Long, lastTimestamp: Long): LiveData<List<BarChartEntry>> =
+        purchaseDao.getAfterAndBefore(firstTimestamp, lastTimestamp)
 
     fun insertPurchase(purchase: Purchase) = purchaseDao.insertPurchase(purchase)
 

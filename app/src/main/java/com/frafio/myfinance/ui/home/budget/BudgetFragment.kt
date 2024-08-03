@@ -90,17 +90,18 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             var nl = incomes.take(limit.toInt()).map { i -> i.copy() }
             nl = IncomeStorage.addTotals(nl)
             viewModel.updateIncomesEmpty(nl.isEmpty())
+            maxIncomeNumber = incomes.size.toLong()
             binding.budgetRecyclerView.also {
                 if (it.adapter == null) {
                     it.adapter = IncomeAdapter(nl, this)
+                    isListBlocked = limit >= maxIncomeNumber
                 } else {
                     it.post {
                         (it.adapter as IncomeAdapter).updateData(nl)
+                        isListBlocked = limit >= maxIncomeNumber
                     }
                 }
             }
-            maxIncomeNumber = incomes.size.toLong()
-            isListBlocked = limit >= maxIncomeNumber
         }
 
         PurchaseStorage.monthlyBudget.observe(viewLifecycleOwner) { budget ->

@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.MediatorLiveData
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.BarChart
+import com.frafio.myfinance.data.models.BarChartEntry
 import com.frafio.myfinance.data.models.ProgressBar
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
@@ -15,8 +17,6 @@ import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.utils.doubleToString
-import java.time.LocalDate
-import java.time.temporal.TemporalAdjusters
 
 class DashboardFragment : BaseFragment() {
     private lateinit var binding: FragmentDashboardBinding
@@ -78,10 +78,16 @@ class DashboardFragment : BaseFragment() {
             }
         }
 
-        viewModel.getPricesList().observe(viewLifecycleOwner) { entries ->
+        val barChartLiveData = MediatorLiveData<List<BarChartEntry>>()
+        var pricesLiveData = viewModel.getPricesList()
+        barChartLiveData.addSource(pricesLiveData) { value ->
+            barChartLiveData.value = value
+        }
+        barChartLiveData.observe(viewLifecycleOwner) { entries ->
+            if (entries == null) return@observe
             val labels = mutableListOf<String>()
             val values = mutableListOf<Double>()
-            var currentDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth())
+            var currentDate = viewModel.lastDateForBarChart.value!!
             var j = 0
             for (i in 0..<12) {
                 if (j < entries.size
@@ -102,6 +108,23 @@ class DashboardFragment : BaseFragment() {
                 currentDate = currentDate.minusMonths(1)
             }
             monthlyBarChart.updateValues(labels, values)
+        }
+
+        viewModel.lastDateForBarChart.observe(viewLifecycleOwner) {
+            // this trigger the observer
+            barChartLiveData.removeSource(pricesLiveData)
+            pricesLiveData = viewModel.getPricesList()
+            barChartLiveData.addSource(pricesLiveData) { value ->
+                barChartLiveData.value = value
+            }
+        }
+
+        binding.previousBtn.setOnClickListener {
+            viewModel.previousBarChartDate()
+        }
+
+        binding.nextBtn.setOnClickListener {
+            viewModel.nextBarChartDate()
         }
 
         PurchaseStorage.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->

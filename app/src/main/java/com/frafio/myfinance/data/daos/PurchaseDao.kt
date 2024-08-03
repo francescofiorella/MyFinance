@@ -28,8 +28,8 @@ interface PurchaseDao {
     @Query("SELECT SUM(price) FROM purchase WHERE year=:year")
     fun getPriceSumFromYear(year: Int): LiveData<Double?>
 
-    @Query("SELECT SUM(price) as value, year, month FROM purchase WHERE timestamp>=:timestamp GROUP BY year, month ORDER BY year DESC, month DESC")
-    fun getAfter(timestamp: Long): LiveData<List<BarChartEntry>>
+    @Query("SELECT SUM(price) as value, year, month FROM purchase WHERE timestamp>=:firstTimestamp AND timestamp<:lastTimestamp GROUP BY year, month ORDER BY year DESC, month DESC")
+    fun getAfterAndBefore(firstTimestamp: Long, lastTimestamp: Long): LiveData<List<BarChartEntry>>
 
     @Insert
     fun insertPurchase(purchase: Purchase)

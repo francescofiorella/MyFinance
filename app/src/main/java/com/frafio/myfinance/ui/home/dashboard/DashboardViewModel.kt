@@ -20,6 +20,19 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     val isListEmpty = MutableLiveData<Boolean?>(null)
 
+
+    private val _lastDateForBarChart = MutableLiveData(LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()))
+    val lastDateForBarChart: LiveData<LocalDate>
+        get() = _lastDateForBarChart
+
+    fun nextBarChartDate() {
+        _lastDateForBarChart.postValue(_lastDateForBarChart.value!!.plusMonths(1))
+    }
+
+    fun previousBarChartDate() {
+        _lastDateForBarChart.postValue(_lastDateForBarChart.value!!.minusMonths(1))
+    }
+
     fun getPurchaseNumber(): LiveData<Int> {
         return localPurchaseRepository.getCount()
     }
@@ -44,11 +57,10 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun getPricesList(): LiveData<List<BarChartEntry>> {
-        val date = LocalDate.now()
-            .minusYears(1)
-            .with(TemporalAdjusters.firstDayOfMonth())
-            .plusMonths(1)
-        val timestamp = dateToUTCTimestamp(date.year, date.monthValue, date.dayOfMonth)
-        return localPurchaseRepository.getPurchasesAfter(timestamp)
+        var date = _lastDateForBarChart.value!!.plusMonths(1)
+        val lastTimestamp = dateToUTCTimestamp(date.year, date.monthValue, date.dayOfMonth)
+        date = date.minusYears(1)
+        val firstTimestamp = dateToUTCTimestamp(date.year, date.monthValue, date.dayOfMonth)
+        return localPurchaseRepository.getPurchasesAfterAndBefore(firstTimestamp, lastTimestamp)
     }
 }
