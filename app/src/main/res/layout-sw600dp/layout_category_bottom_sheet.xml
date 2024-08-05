@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="30dp">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/purchaseCategoryIcon"
+        style="?attr/materialIconButtonFilledTonalStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:clickable="false"
+        android:contentDescription="@string/purchase_category_icon"
+        android:focusable="false"
+        android:longClickable="false"
+        app:icon="@drawable/ic_tag"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="20dp"
+        android:fontFamily="@font/nunito_semibold"
+        android:text="@string/category"
+        android:textColor="@color/primary_text"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/purchaseCategoryIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/purchaseCategoryIcon"
+        app:layout_constraintTop_toTopOf="@+id/purchaseCategoryIcon" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:dividerInsetEnd="16dp"
+        app:dividerInsetStart="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/purchaseCategoryIcon" />
+
+    <LinearLayout
+        android:id="@+id/editCategoryLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider">
+
+        <LinearLayout
+            android:id="@+id/housing_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
+
+            <ImageView
+                android:id="@+id/housing_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/housing"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_baseline_home" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/housingTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/nunito"
+                android:text="@string/housing"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/groceries_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
+
+            <ImageView
+                android:id="@+id/groceries_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/groceries"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_shopping_cart" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/groceriesTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/nunito"
+                android:text="@string/groceries"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/personal_care_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
+
+            <ImageView
+                android:id="@+id/personal_care_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/personal_care"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_self_care" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/personal_careTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/nunito"
+                android:text="@string/personal_care"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/entertainment_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
+
+            <ImageView
+                android:id="@+id/entertainment_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/entertainment"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_theater_comedy" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/entertainmentTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/nunito"
+                android:text="@string/entertainment"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/education_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
+
+            <ImageView
+                android:id="@+id/education_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/education"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_school" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/educationTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/nunito"
+                android:text="@string/education"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dining_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
+
+            <ImageView
+                android:id="@+id/dining_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/dining"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_restaurant" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/diningTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/nunito"
+                android:text="@string/dining"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/health_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
+
+            <ImageView
+                android:id="@+id/health_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/health"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_vaccines" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/healthTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/nunito"
+                android:text="@string/health"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/transportation_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
+
+            <ImageView
+                android:id="@+id/transportation_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/transportation"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_directions_transit" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/transportationTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/nunito"
+                android:text="@string/transportation"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/miscellaneous_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
+
+            <ImageView
+                android:id="@+id/miscellaneous_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/miscellaneous"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_tag" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/miscellaneousTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/nunito"
+                android:text="@string/miscellaneous"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
