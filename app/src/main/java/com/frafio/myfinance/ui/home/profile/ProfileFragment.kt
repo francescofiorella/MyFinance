@@ -19,7 +19,6 @@ import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.dateToString
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
 
@@ -47,7 +46,7 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         }
 
         binding.profileEditCard.setOnClickListener {
-            if (requireActivity().findViewById<NavigationView?>(R.id.nav_drawer) != null) {
+            if (resources.getBoolean(R.bool.is600dp)) {
                 val sideSheetDialog = SideSheetDialog(requireContext())
                 sideSheetDialog.setContentView(R.layout.layout_edit_profile_bottom_sheet)
                 defineSheetInterface(
@@ -89,28 +88,6 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         binding.profileScrollView.scrollTo(0, 0)
     }
 
-    class ModalBottomSheet(
-        private val fragment: ProfileFragment,
-        private val fullName: String,
-        private val viewModel: ProfileViewModel
-    ) : BottomSheetDialogFragment() {
-
-        companion object {
-            const val TAG = "ModalBottomSheet"
-        }
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-            val layout =
-                inflater.inflate(R.layout.layout_edit_profile_bottom_sheet, container, false)
-            fragment.defineSheetInterface(layout, fullName, viewModel, this::dismiss)
-            return layout
-        }
-    }
-
     override fun onStarted() {
         (activity as HomeActivity).showProgressIndicator()
     }
@@ -132,6 +109,28 @@ class ProfileFragment : BaseFragment(), ProfileListener {
 
                 else -> Unit
             }
+        }
+    }
+
+    class ModalBottomSheet(
+        private val fragment: ProfileFragment,
+        private val fullName: String,
+        private val viewModel: ProfileViewModel
+    ) : BottomSheetDialogFragment() {
+
+        companion object {
+            const val TAG = "ModalBottomSheet"
+        }
+
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            val layout =
+                inflater.inflate(R.layout.layout_edit_profile_bottom_sheet, container, false)
+            fragment.defineSheetInterface(layout, fullName, viewModel, this::dismiss)
+            return layout
         }
     }
 

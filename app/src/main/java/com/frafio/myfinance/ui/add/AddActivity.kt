@@ -1,11 +1,15 @@
 package com.frafio.myfinance.ui.add
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
@@ -16,7 +20,9 @@ import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.snackBar
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.sidesheet.SideSheetDialog
 
 class AddActivity : AppCompatActivity(), AddListener {
 
@@ -66,52 +72,19 @@ class AddActivity : AppCompatActivity(), AddListener {
     }
 
     private val categoryViewListener = View.OnClickListener {
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setIcon(R.drawable.ic_tag)
-        builder.setTitle(getString(R.string.category))
-        builder.setSingleChoiceItems(
-            resources.getStringArray(R.array.categories),
-            when (viewModel.category) {
-                DbPurchases.CATEGORIES.HOUSING.value -> 0
-                DbPurchases.CATEGORIES.GROCERIES.value -> 1
-                DbPurchases.CATEGORIES.PERSONAL_CARE.value -> 2
-                DbPurchases.CATEGORIES.ENTERTAINMENT.value -> 3
-                DbPurchases.CATEGORIES.EDUCATION.value -> 4
-                DbPurchases.CATEGORIES.DINING.value -> 5
-                DbPurchases.CATEGORIES.HEALTH.value -> 6
-                DbPurchases.CATEGORIES.TRANSPORTATION.value -> 7
-                DbPurchases.CATEGORIES.MISCELLANEOUS.value -> 8
-                else -> -1 // error, do not select a default option
-            },
-            categoryListener
-        )
-        builder.show()
-    }
-
-    private val categoryListener = DialogInterface.OnClickListener { dialog, selectedItem ->
-        val categories = resources.getStringArray(R.array.categories)
-        if (selectedItem >= 0 && selectedItem < categories.size) {
-            binding.categoryAutoCompleteTV.setText(categories[selectedItem])
-            binding.categoryTextInputLayout.setStartIconDrawable(
-                when (selectedItem) {
-                    DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                    DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                    DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                    DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                    DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                    DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                    DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                    DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                    DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
-                    else -> R.drawable.ic_tag
-                }
+        binding.categoryAutoCompleteTV.requestFocus()
+        if (resources.getBoolean(R.bool.is600dp)) {
+            val sideSheetDialog = SideSheetDialog(this)
+            sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
+            defineSheetInterface(
+                sideSheetDialog.findViewById(android.R.id.content)!!,
+                sideSheetDialog::hide
             )
-            viewModel.category = selectedItem
+            sideSheetDialog.show()
         } else {
-            viewModel.category = -1
+            val modalBottomSheet = ModalBottomSheet(this)
+            modalBottomSheet.show(supportFragmentManager, ModalBottomSheet.TAG)
         }
-
-        dialog.dismiss()
     }
 
     private fun initLayout(code: Int) {
@@ -293,6 +266,108 @@ class AddActivity : AppCompatActivity(), AddListener {
 
             PurchaseCode.EMPTY_CATEGORY.code ->
                 binding.categoryTextInputLayout.error = result.message
+        }
+    }
+
+    class ModalBottomSheet(
+        private val activity: AddActivity
+    ) : BottomSheetDialogFragment() {
+
+        companion object {
+            const val TAG = "ModalBottomSheet"
+        }
+
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            val layout =
+                inflater.inflate(R.layout.layout_category_bottom_sheet, container, false)
+            activity.defineSheetInterface(
+                layout,
+                this::dismiss
+            )
+            return layout
+        }
+    }
+
+    fun defineSheetInterface(
+        layout: View,
+        dismissFun: () -> Unit
+    ) {
+        fun selectCategory(category: Int) {
+            val categories = resources.getStringArray(R.array.categories)
+            binding.categoryAutoCompleteTV.setText(categories[category])
+            binding.categoryTextInputLayout.setStartIconDrawable(
+                when (category) {
+                    DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                    DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                    DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                    DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                    DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                    DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                    DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                    DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                    DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                    else -> R.drawable.ic_tag
+                }
+            )
+            viewModel.category = category
+        }
+
+        layout.findViewById<MaterialButton>(R.id.purchaseCategoryIcon).icon =
+            ContextCompat.getDrawable(
+                applicationContext,
+                when (viewModel.category) {
+                    DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                    DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                    DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                    DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                    DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                    DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                    DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                    DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                    DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                    else -> R.drawable.ic_tag
+                }
+            )
+
+        layout.findViewById<LinearLayout>(R.id.housing_layout).setOnClickListener {
+            selectCategory(DbPurchases.CATEGORIES.HOUSING.value)
+            dismissFun()
+        }
+        layout.findViewById<LinearLayout>(R.id.groceries_layout).setOnClickListener {
+            selectCategory(DbPurchases.CATEGORIES.GROCERIES.value)
+            dismissFun()
+        }
+        layout.findViewById<LinearLayout>(R.id.personal_care_layout).setOnClickListener {
+            selectCategory(DbPurchases.CATEGORIES.PERSONAL_CARE.value)
+            dismissFun()
+        }
+        layout.findViewById<LinearLayout>(R.id.entertainment_layout).setOnClickListener {
+            selectCategory(DbPurchases.CATEGORIES.ENTERTAINMENT.value)
+            dismissFun()
+        }
+        layout.findViewById<LinearLayout>(R.id.education_layout).setOnClickListener {
+            selectCategory(DbPurchases.CATEGORIES.EDUCATION.value)
+            dismissFun()
+        }
+        layout.findViewById<LinearLayout>(R.id.dining_layout).setOnClickListener {
+            selectCategory(DbPurchases.CATEGORIES.DINING.value)
+            dismissFun()
+        }
+        layout.findViewById<LinearLayout>(R.id.health_layout).setOnClickListener {
+            selectCategory(DbPurchases.CATEGORIES.HEALTH.value)
+            dismissFun()
+        }
+        layout.findViewById<LinearLayout>(R.id.transportation_layout).setOnClickListener {
+            selectCategory(DbPurchases.CATEGORIES.TRANSPORTATION.value)
+            dismissFun()
+        }
+        layout.findViewById<LinearLayout>(R.id.miscellaneous_layout).setOnClickListener {
+            selectCategory(DbPurchases.CATEGORIES.MISCELLANEOUS.value)
+            dismissFun()
         }
     }
 }

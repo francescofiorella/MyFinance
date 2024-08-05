@@ -35,7 +35,6 @@ import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
 
@@ -112,7 +111,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             ON_CLICK -> Unit
 
             ON_LONG_CLICK -> {
-                if (requireActivity().findViewById<NavigationView?>(R.id.nav_drawer) != null) {
+                if (resources.getBoolean(R.bool.is600dp)) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
                     sideSheetDialog.setContentView(R.layout.layout_edit_purchase_bottom_sheet)
                     defineSheetInterface(
@@ -137,7 +136,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             }
 
             ON_BUTTON_CLICK -> {
-                if (requireActivity().findViewById<NavigationView?>(R.id.nav_drawer) != null) {
+                if (resources.getBoolean(R.bool.is600dp)) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
                     sideSheetDialog.setContentView(R.layout.layout_edit_purchase_bottom_sheet)
                     defineSheetInterface(

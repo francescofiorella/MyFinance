@@ -31,6 +31,7 @@ open class DatePickerButton(
     }
 
     val listener = View.OnClickListener {
+        textView.requestFocus()
         // date picker
         val calendar = Calendar.getInstance()
         if (year != null && month != null && day != null) {

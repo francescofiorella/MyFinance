@@ -40,7 +40,6 @@ import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
 
@@ -128,7 +127,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                 // cancel any modifications
                 binding.monthlyBudgetTV.visibility = View.VISIBLE
                 binding.monthlyBudgetET.visibility = View.GONE
-                requireContext().hideSoftKeyboard(requireView().rootView)
+                requireContext().hideSoftKeyboard(binding.root)
                 binding.monthlyBudgetEditBtn.icon =
                     ContextCompat.getDrawable(requireContext(), R.drawable.ic_create)
                 binding.monthlyBudgetDeleteBtn.icon =
@@ -174,7 +173,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                     if (!binding.monthlyBudgetTV.isVisible) {
                         binding.monthlyBudgetTV.visibility = View.VISIBLE
                         binding.monthlyBudgetET.visibility = View.GONE
-                        requireContext().hideSoftKeyboard(requireView().rootView)
+                        requireContext().hideSoftKeyboard(binding.root)
                         binding.monthlyBudgetEditBtn.icon =
                             ContextCompat.getDrawable(requireContext(), R.drawable.ic_create)
                         binding.monthlyBudgetDeleteBtn.icon =
@@ -225,7 +224,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     override fun onItemInteraction(interactionID: Int, income: Income, position: Int) {
         when (interactionID) {
             ON_LONG_CLICK -> {
-                if (requireActivity().findViewById<NavigationView?>(R.id.nav_drawer) != null) {
+                if (resources.getBoolean(R.bool.is600dp)) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
                     sideSheetDialog.setContentView(R.layout.layout_edit_purchase_bottom_sheet)
                     defineSheetInterface(
