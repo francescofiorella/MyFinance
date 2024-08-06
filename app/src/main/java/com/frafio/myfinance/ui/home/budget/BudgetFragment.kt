@@ -20,7 +20,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
-import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
+import com.frafio.myfinance.data.managers.IncomeManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.models.Income
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.data.storages.IncomeStorage
@@ -31,7 +31,6 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LONG_CLICK
-import com.frafio.myfinance.ui.home.payments.PurchaseAdapter
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.createTextDrawable
 import com.frafio.myfinance.utils.dateToString
@@ -48,7 +47,8 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     private val viewModel by viewModels<BudgetViewModel>()
     private var isListBlocked = false
     private var maxIncomeNumber: Long = DEFAULT_LIMIT + 1
-    private val mediatorLiveDataForLocalIncomes = MediatorLiveData<List<Income>>()
+    private val recViewLiveData = MediatorLiveData<List<Income>>()
+    private lateinit var localIncomesLiveData: LiveData<List<Income>>
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -73,12 +73,11 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        mediatorLiveDataForLocalIncomes.apply {
-            addSource(viewModel.getLocalIncomes()) {
-                value = it
-            }
+        localIncomesLiveData = viewModel.getLocalIncomes()
+        recViewLiveData.addSource(localIncomesLiveData) { value ->
+            recViewLiveData.value = value
         }
-        mediatorLiveDataForLocalIncomes.observe(viewLifecycleOwner) { incomes ->
+        recViewLiveData.observe(viewLifecycleOwner) { incomes ->
             // Evaluate limit and decide if new items can be retrieved
             val limit = if (binding.budgetRecyclerView.adapter != null) {
                 (binding.budgetRecyclerView.adapter as IncomeAdapter).getLimit()
@@ -253,9 +252,13 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                 if (!isListBlocked) {
                     isListBlocked = true
                     binding.budgetRecyclerView.adapter?.let {
-                        (it as PurchaseAdapter).getLimit(true)
+                        (it as IncomeAdapter).getLimit(true)
                     }
-                    mediatorLiveDataForLocalIncomes.value = mediatorLiveDataForLocalIncomes.value
+                    // this trigger the observer
+                    recViewLiveData.removeSource(localIncomesLiveData)
+                    recViewLiveData.addSource(localIncomesLiveData) { value ->
+                        recViewLiveData.value = value
+                    }
                 }
             }
         }
