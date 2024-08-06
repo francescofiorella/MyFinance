@@ -6,4 +6,4 @@ The app is developed in Kotlin with Android Studio and, so far, three version we
 - An initial [Java version](https://github.com/francescofiorella/MyFinance-Java)
 - The second version uses the Material Design guidelines and the MVVM Design Pattern
 - In the third version, the app design was upgraded to Material You
-- The fourth version tries to improve the user experience by implementing a category system
+- The fourth version tries to improve the user experience by implementing a category system. In addition, incomes and budget management has been implemented, along with some plots.
