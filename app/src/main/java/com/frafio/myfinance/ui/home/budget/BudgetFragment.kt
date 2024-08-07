@@ -320,8 +320,6 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
 
         val editLayout = layout.findViewById<LinearLayout>(R.id.edit_layout)
         val deleteLayout = layout.findViewById<LinearLayout>(R.id.delete_layout)
-        layout.findViewById<LinearLayout>(R.id.editPurchaseLayout).visibility = View.VISIBLE
-        layout.findViewById<ConstraintLayout>(R.id.editCategoryLayout).visibility = View.GONE
         editLayout.setOnClickListener {
             Intent(context, AddActivity::class.java).also {
                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)

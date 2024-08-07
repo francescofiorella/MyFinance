@@ -138,7 +138,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             ON_BUTTON_CLICK -> {
                 if (resources.getBoolean(R.bool.is600dp)) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
-                    sideSheetDialog.setContentView(R.layout.layout_edit_purchase_bottom_sheet)
+                    sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
                     defineSheetInterface(
                         sideSheetDialog.findViewById(android.R.id.content)!!,
                         purchase,
@@ -255,8 +255,12 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             container: ViewGroup?,
             savedInstanceState: Bundle?
         ): View? {
-            val layout =
-                inflater.inflate(R.layout.layout_edit_purchase_bottom_sheet, container, false)
+            val layout = inflater.inflate(
+                if (fromCategoryIcon) R.layout.layout_category_bottom_sheet
+                else R.layout.layout_edit_purchase_bottom_sheet,
+                container,
+                false
+            )
             fragment.defineSheetInterface(
                 layout,
                 purchase,
@@ -302,14 +306,10 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             )
 
         if (fromCategoryIcon) {
-            layout.findViewById<LinearLayout>(R.id.editPurchaseLayout).visibility = View.GONE
-            if (resources.getBoolean(R.bool.is600dp)) {
-                layout.findViewById<LinearLayout>(R.id.editCategoryLayout)
-                    .visibility = View.VISIBLE
-            } else {
-                layout.findViewById<ConstraintLayout>(R.id.editCategoryLayout)
-                    .visibility = View.VISIBLE
-            }
+            // layout_category_bottom_sheet.xml
+            layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout).visibility = View.GONE
+            layout.findViewById<ConstraintLayout>(R.id.purchaseDetailLayout).visibility =
+                View.VISIBLE
             layout.findViewById<LinearLayout>(R.id.housing_layout).setOnClickListener {
                 viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.HOUSING.value)
                 dismissFun()
@@ -349,16 +349,9 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             return
         }
 
+        // layout_edit_purchase_bottom_sheet.xml
         val editLayout = layout.findViewById<LinearLayout>(R.id.edit_layout)
         val deleteLayout = layout.findViewById<LinearLayout>(R.id.delete_layout)
-        layout.findViewById<LinearLayout>(R.id.editPurchaseLayout).visibility = View.VISIBLE
-        if (resources.getBoolean(R.bool.is600dp)) {
-            layout.findViewById<LinearLayout>(R.id.editCategoryLayout)
-                .visibility = View.GONE
-        } else {
-            layout.findViewById<ConstraintLayout>(R.id.editCategoryLayout)
-                .visibility = View.GONE
-        }
         editLayout.setOnClickListener {
             Intent(context, AddActivity::class.java).also {
                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)

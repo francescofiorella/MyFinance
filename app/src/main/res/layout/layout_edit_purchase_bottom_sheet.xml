@@ -69,384 +69,70 @@
         app:layout_constraintTop_toBottomOf="@id/dateTV" />
 
     <LinearLayout
-        android:id="@+id/editPurchaseLayout"
+        android:id="@+id/edit_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:orientation="vertical"
-        android:visibility="gone"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="horizontal"
+        android:paddingHorizontal="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider">
 
-        <LinearLayout
-            android:id="@+id/edit_layout"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/edit_icon"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingHorizontal="30dp">
+            android:contentDescription="@string/edit"
+            android:paddingVertical="15dp"
+            android:src="@drawable/ic_outline_create" />
 
-            <ImageView
-                android:id="@+id/edit_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/edit"
-                android:paddingVertical="15dp"
-                android:src="@drawable/ic_outline_create" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/editTV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/nunito"
-                android:text="@string/edit"
-                android:textColor="@color/primary_text"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/delete_layout"
-            android:layout_width="match_parent"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/editTV"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingHorizontal="30dp">
-
-            <ImageView
-                android:id="@+id/delete_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/delete"
-                android:paddingVertical="15dp"
-                android:src="@drawable/ic_outline_delete" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/deleteTV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/nunito"
-                android:text="@string/delete"
-                android:textColor="@color/primary_text"
-                android:textSize="16sp" />
-
-        </LinearLayout>
+            android:layout_gravity="center"
+            android:layout_marginStart="20dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/nunito"
+            android:text="@string/edit"
+            android:textColor="@color/primary_text"
+            android:textSize="16sp" />
 
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/editCategoryLayout"
+    <LinearLayout
+        android:id="@+id/delete_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:visibility="visible"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="horizontal"
+        android:paddingHorizontal="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider">
+        app:layout_constraintTop_toBottomOf="@id/edit_layout">
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/start_guide"
+        <ImageView
+            android:id="@+id/delete_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent=".33" />
+            android:contentDescription="@string/delete"
+            android:paddingVertical="15dp"
+            android:src="@drawable/ic_outline_delete" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/end_guide"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent=".67" />
-
-        <LinearLayout
-            android:id="@+id/housing_layout"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/deleteTV"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:orientation="vertical"
-            android:paddingVertical="15dp"
-            app:layout_constraintEnd_toStartOf="@id/start_guide"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_gravity="center"
+            android:layout_marginStart="20dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/nunito"
+            android:text="@string/delete"
+            android:textColor="@color/primary_text"
+            android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/housing_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/housing"
-                android:src="@drawable/ic_baseline_home" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/housingTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@string/housing"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/groceries_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:orientation="vertical"
-            android:paddingVertical="15dp"
-            app:layout_constraintEnd_toStartOf="@id/end_guide"
-            app:layout_constraintStart_toEndOf="@id/start_guide"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/groceries_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/groceries"
-                android:src="@drawable/ic_shopping_cart" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/groceriesTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@string/groceries"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/personal_care_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:orientation="vertical"
-            android:paddingVertical="15dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/end_guide"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/personal_care_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/personal_care"
-                android:src="@drawable/ic_self_care" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/personal_careTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@string/personal_care"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/entertainment_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:orientation="vertical"
-            android:paddingVertical="15dp"
-            app:layout_constraintEnd_toStartOf="@id/start_guide"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/housing_layout">
-
-            <ImageView
-                android:id="@+id/entertainment_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/entertainment"
-                android:src="@drawable/ic_theater_comedy" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/entertainmentTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@string/entertainment"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/education_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:orientation="vertical"
-            android:paddingVertical="15dp"
-            app:layout_constraintEnd_toStartOf="@id/end_guide"
-            app:layout_constraintStart_toEndOf="@id/start_guide"
-            app:layout_constraintTop_toBottomOf="@id/groceries_layout">
-
-            <ImageView
-                android:id="@+id/education_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/education"
-                android:src="@drawable/ic_school" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/educationTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@string/education"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/dining_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:orientation="vertical"
-            android:paddingVertical="15dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/end_guide"
-            app:layout_constraintTop_toBottomOf="@id/personal_care_layout">
-
-            <ImageView
-                android:id="@+id/dining_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/dining"
-                android:src="@drawable/ic_restaurant" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/diningTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@string/dining"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/health_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:orientation="vertical"
-            android:paddingVertical="15dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/start_guide"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/entertainment_layout">
-
-            <ImageView
-                android:id="@+id/health_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/health"
-                android:src="@drawable/ic_vaccines" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/healthTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@string/health"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/transportation_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:orientation="vertical"
-            android:paddingVertical="15dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/end_guide"
-            app:layout_constraintStart_toEndOf="@id/start_guide"
-            app:layout_constraintTop_toBottomOf="@id/education_layout">
-
-            <ImageView
-                android:id="@+id/transportation_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/transportation"
-                android:src="@drawable/ic_directions_transit" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/transportationTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@string/transportation"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/miscellaneous_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:orientation="vertical"
-            android:paddingVertical="15dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/end_guide"
-            app:layout_constraintTop_toBottomOf="@id/dining_layout">
-
-            <ImageView
-                android:id="@+id/miscellaneous_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/miscellaneous"
-                android:src="@drawable/ic_tag" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/miscellaneousTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@string/miscellaneous"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

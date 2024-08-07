@@ -120,6 +120,7 @@
     <string name="health">Health</string>
     <string name="transportation">Transportation</string>
     <string name="miscellaneous">Miscellaneous</string>
+    <string name="select">Select</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>

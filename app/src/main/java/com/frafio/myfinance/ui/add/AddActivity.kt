@@ -316,6 +316,9 @@ class AddActivity : AppCompatActivity(), AddListener {
             viewModel.category = category
         }
 
+        layout.findViewById<ConstraintLayout>(R.id.purchaseDetailLayout).visibility = View.GONE
+        layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout).visibility = View.VISIBLE
+
         layout.findViewById<MaterialButton>(R.id.purchaseCategoryIcon).icon =
             ContextCompat.getDrawable(
                 applicationContext,
