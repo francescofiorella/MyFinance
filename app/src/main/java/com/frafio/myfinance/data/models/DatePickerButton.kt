@@ -1,7 +1,8 @@
 package com.frafio.myfinance.data.models
 
 import android.view.View
-import android.widget.AutoCompleteTextView
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import com.frafio.myfinance.data.enums.db.Languages
 import com.frafio.myfinance.utils.dateToString
@@ -9,7 +10,6 @@ import com.frafio.myfinance.utils.getCurrentLanguage
 import com.frafio.myfinance.utils.toLocalDateTime
 import com.frafio.myfinance.utils.toUTCLocalDateTime
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.textfield.TextInputLayout
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -17,8 +17,8 @@ import java.util.Calendar
 import java.util.Date
 
 open class DatePickerButton(
-    private val layout: TextInputLayout,
-    private val textView: AutoCompleteTextView,
+    layout: ViewGroup,
+    private val textView: TextView,
     private val context: FragmentActivity
 ) {
     companion object {
@@ -31,6 +31,7 @@ open class DatePickerButton(
     }
 
     val listener = View.OnClickListener {
+        onStart()
         textView.requestFocus()
         // date picker
         val calendar = Calendar.getInstance()
@@ -45,26 +46,25 @@ open class DatePickerButton(
         builder.setTitleText(DATE_PICKER_TITLE)
         builder.setSelection(calendar.timeInMillis.toLocalDateTime().atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toInstant().toEpochMilli())
         val materialDatePicker = builder.build()
-
         showDatePicker(materialDatePicker)
     }
 
     var year: Int? = null
         set(value) {
             field = value
-            textView.setText(dateString)
+            textView.text = dateString
         }
 
     var month: Int? = null
         set(value) {
             field = value
-            textView.setText(dateString)
+            textView.text = dateString
         }
 
     var day: Int? = null
         set(value) {
             field = value
-            textView.setText(dateString)
+            textView.text = dateString
         }
 
     val dateString: String?
@@ -79,13 +79,9 @@ open class DatePickerButton(
             day = it.dayOfMonth
         }
 
-        setOnClickListener()
+        layout.setOnClickListener(listener)
     }
 
-    private fun setOnClickListener() {
-        layout.setEndIconOnClickListener(listener)
-        textView.setOnClickListener(listener)
-    }
 
     private fun showDatePicker(materialDatePicker: MaterialDatePicker<*>) {
         if (!materialDatePicker.isAdded) {
@@ -108,5 +104,9 @@ open class DatePickerButton(
 
     open fun onPositiveBtnClickListener() {
         // Should override this method to get the selected date
+    }
+
+    open fun onStart() {
+        // Should override this method to perform any preparation operation
     }
 }

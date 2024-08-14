@@ -6,9 +6,9 @@
     <string name="nav_3">Profilo</string>
     <string name="nav_4">Menu</string>
     <string name="nav_5">Budget</string>
-    <string name="add_purchase">Nuovo pagamento</string>
+    <string name="add_purchase">Aggiungi pagamento</string>
     <string name="edit_purchase">Modifica pagamento</string>
-    <string name="add_income">Nuova entrata</string>
+    <string name="add_income">Aggiungi entrata</string>
     <string name="edit_income">Modifica entrata</string>
 
     <string name="addBtnContentDescription">Aggiungi un pagamento</string>
@@ -99,4 +99,6 @@
     <string name="transportation">Trasporti</string>
     <string name="miscellaneous">Varie</string>
     <string name="select">Seleziona</string>
+    <string name="payment">Pagamento</string>
+    <string name="income">Entrata</string>
 </resources>

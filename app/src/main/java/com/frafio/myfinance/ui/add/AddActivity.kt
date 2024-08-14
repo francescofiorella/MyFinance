@@ -19,6 +19,7 @@ import com.frafio.myfinance.data.models.DatePickerButton
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.utils.doubleToString
+import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
@@ -62,7 +63,7 @@ class AddActivity : AppCompatActivity(), AddListener {
             initLayout(code)
         }
 
-        binding.priceTextInputLayout.setStartIconDrawable(
+        binding.priceIcon.setImageResource(
             when (getString(R.string.currency)) {
                 "€" -> R.drawable.ic_euro
                 "$" -> R.drawable.ic_attach_money
@@ -71,28 +72,18 @@ class AddActivity : AppCompatActivity(), AddListener {
         )
     }
 
-    private val categoryViewListener = View.OnClickListener {
-        binding.categoryAutoCompleteTV.requestFocus()
-        if (resources.getBoolean(R.bool.is600dp)) {
-            val sideSheetDialog = SideSheetDialog(this)
-            sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
-            defineSheetInterface(
-                sideSheetDialog.findViewById(android.R.id.content)!!,
-                sideSheetDialog::hide
-            )
-            sideSheetDialog.show()
-        } else {
-            val modalBottomSheet = ModalBottomSheet(this)
-            modalBottomSheet.show(supportFragmentManager, ModalBottomSheet.TAG)
-        }
-    }
-
     private fun initLayout(code: Int) {
         datePickerBtn = object : DatePickerButton(
-            binding.datePickerTextInputLayout,
-            binding.dateAutoCompleteTV,
+            binding.dateLayout,
+            binding.dateET,
             this@AddActivity
         ) {
+            override fun onStart() {
+                super.onStart()
+                binding.nameET.clearFocus()
+                binding.priceET.clearFocus()
+                hideSoftKeyboard(binding.root)
+            }
             override fun onPositiveBtnClickListener() {
                 super.onPositiveBtnClickListener()
                 viewModel.year = year
@@ -102,33 +93,49 @@ class AddActivity : AppCompatActivity(), AddListener {
             }
         }
 
-        binding.categoryAutoCompleteTV.setOnClickListener(categoryViewListener)
-        binding.categoryTextInputLayout.setEndIconOnClickListener(categoryViewListener)
+        binding.categoryLayout.setOnClickListener {
+            binding.nameET.clearFocus()
+            binding.priceET.clearFocus()
+            binding.categoryET.requestFocus()
+            if (resources.getBoolean(R.bool.is600dp)) {
+                val sideSheetDialog = SideSheetDialog(this)
+                sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
+                defineSheetInterface(
+                    sideSheetDialog.findViewById(android.R.id.content)!!,
+                    sideSheetDialog::hide
+                )
+                sideSheetDialog.show()
+            } else {
+                val modalBottomSheet = ModalBottomSheet(this)
+                modalBottomSheet.show(supportFragmentManager, ModalBottomSheet.TAG)
+            }
+        }
 
         when (code) {
             REQUEST_ADD_CODE -> {
                 viewModel.purchaseCode = REQUEST_PAYMENT_CODE
                 viewModel.category = -1
-                binding.toggleButton.addOnButtonCheckedListener { toggleButton, _, _ ->
-                    when (toggleButton.checkedButtonId) {
-                        R.id.payments_btn -> {
+                binding.chipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+                    if (checkedIds.size != 1) return@setOnCheckedStateChangeListener
+                    val checkedId = checkedIds[0]
+                    when (checkedId) {
+                        R.id.payment_chip -> {
                             viewModel.purchaseCode = REQUEST_PAYMENT_CODE
-                            binding.addPurchaseTitle.text = getString(R.string.add_purchase)
-                            binding.categoryTextInputLayout.visibility = View.VISIBLE
+                            binding.categoryLayout.visibility = View.VISIBLE
+                            binding.divider3.visibility = View.VISIBLE
                         }
 
-                        R.id.incomes_btn -> {
+                        R.id.income_chip -> {
                             viewModel.purchaseCode = REQUEST_INCOME_CODE
-                            binding.addPurchaseTitle.text = getString(R.string.add_income)
-                            binding.categoryTextInputLayout.visibility = View.GONE
+                            binding.categoryLayout.visibility = View.GONE
+                            binding.divider3.visibility = View.GONE
                         }
                     }
                 }
             }
 
             REQUEST_EDIT_CODE -> {
-                binding.toggleButton.visibility = View.GONE
-                binding.addPurchaseTitle.text = getString(R.string.edit_purchase)
+                binding.chipGroup.visibility = View.GONE
                 intent.apply {
                     getIntExtra(PURCHASE_REQUEST_KEY, -1).also {
                         viewModel.purchaseCode = it
@@ -162,8 +169,8 @@ class AddActivity : AppCompatActivity(), AddListener {
                 if (viewModel.purchaseCode == REQUEST_PAYMENT_CODE) {
                     val categories = resources.getStringArray(R.array.categories)
                     if (viewModel.category != null && viewModel.category!! >= 0 && viewModel.category!! < categories.size) {
-                        binding.categoryAutoCompleteTV.setText(categories[viewModel.category!!])
-                        binding.categoryTextInputLayout.setStartIconDrawable(
+                        binding.categoryET.text = categories[viewModel.category!!]
+                        binding.categoryIcon.setImageResource(
                             when (viewModel.category) {
                                 DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
                                 DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
@@ -179,8 +186,7 @@ class AddActivity : AppCompatActivity(), AddListener {
                         )
                     }
                 } else {
-                    binding.addPurchaseTitle.text = getString(R.string.edit_income)
-                    binding.categoryTextInputLayout.visibility = View.GONE
+                    binding.categoryLayout.visibility = View.GONE
                 }
             }
         }
@@ -195,9 +201,9 @@ class AddActivity : AppCompatActivity(), AddListener {
     override fun onAddStart() {
         binding.addProgressIndicator.show()
 
-        binding.nameTextInputLayout.isErrorEnabled = false
-        binding.priceTextInputLayout.isErrorEnabled = false
-        binding.categoryTextInputLayout.isErrorEnabled = false
+        binding.nameET.error = null
+        binding.priceET.error = null
+        binding.categoryET.error = null
 
         binding.addAddButton.isEnabled = false
     }
@@ -259,13 +265,13 @@ class AddActivity : AppCompatActivity(), AddListener {
         when (result.code) {
             PurchaseCode.EMPTY_NAME.code,
             PurchaseCode.WRONG_NAME_TOTAL.code ->
-                binding.nameTextInputLayout.error = result.message
+                binding.nameET.error = result.message
 
             PurchaseCode.EMPTY_PRICE.code ->
-                binding.priceTextInputLayout.error = result.message
+                binding.priceET.error = result.message
 
             PurchaseCode.EMPTY_CATEGORY.code ->
-                binding.categoryTextInputLayout.error = result.message
+                binding.categoryET.error = result.message
         }
     }
 
@@ -297,9 +303,10 @@ class AddActivity : AppCompatActivity(), AddListener {
         dismissFun: () -> Unit
     ) {
         fun selectCategory(category: Int) {
+            binding.categoryET.error = null
             val categories = resources.getStringArray(R.array.categories)
-            binding.categoryAutoCompleteTV.setText(categories[category])
-            binding.categoryTextInputLayout.setStartIconDrawable(
+            binding.categoryET.text = categories[category]
+            binding.categoryIcon.setImageResource(
                 when (category) {
                     DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
                     DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart

@@ -6,9 +6,9 @@
     <string name="nav_3">Profile</string>
     <string name="nav_4">Menu</string>
     <string name="nav_5">Budget</string>
-    <string name="add_purchase">New payment</string>
+    <string name="add_purchase">Add payment</string>
     <string name="edit_purchase">Edit payment</string>
-    <string name="add_income">New income</string>
+    <string name="add_income">Add income</string>
     <string name="edit_income">Edit income</string>
 
     <string name="addBtnContentDescription">Add a payment</string>
@@ -121,6 +121,8 @@
     <string name="transportation">Transportation</string>
     <string name="miscellaneous">Miscellaneous</string>
     <string name="select">Select</string>
+    <string name="payment">Payment</string>
+    <string name="income">Income</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>
