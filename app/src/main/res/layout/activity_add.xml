@@ -83,7 +83,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="5dp"
+                    android:layout_marginBottom="1dp"
                     app:checkedButton="@id/payments_btn"
                     app:selectionRequired="true"
                     app:singleSelection="true">
@@ -94,8 +94,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:fontFamily="@font/nunito"
+                        android:paddingVertical="16dp"
                         android:text="@string/nav_2"
-                        app:icon="@drawable/ic_swap_horizontal_circle" />
+                        android:textSize="16sp"
+                        app:cornerRadius="@dimen/field_corner_radius"
+                        app:icon="@drawable/ic_swap_horizontal_circle"
+                        app:iconSize="24dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/incomes_btn"
@@ -103,8 +108,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:fontFamily="@font/nunito"
+                        android:paddingVertical="16dp"
                         android:text="@string/incomes"
-                        app:icon="@drawable/ic_account_balance" />
+                        android:textSize="16sp"
+                        app:cornerRadius="@dimen/field_corner_radius"
+                        app:icon="@drawable/ic_account_balance"
+                        app:iconSize="24dp" />
 
                 </com.google.android.material.button.MaterialButtonToggleGroup>
 

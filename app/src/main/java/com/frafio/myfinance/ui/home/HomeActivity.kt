@@ -1,18 +1,20 @@
 package com.frafio.myfinance.ui.home
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AccelerateInterpolator
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.doOnEnd
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.MyFinanceApplication
@@ -37,6 +39,7 @@ import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 
+
 class HomeActivity : AppCompatActivity(), HomeListener {
 
     private lateinit var binding: ActivityHomeBinding
@@ -49,7 +52,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private var activeFragment: Fragment? = null
 
     private var userRequest: Boolean = false
-    var isLayoutReady: Boolean = false
 
     companion object {
         private const val ACTIVE_FRAGMENT_KEY = "active_fragment_key"
@@ -88,15 +90,18 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 setTheme(R.style.Theme_MyFinance)
             } else {
                 installSplashScreen().also {
-                    it.setKeepOnScreenCondition {
-                        // keep if the layout is not ready
-                        !isLayoutReady
-                    }
                     it.setOnExitAnimationListener { splashScreenViewProvider ->
-                        supportFragmentManager.unregisterFragmentLifecycleCallbacks(
-                            dashboardCallback
+                        val fadeOut = ObjectAnimator.ofFloat(
+                            splashScreenViewProvider.view,
+                            View.ALPHA,
+                            1f, 0f
                         )
-                        splashScreenViewProvider.remove()
+                        fadeOut.interpolator = AccelerateInterpolator()
+                        fadeOut.duration = 200L
+                        fadeOut.doOnEnd {
+                            splashScreenViewProvider.remove()
+                        }
+                        fadeOut.start()
                     }
                 }
                 if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
@@ -254,18 +259,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         }
     }
 
-    // called only one time, when the activity is loaded for the first time
-    private val dashboardCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentCreated(
-            fm: FragmentManager,
-            f: Fragment,
-            savedInstanceState: Bundle?
-        ) {
-            super.onFragmentCreated(fm, f, savedInstanceState)
-            isLayoutReady = true
-        }
-    }
-
     fun onAddButtonClick(view: View) {
         ActivityOptionsCompat.makeClipRevealAnimation(
             view, 0, 0, view.measuredWidth, view.measuredHeight
@@ -316,12 +309,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     viewModel.updateMonthlyBudget()
                     viewModel.updateLocalMonthlyBudget()
                     initFragments()
-                    if (!userRequest) {
-                        supportFragmentManager.registerFragmentLifecycleCallbacks(
-                            dashboardCallback,
-                            true
-                        )
-                    } else {
+                    if (userRequest) {
                         hideProgressIndicator()
                         intent.extras?.getString(LoginActivity.INTENT_USER_NAME).also { userName ->
                             showSnackBar("${getString(R.string.login_successful)} $userName")
