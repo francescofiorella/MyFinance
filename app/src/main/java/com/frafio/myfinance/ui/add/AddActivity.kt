@@ -186,6 +186,7 @@ class AddActivity : AppCompatActivity(), AddListener {
                         )
                     }
                 } else {
+                    binding.divider3.visibility = View.GONE
                     binding.categoryLayout.visibility = View.GONE
                 }
             }
