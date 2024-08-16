@@ -410,8 +410,8 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         binding.navBar?.selectedItemId = fragmentId
         binding.navRail?.selectedItemId = fragmentId
         binding.navDrawer?.let {
-            it.setCheckedItem(fragmentId)
             navigateTo(fragmentId)
+            it.setCheckedItem(fragmentId)
         }
     }
 }
