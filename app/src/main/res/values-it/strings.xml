@@ -101,4 +101,5 @@
     <string name="select">Seleziona</string>
     <string name="payment">Pagamento</string>
     <string name="income">Entrata</string>
+    <string name="save">Salva</string>
 </resources>

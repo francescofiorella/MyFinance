@@ -167,13 +167,13 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         dashboardFragment = supportFragmentManager
-            .findFragmentByTag(DASHBOARD_FRAGMENT_TAG)!! as DashboardFragment
+            .findFragmentByTag(DASHBOARD_FRAGMENT_TAG) as DashboardFragment?
         paymentsFragment = supportFragmentManager
-            .findFragmentByTag(PAYMENTS_FRAGMENT_TAG)!! as PaymentsFragment
+            .findFragmentByTag(PAYMENTS_FRAGMENT_TAG) as PaymentsFragment?
         budgetFragment = supportFragmentManager
-            .findFragmentByTag(BUDGET_FRAGMENT_TAG)!! as BudgetFragment
+            .findFragmentByTag(BUDGET_FRAGMENT_TAG) as BudgetFragment?
         profileFragment = supportFragmentManager
-            .findFragmentByTag(PROFILE_FRAGMENT_TAG)!! as ProfileFragment
+            .findFragmentByTag(PROFILE_FRAGMENT_TAG) as ProfileFragment?
 
         savedInstanceState.getString(ACTIVE_FRAGMENT_KEY).also { tag ->
             when (tag) {
