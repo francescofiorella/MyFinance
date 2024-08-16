@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -218,6 +217,8 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     override fun scrollUp() {
         super.scrollUp()
         binding.budgetScrollView.scrollTo(0, 0)
+        (binding.budgetRecyclerView.layoutManager as LinearLayoutManager?)
+            ?.scrollToPositionWithOffset(0, 0)
     }
 
     override fun onItemInteraction(interactionID: Int, income: Income, position: Int) {

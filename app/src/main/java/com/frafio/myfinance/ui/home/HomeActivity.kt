@@ -14,7 +14,6 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.MyFinanceApplication
@@ -24,6 +23,7 @@ import com.frafio.myfinance.data.enums.db.PurchaseCode
 import com.frafio.myfinance.data.models.AuthResult
 import com.frafio.myfinance.data.models.PurchaseResult
 import com.frafio.myfinance.databinding.ActivityHomeBinding
+import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.ui.home.budget.BudgetFragment
@@ -45,11 +45,11 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private lateinit var binding: ActivityHomeBinding
     private val viewModel by viewModels<HomeViewModel>()
 
-    private lateinit var dashboardFragment: DashboardFragment
-    private lateinit var paymentsFragment: PaymentsFragment
-    private lateinit var budgetFragment: BudgetFragment
-    private lateinit var profileFragment: ProfileFragment
-    private var activeFragment: Fragment? = null
+    private var dashboardFragment: DashboardFragment? = null
+    private var paymentsFragment: PaymentsFragment? = null
+    private var budgetFragment: BudgetFragment? = null
+    private var profileFragment: ProfileFragment? = null
+    private var activeFragment: BaseFragment? = null
 
     private var userRequest: Boolean = false
 
@@ -212,46 +212,85 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     }
 
     private fun navigateTo(itemId: Int) {
+        val currentId = if (binding.navBar != null) {
+            binding.navBar!!.selectedItemId
+        } else if (binding.navRail != null) {
+            binding.navRail!!.selectedItemId
+        } else {
+            binding.navDrawer!!.checkedItem?.itemId
+        }
+        if (currentId == itemId) {
+            activeFragment!!.scrollUp()
+            return
+        }
+        val transaction = supportFragmentManager.beginTransaction()
         when (itemId) {
             R.id.dashboardFragment -> {
-                dashboardFragment.scrollUp()
+                if (dashboardFragment == null) {
+                    dashboardFragment = DashboardFragment()
+                    transaction.add(
+                        R.id.home_fragmentContainerView,
+                        dashboardFragment!!,
+                        DASHBOARD_FRAGMENT_TAG
+                    )
+                }
                 binding.fragmentTitle.text = getString(R.string.nav_1)
                 binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()
-                supportFragmentManager.beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(dashboardFragment).commit()
+
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .hide(activeFragment!!).show(dashboardFragment!!).commit()
                 activeFragment = dashboardFragment
             }
 
             R.id.paymentsFragment -> {
-                paymentsFragment.scrollUp()
+                if (paymentsFragment == null) {
+                    paymentsFragment = PaymentsFragment()
+                    transaction.add(
+                        R.id.home_fragmentContainerView,
+                        paymentsFragment!!,
+                        PAYMENTS_FRAGMENT_TAG
+                    )
+                }
                 binding.fragmentTitle.text = getString(R.string.nav_2)
                 binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()
-                supportFragmentManager.beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(paymentsFragment).commit()
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .hide(activeFragment!!).show(paymentsFragment!!).commit()
                 activeFragment = paymentsFragment
             }
 
             R.id.budgetFragment -> {
+                if (budgetFragment == null) {
+                    budgetFragment = BudgetFragment()
+                    transaction.add(
+                        R.id.home_fragmentContainerView,
+                        budgetFragment!!,
+                        BUDGET_FRAGMENT_TAG
+                    )
+                }
                 binding.fragmentTitle.text = getString(R.string.nav_5)
                 binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()
-                supportFragmentManager.beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(budgetFragment).commit()
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .hide(activeFragment!!).show(budgetFragment!!).commit()
                 activeFragment = budgetFragment
             }
 
             R.id.profileFragment -> {
+                if (profileFragment == null) {
+                    profileFragment = ProfileFragment()
+                    transaction.add(
+                        R.id.home_fragmentContainerView,
+                        profileFragment!!,
+                        PROFILE_FRAGMENT_TAG
+                    )
+                }
                 binding.fragmentTitle.text = getString(R.string.nav_3)
                 binding.logoutBtn.instantShow()
                 binding.propicImageView.instantHide()
-                supportFragmentManager.beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(profileFragment).commit()
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .hide(activeFragment!!).show(profileFragment!!).commit()
                 activeFragment = profileFragment
             }
 
@@ -361,18 +400,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
     private fun initFragments() {
         dashboardFragment = DashboardFragment()
-        paymentsFragment = PaymentsFragment()
-        budgetFragment = BudgetFragment()
-        profileFragment = ProfileFragment()
         activeFragment = dashboardFragment
         supportFragmentManager.beginTransaction()
-            .add(R.id.home_fragmentContainerView, profileFragment, PROFILE_FRAGMENT_TAG)
-            .add(R.id.home_fragmentContainerView, budgetFragment, BUDGET_FRAGMENT_TAG)
-            .add(R.id.home_fragmentContainerView, paymentsFragment, PAYMENTS_FRAGMENT_TAG)
-            .add(R.id.home_fragmentContainerView, dashboardFragment, DASHBOARD_FRAGMENT_TAG)
-            .hide(profileFragment)
-            .hide(budgetFragment)
-            .hide(paymentsFragment)
+            .add(R.id.home_fragmentContainerView, dashboardFragment!!, DASHBOARD_FRAGMENT_TAG)
             .commit()
     }
 
