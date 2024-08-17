@@ -226,15 +226,17 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
     override fun scrollUp() {
         super.scrollUp()
-        (binding.listRecyclerView.layoutManager as LinearLayoutManager?)
-            ?.scrollToPositionWithOffset(0, 0)
+        binding.listRecyclerView.apply {
+            stopScroll()
+            (layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(0, 0)
+        }
     }
 
     fun scrollTo(position: Int) {
-        (binding.listRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
-            position,
-            0
-        )
+        binding.listRecyclerView.apply {
+            stopScroll()
+            (layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(position, 0)
+        }
     }
 
     class ModalBottomSheet(

@@ -214,13 +214,6 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         }
     }
 
-    override fun scrollUp() {
-        super.scrollUp()
-        binding.budgetScrollView.scrollTo(0, 0)
-        (binding.budgetRecyclerView.layoutManager as LinearLayoutManager?)
-            ?.scrollToPositionWithOffset(0, 0)
-    }
-
     override fun onItemInteraction(interactionID: Int, income: Income, position: Int) {
         when (interactionID) {
             ON_LONG_CLICK -> {
@@ -265,11 +258,23 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         }
     }
 
+    override fun scrollUp() {
+        super.scrollUp()
+        binding.budgetRecyclerView.apply {
+            stopScroll()
+            (layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(0, 0)
+        }
+        binding.budgetScrollView.apply {
+            stopNestedScroll()
+            scrollTo(0, 0)
+        }
+    }
+
     fun scrollIncomesTo(position: Int) {
-        (binding.budgetRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
-            position,
-            0
-        )
+        binding.budgetRecyclerView.stopScroll()
+        binding.budgetScrollView.stopNestedScroll()
+        (binding.budgetRecyclerView.layoutManager as LinearLayoutManager?)
+            ?.scrollToPositionWithOffset(position, 0)
     }
 
     class ModalBottomSheet(

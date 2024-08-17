@@ -85,7 +85,10 @@ class ProfileFragment : BaseFragment(), ProfileListener {
 
     override fun scrollUp() {
         super.scrollUp()
-        binding.profileScrollView.scrollTo(0, 0)
+        binding.profileScrollView.apply {
+            stopNestedScroll()
+            scrollTo(0, 0)
+        }
     }
 
     override fun onStarted() {

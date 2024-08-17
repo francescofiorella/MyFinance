@@ -186,6 +186,9 @@ class DashboardFragment : BaseFragment() {
 
     override fun scrollUp() {
         super.scrollUp()
-        binding.dashboardScrollView.scrollTo(0, 0)
+        binding.dashboardScrollView.apply {
+            stopNestedScroll()
+            scrollTo(0, 0)
+        }
     }
 }
