@@ -38,7 +38,11 @@ class ProgressBar(
 
         var percentage = value / maxValue
         val percString = "${(percentage * 100).toInt()}%"
-        if (percentage > 1) percentage = 1.0
+        if (percentage > 1.0) {
+            percentage = 1.0
+        } else if (percentage < 0.08 && percentage != 0.0) {
+            percentage = 0.08
+        }
         labelTextView.text = percString
         percGuideline.setGuidelinePercent(percentage.toFloat())
         val typedValue = TypedValue()
