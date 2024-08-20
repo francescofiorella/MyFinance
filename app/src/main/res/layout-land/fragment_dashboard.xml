@@ -273,7 +273,6 @@
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
-                            android:text=" "
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
                             tools:text="€ 0.00" />
@@ -319,7 +318,6 @@
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
-                            android:text=" "
                             android:textColor="@color/primary_text"
                             android:textSize="@dimen/card_price_size"
                             tools:text="€ 0.00" />
@@ -361,7 +359,7 @@
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <ImageView
-                            android:id="@+id/next_btn"
+                            android:id="@+id/bar_chart_next_btn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="?attr/selectableItemBackgroundBorderless"
@@ -371,14 +369,14 @@
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <ImageView
-                            android:id="@+id/previous_btn"
+                            android:id="@+id/bar_chart_previous_btn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="5dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/change_content"
                             android:src="@drawable/ic_keyboard_arrow_left"
-                            app:layout_constraintEnd_toStartOf="@id/next_btn"
+                            app:layout_constraintEnd_toStartOf="@id/bar_chart_next_btn"
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <androidx.constraintlayout.widget.ConstraintLayout
@@ -669,7 +667,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_0_layout"
@@ -683,7 +680,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_1_layout"
@@ -695,7 +691,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_2_layout"
@@ -707,7 +702,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_3_layout"
@@ -719,7 +713,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_4_layout"
@@ -731,7 +724,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_5_layout"
@@ -743,7 +735,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_6_layout"
@@ -755,7 +746,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_7_layout"
@@ -767,7 +757,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_8_layout"
@@ -779,7 +768,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_9_layout"
@@ -791,7 +779,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_10_layout"
@@ -803,7 +790,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/nunito"
-                                android:text=" "
                                 android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/bar_11_layout"

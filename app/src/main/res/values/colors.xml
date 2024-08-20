@@ -47,4 +47,16 @@
     <color name="inverted_primary_text">@color/white</color>
     <color name="disabled_text">#D4D4D4</color>
     <color name="launcher_icon_bg">#3D5576</color>
+
+    <!--Pie chart colors. -->
+    <color name="red_500">#f44336</color>
+    <color name="purple_500">#9c27b0</color>
+    <color name="indigo_500">#3f51b5</color>
+    <color name="light_blue_500">#03a9f4</color>
+    <color name="teal_500">#009688</color>
+    <color name="light_green_500">#8bc34a</color>
+    <color name="yellow_500">#ffeb3b</color>
+    <color name="orange_500">#ff9800</color>
+    <color name="brown_500">#795548</color>
+
 </resources>

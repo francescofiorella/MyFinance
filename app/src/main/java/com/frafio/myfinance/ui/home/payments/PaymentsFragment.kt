@@ -3,6 +3,7 @@ package com.frafio.myfinance.ui.home.payments
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
@@ -37,6 +41,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
+
 
 class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentListener {
 
@@ -69,6 +74,18 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.listener = this
+
+        /*binding.listRecyclerView.addOnScrollListener(object : OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    val position = (binding.listRecyclerView.layoutManager as LinearLayoutManager)
+                        .findFirstVisibleItemPosition()
+                    scrollTo(position)
+                }
+            }
+        })*/
+
 
         localPurchasesLiveData = viewModel.getLocalPurchases()
         recViewLiveData.addSource(localPurchasesLiveData) { value ->
@@ -234,8 +251,15 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
     fun scrollTo(position: Int) {
         binding.listRecyclerView.apply {
+            val linearSmoothScroller: LinearSmoothScroller =
+                object : LinearSmoothScroller(context) {
+                    override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
+                        return 200.0f / displayMetrics.densityDpi
+                    }
+                }
             stopScroll()
-            (layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(position, 0)
+            linearSmoothScroller.targetPosition = position
+            (layoutManager as LinearLayoutManager?)?.startSmoothScroll(linearSmoothScroller)
         }
     }
 

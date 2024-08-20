@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.models.BarChartEntry
+import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
 import com.frafio.myfinance.utils.dateToUTCTimestamp
 import java.time.LocalDate
@@ -12,6 +13,7 @@ import java.time.temporal.TemporalAdjusters
 
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
     private val localPurchaseRepository = LocalPurchaseRepository()
+    private val today = LocalDate.now()
 
     var monthShown = true
     var thisMonthSum = 0.0
@@ -20,8 +22,12 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     val isListEmpty = MutableLiveData<Boolean?>(null)
 
+    private val _pieChartDate = MutableLiveData(today)
+    val pieChartDate: LiveData<LocalDate>
+        get() = _pieChartDate
 
-    private val _lastDateForBarChart = MutableLiveData(LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()))
+    private val _lastDateForBarChart =
+        MutableLiveData(today.with(TemporalAdjusters.firstDayOfMonth()))
     val lastDateForBarChart: LiveData<LocalDate>
         get() = _lastDateForBarChart
 
@@ -38,7 +44,6 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun getPriceSumFromToday(): LiveData<Double?> {
-        val today = LocalDate.now()
         return localPurchaseRepository.getPriceSumFromDay(
             today.year,
             today.monthValue,
@@ -47,12 +52,10 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun getPriceSumFromThisMonth(): LiveData<Double?> {
-        val today = LocalDate.now()
         return localPurchaseRepository.getPriceSumFromMonth(today.year, today.monthValue)
     }
 
     fun getPriceSumFromThisYear(): LiveData<Double?> {
-        val today = LocalDate.now()
         return localPurchaseRepository.getPriceSumFromYear(today.year)
     }
 
@@ -61,6 +64,20 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         val lastTimestamp = dateToUTCTimestamp(date.year, date.monthValue, date.dayOfMonth)
         date = date.minusYears(1)
         val firstTimestamp = dateToUTCTimestamp(date.year, date.monthValue, date.dayOfMonth)
-        return localPurchaseRepository.getPurchasesAfterAndBefore(firstTimestamp, lastTimestamp)
+        return localPurchaseRepository.getPriceSumAfterAndBefore(firstTimestamp, lastTimestamp)
+    }
+
+    fun getPurchasesOfMonth(): LiveData<List<Purchase>> =
+        localPurchaseRepository.getPurchasesOfMonth(
+            year = _pieChartDate.value!!.year,
+            month = _pieChartDate.value!!.monthValue
+        )
+
+    fun nextPieChartDate() {
+        _pieChartDate.postValue(_pieChartDate.value!!.plusMonths(1))
+    }
+
+    fun previousPieChartDate() {
+        _pieChartDate.postValue(_pieChartDate.value!!.minusMonths(1))
     }
 }

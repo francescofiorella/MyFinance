@@ -20,16 +20,19 @@ interface PurchaseDao {
     fun getCount(): LiveData<Int>
 
     @Query("SELECT SUM(price) FROM purchase WHERE year=:year AND month=:month AND day=:day")
-    fun getPriceSumFromDay(year: Int, month: Int, day: Int): LiveData<Double?>
+    fun getPriceSumOfDay(year: Int, month: Int, day: Int): LiveData<Double?>
 
     @Query("SELECT SUM(price) FROM purchase WHERE year=:year AND month=:month")
-    fun getPriceSumFromMonth(year: Int, month: Int): LiveData<Double?>
+    fun getPriceSumOfMonth(year: Int, month: Int): LiveData<Double?>
 
     @Query("SELECT SUM(price) FROM purchase WHERE year=:year")
-    fun getPriceSumFromYear(year: Int): LiveData<Double?>
+    fun getPriceSumOfYear(year: Int): LiveData<Double?>
 
     @Query("SELECT SUM(price) as value, year, month FROM purchase WHERE timestamp>=:firstTimestamp AND timestamp<:lastTimestamp GROUP BY year, month ORDER BY year DESC, month DESC")
-    fun getAfterAndBefore(firstTimestamp: Long, lastTimestamp: Long): LiveData<List<BarChartEntry>>
+    fun getPriceSumAfterAndBefore(firstTimestamp: Long, lastTimestamp: Long): LiveData<List<BarChartEntry>>
+
+    @Query("SELECT * FROM purchase WHERE year=:year AND month=:month")
+    fun getPurchasesOfMonth(year: Int, month: Int): LiveData<List<Purchase>>
 
     @Insert
     fun insertPurchase(purchase: Purchase)

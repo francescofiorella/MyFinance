@@ -15,16 +15,22 @@ class LocalPurchaseRepository {
     fun getCount(): LiveData<Int> = purchaseDao.getCount()
 
     fun getPriceSumFromDay(year: Int, month: Int, day: Int): LiveData<Double?> =
-        purchaseDao.getPriceSumFromDay(year, month, day)
+        purchaseDao.getPriceSumOfDay(year, month, day)
 
     fun getPriceSumFromMonth(year: Int, month: Int): LiveData<Double?> =
-        purchaseDao.getPriceSumFromMonth(year, month)
+        purchaseDao.getPriceSumOfMonth(year, month)
 
     fun getPriceSumFromYear(year: Int): LiveData<Double?> =
-        purchaseDao.getPriceSumFromYear(year)
+        purchaseDao.getPriceSumOfYear(year)
 
-    fun getPurchasesAfterAndBefore(firstTimestamp: Long, lastTimestamp: Long): LiveData<List<BarChartEntry>> =
-        purchaseDao.getAfterAndBefore(firstTimestamp, lastTimestamp)
+    fun getPriceSumAfterAndBefore(
+        firstTimestamp: Long,
+        lastTimestamp: Long
+    ): LiveData<List<BarChartEntry>> =
+        purchaseDao.getPriceSumAfterAndBefore(firstTimestamp, lastTimestamp)
+
+    fun getPurchasesOfMonth(year: Int, month: Int): LiveData<List<Purchase>> =
+        purchaseDao.getPurchasesOfMonth(year, month)
 
     fun insertPurchase(purchase: Purchase) = purchaseDao.insertPurchase(purchase)
 

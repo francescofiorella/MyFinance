@@ -10,13 +10,16 @@ import androidx.lifecycle.MediatorLiveData
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.models.BarChart
 import com.frafio.myfinance.data.models.BarChartEntry
+import com.frafio.myfinance.data.models.PieChart
 import com.frafio.myfinance.data.models.ProgressBar
+import com.frafio.myfinance.data.models.Purchase
 import com.frafio.myfinance.data.storages.PurchaseStorage
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.utils.doubleToString
+import java.time.format.DateTimeFormatter
 
 class DashboardFragment : BaseFragment() {
     private lateinit var binding: FragmentDashboardBinding
@@ -31,6 +34,8 @@ class DashboardFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         budgetProgressBar = ProgressBar(binding.barChartLayout, requireContext())
         monthlyBarChart = BarChart(binding.monthlyChart, requireContext())
@@ -118,12 +123,64 @@ class DashboardFragment : BaseFragment() {
                 barChartLiveData.value = value
             }
         }
+        val pieChartLiveData = MediatorLiveData<List<Purchase>>()
+        var purchasesOfMonthLiveData = viewModel.getPurchasesOfMonth()
+        pieChartLiveData.addSource(purchasesOfMonthLiveData) { value ->
+            pieChartLiveData.value = value
+        }
+        var animationPlayed = false
+        pieChartLiveData.observe(viewLifecycleOwner) { purchases ->
+            // Create a LocalDate with the given month
+            val formatter = DateTimeFormatter.ofPattern("MMMM uuuu")
+            binding.pieChartTitle?.text = viewModel.pieChartDate.value!!.format(formatter)
+            val values = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+            purchases.forEach { p ->
+                if (p.category!! <= 8) {
+                    values[p.category] += p.price!!
+                }
+            }
+            binding.textView21?.text = doubleToPriceWithoutDecimals(values.sum())
+            binding.textView22?.text = doubleToPriceWithoutDecimals(values[0])
+            binding.textView23?.text = doubleToPriceWithoutDecimals(values[1])
+            binding.textView24?.text = doubleToPriceWithoutDecimals(values[2])
+            binding.textView25?.text = doubleToPriceWithoutDecimals(values[3])
+            binding.textView26?.text = doubleToPriceWithoutDecimals(values[4])
+            binding.textView27?.text = doubleToPriceWithoutDecimals(values[5])
+            binding.textView28?.text = doubleToPriceWithoutDecimals(values[6])
+            binding.textView29?.text = doubleToPriceWithoutDecimals(values[7])
+            binding.textView210?.text = doubleToPriceWithoutDecimals(values[8])
+            binding.pieChartComposeView?.disposeComposition()
+            binding.pieChartComposeView?.setContent {
+                PieChart(
+                    data = values,
+                    animate = !animationPlayed
+                )
+            }
+            animationPlayed = true
+        }
 
-        binding.previousBtn.setOnClickListener {
+        viewModel.pieChartDate.observe(viewLifecycleOwner) {
+            // this trigger the observer
+            pieChartLiveData.removeSource(purchasesOfMonthLiveData)
+            purchasesOfMonthLiveData = viewModel.getPurchasesOfMonth()
+            pieChartLiveData.addSource(purchasesOfMonthLiveData) { value ->
+                pieChartLiveData.value = value
+            }
+        }
+
+        binding.pieChartPreviousBtn?.setOnClickListener {
+            viewModel.previousPieChartDate()
+        }
+
+        binding.pieChartNextBtn?.setOnClickListener {
+            viewModel.nextPieChartDate()
+        }
+
+        binding.barChartPreviousBtn.setOnClickListener {
             viewModel.previousBarChartDate()
         }
 
-        binding.nextBtn.setOnClickListener {
+        binding.barChartNextBtn.setOnClickListener {
             viewModel.nextBarChartDate()
         }
 
@@ -177,9 +234,6 @@ class DashboardFragment : BaseFragment() {
                 )
             }
         }
-
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
 
         return binding.root
     }
