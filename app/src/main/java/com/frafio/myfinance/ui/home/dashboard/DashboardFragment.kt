@@ -133,7 +133,7 @@ class DashboardFragment : BaseFragment() {
         pieChartLiveData.observe(viewLifecycleOwner) { purchases ->
             // Create a LocalDate with the given month
             val formatter = DateTimeFormatter.ofPattern("MMMM uuuu")
-            binding.pieChartTitle?.text = viewModel.pieChartDate.value!!.format(formatter)
+            binding.pieChartTitle.text = viewModel.pieChartDate.value!!.format(formatter)
             val values = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
             purchases.forEach { p ->
                 if (p.category!! <= 8) {
@@ -162,11 +162,11 @@ class DashboardFragment : BaseFragment() {
             }
         }
 
-        binding.pieChartPreviousBtn?.setOnClickListener {
+        binding.pieChartPreviousBtn.setOnClickListener {
             viewModel.previousPieChartDate()
         }
 
-        binding.pieChartNextBtn?.setOnClickListener {
+        binding.pieChartNextBtn.setOnClickListener {
             viewModel.nextPieChartDate()
         }
 
