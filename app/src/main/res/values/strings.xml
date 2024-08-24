@@ -125,6 +125,8 @@
     <string name="income">Income</string>
     <string name="save">Save</string>
 
+    <string name="total">Total</string>
+
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>
         <item>@string/groceries</item>

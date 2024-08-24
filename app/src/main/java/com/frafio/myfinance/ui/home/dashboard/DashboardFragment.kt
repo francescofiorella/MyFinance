@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.unit.dp
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MediatorLiveData
@@ -139,20 +140,13 @@ class DashboardFragment : BaseFragment() {
                     values[p.category] += p.price!!
                 }
             }
-            binding.textView21?.text = doubleToPriceWithoutDecimals(values.sum())
-            binding.textView22?.text = doubleToPriceWithoutDecimals(values[0])
-            binding.textView23?.text = doubleToPriceWithoutDecimals(values[1])
-            binding.textView24?.text = doubleToPriceWithoutDecimals(values[2])
-            binding.textView25?.text = doubleToPriceWithoutDecimals(values[3])
-            binding.textView26?.text = doubleToPriceWithoutDecimals(values[4])
-            binding.textView27?.text = doubleToPriceWithoutDecimals(values[5])
-            binding.textView28?.text = doubleToPriceWithoutDecimals(values[6])
-            binding.textView29?.text = doubleToPriceWithoutDecimals(values[7])
-            binding.textView210?.text = doubleToPriceWithoutDecimals(values[8])
-            binding.pieChartComposeView?.disposeComposition()
-            binding.pieChartComposeView?.setContent {
+            binding.pieChartComposeView.disposeComposition()
+            binding.pieChartComposeView.setContent {
                 PieChart(
                     data = values,
+                    isEmpty = values.sum() == 0.0,
+                    chartBarWidth = if (resources.getBoolean(R.bool.isLandscape)) 12.dp else 10.dp,
+                    chartEntryOffset = if (resources.getBoolean(R.bool.isLandscape)) 11 else 9,
                     animate = !animationPlayed
                 )
             }

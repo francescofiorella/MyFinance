@@ -210,7 +210,7 @@
                             <View
                                 android:id="@+id/progress_bar_back"
                                 android:layout_width="0dp"
-                                android:layout_height="10dp"
+                                android:layout_height="12dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="?attr/colorSecondaryContainer"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -221,7 +221,7 @@
                             <View
                                 android:id="@+id/progress_bar_front"
                                 android:layout_width="0dp"
-                                android:layout_height="10dp"
+                                android:layout_height="12dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="?attr/colorPrimary"
                                 app:layout_constraintBottom_toBottomOf="@id/progress_bar_back"
@@ -327,10 +327,79 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/materialCardView4"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="2"
+                    android:layout_column="0"
+                    android:layout_columnSpan="2"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="@dimen/card_full_margin"
+                    android:layout_marginTop="@dimen/card_half_margin"
+                    android:layout_marginEnd="@dimen/card_full_margin"
+                    android:layout_marginBottom="@dimen/card_half_margin"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/pie_chart_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="Month Year" />
+
+                        <ImageView
+                            android:id="@+id/pie_chart_next_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/change_content"
+                            android:src="@drawable/ic_keyboard_arrow_right"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/pie_chart_previous_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="5dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/change_content"
+                            android:src="@drawable/ic_keyboard_arrow_left"
+                            app:layout_constraintEnd_toStartOf="@id/pie_chart_next_btn"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.compose.ui.platform.ComposeView
+                            android:id="@+id/pie_chart_compose_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:padding="5dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/pie_chart_next_btn"
+                            tools:layout_height="238dp"
+                            tools:layout_width="238dp" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="3"
                     android:layout_column="0"
                     android:layout_columnSpan="2"
                     android:layout_columnWeight="1"
@@ -402,7 +471,7 @@
 
                             <View
                                 android:id="@+id/bar_0"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -425,7 +494,7 @@
 
                             <View
                                 android:id="@+id/bar_1"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -447,7 +516,7 @@
 
                             <View
                                 android:id="@+id/bar_2"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -469,7 +538,7 @@
 
                             <View
                                 android:id="@+id/bar_3"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -491,7 +560,7 @@
 
                             <View
                                 android:id="@+id/bar_4"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -513,7 +582,7 @@
 
                             <View
                                 android:id="@+id/bar_5"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -535,7 +604,7 @@
 
                             <View
                                 android:id="@+id/bar_6"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -557,7 +626,7 @@
 
                             <View
                                 android:id="@+id/bar_7"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -579,7 +648,7 @@
 
                             <View
                                 android:id="@+id/bar_8"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -601,7 +670,7 @@
 
                             <View
                                 android:id="@+id/bar_9"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -623,7 +692,7 @@
 
                             <View
                                 android:id="@+id/bar_10"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"
@@ -645,7 +714,7 @@
 
                             <View
                                 android:id="@+id/bar_11"
-                                android:layout_width="15dp"
+                                android:layout_width="12dp"
                                 android:layout_height="1dp"
                                 android:background="@drawable/bg_round_corners"
                                 android:backgroundTint="@color/bar_chart_color"

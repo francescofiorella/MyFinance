@@ -89,7 +89,9 @@
     <string name="incomes">Entrate</string>
     <string name="amount">Importo</string>
 
-    <string name="housing">Abitazioni</string>
+    <string name="total">Totale</string>
+
+    <string name="housing">Abitazione</string>
     <string name="groceries">Alimentari</string>
     <string name="personal_care">Cura personale</string>
     <string name="entertainment">Intrattenimento</string>
