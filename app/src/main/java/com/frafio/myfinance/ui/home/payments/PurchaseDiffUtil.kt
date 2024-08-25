@@ -1,7 +1,7 @@
 package com.frafio.myfinance.ui.home.payments
 
 import androidx.recyclerview.widget.DiffUtil
-import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.model.Purchase
 
 class PurchaseDiffUtil(
     private val oldPurchaseList: List<Purchase>,

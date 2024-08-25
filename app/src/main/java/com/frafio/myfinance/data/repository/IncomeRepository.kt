@@ -1,9 +1,9 @@
-package com.frafio.myfinance.data.repositories
+package com.frafio.myfinance.data.repository
 
 import androidx.lifecycle.LiveData
-import com.frafio.myfinance.data.managers.IncomeManager
-import com.frafio.myfinance.data.models.Income
-import com.frafio.myfinance.data.models.PurchaseResult
+import com.frafio.myfinance.data.manager.IncomeManager
+import com.frafio.myfinance.data.model.Income
+import com.frafio.myfinance.data.model.PurchaseResult
 
 class IncomeRepository(private val incomeManager: IncomeManager) {
     fun updateIncomeList(): LiveData<PurchaseResult> {

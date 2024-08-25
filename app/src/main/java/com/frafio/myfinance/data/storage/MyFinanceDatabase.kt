@@ -1,13 +1,13 @@
-package com.frafio.myfinance.data.storages
+package com.frafio.myfinance.data.storage
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.frafio.myfinance.data.daos.IncomeDao
-import com.frafio.myfinance.data.daos.PurchaseDao
-import com.frafio.myfinance.data.models.Income
-import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.dao.IncomeDao
+import com.frafio.myfinance.data.dao.PurchaseDao
+import com.frafio.myfinance.data.model.Income
+import com.frafio.myfinance.data.model.Purchase
 
 @Database(
     entities = [Purchase::class, Income::class],

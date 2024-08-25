@@ -1,8 +1,8 @@
 package com.frafio.myfinance.ui.home
 
 import androidx.lifecycle.LiveData
-import com.frafio.myfinance.data.models.AuthResult
-import com.frafio.myfinance.data.models.PurchaseResult
+import com.frafio.myfinance.data.model.AuthResult
+import com.frafio.myfinance.data.model.PurchaseResult
 
 interface HomeListener {
     fun onLogOutSuccess(response: LiveData<AuthResult>)

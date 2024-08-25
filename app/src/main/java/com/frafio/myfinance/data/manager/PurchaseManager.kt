@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.managers
+package com.frafio.myfinance.data.manager
 
 import android.content.SharedPreferences
 import android.util.Log
@@ -6,11 +6,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
-import com.frafio.myfinance.data.models.Purchase
-import com.frafio.myfinance.data.models.PurchaseResult
-import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
-import com.frafio.myfinance.data.storages.PurchaseStorage
-import com.frafio.myfinance.data.storages.UserStorage
+import com.frafio.myfinance.data.model.Purchase
+import com.frafio.myfinance.data.model.PurchaseResult
+import com.frafio.myfinance.data.repository.LocalPurchaseRepository
+import com.frafio.myfinance.data.storage.PurchaseStorage
+import com.frafio.myfinance.data.storage.UserStorage
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.getSharedMonthlyBudget
 import com.frafio.myfinance.utils.setSharedDynamicColor

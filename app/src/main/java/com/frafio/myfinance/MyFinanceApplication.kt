@@ -4,9 +4,9 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.StringRes
-import com.frafio.myfinance.data.managers.AuthManager
-import com.frafio.myfinance.data.managers.IncomeManager
-import com.frafio.myfinance.data.managers.PurchaseManager
+import com.frafio.myfinance.data.manager.AuthManager
+import com.frafio.myfinance.data.manager.IncomeManager
+import com.frafio.myfinance.data.manager.PurchaseManager
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.google.android.material.color.DynamicColors
 

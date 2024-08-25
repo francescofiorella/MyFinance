@@ -9,7 +9,7 @@
 
         <variable
             name="purchase"
-            type="com.frafio.myfinance.data.models.Purchase" />
+            type="com.frafio.myfinance.data.model.Purchase" />
 
         <import type="com.frafio.myfinance.utils.FormatUtilsKt" />
 

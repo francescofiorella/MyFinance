@@ -100,8 +100,13 @@
     <string name="health">Salute</string>
     <string name="transportation">Trasporti</string>
     <string name="miscellaneous">Varie</string>
+
     <string name="select">Seleziona</string>
     <string name="payment">Pagamento</string>
     <string name="income">Entrata</string>
     <string name="save">Salva</string>
+    <string name="monthly">Mensile</string>
+    <string name="annual">Annuale</string>
+    <string name="shown">Mostrato:</string>
+    <string name="payments_by_category">Pagamenti per categoria</string>
 </resources>

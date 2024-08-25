@@ -1,9 +1,9 @@
-package com.frafio.myfinance.data.repositories
+package com.frafio.myfinance.data.repository
 
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.MyFinanceApplication
-import com.frafio.myfinance.data.models.Income
-import com.frafio.myfinance.data.storages.MyFinanceDatabase
+import com.frafio.myfinance.data.model.Income
+import com.frafio.myfinance.data.storage.MyFinanceDatabase
 
 class LocalIncomeRepository {
     private val incomeDao =

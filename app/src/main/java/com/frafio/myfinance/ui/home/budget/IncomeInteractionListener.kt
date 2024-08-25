@@ -1,6 +1,6 @@
 package com.frafio.myfinance.ui.home.budget
 
-import com.frafio.myfinance.data.models.Income
+import com.frafio.myfinance.data.model.Income
 
 interface IncomeInteractionListener {
 

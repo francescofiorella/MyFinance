@@ -5,9 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.MyFinanceApplication
-import com.frafio.myfinance.data.models.Purchase
-import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
-import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.frafio.myfinance.data.model.Purchase
+import com.frafio.myfinance.data.repository.LocalPurchaseRepository
+import com.frafio.myfinance.data.repository.PurchaseRepository
 import com.frafio.myfinance.utils.dateToUTCTimestamp
 
 class PaymentsViewModel(application: Application) : AndroidViewModel(application) {

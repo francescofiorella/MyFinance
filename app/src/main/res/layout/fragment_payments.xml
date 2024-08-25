@@ -60,7 +60,6 @@
             android:id="@+id/list_recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="@dimen/fragment_margin_top"
             android:scrollbars="vertical"
             android:visibility="@{viewModel.isPurchasesEmpty ? View.GONE : View.VISIBLE}"
             app:backgroundTint="?android:colorBackground"

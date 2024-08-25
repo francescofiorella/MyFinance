@@ -17,14 +17,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/fragment_margin_top"
         android:orientation="horizontal">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="@{viewModel.isListEmpty == null || !viewModel.isListEmpty ? View.GONE : View.VISIBLE}"
             android:layout_gravity="center"
+            android:visibility="@{viewModel.isListEmpty == null || !viewModel.isListEmpty ? View.GONE : View.VISIBLE}"
             tools:visibility="gone">
 
             <androidx.constraintlayout.widget.Guideline
@@ -327,6 +326,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView4"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="2"
@@ -337,76 +337,6 @@
                     android:layout_marginTop="@dimen/card_half_margin"
                     android:layout_marginEnd="@dimen/card_full_margin"
                     android:layout_marginBottom="@dimen/card_half_margin"
-                    app:cardCornerRadius="@dimen/card_corner_radius">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:clipChildren="false"
-                        android:clipToPadding="false"
-                        android:paddingHorizontal="25dp"
-                        android:paddingVertical="20dp">
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/pie_chart_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/nunito"
-                            android:textSize="@dimen/card_title_size"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:text="Month Year" />
-
-                        <ImageView
-                            android:id="@+id/pie_chart_next_btn"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/change_content"
-                            android:src="@drawable/ic_keyboard_arrow_right"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <ImageView
-                            android:id="@+id/pie_chart_previous_btn"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="5dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/change_content"
-                            android:src="@drawable/ic_keyboard_arrow_left"
-                            app:layout_constraintEnd_toStartOf="@id/pie_chart_next_btn"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <androidx.compose.ui.platform.ComposeView
-                            android:id="@+id/pie_chart_compose_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:padding="5dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/pie_chart_next_btn"
-                            tools:layout_height="238dp"
-                            tools:layout_width="238dp" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/materialCardView4"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_row="3"
-                    android:layout_column="0"
-                    android:layout_columnSpan="2"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="@dimen/card_full_margin"
-                    android:layout_marginTop="@dimen/card_half_margin"
-                    android:layout_marginEnd="@dimen/card_full_margin"
-                    android:layout_marginBottom="@dimen/dashboard_bottom_margin"
                     app:cardCornerRadius="@dimen/card_corner_radius">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -885,6 +815,123 @@
                                 tools:visibility="visible" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="3"
+                    android:layout_column="0"
+                    android:layout_columnSpan="2"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="@dimen/card_full_margin"
+                    android:layout_marginTop="@dimen/card_half_margin"
+                    android:layout_marginEnd="@dimen/card_full_margin"
+                    android:layout_marginBottom="@dimen/dashboard_bottom_margin"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/pie_chart_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:text="@string/payments_by_category" />
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/chip_group"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            app:layout_constraintStart_toStartOf="@id/pie_chart_title"
+                            app:layout_constraintTop_toBottomOf="@id/pie_chart_title"
+                            app:selectionRequired="true"
+                            app:singleLine="true"
+                            app:singleSelection="true">
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/monthly_chip"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/monthly"
+                                app:checkedIconEnabled="false" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/annual_chip"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/annual"
+                                app:checkedIconEnabled="false" />
+
+                        </com.google.android.material.chip.ChipGroup>
+
+                        <ImageView
+                            android:id="@+id/pie_chart_next_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/change_content"
+                            android:src="@drawable/ic_keyboard_arrow_right"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/pie_chart_previous_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="5dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/change_content"
+                            android:src="@drawable/ic_keyboard_arrow_left"
+                            app:layout_constraintEnd_toStartOf="@id/pie_chart_next_btn"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.compose.ui.platform.ComposeView
+                            android:id="@+id/pie_chart_compose_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/chip_group"
+                            tools:layout_height="238dp"
+                            tools:layout_width="238dp" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/tv0"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/shown"
+                            android:textSize="12sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/pie_chart_compose_view" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/dataShownTV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:fontFamily="@font/nunito"
+                            android:textSize="12sp"
+                            app:layout_constraintStart_toEndOf="@id/tv0"
+                            app:layout_constraintTop_toBottomOf="@id/pie_chart_compose_view"
+                            tools:text="Month Year" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

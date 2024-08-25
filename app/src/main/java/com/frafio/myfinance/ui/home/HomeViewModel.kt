@@ -4,9 +4,9 @@ import android.app.Application
 import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.MyFinanceApplication
-import com.frafio.myfinance.data.repositories.IncomeRepository
-import com.frafio.myfinance.data.repositories.PurchaseRepository
-import com.frafio.myfinance.data.repositories.UserRepository
+import com.frafio.myfinance.data.repository.IncomeRepository
+import com.frafio.myfinance.data.repository.PurchaseRepository
+import com.frafio.myfinance.data.repository.UserRepository
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository(

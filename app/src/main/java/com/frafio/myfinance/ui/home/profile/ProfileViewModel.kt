@@ -4,9 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.BuildConfig
 import com.frafio.myfinance.MyFinanceApplication
-import com.frafio.myfinance.data.models.User
-import com.frafio.myfinance.data.repositories.PurchaseRepository
-import com.frafio.myfinance.data.repositories.UserRepository
+import com.frafio.myfinance.data.model.User
+import com.frafio.myfinance.data.repository.PurchaseRepository
+import com.frafio.myfinance.data.repository.UserRepository
 import com.google.android.material.color.DynamicColors
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {

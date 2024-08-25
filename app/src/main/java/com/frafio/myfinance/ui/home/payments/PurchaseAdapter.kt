@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.managers.PurchaseManager.Companion.DEFAULT_LIMIT
-import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.manager.PurchaseManager.Companion.DEFAULT_LIMIT
+import com.frafio.myfinance.data.model.Purchase
 import com.frafio.myfinance.databinding.LayoutPurchaseItemRvBinding
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_BUTTON_CLICK
 import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LOAD_MORE_REQUEST

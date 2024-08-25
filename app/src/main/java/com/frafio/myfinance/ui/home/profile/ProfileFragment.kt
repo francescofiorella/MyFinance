@@ -13,7 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
-import com.frafio.myfinance.data.models.AuthResult
+import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.databinding.FragmentProfileBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity

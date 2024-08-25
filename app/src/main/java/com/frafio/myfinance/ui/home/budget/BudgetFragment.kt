@@ -19,11 +19,11 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.PurchaseCode
-import com.frafio.myfinance.data.managers.IncomeManager.Companion.DEFAULT_LIMIT
-import com.frafio.myfinance.data.models.Income
-import com.frafio.myfinance.data.models.PurchaseResult
-import com.frafio.myfinance.data.storages.IncomeStorage
-import com.frafio.myfinance.data.storages.PurchaseStorage
+import com.frafio.myfinance.data.manager.IncomeManager.Companion.DEFAULT_LIMIT
+import com.frafio.myfinance.data.model.Income
+import com.frafio.myfinance.data.model.PurchaseResult
+import com.frafio.myfinance.data.storage.IncomeStorage
+import com.frafio.myfinance.data.storage.PurchaseStorage
 import com.frafio.myfinance.databinding.FragmentBudgetBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity

@@ -6,12 +6,12 @@ import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
-import com.frafio.myfinance.data.models.DatePickerButton
-import com.frafio.myfinance.data.models.Income
-import com.frafio.myfinance.data.models.Purchase
-import com.frafio.myfinance.data.models.PurchaseResult
-import com.frafio.myfinance.data.repositories.IncomeRepository
-import com.frafio.myfinance.data.repositories.PurchaseRepository
+import com.frafio.myfinance.data.widget.DatePickerButton
+import com.frafio.myfinance.data.model.Income
+import com.frafio.myfinance.data.model.Purchase
+import com.frafio.myfinance.data.model.PurchaseResult
+import com.frafio.myfinance.data.repository.IncomeRepository
+import com.frafio.myfinance.data.repository.PurchaseRepository
 import com.frafio.myfinance.utils.dateToUTCTimestamp
 import java.time.LocalDate
 

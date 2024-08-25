@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.models
+package com.frafio.myfinance.data.widget
 
 import android.view.View
 import android.view.ViewGroup

@@ -1,9 +1,9 @@
-package com.frafio.myfinance.data.repositories
+package com.frafio.myfinance.data.repository
 
 import androidx.lifecycle.LiveData
-import com.frafio.myfinance.data.managers.PurchaseManager
-import com.frafio.myfinance.data.models.Purchase
-import com.frafio.myfinance.data.models.PurchaseResult
+import com.frafio.myfinance.data.manager.PurchaseManager
+import com.frafio.myfinance.data.model.Purchase
+import com.frafio.myfinance.data.model.PurchaseResult
 
 class PurchaseRepository(private val purchaseManager: PurchaseManager) {
     fun updatePurchaseList(): LiveData<PurchaseResult> {

@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.models
+package com.frafio.myfinance.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,7 +9,7 @@ import java.time.LocalDate
 
 @IgnoreExtraProperties
 @Entity
-data class Income(
+data class Purchase(
     val name: String? = null,
     val price: Double? = null,
     val year: Int? = null,

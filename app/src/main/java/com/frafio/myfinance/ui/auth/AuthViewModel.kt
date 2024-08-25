@@ -6,8 +6,8 @@ import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.auth.AuthCode
-import com.frafio.myfinance.data.models.AuthResult
-import com.frafio.myfinance.data.repositories.UserRepository
+import com.frafio.myfinance.data.model.AuthResult
+import com.frafio.myfinance.data.repository.UserRepository
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository((application as MyFinanceApplication).authManager)

@@ -1,7 +1,7 @@
-package com.frafio.myfinance.data.storages
+package com.frafio.myfinance.data.storage
 
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.models.Income
+import com.frafio.myfinance.data.model.Income
 import java.time.LocalDate
 
 object IncomeStorage {

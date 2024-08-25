@@ -1,7 +1,7 @@
 package com.frafio.myfinance.ui.auth
 
 import androidx.lifecycle.LiveData
-import com.frafio.myfinance.data.models.AuthResult
+import com.frafio.myfinance.data.model.AuthResult
 
 interface AuthListener {
 

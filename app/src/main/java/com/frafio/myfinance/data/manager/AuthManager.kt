@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.managers
+package com.frafio.myfinance.data.manager
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -8,11 +8,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.auth.SignupException
-import com.frafio.myfinance.data.models.AuthResult
-import com.frafio.myfinance.data.repositories.LocalIncomeRepository
-import com.frafio.myfinance.data.repositories.LocalPurchaseRepository
-import com.frafio.myfinance.data.storages.PurchaseStorage
-import com.frafio.myfinance.data.storages.UserStorage
+import com.frafio.myfinance.data.model.AuthResult
+import com.frafio.myfinance.data.repository.LocalIncomeRepository
+import com.frafio.myfinance.data.repository.LocalPurchaseRepository
+import com.frafio.myfinance.data.storage.PurchaseStorage
+import com.frafio.myfinance.data.storage.UserStorage
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedMonthlyBudget
 import com.google.android.gms.auth.api.signin.GoogleSignIn

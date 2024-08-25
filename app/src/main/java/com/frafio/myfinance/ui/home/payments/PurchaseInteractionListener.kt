@@ -1,6 +1,6 @@
 package com.frafio.myfinance.ui.home.payments
 
-import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.model.Purchase
 
 interface PurchaseInteractionListener {
 

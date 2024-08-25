@@ -1,14 +1,14 @@
-package com.frafio.myfinance.data.managers
+package com.frafio.myfinance.data.manager
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.db.DbPurchases
 import com.frafio.myfinance.data.enums.db.PurchaseCode
-import com.frafio.myfinance.data.models.Income
-import com.frafio.myfinance.data.models.PurchaseResult
-import com.frafio.myfinance.data.repositories.LocalIncomeRepository
-import com.frafio.myfinance.data.storages.UserStorage
+import com.frafio.myfinance.data.model.Income
+import com.frafio.myfinance.data.model.PurchaseResult
+import com.frafio.myfinance.data.repository.LocalIncomeRepository
+import com.frafio.myfinance.data.storage.UserStorage
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

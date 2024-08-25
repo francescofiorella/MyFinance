@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.models
+package com.frafio.myfinance.data.widget
 
 import android.content.Context
 import android.util.TypedValue

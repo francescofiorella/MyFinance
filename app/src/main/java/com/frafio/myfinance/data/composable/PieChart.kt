@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.models
+package com.frafio.myfinance.data.composable
 
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -139,12 +139,13 @@ fun PieChart(
 
     // To set the value of each Arc according to
     // the value given in the data, we have used a simple formula.
-    val totalOffset = chartEntryOffset * data.count { v -> v > 0.0 }
+    val offset = if (data.count { v -> v > 0.0 } == 1) 0 else chartEntryOffset
+    val totalOffset = offset * data.count { v -> v > 0.0 }
     data.forEachIndexed { index, value ->
         val angle = (360 - totalOffset) * value.toFloat() / data.sum().toFloat()
         angles[index] = Pair(angles[index].first, angles[index].first + angle)
         if (index < 8 && angle != 0F) {
-            angles[index + 1] = Pair(angles[index].second + chartEntryOffset, 0F)
+            angles[index + 1] = Pair(angles[index].second + offset, 0F)
         } else if (index < 8) {
             angles[index + 1] = Pair(angles[index].second, 0F)
         }
@@ -289,7 +290,7 @@ fun PieChart(
                                 }
                             }
                         }
-                        lastValue += value + chartEntryOffset
+                        lastValue += value + offset
                     }
                 }
             }

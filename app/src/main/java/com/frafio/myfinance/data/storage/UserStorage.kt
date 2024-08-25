@@ -1,6 +1,6 @@
-package com.frafio.myfinance.data.storages
+package com.frafio.myfinance.data.storage
 
-import com.frafio.myfinance.data.models.User
+import com.frafio.myfinance.data.model.User
 import com.google.firebase.auth.FirebaseUser
 import java.util.Calendar
 

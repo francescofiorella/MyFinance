@@ -1,12 +1,12 @@
-package com.frafio.myfinance.data.repositories
+package com.frafio.myfinance.data.repository
 
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.managers.AuthManager
-import com.frafio.myfinance.data.models.AuthResult
-import com.frafio.myfinance.data.models.User
-import com.frafio.myfinance.data.storages.UserStorage
+import com.frafio.myfinance.data.manager.AuthManager
+import com.frafio.myfinance.data.model.AuthResult
+import com.frafio.myfinance.data.model.User
+import com.frafio.myfinance.data.storage.UserStorage
 
 class UserRepository(private val authManager: AuthManager) {
 

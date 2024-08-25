@@ -5,11 +5,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.MyFinanceApplication
-import com.frafio.myfinance.data.models.Income
-import com.frafio.myfinance.data.repositories.IncomeRepository
-import com.frafio.myfinance.data.repositories.LocalIncomeRepository
-import com.frafio.myfinance.data.repositories.PurchaseRepository
-import com.frafio.myfinance.data.storages.PurchaseStorage
+import com.frafio.myfinance.data.model.Income
+import com.frafio.myfinance.data.repository.IncomeRepository
+import com.frafio.myfinance.data.repository.LocalIncomeRepository
+import com.frafio.myfinance.data.repository.PurchaseRepository
+import com.frafio.myfinance.data.storage.PurchaseStorage
 
 class BudgetViewModel(application: Application) : AndroidViewModel(application) {
     private val purchaseRepository = PurchaseRepository(

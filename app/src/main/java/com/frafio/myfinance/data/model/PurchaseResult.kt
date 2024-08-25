@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.models
+package com.frafio.myfinance.data.model
 
 import com.frafio.myfinance.data.enums.db.PurchaseCode
 

@@ -126,6 +126,10 @@
     <string name="save">Save</string>
 
     <string name="total">Total</string>
+    <string name="monthly">Monthly</string>
+    <string name="annual">Annual</string>
+    <string name="shown">Shown:</string>
+    <string name="payments_by_category">Payments by category</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>

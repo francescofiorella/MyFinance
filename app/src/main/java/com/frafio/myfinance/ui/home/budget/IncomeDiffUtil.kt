@@ -1,7 +1,7 @@
 package com.frafio.myfinance.ui.home.budget
 
 import androidx.recyclerview.widget.DiffUtil
-import com.frafio.myfinance.data.models.Income
+import com.frafio.myfinance.data.model.Income
 
 class IncomeDiffUtil(
     private val oldIncomeList: List<Income>,

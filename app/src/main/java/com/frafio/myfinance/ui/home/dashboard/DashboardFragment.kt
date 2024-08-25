@@ -9,12 +9,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MediatorLiveData
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.models.BarChart
-import com.frafio.myfinance.data.models.BarChartEntry
-import com.frafio.myfinance.data.models.PieChart
-import com.frafio.myfinance.data.models.ProgressBar
-import com.frafio.myfinance.data.models.Purchase
-import com.frafio.myfinance.data.storages.PurchaseStorage
+import com.frafio.myfinance.data.composable.PieChart
+import com.frafio.myfinance.data.model.BarChartEntry
+import com.frafio.myfinance.data.model.Purchase
+import com.frafio.myfinance.data.storage.PurchaseStorage
+import com.frafio.myfinance.data.widget.BarChart
+import com.frafio.myfinance.data.widget.ProgressBar
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.utils.doubleToPrice
@@ -115,7 +115,6 @@ class DashboardFragment : BaseFragment() {
             }
             monthlyBarChart.updateValues(labels, values)
         }
-
         viewModel.lastDateForBarChart.observe(viewLifecycleOwner) {
             // this trigger the observer
             barChartLiveData.removeSource(pricesLiveData)
@@ -124,16 +123,20 @@ class DashboardFragment : BaseFragment() {
                 barChartLiveData.value = value
             }
         }
+
         val pieChartLiveData = MediatorLiveData<List<Purchase>>()
-        var purchasesOfMonthLiveData = viewModel.getPurchasesOfMonth()
-        pieChartLiveData.addSource(purchasesOfMonthLiveData) { value ->
+        var purchasesOfMonthOrYearLiveData = viewModel.getPurchasesOfMonth()
+        pieChartLiveData.addSource(purchasesOfMonthOrYearLiveData) { value ->
             pieChartLiveData.value = value
         }
         var animationPlayed = false
         pieChartLiveData.observe(viewLifecycleOwner) { purchases ->
             // Create a LocalDate with the given month
-            val formatter = DateTimeFormatter.ofPattern("MMMM uuuu")
-            binding.pieChartTitle.text = viewModel.pieChartDate.value!!.format(formatter)
+            val formatter = DateTimeFormatter.ofPattern(
+                if (viewModel.monthlyShownInPieChart) "MMMM uuuu" else "uuuu"
+            )
+            val dateShownString = viewModel.pieChartDate.value!!.format(formatter)
+            binding.dataShownTV.text = dateShownString
             val values = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
             purchases.forEach { p ->
                 if (p.category!! <= 8) {
@@ -152,13 +155,29 @@ class DashboardFragment : BaseFragment() {
             }
             animationPlayed = true
         }
-
         viewModel.pieChartDate.observe(viewLifecycleOwner) {
             // this trigger the observer
-            pieChartLiveData.removeSource(purchasesOfMonthLiveData)
-            purchasesOfMonthLiveData = viewModel.getPurchasesOfMonth()
-            pieChartLiveData.addSource(purchasesOfMonthLiveData) { value ->
+            pieChartLiveData.removeSource(purchasesOfMonthOrYearLiveData)
+            purchasesOfMonthOrYearLiveData = if (viewModel.monthlyShownInPieChart)
+                viewModel.getPurchasesOfMonth()
+            else
+                viewModel.getPurchasesOfYear()
+            pieChartLiveData.addSource(purchasesOfMonthOrYearLiveData) { value ->
                 pieChartLiveData.value = value
+            }
+        }
+
+        binding.chipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            if (checkedIds.size != 1) return@setOnCheckedStateChangeListener
+            val checkedId = checkedIds[0]
+            when (checkedId) {
+                R.id.monthly_chip -> {
+                    viewModel.switchPieChartData(true)
+                }
+
+                R.id.annual_chip -> {
+                    viewModel.switchPieChartData(false)
+                }
             }
         }
 

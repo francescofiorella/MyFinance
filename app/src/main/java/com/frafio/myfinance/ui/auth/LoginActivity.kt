@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
-import com.frafio.myfinance.data.models.AuthResult
+import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.databinding.ActivityLoginBinding
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.snackBar

@@ -1,10 +1,10 @@
-package com.frafio.myfinance.data.repositories
+package com.frafio.myfinance.data.repository
 
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.MyFinanceApplication
-import com.frafio.myfinance.data.models.BarChartEntry
-import com.frafio.myfinance.data.models.Purchase
-import com.frafio.myfinance.data.storages.MyFinanceDatabase
+import com.frafio.myfinance.data.model.BarChartEntry
+import com.frafio.myfinance.data.model.Purchase
+import com.frafio.myfinance.data.storage.MyFinanceDatabase
 
 class LocalPurchaseRepository {
     private val purchaseDao =
@@ -31,6 +31,9 @@ class LocalPurchaseRepository {
 
     fun getPurchasesOfMonth(year: Int, month: Int): LiveData<List<Purchase>> =
         purchaseDao.getPurchasesOfMonth(year, month)
+
+    fun getPurchasesOfYear(year: Int): LiveData<List<Purchase>> =
+        purchaseDao.getPurchasesOfYear(year)
 
     fun insertPurchase(purchase: Purchase) = purchaseDao.insertPurchase(purchase)
 

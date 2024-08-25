@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.daos
+package com.frafio.myfinance.data.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -8,8 +8,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.frafio.myfinance.data.models.BarChartEntry
-import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.model.BarChartEntry
+import com.frafio.myfinance.data.model.Purchase
 
 @Dao
 interface PurchaseDao {
@@ -33,6 +33,9 @@ interface PurchaseDao {
 
     @Query("SELECT * FROM purchase WHERE year=:year AND month=:month")
     fun getPurchasesOfMonth(year: Int, month: Int): LiveData<List<Purchase>>
+
+    @Query("SELECT * FROM purchase WHERE year=:year")
+    fun getPurchasesOfYear(year: Int): LiveData<List<Purchase>>
 
     @Insert
     fun insertPurchase(purchase: Purchase)

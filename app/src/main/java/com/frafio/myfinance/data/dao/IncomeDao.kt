@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.daos
+package com.frafio.myfinance.data.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -8,7 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.frafio.myfinance.data.models.Income
+import com.frafio.myfinance.data.model.Income
 
 @Dao
 interface IncomeDao {

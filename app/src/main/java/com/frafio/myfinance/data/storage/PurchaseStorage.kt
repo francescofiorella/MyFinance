@@ -1,9 +1,9 @@
-package com.frafio.myfinance.data.storages
+package com.frafio.myfinance.data.storage
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.models.Purchase
+import com.frafio.myfinance.data.model.Purchase
 import java.time.LocalDate
 
 object PurchaseStorage {
