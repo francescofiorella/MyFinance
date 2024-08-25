@@ -54,7 +54,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private var userRequest: Boolean = false
 
     companion object {
-        private const val ACTIVE_FRAGMENT_KEY = "active_fragment_key"
         private const val DASHBOARD_FRAGMENT_TAG = "dashboard_fragment_tag"
         private const val PAYMENTS_FRAGMENT_TAG = "payments_fragment_tag"
         private const val BUDGET_FRAGMENT_TAG = "budget_fragment_tag"
@@ -147,21 +146,19 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         binding.navDrawer?.setNavigationItemSelectedListener(navDrawerListener)
 
         onBackPressedDispatcher.addCallback {
-            if (activeFragment !is DashboardFragment) {
-                showFragment(R.id.dashboardFragment)
-            } else {
-                finish()
+            viewModel.fragmentStack.removeLast()
+            when (viewModel.fragmentStack.lastOrNull()) {
+                DASHBOARD_FRAGMENT_TAG -> showFragment(R.id.dashboardFragment)
+                PAYMENTS_FRAGMENT_TAG -> showFragment(R.id.paymentsFragment)
+                BUDGET_FRAGMENT_TAG -> showFragment(R.id.budgetFragment)
+                PROFILE_FRAGMENT_TAG -> showFragment(R.id.profileFragment)
+                else -> finish()
             }
         }
     }
 
     fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
         onBackPressedDispatcher.onBackPressed()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        activeFragment?.let { outState.putString(ACTIVE_FRAGMENT_KEY, it.tag) }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -175,28 +172,26 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         profileFragment = supportFragmentManager
             .findFragmentByTag(PROFILE_FRAGMENT_TAG) as ProfileFragment?
 
-        savedInstanceState.getString(ACTIVE_FRAGMENT_KEY).also { tag ->
-            when (tag) {
-                PAYMENTS_FRAGMENT_TAG -> {
-                    activeFragment = paymentsFragment
-                    showFragment(R.id.paymentsFragment)
-                }
+        when (viewModel.fragmentStack.lastOrNull()) {
+            PAYMENTS_FRAGMENT_TAG -> {
+                activeFragment = paymentsFragment
+                showFragment(R.id.paymentsFragment)
+            }
 
-                BUDGET_FRAGMENT_TAG -> {
-                    activeFragment = budgetFragment
-                    showFragment(R.id.budgetFragment)
-                }
+            BUDGET_FRAGMENT_TAG -> {
+                activeFragment = budgetFragment
+                showFragment(R.id.budgetFragment)
+            }
 
-                PROFILE_FRAGMENT_TAG -> {
-                    activeFragment = profileFragment
-                    showFragment(R.id.profileFragment)
-                }
+            PROFILE_FRAGMENT_TAG -> {
+                activeFragment = profileFragment
+                showFragment(R.id.profileFragment)
+            }
 
-                else -> {
-                    // Either tag is DASHBOARD_FRAGMENT_TAG or set Dashboard as default
-                    activeFragment = dashboardFragment
-                    showFragment(R.id.dashboardFragment)
-                }
+            else -> {
+                // Either tag is DASHBOARD_FRAGMENT_TAG or set Dashboard as default
+                activeFragment = dashboardFragment
+                showFragment(R.id.dashboardFragment)
             }
         }
     }
@@ -241,6 +236,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment!!).show(dashboardFragment!!).commit()
                 activeFragment = dashboardFragment
+
+                if (viewModel.fragmentStack.lastOrNull() != DASHBOARD_FRAGMENT_TAG)
+                    viewModel.fragmentStack.add(DASHBOARD_FRAGMENT_TAG)
             }
 
             R.id.paymentsFragment -> {
@@ -258,6 +256,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment!!).show(paymentsFragment!!).commit()
                 activeFragment = paymentsFragment
+
+                if (viewModel.fragmentStack.lastOrNull() != PAYMENTS_FRAGMENT_TAG)
+                    viewModel.fragmentStack.add(PAYMENTS_FRAGMENT_TAG)
             }
 
             R.id.budgetFragment -> {
@@ -275,6 +276,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment!!).show(budgetFragment!!).commit()
                 activeFragment = budgetFragment
+
+                if (viewModel.fragmentStack.lastOrNull() != BUDGET_FRAGMENT_TAG)
+                    viewModel.fragmentStack.add(BUDGET_FRAGMENT_TAG)
             }
 
             R.id.profileFragment -> {
@@ -292,6 +296,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .hide(activeFragment!!).show(profileFragment!!).commit()
                 activeFragment = profileFragment
+
+                if (viewModel.fragmentStack.lastOrNull() != PROFILE_FRAGMENT_TAG)
+                    viewModel.fragmentStack.add(PROFILE_FRAGMENT_TAG)
             }
 
             else -> Unit // should not be possible
@@ -399,6 +406,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     }
 
     private fun initFragments() {
+        viewModel.fragmentStack.add(DASHBOARD_FRAGMENT_TAG)
         dashboardFragment = DashboardFragment()
         activeFragment = dashboardFragment
         supportFragmentManager.beginTransaction()

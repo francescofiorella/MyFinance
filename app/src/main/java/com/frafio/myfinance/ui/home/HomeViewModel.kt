@@ -20,6 +20,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     )
     var listener: HomeListener? = null
 
+    val fragmentStack = mutableListOf<String>()
+
     fun checkUser() {
         listener?.onSplashOperationComplete(userRepository.isUserLogged())
     }
