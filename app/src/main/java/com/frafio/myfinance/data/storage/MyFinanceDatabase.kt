@@ -5,17 +5,17 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.frafio.myfinance.data.dao.IncomeDao
-import com.frafio.myfinance.data.dao.PurchaseDao
+import com.frafio.myfinance.data.dao.ExpenseDao
 import com.frafio.myfinance.data.model.Income
-import com.frafio.myfinance.data.model.Purchase
+import com.frafio.myfinance.data.model.Expense
 
 @Database(
-    entities = [Purchase::class, Income::class],
+    entities = [Expense::class, Income::class],
     version = 1,
     exportSchema = false
 )
 abstract class MyFinanceDatabase : RoomDatabase() {
-    abstract fun purchaseDao(): PurchaseDao
+    abstract fun expenseDao(): ExpenseDao
     abstract fun incomeDao(): IncomeDao
 
     companion object {

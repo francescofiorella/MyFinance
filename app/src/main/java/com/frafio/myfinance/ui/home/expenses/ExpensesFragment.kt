@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home.payments
+package com.frafio.myfinance.ui.home.expenses
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
@@ -20,19 +20,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.enums.db.PurchaseCode
-import com.frafio.myfinance.data.manager.PurchaseManager.Companion.DEFAULT_LIMIT
-import com.frafio.myfinance.data.model.Purchase
-import com.frafio.myfinance.data.model.PurchaseResult
-import com.frafio.myfinance.data.storage.PurchaseStorage
-import com.frafio.myfinance.databinding.FragmentPaymentsBinding
+import com.frafio.myfinance.data.enums.db.FinanceCode
+import com.frafio.myfinance.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
+import com.frafio.myfinance.data.model.Expense
+import com.frafio.myfinance.data.model.FinanceResult
+import com.frafio.myfinance.databinding.FragmentExpensesBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_BUTTON_CLICK
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_CLICK
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_BUTTON_CLICK
+import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_CLICK
+import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
+import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.utils.addTotalsToExpenses
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -41,22 +41,22 @@ import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
 
 
-class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentListener {
+class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesListener {
 
-    private lateinit var binding: FragmentPaymentsBinding
-    private val viewModel by viewModels<PaymentsViewModel>()
+    private lateinit var binding: FragmentExpensesBinding
+    private val viewModel by viewModels<ExpensesViewModel>()
     private var isListBlocked = false
-    private var maxPurchaseNumber = DEFAULT_LIMIT + 1
-    private val recViewLiveData = MediatorLiveData<List<Purchase>>()
-    private lateinit var localPurchasesLiveData: LiveData<List<Purchase>>
+    private var maxExpensesNumber = DEFAULT_LIMIT + 1
+    private val recViewLiveData = MediatorLiveData<List<Expense>>()
+    private lateinit var localExpensesLiveData: LiveData<List<Expense>>
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
-            val editRequest = data!!.getIntExtra(AddActivity.PURCHASE_REQUEST_KEY, -1)
+            val editRequest = data!!.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
 
-            if (editRequest == AddActivity.REQUEST_PAYMENT_CODE) {
-                (activity as HomeActivity).showSnackBar(PurchaseCode.PURCHASE_EDIT_SUCCESS.message)
+            if (editRequest == AddActivity.REQUEST_EXPENSE_CODE) {
+                (activity as HomeActivity).showSnackBar(FinanceCode.EXPENSE_EDIT_SUCCESS.message)
             }
         }
     }
@@ -66,7 +66,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_payments, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_expenses, container, false)
 
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
@@ -85,30 +85,30 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         })*/
 
 
-        localPurchasesLiveData = viewModel.getLocalPurchases()
-        recViewLiveData.addSource(localPurchasesLiveData) { value ->
+        localExpensesLiveData = viewModel.getLocalExpenses()
+        recViewLiveData.addSource(localExpensesLiveData) { value ->
             recViewLiveData.value = value
         }
-        recViewLiveData.observe(viewLifecycleOwner) { purchases ->
+        recViewLiveData.observe(viewLifecycleOwner) { expenses ->
             // Evaluate limit and decide if new items can be retrieved
             val limit = if (binding.listRecyclerView.adapter != null) {
-                (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
+                (binding.listRecyclerView.adapter as ExpenseAdapter).getLimit()
             } else {
                 DEFAULT_LIMIT
             }
             // Get list with limit and update recList
-            var nl = purchases.take(limit.toInt()).map { p -> p.copy() }
-            nl = PurchaseStorage.addTotals(nl)
-            viewModel.updatePurchasesEmpty(nl.isEmpty())
-            maxPurchaseNumber = purchases.size.toLong()
+            var nl = expenses.take(limit.toInt()).map { p -> p.copy() }
+            nl = addTotalsToExpenses(nl)
+            viewModel.updateExpensesEmpty(nl.isEmpty())
+            maxExpensesNumber = expenses.size.toLong()
             binding.listRecyclerView.also {
                 if (it.adapter == null) {
-                    it.adapter = PurchaseAdapter(nl, this)
-                    isListBlocked = limit >= maxPurchaseNumber
+                    it.adapter = ExpenseAdapter(nl, this)
+                    isListBlocked = limit >= maxExpensesNumber
                 } else {
                     it.post {
-                        (it.adapter as PurchaseAdapter).updateData(nl)
-                        isListBlocked = limit >= maxPurchaseNumber
+                        (it.adapter as ExpenseAdapter).updateData(nl)
+                        isListBlocked = limit >= maxExpensesNumber
                     }
                 }
             }
@@ -119,7 +119,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
     override fun onItemInteraction(
         interactionID: Int,
-        purchase: Purchase,
+        expense: Expense,
         position: Int
     ) {
         when (interactionID) {
@@ -128,10 +128,10 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
             ON_LONG_CLICK -> {
                 if (resources.getBoolean(R.bool.is600dp)) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
-                    sideSheetDialog.setContentView(R.layout.layout_edit_purchase_bottom_sheet)
+                    sideSheetDialog.setContentView(R.layout.layout_edit_expense_bottom_sheet)
                     defineSheetInterface(
                         sideSheetDialog.findViewById(android.R.id.content)!!,
-                        purchase,
+                        expense,
                         position,
                         editResultLauncher,
                         viewModel,
@@ -141,7 +141,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 } else {
                     val modalBottomSheet = ModalBottomSheet(
                         this,
-                        purchase,
+                        expense,
                         position,
                         editResultLauncher,
                         viewModel
@@ -156,7 +156,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                     sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
                     defineSheetInterface(
                         sideSheetDialog.findViewById(android.R.id.content)!!,
-                        purchase,
+                        expense,
                         position,
                         editResultLauncher,
                         viewModel,
@@ -167,7 +167,7 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 } else {
                     val modalBottomSheet = ModalBottomSheet(
                         this,
-                        purchase,
+                        expense,
                         position,
                         editResultLauncher,
                         viewModel,
@@ -182,11 +182,11 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
                 if (!isListBlocked) {
                     isListBlocked = true
                     binding.listRecyclerView.adapter?.let {
-                        (it as PurchaseAdapter).getLimit(true)
+                        (it as ExpenseAdapter).getLimit(true)
                     }
                     // this trigger the observer
-                    recViewLiveData.removeSource(localPurchasesLiveData)
-                    recViewLiveData.addSource(localPurchasesLiveData) { value ->
+                    recViewLiveData.removeSource(localExpensesLiveData)
+                    recViewLiveData.addSource(localExpensesLiveData) { value ->
                         recViewLiveData.value = value
                     }
                 }
@@ -194,23 +194,23 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         }
     }
 
-    override fun onCompleted(response: LiveData<PurchaseResult>) {
+    override fun onCompleted(response: LiveData<FinanceResult>) {
         response.observe(viewLifecycleOwner) { result ->
             when (result.code) {
-                PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
+                FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS.code -> {
                     val limit = if (binding.listRecyclerView.adapter != null) {
-                        (binding.listRecyclerView.adapter as PurchaseAdapter).getLimit()
+                        (binding.listRecyclerView.adapter as ExpenseAdapter).getLimit()
                     } else {
                         DEFAULT_LIMIT
                     }
-                    isListBlocked = limit >= maxPurchaseNumber
+                    isListBlocked = limit >= maxExpensesNumber
                 }
 
-                PurchaseCode.PURCHASE_EDIT_SUCCESS.code -> {
+                FinanceCode.EXPENSE_EDIT_SUCCESS.code -> {
                     Unit
                 }
 
-                PurchaseCode.PURCHASE_ADD_SUCCESS.code -> {
+                FinanceCode.EXPENSE_ADD_SUCCESS.code -> {
                     (activity as HomeActivity).showSnackBar(result.message)
                 }
 
@@ -222,16 +222,16 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
     }
 
     override fun onDeleteCompleted(
-        response: LiveData<PurchaseResult>,
-        purchase: Purchase
+        response: LiveData<FinanceResult>,
+        expense: Expense
     ) {
         response.observe(viewLifecycleOwner) { result ->
-            if (result.code == PurchaseCode.PURCHASE_DELETE_SUCCESS.code) {
+            if (result.code == FinanceCode.EXPENSE_DELETE_SUCCESS.code) {
                 (activity as HomeActivity).showSnackBar(
                     result.message,
                     getString(R.string.cancel)
                 ) {
-                    viewModel.addPurchase(purchase)
+                    viewModel.addExpense(expense)
                 }
             } else {
                 (activity as HomeActivity).showSnackBar(result.message)
@@ -262,11 +262,11 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
     }
 
     class ModalBottomSheet(
-        private val fragment: PaymentsFragment,
-        private val purchase: Purchase,
+        private val fragment: ExpensesFragment,
+        private val expense: Expense,
         private val position: Int,
         private val editResultLauncher: ActivityResultLauncher<Intent>,
-        private val viewModel: PaymentsViewModel,
+        private val viewModel: ExpensesViewModel,
         private val fromCategoryIcon: Boolean = false
     ) : BottomSheetDialogFragment() {
 
@@ -281,13 +281,13 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         ): View? {
             val layout = inflater.inflate(
                 if (fromCategoryIcon) R.layout.layout_category_bottom_sheet
-                else R.layout.layout_edit_purchase_bottom_sheet,
+                else R.layout.layout_edit_expense_bottom_sheet,
                 container,
                 false
             )
             fragment.defineSheetInterface(
                 layout,
-                purchase,
+                expense,
                 position,
                 editResultLauncher,
                 viewModel,
@@ -300,22 +300,22 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
 
     fun defineSheetInterface(
         layout: View,
-        purchase: Purchase,
+        expense: Expense,
         position: Int,
         editResultLauncher: ActivityResultLauncher<Intent>,
-        viewModel: PaymentsViewModel,
+        viewModel: ExpensesViewModel,
         dismissFun: () -> Unit,
         fromCategoryIcon: Boolean = false
     ) {
-        layout.findViewById<MaterialTextView>(R.id.nameTV).text = purchase.name
+        layout.findViewById<MaterialTextView>(R.id.nameTV).text = expense.name
         layout.findViewById<MaterialTextView>(R.id.dateTV).text =
-            dateToString(purchase.day, purchase.month, purchase.year)
+            dateToString(expense.day, expense.month, expense.year)
         layout.findViewById<MaterialTextView>(R.id.priceTV).text =
-            doubleToPrice(purchase.price ?: 0.0)
-        layout.findViewById<MaterialButton>(R.id.purchaseCategoryIcon).icon =
+            doubleToPrice(expense.price ?: 0.0)
+        layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon).icon =
             ContextCompat.getDrawable(
                 requireContext(),
-                when (purchase.category) {
+                when (expense.category) {
                     DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
                     DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
                     DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
@@ -332,42 +332,42 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         if (fromCategoryIcon) {
             // layout_category_bottom_sheet.xml
             layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout).visibility = View.GONE
-            layout.findViewById<ConstraintLayout>(R.id.purchaseDetailLayout).visibility =
+            layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout).visibility =
                 View.VISIBLE
             layout.findViewById<LinearLayout>(R.id.housing_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.HOUSING.value)
+                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.HOUSING.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.groceries_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.GROCERIES.value)
+                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.GROCERIES.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.personal_care_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.PERSONAL_CARE.value)
+                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.PERSONAL_CARE.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.entertainment_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.ENTERTAINMENT.value)
+                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.ENTERTAINMENT.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.education_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.EDUCATION.value)
+                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.EDUCATION.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.dining_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.DINING.value)
+                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.DINING.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.health_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.HEALTH.value)
+                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.HEALTH.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.transportation_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.TRANSPORTATION.value)
+                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.TRANSPORTATION.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.miscellaneous_layout).setOnClickListener {
-                viewModel.updateCategory(purchase, DbPurchases.CATEGORIES.MISCELLANEOUS.value)
+                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.MISCELLANEOUS.value)
                 dismissFun()
             }
             return
@@ -379,21 +379,21 @@ class PaymentsFragment : BaseFragment(), PurchaseInteractionListener, PaymentLis
         editLayout.setOnClickListener {
             Intent(context, AddActivity::class.java).also {
                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
-                it.putExtra(AddActivity.PURCHASE_REQUEST_KEY, AddActivity.REQUEST_PAYMENT_CODE)
-                it.putExtra(AddActivity.PURCHASE_ID_KEY, purchase.id)
-                it.putExtra(AddActivity.PURCHASE_NAME_KEY, purchase.name)
-                it.putExtra(AddActivity.PURCHASE_PRICE_KEY, purchase.price)
-                it.putExtra(AddActivity.PURCHASE_CATEGORY_KEY, purchase.category)
-                it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
-                it.putExtra(AddActivity.PURCHASE_YEAR_KEY, purchase.year)
-                it.putExtra(AddActivity.PURCHASE_MONTH_KEY, purchase.month)
-                it.putExtra(AddActivity.PURCHASE_DAY_KEY, purchase.day)
+                it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_EXPENSE_CODE)
+                it.putExtra(AddActivity.EXPENSE_ID_KEY, expense.id)
+                it.putExtra(AddActivity.EXPENSE_NAME_KEY, expense.name)
+                it.putExtra(AddActivity.EXPENSE_PRICE_KEY, expense.price)
+                it.putExtra(AddActivity.EXPENSE_CATEGORY_KEY, expense.category)
+                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                it.putExtra(AddActivity.EXPENSE_YEAR_KEY, expense.year)
+                it.putExtra(AddActivity.EXPENSE_MONTH_KEY, expense.month)
+                it.putExtra(AddActivity.EXPENSE_DAY_KEY, expense.day)
                 editResultLauncher.launch(it)
             }
             dismissFun()
         }
         deleteLayout.setOnClickListener {
-            viewModel.deletePurchase(purchase)
+            viewModel.deleteExpense(expense)
             dismissFun()
         }
     }

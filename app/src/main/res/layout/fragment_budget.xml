@@ -12,7 +12,7 @@
 
         <import type="com.frafio.myfinance.utils.FormatUtilsKt" />
 
-        <import type="com.frafio.myfinance.data.storage.PurchaseStorage" />
+        <import type="com.frafio.myfinance.data.storage.UserStorage" />
 
         <import type="android.view.View" />
 
@@ -93,7 +93,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/textView3"
-                        tools:listitem="@layout/layout_purchase_item_rv"
+                        tools:listitem="@layout/layout_expense_item_rv"
                         tools:visibility="visible" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -155,7 +155,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="5dp"
                         android:fontFamily="@font/nunito"
-                        android:text="@{FormatUtilsKt.doubleToString(PurchaseStorage.INSTANCE.monthlyBudget)}"
+                        android:text="@{FormatUtilsKt.doubleToString(UserStorage.INSTANCE.monthlyBudget)}"
                         android:textColor="@color/primary_text"
                         android:textSize="@dimen/card_price_size"
                         android:visibility="visible"

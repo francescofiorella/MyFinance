@@ -19,16 +19,16 @@ import androidx.lifecycle.LiveData
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
-import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.AuthResult
-import com.frafio.myfinance.data.model.PurchaseResult
+import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.LoginActivity
 import com.frafio.myfinance.ui.home.budget.BudgetFragment
 import com.frafio.myfinance.ui.home.dashboard.DashboardFragment
-import com.frafio.myfinance.ui.home.payments.PaymentsFragment
+import com.frafio.myfinance.ui.home.expenses.ExpensesFragment
 import com.frafio.myfinance.ui.home.profile.ProfileFragment
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
@@ -46,7 +46,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private val viewModel by viewModels<HomeViewModel>()
 
     private var dashboardFragment: DashboardFragment? = null
-    private var paymentsFragment: PaymentsFragment? = null
+    private var expensesFragment: ExpensesFragment? = null
     private var budgetFragment: BudgetFragment? = null
     private var profileFragment: ProfileFragment? = null
     private var activeFragment: BaseFragment? = null
@@ -55,7 +55,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
     companion object {
         private const val DASHBOARD_FRAGMENT_TAG = "dashboard_fragment_tag"
-        private const val PAYMENTS_FRAGMENT_TAG = "payments_fragment_tag"
+        private const val EXPENSES_FRAGMENT_TAG = "expenses_fragment_tag"
         private const val BUDGET_FRAGMENT_TAG = "budget_fragment_tag"
         private const val PROFILE_FRAGMENT_TAG = "profile_fragment_tag"
     }
@@ -63,11 +63,11 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private var addResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data!!
-            val purchaseRequest = data.getIntExtra(AddActivity.PURCHASE_REQUEST_KEY, -1)
+            val expenseRequest = data.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
             val message = data.getStringExtra(AddActivity.ADD_RESULT_MESSAGE) ?: ""
-            when (purchaseRequest) {
-                AddActivity.REQUEST_PAYMENT_CODE -> {
-                    showFragment(R.id.paymentsFragment)
+            when (expenseRequest) {
+                AddActivity.REQUEST_EXPENSE_CODE -> {
+                    showFragment(R.id.expensesFragment)
                     showSnackBar(message)
                 }
 
@@ -125,7 +125,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
             if (userRequest) {
                 showProgressIndicator()
-                viewModel.updateUserPurchases()
+                viewModel.updateUserExpenses()
                 viewModel.updateUserIncomes()
                 viewModel.updateMonthlyBudget()
                 viewModel.updateLocalMonthlyBudget()
@@ -149,7 +149,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             viewModel.fragmentStack.removeLast()
             when (viewModel.fragmentStack.lastOrNull()) {
                 DASHBOARD_FRAGMENT_TAG -> showFragment(R.id.dashboardFragment)
-                PAYMENTS_FRAGMENT_TAG -> showFragment(R.id.paymentsFragment)
+                EXPENSES_FRAGMENT_TAG -> showFragment(R.id.expensesFragment)
                 BUDGET_FRAGMENT_TAG -> showFragment(R.id.budgetFragment)
                 PROFILE_FRAGMENT_TAG -> showFragment(R.id.profileFragment)
                 else -> finish()
@@ -165,17 +165,17 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         super.onRestoreInstanceState(savedInstanceState)
         dashboardFragment = supportFragmentManager
             .findFragmentByTag(DASHBOARD_FRAGMENT_TAG) as DashboardFragment?
-        paymentsFragment = supportFragmentManager
-            .findFragmentByTag(PAYMENTS_FRAGMENT_TAG) as PaymentsFragment?
+        expensesFragment = supportFragmentManager
+            .findFragmentByTag(EXPENSES_FRAGMENT_TAG) as ExpensesFragment?
         budgetFragment = supportFragmentManager
             .findFragmentByTag(BUDGET_FRAGMENT_TAG) as BudgetFragment?
         profileFragment = supportFragmentManager
             .findFragmentByTag(PROFILE_FRAGMENT_TAG) as ProfileFragment?
 
         when (viewModel.fragmentStack.lastOrNull()) {
-            PAYMENTS_FRAGMENT_TAG -> {
-                activeFragment = paymentsFragment
-                showFragment(R.id.paymentsFragment)
+            EXPENSES_FRAGMENT_TAG -> {
+                activeFragment = expensesFragment
+                showFragment(R.id.expensesFragment)
             }
 
             BUDGET_FRAGMENT_TAG -> {
@@ -229,7 +229,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                         DASHBOARD_FRAGMENT_TAG
                     )
                 }
-                binding.fragmentTitle.text = getString(R.string.nav_1)
+                binding.fragmentTitle.text = getString(R.string.dashboard)
                 binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()
 
@@ -241,24 +241,24 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     viewModel.fragmentStack.add(DASHBOARD_FRAGMENT_TAG)
             }
 
-            R.id.paymentsFragment -> {
-                if (paymentsFragment == null) {
-                    paymentsFragment = PaymentsFragment()
+            R.id.expensesFragment -> {
+                if (expensesFragment == null) {
+                    expensesFragment = ExpensesFragment()
                     transaction.add(
                         R.id.home_fragmentContainerView,
-                        paymentsFragment!!,
-                        PAYMENTS_FRAGMENT_TAG
+                        expensesFragment!!,
+                        EXPENSES_FRAGMENT_TAG
                     )
                 }
-                binding.fragmentTitle.text = getString(R.string.nav_2)
+                binding.fragmentTitle.text = getString(R.string.expenses)
                 binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(paymentsFragment!!).commit()
-                activeFragment = paymentsFragment
+                    .hide(activeFragment!!).show(expensesFragment!!).commit()
+                activeFragment = expensesFragment
 
-                if (viewModel.fragmentStack.lastOrNull() != PAYMENTS_FRAGMENT_TAG)
-                    viewModel.fragmentStack.add(PAYMENTS_FRAGMENT_TAG)
+                if (viewModel.fragmentStack.lastOrNull() != EXPENSES_FRAGMENT_TAG)
+                    viewModel.fragmentStack.add(EXPENSES_FRAGMENT_TAG)
             }
 
             R.id.budgetFragment -> {
@@ -270,7 +270,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                         BUDGET_FRAGMENT_TAG
                     )
                 }
-                binding.fragmentTitle.text = getString(R.string.nav_5)
+                binding.fragmentTitle.text = getString(R.string.budget)
                 binding.logoutBtn.instantHide()
                 binding.propicImageView.instantShow()
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -290,7 +290,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                         PROFILE_FRAGMENT_TAG
                     )
                 }
-                binding.fragmentTitle.text = getString(R.string.nav_3)
+                binding.fragmentTitle.text = getString(R.string.profile)
                 binding.logoutBtn.instantShow()
                 binding.propicImageView.instantHide()
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -350,7 +350,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             when (authResult.code) {
                 AuthCode.USER_LOGGED.code -> {
                     showProgressIndicator()
-                    viewModel.updateUserPurchases()
+                    viewModel.updateUserExpenses()
                     viewModel.updateUserIncomes()
                     viewModel.updateMonthlyBudget()
                     viewModel.updateLocalMonthlyBudget()
@@ -372,14 +372,14 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         }
     }
 
-    override fun onUserDataUpdated(response: LiveData<PurchaseResult>) {
+    override fun onUserDataUpdated(response: LiveData<FinanceResult>) {
         response.observe(this) { result ->
             when (result.code) {
-                PurchaseCode.PURCHASE_LIST_UPDATE_SUCCESS.code -> {
+                FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS.code -> {
                     hideProgressIndicator()
                 }
 
-                PurchaseCode.BUDGET_UPDATE_SUCCESS.code -> Unit
+                FinanceCode.BUDGET_UPDATE_SUCCESS.code -> Unit
 
                 else -> Unit
             }

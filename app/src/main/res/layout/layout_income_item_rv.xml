@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="5dp"
                 android:clickable="false"
-                android:contentDescription="@string/purchase_category_icon"
+                android:contentDescription="@string/expense_category_icon"
                 android:visibility="@{income.category == DbPurchases.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

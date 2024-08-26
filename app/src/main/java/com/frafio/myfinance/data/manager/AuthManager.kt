@@ -9,9 +9,8 @@ import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.auth.SignupException
 import com.frafio.myfinance.data.model.AuthResult
-import com.frafio.myfinance.data.repository.LocalIncomeRepository
-import com.frafio.myfinance.data.repository.LocalPurchaseRepository
-import com.frafio.myfinance.data.storage.PurchaseStorage
+import com.frafio.myfinance.data.repository.IncomesLocalRepository
+import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.storage.UserStorage
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedMonthlyBudget
@@ -45,8 +44,8 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
     private val fUser: FirebaseUser?
         get() = fAuth.currentUser
 
-    private val localPurchaseRepository = LocalPurchaseRepository()
-    private val localIncomeRepository = LocalIncomeRepository()
+    private val expensesLocalRepository = ExpensesLocalRepository()
+    private val incomesLocalRepository = IncomesLocalRepository()
 
     fun updateUserProfile(fullName: String?, propicUri: String?): LiveData<AuthResult> {
         val response = MutableLiveData<AuthResult>()
@@ -232,11 +231,11 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         fAuth.signOut()
 
         CoroutineScope(Dispatchers.IO).launch {
-            localPurchaseRepository.deleteAll()
-            localIncomeRepository.deleteAll()
+            expensesLocalRepository.deleteAll()
+            incomesLocalRepository.deleteAll()
         }
         setSharedMonthlyBudget(sharedPreferences, 0.0)
-        PurchaseStorage.resetBudget()
+        UserStorage.resetBudget()
         UserStorage.resetUser()
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)

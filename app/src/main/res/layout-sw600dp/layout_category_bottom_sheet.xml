@@ -8,13 +8,13 @@
     android:paddingVertical="30dp">
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/purchaseCategoryIcon"
+        android:id="@+id/expenseCategoryIcon"
         style="?attr/materialIconButtonFilledTonalStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:clickable="false"
-        android:contentDescription="@string/purchase_category_icon"
+        android:contentDescription="@string/expense_category_icon"
         android:focusable="false"
         android:longClickable="false"
         app:icon="@drawable/ic_tag"
@@ -26,10 +26,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/purchaseCategoryIcon"
+        app:layout_constraintBottom_toBottomOf="@id/expenseCategoryIcon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/purchaseCategoryIcon"
-        app:layout_constraintTop_toTopOf="@id/purchaseCategoryIcon">
+        app:layout_constraintStart_toEndOf="@id/expenseCategoryIcon"
+        app:layout_constraintTop_toTopOf="@id/expenseCategoryIcon">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv0"
@@ -62,14 +62,14 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/purchaseDetailLayout"
+        android:id="@+id/expenseDetailLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@id/purchaseCategoryIcon"
+        app:layout_constraintBottom_toBottomOf="@id/expenseCategoryIcon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/purchaseCategoryIcon"
-        app:layout_constraintTop_toTopOf="@id/purchaseCategoryIcon">
+        app:layout_constraintStart_toEndOf="@id/expenseCategoryIcon"
+        app:layout_constraintTop_toTopOf="@id/expenseCategoryIcon">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/nameTV"
@@ -119,7 +119,7 @@
         app:dividerInsetStart="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/purchaseCategoryIcon" />
+        app:layout_constraintTop_toBottomOf="@id/expenseCategoryIcon" />
 
     <LinearLayout
         android:id="@+id/editCategoryLayout"

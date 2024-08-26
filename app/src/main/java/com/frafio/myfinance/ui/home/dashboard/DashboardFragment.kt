@@ -11,8 +11,8 @@ import androidx.lifecycle.MediatorLiveData
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.composable.PieChart
 import com.frafio.myfinance.data.model.BarChartEntry
-import com.frafio.myfinance.data.model.Purchase
-import com.frafio.myfinance.data.storage.PurchaseStorage
+import com.frafio.myfinance.data.model.Expense
+import com.frafio.myfinance.data.storage.UserStorage
 import com.frafio.myfinance.data.widget.BarChart
 import com.frafio.myfinance.data.widget.ProgressBar
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
@@ -41,7 +41,7 @@ class DashboardFragment : BaseFragment() {
         budgetProgressBar = ProgressBar(binding.barChartLayout, requireContext())
         monthlyBarChart = BarChart(binding.monthlyChart, requireContext())
 
-        viewModel.getPurchaseNumber().observe(viewLifecycleOwner) {
+        viewModel.getExpensesNumber().observe(viewLifecycleOwner) {
             viewModel.isListEmpty.value = it == 0
         }
 
@@ -124,13 +124,13 @@ class DashboardFragment : BaseFragment() {
             }
         }
 
-        val pieChartLiveData = MediatorLiveData<List<Purchase>>()
-        var purchasesOfMonthOrYearLiveData = viewModel.getPurchasesOfMonth()
-        pieChartLiveData.addSource(purchasesOfMonthOrYearLiveData) { value ->
+        val pieChartLiveData = MediatorLiveData<List<Expense>>()
+        var expensesOfMonthOrYearLiveData = viewModel.getExpensesOfMonth()
+        pieChartLiveData.addSource(expensesOfMonthOrYearLiveData) { value ->
             pieChartLiveData.value = value
         }
         var animationPlayed = false
-        pieChartLiveData.observe(viewLifecycleOwner) { purchases ->
+        pieChartLiveData.observe(viewLifecycleOwner) { expenses ->
             // Create a LocalDate with the given month
             val formatter = DateTimeFormatter.ofPattern(
                 if (viewModel.monthlyShownInPieChart) "MMMM uuuu" else "uuuu"
@@ -138,7 +138,7 @@ class DashboardFragment : BaseFragment() {
             val dateShownString = viewModel.pieChartDate.value!!.format(formatter)
             binding.dataShownTV.text = dateShownString
             val values = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-            purchases.forEach { p ->
+            expenses.forEach { p ->
                 if (p.category!! <= 8) {
                     values[p.category] += p.price!!
                 }
@@ -157,12 +157,12 @@ class DashboardFragment : BaseFragment() {
         }
         viewModel.pieChartDate.observe(viewLifecycleOwner) {
             // this trigger the observer
-            pieChartLiveData.removeSource(purchasesOfMonthOrYearLiveData)
-            purchasesOfMonthOrYearLiveData = if (viewModel.monthlyShownInPieChart)
-                viewModel.getPurchasesOfMonth()
+            pieChartLiveData.removeSource(expensesOfMonthOrYearLiveData)
+            expensesOfMonthOrYearLiveData = if (viewModel.monthlyShownInPieChart)
+                viewModel.getExpensesOfMonth()
             else
-                viewModel.getPurchasesOfYear()
-            pieChartLiveData.addSource(purchasesOfMonthOrYearLiveData) { value ->
+                viewModel.getExpensesOfYear()
+            pieChartLiveData.addSource(expensesOfMonthOrYearLiveData) { value ->
                 pieChartLiveData.value = value
             }
         }
@@ -197,7 +197,7 @@ class DashboardFragment : BaseFragment() {
             viewModel.nextBarChartDate()
         }
 
-        PurchaseStorage.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
+        UserStorage.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
             if (monthlyBudget == null) return@observe
             viewModel.monthlyBudget = monthlyBudget
             if (viewModel.monthShown) {

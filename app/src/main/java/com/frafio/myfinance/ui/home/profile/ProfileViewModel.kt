@@ -5,14 +5,14 @@ import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.BuildConfig
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.model.User
-import com.frafio.myfinance.data.repository.PurchaseRepository
+import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.data.repository.UserRepository
 import com.google.android.material.color.DynamicColors
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
-    private val purchaseRepository =
-        PurchaseRepository((application as MyFinanceApplication).purchaseManager)
+    private val expensesRepository =
+        ExpensesRepository((application as MyFinanceApplication).expensesManager)
     var user = userRepository.getUser()
     val googleSignIn = user?.provider == User.GOOGLE_PROVIDER
 
@@ -41,10 +41,10 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     var isSwitchDynamicColorChecked: Boolean = getDynamicColorCheck()
 
     fun setDynamicColor(active: Boolean) {
-        purchaseRepository.setDynamicColorActive(active)
+        expensesRepository.setDynamicColorActive(active)
     }
 
     private fun getDynamicColorCheck(): Boolean {
-        return purchaseRepository.getDynamicColorActive()
+        return expensesRepository.getDynamicColorActive()
     }
 }

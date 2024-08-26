@@ -218,5 +218,5 @@ enum class AuthCode(val code: Int, val message: String) {
             Languages.ITALIANO.value -> "Aggiornamento dati utente non riuscito!"
             else -> "User data not updated!" // english
         }
-    );
+    )
 }

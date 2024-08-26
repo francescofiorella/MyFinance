@@ -7,18 +7,18 @@ import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.repository.IncomeRepository
-import com.frafio.myfinance.data.repository.LocalIncomeRepository
-import com.frafio.myfinance.data.repository.PurchaseRepository
-import com.frafio.myfinance.data.storage.PurchaseStorage
+import com.frafio.myfinance.data.repository.IncomesLocalRepository
+import com.frafio.myfinance.data.repository.ExpensesRepository
+import com.frafio.myfinance.data.storage.UserStorage
 
 class BudgetViewModel(application: Application) : AndroidViewModel(application) {
-    private val purchaseRepository = PurchaseRepository(
-        (application as MyFinanceApplication).purchaseManager
+    private val expensesRepository = ExpensesRepository(
+        (application as MyFinanceApplication).expensesManager
     )
     private val incomeRepository = IncomeRepository(
-        (application as MyFinanceApplication).incomeManager
+        (application as MyFinanceApplication).incomesManager
     )
-    private val localIncomeRepository = LocalIncomeRepository()
+    private val incomesLocalRepository = IncomesLocalRepository()
 
     var listener: BudgetListener? = null
 
@@ -39,13 +39,13 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun setMonthlyBudget(budget: Double, getOldBudget: Boolean = false) {
-        val previousBudget = if (getOldBudget) PurchaseStorage.monthlyBudget.value ?: 0.0 else null
-        val response = purchaseRepository.setMonthlyBudget(budget)
+        val previousBudget = if (getOldBudget) UserStorage.monthlyBudget.value ?: 0.0 else null
+        val response = expensesRepository.setMonthlyBudget(budget)
         listener?.onCompleted(response, previousBudget)
     }
 
     fun getLocalIncomes(): LiveData<List<Income>> {
-        return localIncomeRepository.getAll()
+        return incomesLocalRepository.getAll()
     }
 
     fun deleteIncome(income: Income) {

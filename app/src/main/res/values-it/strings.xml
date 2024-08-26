@@ -1,17 +1,10 @@
 <resources>
     <string name="app_name">MyFinance</string>
 
-    <string name="nav_1">Dashboard</string>
-    <string name="nav_2">Pagamenti</string>
-    <string name="nav_3">Profilo</string>
-    <string name="nav_4">Menu</string>
-    <string name="nav_5">Budget</string>
-    <string name="add_purchase">Aggiungi pagamento</string>
-    <string name="edit_purchase">Modifica pagamento</string>
-    <string name="add_income">Aggiungi entrata</string>
-    <string name="edit_income">Modifica entrata</string>
-
-    <string name="addBtnContentDescription">Aggiungi un pagamento</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="expenses">Spese</string>
+    <string name="profile">Profilo</string>
+    <string name="budget">Budget</string>
 
     <string name="add">Aggiungi</string>
     <string name="edit">Modifica</string>
@@ -19,17 +12,12 @@
     <string name="cancel">Annulla</string>
     <string name="confirm">Conferma</string>
 
-    <string name="purchase_added">Pagamento aggiunto!</string>
-
     <string name="login_successful">Hai effettuato l\'accesso come</string>
 
-    <string name="purchase_delete_dialog">Vuoi eliminare il pagamento selezionato?</string>
-    <string name="purchase_edit_delete_dialog">Vuoi modificare o eliminare il pagamento selezionato?</string>
-
-    <string name="invoice_delete_dialog">Vuoi eliminare la voce selezionata?</string>
-
     <string name="name">Nome</string>
-    <string name="price">Costo</string>
+    <string name="amount">Importo</string>
+    <string name="date">Data</string>
+    <string name="category">Categoria</string>
 
     <string name="login_signup_email">Inserisci la tua email</string>
     <string name="login_password">Inserisci la password</string>
@@ -42,52 +30,37 @@
     <string name="signup_password_confirm">Inserisci nuovamente la password</string>
     <string name="signup">Registrati</string>
     <string name="signup_login">Hai già un account? Accedi</string>
-    <string name="warning_home">Aggiungi il tuo primo pagamento!</string>
+    <string name="warning_home">Aggiungi la tua prima spesa!</string>
     <string name="warning_budget">Nessuna entrata da mostrare</string>
 
-    <string name="avg_month">Media \nmensile</string>
-    <string name="today">Acquisti \noggi</string>
+    <string name="expenses_today">Spese \noggi</string>
     <string name="this_month">Questo mese</string>
     <string name="this_year">Quest\'anno</string>
     <string name="this_month_next">Questo \nmese</string>
     <string name="this_year_next">Questo \nanno</string>
-    <string name="monthly_payments">Pagamenti mensili</string>
+    <string name="monthly_expenses">Spese mensili</string>
 
-    <string name="logout">Log Out</string>
     <string name="profile_picture">Immagine di profilo</string>
 
-    <string name="trend_avg_day">Trend Media Giornaliera</string>
-    <string name="language">Lingua</string>
-
-    <string name="date">Data</string>
-
-    <string name="translation_warning">Riavvia l\'app per rendere le modifiche effettive</string>
     <string name="use_dynamic_color">Colori dinamici</string>
     <string name="restart_app_changes">Riavvia l\'app per applicare le modifiche.</string>
-
-    <string name="total_purchase">Totale</string>
-
     <string name="restart">Riavvia</string>
 
     <string name="sign_up_provider">Registrato con Google</string>
     <string name="signUpDate">Account creato il %1$s</string>
-    <string name="category">Categoria</string>
-    <string name="create">Crea</string>
-    <string name="create_category">Crea categoria</string>
-    <string name="empty_category">Inserisci il nome della categoria!</string>
 
-    <string name="generic_error">Errore generico!</string>
+    <string name="change_content">Scambia contenuto</string>
+
     <string name="edit_profile">Modifica il profilo</string>
     <string name="edit_propic">Carica la foto profilo</string>
     <string name="edit_full_name">Modifica il nome</string>
-    <string name="purchase_category_icon">Icona di categoria acquisto</string>
-    <string name="no_purchases">Nessun acquisto</string>
+    <string name="expense_category_icon">Icona di categoria spesa</string>
+    <string name="no_expenses">Nessuna spesa</string>
     <string name="no_incomes">Nessuna entrata</string>
 
     <string name="monthly_budget">Budget mensile</string>
     <string name="annual_budget">Budget annuale</string>
     <string name="incomes">Entrate</string>
-    <string name="amount">Importo</string>
 
     <string name="total">Totale</string>
 
@@ -102,11 +75,11 @@
     <string name="miscellaneous">Varie</string>
 
     <string name="select">Seleziona</string>
-    <string name="payment">Pagamento</string>
+    <string name="expense">Spesa</string>
     <string name="income">Entrata</string>
     <string name="save">Salva</string>
     <string name="monthly">Mensile</string>
     <string name="annual">Annuale</string>
     <string name="shown">Mostrato:</string>
-    <string name="payments_by_category">Pagamenti per categoria</string>
+    <string name="expenses_by_category">Spese per categoria</string>
 </resources>

@@ -18,18 +18,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.PurchaseCode
-import com.frafio.myfinance.data.manager.IncomeManager.Companion.DEFAULT_LIMIT
+import com.frafio.myfinance.data.enums.db.FinanceCode
+import com.frafio.myfinance.data.manager.IncomesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Income
-import com.frafio.myfinance.data.model.PurchaseResult
-import com.frafio.myfinance.data.storage.IncomeStorage
-import com.frafio.myfinance.data.storage.PurchaseStorage
+import com.frafio.myfinance.data.model.FinanceResult
+import com.frafio.myfinance.data.storage.UserStorage
 import com.frafio.myfinance.databinding.FragmentBudgetBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.utils.addTotalsToIncomes
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.createTextDrawable
 import com.frafio.myfinance.utils.dateToString
@@ -52,10 +52,10 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
-            val editRequest = data!!.getIntExtra(AddActivity.PURCHASE_REQUEST_KEY, -1)
+            val editRequest = data!!.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
 
             if (editRequest == AddActivity.REQUEST_INCOME_CODE) {
-                (activity as HomeActivity).showSnackBar(PurchaseCode.INCOME_EDIT_SUCCESS.message)
+                (activity as HomeActivity).showSnackBar(FinanceCode.INCOME_EDIT_SUCCESS.message)
             }
         }
     }
@@ -85,7 +85,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             }
             // Get list with limit and update recList
             var nl = incomes.take(limit.toInt()).map { i -> i.copy() }
-            nl = IncomeStorage.addTotals(nl)
+            nl = addTotalsToIncomes(nl)
             viewModel.updateIncomesEmpty(nl.isEmpty())
             maxIncomeNumber = incomes.size.toLong()
             binding.budgetRecyclerView.also {
@@ -101,7 +101,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             }
         }
 
-        PurchaseStorage.monthlyBudget.observe(viewLifecycleOwner) { budget ->
+        UserStorage.monthlyBudget.observe(viewLifecycleOwner) { budget ->
             viewModel.updateAnnualBudget(budget * 12)
             binding.monthlyBudgetDeleteBtn.isEnabled = budget != 0.0
         }
@@ -155,10 +155,10 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         return binding.root
     }
 
-    override fun onCompleted(response: LiveData<PurchaseResult>, previousBudget: Double?) {
+    override fun onCompleted(response: LiveData<FinanceResult>, previousBudget: Double?) {
         response.observe(viewLifecycleOwner) { result ->
             when (result.code) {
-                PurchaseCode.INCOME_LIST_UPDATE_SUCCESS.code -> {
+                FinanceCode.INCOME_LIST_UPDATE_SUCCESS.code -> {
                     val limit = if (binding.budgetRecyclerView.adapter != null) {
                         (binding.budgetRecyclerView.adapter as IncomeAdapter).getLimit()
                     } else {
@@ -167,7 +167,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                     isListBlocked = limit >= maxIncomeNumber
                 }
 
-                PurchaseCode.BUDGET_UPDATE_SUCCESS.code -> {
+                FinanceCode.BUDGET_UPDATE_SUCCESS.code -> {
                     if (!binding.monthlyBudgetTV.isVisible) {
                         binding.monthlyBudgetTV.visibility = View.VISIBLE
                         binding.monthlyBudgetET.visibility = View.GONE
@@ -188,7 +188,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                     }
                 }
 
-                PurchaseCode.INCOME_ADD_SUCCESS.code -> {
+                FinanceCode.INCOME_ADD_SUCCESS.code -> {
                     (activity as HomeActivity).showSnackBar(result.message)
                 }
 
@@ -199,9 +199,9 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         }
     }
 
-    override fun onDeleteCompleted(response: LiveData<PurchaseResult>, income: Income) {
+    override fun onDeleteCompleted(response: LiveData<FinanceResult>, income: Income) {
         response.observe(viewLifecycleOwner) { result ->
-            if (result.code == PurchaseCode.INCOME_DELETE_SUCCESS.code) {
+            if (result.code == FinanceCode.INCOME_DELETE_SUCCESS.code) {
                 (activity as HomeActivity).showSnackBar(
                     result.message,
                     getString(R.string.cancel)
@@ -219,7 +219,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             ON_LONG_CLICK -> {
                 if (resources.getBoolean(R.bool.is600dp)) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
-                    sideSheetDialog.setContentView(R.layout.layout_edit_purchase_bottom_sheet)
+                    sideSheetDialog.setContentView(R.layout.layout_edit_expense_bottom_sheet)
                     defineSheetInterface(
                         sideSheetDialog.findViewById(android.R.id.content)!!,
                         income,
@@ -295,7 +295,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             savedInstanceState: Bundle?
         ): View? {
             val layout =
-                inflater.inflate(R.layout.layout_edit_purchase_bottom_sheet, container, false)
+                inflater.inflate(R.layout.layout_edit_expense_bottom_sheet, container, false)
             fragment.defineSheetInterface(
                 layout,
                 income,
@@ -321,7 +321,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             dateToString(income.day, income.month, income.year)
         layout.findViewById<MaterialTextView>(R.id.priceTV).text =
             doubleToPrice(income.price ?: 0.0)
-        layout.findViewById<MaterialButton>(R.id.purchaseCategoryIcon).icon =
+        layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon).icon =
             createTextDrawable(layout.context, income.name!![0].uppercase())
 
         val editLayout = layout.findViewById<LinearLayout>(R.id.edit_layout)
@@ -329,15 +329,15 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         editLayout.setOnClickListener {
             Intent(context, AddActivity::class.java).also {
                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
-                it.putExtra(AddActivity.PURCHASE_REQUEST_KEY, AddActivity.REQUEST_INCOME_CODE)
-                it.putExtra(AddActivity.PURCHASE_ID_KEY, income.id)
-                it.putExtra(AddActivity.PURCHASE_NAME_KEY, income.name)
-                it.putExtra(AddActivity.PURCHASE_PRICE_KEY, income.price)
-                it.putExtra(AddActivity.PURCHASE_CATEGORY_KEY, income.category)
-                it.putExtra(AddActivity.PURCHASE_POSITION_KEY, position)
-                it.putExtra(AddActivity.PURCHASE_YEAR_KEY, income.year)
-                it.putExtra(AddActivity.PURCHASE_MONTH_KEY, income.month)
-                it.putExtra(AddActivity.PURCHASE_DAY_KEY, income.day)
+                it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_INCOME_CODE)
+                it.putExtra(AddActivity.EXPENSE_ID_KEY, income.id)
+                it.putExtra(AddActivity.EXPENSE_NAME_KEY, income.name)
+                it.putExtra(AddActivity.EXPENSE_PRICE_KEY, income.price)
+                it.putExtra(AddActivity.EXPENSE_CATEGORY_KEY, income.category)
+                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                it.putExtra(AddActivity.EXPENSE_YEAR_KEY, income.year)
+                it.putExtra(AddActivity.EXPENSE_MONTH_KEY, income.month)
+                it.putExtra(AddActivity.EXPENSE_DAY_KEY, income.day)
                 editResultLauncher.launch(it)
             }
             dismissFun()

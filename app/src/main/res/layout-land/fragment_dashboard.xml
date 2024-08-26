@@ -261,7 +261,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
-                            android:text="@string/today"
+                            android:text="@string/expenses_today"
                             android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
@@ -352,7 +352,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
-                            android:text="@string/monthly_payments"
+                            android:text="@string/monthly_expenses"
                             android:textSize="@dimen/card_title_size"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -849,7 +849,7 @@
                             android:textSize="@dimen/card_title_size"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            android:text="@string/payments_by_category" />
+                            android:text="@string/expenses_by_category" />
 
                         <com.google.android.material.chip.ChipGroup
                             android:id="@+id/chip_group"

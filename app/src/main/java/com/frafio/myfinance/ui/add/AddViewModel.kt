@@ -5,22 +5,22 @@ import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.widget.DatePickerButton
 import com.frafio.myfinance.data.model.Income
-import com.frafio.myfinance.data.model.Purchase
-import com.frafio.myfinance.data.model.PurchaseResult
+import com.frafio.myfinance.data.model.Expense
+import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.repository.IncomeRepository
-import com.frafio.myfinance.data.repository.PurchaseRepository
+import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.utils.dateToUTCTimestamp
 import java.time.LocalDate
 
 class AddViewModel(application: Application) : AndroidViewModel(application) {
-    private val purchaseRepository = PurchaseRepository(
-        (application as MyFinanceApplication).purchaseManager
+    private val expensesRepository = ExpensesRepository(
+        (application as MyFinanceApplication).expensesManager
     )
     private val incomeRepository = IncomeRepository(
-        (application as MyFinanceApplication).incomeManager
+        (application as MyFinanceApplication).incomesManager
     )
 
     var listener: AddListener? = null
@@ -35,11 +35,11 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
     var month: Int? = LocalDate.now().monthValue
     var day: Int? = LocalDate.now().dayOfMonth
 
-    var purchaseID: String? = null
-    var purchasePosition: Int? = null
+    var expenseId: String? = null
+    var expensePosition: Int? = null
 
     var requestCode: Int? = null
-    var purchaseCode: Int? = null
+    var expenseCode: Int? = null
 
     fun updateTime(datePickerBtn: DatePickerButton) {
         year = datePickerBtn.year
@@ -53,24 +53,24 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
 
         // check info
         if (name.isNullOrEmpty()) {
-            listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_NAME))
+            listener?.onAddFailure(FinanceResult(FinanceCode.EMPTY_NAME))
             return
         }
 
         if ((name == DbPurchases.NAMES.TOTAL.valueEn || name == DbPurchases.NAMES.TOTAL.valueIt)) {
-            listener?.onAddFailure(PurchaseResult(PurchaseCode.WRONG_NAME_TOTAL))
+            listener?.onAddFailure(FinanceResult(FinanceCode.WRONG_NAME_TOTAL))
             return
         }
 
         if (priceString.isNullOrEmpty()) {
-            listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_PRICE))
+            listener?.onAddFailure(FinanceResult(FinanceCode.EMPTY_AMOUNT))
             return
         }
 
-        if (purchaseCode == AddActivity.REQUEST_INCOME_CODE) {
+        if (expenseCode == AddActivity.REQUEST_INCOME_CODE) {
             category = DbPurchases.CATEGORIES.INCOME.value
         } else if (category == -1) {
-            listener?.onAddFailure(PurchaseResult(PurchaseCode.EMPTY_CATEGORY))
+            listener?.onAddFailure(FinanceResult(FinanceCode.EMPTY_CATEGORY))
             return
         }
 
@@ -78,8 +78,8 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
 
         when (requestCode) {
             AddActivity.REQUEST_ADD_CODE -> {
-                val response = if (purchaseCode == AddActivity.REQUEST_PAYMENT_CODE) {
-                    val purchase = Purchase(
+                val response = if (expenseCode == AddActivity.REQUEST_EXPENSE_CODE) {
+                    val expense = Expense(
                         name,
                         price,
                         year,
@@ -88,7 +88,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                         dateToUTCTimestamp(year!!, month!!, day!!),
                         category
                     )
-                    purchaseRepository.addPurchase(purchase)
+                    expensesRepository.addExpense(expense)
                 } else {
                     val income = Income(
                         name,
@@ -105,8 +105,8 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             AddActivity.REQUEST_EDIT_CODE -> {
-                val response = if (purchaseCode == AddActivity.REQUEST_PAYMENT_CODE) {
-                    val purchase = Purchase(
+                val response = if (expenseCode == AddActivity.REQUEST_EXPENSE_CODE) {
+                    val expense = Expense(
                         name,
                         price,
                         year,
@@ -114,9 +114,9 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                         day,
                         dateToUTCTimestamp(year!!, month!!, day!!),
                         category,
-                        purchaseID!!
+                        expenseId!!
                     )
-                    purchaseRepository.editPurchase(purchase)
+                    expensesRepository.editExpense(expense)
                 } else {
                     val income = Income(
                         name,
@@ -126,7 +126,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                         day,
                         dateToUTCTimestamp(year!!, month!!, day!!),
                         category,
-                        purchaseID!!
+                        expenseId!!
                     )
                     incomeRepository.editIncome(income)
                 }

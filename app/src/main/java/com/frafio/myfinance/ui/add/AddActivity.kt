@@ -14,9 +14,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.enums.db.PurchaseCode
+import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.widget.DatePickerButton
-import com.frafio.myfinance.data.model.PurchaseResult
+import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.hideSoftKeyboard
@@ -30,18 +30,18 @@ class AddActivity : AppCompatActivity(), AddListener {
     companion object {
         const val REQUEST_ADD_CODE: Int = 1
         const val REQUEST_EDIT_CODE: Int = 2
-        const val REQUEST_PAYMENT_CODE: Int = 10
+        const val REQUEST_EXPENSE_CODE: Int = 10
         const val REQUEST_INCOME_CODE: Int = 11
         const val REQUEST_CODE_KEY: String = "com.frafio.myfinance.REQUEST_CODE"
-        const val PURCHASE_REQUEST_KEY: String = "com.frafio.myfinance.PURCHASE_REQUEST"
-        const val PURCHASE_ID_KEY: String = "com.frafio.myfinance.PURCHASE_ID"
-        const val PURCHASE_NAME_KEY: String = "com.frafio.myfinance.PURCHASE_NAME"
-        const val PURCHASE_PRICE_KEY: String = "com.frafio.myfinance.PURCHASE_PRICE"
-        const val PURCHASE_CATEGORY_KEY: String = "com.frafio.myfinance.PURCHASE_CATEGORY"
-        const val PURCHASE_POSITION_KEY: String = "com.frafio.myfinance.PURCHASE_POSITION"
-        const val PURCHASE_YEAR_KEY: String = "com.frafio.myfinance.PURCHASE_YEAR"
-        const val PURCHASE_MONTH_KEY: String = "com.frafio.myfinance.PURCHASE_MONTH"
-        const val PURCHASE_DAY_KEY: String = "com.frafio.myfinance.PURCHASE_DAY"
+        const val EXPENSE_REQUEST_KEY: String = "com.frafio.myfinance.EXPENSE_REQUEST"
+        const val EXPENSE_ID_KEY: String = "com.frafio.myfinance.EXPENSE_ID"
+        const val EXPENSE_NAME_KEY: String = "com.frafio.myfinance.EXPENSE_NAME"
+        const val EXPENSE_PRICE_KEY: String = "com.frafio.myfinance.EXPENSE_PRICE"
+        const val EXPENSE_CATEGORY_KEY: String = "com.frafio.myfinance.EXPENSE_CATEGORY"
+        const val EXPENSE_POSITION_KEY: String = "com.frafio.myfinance.EXPENSE_POSITION"
+        const val EXPENSE_YEAR_KEY: String = "com.frafio.myfinance.EXPENSE_YEAR"
+        const val EXPENSE_MONTH_KEY: String = "com.frafio.myfinance.EXPENSE_MONTH"
+        const val EXPENSE_DAY_KEY: String = "com.frafio.myfinance.EXPENSE_DAY"
         const val ADD_RESULT_MESSAGE: String = "com.frafio.myfinance.ADD_RESULT_MESSAGE"
     }
 
@@ -113,20 +113,20 @@ class AddActivity : AppCompatActivity(), AddListener {
 
         when (code) {
             REQUEST_ADD_CODE -> {
-                viewModel.purchaseCode = REQUEST_PAYMENT_CODE
+                viewModel.expenseCode = REQUEST_EXPENSE_CODE
                 viewModel.category = -1
                 binding.chipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
                     if (checkedIds.size != 1) return@setOnCheckedStateChangeListener
                     val checkedId = checkedIds[0]
                     when (checkedId) {
-                        R.id.payment_chip -> {
-                            viewModel.purchaseCode = REQUEST_PAYMENT_CODE
+                        R.id.expense_chip -> {
+                            viewModel.expenseCode = REQUEST_EXPENSE_CODE
                             binding.categoryLayout.visibility = View.VISIBLE
                             binding.divider3.visibility = View.VISIBLE
                         }
 
                         R.id.income_chip -> {
-                            viewModel.purchaseCode = REQUEST_INCOME_CODE
+                            viewModel.expenseCode = REQUEST_INCOME_CODE
                             binding.categoryLayout.visibility = View.GONE
                             binding.divider3.visibility = View.GONE
                         }
@@ -137,36 +137,36 @@ class AddActivity : AppCompatActivity(), AddListener {
             REQUEST_EDIT_CODE -> {
                 binding.chipGroup.visibility = View.GONE
                 intent.apply {
-                    getIntExtra(PURCHASE_REQUEST_KEY, -1).also {
-                        viewModel.purchaseCode = it
+                    getIntExtra(EXPENSE_REQUEST_KEY, -1).also {
+                        viewModel.expenseCode = it
                     }
-                    getStringExtra(PURCHASE_ID_KEY)?.let {
-                        viewModel.purchaseID = it
+                    getStringExtra(EXPENSE_ID_KEY)?.let {
+                        viewModel.expenseId = it
                     }
-                    getStringExtra(PURCHASE_NAME_KEY)?.let {
+                    getStringExtra(EXPENSE_NAME_KEY)?.let {
                         viewModel.name = it
                     }
-                    getDoubleExtra(PURCHASE_PRICE_KEY, 0.0).also {
+                    getDoubleExtra(EXPENSE_PRICE_KEY, 0.0).also {
                         viewModel.priceString = doubleToString(it)
                     }
-                    getIntExtra(PURCHASE_CATEGORY_KEY, 0).also {
+                    getIntExtra(EXPENSE_CATEGORY_KEY, 0).also {
                         viewModel.category = it
                     }
-                    getIntExtra(PURCHASE_POSITION_KEY, 0).also {
-                        viewModel.purchasePosition = it
+                    getIntExtra(EXPENSE_POSITION_KEY, 0).also {
+                        viewModel.expensePosition = it
                     }
-                    getIntExtra(PURCHASE_YEAR_KEY, 0).also {
+                    getIntExtra(EXPENSE_YEAR_KEY, 0).also {
                         datePickerBtn.year = it
                     }
-                    getIntExtra(PURCHASE_MONTH_KEY, 0).also {
+                    getIntExtra(EXPENSE_MONTH_KEY, 0).also {
                         datePickerBtn.month = it
                     }
-                    getIntExtra(PURCHASE_DAY_KEY, 0).also {
+                    getIntExtra(EXPENSE_DAY_KEY, 0).also {
                         datePickerBtn.day = it
                     }
                 }
 
-                if (viewModel.purchaseCode == REQUEST_PAYMENT_CODE) {
+                if (viewModel.expenseCode == REQUEST_EXPENSE_CODE) {
                     val categories = resources.getStringArray(R.array.categories)
                     if (viewModel.category != null && viewModel.category!! >= 0 && viewModel.category!! < categories.size) {
                         binding.categoryET.text = categories[viewModel.category!!]
@@ -209,46 +209,46 @@ class AddActivity : AppCompatActivity(), AddListener {
         binding.addAddButton.isEnabled = false
     }
 
-    override fun onAddSuccess(response: LiveData<PurchaseResult>) {
+    override fun onAddSuccess(response: LiveData<FinanceResult>) {
         response.observe(this) { result ->
-            if (result.code != PurchaseCode.PURCHASE_ADD_SUCCESS.code) {
+            if (result.code != FinanceCode.EXPENSE_ADD_SUCCESS.code) {
                 binding.addProgressIndicator.hide()
                 binding.addAddButton.isEnabled = true
             }
 
             when (result.code) {
-                PurchaseCode.PURCHASE_ADD_SUCCESS.code -> {
+                FinanceCode.EXPENSE_ADD_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
-                        it.putExtra(PURCHASE_REQUEST_KEY, REQUEST_PAYMENT_CODE)
+                        it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_EXPENSE_CODE)
                         it.putExtra(ADD_RESULT_MESSAGE, result.message)
                         setResult(RESULT_OK, it)
                         finish()
                     }
                 }
 
-                PurchaseCode.PURCHASE_EDIT_SUCCESS.code -> {
+                FinanceCode.EXPENSE_EDIT_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
-                        it.putExtra(PURCHASE_REQUEST_KEY, REQUEST_PAYMENT_CODE)
+                        it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_EXPENSE_CODE)
                         setResult(RESULT_OK, it)
                         finish()
                     }
                 }
 
-                PurchaseCode.INCOME_ADD_SUCCESS.code -> {
+                FinanceCode.INCOME_ADD_SUCCESS.code -> {
                     Intent().also {
-                        it.putExtra(PURCHASE_REQUEST_KEY, REQUEST_INCOME_CODE)
+                        it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_INCOME_CODE)
                         it.putExtra(ADD_RESULT_MESSAGE, result.message)
                         setResult(RESULT_OK, it)
                         finish()
                     }
                 }
 
-                PurchaseCode.INCOME_EDIT_SUCCESS.code -> {
+                FinanceCode.INCOME_EDIT_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
-                        it.putExtra(PURCHASE_REQUEST_KEY, REQUEST_INCOME_CODE)
+                        it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_INCOME_CODE)
                         setResult(RESULT_OK, it)
                         finish()
                     }
@@ -259,20 +259,20 @@ class AddActivity : AppCompatActivity(), AddListener {
         }
     }
 
-    override fun onAddFailure(result: PurchaseResult) {
+    override fun onAddFailure(financeResult: FinanceResult) {
         binding.addProgressIndicator.hide()
         binding.addAddButton.isEnabled = true
 
-        when (result.code) {
-            PurchaseCode.EMPTY_NAME.code,
-            PurchaseCode.WRONG_NAME_TOTAL.code ->
-                binding.nameET.error = result.message
+        when (financeResult.code) {
+            FinanceCode.EMPTY_NAME.code,
+            FinanceCode.WRONG_NAME_TOTAL.code ->
+                binding.nameET.error = financeResult.message
 
-            PurchaseCode.EMPTY_PRICE.code ->
-                binding.priceET.error = result.message
+            FinanceCode.EMPTY_AMOUNT.code ->
+                binding.priceET.error = financeResult.message
 
-            PurchaseCode.EMPTY_CATEGORY.code ->
-                binding.categoryET.error = result.message
+            FinanceCode.EMPTY_CATEGORY.code ->
+                binding.categoryET.error = financeResult.message
         }
     }
 
@@ -324,10 +324,10 @@ class AddActivity : AppCompatActivity(), AddListener {
             viewModel.category = category
         }
 
-        layout.findViewById<ConstraintLayout>(R.id.purchaseDetailLayout).visibility = View.GONE
+        layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout).visibility = View.GONE
         layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout).visibility = View.VISIBLE
 
-        layout.findViewById<MaterialButton>(R.id.purchaseCategoryIcon).icon =
+        layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon).icon =
             ContextCompat.getDrawable(
                 applicationContext,
                 when (viewModel.category) {

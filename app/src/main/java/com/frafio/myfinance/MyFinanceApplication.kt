@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.StringRes
 import com.frafio.myfinance.data.manager.AuthManager
-import com.frafio.myfinance.data.manager.IncomeManager
-import com.frafio.myfinance.data.manager.PurchaseManager
+import com.frafio.myfinance.data.manager.IncomesManager
+import com.frafio.myfinance.data.manager.ExpensesManager
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.google.android.material.color.DynamicColors
 
@@ -21,8 +21,8 @@ class MyFinanceApplication : Application() {
 
     lateinit var sharedPreferences: SharedPreferences
     lateinit var authManager: AuthManager
-    lateinit var purchaseManager: PurchaseManager
-    lateinit var incomeManager: IncomeManager
+    lateinit var expensesManager: ExpensesManager
+    lateinit var incomesManager: IncomesManager
 
     override fun onCreate() {
         super.onCreate()
@@ -30,8 +30,8 @@ class MyFinanceApplication : Application() {
         sharedPreferences = getSharedPreferences(PREFERENCES_KEY, Context.MODE_PRIVATE)
 
         authManager = AuthManager(sharedPreferences)
-        purchaseManager = PurchaseManager(sharedPreferences)
-        incomeManager = IncomeManager()
+        expensesManager = ExpensesManager(sharedPreferences)
+        incomesManager = IncomesManager()
 
         // if the user activated it, change the colors
         if (getSharedDynamicColor(sharedPreferences)) {

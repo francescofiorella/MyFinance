@@ -1,24 +1,24 @@
 package com.frafio.myfinance.data.repository
 
 import androidx.lifecycle.LiveData
-import com.frafio.myfinance.data.manager.IncomeManager
+import com.frafio.myfinance.data.manager.IncomesManager
 import com.frafio.myfinance.data.model.Income
-import com.frafio.myfinance.data.model.PurchaseResult
+import com.frafio.myfinance.data.model.FinanceResult
 
-class IncomeRepository(private val incomeManager: IncomeManager) {
-    fun updateIncomeList(): LiveData<PurchaseResult> {
-        return incomeManager.updateIncomeList()
+class IncomeRepository(private val incomesManager: IncomesManager) {
+    fun updateIncomeList(): LiveData<FinanceResult> {
+        return incomesManager.updateIncomeList()
     }
 
-    fun addIncome(income: Income): LiveData<PurchaseResult> {
-        return incomeManager.addIncome(income)
+    fun addIncome(income: Income): LiveData<FinanceResult> {
+        return incomesManager.addIncome(income)
     }
 
-    fun editIncome(income: Income): LiveData<PurchaseResult> {
-        return incomeManager.editIncome(income)
+    fun editIncome(income: Income): LiveData<FinanceResult> {
+        return incomesManager.editIncome(income)
     }
 
-    fun deleteIncome(income: Income): LiveData<PurchaseResult> {
-        return incomeManager.deleteIncome(income)
+    fun deleteIncome(income: Income): LiveData<FinanceResult> {
+        return incomesManager.deleteIncome(income)
     }
 }

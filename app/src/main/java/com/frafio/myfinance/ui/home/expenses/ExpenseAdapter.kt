@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home.payments
+package com.frafio.myfinance.ui.home.expenses
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,46 +8,46 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.DbPurchases
-import com.frafio.myfinance.data.manager.PurchaseManager.Companion.DEFAULT_LIMIT
-import com.frafio.myfinance.data.model.Purchase
-import com.frafio.myfinance.databinding.LayoutPurchaseItemRvBinding
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_BUTTON_CLICK
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
-import com.frafio.myfinance.ui.home.payments.PurchaseInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
+import com.frafio.myfinance.data.model.Expense
+import com.frafio.myfinance.databinding.LayoutExpenseItemRvBinding
+import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_BUTTON_CLICK
+import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
+import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LONG_CLICK
 
-class PurchaseAdapter(
-    private var purchases: List<Purchase>,
-    private val listener: PurchaseInteractionListener
-) : RecyclerView.Adapter<PurchaseAdapter.PurchaseViewHolder>() {
+class ExpenseAdapter(
+    private var expenses: List<Expense>,
+    private val listener: ExpenseInteractionListener
+) : RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder>() {
 
     private var currentLimit: Long = DEFAULT_LIMIT
 
-    inner class PurchaseViewHolder(
-        val binding: LayoutPurchaseItemRvBinding
+    inner class ExpenseViewHolder(
+        val binding: LayoutExpenseItemRvBinding
     ) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        PurchaseViewHolder(
+        ExpenseViewHolder(
             DataBindingUtil.inflate(
                 LayoutInflater.from(parent.context),
-                R.layout.layout_purchase_item_rv,
+                R.layout.layout_expense_item_rv,
                 parent,
                 false
             )
         )
 
-    override fun onBindViewHolder(holder: PurchaseViewHolder, position: Int) {
-        val currentPurchase = purchases[position]
-        holder.binding.purchase = currentPurchase
+    override fun onBindViewHolder(holder: ExpenseViewHolder, position: Int) {
+        val currentExpense = expenses[position]
+        holder.binding.expense = currentExpense
 
-        if (purchases.size - position < (DEFAULT_LIMIT / 2)) {
-            listener.onItemInteraction(ON_LOAD_MORE_REQUEST, currentPurchase, position)
+        if (expenses.size - position < (DEFAULT_LIMIT / 2)) {
+            listener.onItemInteraction(ON_LOAD_MORE_REQUEST, currentExpense, position)
         }
 
-        if (currentPurchase.category != DbPurchases.CATEGORIES.TOTAL.value) {
+        if (currentExpense.category != DbPurchases.CATEGORIES.TOTAL.value) {
             holder.binding.categoryIcon.icon = ContextCompat.getDrawable(
                 holder.binding.categoryIcon.context,
-                when (currentPurchase.category) {
+                when (currentExpense.category) {
                     DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
                     DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
                     DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
@@ -63,11 +63,11 @@ class PurchaseAdapter(
             val types =
                 holder.binding.categoryTextView.context.resources.getStringArray(R.array.categories)
             holder.binding.categoryTextView.text =
-                types[currentPurchase.category ?: DbPurchases.CATEGORIES.MISCELLANEOUS.value]
-            holder.binding.purchaseLayout.setOnLongClickListener {
+                types[currentExpense.category ?: DbPurchases.CATEGORIES.MISCELLANEOUS.value]
+            holder.binding.expenseLayout.setOnLongClickListener {
                 listener.onItemInteraction(
                     ON_LONG_CLICK,
-                    currentPurchase,
+                    currentExpense,
                     holder.getAdapterPosition()
                 )
                 true
@@ -76,24 +76,24 @@ class PurchaseAdapter(
             holder.binding.categoryIcon.setOnClickListener {
                 listener.onItemInteraction(
                     ON_BUTTON_CLICK,
-                    currentPurchase,
+                    currentExpense,
                     holder.getAdapterPosition()
                 )
             }
         } else {
-            holder.binding.purchaseLayout.setOnLongClickListener(null)
+            holder.binding.expenseLayout.setOnLongClickListener(null)
             holder.binding.categoryIcon.setOnClickListener(null)
         }
     }
 
     override fun getItemCount(): Int {
-        return purchases.size
+        return expenses.size
     }
 
-    fun updateData(newPurchaseList: List<Purchase>) {
-        val diffUtil = PurchaseDiffUtil(purchases, newPurchaseList)
+    fun updateData(newExpenseList: List<Expense>) {
+        val diffUtil = ExpenseDiffUtil(expenses, newExpenseList)
         val diffResult = DiffUtil.calculateDiff(diffUtil)
-        purchases = newPurchaseList
+        expenses = newExpenseList
         diffResult.dispatchUpdatesTo(this)
     }
 

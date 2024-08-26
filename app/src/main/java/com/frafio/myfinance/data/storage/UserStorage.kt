@@ -1,14 +1,19 @@
 package com.frafio.myfinance.data.storage
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.model.User
 import com.google.firebase.auth.FirebaseUser
 import java.util.Calendar
-
 
 object UserStorage {
     private var privateUser: User? = null
     val user: User?
         get() = privateUser
+
+    private val _monthlyBudget = MutableLiveData<Double>()
+    val monthlyBudget: LiveData<Double>
+        get() = _monthlyBudget
 
     fun updateUser(fUser: FirebaseUser) {
         var userPic = ""
@@ -37,5 +42,13 @@ object UserStorage {
 
     fun resetUser() {
         privateUser = null
+    }
+
+    fun resetBudget() {
+        _monthlyBudget.value = 0.0
+    }
+
+    fun updateBudget(value: Double) {
+        _monthlyBudget.value = value
     }
 }

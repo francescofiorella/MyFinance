@@ -5,7 +5,7 @@ import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.storage.MyFinanceDatabase
 
-class LocalIncomeRepository {
+class IncomesLocalRepository {
     private val incomeDao =
         MyFinanceDatabase.getDatabase(MyFinanceApplication.instance).incomeDao()
 

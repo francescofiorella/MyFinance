@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.home.payments.PaymentsFragment">
+    tools:context=".ui.home.expenses.ExpensesFragment">
 
     <data>
 
@@ -10,7 +10,7 @@
 
         <variable
             name="viewModel"
-            type="com.frafio.myfinance.ui.home.payments.PaymentsViewModel" />
+            type="com.frafio.myfinance.ui.home.expenses.ExpensesViewModel" />
 
     </data>
 
@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingHorizontal="@dimen/card_half_margin"
-            android:visibility="@{viewModel.isPurchasesEmpty ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.isExpensesEmpty ? View.VISIBLE : View.GONE}"
             tools:visibility="gone">
 
             <androidx.constraintlayout.widget.Guideline
@@ -71,10 +71,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"
-            android:visibility="@{viewModel.isPurchasesEmpty ? View.GONE : View.VISIBLE}"
+            android:visibility="@{viewModel.isExpensesEmpty ? View.GONE : View.VISIBLE}"
             app:backgroundTint="?android:colorBackground"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/layout_purchase_item_rv"
+            tools:listitem="@layout/layout_expense_item_rv"
             tools:visibility="visible" />
 
     </LinearLayout>

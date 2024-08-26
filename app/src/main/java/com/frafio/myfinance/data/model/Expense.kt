@@ -9,7 +9,7 @@ import java.time.LocalDate
 
 @IgnoreExtraProperties
 @Entity
-data class Purchase(
+data class Expense(
     val name: String? = null,
     val price: Double? = null,
     val year: Int? = null,

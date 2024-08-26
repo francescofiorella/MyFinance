@@ -5,18 +5,18 @@ import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.repository.IncomeRepository
-import com.frafio.myfinance.data.repository.PurchaseRepository
+import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.data.repository.UserRepository
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository(
         (application as MyFinanceApplication).authManager
     )
-    private val purchaseRepository = PurchaseRepository(
-        (application as MyFinanceApplication).purchaseManager
+    private val expensesRepository = ExpensesRepository(
+        (application as MyFinanceApplication).expensesManager
     )
     private val incomeRepository = IncomeRepository(
-        (application as MyFinanceApplication).incomeManager
+        (application as MyFinanceApplication).incomesManager
     )
     var listener: HomeListener? = null
 
@@ -39,8 +39,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         return userRepository.isDynamicColorOn()
     }
 
-    fun updateUserPurchases() {
-        listener?.onUserDataUpdated(purchaseRepository.updatePurchaseList())
+    fun updateUserExpenses() {
+        listener?.onUserDataUpdated(expensesRepository.updateExpensesList())
     }
 
     fun updateUserIncomes() {
@@ -48,11 +48,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateMonthlyBudget() {
-        val response = purchaseRepository.getMonthlyBudget()
+        val response = expensesRepository.getMonthlyBudget()
         listener?.onUserDataUpdated(response)
     }
 
     fun updateLocalMonthlyBudget() {
-        purchaseRepository.updateLocalMonthlyBudget()
+        expensesRepository.updateLocalMonthlyBudget()
     }
 }

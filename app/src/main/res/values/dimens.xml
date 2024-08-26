@@ -17,22 +17,13 @@
     <dimen name="title_padding">5dp</dimen>
     <dimen name="title_margin_top">10dp</dimen>
     <dimen name="title_margin_bottom">10dp</dimen>
-    <dimen name="title_margin_start">15dp</dimen>
     <dimen name="title_distance_from_arrow">15dp</dimen>
-
-    <dimen name="fragment_margin_top">5dp</dimen>
 
     <dimen name="arrow_margin_start">15dp</dimen>
     <dimen name="arrow_padding">5dp</dimen>
 
     <dimen name="profile_picture_size">40dp</dimen>
     <dimen name="profile_picture_margin_end">15dp</dimen>
-
-    <dimen name="navigation_item_land_padding_horizontal">20dp</dimen>
-    <dimen name="navigation_item_land_padding_vertical">15dp</dimen>
-    <dimen name="navigation_item_land_padding_horizontal_2">10dp</dimen>
-    <dimen name="navigation_item_land_padding_vertical_2">10dp</dimen>
-    <dimen name="navigation_item_height">65dp</dimen>
 
     <dimen name="fab_margin">16dp</dimen>
 </resources>

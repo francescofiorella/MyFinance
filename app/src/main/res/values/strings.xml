@@ -1,17 +1,10 @@
 <resources>
     <string name="app_name">MyFinance</string>
 
-    <string name="nav_1">Dashboard</string>
-    <string name="nav_2">Payments</string>
-    <string name="nav_3">Profile</string>
-    <string name="nav_4">Menu</string>
-    <string name="nav_5">Budget</string>
-    <string name="add_purchase">Add payment</string>
-    <string name="edit_purchase">Edit payment</string>
-    <string name="add_income">Add income</string>
-    <string name="edit_income">Edit income</string>
-
-    <string name="addBtnContentDescription">Add a payment</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="expenses">Expenses</string>
+    <string name="budget">Budget</string>
+    <string name="profile">Profile</string>
 
     <string name="add">Add</string>
     <string name="edit">Edit</string>
@@ -19,18 +12,12 @@
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
 
-    <string name="purchase_added">Payment added!</string>
-
     <string name="login_successful">You are logged in as</string>
 
-    <string name="purchase_delete_dialog">Do you want to delete the selected payment?</string>
-    <string name="purchase_edit_delete_dialog">Do you want to edit or delete the selected payment?</string>
-
-    <string name="invoice_delete_dialog">Do you want to delete the selected item?</string>
-
     <string name="name">Name</string>
-    <string name="price">Price</string>
-    <string name="date_picker_arrow" translatable="false">DatePickerArrow</string>
+    <string name="amount">Amount</string>
+    <string name="date">Date</string>
+    <string name="category">Category</string>
 
     <string name="login_signup_email">Enter your email</string>
     <string name="login_password">Enter your password</string>
@@ -43,63 +30,40 @@
     <string name="signup_password_confirm">Confirm the password</string>
     <string name="signup">Sign up</string>
     <string name="signup_login">Do you already have an account? Log In</string>
-    <string name="warning_home">Add your first payment!</string>
+    <string name="warning_home">Add your first expense!</string>
     <string name="warning_budget">No income to show</string>
 
-    <string name="avg_month">Monthly \naverage</string>
-    <string name="today">Today \npayment</string>
+    <string name="expenses_today">Expenses \ntoday</string>
     <string name="this_month">This month</string>
     <string name="this_year">This year</string>
     <string name="this_month_next">This \nmonth</string>
     <string name="this_year_next">This \nyear</string>
-    <string name="monthly_payments">Monthly payments</string>
+    <string name="monthly_expenses">Monthly expenses</string>
 
-    <string name="logout">Log Out</string>
     <string name="profile_picture">Profile Picture</string>
 
     <string name="back_arrow" translatable="false">Back Arrow</string>
-    <string name="trend_avg_day">Daily Average Trend</string>
-    <string name="language">Language</string>
-    <string name="dashboard_empty" translatable="false">dashboard_empty</string>
-    <string name="list_empty" translatable="false">list_empty</string>
-    <string name="chart_icon" translatable="false">Chart Icon</string>
+    <string name="dashboard_empty" translatable="false">Dashboard Empty</string>
+    <string name="list_empty" translatable="false">List Empty</string>
     <string name="version_icon" translatable="false">Version Icon</string>
-    <string name="collection_icon" translatable="false">Collection Icon</string>
-    <string name="language_icon" translatable="false">Language Icon</string>
     <string name="dynamic_color_icon" translatable="false">Dynamic Color Icon</string>
-    <string name="total_icon" translatable="false">Total Icon</string>
 
-    <string name="date">Date</string>
-
-    <string name="translation_warning">Restart the app for the changes to take effect</string>
     <string name="use_dynamic_color">Dynamic Colors</string>
     <string name="restart_app_changes">Restart the app to apply the changes.</string>
-
-    <string name="total_purchase">Total</string>
-
     <string name="restart">Restart</string>
 
-    <string name="month_of_total" translatable="false">%1$s %2$d</string>
-
-    <string name="empty" translatable="false">"   "</string>
     <string name="sign_up_provider">Signed up with Google</string>
     <string name="signUpDate">Account created in %1$s</string>
 
     <string name="currency" translatable="false">€</string>
-    <string name="category">Category</string>
-    <string name="create">Create</string>
-    <string name="create_category">Create category</string>
-    <string name="empty_category">Please insert a category name!</string>
 
-    <string name="generic_error">Generic error!</string>
-    <string name="change_content" translatable="false">Swap content</string>
+    <string name="change_content">Swap content</string>
 
-    <string name="coming_soon" translatable="false">Coming Soon!</string>
     <string name="edit_profile">Edit the profile</string>
     <string name="edit_propic">Upload the profile picture</string>
     <string name="edit_full_name">Edit the full name</string>
-    <string name="purchase_category_icon">Purchase Category Icon</string>
-    <string name="no_purchases">No purchases</string>
+    <string name="expense_category_icon">Expense Category Icon</string>
+    <string name="no_expenses">No expenses</string>
     <string name="no_incomes">No incomes</string>
 
     <string name="zero_double" translatable="false">0.00</string>
@@ -109,7 +73,6 @@
     <string name="monthly_budget">Monthly budget</string>
     <string name="annual_budget">Annual budget</string>
     <string name="incomes">Incomes</string>
-    <string name="amount">Amount</string>
 
     <string name="housing">Housing</string>
     <string name="groceries">Groceries</string>
@@ -120,8 +83,9 @@
     <string name="health">Health</string>
     <string name="transportation">Transportation</string>
     <string name="miscellaneous">Miscellaneous</string>
+
     <string name="select">Select</string>
-    <string name="payment">Payment</string>
+    <string name="expense">Expense</string>
     <string name="income">Income</string>
     <string name="save">Save</string>
 
@@ -129,7 +93,7 @@
     <string name="monthly">Monthly</string>
     <string name="annual">Annual</string>
     <string name="shown">Shown:</string>
-    <string name="payments_by_category">Payments by category</string>
+    <string name="expenses_by_category">Expenses by category</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>
