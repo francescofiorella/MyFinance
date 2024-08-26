@@ -48,7 +48,7 @@
     <string name="version_icon" translatable="false">Version Icon</string>
     <string name="dynamic_color_icon" translatable="false">Dynamic Color Icon</string>
 
-    <string name="use_dynamic_color">Dynamic Colors</string>
+    <string name="use_dynamic_color">Dynamic colors</string>
     <string name="restart_app_changes">Restart the app to apply the changes.</string>
     <string name="restart">Restart</string>
 
