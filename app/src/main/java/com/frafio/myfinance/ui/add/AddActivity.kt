@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.widget.DatePickerButton
 import com.frafio.myfinance.data.model.FinanceResult
@@ -172,15 +172,15 @@ class AddActivity : AppCompatActivity(), AddListener {
                         binding.categoryET.text = categories[viewModel.category!!]
                         binding.categoryIcon.setImageResource(
                             when (viewModel.category) {
-                                DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                                DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                                DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                                DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                                DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                                DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                                DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                                DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                                DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                                FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                                FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                                FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                                FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                                FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                                FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                                FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                                FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                                FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
                                 else -> R.drawable.ic_tag
                             }
                         )
@@ -309,15 +309,15 @@ class AddActivity : AppCompatActivity(), AddListener {
             binding.categoryET.text = categories[category]
             binding.categoryIcon.setImageResource(
                 when (category) {
-                    DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                    DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                    DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                    DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                    DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                    DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                    DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                    DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                    DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                    FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                    FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                    FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                    FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                    FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
                     else -> R.drawable.ic_tag
                 }
             )
@@ -331,53 +331,53 @@ class AddActivity : AppCompatActivity(), AddListener {
             ContextCompat.getDrawable(
                 applicationContext,
                 when (viewModel.category) {
-                    DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                    DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                    DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                    DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                    DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                    DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                    DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                    DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                    DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                    FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                    FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                    FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                    FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                    FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
                     else -> R.drawable.ic_tag
                 }
             )
 
         layout.findViewById<LinearLayout>(R.id.housing_layout).setOnClickListener {
-            selectCategory(DbPurchases.CATEGORIES.HOUSING.value)
+            selectCategory(FirestoreEnums.CATEGORIES.HOUSING.value)
             dismissFun()
         }
         layout.findViewById<LinearLayout>(R.id.groceries_layout).setOnClickListener {
-            selectCategory(DbPurchases.CATEGORIES.GROCERIES.value)
+            selectCategory(FirestoreEnums.CATEGORIES.GROCERIES.value)
             dismissFun()
         }
         layout.findViewById<LinearLayout>(R.id.personal_care_layout).setOnClickListener {
-            selectCategory(DbPurchases.CATEGORIES.PERSONAL_CARE.value)
+            selectCategory(FirestoreEnums.CATEGORIES.PERSONAL_CARE.value)
             dismissFun()
         }
         layout.findViewById<LinearLayout>(R.id.entertainment_layout).setOnClickListener {
-            selectCategory(DbPurchases.CATEGORIES.ENTERTAINMENT.value)
+            selectCategory(FirestoreEnums.CATEGORIES.ENTERTAINMENT.value)
             dismissFun()
         }
         layout.findViewById<LinearLayout>(R.id.education_layout).setOnClickListener {
-            selectCategory(DbPurchases.CATEGORIES.EDUCATION.value)
+            selectCategory(FirestoreEnums.CATEGORIES.EDUCATION.value)
             dismissFun()
         }
         layout.findViewById<LinearLayout>(R.id.dining_layout).setOnClickListener {
-            selectCategory(DbPurchases.CATEGORIES.DINING.value)
+            selectCategory(FirestoreEnums.CATEGORIES.DINING.value)
             dismissFun()
         }
         layout.findViewById<LinearLayout>(R.id.health_layout).setOnClickListener {
-            selectCategory(DbPurchases.CATEGORIES.HEALTH.value)
+            selectCategory(FirestoreEnums.CATEGORIES.HEALTH.value)
             dismissFun()
         }
         layout.findViewById<LinearLayout>(R.id.transportation_layout).setOnClickListener {
-            selectCategory(DbPurchases.CATEGORIES.TRANSPORTATION.value)
+            selectCategory(FirestoreEnums.CATEGORIES.TRANSPORTATION.value)
             dismissFun()
         }
         layout.findViewById<LinearLayout>(R.id.miscellaneous_layout).setOnClickListener {
-            selectCategory(DbPurchases.CATEGORIES.MISCELLANEOUS.value)
+            selectCategory(FirestoreEnums.CATEGORIES.MISCELLANEOUS.value)
             dismissFun()
         }
     }

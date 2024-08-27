@@ -19,7 +19,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Expense
@@ -316,15 +316,15 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             ContextCompat.getDrawable(
                 requireContext(),
                 when (expense.category) {
-                    DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                    DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                    DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                    DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                    DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                    DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                    DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                    DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                    DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                    FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                    FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                    FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                    FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                    FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
                     else -> R.drawable.ic_tag
                 }
             )
@@ -335,45 +335,45 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout).visibility =
                 View.VISIBLE
             layout.findViewById<LinearLayout>(R.id.housing_layout).setOnClickListener {
-                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.HOUSING.value)
+                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.HOUSING.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.groceries_layout).setOnClickListener {
-                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.GROCERIES.value)
+                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.GROCERIES.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.personal_care_layout).setOnClickListener {
-                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.PERSONAL_CARE.value)
+                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.PERSONAL_CARE.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.entertainment_layout).setOnClickListener {
-                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.ENTERTAINMENT.value)
+                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.ENTERTAINMENT.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.education_layout).setOnClickListener {
-                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.EDUCATION.value)
+                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.EDUCATION.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.dining_layout).setOnClickListener {
-                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.DINING.value)
+                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.DINING.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.health_layout).setOnClickListener {
-                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.HEALTH.value)
+                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.HEALTH.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.transportation_layout).setOnClickListener {
-                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.TRANSPORTATION.value)
+                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.TRANSPORTATION.value)
                 dismissFun()
             }
             layout.findViewById<LinearLayout>(R.id.miscellaneous_layout).setOnClickListener {
-                viewModel.updateCategory(expense, DbPurchases.CATEGORIES.MISCELLANEOUS.value)
+                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.MISCELLANEOUS.value)
                 dismissFun()
             }
             return
         }
 
-        // layout_edit_purchase_bottom_sheet.xml
+        // layout_edit_expense_bottom_sheet.xml
         val editLayout = layout.findViewById<LinearLayout>(R.id.edit_layout)
         val deleteLayout = layout.findViewById<LinearLayout>(R.id.delete_layout)
         editLayout.setOnClickListener {

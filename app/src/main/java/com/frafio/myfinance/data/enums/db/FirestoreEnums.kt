@@ -2,7 +2,7 @@ package com.frafio.myfinance.data.enums.db
 
 import com.frafio.myfinance.utils.getCurrentLanguage
 
-object DbPurchases {
+object FirestoreEnums {
     enum class FIELDS(val value: String) {
         PURCHASES("purchases"),
         MONTHLY_BUDGET("monthly_budget"),

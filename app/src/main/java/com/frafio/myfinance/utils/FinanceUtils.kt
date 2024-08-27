@@ -1,6 +1,6 @@
 package com.frafio.myfinance.utils
 
-import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.model.Expense
 import java.time.LocalDate
@@ -34,12 +34,12 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
             // Aggiungi totale a 0 per oggi
             val totId = "${todayDate.dayOfMonth}_${todayDate.monthValue}_${todayDate.year}"
             total = Expense(
-                name = DbPurchases.NAMES.TOTAL.value,
+                name = FirestoreEnums.NAMES.TOTAL.value,
                 price = 0.0,
                 year = todayDate.year,
                 month = todayDate.monthValue,
                 day = todayDate.dayOfMonth,
-                category = DbPurchases.CATEGORIES.TOTAL.value,
+                category = FirestoreEnums.CATEGORIES.TOTAL.value,
                 id = totId
             )
             expenseList.add(total!!)
@@ -49,23 +49,23 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
         if (prevDate == null) { // If is the first total
             currentExpenses.add(expense)
             total = Expense(
-                name = DbPurchases.NAMES.TOTAL.value,
+                name = FirestoreEnums.NAMES.TOTAL.value,
                 price = expense.price,
                 year = expense.year,
                 month = expense.month,
                 day = expense.day,
-                category = DbPurchases.CATEGORIES.TOTAL.value,
+                category = FirestoreEnums.CATEGORIES.TOTAL.value,
                 id = expense.getTotalId()
             )
         } else if (total!!.id == expense.getTotalId()) { // If the total should be updated
             currentExpenses.add(expense)
             total = Expense(
-                name = DbPurchases.NAMES.TOTAL.value,
+                name = FirestoreEnums.NAMES.TOTAL.value,
                 price = total!!.price!! + expense.price!!,
                 year = total!!.year,
                 month = total!!.month,
                 day = total!!.day,
-                category = DbPurchases.CATEGORIES.TOTAL.value,
+                category = FirestoreEnums.CATEGORIES.TOTAL.value,
                 id = total!!.getTotalId()
             )
         } else { // If we need a new total
@@ -80,12 +80,12 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
             currentExpenses.add(expense)
             // Create new total
             total = Expense(
-                name = DbPurchases.NAMES.TOTAL.value,
+                name = FirestoreEnums.NAMES.TOTAL.value,
                 price = expense.price,
                 year = expense.year,
                 month = expense.month,
                 day = expense.day,
-                category = DbPurchases.CATEGORIES.TOTAL.value,
+                category = FirestoreEnums.CATEGORIES.TOTAL.value,
                 id = expense.getTotalId()
             )
         }
@@ -104,12 +104,12 @@ fun addTotalsToIncomes(incomes: List<Income>): List<Income> {
 
     val todayYear = LocalDate.now().year
     var total = Income(
-        name = DbPurchases.NAMES.TOTAL.value,
+        name = FirestoreEnums.NAMES.TOTAL.value,
         price = 0.0,
         year = todayYear,
         month = 0,
         day = 0,
-        category = DbPurchases.CATEGORIES.TOTAL.value,
+        category = FirestoreEnums.CATEGORIES.TOTAL.value,
         id = todayYear.toString()
     )
     var currentIncomes = mutableListOf<Income>()
@@ -122,22 +122,22 @@ fun addTotalsToIncomes(incomes: List<Income>): List<Income> {
                 total
             )
             total = Income(
-                name = DbPurchases.NAMES.TOTAL.value,
+                name = FirestoreEnums.NAMES.TOTAL.value,
                 price = 0.0,
                 year = income.year,
                 month = 0,
                 day = 0,
-                category = DbPurchases.CATEGORIES.TOTAL.value,
+                category = FirestoreEnums.CATEGORIES.TOTAL.value,
                 id = income.year.toString()
             )
         } else if (isFirstIncome && income.year!! > todayYear) {
             total = Income(
-                name = DbPurchases.NAMES.TOTAL.value,
+                name = FirestoreEnums.NAMES.TOTAL.value,
                 price = 0.0,
                 year = income.year,
                 month = 0,
                 day = 0,
-                category = DbPurchases.CATEGORIES.TOTAL.value,
+                category = FirestoreEnums.CATEGORIES.TOTAL.value,
                 id = income.year.toString()
             )
         }
@@ -165,12 +165,12 @@ fun addTotalsToIncomes(incomes: List<Income>): List<Income> {
             }
             currentIncomes = mutableListOf()
             total = Income(
-                name = DbPurchases.NAMES.TOTAL.value,
+                name = FirestoreEnums.NAMES.TOTAL.value,
                 price = income.price,
                 year = income.year,
                 month = 0,
                 day = 0,
-                category = DbPurchases.CATEGORIES.TOTAL.value,
+                category = FirestoreEnums.CATEGORIES.TOTAL.value,
                 id = income.year.toString()
             )
             currentIncomes.add(income)

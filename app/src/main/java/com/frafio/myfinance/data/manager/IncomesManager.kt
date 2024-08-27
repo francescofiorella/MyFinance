@@ -3,7 +3,7 @@ package com.frafio.myfinance.data.manager
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.model.FinanceResult
@@ -28,9 +28,9 @@ class IncomesManager {
 
     fun updateIncomeList(): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.INCOMES.value)
+            .collection(FirestoreEnums.FIELDS.INCOMES.value)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
                 val incomeList = mutableListOf<Income>()
                 queryDocumentSnapshots.forEach { document ->
@@ -54,9 +54,9 @@ class IncomesManager {
     fun addIncome(income: Income): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
 
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.INCOMES.value)
+            .collection(FirestoreEnums.FIELDS.INCOMES.value)
             .add(income).addOnSuccessListener {
                 income.id = it.id
                 CoroutineScope(Dispatchers.IO).launch {
@@ -74,9 +74,9 @@ class IncomesManager {
     fun editIncome(income: Income): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
 
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.INCOMES.value)
+            .collection(FirestoreEnums.FIELDS.INCOMES.value)
             .document(income.id).set(income).addOnSuccessListener {
                 CoroutineScope(Dispatchers.IO).launch {
                     incomesLocalRepository.updateIncome(income)
@@ -93,9 +93,9 @@ class IncomesManager {
 
     fun deleteIncome(income: Income): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.INCOMES.value)
+            .collection(FirestoreEnums.FIELDS.INCOMES.value)
             .document(income.id).delete()
             .addOnSuccessListener {
                 CoroutineScope(Dispatchers.IO).launch {

@@ -6,7 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.manager.IncomesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.databinding.LayoutIncomeItemRvBinding
@@ -43,7 +43,7 @@ class IncomeAdapter(
             listener.onItemInteraction(ON_LOAD_MORE_REQUEST, currentIncome, position)
         }
 
-        if (currentIncome.category != DbPurchases.CATEGORIES.TOTAL.value) {
+        if (currentIncome.category != FirestoreEnums.CATEGORIES.TOTAL.value) {
             holder.binding.categoryIcon.icon =
                 createTextDrawable(
                     holder.binding.categoryIcon.context,

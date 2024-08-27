@@ -7,7 +7,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.databinding.LayoutExpenseItemRvBinding
@@ -44,26 +44,26 @@ class ExpenseAdapter(
             listener.onItemInteraction(ON_LOAD_MORE_REQUEST, currentExpense, position)
         }
 
-        if (currentExpense.category != DbPurchases.CATEGORIES.TOTAL.value) {
+        if (currentExpense.category != FirestoreEnums.CATEGORIES.TOTAL.value) {
             holder.binding.categoryIcon.icon = ContextCompat.getDrawable(
                 holder.binding.categoryIcon.context,
                 when (currentExpense.category) {
-                    DbPurchases.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                    DbPurchases.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                    DbPurchases.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                    DbPurchases.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                    DbPurchases.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                    DbPurchases.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                    DbPurchases.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                    DbPurchases.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                    DbPurchases.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
+                    FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+                    FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+                    FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+                    FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+                    FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
                     else -> R.drawable.ic_tag
                 }
             )
             val types =
                 holder.binding.categoryTextView.context.resources.getStringArray(R.array.categories)
             holder.binding.categoryTextView.text =
-                types[currentExpense.category ?: DbPurchases.CATEGORIES.MISCELLANEOUS.value]
+                types[currentExpense.category ?: FirestoreEnums.CATEGORIES.MISCELLANEOUS.value]
             holder.binding.expenseLayout.setOnLongClickListener {
                 listener.onItemInteraction(
                     ON_LONG_CLICK,

@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
@@ -32,10 +32,10 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
 
     fun getMonthlyBudget(): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!).get()
             .addOnSuccessListener {
-                val value = it.data?.get(DbPurchases.FIELDS.MONTHLY_BUDGET.value).toString()
+                val value = it.data?.get(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value).toString()
                     .toDoubleOrNull() ?: 0.0
                 setLocalMonthlyBudget(value)
                 UserStorage.updateBudget(value)
@@ -49,9 +49,9 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
 
     fun setMonthlyBudget(budget: Double): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .set(hashMapOf(DbPurchases.FIELDS.MONTHLY_BUDGET.value to budget))
+            .set(hashMapOf(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value to budget))
             .addOnSuccessListener {
                 setLocalMonthlyBudget(budget)
                 UserStorage.updateBudget(budget)
@@ -66,9 +66,9 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
     fun updateExpensesList(): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
 
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
             val expenseList = mutableListOf<Expense>()
             queryDocumentSnapshots.forEach { document ->
@@ -94,9 +94,9 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
     fun addExpenses(expense: Expense): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
 
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
             .add(expense).addOnSuccessListener {
                 expense.id = it.id
                 CoroutineScope(Dispatchers.IO).launch {
@@ -114,9 +114,9 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
     fun editExpense(expense: Expense): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
 
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
             .document(expense.id).set(expense).addOnSuccessListener {
                 CoroutineScope(Dispatchers.IO).launch {
                     expensesLocalRepository.updateExpense(expense)
@@ -133,9 +133,9 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
 
     fun deleteExpense(expense: Expense): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
-        fStore.collection(DbPurchases.FIELDS.PURCHASES.value)
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(UserStorage.user!!.email!!)
-            .collection(DbPurchases.FIELDS.PAYMENTS.value)
+            .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
             .document(expense.id).delete()
             .addOnSuccessListener {
                 CoroutineScope(Dispatchers.IO).launch {

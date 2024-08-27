@@ -4,7 +4,7 @@ import android.app.Application
 import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.MyFinanceApplication
-import com.frafio.myfinance.data.enums.db.DbPurchases
+import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.widget.DatePickerButton
 import com.frafio.myfinance.data.model.Income
@@ -57,7 +57,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        if ((name == DbPurchases.NAMES.TOTAL.valueEn || name == DbPurchases.NAMES.TOTAL.valueIt)) {
+        if ((name == FirestoreEnums.NAMES.TOTAL.valueEn || name == FirestoreEnums.NAMES.TOTAL.valueIt)) {
             listener?.onAddFailure(FinanceResult(FinanceCode.WRONG_NAME_TOTAL))
             return
         }
@@ -68,7 +68,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         if (expenseCode == AddActivity.REQUEST_INCOME_CODE) {
-            category = DbPurchases.CATEGORIES.INCOME.value
+            category = FirestoreEnums.CATEGORIES.INCOME.value
         } else if (category == -1) {
             listener?.onAddFailure(FinanceResult(FinanceCode.EMPTY_CATEGORY))
             return
