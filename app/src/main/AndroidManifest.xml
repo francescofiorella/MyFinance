@@ -25,7 +25,8 @@
         <activity
             android:name=".ui.home.HomeActivity"
             android:exported="true"
-            android:theme="@style/Theme.MyFinance.SplashScreen">
+            android:theme="@style/Theme.MyFinance.SplashScreen"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

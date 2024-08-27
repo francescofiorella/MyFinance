@@ -47,6 +47,7 @@
     <color name="inverted_primary_text">@color/white</color>
     <color name="disabled_text">#D4D4D4</color>
     <color name="launcher_icon_bg">#3D5576</color>
+    <color name="colorBackground">#FCF5FD</color>
 
     <!--Pie chart colors. -->
     <color name="red_500">#f44336</color>
