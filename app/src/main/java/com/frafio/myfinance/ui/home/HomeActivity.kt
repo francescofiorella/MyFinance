@@ -1,19 +1,18 @@
 package com.frafio.myfinance.ui.home
 
-import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.animation.AccelerateInterpolator
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.animation.doOnEnd
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.MyFinanceApplication
@@ -52,6 +51,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private var activeFragment: BaseFragment? = null
 
     private var userRequest: Boolean = false
+    var isLayoutReady: Boolean = false
 
     companion object {
         private const val DASHBOARD_FRAGMENT_TAG = "dashboard_fragment_tag"
@@ -88,19 +88,16 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             if (userRequest) {
                 setTheme(R.style.Theme_MyFinance)
             } else {
-                installSplashScreen().also {
-                    it.setOnExitAnimationListener { splashScreenViewProvider ->
-                        val fadeOut = ObjectAnimator.ofFloat(
-                            splashScreenViewProvider.view,
-                            View.ALPHA,
-                            1f, 0f
+                installSplashScreen().apply {
+                    setKeepOnScreenCondition {
+                        // keep if the layout is not ready
+                        !isLayoutReady
+                    }
+                    setOnExitAnimationListener { splashScreenViewProvider ->
+                        supportFragmentManager.unregisterFragmentLifecycleCallbacks(
+                            dashboardCallback
                         )
-                        fadeOut.interpolator = AccelerateInterpolator()
-                        fadeOut.duration = 200L
-                        fadeOut.doOnEnd {
-                            splashScreenViewProvider.remove()
-                        }
-                        fadeOut.start()
+                        splashScreenViewProvider.remove()
                     }
                 }
                 if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
@@ -305,6 +302,18 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         }
     }
 
+    // called only one time, when the activity is loaded for the first time
+    private val dashboardCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
+        override fun onFragmentCreated(
+            fm: FragmentManager,
+            f: Fragment,
+            savedInstanceState: Bundle?
+        ) {
+            super.onFragmentCreated(fm, f, savedInstanceState)
+            isLayoutReady = true
+        }
+    }
+
     fun onAddButtonClick(view: View) {
         ActivityOptionsCompat.makeClipRevealAnimation(
             view, 0, 0, view.measuredWidth, view.measuredHeight
@@ -360,6 +369,11 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                         intent.extras?.getString(LoginActivity.INTENT_USER_NAME).also { userName ->
                             showSnackBar("${getString(R.string.login_successful)} $userName")
                         }
+                    } else {
+                        supportFragmentManager.registerFragmentLifecycleCallbacks(
+                            dashboardCallback,
+                            true
+                        )
                     }
                 }
 

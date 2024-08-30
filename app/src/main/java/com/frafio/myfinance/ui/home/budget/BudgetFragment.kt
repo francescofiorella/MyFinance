@@ -260,13 +260,13 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
 
     override fun scrollUp() {
         super.scrollUp()
+        binding.budgetScrollView.apply {
+            fling(0)
+            smoothScrollTo(0, 0)
+        }
         binding.budgetRecyclerView.apply {
             stopScroll()
             (layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(0, 0)
-        }
-        binding.budgetScrollView.apply {
-            fling(0)
-            scrollTo(0, 0)
         }
     }
 

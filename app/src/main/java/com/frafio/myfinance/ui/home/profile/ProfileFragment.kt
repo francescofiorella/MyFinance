@@ -87,7 +87,7 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         super.scrollUp()
         binding.profileScrollView.apply {
             fling(0)
-            scrollTo(0, 0)
+            smoothScrollTo(0, 0)
         }
     }
 

@@ -255,7 +255,7 @@ class DashboardFragment : BaseFragment() {
         super.scrollUp()
         binding.dashboardScrollView.apply {
             fling(0)
-            scrollTo(0, 0)
+            smoothScrollTo(0, 0)
         }
     }
 }
