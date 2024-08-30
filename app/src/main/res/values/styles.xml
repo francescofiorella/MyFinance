@@ -75,4 +75,14 @@
     <style name="ThemeOverlay.MyFinance.NavigationView" parent="ThemeOverlay.Material3.NavigationView">
         <item name="colorControlHighlight">@android:color/transparent</item>
     </style>
+
+    <style name="TextAppearance.MyFinance.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/nunito</item>
+        <item name="android:fontFamily">@font/nunito</item>
+    </style>
+
+    <style name="Widget.MyFinance.Chip.Filter" parent="Widget.Material3.Chip.Filter">
+        <item name="android:textAppearance">@style/TextAppearance.MyFinance.BodyMedium</item>
+        ...
+    </style>
 </resources>

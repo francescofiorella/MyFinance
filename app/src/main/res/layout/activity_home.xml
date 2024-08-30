@@ -17,7 +17,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:theme="@style/Theme.MyFinance">
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/home_progressIndicator"
@@ -122,7 +123,6 @@
             android:id="@+id/nav_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:backgroundTint="?attr/colorSurfaceContainerLow"
             app:itemRippleColor="@android:color/transparent"
             app:itemTextAppearanceActive="@style/TextAppearance.MyFinance.Caption"
             app:itemTextAppearanceInactive="@style/TextAppearance.MyFinance.Caption"

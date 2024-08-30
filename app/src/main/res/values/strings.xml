@@ -94,6 +94,10 @@
     <string name="annual">Annual</string>
     <string name="shown">Shown:</string>
     <string name="expenses_by_category">Expenses by category</string>
+    <string name="search">Search</string>
+    <string name="filter">Filter</string>
+    <string name="date_range">Date range</string>
+    <string name="clear_text">Clear text</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>

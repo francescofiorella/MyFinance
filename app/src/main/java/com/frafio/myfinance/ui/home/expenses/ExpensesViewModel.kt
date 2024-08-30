@@ -18,16 +18,14 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
 
     var listener: ExpensesListener? = null
 
-    private val _isExpensesEmpty = MutableLiveData<Boolean>()
-    val isExpensesEmpty: LiveData<Boolean>
-        get() = _isExpensesEmpty
+    val isExpensesEmpty = MutableLiveData<Boolean?>(null)
+
+    fun getExpensesNumber(): LiveData<Int> {
+        return expensesLocalRepository.getCount()
+    }
 
     fun getLocalExpenses(): LiveData<List<Expense>> {
         return expensesLocalRepository.getAll()
-    }
-
-    fun updateExpensesEmpty(isListEmpty: Boolean) {
-        _isExpensesEmpty.postValue(isListEmpty)
     }
 
     fun deleteExpense(expense: Expense) {
@@ -53,5 +51,9 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
     fun addExpense(expense: Expense) {
         val response = expensesRepository.addExpense(expense)
         listener?.onCompleted(response)
+    }
+
+    fun filterExpenses(name: String): LiveData<List<Expense>> {
+        return expensesLocalRepository.getStartingWith(name)
     }
 }

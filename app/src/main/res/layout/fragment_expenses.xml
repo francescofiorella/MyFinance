@@ -17,13 +17,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:visibility="@{viewModel.isExpensesEmpty ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.isExpensesEmpty == null || !viewModel.isExpensesEmpty ? View.GONE : View.VISIBLE}"
             tools:visibility="gone">
 
             <ImageView
@@ -34,10 +34,12 @@
                 android:layout_marginTop="50dp"
                 android:contentDescription="@string/list_empty"
                 android:src="@drawable/image_empty_list"
+                app:layout_constraintBottom_toTopOf="@id/list_emptyTV"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/list_emptyTV"
@@ -52,16 +54,80 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/list_empty_imageView" />
+                app:layout_constraintTop_toBottomOf="@id/list_empty_imageView"
+                app:layout_constraintVertical_chainStyle="packed" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/bg_search_bar"
+            android:backgroundTint="?attr/colorSurfaceContainer"
+            android:orientation="horizontal"
+            android:paddingHorizontal="15dp"
+            android:visibility="@{viewModel.isExpensesEmpty == null || !viewModel.isExpensesEmpty ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/search_ET"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableStart="@drawable/ic_search"
+                android:drawablePadding="15dp"
+                android:fontFamily="@font/nunito"
+                android:hint="@string/search"
+                android:inputType="textCapSentences"
+                android:paddingVertical="15dp" />
+
+            <ImageView
+                android:id="@+id/clear_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="15dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="@string/clear_text"
+                android:visibility="invisible"
+                app:srcCompat="@drawable/ic_clear" />
+
+            <ImageView
+                android:id="@+id/calendar_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="15dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="@string/date_range"
+                app:srcCompat="@drawable/ic_today" />
+
+            <ImageView
+                android:id="@+id/filter_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="@string/filter"
+                app:srcCompat="@drawable/ic_filter_list" />
+
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:scrollbars="vertical"
-            android:visibility="@{viewModel.isExpensesEmpty ? View.GONE : View.VISIBLE}"
+            android:visibility="@{viewModel.isExpensesEmpty == null || !viewModel.isExpensesEmpty ? View.VISIBLE : View.GONE}"
             app:backgroundTint="?android:colorBackground"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/layout_expense_item_rv"

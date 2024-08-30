@@ -99,6 +99,58 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
     return expenseList
 }
 
+fun addTotalsToExpensesWithoutPrices(expenses: List<Expense>): List<Expense> {
+    // price of -1.0 means that price won't be shown in list
+    val expenseList = mutableListOf<Expense>()
+    if (expenses.isEmpty()) return expenseList
+    // Used to keep the order
+    var currentExpenses = mutableListOf<Expense>()
+
+    // Create total for the local list
+    var total = Expense(
+        name = FirestoreEnums.NAMES.TOTAL.value,
+        price = -1.0,
+        year = expenses[0].year,
+        month = expenses[0].month,
+        day = expenses[0].day,
+        category = FirestoreEnums.CATEGORIES.TOTAL.value,
+        id = expenses[0].getTotalId()
+    )
+
+    expenses.forEach { expense ->
+        if (total.id == expense.getTotalId()) { // Continue with the same total
+            currentExpenses.add(expense)
+        } else { // We need a new total
+            // Update the local list with previous day expenses
+            if (currentExpenses.isNotEmpty()) {
+                expenseList.add(total)
+                currentExpenses.forEach { p ->
+                    expenseList.add(p)
+                }
+            }
+            currentExpenses = mutableListOf()
+            currentExpenses.add(expense)
+            // Create new total
+            total = Expense(
+                name = FirestoreEnums.NAMES.TOTAL.value,
+                price = -1.0,
+                year = expense.year,
+                month = expense.month,
+                day = expense.day,
+                category = FirestoreEnums.CATEGORIES.TOTAL.value,
+                id = expense.getTotalId()
+            )
+        }
+    }
+    if (currentExpenses.isNotEmpty()) {
+        expenseList.add(total)
+        currentExpenses.forEach { p ->
+            expenseList.add(p)
+        }
+    }
+    return expenseList
+}
+
 fun addTotalsToIncomes(incomes: List<Income>): List<Income> {
     val incomeList = mutableListOf<Income>()
 

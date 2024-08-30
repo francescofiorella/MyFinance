@@ -56,7 +56,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/dashboard_scrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -854,7 +854,7 @@
 
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/monthly_chip"
-                                style="@style/Widget.Material3.Chip.Filter"
+                                style="@style/Widget.MyFinance.Chip.Filter"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:checked="true"
@@ -863,7 +863,7 @@
 
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/annual_chip"
-                                style="@style/Widget.Material3.Chip.Filter"
+                                style="@style/Widget.MyFinance.Chip.Filter"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/annual"
@@ -906,6 +906,7 @@
                             android:id="@+id/tv0"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
                             android:fontFamily="@font/nunito"
                             android:text="@string/shown"
                             android:textSize="12sp"
@@ -919,8 +920,9 @@
                             android:layout_marginStart="5dp"
                             android:fontFamily="@font/nunito"
                             android:textSize="12sp"
+                            app:layout_constraintBottom_toBottomOf="@id/tv0"
                             app:layout_constraintStart_toEndOf="@id/tv0"
-                            app:layout_constraintTop_toBottomOf="@id/pie_chart_compose_view"
+                            app:layout_constraintTop_toTopOf="@id/tv0"
                             tools:text="Month Year" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -929,7 +931,7 @@
 
             </GridLayout>
 
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
 

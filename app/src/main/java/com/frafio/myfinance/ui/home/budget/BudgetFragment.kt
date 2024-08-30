@@ -265,7 +265,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             (layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(0, 0)
         }
         binding.budgetScrollView.apply {
-            stopNestedScroll()
+            fling(0)
             scrollTo(0, 0)
         }
     }

@@ -12,12 +12,14 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
@@ -33,13 +35,15 @@ import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companio
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.utils.addTotalsToExpenses
+import com.frafio.myfinance.utils.addTotalsToExpensesWithoutPrices
+import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
+import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
-
 
 class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesListener {
 
@@ -73,17 +77,46 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
 
         viewModel.listener = this
 
-        /*binding.listRecyclerView.addOnScrollListener(object : OnScrollListener() {
+        binding.listRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    val position = (binding.listRecyclerView.layoutManager as LinearLayoutManager)
-                        .findFirstVisibleItemPosition()
-                    scrollTo(position)
+                when (newState) {
+                    /*SCROLL_STATE_IDLE -> {
+                        val position = (binding.listRecyclerView.layoutManager as LinearLayoutManager)
+                            .findFirstVisibleItemPosition()
+                        scrollTo(position)
+                    }*/
+                    RecyclerView.SCROLL_STATE_DRAGGING -> {
+                        requireActivity().hideSoftKeyboard(binding.root)
+                        binding.searchET.clearFocus()
+                    }
                 }
             }
-        })*/
+        })
 
+        viewModel.getExpensesNumber().observe(viewLifecycleOwner) {
+            viewModel.isExpensesEmpty.value = it == 0
+        }
+
+        binding.searchET.doOnTextChanged { text, _, _, _ ->
+            recViewLiveData.removeSource(localExpensesLiveData)
+            localExpensesLiveData = if (text.isNullOrEmpty()) {
+                binding.clearIcon.visibility = View.INVISIBLE
+                viewModel.getLocalExpenses()
+            } else {
+                binding.clearIcon.visibility = View.VISIBLE
+                viewModel.filterExpenses(text.toString())
+            }
+            recViewLiveData.addSource(localExpensesLiveData) { value ->
+                recViewLiveData.value = value
+            }
+        }
+
+        binding.clearIcon.setOnClickListener {
+            requireActivity().hideSoftKeyboard(binding.root)
+            binding.searchET.clearFocus()
+            binding.searchET.clearText()
+        }
 
         localExpensesLiveData = viewModel.getLocalExpenses()
         recViewLiveData.addSource(localExpensesLiveData) { value ->
@@ -98,8 +131,11 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             }
             // Get list with limit and update recList
             var nl = expenses.take(limit.toInt()).map { p -> p.copy() }
-            nl = addTotalsToExpenses(nl)
-            viewModel.updateExpensesEmpty(nl.isEmpty())
+            nl = if (binding.searchET.text.isNullOrEmpty()) {
+                addTotalsToExpenses(nl)
+            } else {
+                addTotalsToExpensesWithoutPrices(nl)
+            }
             maxExpensesNumber = expenses.size.toLong()
             binding.listRecyclerView.also {
                 if (it.adapter == null) {

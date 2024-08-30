@@ -45,7 +45,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_clear" />
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/scrollView2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -98,7 +98,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/expense_chip"
-                            style="@style/Widget.Material3.Chip.Filter"
+                            style="@style/Widget.MyFinance.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="true"
@@ -107,7 +107,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/income_chip"
-                            style="@style/Widget.Material3.Chip.Filter"
+                            style="@style/Widget.MyFinance.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/income"
@@ -231,7 +231,7 @@
 
             </LinearLayout>
 
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/add_addButton"

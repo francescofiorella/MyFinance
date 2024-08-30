@@ -12,7 +12,9 @@ import com.frafio.myfinance.data.model.Income
 
 @Dao
 interface IncomeDao {
-    @Query("SELECT * FROM income ORDER BY year DESC, month DESC, day DESC, price DESC")
+    @Query("SELECT * " +
+            "FROM income " +
+            "ORDER BY year DESC, month DESC, day DESC, price DESC")
     fun getAll(): LiveData<List<Income>>
 
     @Insert

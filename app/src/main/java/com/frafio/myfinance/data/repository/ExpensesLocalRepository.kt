@@ -35,6 +35,8 @@ class ExpensesLocalRepository {
     fun getExpensesOfYear(year: Int): LiveData<List<Expense>> =
         expenseDao.getExpensesOfYear(year)
 
+    fun getStartingWith(string: String): LiveData<List<Expense>> = expenseDao.getStartingWith(string)
+
     fun insertExpense(expense: Expense) = expenseDao.insertExpense(expense)
 
     fun updateExpense(expense: Expense) = expenseDao.updateExpense(expense)
