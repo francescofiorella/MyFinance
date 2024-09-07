@@ -73,18 +73,12 @@ class AddActivity : AppCompatActivity(), AddListener {
         )
 
         binding.priceET.doOnTextChanged { text, _, _, _ ->
-            if (!text.isNullOrEmpty() && text.isNotBlank()) {
-                if (text.contains(".")) {
-                    var lastPartOfText = text.split(".")[text.split(".").size - 1]
-                    if (lastPartOfText.count() > 2) {
-                        try {
-                            lastPartOfText = text.substring(0, text.indexOf(".") + 3)
-                            binding.priceET.setText(lastPartOfText)
-                            binding.priceET.setSelection(lastPartOfText.length)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
+            if (!text.isNullOrEmpty() && text.isNotBlank() && text.contains(".")) {
+                var lastPartOfText = text.split(".")[text.split(".").size - 1]
+                if (lastPartOfText.count() > 2) {
+                    lastPartOfText = text.substring(0, text.indexOf(".") + 3)
+                    binding.priceET.setText(lastPartOfText)
+                    binding.priceET.setSelection(lastPartOfText.length)
                 }
             }
         }
