@@ -68,7 +68,7 @@ fun timeToString(hour: Int?, minute: Int?): String? {
 }
 
 @Suppress("UNUSED")
-fun Float.round(decimals: Int): Float {
+fun Double.round(decimals: Int): Double {
     var multiplier = 1.0f
     repeat(decimals) { multiplier *= 10 }
     return round(this * multiplier) / multiplier

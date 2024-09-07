@@ -29,8 +29,6 @@ object FirestoreEnums {
     }
 
     enum class CATEGORIES(val value: Int) {
-        TOTAL(100),
-        INCOME(101),
         HOUSING(0),
         GROCERIES(1),
         PERSONAL_CARE(2),
@@ -39,6 +37,9 @@ object FirestoreEnums {
         DINING(5),
         HEALTH(6),
         TRANSPORTATION(7),
-        MISCELLANEOUS(8)
+        MISCELLANEOUS(8),
+        TOTAL(100),
+        INCOME(101),
+        JOLLY(102)
     }
 }

@@ -141,6 +141,8 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                 if (it.adapter == null) {
                     it.adapter = ExpenseAdapter(nl, this)
                     isListBlocked = limit >= maxExpensesNumber
+                    val position = (it.adapter as ExpenseAdapter).getTodayPosition()
+                    scrollTo(position)
                 } else {
                     it.post {
                         (it.adapter as ExpenseAdapter).updateData(nl)
@@ -278,22 +280,26 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
     override fun scrollUp() {
         super.scrollUp()
         binding.listRecyclerView.apply {
-            stopScroll()
-            (layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(0, 0)
+            val position = (adapter as ExpenseAdapter).getTodayPosition()
+            scrollTo(position)
         }
     }
 
-    fun scrollTo(position: Int) {
+    fun scrollTo(position: Int, animate: Boolean = false) {
         binding.listRecyclerView.apply {
-            val linearSmoothScroller: LinearSmoothScroller =
-                object : LinearSmoothScroller(context) {
-                    override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
-                        return 200.0f / displayMetrics.densityDpi
-                    }
-                }
             stopScroll()
-            linearSmoothScroller.targetPosition = position
-            (layoutManager as LinearLayoutManager?)?.startSmoothScroll(linearSmoothScroller)
+            if (animate) {
+                val linearSmoothScroller: LinearSmoothScroller =
+                    object : LinearSmoothScroller(context) {
+                        override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
+                            return 200.0f / displayMetrics.densityDpi
+                        }
+                    }
+                linearSmoothScroller.targetPosition = position
+                (layoutManager as LinearLayoutManager?)?.startSmoothScroll(linearSmoothScroller)
+            } else {
+                (layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(position, 0)
+            }
         }
     }
 

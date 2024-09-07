@@ -10,13 +10,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
-import com.frafio.myfinance.data.widget.DatePickerButton
+import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.FinanceResult
+import com.frafio.myfinance.data.widget.DatePickerButton
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.hideSoftKeyboard
@@ -70,6 +71,23 @@ class AddActivity : AppCompatActivity(), AddListener {
                 else -> R.drawable.ic_euro
             }
         )
+
+        binding.priceET.doOnTextChanged { text, _, _, _ ->
+            if (!text.isNullOrEmpty() && text.isNotBlank()) {
+                if (text.contains(".")) {
+                    var lastPartOfText = text.split(".")[text.split(".").size - 1]
+                    if (lastPartOfText.count() > 2) {
+                        try {
+                            lastPartOfText = text.substring(0, text.indexOf(".") + 3)
+                            binding.priceET.setText(lastPartOfText)
+                            binding.priceET.setSelection(lastPartOfText.length)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun initLayout(code: Int) {
@@ -84,6 +102,7 @@ class AddActivity : AppCompatActivity(), AddListener {
                 binding.priceET.clearFocus()
                 hideSoftKeyboard(binding.root)
             }
+
             override fun onPositiveBtnClickListener() {
                 super.onPositiveBtnClickListener()
                 viewModel.year = year
@@ -268,7 +287,8 @@ class AddActivity : AppCompatActivity(), AddListener {
             FinanceCode.WRONG_NAME_TOTAL.code ->
                 binding.nameET.error = financeResult.message
 
-            FinanceCode.EMPTY_AMOUNT.code ->
+            FinanceCode.EMPTY_AMOUNT.code,
+            FinanceCode.WRONG_AMOUNT.code ->
                 binding.priceET.error = financeResult.message
 
             FinanceCode.EMPTY_CATEGORY.code ->
@@ -324,8 +344,10 @@ class AddActivity : AppCompatActivity(), AddListener {
             viewModel.category = category
         }
 
-        layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout).visibility = View.GONE
-        layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout).visibility = View.VISIBLE
+        layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout).visibility =
+            View.GONE
+        layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout).visibility =
+            View.VISIBLE
 
         layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon).icon =
             ContextCompat.getDrawable(

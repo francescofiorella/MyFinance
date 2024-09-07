@@ -17,134 +17,87 @@
 
     </data>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/incomeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:background="?attr/selectableItemBackground"
+        android:clickable="@{income.price != 0.0 ? true : false}"
+        android:focusable="@{income.price != 0.0 ? true : false}"
+        android:longClickable="@{income.price != 0.0 ? true : false}"
+        android:paddingHorizontal="20dp">
 
-        <LinearLayout
-            android:id="@+id/dataLayout"
-            android:layout_width="match_parent"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/totalTextView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="20dp"
-            android:visibility="@{income.category == FirestoreEnums.CATEGORIES.TOTAL.value ? View.VISIBLE : View.GONE}"
-            tools:visibility="visible">
+            android:layout_marginVertical="10dp"
+            android:fontFamily="@font/nunito"
+            android:text="@string/no_incomes"
+            android:textSize="16sp"
+            android:visibility="@{income.price != 0.0 ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/yearTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="5dp"
-                android:fontFamily="@font/nunito"
-                android:text="@{income.year.toString()}"
-                android:textSize="14sp"
-                tools:text="2000" />
-
-            <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/divider"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="10dp"
-                android:layout_weight="1" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/priceTotalTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="5dp"
-                android:fontFamily="@font/nunito"
-                android:text="@{FormatUtilsKt.doubleToPrice(income.price)}"
-                android:textSize="14sp"
-                tools:text="€ 0.00" />
-
-        </LinearLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/incomeLayout"
-            android:layout_width="match_parent"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/categoryIcon"
+            style="?attr/materialIconButtonFilledTonalStyle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="@{income.category != FirestoreEnums.CATEGORIES.TOTAL.value ? true : false}"
-            android:focusable="@{income.category != FirestoreEnums.CATEGORIES.TOTAL.value ? true : false}"
-            android:longClickable="@{income.category != FirestoreEnums.CATEGORIES.TOTAL.value ? true : false}"
-            android:paddingHorizontal="20dp">
+            android:layout_marginVertical="5dp"
+            android:clickable="false"
+            android:contentDescription="@string/expense_category_icon"
+            android:visibility="@{income.price != 0.0 ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:icon="@drawable/ic_restaurant" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/totalTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@string/no_incomes"
-                android:textSize="16sp"
-                android:visibility="@{income.category != FirestoreEnums.CATEGORIES.TOTAL.value || income.price != 0.0 ? View.GONE : View.VISIBLE}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Total"
-                tools:visibility="gone" />
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/nameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/nunito"
+            android:text="@{income.name}"
+            android:textColor="@color/primary_text"
+            android:textSize="16sp"
+            android:visibility="@{income.price != 0.0 ? View.VISIBLE : View.GONE}"
+            app:layout_constraintStart_toEndOf="@id/categoryIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/incomes" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/categoryIcon"
-                style="?attr/materialIconButtonFilledTonalStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="5dp"
-                android:clickable="false"
-                android:contentDescription="@string/expense_category_icon"
-                android:visibility="@{income.category == FirestoreEnums.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:icon="@drawable/ic_restaurant" />
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/dateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="@font/nunito"
+            android:text="@{income.getDateString()}"
+            android:textSize="14sp"
+            android:visibility="@{income.price != 0.0 ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/categoryIcon"
+            app:layout_constraintTop_toBottomOf="@id/nameTextView"
+            tools:text="01/01/2000" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/nameTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@{income.name}"
-                android:textColor="@color/primary_text"
-                android:textSize="16sp"
-                android:visibility="@{income.category == FirestoreEnums.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
-                app:layout_constraintStart_toEndOf="@id/categoryIcon"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="@string/incomes" />
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/priceTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito"
+            android:text="@{FormatUtilsKt.doubleToPrice(income.price)}"
+            android:textSize="16sp"
+            android:visibility="@{income.price != 0.0 ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="€ 0.00" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/dateTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="10dp"
-                android:fontFamily="@font/nunito"
-                android:text="@{income.getDateString()}"
-                android:textSize="14sp"
-                android:visibility="@{income.category == FirestoreEnums.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/categoryIcon"
-                app:layout_constraintTop_toBottomOf="@id/nameTextView"
-                tools:text="01/01/2000" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/priceTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/nunito"
-                android:text="@{FormatUtilsKt.doubleToPrice(income.price)}"
-                android:textSize="16sp"
-                android:visibility="@{income.category == FirestoreEnums.CATEGORIES.TOTAL.value ? View.GONE : View.VISIBLE}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="€ 0.00" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

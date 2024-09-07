@@ -11,24 +11,32 @@ enum class FinanceCode(val code: Int, val message: String) {
         }
     ),
 
-    EMPTY_AMOUNT(
-        2, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Enter the expense amount."
-            Languages.ITALIANO.value -> "Inserisci l'importo della spesa."
-            else -> "Enter the expense amount." // english
-        }
-    ),
-
     WRONG_NAME_TOTAL(
-        3, when (getCurrentLanguage()) {
+        2, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "The expense name can't be 'Total'."
             Languages.ITALIANO.value -> "Il nome della spesa non può essere 'Totale'."
             else -> "The expense name can't be 'Total'." // english
         }
     ),
 
-    EMPTY_CATEGORY(
+    EMPTY_AMOUNT(
+        3, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Enter the expense amount."
+            Languages.ITALIANO.value -> "Inserisci l'importo della spesa."
+            else -> "Enter the expense amount." // english
+        }
+    ),
+
+    WRONG_AMOUNT(
         4, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "The expense amount can't be 0."
+            Languages.ITALIANO.value -> "L'importo della spesa non può essere 0."
+            else -> "Enter the expense amount." // english
+        }
+    ),
+
+    EMPTY_CATEGORY(
+        5, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Enter the expense category."
             Languages.ITALIANO.value -> "Inserisci la categoria della spesa."
             else -> "Enter the expense category." // english

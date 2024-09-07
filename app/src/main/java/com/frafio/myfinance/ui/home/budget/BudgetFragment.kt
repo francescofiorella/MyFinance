@@ -146,6 +146,23 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         }
 
         binding.monthlyBudgetET.doOnTextChanged { text, _, _, _ ->
+            // Remove possibility of adding more than 2 decimals
+            if (!text.isNullOrEmpty() && text.isNotBlank()) {
+                if (text.contains(".")) {
+                    var lastPartOfText = text.split(".")[text.split(".").size - 1]
+                    if (lastPartOfText.count() > 2) {
+                        try {
+                            lastPartOfText = text.substring(0, text.indexOf(".") + 3)
+                            binding.monthlyBudgetET.setText(lastPartOfText)
+                            binding.monthlyBudgetET.setSelection(lastPartOfText.length)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+
+            // Check if budget is not changed from db value
             val newBudget = doubleToString(text?.trim().toString().toDoubleOrNull() ?: 0.0)
             val previousBudget = binding.monthlyBudgetTV.text.toString()
             binding.monthlyBudgetDeleteBtn.isEnabled =

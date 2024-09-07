@@ -10,6 +10,7 @@ import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.manager.IncomesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.databinding.LayoutIncomeItemRvBinding
+import com.frafio.myfinance.databinding.LayoutTotalItemRvBinding
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.utils.createTextDrawable
@@ -17,7 +18,7 @@ import com.frafio.myfinance.utils.createTextDrawable
 class IncomeAdapter(
     private var incomes: List<Income>,
     private val listener: IncomeInteractionListener
-) : RecyclerView.Adapter<IncomeAdapter.IncomeViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var currentLimit: Long = DEFAULT_LIMIT
 
@@ -25,42 +26,72 @@ class IncomeAdapter(
         val binding: LayoutIncomeItemRvBinding
     ) : RecyclerView.ViewHolder(binding.root)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        IncomeViewHolder(
-            DataBindingUtil.inflate(
-                LayoutInflater.from(parent.context),
-                R.layout.layout_income_item_rv,
-                parent,
-                false
-            )
-        )
+    inner class TotalViewHolder(
+        val binding: LayoutTotalItemRvBinding
+    ) : RecyclerView.ViewHolder(binding.root)
 
-    override fun onBindViewHolder(holder: IncomeViewHolder, position: Int) {
+    override fun getItemViewType(position: Int): Int {
+        return if (incomes[position].category == FirestoreEnums.CATEGORIES.TOTAL.value) {
+            FirestoreEnums.CATEGORIES.TOTAL.value
+        } else {
+            super.getItemViewType(position)
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == FirestoreEnums.CATEGORIES.TOTAL.value) {
+            TotalViewHolder(
+                DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.context),
+                    R.layout.layout_total_item_rv,
+                    parent,
+                    false
+                )
+            )
+        } else {
+            IncomeViewHolder(
+                DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.context),
+                    R.layout.layout_income_item_rv,
+                    parent,
+                    false
+                )
+            )
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val currentIncome = incomes[position]
-        holder.binding.income = currentIncome
 
         if (incomes.size - position < (DEFAULT_LIMIT / 2)) {
             listener.onItemInteraction(ON_LOAD_MORE_REQUEST, currentIncome, position)
         }
 
-        if (currentIncome.category != FirestoreEnums.CATEGORIES.TOTAL.value) {
-            holder.binding.categoryIcon.icon =
-                createTextDrawable(
-                    holder.binding.categoryIcon.context,
-                    currentIncome.name!![0].uppercase()
-                )
-            holder.binding.incomeLayout
-                .setOnLongClickListener {
-                    listener.onItemInteraction(
-                        ON_LONG_CLICK,
-                        currentIncome,
-                        holder.getAdapterPosition()
-                    )
-                    true
-                }
-        } else {
-            holder.binding.incomeLayout
-                .setOnLongClickListener(null)
+        if (holder.itemViewType == FirestoreEnums.CATEGORIES.TOTAL.value) {
+            val tHolder = (holder as TotalViewHolder)
+            tHolder.binding.date = currentIncome.year.toString()
+            tHolder.binding.amount = currentIncome.price
+            return
+        }
+
+        val iHolder = holder as IncomeViewHolder
+        iHolder.binding.income = currentIncome
+
+        if (currentIncome.price == 0.0) {
+            iHolder.binding.incomeLayout.setOnLongClickListener(null)
+            return
+        }
+        iHolder.binding.categoryIcon.icon = createTextDrawable(
+            iHolder.binding.categoryIcon.context,
+            currentIncome.name!![0].uppercase()
+        )
+        iHolder.binding.incomeLayout.setOnLongClickListener {
+            listener.onItemInteraction(
+                ON_LONG_CLICK,
+                currentIncome,
+                iHolder.getAdapterPosition()
+            )
+            true
         }
     }
 
@@ -79,6 +110,4 @@ class IncomeAdapter(
         if (increment) currentLimit += (DEFAULT_LIMIT / 2)
         return currentLimit
     }
-
-
 }

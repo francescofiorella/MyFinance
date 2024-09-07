@@ -43,6 +43,17 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
                 id = totId
             )
             expenseList.add(total!!)
+            // Add empty expense (with random name, jolly category, and price to 0.0)
+            total = Expense(
+                name = "",
+                price = 0.0,
+                year = todayDate.year,
+                month = todayDate.monthValue,
+                day = todayDate.dayOfMonth,
+                category = FirestoreEnums.CATEGORIES.JOLLY.value,
+                id = totId
+            )
+            expenseList.add(total!!)
             prevDate = total!!.getLocalDate()
         }
 
@@ -170,9 +181,18 @@ fun addTotalsToIncomes(incomes: List<Income>): List<Income> {
     incomes.forEach { income ->
         if (isFirstIncome && todayYear > income.year!!) {
             // Inserisci totale a 0.0 per oggi
-            incomeList.add(
-                total
+            incomeList.add(total)
+            // Add empty income (with random name, jolly category, and price to 0.0)
+            total = Income(
+                name = "",
+                price = 0.0,
+                year = todayYear,
+                month = 0,
+                day = 0,
+                category = FirestoreEnums.CATEGORIES.JOLLY.value,
+                id = todayYear.toString()
             )
+            incomeList.add(total)
             total = Income(
                 name = FirestoreEnums.NAMES.TOTAL.value,
                 price = 0.0,

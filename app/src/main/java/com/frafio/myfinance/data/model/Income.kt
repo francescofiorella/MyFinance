@@ -5,7 +5,6 @@ import androidx.room.PrimaryKey
 import com.frafio.myfinance.utils.dateToString
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
-import java.time.LocalDate
 
 @IgnoreExtraProperties
 @Entity
@@ -20,17 +19,7 @@ data class Income(
     @PrimaryKey @get:Exclude var id: String = "$name$price$timestamp$category"
 ) {
     @Exclude
-    fun getTotalId(): String {
-        return "${day}_${month}_${year}"
-    }
-
-    @Exclude
     fun getDateString(): String {
         return dateToString(day, month, year) ?: ""
-    }
-
-    @Exclude
-    fun getLocalDate(): LocalDate {
-        return LocalDate.of(year!!, month!!, day!!)
     }
 }

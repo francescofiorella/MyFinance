@@ -66,6 +66,11 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             listener?.onAddFailure(FinanceResult(FinanceCode.EMPTY_AMOUNT))
             return
         }
+        val price = priceString!!.toDouble()
+        if (price == 0.0) {
+            listener?.onAddFailure(FinanceResult(FinanceCode.WRONG_AMOUNT))
+            return
+        }
 
         if (expenseCode == AddActivity.REQUEST_INCOME_CODE) {
             category = FirestoreEnums.CATEGORIES.INCOME.value
@@ -73,8 +78,6 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             listener?.onAddFailure(FinanceResult(FinanceCode.EMPTY_CATEGORY))
             return
         }
-
-        val price = priceString!!.toDouble()
 
         when (requestCode) {
             AddActivity.REQUEST_ADD_CODE -> {
