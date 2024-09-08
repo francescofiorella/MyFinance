@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.home.profile
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,7 @@ import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.dateToString
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.sidesheet.SideSheetDialog
+
 
 class ProfileFragment : BaseFragment(), ProfileListener {
 
@@ -75,7 +77,12 @@ class ProfileFragment : BaseFragment(), ProfileListener {
                     getString(R.string.restart_app_changes),
                     getString(R.string.restart)
                 ) {
-                    (activity as HomeActivity).finish()
+                    (activity as HomeActivity).applicationContext.also { ctx ->
+                        val intent = ctx.packageManager.getLaunchIntentForPackage(ctx.packageName)
+                        val mainIntent = Intent.makeRestartActivityTask(intent!!.component)
+                        ctx.startActivity(mainIntent)
+                        Runtime.getRuntime().exit(0)
+                    }
                 }
             }
         }
