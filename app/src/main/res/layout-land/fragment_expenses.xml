@@ -74,29 +74,26 @@
             android:background="@drawable/bg_search_bar"
             android:backgroundTint="?attr/colorSurfaceContainer"
             android:orientation="horizontal"
-            android:paddingHorizontal="15dp"
             android:visibility="@{viewModel.isExpensesEmpty == null || !viewModel.isExpensesEmpty ? View.VISIBLE : View.GONE}"
             tools:visibility="visible">
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MyFinance.TextInputLayout.TransparentBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginHorizontal="4dp"
                 android:layout_weight="1"
-                app:boxBackgroundMode="none"
+                android:paddingVertical="4dp"
                 app:endIconMode="clear_text"
-                app:hintEnabled="false"
                 app:startIconDrawable="@drawable/ic_search">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/search_ET"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/nunito"
                     android:hint="@string/search"
-                    android:inputType="text|textCapSentences|textNoSuggestions"
-                    android:textColorHint="?attr/colorOnSurfaceVariant" />
+                    android:inputType="text|textCapSentences|textNoSuggestions" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -105,7 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginEnd="15dp"
+                android:layout_marginEnd="16dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:contentDescription="@string/date_range"
@@ -116,6 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginEnd="16dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:contentDescription="@string/filter"
