@@ -94,8 +94,12 @@ class AddActivity : AppCompatActivity(), AddListener {
                     var lastPartOfText = text.split(".")[text.split(".").size - 1]
                     if (lastPartOfText.count() > 2) {
                         lastPartOfText = text.substring(0, text.indexOf(".") + 3)
+                        val selection = binding.priceET.selectionEnd
                         binding.priceET.setText(lastPartOfText)
-                        binding.priceET.setSelection(lastPartOfText.length)
+                        if (selection >= lastPartOfText.length)
+                            binding.priceET.setSelection(lastPartOfText.length)
+                        else
+                            binding.priceET.setSelection(selection)
                     }
                 }
             }

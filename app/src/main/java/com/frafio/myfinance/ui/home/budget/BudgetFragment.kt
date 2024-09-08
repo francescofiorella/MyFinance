@@ -151,8 +151,12 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                 var lastPartOfText = text.split(".")[text.split(".").size - 1]
                 if (lastPartOfText.count() > 2) {
                     lastPartOfText = text.substring(0, text.indexOf(".") + 3)
+                    val selection = binding.monthlyBudgetET.selectionEnd
                     binding.monthlyBudgetET.setText(lastPartOfText)
-                    binding.monthlyBudgetET.setSelection(lastPartOfText.length)
+                    if (selection >= lastPartOfText.length)
+                        binding.monthlyBudgetET.setSelection(lastPartOfText.length)
+                    else
+                        binding.monthlyBudgetET.setSelection(selection)
                 }
             }
 
