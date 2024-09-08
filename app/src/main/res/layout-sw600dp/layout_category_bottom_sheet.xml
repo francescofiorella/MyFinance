@@ -131,266 +131,122 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider">
 
-        <LinearLayout
-            android:id="@+id/housing_layout"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/housingTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingHorizontal="30dp">
+            android:drawableStart="@drawable/ic_baseline_home"
+            android:drawablePadding="20dp"
+            android:fontFamily="@font/nunito"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="15dp"
+            android:text="@string/housing"
+            android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/housing_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/housing"
-                android:paddingVertical="15dp"
-                android:src="@drawable/ic_baseline_home" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/housingTV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/nunito"
-                android:text="@string/housing"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/groceries_layout"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/groceriesTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingHorizontal="30dp">
+            android:drawableStart="@drawable/ic_shopping_cart"
+            android:drawablePadding="20dp"
+            android:fontFamily="@font/nunito"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="15dp"
+            android:text="@string/groceries"
+            android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/groceries_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/groceries"
-                android:paddingVertical="15dp"
-                android:src="@drawable/ic_shopping_cart" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/groceriesTV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/nunito"
-                android:text="@string/groceries"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/personal_care_layout"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/personal_careTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingHorizontal="30dp">
+            android:drawableStart="@drawable/ic_self_care"
+            android:drawablePadding="20dp"
+            android:fontFamily="@font/nunito"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="15dp"
+            android:text="@string/personal_care"
+            android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/personal_care_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/personal_care"
-                android:paddingVertical="15dp"
-                android:src="@drawable/ic_self_care" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/personal_careTV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/nunito"
-                android:text="@string/personal_care"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/entertainment_layout"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/entertainmentTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingHorizontal="30dp">
+            android:drawableStart="@drawable/ic_theater_comedy"
+            android:drawablePadding="20dp"
+            android:fontFamily="@font/nunito"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="15dp"
+            android:text="@string/entertainment"
+            android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/entertainment_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/entertainment"
-                android:paddingVertical="15dp"
-                android:src="@drawable/ic_theater_comedy" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/entertainmentTV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/nunito"
-                android:text="@string/entertainment"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/education_layout"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/educationTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingHorizontal="30dp">
+            android:drawableStart="@drawable/ic_school"
+            android:drawablePadding="20dp"
+            android:fontFamily="@font/nunito"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="15dp"
+            android:text="@string/education"
+            android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/education_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/education"
-                android:paddingVertical="15dp"
-                android:src="@drawable/ic_school" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/educationTV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/nunito"
-                android:text="@string/education"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/dining_layout"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/diningTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingHorizontal="30dp">
+            android:drawableStart="@drawable/ic_restaurant"
+            android:drawablePadding="20dp"
+            android:fontFamily="@font/nunito"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="15dp"
+            android:text="@string/dining"
+            android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/dining_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/dining"
-                android:paddingVertical="15dp"
-                android:src="@drawable/ic_restaurant" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/diningTV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/nunito"
-                android:text="@string/dining"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/health_layout"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/healthTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingHorizontal="30dp">
+            android:drawableStart="@drawable/ic_vaccines"
+            android:drawablePadding="20dp"
+            android:fontFamily="@font/nunito"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="15dp"
+            android:text="@string/health"
+            android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/health_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/health"
-                android:paddingVertical="15dp"
-                android:src="@drawable/ic_vaccines" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/healthTV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/nunito"
-                android:text="@string/health"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/transportation_layout"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/transportationTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingHorizontal="30dp">
+            android:drawableStart="@drawable/ic_directions_transit"
+            android:drawablePadding="20dp"
+            android:fontFamily="@font/nunito"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="15dp"
+            android:text="@string/transportation"
+            android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/transportation_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/transportation"
-                android:paddingVertical="15dp"
-                android:src="@drawable/ic_directions_transit" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/transportationTV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/nunito"
-                android:text="@string/transportation"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/miscellaneous_layout"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/miscellaneousTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingHorizontal="30dp">
-
-            <ImageView
-                android:id="@+id/miscellaneous_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/miscellaneous"
-                android:paddingVertical="15dp"
-                android:src="@drawable/ic_tag" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/miscellaneousTV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/nunito"
-                android:text="@string/miscellaneous"
-                android:textSize="16sp" />
-
-        </LinearLayout>
+            android:drawableStart="@drawable/ic_tag"
+            android:drawablePadding="20dp"
+            android:fontFamily="@font/nunito"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="15dp"
+            android:text="@string/miscellaneous"
+            android:textSize="16sp" />
 
     </LinearLayout>
 

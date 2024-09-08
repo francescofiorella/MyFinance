@@ -7,7 +7,7 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -367,39 +367,39 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout).visibility = View.GONE
             layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout).visibility =
                 View.VISIBLE
-            layout.findViewById<LinearLayout>(R.id.housing_layout).setOnClickListener {
+            layout.findViewById<TextView>(R.id.housingTV).setOnClickListener {
                 viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.HOUSING.value)
                 dismissFun()
             }
-            layout.findViewById<LinearLayout>(R.id.groceries_layout).setOnClickListener {
+            layout.findViewById<TextView>(R.id.groceriesTV).setOnClickListener {
                 viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.GROCERIES.value)
                 dismissFun()
             }
-            layout.findViewById<LinearLayout>(R.id.personal_care_layout).setOnClickListener {
+            layout.findViewById<TextView>(R.id.personal_careTV).setOnClickListener {
                 viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.PERSONAL_CARE.value)
                 dismissFun()
             }
-            layout.findViewById<LinearLayout>(R.id.entertainment_layout).setOnClickListener {
+            layout.findViewById<TextView>(R.id.entertainmentTV).setOnClickListener {
                 viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.ENTERTAINMENT.value)
                 dismissFun()
             }
-            layout.findViewById<LinearLayout>(R.id.education_layout).setOnClickListener {
+            layout.findViewById<TextView>(R.id.educationTV).setOnClickListener {
                 viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.EDUCATION.value)
                 dismissFun()
             }
-            layout.findViewById<LinearLayout>(R.id.dining_layout).setOnClickListener {
+            layout.findViewById<TextView>(R.id.diningTV).setOnClickListener {
                 viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.DINING.value)
                 dismissFun()
             }
-            layout.findViewById<LinearLayout>(R.id.health_layout).setOnClickListener {
+            layout.findViewById<TextView>(R.id.healthTV).setOnClickListener {
                 viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.HEALTH.value)
                 dismissFun()
             }
-            layout.findViewById<LinearLayout>(R.id.transportation_layout).setOnClickListener {
+            layout.findViewById<TextView>(R.id.transportationTV).setOnClickListener {
                 viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.TRANSPORTATION.value)
                 dismissFun()
             }
-            layout.findViewById<LinearLayout>(R.id.miscellaneous_layout).setOnClickListener {
+            layout.findViewById<TextView>(R.id.miscellaneousTV).setOnClickListener {
                 viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.MISCELLANEOUS.value)
                 dismissFun()
             }
@@ -407,9 +407,9 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
 
         // layout_edit_expense_bottom_sheet.xml
-        val editLayout = layout.findViewById<LinearLayout>(R.id.edit_layout)
-        val deleteLayout = layout.findViewById<LinearLayout>(R.id.delete_layout)
-        editLayout.setOnClickListener {
+        val editItem = layout.findViewById<TextView>(R.id.editTV)
+        val deleteItem = layout.findViewById<TextView>(R.id.deleteTV)
+        editItem.setOnClickListener {
             Intent(context, AddActivity::class.java).also {
                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
                 it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_EXPENSE_CODE)
@@ -425,7 +425,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             }
             dismissFun()
         }
-        deleteLayout.setOnClickListener {
+        deleteItem.setOnClickListener {
             viewModel.deleteExpense(expense)
             dismissFun()
         }

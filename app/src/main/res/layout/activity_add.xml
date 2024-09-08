@@ -86,11 +86,10 @@
                             android:id="@+id/nameET"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:minHeight="24dp"
                             android:layout_marginBottom="-13dp"
-                            android:paddingVertical="10dp"
                             android:hint="@string/name"
                             android:inputType="text|textCapSentences|textNoSuggestions"
+                            android:paddingVertical="10dp"
                             android:text="@={viewModel.name}"
                             android:textSize="24sp" />
 

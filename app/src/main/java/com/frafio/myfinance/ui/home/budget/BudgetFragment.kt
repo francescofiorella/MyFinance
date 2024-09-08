@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.ContextCompat
@@ -339,9 +339,9 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon).icon =
             createTextDrawable(layout.context, income.name!![0].uppercase())
 
-        val editLayout = layout.findViewById<LinearLayout>(R.id.edit_layout)
-        val deleteLayout = layout.findViewById<LinearLayout>(R.id.delete_layout)
-        editLayout.setOnClickListener {
+        val editItem = layout.findViewById<TextView>(R.id.editTV)
+        val deleteItem = layout.findViewById<TextView>(R.id.deleteTV)
+        editItem.setOnClickListener {
             Intent(context, AddActivity::class.java).also {
                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
                 it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_INCOME_CODE)
@@ -357,7 +357,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             }
             dismissFun()
         }
-        deleteLayout.setOnClickListener {
+        deleteItem.setOnClickListener {
             viewModel.deleteIncome(income)
             dismissFun()
         }

@@ -25,7 +25,7 @@
         android:id="@+id/nameTV"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginHorizontal="10dp"
         android:fontFamily="@font/nunito"
         android:textColor="@color/primary_text"
         android:textSize="20sp"
@@ -68,71 +68,39 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dateTV" />
 
-    <LinearLayout
-        android:id="@+id/edit_layout"
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/editTV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:background="?attr/selectableItemBackground"
-        android:orientation="horizontal"
+        android:drawableStart="@drawable/ic_outline_create"
+        android:drawablePadding="20dp"
+        android:fontFamily="@font/nunito"
         android:paddingHorizontal="30dp"
+        android:paddingVertical="15dp"
+        android:text="@string/edit"
+        android:textColor="@color/primary_text"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider">
+        app:layout_constraintTop_toBottomOf="@id/divider" />
 
-        <ImageView
-            android:id="@+id/edit_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/edit"
-            android:paddingVertical="15dp"
-            android:src="@drawable/ic_outline_create" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/editTV"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="20dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/nunito"
-            android:text="@string/edit"
-            android:textColor="@color/primary_text"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/delete_layout"
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/deleteTV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:orientation="horizontal"
+        android:drawableStart="@drawable/ic_outline_delete"
+        android:drawablePadding="20dp"
+        android:fontFamily="@font/nunito"
         android:paddingHorizontal="30dp"
+        android:paddingVertical="15dp"
+        android:text="@string/delete"
+        android:textColor="@color/primary_text"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edit_layout">
-
-        <ImageView
-            android:id="@+id/delete_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/delete"
-            android:paddingVertical="15dp"
-            android:src="@drawable/ic_outline_delete" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/deleteTV"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="20dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/nunito"
-            android:text="@string/delete"
-            android:textColor="@color/primary_text"
-            android:textSize="16sp" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@id/editTV" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

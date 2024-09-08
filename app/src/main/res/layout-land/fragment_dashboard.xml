@@ -79,8 +79,7 @@
                 android:id="@+id/stats_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="2"
-                android:rowCount="4">
+                android:columnCount="2">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/materialCardView1"

@@ -59,15 +59,19 @@
             android:id="@+id/nameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
             android:fontFamily="@font/nunito"
             android:text="@{income.name}"
             android:textColor="@color/primary_text"
             android:textSize="16sp"
             android:visibility="@{income.category != FirestoreEnums.CATEGORIES.JOLLY.value ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toTopOf="@id/dateTextView"
+            app:layout_constraintEnd_toStartOf="@+id/priceTextView"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@id/categoryIcon"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
             tools:text="@string/incomes" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -75,7 +79,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginBottom="10dp"
             android:fontFamily="@font/nunito"
             android:text="@{income.getDateString()}"
             android:textSize="14sp"

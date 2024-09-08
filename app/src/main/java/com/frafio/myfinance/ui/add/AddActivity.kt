@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -297,7 +296,7 @@ class AddActivity : AppCompatActivity(), AddListener {
         }
     }
 
-    val categoryInputListener = View.OnClickListener {
+    private val categoryInputListener = View.OnClickListener {
         binding.nameET.clearFocus()
         binding.priceET.clearFocus()
         binding.categoryET.requestFocus()
@@ -385,39 +384,39 @@ class AddActivity : AppCompatActivity(), AddListener {
                 }
             )
 
-        layout.findViewById<LinearLayout>(R.id.housing_layout).setOnClickListener {
+        layout.findViewById<TextView>(R.id.housingTV).setOnClickListener {
             selectCategory(FirestoreEnums.CATEGORIES.HOUSING.value)
             dismissFun()
         }
-        layout.findViewById<LinearLayout>(R.id.groceries_layout).setOnClickListener {
+        layout.findViewById<TextView>(R.id.groceriesTV).setOnClickListener {
             selectCategory(FirestoreEnums.CATEGORIES.GROCERIES.value)
             dismissFun()
         }
-        layout.findViewById<LinearLayout>(R.id.personal_care_layout).setOnClickListener {
+        layout.findViewById<TextView>(R.id.personal_careTV).setOnClickListener {
             selectCategory(FirestoreEnums.CATEGORIES.PERSONAL_CARE.value)
             dismissFun()
         }
-        layout.findViewById<LinearLayout>(R.id.entertainment_layout).setOnClickListener {
+        layout.findViewById<TextView>(R.id.entertainmentTV).setOnClickListener {
             selectCategory(FirestoreEnums.CATEGORIES.ENTERTAINMENT.value)
             dismissFun()
         }
-        layout.findViewById<LinearLayout>(R.id.education_layout).setOnClickListener {
+        layout.findViewById<TextView>(R.id.educationTV).setOnClickListener {
             selectCategory(FirestoreEnums.CATEGORIES.EDUCATION.value)
             dismissFun()
         }
-        layout.findViewById<LinearLayout>(R.id.dining_layout).setOnClickListener {
+        layout.findViewById<TextView>(R.id.diningTV).setOnClickListener {
             selectCategory(FirestoreEnums.CATEGORIES.DINING.value)
             dismissFun()
         }
-        layout.findViewById<LinearLayout>(R.id.health_layout).setOnClickListener {
+        layout.findViewById<TextView>(R.id.healthTV).setOnClickListener {
             selectCategory(FirestoreEnums.CATEGORIES.HEALTH.value)
             dismissFun()
         }
-        layout.findViewById<LinearLayout>(R.id.transportation_layout).setOnClickListener {
+        layout.findViewById<TextView>(R.id.transportationTV).setOnClickListener {
             selectCategory(FirestoreEnums.CATEGORIES.TRANSPORTATION.value)
             dismissFun()
         }
-        layout.findViewById<LinearLayout>(R.id.miscellaneous_layout).setOnClickListener {
+        layout.findViewById<TextView>(R.id.miscellaneousTV).setOnClickListener {
             selectCategory(FirestoreEnums.CATEGORIES.MISCELLANEOUS.value)
             dismissFun()
         }

@@ -5,8 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
@@ -20,7 +21,6 @@ import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.utils.dateToString
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.sidesheet.SideSheetDialog
-import com.google.android.material.textview.MaterialTextView
 
 class ProfileFragment : BaseFragment(), ProfileListener {
 
@@ -143,33 +143,34 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         viewModel: ProfileViewModel,
         dismissFun: () -> Unit
     ) {
-        val propicLayout = layout.findViewById<LinearLayout>(R.id.propic_layout)
-        val fullNameLayout = layout.findViewById<LinearLayout>(R.id.full_name_layout)
+        val propicTV = layout.findViewById<TextView>(R.id.propicTV)
+        val fullNameLayout = layout.findViewById<ConstraintLayout>(R.id.full_name_layout)
+        val fullNameTV = layout.findViewById<TextView>(R.id.full_nameTV)
         val fullNameET = layout.findViewById<AppCompatEditText>(R.id.full_nameET)
         val fullNameBtn = layout.findViewById<Button>(R.id.full_name_btn)
 
-        fullNameET?.setText(fullName)
-        propicLayout?.setOnClickListener {
+        fullNameET.setText(fullName)
+        propicTV.setOnClickListener {
             (activity as HomeActivity).showSnackBar("Cooming soon!")
             //viewModel.uploadPropic()
             dismissFun()
         }
-        fullNameLayout?.setOnClickListener {
-            layout.findViewById<MaterialTextView>(R.id.full_nameTV)?.visibility = View.GONE
-            fullNameBtn?.visibility = View.VISIBLE
-            fullNameET?.visibility = View.VISIBLE
+        fullNameLayout.setOnClickListener {
+            fullNameTV.visibility = View.INVISIBLE
+            fullNameBtn.visibility = View.VISIBLE
+            fullNameET.visibility = View.VISIBLE
             fullNameLayout.isClickable = false
-            fullNameET?.isFocusableInTouchMode = true
-            fullNameET?.requestFocus()
-            fullNameET?.setSelection(fullName.length)
+            fullNameET.isFocusableInTouchMode = true
+            fullNameET.requestFocus()
+            fullNameET.setSelection(fullName.length)
         }
-        fullNameET?.doOnTextChanged { text, _, _, _ ->
+        fullNameET.doOnTextChanged { text, _, _, _ ->
             val currentText = text?.trim()
-            fullNameBtn?.isEnabled =
+            fullNameBtn.isEnabled =
                 currentText.toString().isNotEmpty() && currentText.toString() != fullName
         }
-        fullNameBtn?.setOnClickListener {
-            viewModel.editFullName(fullNameET?.text.toString().trim())
+        fullNameBtn.setOnClickListener {
+            viewModel.editFullName(fullNameET.text.toString().trim())
             dismissFun()
         }
     }
