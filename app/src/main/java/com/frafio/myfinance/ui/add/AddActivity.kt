@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -55,6 +56,8 @@ class AddActivity : AppCompatActivity(), AddListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val errorPadding = (36 * resources.displayMetrics.density).toInt()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add)
         binding.viewModel = viewModel
         viewModel.listener = this
@@ -64,7 +67,14 @@ class AddActivity : AppCompatActivity(), AddListener {
             initLayout(code)
         }
 
-        binding.priceIcon.setImageResource(
+        binding.priceTIL.findViewById<TextView>(R.id.textinput_error)
+            .setPaddingRelative(errorPadding, 0, 0, 0)
+        binding.dateTIL.findViewById<TextView>(R.id.textinput_error)
+            .setPaddingRelative(errorPadding, 0, 0, 0)
+        binding.categoryTIL.findViewById<TextView>(R.id.textinput_error)
+            .setPaddingRelative(errorPadding, 0, 0, 0)
+
+        binding.priceTIL.setStartIconDrawable(
             when (getString(R.string.currency)) {
                 "€" -> R.drawable.ic_euro
                 "$" -> R.drawable.ic_attach_money
@@ -72,13 +82,21 @@ class AddActivity : AppCompatActivity(), AddListener {
             }
         )
 
+        binding.nameET.doOnTextChanged { text, _, _, _ ->
+            if (!text.isNullOrEmpty() && text.isNotBlank())
+                binding.nameTIL.error = ""
+        }
+
         binding.priceET.doOnTextChanged { text, _, _, _ ->
-            if (!text.isNullOrEmpty() && text.isNotBlank() && text.contains(".")) {
-                var lastPartOfText = text.split(".")[text.split(".").size - 1]
-                if (lastPartOfText.count() > 2) {
-                    lastPartOfText = text.substring(0, text.indexOf(".") + 3)
-                    binding.priceET.setText(lastPartOfText)
-                    binding.priceET.setSelection(lastPartOfText.length)
+            if (!text.isNullOrEmpty() && text.isNotBlank()) {
+                binding.priceTIL.error = ""
+                if (text.contains(".")) {
+                    var lastPartOfText = text.split(".")[text.split(".").size - 1]
+                    if (lastPartOfText.count() > 2) {
+                        lastPartOfText = text.substring(0, text.indexOf(".") + 3)
+                        binding.priceET.setText(lastPartOfText)
+                        binding.priceET.setSelection(lastPartOfText.length)
+                    }
                 }
             }
         }
@@ -86,7 +104,7 @@ class AddActivity : AppCompatActivity(), AddListener {
 
     private fun initLayout(code: Int) {
         datePickerBtn = object : DatePickerButton(
-            binding.dateLayout,
+            binding.dateTIL,
             binding.dateET,
             this@AddActivity
         ) {
@@ -106,23 +124,8 @@ class AddActivity : AppCompatActivity(), AddListener {
             }
         }
 
-        binding.categoryLayout.setOnClickListener {
-            binding.nameET.clearFocus()
-            binding.priceET.clearFocus()
-            binding.categoryET.requestFocus()
-            if (resources.getBoolean(R.bool.is600dp)) {
-                val sideSheetDialog = SideSheetDialog(this)
-                sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
-                defineSheetInterface(
-                    sideSheetDialog.findViewById(android.R.id.content)!!,
-                    sideSheetDialog::hide
-                )
-                sideSheetDialog.show()
-            } else {
-                val modalBottomSheet = ModalBottomSheet(this)
-                modalBottomSheet.show(supportFragmentManager, ModalBottomSheet.TAG)
-            }
-        }
+        binding.categoryTIL.setOnClickListener(categoryInputListener)
+        binding.categoryET.setOnClickListener(categoryInputListener)
 
         when (code) {
             REQUEST_ADD_CODE -> {
@@ -134,13 +137,13 @@ class AddActivity : AppCompatActivity(), AddListener {
                     when (checkedId) {
                         R.id.expense_chip -> {
                             viewModel.expenseCode = REQUEST_EXPENSE_CODE
-                            binding.categoryLayout.visibility = View.VISIBLE
+                            binding.categoryTIL.visibility = View.VISIBLE
                             binding.divider3.visibility = View.VISIBLE
                         }
 
                         R.id.income_chip -> {
                             viewModel.expenseCode = REQUEST_INCOME_CODE
-                            binding.categoryLayout.visibility = View.GONE
+                            binding.categoryTIL.visibility = View.GONE
                             binding.divider3.visibility = View.GONE
                         }
                     }
@@ -182,8 +185,8 @@ class AddActivity : AppCompatActivity(), AddListener {
                 if (viewModel.expenseCode == REQUEST_EXPENSE_CODE) {
                     val categories = resources.getStringArray(R.array.categories)
                     if (viewModel.category != null && viewModel.category!! >= 0 && viewModel.category!! < categories.size) {
-                        binding.categoryET.text = categories[viewModel.category!!]
-                        binding.categoryIcon.setImageResource(
+                        binding.categoryET.setText(categories[viewModel.category!!])
+                        binding.categoryTIL.setStartIconDrawable(
                             when (viewModel.category) {
                                 FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
                                 FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
@@ -200,7 +203,7 @@ class AddActivity : AppCompatActivity(), AddListener {
                     }
                 } else {
                     binding.divider3.visibility = View.GONE
-                    binding.categoryLayout.visibility = View.GONE
+                    binding.categoryTIL.visibility = View.GONE
                 }
             }
         }
@@ -215,9 +218,9 @@ class AddActivity : AppCompatActivity(), AddListener {
     override fun onAddStart() {
         binding.addProgressIndicator.show()
 
-        binding.nameET.error = null
-        binding.priceET.error = null
-        binding.categoryET.error = null
+        binding.nameTIL.error = ""
+        binding.priceTIL.error = ""
+        binding.categoryTIL.error = ""
 
         binding.addAddButton.isEnabled = false
     }
@@ -279,14 +282,32 @@ class AddActivity : AppCompatActivity(), AddListener {
         when (financeResult.code) {
             FinanceCode.EMPTY_NAME.code,
             FinanceCode.WRONG_NAME_TOTAL.code ->
-                binding.nameET.error = financeResult.message
+                binding.nameTIL.error = financeResult.message
 
             FinanceCode.EMPTY_AMOUNT.code,
             FinanceCode.WRONG_AMOUNT.code ->
-                binding.priceET.error = financeResult.message
+                binding.priceTIL.error = financeResult.message
 
             FinanceCode.EMPTY_CATEGORY.code ->
-                binding.categoryET.error = financeResult.message
+                binding.categoryTIL.error = financeResult.message
+        }
+    }
+
+    val categoryInputListener = View.OnClickListener {
+        binding.nameET.clearFocus()
+        binding.priceET.clearFocus()
+        binding.categoryET.requestFocus()
+        if (resources.getBoolean(R.bool.is600dp)) {
+            val sideSheetDialog = SideSheetDialog(this)
+            sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
+            defineSheetInterface(
+                sideSheetDialog.findViewById(android.R.id.content)!!,
+                sideSheetDialog::hide
+            )
+            sideSheetDialog.show()
+        } else {
+            val modalBottomSheet = ModalBottomSheet(this)
+            modalBottomSheet.show(supportFragmentManager, ModalBottomSheet.TAG)
         }
     }
 
@@ -318,10 +339,10 @@ class AddActivity : AppCompatActivity(), AddListener {
         dismissFun: () -> Unit
     ) {
         fun selectCategory(category: Int) {
-            binding.categoryET.error = null
+            binding.categoryTIL.error = ""
             val categories = resources.getStringArray(R.array.categories)
-            binding.categoryET.text = categories[category]
-            binding.categoryIcon.setImageResource(
+            binding.categoryET.setText(categories[category])
+            binding.categoryTIL.setStartIconDrawable(
                 when (category) {
                     FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
                     FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart

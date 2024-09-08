@@ -36,7 +36,6 @@ import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companio
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.utils.addTotalsToExpenses
 import com.frafio.myfinance.utils.addTotalsToExpensesWithoutPrices
-import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.hideSoftKeyboard
@@ -101,21 +100,13 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         binding.searchET.doOnTextChanged { text, _, _, _ ->
             recViewLiveData.removeSource(localExpensesLiveData)
             localExpensesLiveData = if (text.isNullOrEmpty()) {
-                binding.clearIcon.visibility = View.INVISIBLE
                 viewModel.getLocalExpenses()
             } else {
-                binding.clearIcon.visibility = View.VISIBLE
                 viewModel.filterExpenses(text.toString())
             }
             recViewLiveData.addSource(localExpensesLiveData) { value ->
                 recViewLiveData.value = value
             }
-        }
-
-        binding.clearIcon.setOnClickListener {
-            requireActivity().hideSoftKeyboard(binding.root)
-            binding.searchET.clearFocus()
-            binding.searchET.clearText()
         }
 
         localExpensesLiveData = viewModel.getLocalExpenses()

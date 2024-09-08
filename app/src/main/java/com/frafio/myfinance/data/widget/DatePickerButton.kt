@@ -80,6 +80,7 @@ open class DatePickerButton(
         }
 
         layout.setOnClickListener(listener)
+        textView.setOnClickListener(listener)
     }
 
 

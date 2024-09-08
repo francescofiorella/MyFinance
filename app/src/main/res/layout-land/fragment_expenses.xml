@@ -78,32 +78,27 @@
             android:visibility="@{viewModel.isExpensesEmpty == null || !viewModel.isExpensesEmpty ? View.VISIBLE : View.GONE}"
             tools:visibility="visible">
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/search_ET"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginEnd="10dp"
+                android:layout_marginHorizontal="4dp"
                 android:layout_weight="1"
-                android:background="@null"
-                android:drawableStart="@drawable/ic_search"
-                android:drawablePadding="15dp"
-                android:fontFamily="@font/nunito"
-                android:hint="@string/search"
-                android:inputType="textCapSentences"
-                android:paddingVertical="15dp" />
+                app:boxBackgroundMode="none"
+                app:endIconMode="clear_text"
+                app:hintEnabled="false"
+                app:startIconDrawable="@drawable/ic_search">
 
-            <ImageView
-                android:id="@+id/clear_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="15dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:contentDescription="@string/clear_text"
-                android:visibility="invisible"
-                app:srcCompat="@drawable/ic_clear" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/search_ET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/nunito"
+                    android:hint="@string/search"
+                    android:inputType="text|textCapSentences|textNoSuggestions"
+                    android:textColorHint="?attr/colorOnSurfaceVariant" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <ImageView
                 android:id="@+id/calendar_icon"

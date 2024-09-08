@@ -27,21 +27,44 @@
 
     <!--Material Fields style.-->
     <style name="Widget.MyFinance.TextInputLayout.OutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
+        <item name="materialThemeOverlay">
+            @style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
         </item>
     </style>
 
     <style name="Widget.MyFinance.TextInputLayout.OutlinedBox.ExposedDropdownMenu" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
+        <item name="materialThemeOverlay">
+            @style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
         </item>
     </style>
 
     <style name="ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox" parent="">
-        <item name="editTextStyle">@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox
+        <item name="editTextStyle">
+            @style/Widget.Material3.TextInputEditText.OutlinedBox
         </item>
         <item name="autoCompleteTextViewStyle">
-            @style/Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox
+            @style/Widget.Material3.AutoCompleteTextView.OutlinedBox
         </item>
+    </style>
+
+    <style name="Widget.MyFinance.TextInputLayout.TransparentBox" parent="Widget.MyFinance.TextInputLayout.OutlinedBox">
+        <item name="materialThemeOverlay">
+            @style/ThemeOverlay.MyFinance.TextInputLayout.TransparentBox
+        </item>
+        <item name="hintEnabled">false</item>
+        <item name="boxBackgroundMode">none</item>
+    </style>
+
+    <style name="ThemeOverlay.MyFinance.TextInputLayout.TransparentBox" parent="">
+        <item name="editTextStyle">
+            @style/Widget.MyFinance.TextInputEditText.TransparentBox
+        </item>
+    </style>
+
+    <style name="Widget.MyFinance.TextInputEditText.TransparentBox" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        <item name="android:paddingVertical">6dp</item>
+        <item name="fontFamily">@font/nunito</item>
+        <item name="android:textColorHint">?attr/colorOnSurfaceVariant</item>
     </style>
 
     <!--Material DatePicker style. -->

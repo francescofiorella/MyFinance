@@ -69,29 +69,38 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <androidx.appcompat.widget.AppCompatEditText
-                        android:id="@+id/nameET"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/name_TIL"
+                        style="@style/Widget.MyFinance.TextInputLayout.TransparentBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="64dp"
-                        android:layout_marginEnd="@dimen/arrow_margin_start"
-                        android:background="@null"
-                        android:fontFamily="@font/nunito"
-                        android:hint="@string/name"
-                        android:inputType="text|textCapSentences|textNoSuggestions"
-                        android:text="@={viewModel.name}"
-                        android:textSize="24sp"
+                        android:paddingStart="44dp"
+                        android:paddingEnd="8dp"
+                        app:endIconMode="clear_text"
+                        app:errorEnabled="true"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/nameET"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="-13dp"
+                            android:hint="@string/name"
+                            android:inputType="text|textCapSentences|textNoSuggestions"
+                            android:text="@={viewModel.name}"
+                            android:textSize="24sp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/chip_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/arrow_margin_start"
-                        app:layout_constraintStart_toStartOf="@id/nameET"
-                        app:layout_constraintTop_toBottomOf="@id/nameET"
+                        android:layout_marginStart="60dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/name_TIL"
                         app:selectionRequired="true"
                         app:singleLine="true"
                         app:singleSelection="true">
@@ -127,107 +136,91 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <LinearLayout
-                    android:id="@+id/price_layout"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/price_TIL"
+                    style="@style/Widget.MyFinance.TextInputLayout.TransparentBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:paddingHorizontal="8dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="4dp"
+                    app:endIconMode="clear_text"
+                    app:errorEnabled="true"
+                    app:startIconDrawable="@drawable/ic_attach_money">
 
-                    <ImageView
-                        android:id="@+id/price_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/arrow_margin_start"
-                        android:contentDescription="@string/amount"
-                        android:padding="@dimen/arrow_padding"
-                        android:src="@drawable/ic_attach_money" />
-
-                    <androidx.appcompat.widget.AppCompatEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/priceET"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="@dimen/title_distance_from_arrow"
-                        android:layout_weight="1"
-                        android:background="@null"
-                        android:fontFamily="@font/nunito"
+                        android:layout_marginBottom="-13dp"
                         android:hint="@string/amount"
                         android:inputType="numberDecimal"
-                        android:text="@={viewModel.priceString}" />
+                        android:text="@={viewModel.priceString}"
+                        android:textSize="18sp" />
 
-                </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <LinearLayout
-                    android:id="@+id/date_layout"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/date_TIL"
+                    style="@style/Widget.MyFinance.TextInputLayout.TransparentBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
-                    android:orientation="horizontal">
+                    android:clickable="true"
+                    android:paddingHorizontal="8dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="4dp"
+                    app:errorEnabled="true"
+                    app:startIconDrawable="@drawable/ic_today">
 
-                    <ImageView
-                        android:id="@+id/date_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/arrow_margin_start"
-                        android:contentDescription="@string/date"
-                        android:padding="@dimen/arrow_padding"
-                        android:src="@drawable/ic_today" />
-
-                    <TextView
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/dateET"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="@dimen/title_distance_from_arrow"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/nunito"
+                        android:layout_marginBottom="-13dp"
+                        android:clickable="true"
+                        android:focusable="false"
                         android:hint="@string/date"
                         android:text="@{viewModel.dateString}"
                         android:textSize="18sp"
                         tools:text="01/01/2000" />
 
-                </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider_3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <LinearLayout
-                    android:id="@+id/category_layout"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/category_TIL"
+                    style="@style/Widget.MyFinance.TextInputLayout.TransparentBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
-                    android:orientation="horizontal">
+                    android:clickable="true"
+                    android:paddingHorizontal="8dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="4dp"
+                    app:errorEnabled="true"
+                    app:startIconDrawable="@drawable/ic_tag">
 
-                    <ImageView
-                        android:id="@+id/category_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/arrow_margin_start"
-                        android:contentDescription="@string/category"
-                        android:padding="@dimen/arrow_padding"
-                        android:src="@drawable/ic_tag"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/divider_3" />
-
-                    <TextView
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/categoryET"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="@dimen/title_distance_from_arrow"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/nunito"
+                        android:layout_marginBottom="-13dp"
+                        android:clickable="true"
+                        android:focusable="false"
                         android:hint="@string/category"
                         android:textSize="18sp" />
 
-                </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
 
