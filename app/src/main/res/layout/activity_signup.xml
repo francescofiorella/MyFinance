@@ -162,7 +162,7 @@
                     app:startIconDrawable="@drawable/ic_password_confirm">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/signup_passwordAgainInputText"
+                        android:id="@+id/signup_passwordConfirmInputText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
@@ -192,7 +192,7 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="15dp"
+                    android:layout_marginBottom="10dp"
                     app:layout_constraintBottom_toTopOf="@id/sLogintextView"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -203,9 +203,10 @@
                     android:id="@+id/sLogintextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="15dp"
                     android:fontFamily="@font/nunito"
                     android:onClick="onBackClick"
+                    android:padding="5dp"
                     android:text="@string/signup_login"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

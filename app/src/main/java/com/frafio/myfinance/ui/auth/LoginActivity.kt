@@ -6,6 +6,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
@@ -54,6 +55,15 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         binding.viewModel = viewModel
 
         viewModel.authListener = this
+
+        binding.loginEmailInputText.doOnTextChanged { text, _, _, _ ->
+            if (!text.isNullOrEmpty() && text.isNotBlank())
+                binding.loginEmailInputLayout.isErrorEnabled = false
+        }
+        binding.loginPasswordInputText.doOnTextChanged { text, _, _, _ ->
+            if (!text.isNullOrEmpty() && text.isNotBlank())
+                binding.loginPasswordInputLayout.isErrorEnabled = false
+        }
     }
 
     override fun onStart() {
