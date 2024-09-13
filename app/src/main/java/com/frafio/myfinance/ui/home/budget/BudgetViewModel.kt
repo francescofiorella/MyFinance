@@ -9,7 +9,7 @@ import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.repository.IncomeRepository
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.data.repository.ExpensesRepository
-import com.frafio.myfinance.data.storage.UserStorage
+import com.frafio.myfinance.data.storage.MyFinanceStorage
 
 class BudgetViewModel(application: Application) : AndroidViewModel(application) {
     private val expensesRepository = ExpensesRepository(
@@ -39,7 +39,7 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun setMonthlyBudget(budget: Double, getOldBudget: Boolean = false) {
-        val previousBudget = if (getOldBudget) UserStorage.monthlyBudget.value ?: 0.0 else null
+        val previousBudget = if (getOldBudget) MyFinanceStorage.monthlyBudget.value ?: 0.0 else null
         val response = expensesRepository.setMonthlyBudget(budget)
         listener?.onCompleted(response, previousBudget)
     }

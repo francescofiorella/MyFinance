@@ -18,7 +18,7 @@ android {
         minSdk = 29
         targetSdk = 34
         versionCode = 4
-        versionName = "4.6.9"
+        versionName = "4.6.10"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -77,7 +77,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Firebase libraries
-    implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
@@ -98,8 +98,8 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
 
     // Jetpack Compose
-    implementation("androidx.compose.ui:ui:1.7.0")
+    implementation("androidx.compose.ui:ui:1.7.1")
     implementation("androidx.compose.material3:material3:1.3.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.7.0")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.7.1")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 }

@@ -8,7 +8,7 @@ import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
-import com.frafio.myfinance.data.storage.UserStorage
+import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ class IncomesManager {
     fun updateIncomeList(): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
+            .document(MyFinanceStorage.user!!.email!!)
             .collection(FirestoreEnums.FIELDS.INCOMES.value)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
                 val incomeList = mutableListOf<Income>()
@@ -55,7 +55,7 @@ class IncomesManager {
         val response = MutableLiveData<FinanceResult>()
 
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
+            .document(MyFinanceStorage.user!!.email!!)
             .collection(FirestoreEnums.FIELDS.INCOMES.value)
             .add(income).addOnSuccessListener {
                 income.id = it.id
@@ -75,7 +75,7 @@ class IncomesManager {
         val response = MutableLiveData<FinanceResult>()
 
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
+            .document(MyFinanceStorage.user!!.email!!)
             .collection(FirestoreEnums.FIELDS.INCOMES.value)
             .document(income.id).set(income).addOnSuccessListener {
                 CoroutineScope(Dispatchers.IO).launch {
@@ -94,7 +94,7 @@ class IncomesManager {
     fun deleteIncome(income: Income): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
+            .document(MyFinanceStorage.user!!.email!!)
             .collection(FirestoreEnums.FIELDS.INCOMES.value)
             .document(income.id).delete()
             .addOnSuccessListener {

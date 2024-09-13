@@ -143,4 +143,12 @@ class ExpenseAdapter(
         }
         return if (total == null) 0 else expenses.indexOf(total)
     }
+
+    fun getItemPositionWithId(id: String): Int {
+        val i = expenses.find { it.id == id }
+        if (i != null) {
+            return expenses.indexOf(i)
+        }
+        return 0
+    }
 }

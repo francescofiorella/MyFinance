@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.manager.AuthManager
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.data.model.User
-import com.frafio.myfinance.data.storage.UserStorage
+import com.frafio.myfinance.data.storage.MyFinanceStorage
 
 class UserRepository(private val authManager: AuthManager) {
 
@@ -42,11 +42,11 @@ class UserRepository(private val authManager: AuthManager) {
     }
 
     fun getUser(): User? {
-        return UserStorage.user
+        return MyFinanceStorage.user
     }
 
     fun getProPic(): String? {
-        return UserStorage.user?.photoUrl
+        return MyFinanceStorage.user?.photoUrl
     }
 
     fun isDynamicColorOn(): Boolean {

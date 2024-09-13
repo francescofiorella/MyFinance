@@ -53,6 +53,8 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
     private val recViewLiveData = MediatorLiveData<List<Expense>>()
     private lateinit var localExpensesLiveData: LiveData<List<Expense>>
 
+    private var toScroll: String? = null
+
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
@@ -139,6 +141,11 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                         (it.adapter as ExpenseAdapter).updateData(nl)
                         isListBlocked = limit >= maxExpensesNumber
                     }
+                }
+                toScroll?.let { id ->
+                    // If the list was just created and an item was just added
+                    scrollToId(id)
+                    toScroll = null
                 }
             }
         }
@@ -276,7 +283,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
     }
 
-    fun scrollTo(position: Int, animate: Boolean = false) {
+    private fun scrollTo(position: Int, animate: Boolean = false) {
         binding.listRecyclerView.apply {
             stopScroll()
             if (animate) {
@@ -291,6 +298,16 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             } else {
                 (layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(position, 0)
             }
+        }
+    }
+
+    fun scrollToId(id: String) {
+        if (::binding.isInitialized) {
+            val position = (binding.listRecyclerView.adapter as ExpenseAdapter)
+                .getItemPositionWithId(id)
+            scrollTo(position)
+        } else {
+            toScroll = id
         }
     }
 

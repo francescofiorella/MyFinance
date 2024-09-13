@@ -22,7 +22,7 @@ import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.manager.IncomesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.model.FinanceResult
-import com.frafio.myfinance.data.storage.UserStorage
+import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.databinding.FragmentBudgetBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
@@ -48,6 +48,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     private var maxIncomeNumber: Long = DEFAULT_LIMIT + 1
     private val recViewLiveData = MediatorLiveData<List<Income>>()
     private lateinit var localIncomesLiveData: LiveData<List<Income>>
+    private var toScroll: String? = null
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -99,9 +100,14 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                     }
                 }
             }
+            toScroll?.let { id ->
+                // If the list was just created and an item was just added
+                scrollIncomesToId(id)
+                toScroll = null
+            }
         }
 
-        UserStorage.monthlyBudget.observe(viewLifecycleOwner) { budget ->
+        MyFinanceStorage.monthlyBudget.observe(viewLifecycleOwner) { budget ->
             viewModel.updateAnnualBudget(budget * 12)
             binding.monthlyBudgetDeleteBtn.isEnabled = budget != 0.0
         }
@@ -285,11 +291,21 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         }
     }
 
-    fun scrollIncomesTo(position: Int) {
+    private fun scrollIncomesTo(position: Int) {
         binding.budgetRecyclerView.stopScroll()
         binding.budgetScrollView.stopNestedScroll()
         (binding.budgetRecyclerView.layoutManager as LinearLayoutManager?)
             ?.scrollToPositionWithOffset(position, 0)
+    }
+
+    fun scrollIncomesToId(id: String) {
+        if (::binding.isInitialized) {
+            val position = (binding.budgetRecyclerView.adapter as IncomeAdapter)
+                .getItemPositionWithId(id)
+            scrollIncomesTo(position)
+        } else {
+            toScroll = id
+        }
     }
 
     class ModalBottomSheet(

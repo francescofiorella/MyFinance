@@ -65,14 +65,17 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             val data = result.data!!
             val expenseRequest = data.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
             val message = data.getStringExtra(AddActivity.ADD_RESULT_MESSAGE) ?: ""
+            val totalId = data.getStringExtra(AddActivity.ADD_RESULT_TOTAL_ID) ?: ""
             when (expenseRequest) {
                 AddActivity.REQUEST_EXPENSE_CODE -> {
                     showFragment(R.id.expensesFragment)
+                    expensesFragment?.scrollToId(totalId)
                     showSnackBar(message)
                 }
 
                 AddActivity.REQUEST_INCOME_CODE -> {
                     showFragment(R.id.budgetFragment)
+                    budgetFragment?.scrollIncomesToId(totalId)
                     showSnackBar(message)
                 }
             }
@@ -95,7 +98,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     }
                     setOnExitAnimationListener { splashScreenViewProvider ->
                         supportFragmentManager.unregisterFragmentLifecycleCallbacks(
-                            dashboardCallback
+                            fragmentCallback
                         )
                         splashScreenViewProvider.remove()
                     }
@@ -303,7 +306,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     }
 
     // called only one time, when the activity is loaded for the first time
-    private val dashboardCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
+    private val fragmentCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentCreated(
             fm: FragmentManager,
             f: Fragment,
@@ -371,7 +374,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                         }
                     } else {
                         supportFragmentManager.registerFragmentLifecycleCallbacks(
-                            dashboardCallback,
+                            fragmentCallback,
                             true
                         )
                     }

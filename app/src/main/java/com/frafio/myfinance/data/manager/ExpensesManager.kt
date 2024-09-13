@@ -9,7 +9,7 @@ import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
-import com.frafio.myfinance.data.storage.UserStorage
+import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.getSharedMonthlyBudget
 import com.frafio.myfinance.utils.setSharedDynamicColor
@@ -33,12 +33,12 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
     fun getMonthlyBudget(): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!).get()
+            .document(MyFinanceStorage.user!!.email!!).get()
             .addOnSuccessListener {
                 val value = it.data?.get(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value).toString()
                     .toDoubleOrNull() ?: 0.0
                 setLocalMonthlyBudget(value)
-                UserStorage.updateBudget(value)
+                MyFinanceStorage.updateBudget(value)
                 response.value = FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
             }
             .addOnFailureListener {
@@ -50,11 +50,11 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
     fun setMonthlyBudget(budget: Double): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
+            .document(MyFinanceStorage.user!!.email!!)
             .set(hashMapOf(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value to budget))
             .addOnSuccessListener {
                 setLocalMonthlyBudget(budget)
-                UserStorage.updateBudget(budget)
+                MyFinanceStorage.updateBudget(budget)
                 response.value = FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
             }
             .addOnFailureListener {
@@ -67,7 +67,7 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
         val response = MutableLiveData<FinanceResult>()
 
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
+            .document(MyFinanceStorage.user!!.email!!)
             .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
             .get().addOnSuccessListener { queryDocumentSnapshots ->
             val expenseList = mutableListOf<Expense>()
@@ -95,7 +95,7 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
         val response = MutableLiveData<FinanceResult>()
 
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
+            .document(MyFinanceStorage.user!!.email!!)
             .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
             .add(expense).addOnSuccessListener {
                 expense.id = it.id
@@ -115,7 +115,7 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
         val response = MutableLiveData<FinanceResult>()
 
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
+            .document(MyFinanceStorage.user!!.email!!)
             .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
             .document(expense.id).set(expense).addOnSuccessListener {
                 CoroutineScope(Dispatchers.IO).launch {
@@ -134,7 +134,7 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
     fun deleteExpense(expense: Expense): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(UserStorage.user!!.email!!)
+            .document(MyFinanceStorage.user!!.email!!)
             .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
             .document(expense.id).delete()
             .addOnSuccessListener {
@@ -164,6 +164,6 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
     }
 
     fun updateLocalMonthlyBudget() {
-        UserStorage.updateBudget(getSharedMonthlyBudget(sharedPreferences))
+        MyFinanceStorage.updateBudget(getSharedMonthlyBudget(sharedPreferences))
     }
 }

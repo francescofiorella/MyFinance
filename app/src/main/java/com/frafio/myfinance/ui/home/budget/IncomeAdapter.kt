@@ -110,4 +110,12 @@ class IncomeAdapter(
         if (increment) currentLimit += (DEFAULT_LIMIT / 2)
         return currentLimit
     }
+
+    fun getItemPositionWithId(id: String): Int {
+        val i = incomes.find { it.id == id }
+        if (i != null) {
+            return incomes.indexOf(i)
+        }
+        return 0
+    }
 }

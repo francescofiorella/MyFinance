@@ -12,7 +12,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.composable.PieChart
 import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.data.model.Expense
-import com.frafio.myfinance.data.storage.UserStorage
+import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.data.widget.BarChart
 import com.frafio.myfinance.data.widget.ProgressBar
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
@@ -197,7 +197,7 @@ class DashboardFragment : BaseFragment() {
             viewModel.nextBarChartDate()
         }
 
-        UserStorage.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
+        MyFinanceStorage.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
             if (monthlyBudget == null) return@observe
             viewModel.monthlyBudget = monthlyBudget
             if (viewModel.monthShown) {

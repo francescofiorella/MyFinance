@@ -6,7 +6,7 @@ import com.frafio.myfinance.data.model.User
 import com.google.firebase.auth.FirebaseUser
 import java.util.Calendar
 
-object UserStorage {
+object MyFinanceStorage {
     private var privateUser: User? = null
     val user: User?
         get() = privateUser

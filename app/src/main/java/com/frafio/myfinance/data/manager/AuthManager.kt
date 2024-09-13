@@ -11,7 +11,7 @@ import com.frafio.myfinance.data.enums.auth.SignupException
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
-import com.frafio.myfinance.data.storage.UserStorage
+import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedMonthlyBudget
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -63,7 +63,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         fUser!!.updateProfile(profileUpdates)
             .addOnCompleteListener { task ->
                 response.value = if (task.isSuccessful) {
-                    UserStorage.updateUser(fUser!!)
+                    MyFinanceStorage.updateUser(fUser!!)
                     AuthResult(AuthCode.USER_DATA_UPDATED)
                 } else {
                     // If sign in fails, display a message to the user.
@@ -77,7 +77,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
     fun isUserLogged(): AuthResult {
         fUser.also {
             return if (it != null) {
-                UserStorage.updateUser(it)
+                MyFinanceStorage.updateUser(it)
                 AuthResult(AuthCode.USER_LOGGED)
             } else {
                 AuthResult(AuthCode.USER_NOT_LOGGED)
@@ -97,7 +97,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
                 .addOnCompleteListener { authTask ->
                     response.value = if (authTask.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
-                        UserStorage.updateUser(authTask.result!!.user!!)
+                        MyFinanceStorage.updateUser(authTask.result!!.user!!)
                         AuthResult(AuthCode.LOGIN_SUCCESS)
                     } else {
                         // If sign in fails, display a message to the user.
@@ -120,7 +120,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         // authenticate the user
         fAuth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
-                UserStorage.updateUser(authResult.user!!)
+                MyFinanceStorage.updateUser(authResult.user!!)
                 response.value = AuthResult(AuthCode.LOGIN_SUCCESS)
             }.addOnFailureListener { e ->
                 Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -200,7 +200,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
                     UserProfileChangeRequest.Builder().setDisplayName(fullName).build()
 
                 fUser?.updateProfile(profileUpdates)?.addOnSuccessListener {
-                    UserStorage.updateUser(authResult.user!!)
+                    MyFinanceStorage.updateUser(authResult.user!!)
                     response.value = AuthResult(AuthCode.SIGNUP_SUCCESS)
                 }?.addOnFailureListener { e ->
                     Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -235,8 +235,8 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
             incomesLocalRepository.deleteAll()
         }
         setSharedMonthlyBudget(sharedPreferences, 0.0)
-        UserStorage.resetBudget()
-        UserStorage.resetUser()
+        MyFinanceStorage.resetBudget()
+        MyFinanceStorage.resetUser()
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
         return (response)

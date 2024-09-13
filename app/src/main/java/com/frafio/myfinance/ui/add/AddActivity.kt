@@ -44,6 +44,7 @@ class AddActivity : AppCompatActivity(), AddListener {
         const val EXPENSE_MONTH_KEY: String = "com.frafio.myfinance.EXPENSE_MONTH"
         const val EXPENSE_DAY_KEY: String = "com.frafio.myfinance.EXPENSE_DAY"
         const val ADD_RESULT_MESSAGE: String = "com.frafio.myfinance.ADD_RESULT_MESSAGE"
+        const val ADD_RESULT_TOTAL_ID: String = "com.frafio.myfinance.ADD_RESULT_TOTAL_ID"
     }
 
     private lateinit var binding: ActivityAddBinding
@@ -239,8 +240,14 @@ class AddActivity : AppCompatActivity(), AddListener {
                 FinanceCode.EXPENSE_ADD_SUCCESS.code -> {
                     // go back to the homepage
                     Intent().also {
+                        val totalId = evaluateExpenseTotalId(
+                            viewModel.day!!,
+                            viewModel.month!!,
+                            viewModel.year!!
+                        )
                         it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_EXPENSE_CODE)
                         it.putExtra(ADD_RESULT_MESSAGE, result.message)
+                        it.putExtra(ADD_RESULT_TOTAL_ID, totalId)
                         setResult(RESULT_OK, it)
                         finish()
                     }
@@ -259,6 +266,7 @@ class AddActivity : AppCompatActivity(), AddListener {
                     Intent().also {
                         it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_INCOME_CODE)
                         it.putExtra(ADD_RESULT_MESSAGE, result.message)
+                        it.putExtra(ADD_RESULT_TOTAL_ID, viewModel.year.toString())
                         setResult(RESULT_OK, it)
                         finish()
                     }
@@ -312,6 +320,10 @@ class AddActivity : AppCompatActivity(), AddListener {
             val modalBottomSheet = ModalBottomSheet(this)
             modalBottomSheet.show(supportFragmentManager, ModalBottomSheet.TAG)
         }
+    }
+
+    private fun evaluateExpenseTotalId(day: Int, month: Int, year: Int): String {
+        return "${day}_${month}_${year}"
     }
 
     class ModalBottomSheet(
