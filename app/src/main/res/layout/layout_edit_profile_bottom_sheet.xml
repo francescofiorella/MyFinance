@@ -14,6 +14,7 @@
         android:drawableStart="@drawable/ic_outline_file_upload"
         android:drawablePadding="20dp"
         android:fontFamily="@font/nunito"
+        android:gravity="center_vertical"
         android:paddingHorizontal="30dp"
         android:paddingVertical="15dp"
         android:text="@string/edit_propic"
