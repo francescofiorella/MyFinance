@@ -1,42 +1,19 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="2500dp"
-    android:height="2501dp"
-    android:viewportWidth="2500"
-    android:viewportHeight="2501">
-  <path
-      android:pathData="M0.5,0.5h2500v2501h-2500z"
-      android:fillColor="#3d5576"/>
-  <path
-      android:pathData="M712.5,800.5L2188.5,800.5A312,312 0,0 1,2500.5 1112.5L2500.5,1788.5A312,312 0,0 1,2188.5 2100.5L712.5,2100.5A312,312 0,0 1,400.5 1788.5L400.5,1112.5A312,312 0,0 1,712.5 800.5z"
-      android:fillColor="#000000"
-      android:fillAlpha="0.15"
-      android:strokeColor="#00000000"/>
-  <path
-      android:pathData="M588.5,700.5L2012.5,700.5A288,288 0,0 1,2300.5 988.5L2300.5,1612.5A288,288 0,0 1,2012.5 1900.5L588.5,1900.5A288,288 0,0 1,300.5 1612.5L300.5,988.5A288,288 0,0 1,588.5 700.5z"
-      android:strokeWidth="150"
-      android:fillColor="#5bc5ae"
-      android:strokeColor="#e5e0cd"/>
-  <path
-      android:pathData="M512.5,600.5L1988.5,600.5A312,312 0,0 1,2300.5 912.5L2300.5,1588.5A312,312 0,0 1,1988.5 1900.5L512.5,1900.5A312,312 0,0 1,200.5 1588.5L200.5,912.5A312,312 0,0 1,512.5 600.5z"
-      android:fillColor="#000000"
-      android:fillAlpha="0.15"
-      android:strokeColor="#00000000"/>
-  <path
-      android:pathData="M388.5,500.5L1812.5,500.5A288,288 0,0 1,2100.5 788.5L2100.5,1412.5A288,288 0,0 1,1812.5 1700.5L388.5,1700.5A288,288 0,0 1,100.5 1412.5L100.5,788.5A288,288 0,0 1,388.5 500.5z"
-      android:strokeWidth="150"
-      android:fillColor="#5bc5ae"
-      android:strokeColor="#e5e0cd"/>
-  <path
-      android:pathData="M838,1100.5a262.5,262.5 0,1 0,525 0a262.5,262.5 0,1 0,-525 0z"
-      android:strokeWidth="100"
-      android:fillColor="#3d5576"
-      android:strokeColor="#e5e0cd"/>
-  <path
-      android:pathData="M350.5,1100.5a150,150 0,1 0,300 0a150,150 0,1 0,-300 0z"
-      android:fillColor="#e5e0cd"
-      android:strokeColor="#00000000"/>
-  <path
-      android:pathData="M1535.5,1100.5a150,150 0,1 0,300 0a150,150 0,1 0,-300 0z"
-      android:fillColor="#e5e0cd"
-      android:strokeColor="#00000000"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="200dp" android:viewportHeight="5600" android:viewportWidth="5600" android:width="200dp">
+      
+    <path android:fillColor="#3d5576" android:pathData="M0.5,0.5h5600v5600h-5600z"/>
+      
+    <path android:fillAlpha="0.15" android:fillColor="#000000" android:pathData="M1824.5,2000.5L4776.5,2000.5A624,624 0,0 1,5400.5 2624.5L5400.5,3976.5A624,624 0,0 1,4776.5 4600.5L1824.5,4600.5A624,624 0,0 1,1200.5 3976.5L1200.5,2624.5A624,624 0,0 1,1824.5 2000.5z" android:strokeColor="#00000000"/>
+      
+    <path android:fillColor="#5bc5ae" android:pathData="M1576.5,1800.5L4424.5,1800.5A576,576 0,0 1,5000.5 2376.5L5000.5,3624.5A576,576 0,0 1,4424.5 4200.5L1576.5,4200.5A576,576 0,0 1,1000.5 3624.5L1000.5,2376.5A576,576 0,0 1,1576.5 1800.5z" android:strokeColor="#e5e0cd" android:strokeWidth="300"/>
+      
+    <path android:fillAlpha="0.15" android:fillColor="#000000" android:pathData="M1424.5,1600.5L4376.5,1600.5A624,624 0,0 1,5000.5 2224.5L5000.5,3576.5A624,624 0,0 1,4376.5 4200.5L1424.5,4200.5A624,624 0,0 1,800.5 3576.5L800.5,2224.5A624,624 0,0 1,1424.5 1600.5z" android:strokeColor="#00000000"/>
+      
+    <path android:fillColor="#5bc5ae" android:pathData="M1176.5,1400.5L4024.5,1400.5A576,576 0,0 1,4600.5 1976.5L4600.5,3224.5A576,576 0,0 1,4024.5 3800.5L1176.5,3800.5A576,576 0,0 1,600.5 3224.5L600.5,1976.5A576,576 0,0 1,1176.5 1400.5z" android:strokeColor="#e5e0cd" android:strokeWidth="300"/>
+      
+    <path android:fillColor="#3d5576" android:pathData="M2075.5,2600.5a525,525 0,1 0,1050 0a525,525 0,1 0,-1050 0z" android:strokeColor="#e5e0cd" android:strokeWidth="300"/>
+      
+    <path android:fillColor="#e5e0cd" android:pathData="M1100.5,2600.5a300,300 0,1 0,600 0a300,300 0,1 0,-600 0z" android:strokeColor="#00000000"/>
+      
+    <path android:fillColor="#e5e0cd" android:pathData="M3470.5,2600.5a300,300 0,1 0,600 0a300,300 0,1 0,-600 0z" android:strokeColor="#00000000"/>
+    
 </vector>
