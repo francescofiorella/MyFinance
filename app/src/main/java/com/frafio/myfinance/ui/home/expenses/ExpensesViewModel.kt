@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.MyFinanceApplication
+import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.repository.ExpensesRepository
@@ -20,12 +21,11 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
 
     val isExpensesEmpty = MutableLiveData<Boolean?>(null)
 
+    var nameFilter = ""
+    val categoryFilterList = mutableListOf<Int>()
+
     fun getExpensesNumber(): LiveData<Int> {
         return expensesLocalRepository.getCount()
-    }
-
-    fun getLocalExpenses(): LiveData<List<Expense>> {
-        return expensesLocalRepository.getAll()
     }
 
     fun deleteExpense(expense: Expense) {
@@ -53,7 +53,21 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
         listener?.onCompleted(response)
     }
 
-    fun filterExpenses(name: String): LiveData<List<Expense>> {
-        return expensesLocalRepository.getStartingWith(name)
+    fun getLocalExpenses(): LiveData<List<Expense>> {
+        val categories = if (categoryFilterList.isEmpty())
+            listOf(
+                FirestoreEnums.CATEGORIES.HOUSING.value,
+                FirestoreEnums.CATEGORIES.GROCERIES.value,
+                FirestoreEnums.CATEGORIES.PERSONAL_CARE.value,
+                FirestoreEnums.CATEGORIES.ENTERTAINMENT.value,
+                FirestoreEnums.CATEGORIES.EDUCATION.value,
+                FirestoreEnums.CATEGORIES.DINING.value,
+                FirestoreEnums.CATEGORIES.HEALTH.value,
+                FirestoreEnums.CATEGORIES.TRANSPORTATION.value,
+                FirestoreEnums.CATEGORIES.MISCELLANEOUS.value
+            )
+        else
+            categoryFilterList
+        return expensesLocalRepository.getWithFilter(nameFilter, categories)
     }
 }

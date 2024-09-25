@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -41,10 +40,17 @@ import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
 
 class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesListener {
+
+    companion object {
+        private const val SHOW_MENU = "SHOW_MENU"
+        private const val SHOW_CATEGORY = "SHOW_CATEGORY"
+        private const val SHOW_CATEGORY_FILTER = "SHOW_CATEGORY_FILTER"
+    }
 
     private lateinit var binding: FragmentExpensesBinding
     private val viewModel by viewModels<ExpensesViewModel>()
@@ -100,12 +106,9 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
 
         binding.searchET.doOnTextChanged { text, _, _, _ ->
+            viewModel.nameFilter = text.toString()
             recViewLiveData.removeSource(localExpensesLiveData)
-            localExpensesLiveData = if (text.isNullOrEmpty()) {
-                viewModel.getLocalExpenses()
-            } else {
-                viewModel.filterExpenses(text.toString())
-            }
+            localExpensesLiveData = viewModel.getLocalExpenses()
             recViewLiveData.addSource(localExpensesLiveData) { value ->
                 recViewLiveData.value = value
             }
@@ -124,7 +127,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             }
             // Get list with limit and update recList
             var nl = expenses.take(limit.toInt()).map { p -> p.copy() }
-            nl = if (binding.searchET.text.isNullOrEmpty()) {
+            nl = if (viewModel.nameFilter.isEmpty() && viewModel.categoryFilterList.isEmpty()) {
                 addTotalsToExpenses(nl)
             } else {
                 addTotalsToExpensesWithoutPrices(nl)
@@ -150,7 +153,44 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             }
         }
 
+        binding.filterIcon.setOnClickListener(onCategoryFilterListener)
+
         return binding.root
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        for (categoryId in viewModel.categoryFilterList) {
+            addChip(categoryId)
+        }
+        recViewLiveData.removeSource(localExpensesLiveData)
+        localExpensesLiveData = viewModel.getLocalExpenses()
+        recViewLiveData.addSource(localExpensesLiveData) { value ->
+            recViewLiveData.value = value
+        }
+    }
+
+    private val onCategoryFilterListener = View.OnClickListener {
+        if (resources.getBoolean(R.bool.is600dp)) {
+            val sideSheetDialog = SideSheetDialog(requireContext())
+            sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
+            defineSheetInterface(
+                sideSheetDialog.findViewById(android.R.id.content)!!,
+                null,
+                null,
+                sideSheetDialog::hide,
+                SHOW_CATEGORY_FILTER
+            )
+            sideSheetDialog.show()
+        } else {
+            val modalBottomSheet = ModalBottomSheet(
+                this,
+                null,
+                null,
+                SHOW_CATEGORY_FILTER
+            )
+            modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+        }
     }
 
     override fun onItemInteraction(
@@ -169,9 +209,8 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                         sideSheetDialog.findViewById(android.R.id.content)!!,
                         expense,
                         position,
-                        editResultLauncher,
-                        viewModel,
-                        sideSheetDialog::hide
+                        sideSheetDialog::hide,
+                        SHOW_MENU
                     )
                     sideSheetDialog.show()
                 } else {
@@ -179,8 +218,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                         this,
                         expense,
                         position,
-                        editResultLauncher,
-                        viewModel
+                        SHOW_MENU
                     )
                     modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
                 }
@@ -194,10 +232,8 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                         sideSheetDialog.findViewById(android.R.id.content)!!,
                         expense,
                         position,
-                        editResultLauncher,
-                        viewModel,
                         sideSheetDialog::hide,
-                        true
+                        SHOW_CATEGORY
                     )
                     sideSheetDialog.show()
                 } else {
@@ -205,9 +241,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                         this,
                         expense,
                         position,
-                        editResultLauncher,
-                        viewModel,
-                        true
+                        SHOW_CATEGORY
                     )
                     modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
                 }
@@ -222,6 +256,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                     }
                     // this trigger the observer
                     recViewLiveData.removeSource(localExpensesLiveData)
+                    localExpensesLiveData = viewModel.getLocalExpenses()
                     recViewLiveData.addSource(localExpensesLiveData) { value ->
                         recViewLiveData.value = value
                     }
@@ -311,13 +346,52 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
     }
 
+    private fun getCategoryDrawable(categoryId: Int) = ContextCompat.getDrawable(
+        requireContext(),
+        when (categoryId) {
+            FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
+            FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
+            FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
+            FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
+            FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
+            FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
+            FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
+            FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
+            FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
+            else -> R.drawable.ic_tag
+        }
+    )
+
+    private fun addChip(categoryId: Int) {
+        val label = resources.getStringArray(R.array.categories)[categoryId]
+        val chip = layoutInflater.inflate(
+            R.layout.layout_chip_input,
+            binding.filterChipGroup,
+            false
+        ) as Chip
+        chip.text = label
+        chip.chipIcon = getCategoryDrawable(categoryId)
+        chip.setOnCloseIconClickListener {
+            binding.filterChipGroup.removeView(chip)
+            viewModel.categoryFilterList.remove(categoryId)
+            if (viewModel.categoryFilterList.isEmpty())
+                binding.filterChipGroup.visibility = View.GONE
+
+            recViewLiveData.removeSource(localExpensesLiveData)
+            localExpensesLiveData = viewModel.getLocalExpenses()
+            recViewLiveData.addSource(localExpensesLiveData) { value ->
+                recViewLiveData.value = value
+            }
+        }
+        binding.filterChipGroup.addView(chip)
+        binding.filterChipGroup.visibility = View.VISIBLE
+    }
+
     class ModalBottomSheet(
         private val fragment: ExpensesFragment,
-        private val expense: Expense,
-        private val position: Int,
-        private val editResultLauncher: ActivityResultLauncher<Intent>,
-        private val viewModel: ExpensesViewModel,
-        private val fromCategoryIcon: Boolean = false
+        private val expense: Expense?,
+        private val position: Int?,
+        private val sourceTag: String
     ) : BottomSheetDialogFragment() {
 
         companion object {
@@ -330,8 +404,10 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             savedInstanceState: Bundle?
         ): View? {
             val layout = inflater.inflate(
-                if (fromCategoryIcon) R.layout.layout_category_bottom_sheet
-                else R.layout.layout_edit_expense_bottom_sheet,
+                when (sourceTag) {
+                    SHOW_MENU -> R.layout.layout_edit_expense_bottom_sheet
+                    else -> R.layout.layout_category_bottom_sheet
+                },
                 container,
                 false
             )
@@ -339,10 +415,8 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                 layout,
                 expense,
                 position,
-                editResultLauncher,
-                viewModel,
                 this::dismiss,
-                fromCategoryIcon
+                sourceTag
             )
             return layout
         }
@@ -350,75 +424,99 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
 
     fun defineSheetInterface(
         layout: View,
-        expense: Expense,
-        position: Int,
-        editResultLauncher: ActivityResultLauncher<Intent>,
-        viewModel: ExpensesViewModel,
+        expense: Expense?,
+        position: Int?,
         dismissFun: () -> Unit,
-        fromCategoryIcon: Boolean = false
+        sourceTag: String
     ) {
-        layout.findViewById<MaterialTextView>(R.id.nameTV).text = expense.name
-        layout.findViewById<MaterialTextView>(R.id.dateTV).text =
-            dateToString(expense.day, expense.month, expense.year)
-        layout.findViewById<MaterialTextView>(R.id.priceTV).text =
-            doubleToPrice(expense.price ?: 0.0)
-        layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon).icon =
-            ContextCompat.getDrawable(
-                requireContext(),
-                when (expense.category) {
-                    FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                    FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                    FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                    FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                    FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
-                    else -> R.drawable.ic_tag
+        fun onCategoryClick(categoryId: Int) {
+            when (sourceTag) {
+                SHOW_CATEGORY -> viewModel.updateCategory(expense!!, categoryId)
+                SHOW_CATEGORY_FILTER -> {
+                    viewModel.categoryFilterList.add(categoryId)
+                    addChip(categoryId)
+                    recViewLiveData.removeSource(localExpensesLiveData)
+                    localExpensesLiveData = viewModel.getLocalExpenses()
+                    recViewLiveData.addSource(localExpensesLiveData) { value ->
+                        recViewLiveData.value = value
+                    }
                 }
-            )
+            }
+            dismissFun()
+        }
 
-        if (fromCategoryIcon) {
+        if (sourceTag == SHOW_CATEGORY_FILTER) {
+            layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout)
+                .visibility = View.GONE
+            layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout)
+                .visibility = View.VISIBLE
+            for (filterId in viewModel.categoryFilterList) {
+                when (filterId) {
+                    FirestoreEnums.CATEGORIES.HOUSING.value ->
+                        layout.findViewById<TextView>(R.id.housingTV).isEnabled = false
+
+                    FirestoreEnums.CATEGORIES.GROCERIES.value ->
+                        layout.findViewById<TextView>(R.id.groceriesTV).isEnabled = false
+
+                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value ->
+                        layout.findViewById<TextView>(R.id.personal_careTV).isEnabled = false
+
+                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value ->
+                        layout.findViewById<TextView>(R.id.entertainmentTV).isEnabled = false
+
+                    FirestoreEnums.CATEGORIES.EDUCATION.value ->
+                        layout.findViewById<TextView>(R.id.educationTV).isEnabled = false
+
+                    FirestoreEnums.CATEGORIES.DINING.value ->
+                        layout.findViewById<TextView>(R.id.diningTV).isEnabled = false
+
+                    FirestoreEnums.CATEGORIES.HEALTH.value ->
+                        layout.findViewById<TextView>(R.id.healthTV).isEnabled = false
+
+                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value ->
+                        layout.findViewById<TextView>(R.id.transportationTV).isEnabled = false
+
+                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value ->
+                        layout.findViewById<TextView>(R.id.miscellaneousTV).isEnabled = false
+                }
+            }
+        } else {
+            layout.findViewById<MaterialTextView>(R.id.nameTV).text = expense!!.name
+            layout.findViewById<MaterialTextView>(R.id.dateTV).text =
+                dateToString(expense.day, expense.month, expense.year)
+            layout.findViewById<MaterialTextView>(R.id.priceTV).text =
+                doubleToPrice(expense.price ?: 0.0)
+            layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon)
+                .icon = getCategoryDrawable(expense.category!!)
+        }
+        if (sourceTag != SHOW_MENU) {
             // layout_category_bottom_sheet.xml
-            layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout).visibility = View.GONE
-            layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout).visibility =
-                View.VISIBLE
             layout.findViewById<TextView>(R.id.housingTV).setOnClickListener {
-                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.HOUSING.value)
-                dismissFun()
+                onCategoryClick(FirestoreEnums.CATEGORIES.HOUSING.value)
             }
             layout.findViewById<TextView>(R.id.groceriesTV).setOnClickListener {
-                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.GROCERIES.value)
-                dismissFun()
+                onCategoryClick(FirestoreEnums.CATEGORIES.GROCERIES.value)
             }
             layout.findViewById<TextView>(R.id.personal_careTV).setOnClickListener {
-                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.PERSONAL_CARE.value)
-                dismissFun()
+                onCategoryClick(FirestoreEnums.CATEGORIES.PERSONAL_CARE.value)
             }
             layout.findViewById<TextView>(R.id.entertainmentTV).setOnClickListener {
-                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.ENTERTAINMENT.value)
-                dismissFun()
+                onCategoryClick(FirestoreEnums.CATEGORIES.ENTERTAINMENT.value)
             }
             layout.findViewById<TextView>(R.id.educationTV).setOnClickListener {
-                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.EDUCATION.value)
-                dismissFun()
+                onCategoryClick(FirestoreEnums.CATEGORIES.EDUCATION.value)
             }
             layout.findViewById<TextView>(R.id.diningTV).setOnClickListener {
-                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.DINING.value)
-                dismissFun()
+                onCategoryClick(FirestoreEnums.CATEGORIES.DINING.value)
             }
             layout.findViewById<TextView>(R.id.healthTV).setOnClickListener {
-                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.HEALTH.value)
-                dismissFun()
+                onCategoryClick(FirestoreEnums.CATEGORIES.HEALTH.value)
             }
             layout.findViewById<TextView>(R.id.transportationTV).setOnClickListener {
-                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.TRANSPORTATION.value)
-                dismissFun()
+                onCategoryClick(FirestoreEnums.CATEGORIES.TRANSPORTATION.value)
             }
             layout.findViewById<TextView>(R.id.miscellaneousTV).setOnClickListener {
-                viewModel.updateCategory(expense, FirestoreEnums.CATEGORIES.MISCELLANEOUS.value)
-                dismissFun()
+                onCategoryClick(FirestoreEnums.CATEGORIES.MISCELLANEOUS.value)
             }
             return
         }
@@ -430,7 +528,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             Intent(context, AddActivity::class.java).also {
                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
                 it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_EXPENSE_CODE)
-                it.putExtra(AddActivity.EXPENSE_ID_KEY, expense.id)
+                it.putExtra(AddActivity.EXPENSE_ID_KEY, expense!!.id)
                 it.putExtra(AddActivity.EXPENSE_NAME_KEY, expense.name)
                 it.putExtra(AddActivity.EXPENSE_PRICE_KEY, expense.price)
                 it.putExtra(AddActivity.EXPENSE_CATEGORY_KEY, expense.category)
@@ -443,7 +541,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             dismissFun()
         }
         deleteItem.setOnClickListener {
-            viewModel.deleteExpense(expense)
+            viewModel.deleteExpense(expense!!)
             dismissFun()
         }
     }

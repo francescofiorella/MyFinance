@@ -106,6 +106,9 @@
 
     <style name="Widget.MyFinance.Chip.Filter" parent="Widget.Material3.Chip.Filter">
         <item name="android:textAppearance">@style/TextAppearance.MyFinance.BodyMedium</item>
-        ...
+    </style>
+
+    <style name="Widget.MyFinance.Chip.Input" parent="Widget.Material3.Chip.Input">
+        <item name="android:textAppearance">@style/TextAppearance.MyFinance.BodyMedium</item>
     </style>
 </resources>

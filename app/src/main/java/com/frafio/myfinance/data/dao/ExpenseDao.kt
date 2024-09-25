@@ -15,8 +15,9 @@ import com.frafio.myfinance.data.model.Expense
 interface ExpenseDao {
     @Query("SELECT * " +
             "FROM expense " +
+            "WHERE (name LIKE :name || '%' OR name LIKE '% ' || :name || '%') AND category IN (:categories)" +
             "ORDER BY year DESC, month DESC, day DESC, price DESC, category DESC")
-    fun getAll(): LiveData<List<Expense>>
+    fun getWithFilter(name: String, categories: List<Int>): LiveData<List<Expense>>
 
     @Query("SELECT COUNT(*) " +
             "FROM expense")
@@ -53,12 +54,6 @@ interface ExpenseDao {
             "FROM expense " +
             "WHERE year=:year")
     fun getExpensesOfYear(year: Int): LiveData<List<Expense>>
-
-    @Query("SELECT * " +
-            "FROM expense " +
-            "WHERE name LIKE :string || '%' OR name LIKE '% ' || :string || '%' " +
-            "ORDER BY year DESC, month DESC, day DESC, price DESC, category DESC")
-    fun getStartingWith(string: String): LiveData<List<Expense>>
 
     @Insert
     fun insertExpense(expense: Expense)

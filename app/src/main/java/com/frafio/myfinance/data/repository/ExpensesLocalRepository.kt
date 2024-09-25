@@ -10,7 +10,8 @@ class ExpensesLocalRepository {
     private val expenseDao =
         MyFinanceDatabase.getDatabase(MyFinanceApplication.instance).expenseDao()
 
-    fun getAll(): LiveData<List<Expense>> = expenseDao.getAll()
+    fun getWithFilter(name: String, categories: List<Int>): LiveData<List<Expense>> =
+        expenseDao.getWithFilter(name, categories)
 
     fun getCount(): LiveData<Int> = expenseDao.getCount()
 
@@ -34,8 +35,6 @@ class ExpensesLocalRepository {
 
     fun getExpensesOfYear(year: Int): LiveData<List<Expense>> =
         expenseDao.getExpensesOfYear(year)
-
-    fun getStartingWith(string: String): LiveData<List<Expense>> = expenseDao.getStartingWith(string)
 
     fun insertExpense(expense: Expense) = expenseDao.insertExpense(expense)
 
