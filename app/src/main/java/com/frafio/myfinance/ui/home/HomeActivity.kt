@@ -1,12 +1,17 @@
 package com.frafio.myfinance.ui.home
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.AnticipateInterpolator
+import android.view.animation.LinearInterpolator
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.doOnEnd
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
@@ -100,7 +105,17 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                         supportFragmentManager.unregisterFragmentLifecycleCallbacks(
                             fragmentCallback
                         )
-                        splashScreenViewProvider.remove()
+                        val fadeOut = ObjectAnimator.ofFloat(
+                            splashScreenViewProvider.view,
+                            View.ALPHA,
+                            1f,
+                            0f
+                        ).apply {
+                            interpolator = LinearInterpolator()
+                            duration = 200L
+                        }
+                        fadeOut.doOnEnd { splashScreenViewProvider.remove() }
+                        fadeOut.start()
                     }
                 }
                 if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
@@ -307,12 +322,8 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
     // called only one time, when the activity is loaded for the first time
     private val fragmentCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentCreated(
-            fm: FragmentManager,
-            f: Fragment,
-            savedInstanceState: Bundle?
-        ) {
-            super.onFragmentCreated(fm, f, savedInstanceState)
+        override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
+            super.onFragmentResumed(fm, f)
             isLayoutReady = true
         }
     }
