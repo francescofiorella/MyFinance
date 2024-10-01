@@ -13,6 +13,9 @@ class ExpensesLocalRepository {
     fun getWithFilter(name: String, categories: List<Int>): LiveData<List<Expense>> =
         expenseDao.getWithFilter(name, categories)
 
+    fun getWithFilterDate(name: String, categories: List<Int>, firstTimestamp: Long, lastTimestamp: Long): LiveData<List<Expense>> =
+        expenseDao.getWithFilterDate(name, categories, firstTimestamp, lastTimestamp)
+
     fun getCount(): LiveData<Int> = expenseDao.getCount()
 
     fun getPriceSumFromDay(year: Int, month: Int, day: Int): LiveData<Double?> =

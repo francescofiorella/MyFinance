@@ -10,6 +10,7 @@ import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.utils.dateToUTCTimestamp
+import java.time.LocalDate
 
 class ExpensesViewModel(application: Application) : AndroidViewModel(application) {
     private val expensesRepository = ExpensesRepository(
@@ -23,6 +24,7 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
 
     var nameFilter = ""
     val categoryFilterList = mutableListOf<Int>()
+    var dateFilter: Pair<LocalDate, LocalDate>? = null
 
     fun getExpensesNumber(): LiveData<Int> {
         return expensesLocalRepository.getCount()
@@ -68,6 +70,14 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
             )
         else
             categoryFilterList
-        return expensesLocalRepository.getWithFilter(nameFilter, categories)
+        return if (dateFilter == null)
+            expensesLocalRepository.getWithFilter(nameFilter, categories)
+        else
+            expensesLocalRepository.getWithFilterDate(
+                nameFilter,
+                categories,
+                dateToUTCTimestamp(dateFilter!!.first),
+                dateToUTCTimestamp(dateFilter!!.second.plusDays(1))
+            )
     }
 }

@@ -54,6 +54,19 @@ fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?): String? {
     return formattedDate
 }
 
+fun dateToString(date: LocalDate?): String? {
+    var formattedDate: String? = null
+    date?.let {
+        val dayString =
+            if (date.dayOfMonth < 10) "0${date.dayOfMonth}" else date.dayOfMonth.toString()
+        val monthString =
+            if (date.monthValue < 10) "0${date.monthValue}" else date.monthValue.toString()
+        formattedDate = "$dayString/$monthString/${date.year}"
+    }
+
+    return formattedDate
+}
+
 @Suppress("UNUSED")
 fun timeToString(hour: Int?, minute: Int?): String? {
     var formattedTime: String? = null
@@ -87,5 +100,10 @@ fun Long.toUTCLocalDateTime(): LocalDateTime =
 fun dateToUTCTimestamp(year: Int, month: Int, day: Int): Long {
     val localDate = LocalDate.of(year, month, day)
     val instant = localDate.atStartOfDay().toInstant(ZoneOffset.UTC)
+    return Timestamp.from(instant).time
+}
+
+fun dateToUTCTimestamp(date: LocalDate): Long {
+    val instant = date.atStartOfDay().toInstant(ZoneOffset.UTC)
     return Timestamp.from(instant).time
 }

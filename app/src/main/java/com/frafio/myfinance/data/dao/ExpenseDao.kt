@@ -15,9 +15,15 @@ import com.frafio.myfinance.data.model.Expense
 interface ExpenseDao {
     @Query("SELECT * " +
             "FROM expense " +
-            "WHERE (name LIKE :name || '%' OR name LIKE '% ' || :name || '%') AND category IN (:categories)" +
+            "WHERE (name LIKE :name || '%' OR name LIKE '% ' || :name || '%') AND category IN (:categories) " +
             "ORDER BY year DESC, month DESC, day DESC, price DESC, category DESC")
     fun getWithFilter(name: String, categories: List<Int>): LiveData<List<Expense>>
+
+    @Query("SELECT * " +
+            "FROM expense " +
+            "WHERE (name LIKE :name || '%' OR name LIKE '% ' || :name || '%') AND category IN (:categories) AND timestamp>=:firstTimestamp AND timestamp<:lastTimestamp " +
+            "ORDER BY year DESC, month DESC, day DESC, price DESC, category DESC")
+    fun getWithFilterDate(name: String, categories: List<Int>, firstTimestamp: Long, lastTimestamp: Long): LiveData<List<Expense>>
 
     @Query("SELECT COUNT(*) " +
             "FROM expense")

@@ -25,6 +25,7 @@ import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
+import com.frafio.myfinance.data.widget.DatePickerRangeButton
 import com.frafio.myfinance.databinding.FragmentExpensesBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
@@ -54,8 +55,11 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
 
     private lateinit var binding: FragmentExpensesBinding
     private val viewModel by viewModels<ExpensesViewModel>()
+    private lateinit var datePickerRangeBtn: DatePickerRangeButton
+
     private var isListBlocked = false
     private var maxExpensesNumber = DEFAULT_LIMIT + 1
+
     private val recViewLiveData = MediatorLiveData<List<Expense>>()
     private lateinit var localExpensesLiveData: LiveData<List<Expense>>
 
@@ -83,6 +87,30 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.listener = this
+
+        binding.filterIcon.setOnClickListener(onCategoryFilterListener)
+
+        datePickerRangeBtn = object : DatePickerRangeButton(
+            binding.calendarIcon,
+            requireActivity()
+        ) {
+            override fun onStart() {
+                super.onStart()
+                requireActivity().hideSoftKeyboard(binding.root)
+            }
+
+            override fun onPositiveBtnClickListener() {
+                super.onPositiveBtnClickListener()
+                binding.calendarIcon.isEnabled = false
+                viewModel.dateFilter = Pair(startDate!!, endDate!!)
+                addDateChip(startDateString!!, endDateString!!)
+                recViewLiveData.removeSource(localExpensesLiveData)
+                localExpensesLiveData = viewModel.getLocalExpenses()
+                recViewLiveData.addSource(localExpensesLiveData) { value ->
+                    recViewLiveData.value = value
+                }
+            }
+        }
 
         binding.listRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -127,7 +155,11 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             }
             // Get list with limit and update recList
             var nl = expenses.take(limit.toInt()).map { p -> p.copy() }
-            nl = if (viewModel.nameFilter.isEmpty() && viewModel.categoryFilterList.isEmpty()) {
+            nl = if (
+                viewModel.nameFilter.isEmpty() &&
+                viewModel.categoryFilterList.isEmpty() &&
+                viewModel.dateFilter == null
+            ) {
                 addTotalsToExpenses(nl)
             } else {
                 addTotalsToExpensesWithoutPrices(nl)
@@ -153,15 +185,20 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             }
         }
 
-        binding.filterIcon.setOnClickListener(onCategoryFilterListener)
-
         return binding.root
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
+        if (viewModel.dateFilter != null) {
+            addDateChip(
+                dateToString(viewModel.dateFilter!!.first)!!,
+                dateToString(viewModel.dateFilter!!.second)!!
+            )
+            binding.calendarIcon.isEnabled = false
+        }
         for (categoryId in viewModel.categoryFilterList) {
-            addChip(categoryId)
+            addCategoryChip(categoryId)
         }
         recViewLiveData.removeSource(localExpensesLiveData)
         localExpensesLiveData = viewModel.getLocalExpenses()
@@ -362,7 +399,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
     )
 
-    private fun addChip(categoryId: Int) {
+    private fun addCategoryChip(categoryId: Int) {
         val label = resources.getStringArray(R.array.categories)[categoryId]
         val chip = layoutInflater.inflate(
             R.layout.layout_chip_input,
@@ -374,7 +411,33 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         chip.setOnCloseIconClickListener {
             binding.filterChipGroup.removeView(chip)
             viewModel.categoryFilterList.remove(categoryId)
-            if (viewModel.categoryFilterList.isEmpty())
+            if (viewModel.categoryFilterList.isEmpty() && viewModel.dateFilter == null)
+                binding.filterChipGroup.visibility = View.GONE
+
+            recViewLiveData.removeSource(localExpensesLiveData)
+            localExpensesLiveData = viewModel.getLocalExpenses()
+            recViewLiveData.addSource(localExpensesLiveData) { value ->
+                recViewLiveData.value = value
+            }
+        }
+        binding.filterChipGroup.addView(chip)
+        binding.filterChipGroup.visibility = View.VISIBLE
+    }
+
+    private fun addDateChip(startDate: String, endDate: String) {
+        val label = "$startDate - $endDate"
+        val chip = layoutInflater.inflate(
+            R.layout.layout_chip_input,
+            binding.filterChipGroup,
+            false
+        ) as Chip
+        chip.text = label
+        chip.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_today)
+        chip.setOnCloseIconClickListener {
+            viewModel.dateFilter = null
+            binding.calendarIcon.isEnabled = true
+            binding.filterChipGroup.removeView(chip)
+            if (viewModel.categoryFilterList.isEmpty() && viewModel.dateFilter == null)
                 binding.filterChipGroup.visibility = View.GONE
 
             recViewLiveData.removeSource(localExpensesLiveData)
@@ -434,7 +497,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                 SHOW_CATEGORY -> viewModel.updateCategory(expense!!, categoryId)
                 SHOW_CATEGORY_FILTER -> {
                     viewModel.categoryFilterList.add(categoryId)
-                    addChip(categoryId)
+                    addCategoryChip(categoryId)
                     recViewLiveData.removeSource(localExpensesLiveData)
                     localExpensesLiveData = viewModel.getLocalExpenses()
                     recViewLiveData.addSource(localExpensesLiveData) { value ->
