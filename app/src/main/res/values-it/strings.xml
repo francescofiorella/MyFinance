@@ -83,7 +83,7 @@
     <string name="shown">Mostrato:</string>
     <string name="expenses_by_category">Spese per categoria</string>
     <string name="search">Cerca</string>
-    <string name="filter">Filtra</string>
+    <string name="filter">Filtro</string>
     <string name="date_range">Intervallo di date</string>
     <string name="clear_text">Pulisci testo</string>
 </resources>

@@ -98,17 +98,6 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <ImageView
-                android:id="@+id/calendar_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="16dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:contentDescription="@string/date_range"
-                app:srcCompat="@drawable/ic_today" />
-
-            <ImageView
                 android:id="@+id/filter_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

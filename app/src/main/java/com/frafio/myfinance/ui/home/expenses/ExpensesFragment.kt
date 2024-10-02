@@ -51,6 +51,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         private const val SHOW_MENU = "SHOW_MENU"
         private const val SHOW_CATEGORY = "SHOW_CATEGORY"
         private const val SHOW_CATEGORY_FILTER = "SHOW_CATEGORY_FILTER"
+        private const val SHOW_FILTER_MENU = "SHOW_FILTER_MENU"
     }
 
     private lateinit var binding: FragmentExpensesBinding
@@ -88,29 +89,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
 
         viewModel.listener = this
 
-        binding.filterIcon.setOnClickListener(onCategoryFilterListener)
-
-        datePickerRangeBtn = object : DatePickerRangeButton(
-            binding.calendarIcon,
-            requireActivity()
-        ) {
-            override fun onStart() {
-                super.onStart()
-                requireActivity().hideSoftKeyboard(binding.root)
-            }
-
-            override fun onPositiveBtnClickListener() {
-                super.onPositiveBtnClickListener()
-                binding.calendarIcon.isEnabled = false
-                viewModel.dateFilter = Pair(startDate!!, endDate!!)
-                addDateChip(startDateString!!, endDateString!!)
-                recViewLiveData.removeSource(localExpensesLiveData)
-                localExpensesLiveData = viewModel.getLocalExpenses()
-                recViewLiveData.addSource(localExpensesLiveData) { value ->
-                    recViewLiveData.value = value
-                }
-            }
-        }
+        binding.filterIcon.setOnClickListener(onFilterClickListener)
 
         binding.listRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -195,7 +174,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                 dateToString(viewModel.dateFilter!!.first)!!,
                 dateToString(viewModel.dateFilter!!.second)!!
             )
-            binding.calendarIcon.isEnabled = false
         }
         for (categoryId in viewModel.categoryFilterList) {
             addCategoryChip(categoryId)
@@ -207,16 +185,16 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
     }
 
-    private val onCategoryFilterListener = View.OnClickListener {
+    private val onFilterClickListener = View.OnClickListener {
         if (resources.getBoolean(R.bool.is600dp)) {
             val sideSheetDialog = SideSheetDialog(requireContext())
-            sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
+            sideSheetDialog.setContentView(R.layout.layout_filter_expenses_bottom_sheet)
             defineSheetInterface(
                 sideSheetDialog.findViewById(android.R.id.content)!!,
                 null,
                 null,
                 sideSheetDialog::hide,
-                SHOW_CATEGORY_FILTER
+                SHOW_FILTER_MENU
             )
             sideSheetDialog.show()
         } else {
@@ -224,7 +202,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                 this,
                 null,
                 null,
-                SHOW_CATEGORY_FILTER
+                SHOW_FILTER_MENU
             )
             modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
         }
@@ -349,8 +327,8 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
 
     override fun scrollUp() {
         super.scrollUp()
-        binding.listRecyclerView.apply {
-            val position = (adapter as ExpenseAdapter).getTodayPosition()
+        (binding.listRecyclerView.adapter as ExpenseAdapter?)?.apply {
+            val position = getTodayPosition()
             scrollTo(position)
         }
     }
@@ -435,7 +413,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         chip.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_today)
         chip.setOnCloseIconClickListener {
             viewModel.dateFilter = null
-            binding.calendarIcon.isEnabled = true
             binding.filterChipGroup.removeView(chip)
             if (viewModel.categoryFilterList.isEmpty() && viewModel.dateFilter == null)
                 binding.filterChipGroup.visibility = View.GONE
@@ -469,6 +446,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             val layout = inflater.inflate(
                 when (sourceTag) {
                     SHOW_MENU -> R.layout.layout_edit_expense_bottom_sheet
+                    SHOW_FILTER_MENU -> R.layout.layout_filter_expenses_bottom_sheet
                     else -> R.layout.layout_category_bottom_sheet
                 },
                 container,
@@ -508,49 +486,107 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             dismissFun()
         }
 
-        if (sourceTag == SHOW_CATEGORY_FILTER) {
-            layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout)
-                .visibility = View.GONE
-            layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout)
-                .visibility = View.VISIBLE
-            for (filterId in viewModel.categoryFilterList) {
-                when (filterId) {
-                    FirestoreEnums.CATEGORIES.HOUSING.value ->
-                        layout.findViewById<TextView>(R.id.housingTV).isEnabled = false
+        when (sourceTag) {
+            SHOW_CATEGORY_FILTER -> {
+                layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout)
+                    .visibility = View.GONE
+                layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout)
+                    .visibility = View.VISIBLE
+                for (filterId in viewModel.categoryFilterList) {
+                    when (filterId) {
+                        FirestoreEnums.CATEGORIES.HOUSING.value ->
+                            layout.findViewById<TextView>(R.id.housingTV).isEnabled = false
 
-                    FirestoreEnums.CATEGORIES.GROCERIES.value ->
-                        layout.findViewById<TextView>(R.id.groceriesTV).isEnabled = false
+                        FirestoreEnums.CATEGORIES.GROCERIES.value ->
+                            layout.findViewById<TextView>(R.id.groceriesTV).isEnabled = false
 
-                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value ->
-                        layout.findViewById<TextView>(R.id.personal_careTV).isEnabled = false
+                        FirestoreEnums.CATEGORIES.PERSONAL_CARE.value ->
+                            layout.findViewById<TextView>(R.id.personal_careTV).isEnabled = false
 
-                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value ->
-                        layout.findViewById<TextView>(R.id.entertainmentTV).isEnabled = false
+                        FirestoreEnums.CATEGORIES.ENTERTAINMENT.value ->
+                            layout.findViewById<TextView>(R.id.entertainmentTV).isEnabled = false
 
-                    FirestoreEnums.CATEGORIES.EDUCATION.value ->
-                        layout.findViewById<TextView>(R.id.educationTV).isEnabled = false
+                        FirestoreEnums.CATEGORIES.EDUCATION.value ->
+                            layout.findViewById<TextView>(R.id.educationTV).isEnabled = false
 
-                    FirestoreEnums.CATEGORIES.DINING.value ->
-                        layout.findViewById<TextView>(R.id.diningTV).isEnabled = false
+                        FirestoreEnums.CATEGORIES.DINING.value ->
+                            layout.findViewById<TextView>(R.id.diningTV).isEnabled = false
 
-                    FirestoreEnums.CATEGORIES.HEALTH.value ->
-                        layout.findViewById<TextView>(R.id.healthTV).isEnabled = false
+                        FirestoreEnums.CATEGORIES.HEALTH.value ->
+                            layout.findViewById<TextView>(R.id.healthTV).isEnabled = false
 
-                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value ->
-                        layout.findViewById<TextView>(R.id.transportationTV).isEnabled = false
+                        FirestoreEnums.CATEGORIES.TRANSPORTATION.value ->
+                            layout.findViewById<TextView>(R.id.transportationTV).isEnabled = false
 
-                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value ->
-                        layout.findViewById<TextView>(R.id.miscellaneousTV).isEnabled = false
+                        FirestoreEnums.CATEGORIES.MISCELLANEOUS.value ->
+                            layout.findViewById<TextView>(R.id.miscellaneousTV).isEnabled = false
+                    }
                 }
             }
-        } else {
-            layout.findViewById<MaterialTextView>(R.id.nameTV).text = expense!!.name
-            layout.findViewById<MaterialTextView>(R.id.dateTV).text =
-                dateToString(expense.day, expense.month, expense.year)
-            layout.findViewById<MaterialTextView>(R.id.priceTV).text =
-                doubleToPrice(expense.price ?: 0.0)
-            layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon)
-                .icon = getCategoryDrawable(expense.category!!)
+
+            SHOW_FILTER_MENU -> {
+                val categoryTV = layout.findViewById<TextView>(R.id.categoryTV)
+                val dateRangeTV = layout.findViewById<TextView>(R.id.dateRangeTV)
+
+                dateRangeTV.isEnabled = viewModel.dateFilter == null
+                categoryTV.isEnabled = viewModel.categoryFilterList.size != 9
+                categoryTV.setOnClickListener {
+                    dismissFun()
+                    if (resources.getBoolean(R.bool.is600dp)) {
+                        val sideSheetDialog = SideSheetDialog(requireContext())
+                        sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
+                        defineSheetInterface(
+                            sideSheetDialog.findViewById(android.R.id.content)!!,
+                            null,
+                            null,
+                            sideSheetDialog::hide,
+                            SHOW_CATEGORY_FILTER
+                        )
+                        sideSheetDialog.show()
+                    } else {
+                        val modalBottomSheet = ModalBottomSheet(
+                            this,
+                            null,
+                            null,
+                            SHOW_CATEGORY_FILTER
+                        )
+                        modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+                    }
+                }
+
+                datePickerRangeBtn = object : DatePickerRangeButton(
+                    dateRangeTV,
+                    requireActivity()
+                ) {
+                    override fun onStart() {
+                        super.onStart()
+                        requireActivity().hideSoftKeyboard(binding.root)
+                        dismissFun()
+                    }
+
+                    override fun onPositiveBtnClickListener() {
+                        super.onPositiveBtnClickListener()
+                        viewModel.dateFilter = Pair(startDate!!, endDate!!)
+                        addDateChip(startDateString!!, endDateString!!)
+                        recViewLiveData.removeSource(localExpensesLiveData)
+                        localExpensesLiveData = viewModel.getLocalExpenses()
+                        recViewLiveData.addSource(localExpensesLiveData) { value ->
+                            recViewLiveData.value = value
+                        }
+                    }
+                }
+                return
+            }
+
+            else -> {
+                layout.findViewById<MaterialTextView>(R.id.nameTV).text = expense!!.name
+                layout.findViewById<MaterialTextView>(R.id.dateTV).text =
+                    dateToString(expense.day, expense.month, expense.year)
+                layout.findViewById<MaterialTextView>(R.id.priceTV).text =
+                    doubleToPrice(expense.price ?: 0.0)
+                layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon)
+                    .icon = getCategoryDrawable(expense.category!!)
+            }
         }
         if (sourceTag != SHOW_MENU) {
             // layout_category_bottom_sheet.xml

@@ -43,8 +43,8 @@
     <color name="cinnamon_satin">#cf6679</color>
 
     <!--Theme-related custom colors. -->
-    <color name="primary_text">@color/black</color>
-    <color name="inverted_primary_text">@color/white</color>
+    <color name="primary_text_disabled">#9D999E</color>
+    <color name="inverted_primary_text_disabled">#6B6B6F</color>
     <color name="disabled_text">#D4D4D4</color>
     <color name="launcher_icon_bg">#3D5576</color>
     <color name="colorBackground">#FCF5FD</color>
