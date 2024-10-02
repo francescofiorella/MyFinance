@@ -17,10 +17,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:clickable="false"
-            android:contentDescription="@string/expense_category_icon"
+            android:contentDescription="@string/filter"
             android:focusable="false"
             android:longClickable="false"
-            app:icon="@drawable/ic_payments_myfinance"
+            app:icon="@drawable/ic_filter_list"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
