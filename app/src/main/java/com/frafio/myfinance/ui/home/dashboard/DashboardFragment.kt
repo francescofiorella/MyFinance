@@ -200,6 +200,15 @@ class DashboardFragment : BaseFragment() {
         MyFinanceStorage.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
             if (monthlyBudget == null) return@observe
             viewModel.monthlyBudget = monthlyBudget
+            if (viewModel.monthlyBudget == 0.0) {
+                binding.slashTV.visibility = View.GONE
+                binding.budgetTV.visibility = View.GONE
+                binding.changeBtn.visibility = View.GONE
+                return@observe
+            }
+            binding.slashTV.visibility = View.VISIBLE
+            binding.budgetTV.visibility = View.VISIBLE
+            binding.changeBtn.visibility = View.VISIBLE
             if (viewModel.monthShown) {
                 binding.budgetTV.text = doubleToString(monthlyBudget)
                 budgetProgressBar.updateValue(viewModel.thisMonthSum, monthlyBudget)

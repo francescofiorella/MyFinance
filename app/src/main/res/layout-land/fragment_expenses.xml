@@ -14,16 +14,18 @@
 
     </data>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/card_half_margin"
             android:visibility="@{viewModel.isExpensesEmpty == null || !viewModel.isExpensesEmpty ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:visibility="gone">
 
             <androidx.constraintlayout.widget.Guideline
@@ -67,6 +69,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
+            android:id="@+id/search_bar_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="15dp"
@@ -75,6 +78,9 @@
             android:backgroundTint="?attr/colorSurfaceContainer"
             android:orientation="horizontal"
             android:visibility="@{viewModel.isExpensesEmpty == null || !viewModel.isExpensesEmpty ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible">
 
             <com.google.android.material.textfield.TextInputLayout
@@ -116,7 +122,10 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="15dp"
             android:paddingVertical="10dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/search_bar_view" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_recyclerView"
@@ -127,9 +136,13 @@
             android:visibility="@{viewModel.isExpensesEmpty == null || !viewModel.isExpensesEmpty ? View.VISIBLE : View.GONE}"
             app:backgroundTint="?android:colorBackground"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/filterChipGroup"
             tools:listitem="@layout/layout_expense_item_rv"
             tools:visibility="visible" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
