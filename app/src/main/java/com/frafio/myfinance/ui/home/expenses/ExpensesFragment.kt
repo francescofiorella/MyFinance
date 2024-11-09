@@ -35,7 +35,7 @@ import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companio
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.utils.addTotalsToExpenses
-import com.frafio.myfinance.utils.addTotalsToExpensesWithoutPrices
+import com.frafio.myfinance.utils.addTotalsToExpensesWithoutToday
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.hideSoftKeyboard
@@ -141,7 +141,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             ) {
                 addTotalsToExpenses(nl)
             } else {
-                addTotalsToExpensesWithoutPrices(nl)
+                addTotalsToExpensesWithoutToday(nl)
             }
             maxExpensesNumber = expenses.size.toLong()
             binding.listRecyclerView.also {

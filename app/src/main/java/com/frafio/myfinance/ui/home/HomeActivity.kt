@@ -4,8 +4,6 @@ import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.AnticipateInterpolator
 import android.view.animation.LinearInterpolator
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -161,7 +159,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         binding.navDrawer?.setNavigationItemSelectedListener(navDrawerListener)
 
         onBackPressedDispatcher.addCallback {
-            viewModel.fragmentStack.removeLast()
+            viewModel.fragmentStack.removeAt(viewModel.fragmentStack.size - 1)
             when (viewModel.fragmentStack.lastOrNull()) {
                 DASHBOARD_FRAGMENT_TAG -> showFragment(R.id.dashboardFragment)
                 EXPENSES_FRAGMENT_TAG -> showFragment(R.id.expensesFragment)
