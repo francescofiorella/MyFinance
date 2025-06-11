@@ -168,67 +168,16 @@
                             android:orientation="vertical"
                             app:layout_constraintGuide_percent="0.5" />
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/bar_chart_layout"
+                        <include
+                            android:id="@+id/monthly_barChartLayout"
+                            layout="@layout/layout_progress_bar_chart"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
                             android:layout_marginStart="25dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@id/monthly_guideline"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <androidx.constraintlayout.widget.Guideline
-                                android:id="@+id/bar_guideline"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                app:layout_constraintGuide_percent=".6" />
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/percentageTV"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="5dp"
-                                android:alpha="0.7"
-                                android:background="@drawable/bg_round_popup_right"
-                                android:backgroundTint="?attr/colorSecondaryContainer"
-                                android:fontFamily="@font/nunito"
-                                android:paddingHorizontal="5dp"
-                                android:paddingVertical="3dp"
-                                android:text="@string/zero_perc"
-                                android:textColor="?attr/colorOnSecondaryContainer"
-                                android:textSize="13sp"
-                                app:layout_constraintBottom_toTopOf="@id/progress_bar_back"
-                                app:layout_constraintEnd_toEndOf="@id/progress_bar_front"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintVertical_chainStyle="packed"
-                                tools:text="0%" />
-
-                            <View
-                                android:id="@+id/progress_bar_back"
-                                android:layout_width="0dp"
-                                android:layout_height="12dp"
-                                android:background="@drawable/bg_round_corners"
-                                android:backgroundTint="?attr/colorSecondaryContainer"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/percentageTV" />
-
-                            <View
-                                android:id="@+id/progress_bar_front"
-                                android:layout_width="0dp"
-                                android:layout_height="12dp"
-                                android:background="@drawable/bg_round_corners"
-                                android:backgroundTint="?attr/colorPrimary"
-                                app:layout_constraintBottom_toBottomOf="@id/progress_bar_back"
-                                app:layout_constraintEnd_toEndOf="@id/bar_guideline"
-                                app:layout_constraintHorizontal_bias="0.0"
-                                app:layout_constraintStart_toStartOf="@id/progress_bar_back"
-                                app:layout_constraintTop_toTopOf="@id/progress_bar_back" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                            app:layout_constraintTop_toTopOf="parent" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -324,11 +273,143 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/materialCardView4"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_row="2"
+                    android:layout_column="0"
+                    android:layout_columnSpan="2"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="@dimen/card_full_margin"
+                    android:layout_marginTop="@dimen/card_half_margin"
+                    android:layout_marginEnd="@dimen/card_full_margin"
+                    android:layout_marginBottom="@dimen/card_half_margin"
+                    app:cardCornerRadius="@dimen/card_corner_radius">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/balance_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="20dp">
+
+                        <ImageView
+                            android:id="@+id/balance_next_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/change_content"
+                            android:src="@drawable/ic_keyboard_arrow_right"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/balance_previous_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="5dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/change_content"
+                            android:src="@drawable/ic_keyboard_arrow_left"
+                            app:layout_constraintEnd_toStartOf="@id/balance_next_btn"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/balance_TV_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/annual_balance"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/balance_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="@dimen/card_price_size"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/balance_TV_title"
+                            tools:text="€ 0.00" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/tv1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/nunito"
+                            android:maxLines="1"
+                            android:text="@string/incomes"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintEnd_toEndOf="@id/balance_incomes_TV"
+                            app:layout_constraintStart_toStartOf="@id/balance_incomes_TV"
+                            app:layout_constraintTop_toBottomOf="@id/balance_TV" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/balance_incomes_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:textColor="@color/primary_text"
+                            android:textSize="20sp"
+                            app:layout_constraintEnd_toEndOf="@id/balance_guideline"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/tv1"
+                            tools:text="€ 0.00" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/tv2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/nunito"
+                            android:text="@string/expenses"
+                            android:textSize="@dimen/card_title_size"
+                            app:layout_constraintEnd_toEndOf="@id/balance_expenses_TV"
+                            app:layout_constraintStart_toStartOf="@id/balance_expenses_TV"
+                            app:layout_constraintTop_toBottomOf="@id/balance_TV" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/balance_expenses_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito_semibold"
+                            android:maxLines="1"
+                            android:textColor="@color/primary_text"
+                            android:textSize="20sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/balance_guideline"
+                            app:layout_constraintTop_toBottomOf="@id/tv2"
+                            tools:text="€ 0.00" />
+
+                        <androidx.constraintlayout.widget.Guideline
+                            android:id="@+id/balance_guideline"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintGuide_percent="0.5" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_row="3"
                     android:layout_column="0"
                     android:layout_columnSpan="2"
                     android:layout_columnWeight="1"
@@ -820,9 +901,10 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/materialCardView6"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_row="3"
+                    android:layout_row="4"
                     android:layout_column="0"
                     android:layout_columnSpan="2"
                     android:layout_columnWeight="1"

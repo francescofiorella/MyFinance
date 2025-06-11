@@ -353,7 +353,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         layout.findViewById<MaterialTextView>(R.id.priceTV).text =
             doubleToPrice(income.price ?: 0.0)
         layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon).icon =
-            createTextDrawable(layout.context, income.name!![0].uppercase())
+            layout.context.createTextDrawable(income.name!![0].uppercase())
 
         val editItem = layout.findViewById<TextView>(R.id.editTV)
         val deleteItem = layout.findViewById<TextView>(R.id.deleteTV)

@@ -20,7 +20,9 @@ import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.utils.doubleToString
+import com.frafio.myfinance.utils.getThemeColor
 import java.time.format.DateTimeFormatter
+import kotlin.math.abs
 
 class DashboardFragment : BaseFragment() {
     private lateinit var binding: FragmentDashboardBinding
@@ -38,7 +40,8 @@ class DashboardFragment : BaseFragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        budgetProgressBar = ProgressBar(binding.barChartLayout, requireContext())
+        budgetProgressBar =
+            ProgressBar(binding.monthlyBarChartLayout.barChartLayout, requireContext())
         monthlyBarChart = BarChart(binding.monthlyChart, requireContext())
 
         viewModel.getExpensesNumber().observe(viewLifecycleOwner) {
@@ -82,6 +85,32 @@ class DashboardFragment : BaseFragment() {
                 binding.thisMonthTV.text = doubleToPrice(viewModel.thisYearSum)
                 budgetProgressBar.updateValue(viewModel.thisYearSum, viewModel.monthlyBudget * 12)
             }
+            binding.balanceExpensesTV.text = doubleToPrice(viewModel.thisYearSum)
+            val balance = viewModel.incomeSum - viewModel.thisYearSum
+            binding.balanceTV.text = doubleToPrice(abs(balance))
+            val balanceColor = requireContext().getThemeColor(
+                if (balance < 0.0) {
+                    androidx.appcompat.R.attr.colorError
+                } else {
+                    androidx.appcompat.R.attr.colorPrimary
+                }
+            )
+            binding.balanceTV.setTextColor(balanceColor)
+        }
+
+        viewModel.getLocalIncomeSum().observe(viewLifecycleOwner) {
+            viewModel.incomeSum = it ?: 0.0
+            binding.balanceIncomesTV.text = doubleToPrice(viewModel.incomeSum)
+            val balance = viewModel.incomeSum - viewModel.thisYearSum
+            binding.balanceTV.text = doubleToPrice(abs(balance))
+            val balanceColor = requireContext().getThemeColor(
+                if (balance < 0.0) {
+                    androidx.appcompat.R.attr.colorError
+                } else {
+                    androidx.appcompat.R.attr.colorPrimary
+                }
+            )
+            binding.balanceTV.setTextColor(balanceColor)
         }
 
         val barChartLiveData = MediatorLiveData<List<BarChartEntry>>()
@@ -122,6 +151,10 @@ class DashboardFragment : BaseFragment() {
             barChartLiveData.addSource(pricesLiveData) { value ->
                 barChartLiveData.value = value
             }
+        }
+
+        viewModel.balanceYearShown.observe(viewLifecycleOwner) {
+
         }
 
         val pieChartLiveData = MediatorLiveData<List<Expense>>()
@@ -179,6 +212,14 @@ class DashboardFragment : BaseFragment() {
                     viewModel.switchPieChartData(false)
                 }
             }
+        }
+
+        binding.balancePreviousBtn.setOnClickListener {
+            viewModel.previousBalanceYear()
+        }
+
+        binding.balanceNextBtn.setOnClickListener {
+            viewModel.nextBalanceYear()
         }
 
         binding.pieChartPreviousBtn.setOnClickListener {

@@ -7,18 +7,27 @@ import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
+import com.frafio.myfinance.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.utils.dateToUTCTimestamp
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
     private val expensesLocalRepository = ExpensesLocalRepository()
+    private val incomesLocalRepository = IncomesLocalRepository()
     private val today = LocalDate.now()
 
     var monthShown = true
     var thisMonthSum = 0.0
     var thisYearSum = 0.0
     var monthlyBudget = 0.0
+    var incomeSum = 0.0
+
+    private val _balanceYearShown = MutableLiveData(
+        today.year
+    )
+    val balanceYearShown: LiveData<Int>
+        get() = _balanceYearShown
 
     val isListEmpty = MutableLiveData<Boolean?>(null)
 
@@ -36,6 +45,14 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     )
     val lastDateForBarChart: LiveData<LocalDate>
         get() = _lastDateForBarChart
+
+    fun nextBalanceYear() {
+        _balanceYearShown.postValue(_balanceYearShown.value!! + 1)
+    }
+
+    fun previousBalanceYear() {
+        _balanceYearShown.postValue(_balanceYearShown.value!! - 1)
+    }
 
     fun nextBarChartDate() {
         _lastDateForBarChart.postValue(_lastDateForBarChart.value!!.plusMonths(1))
@@ -83,6 +100,10 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         expensesLocalRepository.getExpensesOfYear(
             year = _pieChartDate.value!!.year
         )
+
+    fun getLocalIncomeSum(): LiveData<Double?> {
+        return incomesLocalRepository.getPriceSumFromYear(balanceYearShown.value!!)
+    }
 
     fun switchPieChartData(setMonthly: Boolean) {
         _monthlyShownInPieChart = setMonthly

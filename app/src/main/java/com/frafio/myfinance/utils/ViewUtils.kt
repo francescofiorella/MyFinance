@@ -1,11 +1,9 @@
 package com.frafio.myfinance.utils
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.transition.AutoTransition
 import android.transition.TransitionManager
@@ -13,8 +11,11 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.AttrRes
 import androidx.core.content.res.ResourcesCompat
 import com.frafio.myfinance.R
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.graphics.createBitmap
 
 fun View.instantShow() {
     visibility = View.VISIBLE
@@ -34,10 +35,16 @@ fun ViewGroup.animateRoot(duration: Long = 100) {
     TransitionManager.beginDelayedTransition(this, transition)
 }
 
-fun createTextDrawable(context: Context, text: String): Drawable {
-    val typeface = ResourcesCompat.getFont(context, R.font.nunito_bold)
+fun Context.getThemeColor(@AttrRes attrResId: Int): Int {
     val typedValue = TypedValue()
-    context.theme.resolveAttribute(
+    val resolved = theme.resolveAttribute(attrResId, typedValue, true)
+    return if (resolved) typedValue.data else throw IllegalArgumentException("Attribute not found")
+}
+
+fun Context.createTextDrawable(text: String): Drawable {
+    val typeface = ResourcesCompat.getFont(applicationContext, R.font.nunito_bold)
+    val typedValue = TypedValue()
+    theme.resolveAttribute(
         com.google.android.material.R.attr.colorOnSecondaryContainer,
         typedValue,
         true
@@ -53,7 +60,7 @@ fun createTextDrawable(context: Context, text: String): Drawable {
     paint.getTextBounds(text, 0, text.length, bounds)
 
     val bitmapSize = 96
-    val bitmap = Bitmap.createBitmap(bitmapSize, bitmapSize, Bitmap.Config.ARGB_8888)
+    val bitmap = createBitmap(bitmapSize, bitmapSize)
     val canvas = Canvas(bitmap)
     canvas.drawText(
         text,
@@ -62,5 +69,5 @@ fun createTextDrawable(context: Context, text: String): Drawable {
         paint
     )
 
-    return BitmapDrawable(context.resources, bitmap)
+    return bitmap.toDrawable(resources)
 }

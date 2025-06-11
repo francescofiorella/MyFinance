@@ -81,10 +81,10 @@ class IncomeAdapter(
             iHolder.binding.incomeLayout.setOnLongClickListener(null)
             return
         }
-        iHolder.binding.categoryIcon.icon = createTextDrawable(
-            iHolder.binding.categoryIcon.context,
-            currentIncome.name!![0].uppercase()
-        )
+        iHolder.binding.categoryIcon.icon =
+            iHolder.binding.categoryIcon.context.createTextDrawable(
+                currentIncome.name!![0].uppercase()
+            )
         iHolder.binding.incomeLayout.setOnLongClickListener {
             listener.onItemInteraction(
                 ON_LONG_CLICK,

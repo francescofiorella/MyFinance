@@ -11,6 +11,9 @@ class IncomesLocalRepository {
 
     fun getAll(): LiveData<List<Income>> = incomeDao.getAll()
 
+    fun getPriceSumFromYear(year: Int): LiveData<Double?> =
+        incomeDao.getPriceSumOfYear(year)
+
     fun insertIncome(income: Income) = incomeDao.insertIncome(income)
 
     fun updateIncome(income: Income) = incomeDao.updateIncome(income)

@@ -34,10 +34,10 @@
     <string name="warning_budget">Nessuna entrata da mostrare</string>
 
     <string name="expenses_today">Spese \noggi</string>
-    <string name="this_month">Questo mese</string>
-    <string name="this_year">Quest\'anno</string>
-    <string name="this_month_next">Questo \nmese</string>
-    <string name="this_year_next">Questo \nanno</string>
+    <string name="this_month">Spese questo mese</string>
+    <string name="this_year">Spese quest\'anno</string>
+    <string name="this_month_next">Spese \nquesto mese</string>
+    <string name="this_year_next">Spese \nquest\'anno</string>
     <string name="monthly_expenses">Spese mensili</string>
 
     <string name="profile_picture">Immagine di profilo</string>
@@ -86,4 +86,5 @@
     <string name="filter">Filtro</string>
     <string name="date_range">Intervallo di date</string>
     <string name="clear_text">Pulisci testo</string>
+    <string name="annual_balance">Bilancio annuale</string>
 </resources>

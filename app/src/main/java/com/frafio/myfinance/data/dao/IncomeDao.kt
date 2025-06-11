@@ -17,6 +17,11 @@ interface IncomeDao {
             "ORDER BY year DESC, month DESC, day DESC, price DESC")
     fun getAll(): LiveData<List<Income>>
 
+    @Query("SELECT SUM(price) " +
+            "FROM income " +
+            "WHERE year=:year")
+    fun getPriceSumOfYear(year: Int): LiveData<Double?>
+
     @Insert
     fun insertIncome(income: Income)
 

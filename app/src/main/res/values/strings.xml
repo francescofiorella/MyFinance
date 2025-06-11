@@ -34,10 +34,10 @@
     <string name="warning_budget">No income to show</string>
 
     <string name="expenses_today">Expenses \ntoday</string>
-    <string name="this_month">This month</string>
-    <string name="this_year">This year</string>
-    <string name="this_month_next">This \nmonth</string>
-    <string name="this_year_next">This \nyear</string>
+    <string name="this_month">Expenses this month</string>
+    <string name="this_year">Expenses this year</string>
+    <string name="this_month_next">Expenses \nthis month</string>
+    <string name="this_year_next">Expenses \nthis year</string>
     <string name="monthly_expenses">Monthly expenses</string>
 
     <string name="profile_picture">Profile Picture</string>
@@ -98,6 +98,7 @@
     <string name="filter">Filter</string>
     <string name="date_range">Date range</string>
     <string name="clear_text">Clear text</string>
+    <string name="annual_balance">Annual balance</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>
