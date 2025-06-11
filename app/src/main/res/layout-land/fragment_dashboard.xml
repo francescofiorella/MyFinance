@@ -305,8 +305,10 @@
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/change_content"
                             android:src="@drawable/ic_keyboard_arrow_right"
+                            android:visibility="gone"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:visibility="visible" />
 
                         <ImageView
                             android:id="@+id/balance_previous_btn"
@@ -316,8 +318,10 @@
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/change_content"
                             android:src="@drawable/ic_keyboard_arrow_left"
+                            android:visibility="gone"
                             app:layout_constraintEnd_toStartOf="@id/balance_next_btn"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:visibility="visible" />
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/balance_TV_title"
