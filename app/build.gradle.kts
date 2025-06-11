@@ -75,7 +75,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Firebase libraries
-    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
