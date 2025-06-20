@@ -85,8 +85,17 @@ class DashboardFragment : BaseFragment() {
                 binding.thisMonthTV.text = doubleToPrice(viewModel.thisYearSum)
                 budgetProgressBar.updateValue(viewModel.thisYearSum, viewModel.monthlyBudget * 12)
             }
-            binding.balanceExpensesTV.text = doubleToPrice(viewModel.thisYearSum)
-            val balance = viewModel.incomeSum - viewModel.thisYearSum
+        }
+
+        val expensesSumLiveData = MediatorLiveData<Double?>()
+        var expensesSumLD = viewModel.getExpensesSumForBalance()
+        expensesSumLiveData.addSource(expensesSumLD) { value ->
+            expensesSumLiveData.value = value
+        }
+        expensesSumLiveData.observe(viewLifecycleOwner) {
+            viewModel.expensesSum = it ?: 0.0
+            binding.balanceExpensesTV.text = doubleToPrice(viewModel.expensesSum)
+            val balance = viewModel.incomesSum - viewModel.expensesSum
             binding.balanceTV.text = doubleToPrice(abs(balance))
             val balanceColor = requireContext().getThemeColor(
                 if (balance < 0.0) {
@@ -98,10 +107,15 @@ class DashboardFragment : BaseFragment() {
             binding.balanceTV.setTextColor(balanceColor)
         }
 
-        viewModel.getLocalIncomeSum().observe(viewLifecycleOwner) {
-            viewModel.incomeSum = it ?: 0.0
-            binding.balanceIncomesTV.text = doubleToPrice(viewModel.incomeSum)
-            val balance = viewModel.incomeSum - viewModel.thisYearSum
+        val incomesSumLiveData = MediatorLiveData<Double?>()
+        var incomesSumLD = viewModel.getIncomesSumForBalance()
+        incomesSumLiveData.addSource(incomesSumLD) { value ->
+            incomesSumLiveData.value = value
+        }
+        incomesSumLiveData.observe(viewLifecycleOwner) {
+            viewModel.incomesSum = it ?: 0.0
+            binding.balanceIncomesTV.text = doubleToPrice(viewModel.incomesSum)
+            val balance = viewModel.incomesSum - viewModel.expensesSum
             binding.balanceTV.text = doubleToPrice(abs(balance))
             val balanceColor = requireContext().getThemeColor(
                 if (balance < 0.0) {
@@ -154,7 +168,20 @@ class DashboardFragment : BaseFragment() {
         }
 
         viewModel.balanceYearShown.observe(viewLifecycleOwner) {
-
+            binding.balanceTVTitle.text = getString(
+                R.string.annual_balance,
+                it.toString()
+            )
+            incomesSumLiveData.removeSource(incomesSumLD)
+            incomesSumLD = viewModel.getIncomesSumForBalance()
+            incomesSumLiveData.addSource(incomesSumLD) { value ->
+                incomesSumLiveData.value = value
+            }
+            expensesSumLiveData.removeSource(expensesSumLD)
+            expensesSumLD = viewModel.getExpensesSumForBalance()
+            expensesSumLiveData.addSource(expensesSumLD) { value ->
+                expensesSumLiveData.value = value
+            }
         }
 
         val pieChartLiveData = MediatorLiveData<List<Expense>>()

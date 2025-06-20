@@ -21,7 +21,8 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     var thisMonthSum = 0.0
     var thisYearSum = 0.0
     var monthlyBudget = 0.0
-    var incomeSum = 0.0
+    var incomesSum = 0.0
+    var expensesSum = 0.0
 
     private val _balanceYearShown = MutableLiveData(
         today.year
@@ -101,7 +102,11 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
             year = _pieChartDate.value!!.year
         )
 
-    fun getLocalIncomeSum(): LiveData<Double?> {
+    fun getExpensesSumForBalance(): LiveData<Double?> {
+        return expensesLocalRepository.getPriceSumFromYear(balanceYearShown.value!!)
+    }
+
+    fun getIncomesSumForBalance(): LiveData<Double?> {
         return incomesLocalRepository.getPriceSumFromYear(balanceYearShown.value!!)
     }
 

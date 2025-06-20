@@ -86,5 +86,5 @@
     <string name="filter">Filtro</string>
     <string name="date_range">Intervallo di date</string>
     <string name="clear_text">Pulisci testo</string>
-    <string name="annual_balance">Bilancio annuale</string>
+    <string name="annual_balance">Bilancio annuale: %1$s</string>
 </resources>

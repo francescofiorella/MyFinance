@@ -98,7 +98,7 @@
     <string name="filter">Filter</string>
     <string name="date_range">Date range</string>
     <string name="clear_text">Clear text</string>
-    <string name="annual_balance">Annual balance</string>
+    <string name="annual_balance">Annual balance: %1$s</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>
