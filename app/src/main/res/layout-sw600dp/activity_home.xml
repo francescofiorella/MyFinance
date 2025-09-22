@@ -15,6 +15,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:theme="@style/Theme.MyFinance">
@@ -29,7 +30,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:showAnimationBehavior="inward" />
+            app:showAnimationBehavior="inward"
+            app:trackThickness="4dp"
+            app:waveAmplitude="3dp"
+            app:wavelength="40dp" />
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/nav_drawer"

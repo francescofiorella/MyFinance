@@ -2,6 +2,7 @@ package com.frafio.myfinance.ui.home
 
 import android.animation.ObjectAnimator
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.animation.LinearInterpolator
@@ -12,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -116,20 +120,33 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                         fadeOut.start()
                     }
                 }
-                if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
-                    DynamicColors.applyToActivityIfAvailable(this)
-                }
             }
         } else {
             setTheme(R.style.Theme_MyFinance)
-            if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
-                DynamicColors.applyToActivityIfAvailable(this)
-            }
+        }
+
+        if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
+            DynamicColors.applyToActivityIfAvailable(this)
         }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         viewModel.listener = this
         binding.viewModel = viewModel
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+                val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+                // Apply padding
+                view.setPadding(
+                    statusBarInsets.left,
+                    statusBarInsets.top,
+                    statusBarInsets.right,
+                    0
+                )
+                insets
+            }
+        }
 
         if (savedInstanceState == null) {
             if (viewModel.isDynamicColorOn()) {

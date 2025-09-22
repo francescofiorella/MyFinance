@@ -1,11 +1,15 @@
 package com.frafio.myfinance.ui.auth
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
@@ -55,6 +59,22 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         binding.viewModel = viewModel
 
         viewModel.authListener = this
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+                val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+                val navBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                // Apply padding
+                view.setPadding(
+                    statusBarInsets.left,
+                    statusBarInsets.top,
+                    statusBarInsets.right,
+                    navBarInsets.bottom
+                )
+                insets
+            }
+        }
 
         binding.loginEmailInputText.doOnTextChanged { text, _, _, _ ->
             if (!text.isNullOrEmpty() && text.isNotBlank())

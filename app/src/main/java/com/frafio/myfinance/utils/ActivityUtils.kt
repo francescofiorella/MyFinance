@@ -66,6 +66,9 @@ fun Activity.snackBar(
             snackBar.setAction(text) {
                 actionFun()
             }
+
+            val actionView = snackBar.view.findViewById<TextView>(R.id.snackbar_action)
+            actionView.typeface = nunito
         }
 
         snackBar.show()

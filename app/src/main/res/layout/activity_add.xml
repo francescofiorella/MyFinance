@@ -29,7 +29,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:showAnimationBehavior="inward" />
+            app:showAnimationBehavior="inward"
+            app:trackThickness="4dp"
+            app:waveAmplitude="3dp"
+            app:wavelength="40dp" />
 
         <ImageView
             android:id="@+id/back_arrow"

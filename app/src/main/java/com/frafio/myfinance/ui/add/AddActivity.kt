@@ -1,6 +1,7 @@
 package com.frafio.myfinance.ui.add
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
@@ -61,6 +65,22 @@ class AddActivity : AppCompatActivity(), AddListener {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add)
         binding.viewModel = viewModel
         viewModel.listener = this
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+                val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+                val navBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                // Apply padding
+                view.setPadding(
+                    statusBarInsets.left,
+                    statusBarInsets.top,
+                    statusBarInsets.right,
+                    navBarInsets.bottom
+                )
+                insets
+            }
+        }
 
         intent.getIntExtra(REQUEST_CODE_KEY, 0).also { code ->
             viewModel.requestCode = code
