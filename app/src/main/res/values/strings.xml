@@ -99,6 +99,7 @@
     <string name="date_range">Date range</string>
     <string name="clear_text">Clear text</string>
     <string name="annual_balance">Annual balance: %1$s</string>
+    <string name="on_total_budget" translatable="false">/ %1$s</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>

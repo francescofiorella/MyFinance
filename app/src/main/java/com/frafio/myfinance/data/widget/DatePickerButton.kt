@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import com.frafio.myfinance.data.enums.db.Languages
-import com.frafio.myfinance.utils.dateToString
+import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.getCurrentLanguage
 import com.frafio.myfinance.utils.toLocalDateTime
 import com.frafio.myfinance.utils.toUTCLocalDateTime
@@ -69,7 +69,7 @@ open class DatePickerButton(
 
     val dateString: String?
         get() {
-            return dateToString(day, month, year)
+            return dateToExtendedString(day, month, year)
         }
 
     init {

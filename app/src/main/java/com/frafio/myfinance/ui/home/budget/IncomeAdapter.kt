@@ -89,7 +89,7 @@ class IncomeAdapter(
             listener.onItemInteraction(
                 ON_LONG_CLICK,
                 currentIncome,
-                iHolder.getAdapterPosition()
+                iHolder.bindingAdapterPosition
             )
             true
         }

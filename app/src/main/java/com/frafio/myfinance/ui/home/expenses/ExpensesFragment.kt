@@ -36,7 +36,7 @@ import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companio
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.utils.addTotalsToExpenses
 import com.frafio.myfinance.utils.addTotalsToExpensesWithoutToday
-import com.frafio.myfinance.utils.dateToString
+import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -44,6 +44,9 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textview.MaterialTextView
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesListener {
 
@@ -171,8 +174,8 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         super.onViewStateRestored(savedInstanceState)
         if (viewModel.dateFilter != null) {
             addDateChip(
-                dateToString(viewModel.dateFilter!!.first)!!,
-                dateToString(viewModel.dateFilter!!.second)!!
+                viewModel.dateFilter!!.first,
+                viewModel.dateFilter!!.second
             )
         }
         for (categoryId in viewModel.categoryFilterList) {
@@ -402,8 +405,18 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         binding.filterChipGroup.visibility = View.VISIBLE
     }
 
-    private fun addDateChip(startDate: String, endDate: String) {
-        val label = "$startDate - $endDate"
+    private fun addDateChip(startDate: LocalDate, endDate: LocalDate) {
+        val label = if (startDate.year == endDate.year && startDate.monthValue == endDate.monthValue) {
+            val startDayOfMonth = if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+            "$startDayOfMonth - ${dateToExtendedString(endDate)}"
+        } else if (startDate.year == endDate.year) {
+            val startDayOfMonth = if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+            val startMonth = startDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                .replaceFirstChar { it.uppercase() }
+            "$startDayOfMonth $startMonth - ${dateToExtendedString(endDate)}"
+        } else {
+            "${dateToExtendedString(startDate)} - ${dateToExtendedString(endDate)}"
+        }
         val chip = layoutInflater.inflate(
             R.layout.layout_chip_input,
             binding.filterChipGroup,
@@ -567,7 +580,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                     override fun onPositiveBtnClickListener() {
                         super.onPositiveBtnClickListener()
                         viewModel.dateFilter = Pair(startDate!!, endDate!!)
-                        addDateChip(startDateString!!, endDateString!!)
+                        addDateChip(startDate!!, endDate!!)
                         recViewLiveData.removeSource(localExpensesLiveData)
                         localExpensesLiveData = viewModel.getLocalExpenses()
                         recViewLiveData.addSource(localExpensesLiveData) { value ->
@@ -581,7 +594,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             else -> {
                 layout.findViewById<MaterialTextView>(R.id.nameTV).text = expense!!.name
                 layout.findViewById<MaterialTextView>(R.id.dateTV).text =
-                    dateToString(expense.day, expense.month, expense.year)
+                    dateToExtendedString(expense.day, expense.month, expense.year)
                 layout.findViewById<MaterialTextView>(R.id.priceTV).text =
                     doubleToPrice(expense.price ?: 0.0)
                 layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon)

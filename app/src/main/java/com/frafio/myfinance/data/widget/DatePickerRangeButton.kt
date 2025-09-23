@@ -4,7 +4,6 @@ import android.view.View
 import androidx.core.util.Pair
 import androidx.fragment.app.FragmentActivity
 import com.frafio.myfinance.data.enums.db.Languages
-import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.getCurrentLanguage
 import com.frafio.myfinance.utils.toUTCLocalDateTime
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -35,11 +34,7 @@ open class DatePickerRangeButton(
     }
 
     var startDate: LocalDate? = null
-    val startDateString: String?
-        get() = dateToString(startDate?.dayOfMonth, startDate?.monthValue, startDate?.year)
     var endDate: LocalDate? = null
-    val endDateString: String?
-        get() = dateToString(endDate?.dayOfMonth, endDate?.monthValue, endDate?.year)
 
     init {
         layout.setOnClickListener(listener)

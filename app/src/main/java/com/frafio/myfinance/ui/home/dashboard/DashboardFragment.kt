@@ -138,7 +138,7 @@ class DashboardFragment : BaseFragment() {
             val values = mutableListOf<Double>()
             var currentDate = viewModel.lastDateForBarChart.value!!
             var j = 0
-            for (i in 0..<12) {
+            repeat(12) {
                 if (j < entries.size
                     && entries[j].year == currentDate.year
                     && entries[j].month == currentDate.monthValue
@@ -269,19 +269,23 @@ class DashboardFragment : BaseFragment() {
             if (monthlyBudget == null) return@observe
             viewModel.monthlyBudget = monthlyBudget
             if (viewModel.monthlyBudget == 0.0) {
-                binding.slashTV.visibility = View.GONE
-                binding.budgetTV.visibility = View.GONE
+                binding.onBudgetTV.visibility = View.GONE
                 binding.changeBtn.visibility = View.GONE
                 return@observe
             }
-            binding.slashTV.visibility = View.VISIBLE
-            binding.budgetTV.visibility = View.VISIBLE
+            binding.onBudgetTV.visibility = View.VISIBLE
             binding.changeBtn.visibility = View.VISIBLE
             if (viewModel.monthShown) {
-                binding.budgetTV.text = doubleToString(monthlyBudget)
+                binding.onBudgetTV.text = getString(
+                    R.string.on_total_budget,
+                    doubleToString(monthlyBudget)
+                )
                 budgetProgressBar.updateValue(viewModel.thisMonthSum, monthlyBudget)
             } else {
-                binding.budgetTV.text = doubleToString(monthlyBudget * 12)
+                binding.onBudgetTV.text = getString(
+                    R.string.on_total_budget,
+                    doubleToString(monthlyBudget * 12)
+                )
                 budgetProgressBar.updateValue(
                     viewModel.thisYearSum,
                     monthlyBudget * 12
@@ -302,7 +306,10 @@ class DashboardFragment : BaseFragment() {
                     doubleToPrice(viewModel.thisYearSum)
                 else
                     doubleToPriceWithoutDecimals(viewModel.thisYearSum)
-                binding.budgetTV.text = doubleToString(viewModel.monthlyBudget)
+                binding.onBudgetTV.text = getString(
+                    R.string.on_total_budget,
+                    doubleToString(viewModel.monthlyBudget)
+                )
                 budgetProgressBar.updateValue(
                     viewModel.thisMonthSum,
                     viewModel.monthlyBudget
@@ -315,8 +322,9 @@ class DashboardFragment : BaseFragment() {
                     doubleToPrice(viewModel.thisMonthSum)
                 else
                     doubleToPriceWithoutDecimals(viewModel.thisMonthSum)
-                binding.budgetTV.text = doubleToString(
-                    viewModel.monthlyBudget * 12
+                binding.onBudgetTV.text = getString(
+                    R.string.on_total_budget,
+                    doubleToString(viewModel.monthlyBudget * 12)
                 )
                 budgetProgressBar.updateValue(
                     viewModel.thisYearSum,

@@ -10,11 +10,12 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.math.round
 
 fun doubleToString(double: Double): String {
-    val locale = Locale("en", "UK")
+    val locale = Locale.UK
     val nf = NumberFormat.getInstance(locale)
     val formatter = nf as DecimalFormat
     formatter.applyPattern("########0.00")
@@ -23,7 +24,7 @@ fun doubleToString(double: Double): String {
 }
 
 fun doubleToStringWithoutDecimals(double: Double): String {
-    val locale = Locale("en", "UK")
+    val locale = Locale.UK
     val nf = NumberFormat.getInstance(locale)
     val formatter = nf as DecimalFormat
     formatter.applyPattern("########0")
@@ -54,6 +55,7 @@ fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?): String? {
     return formattedDate
 }
 
+@Suppress("UNUSED")
 fun dateToString(date: LocalDate?): String? {
     var formattedDate: String? = null
     date?.let {
@@ -67,6 +69,36 @@ fun dateToString(date: LocalDate?): String? {
     return formattedDate
 }
 
+fun dateToExtendedString(dayOfMonth: Int?, month: Int?, year: Int?): String? {
+    var formattedDate: String? = null
+    dayOfMonth?.let {
+        month?.let {
+            year?.let {
+                val locale = Locale.getDefault()
+                val date = LocalDate.of(year, month, dayOfMonth)
+                val dayString = if (dayOfMonth < 10) "0$dayOfMonth" else dayOfMonth.toString()
+                val monthString = date.month.getDisplayName(TextStyle.SHORT, locale)
+                    .replaceFirstChar { it.uppercase() }
+                formattedDate = "$dayString $monthString $year"
+            }
+        }
+    }
+
+    return formattedDate
+}
+
+fun dateToExtendedString(date: LocalDate?): String? {
+    var formattedDate: String? = null
+    date?.let {
+        val locale = Locale.getDefault()
+        val dayString = if (date.dayOfMonth < 10) "0${date.dayOfMonth}" else date.dayOfMonth.toString()
+        val monthString = date.month.getDisplayName(TextStyle.SHORT, locale)
+            .replaceFirstChar { it.uppercase() }
+        formattedDate = "$dayString $monthString ${date.year}"
+    }
+
+    return formattedDate
+}
 @Suppress("UNUSED")
 fun timeToString(hour: Int?, minute: Int?): String? {
     var formattedTime: String? = null

@@ -128,28 +128,17 @@
                             tools:text="€ 0.00" />
 
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/slash_TV"
+                            android:id="@+id/on_budget_TV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/card_half_margin"
                             android:fontFamily="@font/nunito"
-                            android:text="/ "
+                            android:text="@string/on_total_budget"
                             android:textSize="20sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/thisMonth_TV" />
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/budget_TV"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/nunito_semibold"
-                            android:maxLines="1"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toEndOf="@id/slash_TV"
                             app:layout_constraintTop_toBottomOf="@id/thisMonth_TV"
-                            tools:text="0.00" />
+                            tools:text="/ 0.00" />
 
                         <androidx.constraintlayout.widget.Guideline
                             android:id="@+id/monthly_guideline"

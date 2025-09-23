@@ -106,7 +106,7 @@ class ExpenseAdapter(
             listener.onItemInteraction(
                 ON_LONG_CLICK,
                 currentExpense,
-                eHolder.getAdapterPosition()
+                eHolder.bindingAdapterPosition
             )
             true
         }
@@ -115,7 +115,7 @@ class ExpenseAdapter(
             listener.onItemInteraction(
                 ON_BUTTON_CLICK,
                 currentExpense,
-                eHolder.getAdapterPosition()
+                eHolder.bindingAdapterPosition
             )
         }
     }

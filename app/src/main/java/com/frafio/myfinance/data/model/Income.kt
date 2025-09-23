@@ -2,7 +2,7 @@ package com.frafio.myfinance.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.frafio.myfinance.utils.dateToString
+import com.frafio.myfinance.utils.dateToExtendedString
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 
@@ -20,6 +20,6 @@ data class Income(
 ) {
     @Exclude
     fun getDateString(): String {
-        return dateToString(day, month, year) ?: ""
+        return dateToExtendedString(day, month, year) ?: ""
     }
 }

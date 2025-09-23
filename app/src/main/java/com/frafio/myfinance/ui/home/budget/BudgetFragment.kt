@@ -32,7 +32,7 @@ import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.O
 import com.frafio.myfinance.utils.addTotalsToIncomes
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.createTextDrawable
-import com.frafio.myfinance.utils.dateToString
+import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.hideSoftKeyboard
@@ -349,7 +349,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
     ) {
         layout.findViewById<MaterialTextView>(R.id.nameTV).text = income.name
         layout.findViewById<MaterialTextView>(R.id.dateTV).text =
-            dateToString(income.day, income.month, income.year)
+            dateToExtendedString(income.day, income.month, income.year)
         layout.findViewById<MaterialTextView>(R.id.priceTV).text =
             doubleToPrice(income.price ?: 0.0)
         layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon).icon =

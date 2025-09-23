@@ -1,7 +1,6 @@
 package com.frafio.myfinance
 
 import android.app.Application
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.StringRes
 import com.frafio.myfinance.data.manager.AuthManager
@@ -27,7 +26,7 @@ class MyFinanceApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        sharedPreferences = getSharedPreferences(PREFERENCES_KEY, Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(PREFERENCES_KEY, MODE_PRIVATE)
 
         authManager = AuthManager(sharedPreferences)
         expensesManager = ExpensesManager(sharedPreferences)
@@ -44,7 +43,7 @@ object Strings {
     fun get(@StringRes stringRes: Int, vararg formatArgs: Any = emptyArray()): String {
         return try {
             MyFinanceApplication.instance.getString(stringRes, *formatArgs)
-        } catch (e: UninitializedPropertyAccessException) {
+        } catch (_: UninitializedPropertyAccessException) {
             ""
         }
     }
