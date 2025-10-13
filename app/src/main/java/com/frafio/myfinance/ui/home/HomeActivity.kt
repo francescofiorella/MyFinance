@@ -2,6 +2,7 @@ package com.frafio.myfinance.ui.home
 
 import android.animation.ObjectAnimator
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -136,13 +137,16 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             WindowCompat.setDecorFitsSystemWindows(window, false)
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-                val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+                val systemBars = insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+                )
+                val orientation = view.resources.configuration.orientation
                 // Apply padding
                 view.setPadding(
-                    statusBarInsets.left,
-                    statusBarInsets.top,
-                    statusBarInsets.right,
-                    0
+                    systemBars.left,
+                    systemBars.top,
+                    systemBars.right,
+                    if (orientation == Configuration.ORIENTATION_LANDSCAPE) systemBars.bottom else 0
                 )
                 insets
             }
@@ -172,7 +176,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         }
 
         binding.navBar?.setOnItemSelectedListener(navBarListener)
-        binding.navRail?.setOnItemSelectedListener(navBarListener)
         binding.navDrawer?.setNavigationItemSelectedListener(navDrawerListener)
 
         onBackPressedDispatcher.addCallback {
@@ -239,8 +242,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     private fun navigateTo(itemId: Int) {
         val currentId = if (binding.navBar != null) {
             binding.navBar!!.selectedItemId
-        } else if (binding.navRail != null) {
-            binding.navRail!!.selectedItemId
         } else {
             binding.navDrawer!!.checkedItem?.itemId
         }
@@ -459,7 +460,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
     private fun showFragment(fragmentId: Int) {
         binding.navBar?.selectedItemId = fragmentId
-        binding.navRail?.selectedItemId = fragmentId
         binding.navDrawer?.let {
             navigateTo(fragmentId)
             it.setCheckedItem(fragmentId)

@@ -19,7 +19,7 @@ android {
         minSdk = 29
         targetSdk = 35
         versionCode = 4
-        versionName = "4.7.3"
+        versionName = "4.7.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -79,7 +79,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Firebase libraries
-    implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-crashlytics")
@@ -94,14 +94,14 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     // Room
-    implementation("androidx.room:room-runtime:2.8.0")
-    annotationProcessor("androidx.room:room-compiler:2.8.0")
-    ksp("androidx.room:room-compiler:2.8.0")
-    implementation("androidx.room:room-ktx:2.8.0")
+    implementation("androidx.room:room-runtime:2.8.2")
+    annotationProcessor("androidx.room:room-compiler:2.8.2")
+    ksp("androidx.room:room-compiler:2.8.2")
+    implementation("androidx.room:room-ktx:2.8.2")
 
     // Jetpack Compose
-    implementation("androidx.compose.ui:ui:1.9.1")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.9.1")
-    implementation("androidx.compose.material3:material3:1.3.2")
+    implementation("androidx.compose.ui:ui:1.9.3")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.9.3")
+    implementation("androidx.compose.material3:material3:1.4.0")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
 }

@@ -63,14 +63,15 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             WindowCompat.setDecorFitsSystemWindows(window, false)
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-                val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-                val navBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                val systemBars = insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+                )
                 // Apply padding
                 view.setPadding(
-                    statusBarInsets.left,
-                    statusBarInsets.top,
-                    statusBarInsets.right,
-                    navBarInsets.bottom
+                    systemBars.left,
+                    systemBars.top,
+                    systemBars.right,
+                    systemBars.bottom
                 )
                 insets
             }
