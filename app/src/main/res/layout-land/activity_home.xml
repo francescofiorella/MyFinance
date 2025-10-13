@@ -35,15 +35,13 @@
             app:waveAmplitude="3dp"
             app:wavelength="40dp" />
 
-        <com.google.android.material.navigationrail.NavigationRailView
-            android:id="@+id/nav_rail"
-            android:layout_width="wrap_content"
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/nav_drawer"
+            android:layout_width="200dp"
             android:layout_height="match_parent"
             android:background="@drawable/bg_drawer"
-            app:itemRippleColor="@android:color/transparent"
-            app:itemTextAppearanceActive="@style/TextAppearance.MyFinance.Caption"
-            app:itemTextAppearanceInactive="@style/TextAppearance.MyFinance.Caption"
-            app:labelVisibilityMode="labeled"
+            android:theme="@style/ThemeOverlay.MyFinance.NavigationView"
+            app:itemTextAppearance="@style/TextAppearance.MyFinance.Caption"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -55,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="5dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/nav_rail"
+            app:layout_constraintStart_toEndOf="@id/nav_drawer"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textview.MaterialTextView
@@ -121,7 +119,7 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/nav_rail"
+            app:layout_constraintStart_toEndOf="@+id/nav_drawer"
             app:layout_constraintTop_toBottomOf="@+id/titleLayout"
             tools:layout="@layout/fragment_dashboard" />
 
