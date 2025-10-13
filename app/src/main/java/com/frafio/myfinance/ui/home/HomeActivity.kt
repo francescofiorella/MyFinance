@@ -229,7 +229,18 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     }
 
     private fun navigateTo(itemId: Int) {
-        if (!onBackPressedDispatcher.hasEnabledCallbacks()) {
+        val currentId = if (binding.navBar != null) {
+            binding.navBar!!.selectedItemId
+        } else {
+            binding.navDrawer!!.checkedItem?.itemId
+        }
+        if (currentId == itemId) {
+            activeFragment!!.scrollUp()
+            return
+        }
+
+        if (!onBackPressedDispatcher.hasEnabledCallbacks()
+            && !(viewModel.fragmentStack.size == 1 && itemId == R.id.dashboardFragment)) {
             // add on back pressed callback
             onBackPressedDispatcher.addCallback {
                 viewModel.fragmentStack.removeAt(viewModel.fragmentStack.size - 1)
@@ -244,7 +255,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     EXPENSES_FRAGMENT_TAG -> showFragment(R.id.expensesFragment)
                     BUDGET_FRAGMENT_TAG -> showFragment(R.id.budgetFragment)
                     PROFILE_FRAGMENT_TAG -> showFragment(R.id.profileFragment)
-                    else -> {
+                    else -> { // Should not be reached
                         isEnabled = false
                         onBackPressedDispatcher.onBackPressed()
                     }
@@ -252,15 +263,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             }
         }
 
-        val currentId = if (binding.navBar != null) {
-            binding.navBar!!.selectedItemId
-        } else {
-            binding.navDrawer!!.checkedItem?.itemId
-        }
-        if (currentId == itemId) {
-            activeFragment!!.scrollUp()
-            return
-        }
         val transaction = supportFragmentManager.beginTransaction()
         when (itemId) {
             R.id.dashboardFragment -> {

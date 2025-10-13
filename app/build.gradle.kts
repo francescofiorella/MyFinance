@@ -2,11 +2,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
-    id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.devtools.ksp)
     id("kotlin-kapt")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
+    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId = "com.frafio.myfinance"
         minSdk = 29
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 4
         versionName = "4.7.4"
 

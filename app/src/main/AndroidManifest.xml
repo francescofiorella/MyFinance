@@ -8,7 +8,6 @@
         android:name=".MyFinanceApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,16 +18,22 @@
         tools:targetApi="33">
         <activity
             android:name=".ui.add.AddActivity"
+            android:enableOnBackInvokedCallback="false"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.auth.SignupActivity"
-            android:exported="false" />
+            android:enableOnBackInvokedCallback="false"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.auth.LoginActivity"
-            android:exported="false" />
+            android:enableOnBackInvokedCallback="true"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.home.HomeActivity"
+            android:enableOnBackInvokedCallback="true"
             android:exported="true"
             android:theme="@style/Theme.MyFinance.SplashScreen"
             android:windowSoftInputMode="adjustPan">
