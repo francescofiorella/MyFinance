@@ -177,17 +177,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
         binding.navBar?.setOnItemSelectedListener(navBarListener)
         binding.navDrawer?.setNavigationItemSelectedListener(navDrawerListener)
-
-        onBackPressedDispatcher.addCallback {
-            viewModel.fragmentStack.removeAt(viewModel.fragmentStack.size - 1)
-            when (viewModel.fragmentStack.lastOrNull()) {
-                DASHBOARD_FRAGMENT_TAG -> showFragment(R.id.dashboardFragment)
-                EXPENSES_FRAGMENT_TAG -> showFragment(R.id.expensesFragment)
-                BUDGET_FRAGMENT_TAG -> showFragment(R.id.budgetFragment)
-                PROFILE_FRAGMENT_TAG -> showFragment(R.id.profileFragment)
-                else -> finish()
-            }
-        }
     }
 
     fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -240,6 +229,29 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     }
 
     private fun navigateTo(itemId: Int) {
+        if (!onBackPressedDispatcher.hasEnabledCallbacks()) {
+            // add on back pressed callback
+            onBackPressedDispatcher.addCallback {
+                viewModel.fragmentStack.removeAt(viewModel.fragmentStack.size - 1)
+                when (viewModel.fragmentStack.lastOrNull()) {
+                    DASHBOARD_FRAGMENT_TAG -> {
+                        showFragment(R.id.dashboardFragment)
+                        // if last fragment, remove callback
+                        if (viewModel.fragmentStack.size == 1) {
+                            isEnabled = false
+                        }
+                    }
+                    EXPENSES_FRAGMENT_TAG -> showFragment(R.id.expensesFragment)
+                    BUDGET_FRAGMENT_TAG -> showFragment(R.id.budgetFragment)
+                    PROFILE_FRAGMENT_TAG -> showFragment(R.id.profileFragment)
+                    else -> {
+                        isEnabled = false
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            }
+        }
+
         val currentId = if (binding.navBar != null) {
             binding.navBar!!.selectedItemId
         } else {
