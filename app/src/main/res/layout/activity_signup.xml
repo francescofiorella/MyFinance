@@ -81,7 +81,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/signupTextView"
-                    app:startIconDrawable="@drawable/ic_person">
+                    app:startIconDrawable="@drawable/ic_person_filled">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/signup_nameInputText"
@@ -108,7 +108,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/signup_nameInputLayout"
-                    app:startIconDrawable="@drawable/ic_email">
+                    app:startIconDrawable="@drawable/ic_mail_filled">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/signup_emailInputText"
@@ -135,7 +135,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/signup_emailInputLayout"
-                    app:startIconDrawable="@drawable/ic_lock">
+                    app:startIconDrawable="@drawable/ic_password_filled">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/signup_passwordInputText"
@@ -162,7 +162,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/signup_passwordInputLayout"
-                    app:startIconDrawable="@drawable/ic_password_confirm">
+                    app:startIconDrawable="@drawable/ic_password_2_filled">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/signup_passwordConfirmInputText"
@@ -183,7 +183,7 @@
                     android:onClick="@{viewModel::onSignupButtonClick}"
                     android:text="@string/signup"
                     app:cornerRadius="@dimen/field_corner_radius"
-                    app:icon="@drawable/ic_login"
+                    app:icon="@drawable/ic_login_filled"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/signup_passwordConfirmInputLayout" />
@@ -231,7 +231,7 @@
             android:padding="@dimen/arrow_padding"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_west" />
+            app:srcCompat="@drawable/ic_arrow_back_filled" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

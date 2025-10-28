@@ -97,9 +97,9 @@ class AddActivity : AppCompatActivity(), AddListener {
 
         binding.priceTIL.setStartIconDrawable(
             when (getString(R.string.currency)) {
-                "€" -> R.drawable.ic_euro
-                "$" -> R.drawable.ic_attach_money
-                else -> R.drawable.ic_euro
+                "€" -> R.drawable.ic_euro_filled
+                "$" -> R.drawable.ic_attach_money_filled
+                else -> R.drawable.ic_euro_filled
             }
         )
 
@@ -213,16 +213,16 @@ class AddActivity : AppCompatActivity(), AddListener {
                         binding.categoryET.setText(categories[viewModel.category!!])
                         binding.categoryTIL.setStartIconDrawable(
                             when (viewModel.category) {
-                                FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                                FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                                FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                                FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                                FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                                FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                                FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                                FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                                FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
-                                else -> R.drawable.ic_tag
+                                FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_home_filled
+                                FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart_filled
+                                FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care_filled
+                                FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy_filled
+                                FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school_filled
+                                FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant_filled
+                                FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines_filled
+                                FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_subway_filled
+                                FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_grid_3x3_filled
+                                else -> R.drawable.ic_grid_3x3_filled
                             }
                         )
                     }
@@ -380,16 +380,16 @@ class AddActivity : AppCompatActivity(), AddListener {
             binding.categoryET.setText(categories[category])
             binding.categoryTIL.setStartIconDrawable(
                 when (category) {
-                    FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                    FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                    FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                    FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                    FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
-                    else -> R.drawable.ic_tag
+                    FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_home_filled
+                    FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart_filled
+                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care_filled
+                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy_filled
+                    FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school_filled
+                    FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant_filled
+                    FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines_filled
+                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_subway_filled
+                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_grid_3x3_filled
+                    else -> R.drawable.ic_grid_3x3_filled
                 }
             )
             viewModel.category = category
@@ -404,16 +404,16 @@ class AddActivity : AppCompatActivity(), AddListener {
             ContextCompat.getDrawable(
                 applicationContext,
                 when (viewModel.category) {
-                    FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-                    FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-                    FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-                    FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-                    FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
-                    else -> R.drawable.ic_tag
+                    FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_home_filled
+                    FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart_filled
+                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care_filled
+                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy_filled
+                    FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school_filled
+                    FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant_filled
+                    FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines_filled
+                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_subway_filled
+                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_grid_3x3_filled
+                    else -> R.drawable.ic_grid_3x3_filled
                 }
             )
 

@@ -26,7 +26,7 @@
     <string name="login_google">Accedi con Google</string>
     <string name="login_signup">Non hai un account? Iscriviti</string>
     <string name="signup_name">Inserisci nome e cognome</string>
-    <string name="signup_password">Inserisci una password</string>
+    <string name="signup_password">Inserisci la password</string>
     <string name="signup_password_confirm">Inserisci nuovamente la password</string>
     <string name="signup">Registrati</string>
     <string name="signup_login">Hai già un account? Accedi</string>

@@ -92,7 +92,7 @@
                 android:layout_weight="1"
                 android:paddingVertical="4dp"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/ic_search">
+                app:startIconDrawable="@drawable/ic_search_filled">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/search_ET"
@@ -112,7 +112,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:contentDescription="@string/filter"
-                app:srcCompat="@drawable/ic_filter_list" />
+                app:srcCompat="@drawable/ic_filter_list_filled" />
 
         </LinearLayout>
 

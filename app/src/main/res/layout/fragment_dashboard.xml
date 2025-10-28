@@ -100,7 +100,7 @@
                             android:layout_height="wrap_content"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/change_content"
-                            android:src="@drawable/ic_swap_horiz"
+                            android:src="@drawable/ic_swap_horiz_filled"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -282,7 +282,7 @@
                             android:layout_height="wrap_content"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/change_content"
-                            android:src="@drawable/ic_keyboard_arrow_right"
+                            android:src="@drawable/ic_keyboard_arrow_right_filled"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -293,7 +293,7 @@
                             android:layout_marginEnd="5dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/change_content"
-                            android:src="@drawable/ic_keyboard_arrow_left"
+                            android:src="@drawable/ic_keyboard_arrow_left_filled"
                             app:layout_constraintEnd_toStartOf="@id/balance_next_btn"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -421,7 +421,7 @@
                             android:layout_height="wrap_content"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/change_content"
-                            android:src="@drawable/ic_keyboard_arrow_right"
+                            android:src="@drawable/ic_keyboard_arrow_right_filled"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -432,7 +432,7 @@
                             android:layout_marginEnd="5dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/change_content"
-                            android:src="@drawable/ic_keyboard_arrow_left"
+                            android:src="@drawable/ic_keyboard_arrow_left_filled"
                             app:layout_constraintEnd_toStartOf="@id/bar_chart_next_btn"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -946,7 +946,7 @@
                             android:layout_height="wrap_content"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/change_content"
-                            android:src="@drawable/ic_keyboard_arrow_right"
+                            android:src="@drawable/ic_keyboard_arrow_right_filled"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -957,7 +957,7 @@
                             android:layout_marginEnd="5dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/change_content"
-                            android:src="@drawable/ic_keyboard_arrow_left"
+                            android:src="@drawable/ic_keyboard_arrow_left_filled"
                             app:layout_constraintEnd_toStartOf="@id/pie_chart_next_btn"
                             app:layout_constraintTop_toTopOf="parent" />
 

@@ -73,15 +73,15 @@ fun PieChart(
         colorResource(R.color.brown_500)
     )
     val painters = listOf(
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_baseline_home)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_shopping_cart)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_self_care)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_theater_comedy)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_school)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_restaurant)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_vaccines)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_directions_transit)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_tag))
+        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_home_filled)),
+        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_shopping_cart_filled)),
+        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_self_care_filled)),
+        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_theater_comedy_filled)),
+        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_school_filled)),
+        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_restaurant_filled)),
+        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_vaccines_filled)),
+        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_directions_subway_filled)),
+        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_grid_3x3_filled))
     )
 
     val defaultSelectedText = stringResource(R.string.total)

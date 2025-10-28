@@ -123,9 +123,9 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                 binding.monthlyBudgetTV.visibility = View.GONE
                 binding.monthlyBudgetET.visibility = View.VISIBLE
                 binding.monthlyBudgetEditBtn.icon =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear)
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_close_filled)
                 binding.monthlyBudgetDeleteBtn.icon =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_check)
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_check_filled)
                 binding.monthlyBudgetDeleteBtn.isEnabled = false
             } else {
                 // cancel any modifications
@@ -133,9 +133,9 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                 binding.monthlyBudgetET.visibility = View.GONE
                 requireContext().hideSoftKeyboard(binding.root)
                 binding.monthlyBudgetEditBtn.icon =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_create)
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_edit_filled)
                 binding.monthlyBudgetDeleteBtn.icon =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete_filled)
                 binding.monthlyBudgetDeleteBtn.isEnabled = binding.monthlyBudgetTV.text != "0.00"
             }
         }
@@ -194,9 +194,9 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
                         binding.monthlyBudgetET.visibility = View.GONE
                         requireContext().hideSoftKeyboard(binding.root)
                         binding.monthlyBudgetEditBtn.icon =
-                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_create)
+                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_edit_filled)
                         binding.monthlyBudgetDeleteBtn.icon =
-                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
+                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete_filled)
                     }
                     // Show snackbar for undoing the operation
                     previousBudget?.let {

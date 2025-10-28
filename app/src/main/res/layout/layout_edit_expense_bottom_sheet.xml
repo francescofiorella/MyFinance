@@ -19,7 +19,7 @@
         app:layout_constraintBottom_toBottomOf="@id/dateTV"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/nameTV"
-        tools:icon="@drawable/ic_restaurant" />
+        tools:icon="@drawable/ic_restaurant_filled" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/nameTV"
@@ -74,7 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:background="?attr/selectableItemBackground"
-        android:drawableStart="@drawable/ic_outline_create"
+        android:drawableStart="@drawable/ic_edit_outline"
         android:drawablePadding="20dp"
         android:fontFamily="@font/nunito"
         android:gravity="center_vertical"
@@ -92,7 +92,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:drawableStart="@drawable/ic_outline_delete"
+        android:drawableStart="@drawable/ic_delete_outline"
         android:drawablePadding="20dp"
         android:fontFamily="@font/nunito"
         android:gravity="center_vertical"

@@ -94,7 +94,7 @@
                 android:layout_marginEnd="11dp"
                 android:onClick="@{viewModel::onLogoutButtonClick}"
                 android:visibility="gone"
-                app:icon="@drawable/ic_logout"
+                app:icon="@drawable/ic_logout_filled"
                 app:layout_constraintBottom_toBottomOf="@id/fragmentTitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/myFinanceTitle" />
@@ -118,7 +118,7 @@
             android:layout_margin="@dimen/fab_margin"
             android:contentDescription="@string/add"
             android:onClick="onAddButtonClick"
-            android:src="@drawable/ic_add"
+            android:src="@drawable/ic_add_filled"
             app:layout_constraintBottom_toBottomOf="@+id/home_fragmentContainerView"
             app:layout_constraintEnd_toEndOf="parent" />
 

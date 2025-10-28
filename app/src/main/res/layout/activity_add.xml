@@ -46,7 +46,7 @@
             android:padding="@dimen/arrow_padding"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_clear" />
+            app:srcCompat="@drawable/ic_close_filled" />
 
         <ScrollView
             android:id="@+id/scrollView2"
@@ -150,7 +150,7 @@
                     android:paddingBottom="4dp"
                     app:endIconMode="clear_text"
                     app:errorEnabled="true"
-                    app:startIconDrawable="@drawable/ic_attach_money">
+                    app:startIconDrawable="@drawable/ic_attach_money_filled">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/priceET"
@@ -180,7 +180,7 @@
                     android:paddingTop="12dp"
                     android:paddingBottom="4dp"
                     app:errorEnabled="true"
-                    app:startIconDrawable="@drawable/ic_today">
+                    app:startIconDrawable="@drawable/ic_today_filled">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/dateET"
@@ -212,7 +212,7 @@
                     android:paddingTop="12dp"
                     android:paddingBottom="4dp"
                     app:errorEnabled="true"
-                    app:startIconDrawable="@drawable/ic_tag">
+                    app:startIconDrawable="@drawable/ic_grid_3x3_filled">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/categoryET"
@@ -240,7 +240,7 @@
             android:fontFamily="@font/nunito_semibold"
             android:onClick="@{viewModel::onAddButtonClick}"
             android:text="@string/save"
-            app:icon="@drawable/ic_check"
+            app:icon="@drawable/ic_check_filled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

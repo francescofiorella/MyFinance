@@ -367,16 +367,16 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
     private fun getCategoryDrawable(categoryId: Int) = ContextCompat.getDrawable(
         requireContext(),
         when (categoryId) {
-            FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_baseline_home
-            FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart
-            FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care
-            FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy
-            FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school
-            FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant
-            FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines
-            FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_transit
-            FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_tag
-            else -> R.drawable.ic_tag
+            FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_home_filled
+            FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart_filled
+            FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care_filled
+            FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy_filled
+            FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school_filled
+            FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant_filled
+            FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines_filled
+            FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_subway_filled
+            FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_grid_3x3_filled
+            else -> R.drawable.ic_grid_3x3_filled
         }
     )
 
@@ -423,7 +423,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             false
         ) as Chip
         chip.text = label
-        chip.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_today)
+        chip.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_today_filled)
         chip.setOnCloseIconClickListener {
             viewModel.dateFilter = null
             binding.filterChipGroup.removeView(chip)
