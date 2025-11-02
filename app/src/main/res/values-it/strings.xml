@@ -26,7 +26,7 @@
     <string name="forgotten_password">Hai dimenticato la password? Clicca qui</string>
     <string name="login_google">Accedi con Google</string>
     <string name="login_signup">Non hai un account? Iscriviti</string>
-    <string name="signup_name">Inserisci il tuo nome e cognome</string>
+    <string name="signup_name">Inserisci il tuo nome completo</string>
     <string name="signup_password">Crea una password</string>
     <string name="signup_password_confirm">Conferma la tua password</string>
     <string name="signup">Registrati</string>
@@ -56,6 +56,7 @@
 
     <string name="change_content">Scambia contenuto</string>
 
+    <string name="your_profile">Il tuo profilo</string>
     <string name="edit_profile">Modifica il tuo profilo</string>
     <string name="edit_propic">Carica la tua foto profilo</string>
     <string name="edit_full_name">Modifica il tuo nome</string>

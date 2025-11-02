@@ -331,7 +331,7 @@ class AddActivity : AppCompatActivity(), AddListener {
         binding.categoryET.requestFocus()
         if (resources.getBoolean(R.bool.is600dp)) {
             val sideSheetDialog = SideSheetDialog(this)
-            sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
+            sideSheetDialog.setContentView(R.layout.layout_category_sheet)
             defineSheetInterface(
                 sideSheetDialog.findViewById(android.R.id.content)!!,
                 sideSheetDialog::hide
@@ -361,7 +361,7 @@ class AddActivity : AppCompatActivity(), AddListener {
             savedInstanceState: Bundle?
         ): View? {
             val layout =
-                inflater.inflate(R.layout.layout_category_bottom_sheet, container, false)
+                inflater.inflate(R.layout.layout_category_sheet, container, false)
             activity.defineSheetInterface(
                 layout,
                 this::dismiss

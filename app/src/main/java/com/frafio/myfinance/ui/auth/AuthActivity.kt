@@ -117,7 +117,7 @@ class AuthActivity : AppCompatActivity(), AuthListener {
     fun onResetButtonClick(view: View) {
         if (resources.getBoolean(R.bool.is600dp)) {
             val sideSheetDialog = SideSheetDialog(view.context)
-            sideSheetDialog.setContentView(R.layout.layout_reset_password)
+            sideSheetDialog.setContentView(R.layout.layout_reset_password_sheet)
             defineSheetInterface(
                 sideSheetDialog.findViewById(android.R.id.content)!!,
                 viewModel,
@@ -147,7 +147,7 @@ class AuthActivity : AppCompatActivity(), AuthListener {
             savedInstanceState: Bundle?
         ): View? {
             val layout =
-                inflater.inflate(R.layout.layout_reset_password, container, false)
+                inflater.inflate(R.layout.layout_reset_password_sheet, container, false)
             activity.defineSheetInterface(layout, viewModel, this::dismiss)
             return layout
         }

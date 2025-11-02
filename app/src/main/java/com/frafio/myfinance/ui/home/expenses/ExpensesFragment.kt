@@ -191,7 +191,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
     private val onFilterClickListener = View.OnClickListener {
         if (resources.getBoolean(R.bool.is600dp)) {
             val sideSheetDialog = SideSheetDialog(requireContext())
-            sideSheetDialog.setContentView(R.layout.layout_filter_expenses_bottom_sheet)
+            sideSheetDialog.setContentView(R.layout.layout_filter_expenses_sheet)
             defineSheetInterface(
                 sideSheetDialog.findViewById(android.R.id.content)!!,
                 null,
@@ -222,7 +222,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             ON_LONG_CLICK -> {
                 if (resources.getBoolean(R.bool.is600dp)) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
-                    sideSheetDialog.setContentView(R.layout.layout_edit_expense_bottom_sheet)
+                    sideSheetDialog.setContentView(R.layout.layout_edit_expense_sheet)
                     defineSheetInterface(
                         sideSheetDialog.findViewById(android.R.id.content)!!,
                         expense,
@@ -245,7 +245,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             ON_BUTTON_CLICK -> {
                 if (resources.getBoolean(R.bool.is600dp)) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
-                    sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
+                    sideSheetDialog.setContentView(R.layout.layout_category_sheet)
                     defineSheetInterface(
                         sideSheetDialog.findViewById(android.R.id.content)!!,
                         expense,
@@ -458,9 +458,9 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         ): View? {
             val layout = inflater.inflate(
                 when (sourceTag) {
-                    SHOW_MENU -> R.layout.layout_edit_expense_bottom_sheet
-                    SHOW_FILTER_MENU -> R.layout.layout_filter_expenses_bottom_sheet
-                    else -> R.layout.layout_category_bottom_sheet
+                    SHOW_MENU -> R.layout.layout_edit_expense_sheet
+                    SHOW_FILTER_MENU -> R.layout.layout_filter_expenses_sheet
+                    else -> R.layout.layout_category_sheet
                 },
                 container,
                 false
@@ -547,7 +547,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                     dismissFun()
                     if (resources.getBoolean(R.bool.is600dp)) {
                         val sideSheetDialog = SideSheetDialog(requireContext())
-                        sideSheetDialog.setContentView(R.layout.layout_category_bottom_sheet)
+                        sideSheetDialog.setContentView(R.layout.layout_category_sheet)
                         defineSheetInterface(
                             sideSheetDialog.findViewById(android.R.id.content)!!,
                             null,

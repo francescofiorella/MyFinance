@@ -50,7 +50,7 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         binding.profileEditCard.setOnClickListener {
             if (resources.getBoolean(R.bool.is600dp)) {
                 val sideSheetDialog = SideSheetDialog(requireContext())
-                sideSheetDialog.setContentView(R.layout.layout_edit_profile_bottom_sheet)
+                sideSheetDialog.setContentView(R.layout.layout_edit_profile_sheet)
                 defineSheetInterface(
                     sideSheetDialog.findViewById(android.R.id.content)!!,
                     viewModel.user?.fullName ?: "",
@@ -138,7 +138,7 @@ class ProfileFragment : BaseFragment(), ProfileListener {
             savedInstanceState: Bundle?
         ): View? {
             val layout =
-                inflater.inflate(R.layout.layout_edit_profile_bottom_sheet, container, false)
+                inflater.inflate(R.layout.layout_edit_profile_sheet, container, false)
             fragment.defineSheetInterface(layout, fullName, viewModel, this::dismiss)
             return layout
         }

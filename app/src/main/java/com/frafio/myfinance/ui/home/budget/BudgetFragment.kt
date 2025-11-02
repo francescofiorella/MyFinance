@@ -240,7 +240,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             ON_LONG_CLICK -> {
                 if (resources.getBoolean(R.bool.is600dp)) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
-                    sideSheetDialog.setContentView(R.layout.layout_edit_expense_bottom_sheet)
+                    sideSheetDialog.setContentView(R.layout.layout_edit_expense_sheet)
                     defineSheetInterface(
                         sideSheetDialog.findViewById(android.R.id.content)!!,
                         income,
@@ -326,7 +326,7 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             savedInstanceState: Bundle?
         ): View? {
             val layout =
-                inflater.inflate(R.layout.layout_edit_expense_bottom_sheet, container, false)
+                inflater.inflate(R.layout.layout_edit_expense_sheet, container, false)
             fragment.defineSheetInterface(
                 layout,
                 income,
