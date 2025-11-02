@@ -42,7 +42,7 @@
             android:layout_marginTop="@dimen/title_margin_top"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/back_arrow"
-            android:onClick="onBackClick"
+            android:onClick="prepareLoginLayout"
             android:padding="@dimen/arrow_padding"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

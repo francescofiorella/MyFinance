@@ -32,7 +32,7 @@ import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.databinding.ActivityHomeBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
-import com.frafio.myfinance.ui.auth.LoginActivity
+import com.frafio.myfinance.ui.auth.AuthActivity
 import com.frafio.myfinance.ui.home.budget.BudgetFragment
 import com.frafio.myfinance.ui.home.dashboard.DashboardFragment
 import com.frafio.myfinance.ui.home.expenses.ExpensesFragment
@@ -94,7 +94,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
-            userRequest = intent.extras?.getBoolean(LoginActivity.INTENT_USER_REQUEST, false)
+            userRequest = intent.extras?.getBoolean(AuthActivity.INTENT_USER_REQUEST, false)
                 ?: false
             if (userRequest) {
                 setTheme(R.style.Theme_MyFinance)
@@ -164,7 +164,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 viewModel.updateMonthlyBudget()
                 viewModel.updateLocalMonthlyBudget()
                 initFragments()
-                intent.extras?.getString(LoginActivity.INTENT_USER_NAME).also { userName ->
+                intent.extras?.getString(AuthActivity.INTENT_USER_NAME).also { userName ->
                     showSnackBar("${getString(R.string.login_successful)} $userName")
                 }
             } else {
@@ -177,10 +177,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
         binding.navBar?.setOnItemSelectedListener(navBarListener)
         binding.navDrawer?.setNavigationItemSelectedListener(navDrawerListener)
-    }
-
-    fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        onBackPressedDispatcher.onBackPressed()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -410,7 +406,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     initFragments()
                     if (userRequest) {
                         hideProgressIndicator()
-                        intent.extras?.getString(LoginActivity.INTENT_USER_NAME).also { userName ->
+                        intent.extras?.getString(AuthActivity.INTENT_USER_NAME).also { userName ->
                             showSnackBar("${getString(R.string.login_successful)} $userName")
                         }
                     } else {
@@ -449,7 +445,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     }
 
     private fun goToLoginActivity() {
-        Intent(applicationContext, LoginActivity::class.java).also {
+        Intent(applicationContext, AuthActivity::class.java).also {
             startActivity(it)
             finish()
         }

@@ -2,7 +2,6 @@ package com.frafio.myfinance.ui.auth
 
 import android.app.Application
 import android.content.Intent
-import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.auth.AuthCode
@@ -20,7 +19,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     var authListener: AuthListener? = null
 
-    fun onLoginButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+    var isSigningUp: Boolean = false
+
+    fun onLoginButtonClick() {
         authListener?.onAuthStarted()
 
         if (email.isNullOrEmpty()) {
@@ -42,15 +43,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         authListener?.onAuthSuccess(loginResponse)
     }
 
-    fun onResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun resetPassword(email: String) {
         authListener?.onAuthStarted()
-
-        if (email.isNullOrEmpty()) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_EMAIL))
-            return
-        }
-
-        val resetResponse = userRepository.resetPassword(email!!)
+        val resetResponse = userRepository.resetPassword(email)
         authListener?.onAuthSuccess(resetResponse)
     }
 
@@ -61,7 +56,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         authListener?.onAuthSuccess(googleResponse)
     }
 
-    fun onSignupButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun onSignupButtonClick() {
         authListener?.onAuthStarted()
 
         // check info

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.auth.AuthActivity">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.frafio.myfinance.ui.auth.AuthViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/authParentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/auth_progressIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="invisible"
+            app:hideAnimationBehavior="outward"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:showAnimationBehavior="inward"
+            app:trackThickness="4dp"
+            app:waveAmplitude="3dp"
+            app:wavelength="40dp" />
+
+        <ScrollView
+            android:id="@+id/auth_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toTopOf="@id/auth_divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.2" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/authTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="casual"
+                    android:text="@string/app_name"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="45sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/guideline" />
+
+                <LinearLayout
+                    android:id="@+id/authInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="30dp"
+                    android:layout_marginTop="20dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/authTextView">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/auth_fullNameInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/signup_name"
+                        android:visibility="gone"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
+                        app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
+                        app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
+                        app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
+                        app:endIconMode="clear_text"
+                        app:startIconDrawable="@drawable/ic_person_filled"
+                        tools:visibility="visible">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/auth_fullNameInputText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:inputType="textPersonName|textCapWords"
+                            android:text="@={viewModel.fullName}" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/auth_emailInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/login_signup_email"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
+                        app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
+                        app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
+                        app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
+                        app:endIconMode="clear_text"
+                        app:startIconDrawable="@drawable/ic_mail_filled">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/auth_emailInputText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:inputType="textEmailAddress"
+                            android:text="@={viewModel.email}" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/auth_passwordInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/login_password"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
+                        app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
+                        app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
+                        app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
+                        app:endIconMode="password_toggle"
+                        app:startIconDrawable="@drawable/ic_password_filled">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/auth_passwordInputText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:inputType="textPassword"
+                            android:text="@={viewModel.password}" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/auth_confirmPasswordInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/signup_password_confirm"
+                        android:visibility="gone"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusBottomEnd="@dimen/field_corner_radius"
+                        app:boxCornerRadiusBottomStart="@dimen/field_corner_radius"
+                        app:boxCornerRadiusTopEnd="@dimen/field_corner_radius"
+                        app:boxCornerRadiusTopStart="@dimen/field_corner_radius"
+                        app:endIconMode="password_toggle"
+                        app:startIconDrawable="@drawable/ic_password_2_filled"
+                        tools:visibility="visible">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/auth_confirmPasswordInputText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nunito"
+                            android:inputType="textPassword"
+                            android:text="@={viewModel.passwordConfirm}" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/authButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/nunito_semibold"
+                        android:text="@string/login"
+                        app:cornerRadius="@dimen/field_corner_radius"
+                        app:icon="@drawable/ic_login_filled" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/auth_resetPassTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:fontFamily="@font/nunito"
+                        android:onClick="onResetButtonClick"
+                        android:padding="5dp"
+                        android:text="@string/forgotten_password" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/googleButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="20dp"
+                        android:backgroundTint="@color/white"
+                        android:elevation="@dimen/card_elevation"
+                        android:fontFamily="@font/nunito_bold"
+                        android:onClick="onGoogleButtonClick"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="@string/login_google"
+                        android:textAllCaps="false"
+                        android:textColor="@color/quantum_grey_600"
+                        app:cornerRadius="@dimen/field_corner_radius"
+                        app:icon="@drawable/ic_google"
+                        app:iconSize="24dp"
+                        app:iconTint="@null" />
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </ScrollView>
+
+        <ImageView
+            android:id="@+id/auth_back_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/arrow_margin_start"
+            android:layout_marginTop="21dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/back_arrow"
+            android:padding="@dimen/arrow_padding"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_arrow_back_filled"
+            tools:visibility="visible" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/auth_divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@id/authSwitchTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/auth_layout"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/authSwitchTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:fontFamily="@font/nunito"
+            android:padding="5dp"
+            android:text="@string/login_signup"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -11,6 +11,7 @@
     <string name="delete">Elimina</string>
     <string name="cancel">Annulla</string>
     <string name="confirm">Conferma</string>
+    <string name="send">Invia</string>
 
     <string name="login_successful">Hai effettuato l\'accesso come</string>
 
@@ -20,16 +21,20 @@
     <string name="category">Categoria</string>
 
     <string name="login_signup_email">Inserisci la tua email</string>
-    <string name="login_password">Inserisci la password</string>
+    <string name="login_password">Inserisci la tua password</string>
     <string name="login">Accedi</string>
-    <string name="forgotten_password">Hai dimenticato la password?</string>
+    <string name="forgotten_password">Hai dimenticato la password? Clicca qui</string>
     <string name="login_google">Accedi con Google</string>
     <string name="login_signup">Non hai un account? Iscriviti</string>
-    <string name="signup_name">Inserisci nome e cognome</string>
-    <string name="signup_password">Inserisci la password</string>
-    <string name="signup_password_confirm">Inserisci nuovamente la password</string>
+    <string name="signup_name">Inserisci il tuo nome e cognome</string>
+    <string name="signup_password">Crea una password</string>
+    <string name="signup_password_confirm">Conferma la tua password</string>
     <string name="signup">Registrati</string>
     <string name="signup_login">Hai già un account? Accedi</string>
+    <string name="auth_or">oppure</string>
+    <string name="reset">Reimposta</string>
+    <string name="password">Password</string>
+
     <string name="warning_home">Aggiungi la tua prima spesa!</string>
     <string name="warning_budget">Nessuna entrata da mostrare</string>
 
@@ -51,9 +56,9 @@
 
     <string name="change_content">Scambia contenuto</string>
 
-    <string name="edit_profile">Modifica il profilo</string>
-    <string name="edit_propic">Carica la foto profilo</string>
-    <string name="edit_full_name">Modifica il nome</string>
+    <string name="edit_profile">Modifica il tuo profilo</string>
+    <string name="edit_propic">Carica la tua foto profilo</string>
+    <string name="edit_full_name">Modifica il tuo nome</string>
     <string name="expense_category_icon">Icona di categoria spesa</string>
     <string name="no_expenses">Nessuna spesa</string>
     <string name="no_incomes">Nessuna entrata</string>
