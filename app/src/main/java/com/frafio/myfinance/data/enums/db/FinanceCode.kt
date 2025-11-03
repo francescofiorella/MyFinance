@@ -5,41 +5,41 @@ import com.frafio.myfinance.utils.getCurrentLanguage
 enum class FinanceCode(val code: Int, val message: String) {
     EMPTY_NAME(
         1, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Enter the name."
-            Languages.ITALIANO.value -> "Inserisci il nome."
-            else -> "Enter the name." // english
+            Languages.ENGLISH.value -> "Enter the name"
+            Languages.ITALIANO.value -> "Inserisci il nome"
+            else -> "Enter the name" // english
         }
     ),
 
     WRONG_NAME_TOTAL(
         2, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "The name can't be 'Total'."
-            Languages.ITALIANO.value -> "Il nome non può essere 'Totale'."
-            else -> "The name can't be 'Total'." // english
+            Languages.ENGLISH.value -> "The name can't be 'Total'"
+            Languages.ITALIANO.value -> "Il nome non può essere 'Totale'"
+            else -> "The name can't be 'Total'" // english
         }
     ),
 
     EMPTY_AMOUNT(
         3, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Enter the amount."
-            Languages.ITALIANO.value -> "Inserisci l'importo."
-            else -> "Enter the amount." // english
+            Languages.ENGLISH.value -> "Enter the amount"
+            Languages.ITALIANO.value -> "Inserisci l'importo"
+            else -> "Enter the amount" // english
         }
     ),
 
     WRONG_AMOUNT(
         4, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "The amount can't be zero."
-            Languages.ITALIANO.value -> "L'importo non può essere zero."
-            else -> "The amount can't be zero." // english
+            Languages.ENGLISH.value -> "The amount can't be zero"
+            Languages.ITALIANO.value -> "L'importo non può essere zero"
+            else -> "The amount can't be zero" // english
         }
     ),
 
     EMPTY_CATEGORY(
         5, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Enter the category."
-            Languages.ITALIANO.value -> "Inserisci la categoria."
-            else -> "Enter the category." // english
+            Languages.ENGLISH.value -> "Enter the category"
+            Languages.ITALIANO.value -> "Inserisci la categoria"
+            else -> "Enter the category" // english
         }
     ),
 

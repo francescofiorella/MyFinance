@@ -48,7 +48,7 @@
     <string name="profile_picture">Immagine di profilo</string>
 
     <string name="use_dynamic_color">Colori dinamici</string>
-    <string name="restart_app_changes">Riavvia l\'app per applicare le modifiche.</string>
+    <string name="restart_app_changes">Riavvia l\'app per applicare le modifiche</string>
     <string name="restart">Riavvia</string>
 
     <string name="sign_up_provider">Registrato con Google</string>

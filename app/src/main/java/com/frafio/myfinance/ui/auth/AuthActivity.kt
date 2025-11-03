@@ -17,13 +17,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
-import androidx.transition.AutoTransition
-import androidx.transition.TransitionManager
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.databinding.ActivityAuthBinding
 import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.utils.animateRoot
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
@@ -239,7 +238,7 @@ class AuthActivity : AppCompatActivity(), AuthListener {
         }
 
         viewModel.isSigningUp = true
-        TransitionManager.beginDelayedTransition(binding.authParentLayout, AutoTransition())
+        binding.authParentLayout.animateRoot()
 
         binding.authSwitchTextView.setOnClickListener { prepareLoginLayout() }
         binding.authButton.setOnClickListener { viewModel.onSignupButtonClick() }
@@ -269,7 +268,7 @@ class AuthActivity : AppCompatActivity(), AuthListener {
         }
 
         viewModel.isSigningUp = false
-        TransitionManager.beginDelayedTransition(binding.authParentLayout, AutoTransition())
+        binding.authParentLayout.animateRoot()
 
         binding.authSwitchTextView.setOnClickListener { prepareSignUpLayout() }
         binding.authButton.setOnClickListener { viewModel.onLoginButtonClick() }
@@ -366,7 +365,7 @@ class AuthActivity : AppCompatActivity(), AuthListener {
             AuthCode.SHORT_PASSWORD.code ->
                 binding.authPasswordInputLayout.error = authResult.message
 
-            AuthCode.EMPTY_PASSWORD_CONFIRM.code,
+            AuthCode.EMPTY_CONFIRM_PASSWORD.code,
             AuthCode.PASSWORD_NOT_MATCH.code ->
                 binding.authConfirmPasswordInputLayout.error = authResult.message
 

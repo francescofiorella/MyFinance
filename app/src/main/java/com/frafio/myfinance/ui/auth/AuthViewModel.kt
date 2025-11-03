@@ -24,20 +24,23 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     fun onLoginButtonClick() {
         authListener?.onAuthStarted()
 
+        var hasError = false
         if (email.isNullOrEmpty()) {
             authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_EMAIL))
-            return
+            hasError = true
         }
 
         if (password.isNullOrEmpty()) {
             authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_PASSWORD))
-            return
+            hasError = true
         }
 
-        if (password!!.length < 8) {
+        if (!password.isNullOrEmpty() && password!!.length < 8) {
             authListener?.onAuthFailure(AuthResult(AuthCode.SHORT_PASSWORD))
-            return
+            hasError = true
         }
+
+        if (hasError) return
 
         val loginResponse = userRepository.userLogin(email!!, password!!)
         authListener?.onAuthSuccess(loginResponse)
@@ -60,35 +63,34 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         authListener?.onAuthStarted()
 
         // check info
+        var hasError = false
         if (fullName.isNullOrEmpty()) {
             authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_NAME))
-            return
+            hasError = true
         }
 
         if (email.isNullOrEmpty()) {
             authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_EMAIL))
-            return
+            hasError = true
         }
 
         if (password.isNullOrEmpty()) {
             authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_PASSWORD))
-            return
-        }
-
-        if (password!!.length < 8) {
+            hasError = true
+        } else if (password!!.length < 8) {
             authListener?.onAuthFailure(AuthResult(AuthCode.SHORT_PASSWORD))
-            return
+            hasError = true
         }
 
         if (passwordConfirm.isNullOrEmpty()) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_PASSWORD_CONFIRM))
-            return
+            authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_CONFIRM_PASSWORD))
+            hasError = true
+        } else if (!password.isNullOrEmpty() && passwordConfirm != password) {
+            authListener?.onAuthFailure(AuthResult(AuthCode.PASSWORD_NOT_MATCH))
+            hasError = true
         }
 
-        if (passwordConfirm != password) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.PASSWORD_NOT_MATCH))
-            return
-        }
+        if (hasError) return
 
         val signupResponse = userRepository.userSignup(fullName!!, email!!, password!!)
         authListener?.onAuthSuccess(signupResponse)

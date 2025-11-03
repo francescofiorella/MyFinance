@@ -31,6 +31,8 @@ class DashboardFragment : BaseFragment() {
     private lateinit var monthlyBarChart: BarChart
     private lateinit var budgetProgressBar: ProgressBar
 
+    private var pieChartAnimationPlayed = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -189,7 +191,6 @@ class DashboardFragment : BaseFragment() {
         pieChartLiveData.addSource(expensesOfMonthOrYearLiveData) { value ->
             pieChartLiveData.value = value
         }
-        var animationPlayed = false
         pieChartLiveData.observe(viewLifecycleOwner) { expenses ->
             // Create a LocalDate with the given month
             val formatter = DateTimeFormatter.ofPattern(
@@ -210,10 +211,10 @@ class DashboardFragment : BaseFragment() {
                     isEmpty = values.sum() == 0.0,
                     chartBarWidth = if (resources.getBoolean(R.bool.isLandscape)) 12.dp else 10.dp,
                     chartEntryOffset = if (resources.getBoolean(R.bool.isLandscape)) 11 else 9,
-                    animate = !animationPlayed
+                    animate = !pieChartAnimationPlayed
                 )
             }
-            animationPlayed = true
+            pieChartAnimationPlayed = true
         }
         viewModel.pieChartDate.observe(viewLifecycleOwner) {
             // this trigger the observer
@@ -232,10 +233,12 @@ class DashboardFragment : BaseFragment() {
             val checkedId = checkedIds[0]
             when (checkedId) {
                 R.id.monthly_chip -> {
+                    pieChartAnimationPlayed = false
                     viewModel.switchPieChartData(true)
                 }
 
                 R.id.annual_chip -> {
+                    pieChartAnimationPlayed = false
                     viewModel.switchPieChartData(false)
                 }
             }
@@ -250,10 +253,12 @@ class DashboardFragment : BaseFragment() {
         }
 
         binding.pieChartPreviousBtn.setOnClickListener {
+            pieChartAnimationPlayed = false
             viewModel.previousPieChartDate()
         }
 
         binding.pieChartNextBtn.setOnClickListener {
+            pieChartAnimationPlayed = false
             viewModel.nextPieChartDate()
         }
 

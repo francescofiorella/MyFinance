@@ -5,17 +5,17 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.transition.AutoTransition
-import android.transition.TransitionManager
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.core.content.res.ResourcesCompat
-import com.frafio.myfinance.R
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.createBitmap
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
+import com.frafio.myfinance.R
 
 fun View.instantShow() {
     visibility = View.VISIBLE
@@ -29,9 +29,9 @@ fun TextView.clearText() {
     text = ""
 }
 
-fun ViewGroup.animateRoot(duration: Long = 100) {
+fun ViewGroup.animateRoot(duration: Long? = 200) {
     val transition = AutoTransition()
-    transition.duration = duration
+    duration?.let { transition.duration = it }
     TransitionManager.beginDelayedTransition(this, transition)
 }
 

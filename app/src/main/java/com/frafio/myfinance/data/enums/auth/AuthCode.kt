@@ -6,49 +6,49 @@ import com.frafio.myfinance.utils.getCurrentLanguage
 enum class AuthCode(val code: Int, val message: String) {
     LOGIN_SUCCESS(
         1, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Log in successful!"
+            Languages.ENGLISH.value -> "Login successful!"
             Languages.ITALIANO.value -> "Accesso avvenuto con successo!"
-            else -> "Log in successful!" // english
+            else -> "Login successful!" // english
         }
     ),
 
     GOOGLE_LOGIN_FAILURE(
         2, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Google log in failed!"
+            Languages.ENGLISH.value -> "Google login failed!"
             Languages.ITALIANO.value -> "Accesso con Google fallito!"
-            else -> "Google log in failed!" // english
+            else -> "Google login failed!" // english
         }
     ),
 
     LOGIN_FAILURE(
         3, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Log in failed!"
+            Languages.ENGLISH.value -> "Login failed!"
             Languages.ITALIANO.value -> "Accesso fallito!"
-            else -> "Log in failed!" // english
+            else -> "Login failed!" // english
         }
     ),
 
     INVALID_EMAIL(
         4, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Invalid email."
-            Languages.ITALIANO.value -> "L'email inserita non è valida."
-            else -> "Invalid email." // english
+            Languages.ENGLISH.value -> "The entered email is not valid"
+            Languages.ITALIANO.value -> "L'email inserita non è valida"
+            else -> "The entered email is not valid" // english
         }
     ),
 
     WRONG_PASSWORD(
         5, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Wrong password."
-            Languages.ITALIANO.value -> "La password inserita non è corretta."
-            else -> "Wrong password." // english
+            Languages.ENGLISH.value -> "The entered password is incorrect"
+            Languages.ITALIANO.value -> "La password inserita non è corretta"
+            else -> "The entered password is incorrect" // english
         }
     ),
 
     USER_NOT_FOUND(
         6, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "The email does not correspond to any account."
-            Languages.ITALIANO.value -> "L'email inserita non ha un account associato."
-            else -> "The email does not correspond to any account." // english
+            Languages.ENGLISH.value -> "The entered email does not have an associated account"
+            Languages.ITALIANO.value -> "L'email inserita non ha un account associato"
+            else -> "The entered email does not have an associated account" // english
         }
     ),
 
@@ -62,65 +62,65 @@ enum class AuthCode(val code: Int, val message: String) {
 
     SIGNUP_SUCCESS(
         10, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Sign up successful!"
+            Languages.ENGLISH.value -> "Signup successful!"
             Languages.ITALIANO.value -> "Registrazione avvenuta con successo!"
-            else -> "Sign up successful!" // english
+            else -> "Signup successful!" // english
         }
     ),
 
     WEAK_PASSWORD(
         11, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Weak password."
-            Languages.ITALIANO.value -> "La password inserita non è sicura."
-            else -> "Weak password." // english
+            Languages.ENGLISH.value -> "The entered password is not secure"
+            Languages.ITALIANO.value -> "La password inserita non è sicura"
+            else -> "The entered password is not secure" // english
         }
     ),
 
     EMAIL_NOT_WELL_FORMED(
         12, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Email not well formed."
-            Languages.ITALIANO.value -> "L'email inserita non è ben formata."
-            else -> "Email not well formed." // english
+            Languages.ENGLISH.value -> "The entered email is not well formed"
+            Languages.ITALIANO.value -> "L'email inserita non è ben formata"
+            else -> "The entered email is not well formed" // english
         }
     ),
 
     EMAIL_ALREADY_ASSOCIATED(
         13, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "The email already has an associated account."
-            Languages.ITALIANO.value -> "L'email inserita ha già un account associato."
-            else -> "The email already has an associated account." // english
+            Languages.ENGLISH.value -> "The entered email already has an associated account"
+            Languages.ITALIANO.value -> "L'email inserita ha già un account associato"
+            else -> "The entered email already has an associated account" // english
         }
     ),
 
     SIGNUP_PROFILE_NOT_UPDATED(
         14, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Sign up failed! Contact the administrator."
-            Languages.ITALIANO.value -> "Registrazione non avvenuta correttamente! Contatta l'amministratore."
-            else -> "Sign up failed! Contact the administrator." // english
+            Languages.ENGLISH.value -> "Signup failed! Please contact the administrator"
+            Languages.ITALIANO.value -> "Registrazione non avvenuta correttamente! Per favore contatta l'amministratore"
+            else -> "Signup failed! Please contact the administrator" // english
         }
     ),
 
     SIGNUP_FAILURE(
         15, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Sign up failed!"
+            Languages.ENGLISH.value -> "Signup failed!"
             Languages.ITALIANO.value -> "Registrazione fallita!"
-            else -> "Sign up failed!" // english
+            else -> "Signup failed!" // english
         }
     ),
 
     EMPTY_EMAIL(
         20, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Enter your email."
-            Languages.ITALIANO.value -> "Inserisci la tua email."
-            else -> "Enter your email." // english
+            Languages.ENGLISH.value -> "Enter your email"
+            Languages.ITALIANO.value -> "Inserisci la tua email"
+            else -> "Enter your email" // english
         }
     ),
 
     EMPTY_PASSWORD(
         21, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Enter the password."
-            Languages.ITALIANO.value -> "Inserisci la password."
-            else -> "Enter the password." // english
+            Languages.ENGLISH.value -> "Enter your password"
+            Languages.ITALIANO.value -> "Inserisci la tua password"
+            else -> "Enter your password" // english
         }
     ),
 
@@ -134,49 +134,49 @@ enum class AuthCode(val code: Int, val message: String) {
 
     EMPTY_NAME(
         23, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Enter your first and last name."
-            Languages.ITALIANO.value -> "Inserisci nome e cognome."
-            else -> "Enter your first and last name." // english
+            Languages.ENGLISH.value -> "Enter your full name"
+            Languages.ITALIANO.value -> "Inserisci il tuo nome e cognome"
+            else -> "Enter your full name" // english
         }
     ),
 
-    EMPTY_PASSWORD_CONFIRM(
+    EMPTY_CONFIRM_PASSWORD(
         24, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Confirm the password."
-            Languages.ITALIANO.value -> "Inserisci nuovamente la password."
-            else -> "Confirm the password." // english
+            Languages.ENGLISH.value -> "Confirm your password"
+            Languages.ITALIANO.value -> "Conferma la tua password"
+            else -> "Confirm your password" // english
         }
     ),
 
     PASSWORD_NOT_MATCH(
         25, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Passwords do not match!"
+            Languages.ENGLISH.value -> "The entered passwords do not match!"
             Languages.ITALIANO.value -> "Le password inserite non corrispondono!"
-            else -> "Passwords do not match!" // english
+            else -> "The entered passwords do not match!" // english
         }
     ),
 
     EMAIL_SENT(
         30, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Email sent. Check your mail!"
-            Languages.ITALIANO.value -> "Email inviata. Controlla la tua posta!"
-            else -> "Email sent. Check your mail!" // english
+            Languages.ENGLISH.value -> "Email sent. Check your email box!"
+            Languages.ITALIANO.value -> "Email inviata. Controlla la tua casella di posta!"
+            else -> "Email sent. Check your email box!" // english
         }
     ),
 
     EMAIL_NOT_SENT_TOO_MANY_REQUESTS(
         31, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Email not sent! Too many requests have been made."
-            Languages.ITALIANO.value -> "Email non inviata! Sono state effettuate troppe richieste."
-            else -> "Email not sent! Too many requests have been made." // english
+            Languages.ENGLISH.value -> "Email not sent! Too many requests have been made"
+            Languages.ITALIANO.value -> "Email non inviata! Sono state effettuate troppe richieste"
+            else -> "Email not sent! Too many requests have been made" // english
         }
     ),
 
     EMAIL_NOT_SENT(
         32, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "Error! Email not sent."
-            Languages.ITALIANO.value -> "Errore! Email non inviata."
-            else -> "Error! Email not sent." // english
+            Languages.ENGLISH.value -> "Error! Email not sent"
+            Languages.ITALIANO.value -> "Errore! Email non inviata"
+            else -> "Error! Email not sent" // english
         }
     ),
 

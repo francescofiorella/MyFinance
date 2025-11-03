@@ -28,6 +28,7 @@ import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
 import com.google.android.material.sidesheet.SideSheetDialog
 
 class AddActivity : AppCompatActivity(), AddListener {
@@ -176,7 +177,6 @@ class AddActivity : AppCompatActivity(), AddListener {
             }
 
             REQUEST_EDIT_CODE -> {
-                binding.chipGroup.visibility = View.GONE
                 intent.apply {
                     getIntExtra(EXPENSE_REQUEST_KEY, -1).also {
                         viewModel.expenseCode = it
@@ -208,6 +208,10 @@ class AddActivity : AppCompatActivity(), AddListener {
                 }
 
                 if (viewModel.expenseCode == REQUEST_EXPENSE_CODE) {
+                    binding.chipGroup.apply {
+                        check(R.id.expense_chip)
+                        binding.chipGroup.findViewById<Chip>(R.id.income_chip).isEnabled = false
+                    }
                     val categories = resources.getStringArray(R.array.categories)
                     if (viewModel.category != null && viewModel.category!! >= 0 && viewModel.category!! < categories.size) {
                         binding.categoryET.setText(categories[viewModel.category!!])
@@ -227,6 +231,10 @@ class AddActivity : AppCompatActivity(), AddListener {
                         )
                     }
                 } else {
+                    binding.chipGroup.apply {
+                        check(R.id.income_chip)
+                        binding.chipGroup.findViewById<Chip>(R.id.expense_chip).isEnabled = false
+                    }
                     binding.divider3.visibility = View.GONE
                     binding.categoryTIL.visibility = View.GONE
                 }

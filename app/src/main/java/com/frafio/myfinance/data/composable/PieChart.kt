@@ -38,6 +38,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,6 +48,15 @@ import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+
+@Preview(showBackground = true)
+@Composable
+fun PieChartPreview() {
+    PieChart(
+        data = listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
+        isEmpty = false
+    )
+}
 
 @Composable
 fun PieChart(
@@ -154,11 +164,9 @@ fun PieChart(
 
     var animationPlayed by remember { mutableStateOf(!animate) }
 
-    var lastValue = 0f
-    // if you want to stabilize the Pie Chart you can use value -90f
-    // 90f is used to complete 1/4 of the rotation
+    var lastValue = -135f
     val animateRotation by animateFloatAsState(
-        targetValue = if (animationPlayed) 90f * 11f else 0f,
+        targetValue = if (animationPlayed) 45f else 0f,
         animationSpec = tween(
             durationMillis = animDuration,
             delayMillis = 0,
@@ -203,7 +211,7 @@ fun PieChart(
                                 val clickedAngle = calculateAngle(offset, center)
                                 // You can determine which arc is clicked based on this angle
                                 // Check which arc was clicked and get the index
-                                val clickedArcIndex = isArcClicked(clickedAngle, angles)
+                                val clickedArcIndex = isArcClicked(clickedAngle + 135f, angles)
 
                                 // Perform an action based on the clicked arc
                                 clickedArcIndex?.let { i ->
@@ -272,14 +280,14 @@ fun PieChart(
                         )
                         // Draw the icons
                         rotate(
-                            degrees = 90F,
+                            degrees = -45F,
                             pivot = Offset(
-                                topLeft.x + paddingSize.toPx() + innerIconSize.toPx(),
-                                topLeft.y + paddingSize.toPx()
+                                topLeft.x + iconSizes[index].toPx() / 2 ,
+                                topLeft.y + iconSizes[index].toPx() / 2
                             )
                         ) {
                             translate(
-                                left = topLeft.x + paddingSize.toPx() + innerIconSize.toPx(),
+                                left = topLeft.x + paddingSize.toPx(),
                                 top = topLeft.y + paddingSize.toPx()
                             ) {
                                 with(painters[index]) {

@@ -52,32 +52,33 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
         listener?.onAddStart()
 
         // check info
+        var hasError = false
         if (name.isNullOrEmpty()) {
             listener?.onAddFailure(FinanceResult(FinanceCode.EMPTY_NAME))
-            return
-        }
-
-        if ((name == FirestoreEnums.NAMES.TOTAL.valueEn || name == FirestoreEnums.NAMES.TOTAL.valueIt)) {
+            hasError = true
+        } else if (name == FirestoreEnums.NAMES.TOTAL.valueEn || name == FirestoreEnums.NAMES.TOTAL.valueIt) {
             listener?.onAddFailure(FinanceResult(FinanceCode.WRONG_NAME_TOTAL))
-            return
+            hasError = true
         }
 
         if (priceString.isNullOrEmpty()) {
             listener?.onAddFailure(FinanceResult(FinanceCode.EMPTY_AMOUNT))
-            return
-        }
-        val price = priceString!!.toDouble()
-        if (price == 0.0) {
+            hasError = true
+        } else if (priceString!!.toDouble() == 0.0) {
             listener?.onAddFailure(FinanceResult(FinanceCode.WRONG_AMOUNT))
-            return
+            hasError = true
         }
 
         if (expenseCode == AddActivity.REQUEST_INCOME_CODE) {
             category = FirestoreEnums.CATEGORIES.INCOME.value
         } else if (category == -1) {
             listener?.onAddFailure(FinanceResult(FinanceCode.EMPTY_CATEGORY))
-            return
+            hasError = true
         }
+
+        if (hasError) return
+
+        val price = priceString!!.toDouble()
 
         when (requestCode) {
             AddActivity.REQUEST_ADD_CODE -> {
