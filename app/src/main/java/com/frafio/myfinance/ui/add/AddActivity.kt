@@ -23,6 +23,7 @@ import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.widget.DatePickerButton
 import com.frafio.myfinance.databinding.ActivityAddBinding
+import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.frafio.myfinance.utils.snackBar
@@ -162,12 +163,20 @@ class AddActivity : AppCompatActivity(), AddListener {
                     val checkedId = checkedIds[0]
                     when (checkedId) {
                         R.id.expense_chip -> {
+                            if (viewModel.expenseCode == REQUEST_INCOME_CODE) {
+                                binding.categoryTIL.setStartIconDrawable(R.drawable.ic_grid_3x3_filled)
+                                binding.categoryET.clearText()
+                            }
                             viewModel.expenseCode = REQUEST_EXPENSE_CODE
                             binding.categoryTIL.visibility = View.VISIBLE
                             binding.divider3.visibility = View.VISIBLE
                         }
 
                         R.id.income_chip -> {
+                            if (viewModel.expenseCode == REQUEST_EXPENSE_CODE) {
+                                binding.categoryTIL.setStartIconDrawable(R.drawable.ic_grid_3x3_filled)
+                                binding.categoryET.clearText()
+                            }
                             viewModel.expenseCode = REQUEST_INCOME_CODE
                             binding.categoryTIL.visibility = View.GONE
                             binding.divider3.visibility = View.GONE

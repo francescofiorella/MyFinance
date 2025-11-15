@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.activity.addCallback
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -50,6 +50,8 @@ class AuthActivity : AppCompatActivity(), AuthListener {
 
     // login Google
     private lateinit var mGoogleSignInClient: GoogleSignInClient
+
+    private var backPressedCallback: OnBackPressedCallback? = null
 
     private val googleSignInResultLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
@@ -252,12 +254,15 @@ class AuthActivity : AppCompatActivity(), AuthListener {
         binding.authResetPassTextView.isClickable = false
         binding.authSwitchTextView.text = getString(R.string.signup_login)
 
-
         if (!onBackPressedDispatcher.hasEnabledCallbacks()) {
-            onBackPressedDispatcher.addCallback {
-                prepareLoginLayout()
-                isEnabled = false
+            if (backPressedCallback == null) {
+                backPressedCallback = object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        prepareLoginLayout()
+                    }
+                }
             }
+            onBackPressedDispatcher.addCallback(backPressedCallback!!)
         }
     }
 
@@ -265,6 +270,10 @@ class AuthActivity : AppCompatActivity(), AuthListener {
         if (clearInputs) {
             clearErrors()
             clearInputs()
+        }
+
+        if (onBackPressedDispatcher.hasEnabledCallbacks()) {
+            backPressedCallback?.remove()
         }
 
         viewModel.isSigningUp = false
