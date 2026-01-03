@@ -9,7 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MediatorLiveData
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.composable.PieChart
+import com.frafio.myfinance.ui.composable.components.PieChart
 import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.storage.MyFinanceStorage

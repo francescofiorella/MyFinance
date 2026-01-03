@@ -21,7 +21,7 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
             prevDate = total!!.getLocalDate()
         }
 
-        if ((prevDate == null || prevDate!!.isAfter(todayDate)) &&
+        if ((prevDate == null || prevDate.isAfter(todayDate)) &&
             expenseDate.isBefore(todayDate)
         ) {
             if (currentExpenses.isNotEmpty()) {
@@ -42,7 +42,7 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
                 id = totId
             )
-            expenseList.add(total!!)
+            expenseList.add(total)
             // Add empty expense (with random name, jolly category, and price to 0.0)
             total = Expense(
                 name = "",
@@ -53,8 +53,8 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
                 category = FirestoreEnums.CATEGORIES.JOLLY.value,
                 id = totId
             )
-            expenseList.add(total!!)
-            prevDate = total!!.getLocalDate()
+            expenseList.add(total)
+            prevDate = total.getLocalDate()
         }
 
         if (prevDate == null) { // If is the first total
@@ -72,17 +72,17 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
             currentExpenses.add(expense)
             total = Expense(
                 name = FirestoreEnums.NAMES.TOTAL.value,
-                price = total!!.price!! + expense.price!!,
-                year = total!!.year,
-                month = total!!.month,
-                day = total!!.day,
+                price = total.price!! + expense.price!!,
+                year = total.year,
+                month = total.month,
+                day = total.day,
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = total!!.getTotalId()
+                id = total.getTotalId()
             )
         } else { // If we need a new total
             // Update the local list with previous day expenses
             if (currentExpenses.isNotEmpty()) {
-                expenseList.add(total!!)
+                expenseList.add(total)
                 currentExpenses.forEach { p ->
                     expenseList.add(p)
                 }
@@ -173,32 +173,32 @@ fun addTotalsToExpensesWithoutToday(expenses: List<Expense>): List<Expense> {
 fun addTotalsToIncomes(incomes: List<Income>): List<Income> {
     val incomeList = mutableListOf<Income>()
 
-    val todayYear = LocalDate.now().year
+    val todayDate = LocalDate.now()
     var total = Income(
         name = FirestoreEnums.NAMES.TOTAL.value,
         price = 0.0,
-        year = todayYear,
+        year = todayDate.year,
         month = 0,
         day = 0,
         category = FirestoreEnums.CATEGORIES.TOTAL.value,
-        id = todayYear.toString()
+        id = todayDate.year.toString()
     )
     var currentIncomes = mutableListOf<Income>()
 
     var isFirstIncome = true
     incomes.forEach { income ->
-        if (isFirstIncome && todayYear > income.year!!) {
+        if (isFirstIncome && todayDate.year > income.year!!) {
             // Inserisci totale a 0.0 per oggi
             incomeList.add(total)
             // Add empty income (with random name, jolly category, and price to 0.0)
             total = Income(
                 name = "",
                 price = 0.0,
-                year = todayYear,
-                month = 0,
-                day = 0,
+                year = todayDate.year,
+                month = todayDate.monthValue,
+                day = todayDate.dayOfMonth,
                 category = FirestoreEnums.CATEGORIES.JOLLY.value,
-                id = todayYear.toString()
+                id = todayDate.year.toString()
             )
             incomeList.add(total)
             total = Income(
@@ -210,7 +210,7 @@ fun addTotalsToIncomes(incomes: List<Income>): List<Income> {
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
                 id = income.year.toString()
             )
-        } else if (isFirstIncome && income.year!! > todayYear) {
+        } else if (isFirstIncome && income.year!! > todayDate.year) {
             total = Income(
                 name = FirestoreEnums.NAMES.TOTAL.value,
                 price = 0.0,

@@ -1,4 +1,4 @@
-package com.frafio.myfinance.data.composable
+package com.frafio.myfinance.ui.composable.components
 
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
