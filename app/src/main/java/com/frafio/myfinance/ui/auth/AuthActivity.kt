@@ -3,20 +3,25 @@ package com.frafio.myfinance.ui.auth
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.AuthResult
@@ -27,17 +32,17 @@ import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.snackBar
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.launch
 
 class AuthActivity : AppCompatActivity(), AuthListener {
 
     companion object {
+        private val TAG = AuthActivity::class.java.simpleName
         const val INTENT_USER_REQUEST: String = "com.frafio.myfinance.USER_REQUEST"
         const val INTENT_USER_NAME: String = "com.frafio.myfinance.USER_NAME"
     }
@@ -48,16 +53,7 @@ class AuthActivity : AppCompatActivity(), AuthListener {
     // viewModel
     private val viewModel by viewModels<AuthViewModel>()
 
-    // login Google
-    private lateinit var mGoogleSignInClient: GoogleSignInClient
-
     private var backPressedCallback: OnBackPressedCallback? = null
-
-    private val googleSignInResultLauncher =
-        registerForActivityResult(StartActivityForResult()) { result ->
-            val data: Intent? = result.data
-            viewModel.onGoogleRequest(data)
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,6 +109,8 @@ class AuthActivity : AppCompatActivity(), AuthListener {
                 prepareLoginLayout(false)
             }
         }
+
+        viewModel.credentialManager = CredentialManager.create(baseContext)
     }
 
     fun onResetButtonClick(view: View) {
@@ -172,8 +170,7 @@ class AuthActivity : AppCompatActivity(), AuthListener {
             }
         }
         sendButton.setOnClickListener {
-            binding.googleButton.isEnabled = false
-            binding.authButton.isEnabled = false
+            onAuthStarted()
 
             clearErrors()
             emailInputLayout.isErrorEnabled = false
@@ -210,27 +207,38 @@ class AuthActivity : AppCompatActivity(), AuthListener {
     fun onGoogleButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         binding.authProgressIndicator.show()
 
-        binding.googleButton.isEnabled = false
-        binding.authButton.isEnabled = false
+        onAuthStarted()
 
-        mGoogleSignInClient = getGoogleClient()
-
-        // SignIn Intent
-        mGoogleSignInClient.signInIntent.also {
-            googleSignInResultLauncher.launch(it)
-        }
-
-    }
-
-    private fun getGoogleClient(): GoogleSignInClient {
-        // Create request
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
+        // Instantiate a Google sign-in request
+        val googleIdOption = GetGoogleIdOption.Builder()
+            // Your server's client ID
+            .setServerClientId(getString(R.string.default_web_client_id))
+            // Only show accounts previously used to sign in
+            .setFilterByAuthorizedAccounts(true)
             .build()
 
-        // Build a GoogleSignInClient with the options specified by gso.
-        return GoogleSignIn.getClient(this, gso)
+        // Create the Credential Manager request
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        lifecycleScope.launch {
+            try {
+                // Launch Credential Manager UI
+                val result = viewModel.credentialManager!!.getCredential(
+                    context = baseContext,
+                    request = request
+                )
+
+                // Extract credential from the result returned by Credential Manager
+                viewModel.onGoogleRequest(result.credential)
+            } catch (e: GetCredentialException) {
+                val result = MutableLiveData<AuthResult>()
+                result.value = AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
+                onAuthSuccess(result)
+                Log.e(TAG, "Couldn't retrieve user's credentials: ${e.localizedMessage}")
+            }
+        }
     }
 
     fun prepareSignUpLayout(clearInputs: Boolean = true) {
@@ -299,10 +307,10 @@ class AuthActivity : AppCompatActivity(), AuthListener {
         binding.authEmailInputLayout.isEnabled = false
         binding.authPasswordInputLayout.isEnabled = false
         binding.authConfirmPasswordInputLayout.isEnabled = false
-        binding.authResetPassTextView.isEnabled = false
-
-        binding.googleButton.isEnabled = false
         binding.authButton.isEnabled = false
+        binding.authResetPassTextView.isEnabled = false
+        binding.googleButton.isEnabled = false
+        binding.authSwitchTextView.isEnabled = false
 
         clearErrors()
     }
@@ -316,10 +324,10 @@ class AuthActivity : AppCompatActivity(), AuthListener {
                 binding.authEmailInputLayout.isEnabled = true
                 binding.authPasswordInputLayout.isEnabled = true
                 binding.authConfirmPasswordInputLayout.isEnabled = true
-                binding.authResetPassTextView.isEnabled = true
-
-                binding.googleButton.isEnabled = true
                 binding.authButton.isEnabled = true
+                binding.authResetPassTextView.isEnabled = true
+                binding.googleButton.isEnabled = true
+                binding.authSwitchTextView.isEnabled = true
             }
 
             when (authResult.code) {
@@ -344,9 +352,9 @@ class AuthActivity : AppCompatActivity(), AuthListener {
                 AuthCode.LOGIN_FAILURE.code,
                 AuthCode.SIGNUP_PROFILE_NOT_UPDATED.code,
                 AuthCode.SIGNUP_FAILURE.code ->
-                    snackBar(authResult.message)
+                    snackBar(authResult.message, binding.authDivider)
 
-                else -> snackBar(authResult.message)
+                else -> snackBar(authResult.message, binding.authDivider)
             }
         }
     }
@@ -358,10 +366,10 @@ class AuthActivity : AppCompatActivity(), AuthListener {
         binding.authEmailInputLayout.isEnabled = true
         binding.authPasswordInputLayout.isEnabled = true
         binding.authConfirmPasswordInputLayout.isEnabled = true
-        binding.authResetPassTextView.isEnabled = true
-
-        binding.googleButton.isEnabled = true
         binding.authButton.isEnabled = true
+        binding.authResetPassTextView.isEnabled = true
+        binding.googleButton.isEnabled = true
+        binding.authSwitchTextView.isEnabled = true
 
         when (authResult.code) {
             AuthCode.EMPTY_NAME.code ->
@@ -378,7 +386,7 @@ class AuthActivity : AppCompatActivity(), AuthListener {
             AuthCode.PASSWORD_NOT_MATCH.code ->
                 binding.authConfirmPasswordInputLayout.error = authResult.message
 
-            else -> snackBar(authResult.message)
+            else -> snackBar(authResult.message, binding.authDivider)
         }
     }
 

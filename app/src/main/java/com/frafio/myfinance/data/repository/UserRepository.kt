@@ -1,14 +1,23 @@
 package com.frafio.myfinance.data.repository
 
-import android.content.Intent
+import android.util.Log
+import androidx.credentials.Credential
+import androidx.credentials.CustomCredential
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.manager.AuthManager
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.data.model.User
 import com.frafio.myfinance.data.storage.MyFinanceStorage
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 
 class UserRepository(private val authManager: AuthManager) {
+
+    companion object {
+        private val TAG = UserRepository::class.java.simpleName
+    }
 
     fun updateProfile(fullName: String?, propicUri: String?): LiveData<AuthResult> {
         return authManager.updateUserProfile(fullName, propicUri)
@@ -18,8 +27,23 @@ class UserRepository(private val authManager: AuthManager) {
         return authManager.defaultLogin(email, password)
     }
 
-    fun userLogin(data: Intent?): LiveData<AuthResult> {
-        return authManager.googleLogin(data)
+    fun userLogin(credential: Credential): LiveData<AuthResult> {
+        val result: LiveData<AuthResult>
+
+        // Check if credential is of type Google ID
+        if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            // Create Google ID Token
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+
+            // Sign in to Firebase with using the token
+            result = authManager.firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
+        } else {
+            Log.w(TAG, "Credential is not of type Google ID!")
+            result = MutableLiveData<AuthResult>()
+            result.value = AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
+        }
+
+        return result
     }
 
     fun resetPassword(email: String): LiveData<AuthResult> {

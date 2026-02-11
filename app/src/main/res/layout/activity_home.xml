@@ -83,8 +83,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/fragmentTitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/myFinanceTitle"
-                app:srcCompat="@drawable/ic_user"
-                app:srcRound="@{viewModel.getProPic()}" />
+                app:srcCompat="@drawable/ic_user" />
 
             <Button
                 android:id="@+id/logout_btn"

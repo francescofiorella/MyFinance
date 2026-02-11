@@ -90,11 +90,11 @@ class AddActivity : AppCompatActivity(), AddListener {
             initLayout(code)
         }
 
-        binding.priceTIL.findViewById<TextView>(R.id.textinput_error)
+        binding.priceTIL.findViewById<TextView>(com.google.android.material.R.id.textinput_error)
             .setPaddingRelative(errorPadding, 0, 0, 0)
-        binding.dateTIL.findViewById<TextView>(R.id.textinput_error)
+        binding.dateTIL.findViewById<TextView>(com.google.android.material.R.id.textinput_error)
             .setPaddingRelative(errorPadding, 0, 0, 0)
-        binding.categoryTIL.findViewById<TextView>(R.id.textinput_error)
+        binding.categoryTIL.findViewById<TextView>(com.google.android.material.R.id.textinput_error)
             .setPaddingRelative(errorPadding, 0, 0, 0)
 
         binding.priceTIL.setStartIconDrawable(

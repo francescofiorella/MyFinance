@@ -48,8 +48,7 @@
                 app:layout_constraintEnd_toEndOf="@id/right_pic_guide"
                 app:layout_constraintStart_toStartOf="@id/left_pic_guide"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_user"
-                app:srcRound="@{viewModel.user.photoUrl}" />
+                app:srcCompat="@drawable/ic_user" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/profile_username_tv"

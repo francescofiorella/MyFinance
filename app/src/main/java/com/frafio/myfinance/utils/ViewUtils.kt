@@ -8,14 +8,21 @@ import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.AttrRes
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.createBitmap
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.frafio.myfinance.R
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.MaterialShapeDrawable
 
 fun View.instantShow() {
     visibility = View.VISIBLE
@@ -27,6 +34,27 @@ fun View.instantHide() {
 
 fun TextView.clearText() {
     text = ""
+}
+
+fun ImageView.setRoundDrawableFromUrl(url: String?) {
+    if (!url.isNullOrBlank()) {
+        Glide.with(this)
+            .load(url)
+            .apply(RequestOptions.circleCropTransform())
+            .into(this)
+    } else {
+        setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_user))
+    }
+}
+
+fun BottomAppBar.setCornerRadius(cornerSize: Float) {
+    (background as MaterialShapeDrawable).also { background ->
+        background.shapeAppearanceModel = background.shapeAppearanceModel
+            .toBuilder()
+            .setTopRightCorner(CornerFamily.ROUNDED, cornerSize)
+            .setTopLeftCorner(CornerFamily.ROUNDED, cornerSize)
+            .build()
+    }
 }
 
 fun ViewGroup.animateRoot(duration: Long? = 200) {

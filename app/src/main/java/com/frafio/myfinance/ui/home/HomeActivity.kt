@@ -40,6 +40,7 @@ import com.frafio.myfinance.ui.home.profile.ProfileFragment
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
+import com.frafio.myfinance.utils.setRoundDrawableFromUrl
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.navigation.NavigationBarView
@@ -177,6 +178,8 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
         binding.navBar?.setOnItemSelectedListener(navBarListener)
         binding.navDrawer?.setNavigationItemSelectedListener(navDrawerListener)
+
+        binding.propicImageView.setRoundDrawableFromUrl(viewModel.getProPic())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -368,7 +371,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         }
     }
 
-    // method for children
     fun showSnackBar(
         message: String,
         actionText: String? = null,

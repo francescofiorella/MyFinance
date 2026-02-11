@@ -1,8 +1,6 @@
 package com.frafio.myfinance.data.manager
 
-import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,7 +12,6 @@ import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedMonthlyBudget
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
@@ -29,6 +26,7 @@ import com.google.firebase.auth.userProfileChangeRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 class AuthManager(private val sharedPreferences: SharedPreferences) {
 
@@ -55,7 +53,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
             }
             propicUri?.let {
                 if (it.isNotEmpty()) {
-                    photoUri = Uri.parse(it)
+                    photoUri = it.toUri()
                 }
             }
         }
@@ -85,23 +83,21 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         }
     }
 
-    fun googleLogin(data: Intent?): LiveData<AuthResult> {
+    fun firebaseAuthWithGoogle(idToken: String): LiveData<AuthResult> {
         val response = MutableLiveData<AuthResult>()
 
-        val task = GoogleSignIn.getSignedInAccountFromIntent(data)
         try {
-            // Google Sign In was successful, authenticate with Firebase
-            val account = task.getResult(ApiException::class.java)
-            val credential = GoogleAuthProvider.getCredential(account?.idToken, null)
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
             fAuth.signInWithCredential(credential)
-                .addOnCompleteListener { authTask ->
-                    response.value = if (authTask.isSuccessful) {
+                .addOnCompleteListener { task ->
+                    response.value = if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
-                        MyFinanceStorage.updateUser(authTask.result!!.user!!)
+                        Log.d(TAG, "signInWithCredential:success")
+                        MyFinanceStorage.updateUser(task.result!!.user!!)
                         AuthResult(AuthCode.LOGIN_SUCCESS)
                     } else {
-                        // If sign in fails, display a message to the user.
-                        Log.e(TAG, "Error! ${authTask.exception?.localizedMessage}")
+                        // If sign in fails, display a message to the user
+                        Log.w(TAG, "signInWithCredential:failure", task.exception)
                         AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
                     }
                 }

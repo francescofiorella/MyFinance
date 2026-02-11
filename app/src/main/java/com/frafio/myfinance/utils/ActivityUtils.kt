@@ -59,7 +59,7 @@ fun Activity.snackBar(
 
         snackBar.view.background = AppCompatResources.getDrawable(this, R.drawable.bg_round_corners)
 
-        val tv = snackBar.view.findViewById<TextView>(R.id.snackbar_text)
+        val tv = snackBar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
         tv.typeface = nunito
 
         actionText?.also { text ->
@@ -67,7 +67,7 @@ fun Activity.snackBar(
                 actionFun()
             }
 
-            val actionView = snackBar.view.findViewById<TextView>(R.id.snackbar_action)
+            val actionView = snackBar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_action)
             actionView.typeface = nunito
         }
 

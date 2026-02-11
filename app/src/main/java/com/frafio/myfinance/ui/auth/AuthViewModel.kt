@@ -1,7 +1,8 @@
 package com.frafio.myfinance.ui.auth
 
 import android.app.Application
-import android.content.Intent
+import androidx.credentials.Credential
+import androidx.credentials.CredentialManager
 import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.auth.AuthCode
@@ -20,6 +21,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     var authListener: AuthListener? = null
 
     var isSigningUp: Boolean = false
+
+    var credentialManager: CredentialManager? = null
 
     fun onLoginButtonClick() {
         authListener?.onAuthStarted()
@@ -52,10 +55,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         authListener?.onAuthSuccess(resetResponse)
     }
 
-    fun onGoogleRequest(data: Intent?) {
+    fun onGoogleRequest(credential: Credential) {
         authListener?.onAuthStarted()
 
-        val googleResponse = userRepository.userLogin(data)
+        val googleResponse = userRepository.userLogin(credential)
         authListener?.onAuthSuccess(googleResponse)
     }
 
