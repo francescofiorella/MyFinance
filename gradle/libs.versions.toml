@@ -1,8 +1,8 @@
 [versions]
-activityKtx = "1.12.3"
+activityKtx = "1.12.4"
 agp = "9.0.0"
 appcompat = "1.7.1"
-composeBom = "2026.01.01"
+composeBom = "2026.02.00"
 constraintlayout = "2.2.1"
 constraintlayoutCompose = "1.1.1"
 coreKtx = "1.17.0"
@@ -27,7 +27,7 @@ material = "1.13.0"
 material3 = "1.4.0"
 playServicesAuth = "21.5.0"
 roomRuntime = "2.8.4"
-ui = "1.10.2"
+ui = "1.10.3"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }

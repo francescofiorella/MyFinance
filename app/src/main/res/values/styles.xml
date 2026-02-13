@@ -1,4 +1,11 @@
 <resources>
+    <!-- SplashScreen themes. -->
+    <style name="Theme.MyFinance.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/launcher_icon_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_myfinance</item>
+        <item name="postSplashScreenTheme">@style/Theme.MyFinance</item>
+    </style>
+
     <!--Dialog style. -->
     <style name="ThemeOverlay.MyFinance.AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="materialAlertDialogTitleTextStyle">
