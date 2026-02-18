@@ -5,11 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
-import androidx.appcompat.widget.AppCompatEditText
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.widget.doOnTextChanged
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
@@ -19,11 +16,11 @@ import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.databinding.FragmentProfileBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.setRoundDrawableFromUrl
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.sidesheet.SideSheetDialog
-
 
 class ProfileFragment : BaseFragment(), ProfileListener {
 
@@ -52,21 +49,14 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         binding.profileEditCard.setOnClickListener {
             if (resources.getBoolean(R.bool.is600dp)) {
                 val sideSheetDialog = SideSheetDialog(requireContext())
-                sideSheetDialog.setContentView(R.layout.layout_edit_profile_sheet)
-                defineSheetInterface(
-                    sideSheetDialog.findViewById(android.R.id.content)!!,
-                    viewModel.user?.fullName ?: "",
-                    viewModel,
-                    sideSheetDialog::hide
-                )
+                val composeView = getSheetDialogComposeView { sideSheetDialog.hide() }
+                sideSheetDialog.setContentView(composeView)
                 sideSheetDialog.show()
             } else {
-                val modalBottomSheet = ModalBottomSheet(
-                    this,
-                    viewModel.user?.fullName ?: "",
-                    viewModel
-                )
-                modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+                val bottomSheetDialog = BottomSheetDialog(requireContext())
+                val composeView = getSheetDialogComposeView { bottomSheetDialog.hide() }
+                bottomSheetDialog.setContentView(composeView)
+                bottomSheetDialog.show()
             }
         }
 
@@ -90,6 +80,22 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         }
 
         return binding.root
+    }
+
+    private fun getSheetDialogComposeView(onDismiss: () -> Unit): ComposeView {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    EditProfileSheet(
+                        fullName = viewModel.user?.fullName ?: "",
+                        onDismiss = onDismiss,
+                        onEditFullName = { viewModel.editFullName(it) },
+                        showSnackbar = { (activity as HomeActivity).showSnackBar(it) }
+                    )
+                }
+            }
+        }
     }
 
     override fun scrollUp() {
@@ -121,66 +127,6 @@ class ProfileFragment : BaseFragment(), ProfileListener {
 
                 else -> Unit
             }
-        }
-    }
-
-    class ModalBottomSheet(
-        private val fragment: ProfileFragment,
-        private val fullName: String,
-        private val viewModel: ProfileViewModel
-    ) : BottomSheetDialogFragment() {
-
-        companion object {
-            const val TAG = "ModalBottomSheet"
-        }
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-            val layout =
-                inflater.inflate(R.layout.layout_edit_profile_sheet, container, false)
-            fragment.defineSheetInterface(layout, fullName, viewModel, this::dismiss)
-            return layout
-        }
-    }
-
-    fun defineSheetInterface(
-        layout: View,
-        fullName: String,
-        viewModel: ProfileViewModel,
-        dismissFun: () -> Unit
-    ) {
-        val propicTV = layout.findViewById<TextView>(R.id.propicTV)
-        val fullNameLayout = layout.findViewById<ConstraintLayout>(R.id.full_name_layout)
-        val fullNameTV = layout.findViewById<TextView>(R.id.full_nameTV)
-        val fullNameET = layout.findViewById<AppCompatEditText>(R.id.full_nameET)
-        val fullNameBtn = layout.findViewById<Button>(R.id.full_name_btn)
-
-        fullNameET.setText(fullName)
-        propicTV.setOnClickListener {
-            (activity as HomeActivity).showSnackBar("Cooming soon!")
-            //viewModel.uploadPropic()
-            dismissFun()
-        }
-        fullNameLayout.setOnClickListener {
-            fullNameTV.visibility = View.INVISIBLE
-            fullNameBtn.visibility = View.VISIBLE
-            fullNameET.visibility = View.VISIBLE
-            fullNameLayout.isClickable = false
-            fullNameET.isFocusableInTouchMode = true
-            fullNameET.requestFocus()
-            fullNameET.setSelection(fullName.length)
-        }
-        fullNameET.doOnTextChanged { text, _, _, _ ->
-            val currentText = text?.trim()
-            fullNameBtn.isEnabled =
-                currentText.toString().isNotEmpty() && currentText.toString() != fullName
-        }
-        fullNameBtn.setOnClickListener {
-            viewModel.editFullName(fullNameET.text.toString().trim())
-            dismissFun()
         }
     }
 }

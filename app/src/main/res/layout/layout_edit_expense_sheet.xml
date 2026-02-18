@@ -28,7 +28,7 @@
         android:layout_marginHorizontal="10dp"
         android:fontFamily="@font/nunito"
         android:textColor="@color/primary_text"
-        android:textSize="20sp"
+        android:textSize="22sp"
         app:layout_constraintEnd_toStartOf="@id/priceTV"
         app:layout_constraintStart_toEndOf="@id/expenseCategoryIcon"
         app:layout_constraintTop_toTopOf="parent"

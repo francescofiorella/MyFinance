@@ -19,7 +19,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 4
-        versionName = "4.7.11"
+        versionName = "4.7.12"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -103,4 +103,5 @@ dependencies {
     implementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout.compose)
+    implementation(libs.androidx.google.fonts)
 }
