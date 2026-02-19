@@ -11,8 +11,6 @@
             name="expense"
             type="com.frafio.myfinance.data.model.Expense" />
 
-        <import type="com.frafio.myfinance.utils.FormatUtilsKt" />
-
         <import type="com.frafio.myfinance.data.enums.db.FirestoreEnums" />
 
     </data>
@@ -90,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/nunito"
-            android:text="@{FormatUtilsKt.doubleToPrice(expense.price)}"
+            android:text="@{expense.getPriceString(true)}"
             android:textSize="16sp"
             android:visibility="@{expense.category != FirestoreEnums.CATEGORIES.JOLLY.value ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"

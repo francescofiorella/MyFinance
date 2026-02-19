@@ -71,7 +71,7 @@ class ExpenseAdapter(
 
         if (holder.itemViewType == FirestoreEnums.CATEGORIES.TOTAL.value) {
             val tHolder = (holder as TotalViewHolder)
-            tHolder.binding.date = currentExpense.getDateString()
+            tHolder.binding.date = currentExpense.getDateString(extended = true)
             tHolder.binding.amount = currentExpense.price
             return
         }

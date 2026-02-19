@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -29,17 +29,14 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.ui.home.expenses.EditTransactionSheet
+import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.addTotalsToIncomes
 import com.frafio.myfinance.utils.clearText
-import com.frafio.myfinance.utils.createTextDrawable
-import com.frafio.myfinance.utils.dateToExtendedString
-import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.hideSoftKeyboard
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.button.MaterialButton
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.sidesheet.SideSheetDialog
-import com.google.android.material.textview.MaterialTextView
 
 class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener {
     private lateinit var binding: FragmentBudgetBinding
@@ -240,25 +237,18 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
             ON_LONG_CLICK -> {
                 if (resources.getBoolean(R.bool.is600dp)) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
-                    sideSheetDialog.setContentView(R.layout.layout_edit_expense_sheet)
-                    defineSheetInterface(
-                        sideSheetDialog.findViewById(android.R.id.content)!!,
-                        income,
-                        position,
-                        editResultLauncher,
-                        viewModel,
-                        sideSheetDialog::hide
-                    )
+                    val composeView = getEditIncomeSheetDialogComposeView(income, position) {
+                        sideSheetDialog.hide()
+                    }
+                    sideSheetDialog.setContentView(composeView)
                     sideSheetDialog.show()
                 } else {
-                    val modalBottomSheet = ModalBottomSheet(
-                        this,
-                        income,
-                        position,
-                        editResultLauncher,
-                        viewModel
-                    )
-                    modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+                    val bottomSheetDialog = BottomSheetDialog(requireContext())
+                    val composeView = getEditIncomeSheetDialogComposeView(income, position) {
+                        bottomSheetDialog.hide()
+                    }
+                    bottomSheetDialog.setContentView(composeView)
+                    bottomSheetDialog.show()
                 }
             }
 
@@ -308,74 +298,41 @@ class BudgetFragment : BaseFragment(), BudgetListener, IncomeInteractionListener
         }
     }
 
-    class ModalBottomSheet(
-        private val fragment: BudgetFragment,
-        private val income: Income,
-        private val position: Int,
-        private val editResultLauncher: ActivityResultLauncher<Intent>,
-        private val viewModel: BudgetViewModel
-    ) : BottomSheetDialogFragment() {
-
-        companion object {
-            const val TAG = "ModalBottomSheet"
-        }
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-            val layout =
-                inflater.inflate(R.layout.layout_edit_expense_sheet, container, false)
-            fragment.defineSheetInterface(
-                layout,
-                income,
-                position,
-                editResultLauncher,
-                viewModel,
-                this::dismiss
-            )
-            return layout
-        }
-    }
-
-    fun defineSheetInterface(
-        layout: View,
+    private fun getEditIncomeSheetDialogComposeView(
         income: Income,
         position: Int,
-        editResultLauncher: ActivityResultLauncher<Intent>,
-        viewModel: BudgetViewModel,
-        dismissFun: () -> Unit
-    ) {
-        layout.findViewById<MaterialTextView>(R.id.nameTV).text = income.name
-        layout.findViewById<MaterialTextView>(R.id.dateTV).text =
-            dateToExtendedString(income.day, income.month, income.year)
-        layout.findViewById<MaterialTextView>(R.id.priceTV).text =
-            doubleToPrice(income.price ?: 0.0)
-        layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon).icon =
-            layout.context.createTextDrawable(income.name!![0].uppercase())
-
-        val editItem = layout.findViewById<TextView>(R.id.editTV)
-        val deleteItem = layout.findViewById<TextView>(R.id.deleteTV)
-        editItem.setOnClickListener {
-            Intent(context, AddActivity::class.java).also {
-                it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
-                it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_INCOME_CODE)
-                it.putExtra(AddActivity.EXPENSE_ID_KEY, income.id)
-                it.putExtra(AddActivity.EXPENSE_NAME_KEY, income.name)
-                it.putExtra(AddActivity.EXPENSE_PRICE_KEY, income.price)
-                it.putExtra(AddActivity.EXPENSE_CATEGORY_KEY, income.category)
-                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                it.putExtra(AddActivity.EXPENSE_YEAR_KEY, income.year)
-                it.putExtra(AddActivity.EXPENSE_MONTH_KEY, income.month)
-                it.putExtra(AddActivity.EXPENSE_DAY_KEY, income.day)
-                editResultLauncher.launch(it)
+        onDismiss: () -> Unit
+    ): ComposeView {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    EditTransactionSheet(
+                        transaction = income,
+                        onDismiss = onDismiss,
+                        onEdit = {
+                            Intent(context, AddActivity::class.java).also {
+                                it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
+                                it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_INCOME_CODE)
+                                it.putExtra(AddActivity.EXPENSE_ID_KEY, income.id)
+                                it.putExtra(AddActivity.EXPENSE_NAME_KEY, income.name)
+                                it.putExtra(AddActivity.EXPENSE_PRICE_KEY, income.price)
+                                it.putExtra(AddActivity.EXPENSE_CATEGORY_KEY, income.category)
+                                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                                it.putExtra(AddActivity.EXPENSE_YEAR_KEY, income.year)
+                                it.putExtra(AddActivity.EXPENSE_MONTH_KEY, income.month)
+                                it.putExtra(AddActivity.EXPENSE_DAY_KEY, income.day)
+                                editResultLauncher.launch(it)
+                            }
+                            onDismiss()
+                        },
+                        onDelete = {
+                            viewModel.deleteIncome(income)
+                            onDismiss()
+                        }
+                    )
+                }
             }
-            dismissFun()
-        }
-        deleteItem.setOnClickListener {
-            viewModel.deleteIncome(income)
-            dismissFun()
         }
     }
 }

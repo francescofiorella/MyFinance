@@ -17,7 +17,6 @@ import com.frafio.myfinance.databinding.FragmentProfileBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
-import com.frafio.myfinance.utils.dateToString
 import com.frafio.myfinance.utils.setRoundDrawableFromUrl
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.sidesheet.SideSheetDialog
@@ -41,7 +40,7 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         viewModel.user?.apply {
             binding.signupDateTV.text = getString(
                 R.string.signUpDate,
-                dateToString(creationDay, creationMonth, creationYear)
+                getCreationDataString()
             )
             binding.profilePropicIv.setRoundDrawableFromUrl(photoUrl)
         }

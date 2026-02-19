@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
@@ -34,11 +36,12 @@ import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companio
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.addTotalsToExpenses
 import com.frafio.myfinance.utils.addTotalsToExpensesWithoutToday
 import com.frafio.myfinance.utils.dateToExtendedString
-import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.hideSoftKeyboard
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
@@ -51,7 +54,6 @@ import java.util.Locale
 class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesListener {
 
     companion object {
-        private const val SHOW_MENU = "SHOW_MENU"
         private const val SHOW_CATEGORY = "SHOW_CATEGORY"
         private const val SHOW_CATEGORY_FILTER = "SHOW_CATEGORY_FILTER"
         private const val SHOW_FILTER_MENU = "SHOW_FILTER_MENU"
@@ -195,7 +197,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             defineSheetInterface(
                 sideSheetDialog.findViewById(android.R.id.content)!!,
                 null,
-                null,
                 sideSheetDialog::hide,
                 SHOW_FILTER_MENU
             )
@@ -203,7 +204,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         } else {
             val modalBottomSheet = ModalBottomSheet(
                 this,
-                null,
                 null,
                 SHOW_FILTER_MENU
             )
@@ -222,23 +222,18 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             ON_LONG_CLICK -> {
                 if (resources.getBoolean(R.bool.is600dp)) {
                     val sideSheetDialog = SideSheetDialog(requireContext())
-                    sideSheetDialog.setContentView(R.layout.layout_edit_expense_sheet)
-                    defineSheetInterface(
-                        sideSheetDialog.findViewById(android.R.id.content)!!,
-                        expense,
-                        position,
-                        sideSheetDialog::hide,
-                        SHOW_MENU
-                    )
+                    val composeView = getEditExpenseSheetDialogComposeView(expense, position) {
+                        sideSheetDialog.hide()
+                    }
+                    sideSheetDialog.setContentView(composeView)
                     sideSheetDialog.show()
                 } else {
-                    val modalBottomSheet = ModalBottomSheet(
-                        this,
-                        expense,
-                        position,
-                        SHOW_MENU
-                    )
-                    modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+                    val bottomSheetDialog = BottomSheetDialog(requireContext())
+                    val composeView = getEditExpenseSheetDialogComposeView(expense, position) {
+                        bottomSheetDialog.hide()
+                    }
+                    bottomSheetDialog.setContentView(composeView)
+                    bottomSheetDialog.show()
                 }
             }
 
@@ -249,7 +244,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                     defineSheetInterface(
                         sideSheetDialog.findViewById(android.R.id.content)!!,
                         expense,
-                        position,
                         sideSheetDialog::hide,
                         SHOW_CATEGORY
                     )
@@ -258,7 +252,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                     val modalBottomSheet = ModalBottomSheet(
                         this,
                         expense,
-                        position,
                         SHOW_CATEGORY
                     )
                     modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
@@ -295,9 +288,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                     isListBlocked = limit >= maxExpensesNumber
                 }
 
-                FinanceCode.EXPENSE_EDIT_SUCCESS.code -> {
-                    Unit
-                }
+                FinanceCode.EXPENSE_EDIT_SUCCESS.code -> {}
 
                 FinanceCode.EXPENSE_ADD_SUCCESS.code -> {
                     (activity as HomeActivity).showSnackBar(result.message)
@@ -406,17 +397,21 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
     }
 
     private fun addDateChip(startDate: LocalDate, endDate: LocalDate) {
-        val label = if (startDate.year == endDate.year && startDate.monthValue == endDate.monthValue) {
-            val startDayOfMonth = if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
-            "$startDayOfMonth - ${dateToExtendedString(endDate)}"
-        } else if (startDate.year == endDate.year) {
-            val startDayOfMonth = if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
-            val startMonth = startDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                .replaceFirstChar { it.uppercase() }
-            "$startDayOfMonth $startMonth - ${dateToExtendedString(endDate)}"
-        } else {
-            "${dateToExtendedString(startDate)} - ${dateToExtendedString(endDate)}"
-        }
+        val label =
+            if (startDate.year == endDate.year && startDate.monthValue == endDate.monthValue) {
+                val startDayOfMonth =
+                    if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+                "$startDayOfMonth - ${dateToExtendedString(endDate)}"
+            } else if (startDate.year == endDate.year) {
+                val startDayOfMonth =
+                    if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+                val startMonth =
+                    startDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                        .replaceFirstChar { it.uppercase() }
+                "$startDayOfMonth $startMonth - ${dateToExtendedString(endDate)}"
+            } else {
+                "${dateToExtendedString(startDate)} - ${dateToExtendedString(endDate)}"
+            }
         val chip = layoutInflater.inflate(
             R.layout.layout_chip_input,
             binding.filterChipGroup,
@@ -440,10 +435,53 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         binding.filterChipGroup.visibility = View.VISIBLE
     }
 
+    private fun getEditExpenseSheetDialogComposeView(
+        expense: Expense,
+        position: Int,
+        onDismiss: () -> Unit
+    ): ComposeView {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    EditTransactionSheet(
+                        transaction = expense,
+                        onDismiss = onDismiss,
+                        onEdit = {
+                            Intent(context, AddActivity::class.java).also {
+                                it.putExtra(
+                                    AddActivity.REQUEST_CODE_KEY,
+                                    AddActivity.REQUEST_EDIT_CODE
+                                )
+                                it.putExtra(
+                                    AddActivity.EXPENSE_REQUEST_KEY,
+                                    AddActivity.REQUEST_EXPENSE_CODE
+                                )
+                                it.putExtra(AddActivity.EXPENSE_ID_KEY, expense.id)
+                                it.putExtra(AddActivity.EXPENSE_NAME_KEY, expense.name)
+                                it.putExtra(AddActivity.EXPENSE_PRICE_KEY, expense.price)
+                                it.putExtra(AddActivity.EXPENSE_CATEGORY_KEY, expense.category)
+                                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                                it.putExtra(AddActivity.EXPENSE_YEAR_KEY, expense.year)
+                                it.putExtra(AddActivity.EXPENSE_MONTH_KEY, expense.month)
+                                it.putExtra(AddActivity.EXPENSE_DAY_KEY, expense.day)
+                                editResultLauncher.launch(it)
+                            }
+                            onDismiss()
+                        },
+                        onDelete = {
+                            viewModel.deleteExpense(expense)
+                            onDismiss()
+                        }
+                    )
+                }
+            }
+        }
+    }
+
     class ModalBottomSheet(
         private val fragment: ExpensesFragment,
         private val expense: Expense?,
-        private val position: Int?,
         private val sourceTag: String
     ) : BottomSheetDialogFragment() {
 
@@ -458,7 +496,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         ): View? {
             val layout = inflater.inflate(
                 when (sourceTag) {
-                    SHOW_MENU -> R.layout.layout_edit_expense_sheet
                     SHOW_FILTER_MENU -> R.layout.layout_filter_expenses_sheet
                     else -> R.layout.layout_category_sheet
                 },
@@ -468,7 +505,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             fragment.defineSheetInterface(
                 layout,
                 expense,
-                position,
                 this::dismiss,
                 sourceTag
             )
@@ -479,7 +515,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
     fun defineSheetInterface(
         layout: View,
         expense: Expense?,
-        position: Int?,
         dismissFun: () -> Unit,
         sourceTag: String
     ) {
@@ -551,7 +586,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                         defineSheetInterface(
                             sideSheetDialog.findViewById(android.R.id.content)!!,
                             null,
-                            null,
                             sideSheetDialog::hide,
                             SHOW_CATEGORY_FILTER
                         )
@@ -559,7 +593,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                     } else {
                         val modalBottomSheet = ModalBottomSheet(
                             this,
-                            null,
                             null,
                             SHOW_CATEGORY_FILTER
                         )
@@ -593,68 +626,39 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
 
             else -> {
                 layout.findViewById<MaterialTextView>(R.id.nameTV).text = expense!!.name
-                layout.findViewById<MaterialTextView>(R.id.dateTV).text =
-                    dateToExtendedString(expense.day, expense.month, expense.year)
-                layout.findViewById<MaterialTextView>(R.id.priceTV).text =
-                    doubleToPrice(expense.price ?: 0.0)
+                layout.findViewById<MaterialTextView>(R.id.dateTV).text = expense.getDateString(true)
+                layout.findViewById<MaterialTextView>(R.id.priceTV).text = expense.getPriceString()
                 layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon)
                     .icon = getCategoryDrawable(expense.category!!)
             }
         }
-        if (sourceTag != SHOW_MENU) {
-            // layout_category_bottom_sheet.xml
-            layout.findViewById<TextView>(R.id.housingTV).setOnClickListener {
-                onCategoryClick(FirestoreEnums.CATEGORIES.HOUSING.value)
-            }
-            layout.findViewById<TextView>(R.id.groceriesTV).setOnClickListener {
-                onCategoryClick(FirestoreEnums.CATEGORIES.GROCERIES.value)
-            }
-            layout.findViewById<TextView>(R.id.personal_careTV).setOnClickListener {
-                onCategoryClick(FirestoreEnums.CATEGORIES.PERSONAL_CARE.value)
-            }
-            layout.findViewById<TextView>(R.id.entertainmentTV).setOnClickListener {
-                onCategoryClick(FirestoreEnums.CATEGORIES.ENTERTAINMENT.value)
-            }
-            layout.findViewById<TextView>(R.id.educationTV).setOnClickListener {
-                onCategoryClick(FirestoreEnums.CATEGORIES.EDUCATION.value)
-            }
-            layout.findViewById<TextView>(R.id.diningTV).setOnClickListener {
-                onCategoryClick(FirestoreEnums.CATEGORIES.DINING.value)
-            }
-            layout.findViewById<TextView>(R.id.healthTV).setOnClickListener {
-                onCategoryClick(FirestoreEnums.CATEGORIES.HEALTH.value)
-            }
-            layout.findViewById<TextView>(R.id.transportationTV).setOnClickListener {
-                onCategoryClick(FirestoreEnums.CATEGORIES.TRANSPORTATION.value)
-            }
-            layout.findViewById<TextView>(R.id.miscellaneousTV).setOnClickListener {
-                onCategoryClick(FirestoreEnums.CATEGORIES.MISCELLANEOUS.value)
-            }
-            return
+        // layout_category_bottom_sheet.xml
+        layout.findViewById<TextView>(R.id.housingTV).setOnClickListener {
+            onCategoryClick(FirestoreEnums.CATEGORIES.HOUSING.value)
         }
-
-        // layout_edit_expense_bottom_sheet.xml
-        val editItem = layout.findViewById<TextView>(R.id.editTV)
-        val deleteItem = layout.findViewById<TextView>(R.id.deleteTV)
-        editItem.setOnClickListener {
-            Intent(context, AddActivity::class.java).also {
-                it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
-                it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_EXPENSE_CODE)
-                it.putExtra(AddActivity.EXPENSE_ID_KEY, expense!!.id)
-                it.putExtra(AddActivity.EXPENSE_NAME_KEY, expense.name)
-                it.putExtra(AddActivity.EXPENSE_PRICE_KEY, expense.price)
-                it.putExtra(AddActivity.EXPENSE_CATEGORY_KEY, expense.category)
-                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                it.putExtra(AddActivity.EXPENSE_YEAR_KEY, expense.year)
-                it.putExtra(AddActivity.EXPENSE_MONTH_KEY, expense.month)
-                it.putExtra(AddActivity.EXPENSE_DAY_KEY, expense.day)
-                editResultLauncher.launch(it)
-            }
-            dismissFun()
+        layout.findViewById<TextView>(R.id.groceriesTV).setOnClickListener {
+            onCategoryClick(FirestoreEnums.CATEGORIES.GROCERIES.value)
         }
-        deleteItem.setOnClickListener {
-            viewModel.deleteExpense(expense!!)
-            dismissFun()
+        layout.findViewById<TextView>(R.id.personal_careTV).setOnClickListener {
+            onCategoryClick(FirestoreEnums.CATEGORIES.PERSONAL_CARE.value)
+        }
+        layout.findViewById<TextView>(R.id.entertainmentTV).setOnClickListener {
+            onCategoryClick(FirestoreEnums.CATEGORIES.ENTERTAINMENT.value)
+        }
+        layout.findViewById<TextView>(R.id.educationTV).setOnClickListener {
+            onCategoryClick(FirestoreEnums.CATEGORIES.EDUCATION.value)
+        }
+        layout.findViewById<TextView>(R.id.diningTV).setOnClickListener {
+            onCategoryClick(FirestoreEnums.CATEGORIES.DINING.value)
+        }
+        layout.findViewById<TextView>(R.id.healthTV).setOnClickListener {
+            onCategoryClick(FirestoreEnums.CATEGORIES.HEALTH.value)
+        }
+        layout.findViewById<TextView>(R.id.transportationTV).setOnClickListener {
+            onCategoryClick(FirestoreEnums.CATEGORIES.TRANSPORTATION.value)
+        }
+        layout.findViewById<TextView>(R.id.miscellaneousTV).setOnClickListener {
+            onCategoryClick(FirestoreEnums.CATEGORIES.MISCELLANEOUS.value)
         }
     }
 }

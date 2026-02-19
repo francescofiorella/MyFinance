@@ -1,5 +1,7 @@
 package com.frafio.myfinance.data.model
 
+import com.frafio.myfinance.utils.dateToString
+
 data class User(
     val fullName: String? = null,
     val email: String? = null,
@@ -12,5 +14,9 @@ data class User(
     companion object {
         const val EMAIL_PROVIDER = 0
         const val GOOGLE_PROVIDER = 1
+    }
+
+    fun getCreationDataString(): String {
+        return dateToString(creationDay, creationMonth, creationYear) ?: ""
     }
 }

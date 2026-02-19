@@ -21,26 +21,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
+import com.frafio.myfinance.data.model.Expense
+import com.frafio.myfinance.data.model.Transaction
 import com.frafio.myfinance.ui.composable.components.SheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 
 @Composable
-fun EditExpenseSheet(
-    name: String,
-    date: String,
-    price: String,
-    category: Int,
+fun EditTransactionSheet(
+    transaction: Transaction,
     onDismiss: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     SheetDialog(
-        icon = getCategoryIcon(category),
-        title = name,
-        label = date,
+        icon = getCategoryIcon(transaction.category ?: 0),
+        title = transaction.name ?: "",
+        label = transaction.getDateString(),
         labelFirst = false,
-        endContent = price,
+        endContent = transaction.getPriceString(),
         modifier = modifier
     ) {
         Column {
@@ -126,13 +125,16 @@ private fun getCategoryIcon(categoryId: Int): Int {
 
 @Preview(showBackground = true)
 @Composable
-fun EditExpenseSheetPreview() {
+fun EditTransactionSheetPreview() {
     MyFinanceTheme {
-        EditExpenseSheet(
-            name = "Acquisto",
-            date = "01/01/2000",
-            price = "€ 0.00",
-            category = FirestoreEnums.CATEGORIES.HOUSING.value,
+        EditTransactionSheet(
+            transaction = Expense(
+                name = "Expense",
+                price = 0.00,
+                year = 1970,
+                month = 1,
+                day = 1
+            ),
             onDismiss = {},
             onEdit = {},
             onDelete = {},
