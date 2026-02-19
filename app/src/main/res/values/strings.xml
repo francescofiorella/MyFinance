@@ -65,6 +65,7 @@
     <string name="change_content">Swap content</string>
 
     <string name="your_profile">Your profile</string>
+    <string name="your_name">Your name</string>
     <string name="edit_profile">Edit your profile</string>
     <string name="edit_propic">Upload your profile picture</string>
     <string name="edit_full_name">Edit your full name</string>
@@ -106,6 +107,8 @@
     <string name="clear_text">Clear text</string>
     <string name="annual_balance">Annual balance: %1$s</string>
     <string name="on_total_budget" translatable="false">/ %1$s</string>
+
+    <string name="coming_soon" translatable="false">Coming soon!</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>

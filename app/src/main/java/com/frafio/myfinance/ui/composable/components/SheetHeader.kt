@@ -1,7 +1,7 @@
 package com.frafio.myfinance.ui.composable.components
 
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,13 +28,15 @@ import com.frafio.myfinance.ui.theme.MyFinanceTheme
 @Composable
 fun SheetHeader(
     @DrawableRes icon: Int,
-    @StringRes title: Int,
-    @StringRes label: Int,
+    title: String,
+    label: String,
     modifier: Modifier = Modifier,
-    labelFirst: Boolean = true
+    labelFirst: Boolean = true,
+    endContent: String? = null
 ) {
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
@@ -56,10 +58,10 @@ fun SheetHeader(
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 val labelText = @Composable {
                     Text(
-                        text = stringResource(id = label),
+                        text = label,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
@@ -68,7 +70,7 @@ fun SheetHeader(
                 }
                 val titleText = @Composable {
                     Text(
-                        text = stringResource(id = title),
+                        text = title,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 22.sp
@@ -83,6 +85,16 @@ fun SheetHeader(
                     titleText()
                     labelText()
                 }
+            }
+            if (endContent != null) {
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = endContent,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                )
             }
         }
 
@@ -101,8 +113,26 @@ fun SheetHeaderPreview() {
     MyFinanceTheme {
         SheetHeader(
             icon = R.drawable.ic_person_filled,
-            title = R.string.your_profile,
-            label = R.string.edit
+            title = stringResource(id = R.string.your_profile),
+            label = stringResource(id = R.string.edit),
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.surfaceContainerLow)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ExpenseSheetHeaderPreview() {
+    MyFinanceTheme {
+        SheetHeader(
+            icon = R.drawable.ic_home_filled,
+            title = stringResource(id = R.string.expense),
+            label = "01/01/1970",
+            labelFirst = false,
+            endContent = "€0.00",
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.surfaceContainerLow)
         )
     }
 }

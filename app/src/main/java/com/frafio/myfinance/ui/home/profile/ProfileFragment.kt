@@ -49,12 +49,12 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         binding.profileEditCard.setOnClickListener {
             if (resources.getBoolean(R.bool.is600dp)) {
                 val sideSheetDialog = SideSheetDialog(requireContext())
-                val composeView = getSheetDialogComposeView { sideSheetDialog.hide() }
+                val composeView = getEditProfileSheetDialogComposeView { sideSheetDialog.hide() }
                 sideSheetDialog.setContentView(composeView)
                 sideSheetDialog.show()
             } else {
                 val bottomSheetDialog = BottomSheetDialog(requireContext())
-                val composeView = getSheetDialogComposeView { bottomSheetDialog.hide() }
+                val composeView = getEditProfileSheetDialogComposeView { bottomSheetDialog.hide() }
                 bottomSheetDialog.setContentView(composeView)
                 bottomSheetDialog.show()
             }
@@ -82,16 +82,47 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         return binding.root
     }
 
-    private fun getSheetDialogComposeView(onDismiss: () -> Unit): ComposeView {
+    private fun getEditProfileSheetDialogComposeView(onDismiss: () -> Unit): ComposeView {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MyFinanceTheme {
                     EditProfileSheet(
+                        onDismiss = onDismiss,
+                        onUploadProPic = {
+                            (activity as HomeActivity).showSnackBar(getString(R.string.coming_soon))
+                        },
+                        onEditFullName = {
+                            if (resources.getBoolean(R.bool.is600dp)) {
+                                val sideSheetDialog = SideSheetDialog(requireContext())
+                                val composeView = getEditFullNameSheetDialogComposeView { sideSheetDialog.hide() }
+                                sideSheetDialog.setContentView(composeView)
+                                onDismiss()
+                                sideSheetDialog.show()
+                            } else {
+                                val bottomSheetDialog = BottomSheetDialog(requireContext())
+                                val composeView = getEditFullNameSheetDialogComposeView { bottomSheetDialog.hide() }
+                                bottomSheetDialog.setContentView(composeView)
+                                onDismiss()
+                                bottomSheetDialog.show()
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun getEditFullNameSheetDialogComposeView(onDismiss: () -> Unit): ComposeView {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    EditFullNameSheet(
                         fullName = viewModel.user?.fullName ?: "",
                         onDismiss = onDismiss,
-                        onEditFullName = { viewModel.editFullName(it) },
-                        showSnackbar = { (activity as HomeActivity).showSnackBar(it) }
+                        onEditFullName = { viewModel.editFullName(it) }
+
                     )
                 }
             }
