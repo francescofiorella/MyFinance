@@ -398,19 +398,23 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
 
     private fun addDateChip(startDate: LocalDate, endDate: LocalDate) {
         val label =
-            if (startDate.year == endDate.year && startDate.monthValue == endDate.monthValue) {
-                val startDayOfMonth =
-                    if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
-                "$startDayOfMonth - ${dateToExtendedString(endDate)}"
-            } else if (startDate.year == endDate.year) {
-                val startDayOfMonth =
-                    if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
-                val startMonth =
-                    startDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                        .replaceFirstChar { it.uppercase() }
-                "$startDayOfMonth $startMonth - ${dateToExtendedString(endDate)}"
-            } else {
-                "${dateToExtendedString(startDate)} - ${dateToExtendedString(endDate)}"
+            when (startDate.year) {
+                endDate.year if startDate.monthValue == endDate.monthValue -> {
+                    val startDayOfMonth =
+                        if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+                    "$startDayOfMonth - ${dateToExtendedString(endDate)}"
+                }
+                endDate.year -> {
+                    val startDayOfMonth =
+                        if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+                    val startMonth =
+                        startDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                            .replaceFirstChar { it.uppercase() }
+                    "$startDayOfMonth $startMonth - ${dateToExtendedString(endDate)}"
+                }
+                else -> {
+                    "${dateToExtendedString(startDate)} - ${dateToExtendedString(endDate)}"
+                }
             }
         val chip = layoutInflater.inflate(
             R.layout.layout_chip_input,

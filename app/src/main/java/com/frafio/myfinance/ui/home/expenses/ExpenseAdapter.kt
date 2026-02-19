@@ -24,11 +24,11 @@ class ExpenseAdapter(
 
     private var currentLimit: Long = DEFAULT_LIMIT
 
-    inner class ExpenseViewHolder(
+    class ExpenseViewHolder(
         val binding: LayoutExpenseItemRvBinding
     ) : RecyclerView.ViewHolder(binding.root)
 
-    inner class TotalViewHolder(
+    class TotalViewHolder(
         val binding: LayoutTotalItemRvBinding
     ) : RecyclerView.ViewHolder(binding.root)
 
