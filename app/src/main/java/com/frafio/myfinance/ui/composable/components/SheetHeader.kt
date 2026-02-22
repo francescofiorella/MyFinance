@@ -62,19 +62,17 @@ fun SheetHeader(
                 val labelText = @Composable {
                     Text(
                         text = label,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 14.sp
-                        )
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 14.sp
                     )
                 }
                 val titleText = @Composable {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 22.sp
-                        )
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 22.sp
                     )
                 }
 
@@ -90,10 +88,9 @@ fun SheetHeader(
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = endContent,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 18.sp
                 )
             }
         }

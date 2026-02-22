@@ -27,7 +27,7 @@ import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
-import com.frafio.myfinance.data.widget.DatePickerRangeButton
+import com.frafio.myfinance.data.widget.DatePickerRangeDialog
 import com.frafio.myfinance.databinding.FragmentExpensesBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
@@ -56,12 +56,11 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
     companion object {
         private const val SHOW_CATEGORY = "SHOW_CATEGORY"
         private const val SHOW_CATEGORY_FILTER = "SHOW_CATEGORY_FILTER"
-        private const val SHOW_FILTER_MENU = "SHOW_FILTER_MENU"
     }
 
     private lateinit var binding: FragmentExpensesBinding
     private val viewModel by viewModels<ExpensesViewModel>()
-    private lateinit var datePickerRangeBtn: DatePickerRangeButton
+    private lateinit var datePickerRangeDialog: DatePickerRangeDialog
 
     private var isListBlocked = false
     private var maxExpensesNumber = DEFAULT_LIMIT + 1
@@ -169,6 +168,26 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             }
         }
 
+        datePickerRangeDialog = object : DatePickerRangeDialog(
+            requireActivity()
+        ) {
+            override fun onStart() {
+                super.onStart()
+                requireActivity().hideSoftKeyboard(binding.root)
+            }
+
+            override fun onPositiveBtnClickListener() {
+                super.onPositiveBtnClickListener()
+                viewModel.dateFilter = Pair(startDate!!, endDate!!)
+                addDateChip(startDate!!, endDate!!)
+                recViewLiveData.removeSource(localExpensesLiveData)
+                localExpensesLiveData = viewModel.getLocalExpenses()
+                recViewLiveData.addSource(localExpensesLiveData) { value ->
+                    recViewLiveData.value = value
+                }
+            }
+        }
+
         return binding.root
     }
 
@@ -193,21 +212,18 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
     private val onFilterClickListener = View.OnClickListener {
         if (resources.getBoolean(R.bool.is600dp)) {
             val sideSheetDialog = SideSheetDialog(requireContext())
-            sideSheetDialog.setContentView(R.layout.layout_filter_expenses_sheet)
-            defineSheetInterface(
-                sideSheetDialog.findViewById(android.R.id.content)!!,
-                null,
-                sideSheetDialog::hide,
-                SHOW_FILTER_MENU
-            )
+            val composeView = getFilterExpensesSheetDialogComposeView {
+                sideSheetDialog.hide()
+            }
+            sideSheetDialog.setContentView(composeView)
             sideSheetDialog.show()
         } else {
-            val modalBottomSheet = ModalBottomSheet(
-                this,
-                null,
-                SHOW_FILTER_MENU
-            )
-            modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+            val bottomSheetDialog = BottomSheetDialog(requireContext())
+            val composeView = getFilterExpensesSheetDialogComposeView {
+                bottomSheetDialog.hide()
+            }
+            bottomSheetDialog.setContentView(composeView)
+            bottomSheetDialog.show()
         }
     }
 
@@ -483,6 +499,48 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
     }
 
+    private fun getFilterExpensesSheetDialogComposeView(
+        onDismiss: () -> Unit
+    ): ComposeView {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    FilterExpensesSheet(
+                        onDismiss = onDismiss,
+                        categoryEnabled = viewModel.categoryFilterList.size != 9,
+                        dateRangeEnabled = viewModel.dateFilter == null,
+                        onSelectCategory = {
+                            onDismiss()
+                            if (resources.getBoolean(R.bool.is600dp)) {
+                                val sideSheetDialog = SideSheetDialog(requireContext())
+                                sideSheetDialog.setContentView(R.layout.layout_category_sheet)
+                                defineSheetInterface(
+                                    sideSheetDialog.findViewById(android.R.id.content)!!,
+                                    null,
+                                    sideSheetDialog::hide,
+                                    SHOW_CATEGORY_FILTER
+                                )
+                                sideSheetDialog.show()
+                            } else {
+                                val modalBottomSheet = ModalBottomSheet(
+                                    this@ExpensesFragment,
+                                    null,
+                                    SHOW_CATEGORY_FILTER
+                                )
+                                modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+                            }
+                        },
+                        onSelectDateRange = {
+                            onDismiss()
+                            datePickerRangeDialog.show()
+                        }
+                    )
+                }
+            }
+        }
+    }
+
     class ModalBottomSheet(
         private val fragment: ExpensesFragment,
         private val expense: Expense?,
@@ -499,10 +557,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             savedInstanceState: Bundle?
         ): View? {
             val layout = inflater.inflate(
-                when (sourceTag) {
-                    SHOW_FILTER_MENU -> R.layout.layout_filter_expenses_sheet
-                    else -> R.layout.layout_category_sheet
-                },
+                R.layout.layout_category_sheet,
                 container,
                 false
             )
@@ -539,6 +594,14 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
 
         when (sourceTag) {
+            SHOW_CATEGORY -> {
+                layout.findViewById<MaterialTextView>(R.id.nameTV).text = expense!!.name
+                layout.findViewById<MaterialTextView>(R.id.dateTV).text = expense.getDateString(true)
+                layout.findViewById<MaterialTextView>(R.id.priceTV).text = expense.getPriceString()
+                layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon)
+                    .icon = getCategoryDrawable(expense.category!!)
+            }
+
             SHOW_CATEGORY_FILTER -> {
                 layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout)
                     .visibility = View.GONE
@@ -574,66 +637,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                             layout.findViewById<TextView>(R.id.miscellaneousTV).isEnabled = false
                     }
                 }
-            }
-
-            SHOW_FILTER_MENU -> {
-                val categoryTV = layout.findViewById<TextView>(R.id.categoryTV)
-                val dateRangeTV = layout.findViewById<TextView>(R.id.dateRangeTV)
-
-                dateRangeTV.isEnabled = viewModel.dateFilter == null
-                categoryTV.isEnabled = viewModel.categoryFilterList.size != 9
-                categoryTV.setOnClickListener {
-                    dismissFun()
-                    if (resources.getBoolean(R.bool.is600dp)) {
-                        val sideSheetDialog = SideSheetDialog(requireContext())
-                        sideSheetDialog.setContentView(R.layout.layout_category_sheet)
-                        defineSheetInterface(
-                            sideSheetDialog.findViewById(android.R.id.content)!!,
-                            null,
-                            sideSheetDialog::hide,
-                            SHOW_CATEGORY_FILTER
-                        )
-                        sideSheetDialog.show()
-                    } else {
-                        val modalBottomSheet = ModalBottomSheet(
-                            this,
-                            null,
-                            SHOW_CATEGORY_FILTER
-                        )
-                        modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
-                    }
-                }
-
-                datePickerRangeBtn = object : DatePickerRangeButton(
-                    dateRangeTV,
-                    requireActivity()
-                ) {
-                    override fun onStart() {
-                        super.onStart()
-                        requireActivity().hideSoftKeyboard(binding.root)
-                        dismissFun()
-                    }
-
-                    override fun onPositiveBtnClickListener() {
-                        super.onPositiveBtnClickListener()
-                        viewModel.dateFilter = Pair(startDate!!, endDate!!)
-                        addDateChip(startDate!!, endDate!!)
-                        recViewLiveData.removeSource(localExpensesLiveData)
-                        localExpensesLiveData = viewModel.getLocalExpenses()
-                        recViewLiveData.addSource(localExpensesLiveData) { value ->
-                            recViewLiveData.value = value
-                        }
-                    }
-                }
-                return
-            }
-
-            else -> {
-                layout.findViewById<MaterialTextView>(R.id.nameTV).text = expense!!.name
-                layout.findViewById<MaterialTextView>(R.id.dateTV).text = expense.getDateString(true)
-                layout.findViewById<MaterialTextView>(R.id.priceTV).text = expense.getPriceString()
-                layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon)
-                    .icon = getCategoryDrawable(expense.category!!)
             }
         }
         // layout_category_bottom_sheet.xml

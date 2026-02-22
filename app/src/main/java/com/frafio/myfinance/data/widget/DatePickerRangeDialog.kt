@@ -1,6 +1,5 @@
 package com.frafio.myfinance.data.widget
 
-import android.view.View
 import androidx.core.util.Pair
 import androidx.fragment.app.FragmentActivity
 import com.frafio.myfinance.data.enums.db.Languages
@@ -12,8 +11,7 @@ import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 
-open class DatePickerRangeButton(
-    layout: View,
+open class DatePickerRangeDialog(
     private val context: FragmentActivity
 ) {
     companion object {
@@ -25,21 +23,16 @@ open class DatePickerRangeButton(
         }
     }
 
-    val listener = View.OnClickListener {
+    var startDate: LocalDate? = null
+    var endDate: LocalDate? = null
+
+    fun show() {
         onStart()
         val builder = MaterialDatePicker.Builder.dateRangePicker()
         builder.setTitleText(DATE_PICKER_TITLE)
         val materialDatePicker = builder.build()
         showDatePicker(materialDatePicker)
     }
-
-    var startDate: LocalDate? = null
-    var endDate: LocalDate? = null
-
-    init {
-        layout.setOnClickListener(listener)
-    }
-
 
     private fun showDatePicker(materialDatePicker: MaterialDatePicker<*>) {
         if (!materialDatePicker.isAdded) {
