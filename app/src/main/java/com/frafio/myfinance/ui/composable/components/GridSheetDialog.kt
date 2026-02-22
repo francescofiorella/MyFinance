@@ -1,7 +1,6 @@
 package com.frafio.myfinance.ui.composable.components
 
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,13 +50,10 @@ fun GridSheetDialog(
         Column(modifier = Modifier.padding(top = 5.dp)) {
             items.chunked(rowSize).forEach { rowItems ->
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    rowItems.forEach { category ->
+                    rowItems.forEach { item ->
                         GridItem(
                             modifier = Modifier.weight(1f),
-                            icon = category.iconRes,
-                            text = category.textRes,
-                            enabled = category.enabled,
-                            onClick = category.onClick,
+                            item = item,
                             onDismiss = onDismiss
                         )
                     }
@@ -76,40 +72,32 @@ fun GridSheetDialog(
 @Composable
 private fun GridItem(
     modifier: Modifier = Modifier,
-    @DrawableRes icon: Int,
-    @StringRes text: Int,
-    enabled: Boolean = true,
-    onClick: () -> Unit,
+    item: MenuItem,
     onDismiss: () -> Unit
 ) {
     Surface(
-        modifier = if (enabled) {
-            modifier
-                .fillMaxWidth()
-        } else {
-            modifier
-                .fillMaxWidth()
-                .alpha(0.38f)
-        },
+        modifier = modifier.alpha(if (item.enabled) 1f else 0.38f),
         onClick = {
-            onClick()
+            item.onClick()
             onDismiss()
         },
-        enabled = enabled,
+        enabled = item.enabled,
         color = MaterialTheme.colorScheme.surfaceContainerLow
     ) {
         Column(
-            modifier = modifier.padding(vertical = 15.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 15.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                painter = painterResource(id = icon),
+                painter = painterResource(id = item.iconRes),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = stringResource(id = text),
+                text = stringResource(id = item.textRes),
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,

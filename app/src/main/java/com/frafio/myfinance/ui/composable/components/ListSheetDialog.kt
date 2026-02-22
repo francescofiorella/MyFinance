@@ -44,40 +44,48 @@ fun ListSheetDialog(
         modifier = modifier
     ) {
         items.forEach { item ->
-            Surface(
-                modifier = if (item.enabled) {
-                    Modifier
-                } else {
-                    Modifier.alpha(0.38f)
-                },
-                onClick = {
-                    item.onClick()
-                    onDismiss()
-                },
-                enabled = item.enabled,
-                color = MaterialTheme.colorScheme.surfaceContainerLow
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = item.iconRes),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(vertical = 15.dp)
-                    )
-                    Spacer(modifier = Modifier.width(20.dp))
-                    Text(
-                        text = stringResource(id = item.textRes),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 16.sp
-                    )
-                }
-            }
+            ListItem(
+                item = item,
+                onDismiss = onDismiss
+            )
+        }
+    }
+}
+
+@Composable
+private fun ListItem(
+    item: MenuItem,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.alpha(if (item.enabled) 1f else 0.38f),
+        onClick = {
+            item.onClick()
+            onDismiss()
+        },
+        enabled = item.enabled,
+        color = MaterialTheme.colorScheme.surfaceContainerLow
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = item.iconRes),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = 15.dp)
+            )
+            Spacer(modifier = Modifier.width(20.dp))
+            Text(
+                text = stringResource(id = item.textRes),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 16.sp
+            )
         }
     }
 }

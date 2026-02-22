@@ -64,8 +64,7 @@ private fun SheetHeader(
     endContent: String? = null
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
@@ -88,7 +87,7 @@ private fun SheetHeader(
             }
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
-                val labelText = @Composable {
+                val labelComposable = @Composable {
                     Text(
                         text = label,
                         style = MaterialTheme.typography.bodyMedium,
@@ -96,7 +95,7 @@ private fun SheetHeader(
                         fontSize = 14.sp
                     )
                 }
-                val titleText = @Composable {
+                val titleComposable = @Composable {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.bodyMedium,
@@ -106,11 +105,11 @@ private fun SheetHeader(
                 }
 
                 if (labelFirst) {
-                    labelText()
-                    titleText()
+                    labelComposable()
+                    titleComposable()
                 } else {
-                    titleText()
-                    labelText()
+                    titleComposable()
+                    labelComposable()
                 }
             }
             if (endContent != null) {
