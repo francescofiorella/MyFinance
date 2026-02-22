@@ -27,14 +27,14 @@ fun FilterExpensesSheet(
         onDismiss = onDismiss,
         items = listOf(
             MenuItem(
-                icon = R.drawable.ic_grid_3x3_filled,
-                text = stringResource(id = R.string.category),
+                iconRes = R.drawable.ic_grid_3x3_filled,
+                textRes = R.string.category,
                 enabled = categoryEnabled,
                 onClick = onSelectCategory
             ),
             MenuItem(
-                icon = R.drawable.ic_today_outline,
-                text = stringResource(id = R.string.date_range),
+                iconRes = R.drawable.ic_today_outline,
+                textRes = R.string.date_range,
                 enabled = dateRangeEnabled,
                 onClick = onSelectDateRange
             )

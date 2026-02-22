@@ -26,7 +26,7 @@
     <string name="forgotten_password">Hai dimenticato la password? Clicca qui</string>
     <string name="login_google">Accedi con Google</string>
     <string name="login_signup">Non hai un account? Iscriviti</string>
-    <string name="signup_name">Inserisci il tuo nome completo</string>
+    <string name="signup_name">Inserisci il tuo nome</string>
     <string name="signup_password">Crea una password</string>
     <string name="signup_password_confirm">Conferma la tua password</string>
     <string name="signup">Registrati</string>

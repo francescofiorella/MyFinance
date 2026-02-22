@@ -46,17 +46,14 @@ class ProfileFragment : BaseFragment(), ProfileListener {
         }
 
         binding.profileEditCard.setOnClickListener {
-            if (resources.getBoolean(R.bool.is600dp)) {
-                val sideSheetDialog = SideSheetDialog(requireContext())
-                val composeView = getEditProfileSheetDialogComposeView { sideSheetDialog.hide() }
-                sideSheetDialog.setContentView(composeView)
-                sideSheetDialog.show()
+            val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+                SideSheetDialog(requireContext())
             } else {
-                val bottomSheetDialog = BottomSheetDialog(requireContext())
-                val composeView = getEditProfileSheetDialogComposeView { bottomSheetDialog.hide() }
-                bottomSheetDialog.setContentView(composeView)
-                bottomSheetDialog.show()
+                BottomSheetDialog(requireContext())
             }
+            val composeView = getEditProfileSheetDialogComposeView(sheetDialog::hide)
+            sheetDialog.setContentView(composeView)
+            sheetDialog.show()
         }
 
         binding.dynamicColorSwitch.also {
@@ -92,19 +89,15 @@ class ProfileFragment : BaseFragment(), ProfileListener {
                             (activity as HomeActivity).showSnackBar(getString(R.string.coming_soon))
                         },
                         onEditFullName = {
-                            if (resources.getBoolean(R.bool.is600dp)) {
-                                val sideSheetDialog = SideSheetDialog(requireContext())
-                                val composeView = getEditFullNameSheetDialogComposeView { sideSheetDialog.hide() }
-                                sideSheetDialog.setContentView(composeView)
-                                onDismiss()
-                                sideSheetDialog.show()
+                            val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+                                SideSheetDialog(requireContext())
                             } else {
-                                val bottomSheetDialog = BottomSheetDialog(requireContext())
-                                val composeView = getEditFullNameSheetDialogComposeView { bottomSheetDialog.hide() }
-                                bottomSheetDialog.setContentView(composeView)
-                                onDismiss()
-                                bottomSheetDialog.show()
+                                BottomSheetDialog(requireContext())
                             }
+                            val composeView = getEditFullNameSheetDialogComposeView(sheetDialog::hide)
+                            sheetDialog.setContentView(composeView)
+                            onDismiss()
+                            sheetDialog.show()
                         }
                     )
                 }

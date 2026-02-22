@@ -7,11 +7,9 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
@@ -31,6 +29,7 @@ import com.frafio.myfinance.data.widget.DatePickerRangeDialog
 import com.frafio.myfinance.databinding.FragmentExpensesBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
+import com.frafio.myfinance.ui.composable.components.CategorySheetDialog
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_BUTTON_CLICK
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_CLICK
@@ -42,21 +41,13 @@ import com.frafio.myfinance.utils.addTotalsToExpensesWithoutToday
 import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.sidesheet.SideSheetDialog
-import com.google.android.material.textview.MaterialTextView
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
 
 class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesListener {
-
-    companion object {
-        private const val SHOW_CATEGORY = "SHOW_CATEGORY"
-        private const val SHOW_CATEGORY_FILTER = "SHOW_CATEGORY_FILTER"
-    }
 
     private lateinit var binding: FragmentExpensesBinding
     private val viewModel by viewModels<ExpensesViewModel>()
@@ -210,21 +201,14 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
     }
 
     private val onFilterClickListener = View.OnClickListener {
-        if (resources.getBoolean(R.bool.is600dp)) {
-            val sideSheetDialog = SideSheetDialog(requireContext())
-            val composeView = getFilterExpensesSheetDialogComposeView {
-                sideSheetDialog.hide()
-            }
-            sideSheetDialog.setContentView(composeView)
-            sideSheetDialog.show()
+        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+            SideSheetDialog(requireContext())
         } else {
-            val bottomSheetDialog = BottomSheetDialog(requireContext())
-            val composeView = getFilterExpensesSheetDialogComposeView {
-                bottomSheetDialog.hide()
-            }
-            bottomSheetDialog.setContentView(composeView)
-            bottomSheetDialog.show()
+            BottomSheetDialog(requireContext())
         }
+        val composeView = getFilterExpensesSheetDialogComposeView(sheetDialog::hide)
+        sheetDialog.setContentView(composeView)
+        sheetDialog.show()
     }
 
     override fun onItemInteraction(
@@ -236,42 +220,33 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             ON_CLICK -> Unit
 
             ON_LONG_CLICK -> {
-                if (resources.getBoolean(R.bool.is600dp)) {
-                    val sideSheetDialog = SideSheetDialog(requireContext())
-                    val composeView = getEditExpenseSheetDialogComposeView(expense, position) {
-                        sideSheetDialog.hide()
-                    }
-                    sideSheetDialog.setContentView(composeView)
-                    sideSheetDialog.show()
+                val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+                    SideSheetDialog(requireContext())
                 } else {
-                    val bottomSheetDialog = BottomSheetDialog(requireContext())
-                    val composeView = getEditExpenseSheetDialogComposeView(expense, position) {
-                        bottomSheetDialog.hide()
-                    }
-                    bottomSheetDialog.setContentView(composeView)
-                    bottomSheetDialog.show()
+                    BottomSheetDialog(requireContext())
                 }
+                val composeView = getEditExpenseSheetDialogComposeView(
+                    expense,
+                    position,
+                    sheetDialog::hide
+                )
+                sheetDialog.setContentView(composeView)
+                sheetDialog.show()
             }
 
             ON_BUTTON_CLICK -> {
-                if (resources.getBoolean(R.bool.is600dp)) {
-                    val sideSheetDialog = SideSheetDialog(requireContext())
-                    sideSheetDialog.setContentView(R.layout.layout_category_sheet)
-                    defineSheetInterface(
-                        sideSheetDialog.findViewById(android.R.id.content)!!,
-                        expense,
-                        sideSheetDialog::hide,
-                        SHOW_CATEGORY
-                    )
-                    sideSheetDialog.show()
+                val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+                    SideSheetDialog(requireContext())
                 } else {
-                    val modalBottomSheet = ModalBottomSheet(
-                        this,
-                        expense,
-                        SHOW_CATEGORY
-                    )
-                    modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+                    BottomSheetDialog(requireContext())
                 }
+                val composeView = getCategorySheetDialogComposeView(
+                    expense = expense,
+                    onDismiss = sheetDialog::hide,
+                    onCategorySelected = { viewModel.updateCategory(expense, it) }
+                )
+                sheetDialog.setContentView(composeView)
+                sheetDialog.show()
             }
 
             ON_LOAD_MORE_REQUEST -> {
@@ -512,24 +487,26 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                         dateRangeEnabled = viewModel.dateFilter == null,
                         onSelectCategory = {
                             onDismiss()
-                            if (resources.getBoolean(R.bool.is600dp)) {
-                                val sideSheetDialog = SideSheetDialog(requireContext())
-                                sideSheetDialog.setContentView(R.layout.layout_category_sheet)
-                                defineSheetInterface(
-                                    sideSheetDialog.findViewById(android.R.id.content)!!,
-                                    null,
-                                    sideSheetDialog::hide,
-                                    SHOW_CATEGORY_FILTER
-                                )
-                                sideSheetDialog.show()
+                            val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+                                SideSheetDialog(requireContext())
                             } else {
-                                val modalBottomSheet = ModalBottomSheet(
-                                    this@ExpensesFragment,
-                                    null,
-                                    SHOW_CATEGORY_FILTER
-                                )
-                                modalBottomSheet.show(parentFragmentManager, ModalBottomSheet.TAG)
+                                BottomSheetDialog(requireContext())
                             }
+                            val composeView = getCategorySheetDialogComposeView(
+                                disabledCategories = viewModel.categoryFilterList,
+                                onDismiss = sheetDialog::hide,
+                                onCategorySelected = {
+                                    viewModel.categoryFilterList.add(it)
+                                    addCategoryChip(it)
+                                    recViewLiveData.removeSource(localExpensesLiveData)
+                                    localExpensesLiveData = viewModel.getLocalExpenses()
+                                    recViewLiveData.addSource(localExpensesLiveData) { value ->
+                                        recViewLiveData.value = value
+                                    }
+                                }
+                            )
+                            sheetDialog.setContentView(composeView)
+                            sheetDialog.show()
                         },
                         onSelectDateRange = {
                             onDismiss()
@@ -541,131 +518,24 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
     }
 
-    class ModalBottomSheet(
-        private val fragment: ExpensesFragment,
-        private val expense: Expense?,
-        private val sourceTag: String
-    ) : BottomSheetDialogFragment() {
-
-        companion object {
-            const val TAG = "ModalBottomSheet"
-        }
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-            val layout = inflater.inflate(
-                R.layout.layout_category_sheet,
-                container,
-                false
-            )
-            fragment.defineSheetInterface(
-                layout,
-                expense,
-                this::dismiss,
-                sourceTag
-            )
-            return layout
-        }
-    }
-
-    fun defineSheetInterface(
-        layout: View,
-        expense: Expense?,
-        dismissFun: () -> Unit,
-        sourceTag: String
-    ) {
-        fun onCategoryClick(categoryId: Int) {
-            when (sourceTag) {
-                SHOW_CATEGORY -> viewModel.updateCategory(expense!!, categoryId)
-                SHOW_CATEGORY_FILTER -> {
-                    viewModel.categoryFilterList.add(categoryId)
-                    addCategoryChip(categoryId)
-                    recViewLiveData.removeSource(localExpensesLiveData)
-                    localExpensesLiveData = viewModel.getLocalExpenses()
-                    recViewLiveData.addSource(localExpensesLiveData) { value ->
-                        recViewLiveData.value = value
-                    }
+    private fun getCategorySheetDialogComposeView(
+        expense: Expense? = null,
+        disabledCategories: List<Int> = listOf(),
+        onDismiss: () -> Unit,
+        onCategorySelected: (Int) -> Unit
+    ): ComposeView {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    CategorySheetDialog(
+                        expense = expense,
+                        disabledCategories = disabledCategories,
+                        onCategorySelected = onCategorySelected,
+                        onDismiss = onDismiss
+                    )
                 }
             }
-            dismissFun()
-        }
-
-        when (sourceTag) {
-            SHOW_CATEGORY -> {
-                layout.findViewById<MaterialTextView>(R.id.nameTV).text = expense!!.name
-                layout.findViewById<MaterialTextView>(R.id.dateTV).text = expense.getDateString(true)
-                layout.findViewById<MaterialTextView>(R.id.priceTV).text = expense.getPriceString()
-                layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon)
-                    .icon = getCategoryDrawable(expense.category!!)
-            }
-
-            SHOW_CATEGORY_FILTER -> {
-                layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout)
-                    .visibility = View.GONE
-                layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout)
-                    .visibility = View.VISIBLE
-                for (filterId in viewModel.categoryFilterList) {
-                    when (filterId) {
-                        FirestoreEnums.CATEGORIES.HOUSING.value ->
-                            layout.findViewById<TextView>(R.id.housingTV).isEnabled = false
-
-                        FirestoreEnums.CATEGORIES.GROCERIES.value ->
-                            layout.findViewById<TextView>(R.id.groceriesTV).isEnabled = false
-
-                        FirestoreEnums.CATEGORIES.PERSONAL_CARE.value ->
-                            layout.findViewById<TextView>(R.id.personal_careTV).isEnabled = false
-
-                        FirestoreEnums.CATEGORIES.ENTERTAINMENT.value ->
-                            layout.findViewById<TextView>(R.id.entertainmentTV).isEnabled = false
-
-                        FirestoreEnums.CATEGORIES.EDUCATION.value ->
-                            layout.findViewById<TextView>(R.id.educationTV).isEnabled = false
-
-                        FirestoreEnums.CATEGORIES.DINING.value ->
-                            layout.findViewById<TextView>(R.id.diningTV).isEnabled = false
-
-                        FirestoreEnums.CATEGORIES.HEALTH.value ->
-                            layout.findViewById<TextView>(R.id.healthTV).isEnabled = false
-
-                        FirestoreEnums.CATEGORIES.TRANSPORTATION.value ->
-                            layout.findViewById<TextView>(R.id.transportationTV).isEnabled = false
-
-                        FirestoreEnums.CATEGORIES.MISCELLANEOUS.value ->
-                            layout.findViewById<TextView>(R.id.miscellaneousTV).isEnabled = false
-                    }
-                }
-            }
-        }
-        // layout_category_bottom_sheet.xml
-        layout.findViewById<TextView>(R.id.housingTV).setOnClickListener {
-            onCategoryClick(FirestoreEnums.CATEGORIES.HOUSING.value)
-        }
-        layout.findViewById<TextView>(R.id.groceriesTV).setOnClickListener {
-            onCategoryClick(FirestoreEnums.CATEGORIES.GROCERIES.value)
-        }
-        layout.findViewById<TextView>(R.id.personal_careTV).setOnClickListener {
-            onCategoryClick(FirestoreEnums.CATEGORIES.PERSONAL_CARE.value)
-        }
-        layout.findViewById<TextView>(R.id.entertainmentTV).setOnClickListener {
-            onCategoryClick(FirestoreEnums.CATEGORIES.ENTERTAINMENT.value)
-        }
-        layout.findViewById<TextView>(R.id.educationTV).setOnClickListener {
-            onCategoryClick(FirestoreEnums.CATEGORIES.EDUCATION.value)
-        }
-        layout.findViewById<TextView>(R.id.diningTV).setOnClickListener {
-            onCategoryClick(FirestoreEnums.CATEGORIES.DINING.value)
-        }
-        layout.findViewById<TextView>(R.id.healthTV).setOnClickListener {
-            onCategoryClick(FirestoreEnums.CATEGORIES.HEALTH.value)
-        }
-        layout.findViewById<TextView>(R.id.transportationTV).setOnClickListener {
-            onCategoryClick(FirestoreEnums.CATEGORIES.TRANSPORTATION.value)
-        }
-        layout.findViewById<TextView>(R.id.miscellaneousTV).setOnClickListener {
-            onCategoryClick(FirestoreEnums.CATEGORIES.MISCELLANEOUS.value)
         }
     }
 }

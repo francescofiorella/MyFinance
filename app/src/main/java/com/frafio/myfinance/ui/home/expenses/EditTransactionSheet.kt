@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
@@ -31,13 +30,13 @@ fun EditTransactionSheet(
         onDismiss = onDismiss,
         items = listOf(
             MenuItem(
-                icon = R.drawable.ic_edit_outline,
-                text = stringResource(id = R.string.edit),
+                iconRes = R.drawable.ic_edit_outline,
+                textRes = R.string.edit,
                 onClick = onEdit
             ),
             MenuItem(
-                icon = R.drawable.ic_delete_outline,
-                text = stringResource(id = R.string.delete),
+                iconRes = R.drawable.ic_delete_outline,
+                textRes = R.string.delete,
                 onClick = onDelete
             )
         ),

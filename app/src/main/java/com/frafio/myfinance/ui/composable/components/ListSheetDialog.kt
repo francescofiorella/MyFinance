@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +47,11 @@ fun ListSheetDialog(
         for (item in items) {
             Column {
                 Surface(
+                    modifier = if (item.enabled) {
+                        Modifier
+                    } else {
+                        Modifier.alpha(0.38f)
+                    },
                     onClick = {
                         item.onClick()
                         onDismiss()
@@ -59,27 +65,17 @@ fun ListSheetDialog(
                             .padding(horizontal = 30.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val iconColor = if (item.enabled) {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-                        }
-                        val textColor = if (item.enabled) {
-                            MaterialTheme.colorScheme.onSurface
-                        } else {
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                        }
                         Icon(
-                            painter = painterResource(id = item.icon),
+                            painter = painterResource(id = item.iconRes),
                             contentDescription = null,
-                            tint = iconColor,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(vertical = 15.dp)
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                         Text(
-                            text = item.text,
+                            text = stringResource(id = item.textRes),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = textColor,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 16.sp
                         )
                     }
@@ -100,13 +96,13 @@ fun EditProfileSheetPreview() {
             onDismiss = {},
             items = listOf(
                 MenuItem(
-                    R.drawable.ic_upload_filled,
-                    stringResource(id = R.string.edit_propic),
-                    false
+                    iconRes = R.drawable.ic_upload_filled,
+                    textRes = R.string.edit_propic,
+                    enabled = false
                 ) {},
                 MenuItem(
-                    R.drawable.ic_edit_outline,
-                    stringResource(id = R.string.edit_full_name)
+                    iconRes = R.drawable.ic_edit_outline,
+                    textRes = R.string.edit_full_name
                 ) {}
             ),
             modifier = Modifier

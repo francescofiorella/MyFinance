@@ -25,13 +25,13 @@ fun EditProfileSheet(
         onDismiss = onDismiss,
         items = listOf(
             MenuItem(
-                icon = R.drawable.ic_upload_filled,
-                text = stringResource(id = R.string.edit_propic),
+                iconRes = R.drawable.ic_upload_filled,
+                textRes = R.string.edit_propic,
                 onClick = onUploadProPic
             ),
             MenuItem(
-                icon = R.drawable.ic_edit_outline,
-                text = stringResource(id = R.string.edit_full_name),
+                iconRes = R.drawable.ic_edit_outline,
+                textRes = R.string.edit_full_name,
                 onClick = onEditFullName
             )
         ),

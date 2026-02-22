@@ -66,7 +66,7 @@ fun EditFullNameSheet(
                 onValueChange = { nameTextFieldValue = it },
                 modifier = Modifier
                     .weight(1f),
-                placeholder = { Text(stringResource(id = R.string.signup_name)) },
+                label = { Text(stringResource(id = R.string.signup_name)) },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
