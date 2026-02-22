@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
@@ -20,7 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Expense
@@ -29,18 +27,21 @@ import com.frafio.myfinance.data.widget.DatePickerRangeDialog
 import com.frafio.myfinance.databinding.FragmentExpensesBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
+import com.frafio.myfinance.ui.features.home.expenses.CategorySheetDialog
+import com.frafio.myfinance.ui.features.home.EditTransactionSheet
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_BUTTON_CLICK
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_CLICK
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
+import com.frafio.myfinance.ui.features.home.expenses.FilterChipBar
+import com.frafio.myfinance.ui.features.home.expenses.FilterExpensesSheet
 import com.frafio.myfinance.utils.addTotalsToExpenses
 import com.frafio.myfinance.utils.addTotalsToExpensesWithoutToday
 import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.chip.Chip
 import com.google.android.material.sidesheet.SideSheetDialog
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -89,11 +90,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 when (newState) {
-                    /*SCROLL_STATE_IDLE -> {
-                        val position = (binding.listRecyclerView.layoutManager as LinearLayoutManager)
-                            .findFirstVisibleItemPosition()
-                        scrollTo(position)
-                    }*/
                     RecyclerView.SCROLL_STATE_DRAGGING -> {
                         requireActivity().hideSoftKeyboard(binding.root)
                         binding.searchET.clearFocus()
@@ -108,11 +104,7 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
 
         binding.searchET.doOnTextChanged { text, _, _, _ ->
             viewModel.nameFilter = text.toString()
-            recViewLiveData.removeSource(localExpensesLiveData)
-            localExpensesLiveData = viewModel.getLocalExpenses()
-            recViewLiveData.addSource(localExpensesLiveData) { value ->
-                recViewLiveData.value = value
-            }
+            refreshExpensesList()
         }
 
         localExpensesLiveData = viewModel.getLocalExpenses()
@@ -120,13 +112,11 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             recViewLiveData.value = value
         }
         recViewLiveData.observe(viewLifecycleOwner) { expenses ->
-            // Evaluate limit and decide if new items can be retrieved
             val limit = if (binding.listRecyclerView.adapter != null) {
                 (binding.listRecyclerView.adapter as ExpenseAdapter).getLimit()
             } else {
                 DEFAULT_LIMIT
             }
-            // Get list with limit and update recList
             var nl = expenses.take(limit.toInt()).map { p -> p.copy() }
             nl = if (
                 viewModel.nameFilter.isEmpty() &&
@@ -151,7 +141,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                     }
                 }
                 toScroll?.let { id ->
-                    // If the list was just created and an item was just added
                     scrollToId(id)
                     toScroll = null
                 }
@@ -169,33 +158,69 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             override fun onPositiveBtnClickListener() {
                 super.onPositiveBtnClickListener()
                 viewModel.dateFilter = Pair(startDate!!, endDate!!)
-                addDateChip(startDate!!, endDate!!)
-                recViewLiveData.removeSource(localExpensesLiveData)
-                localExpensesLiveData = viewModel.getLocalExpenses()
-                recViewLiveData.addSource(localExpensesLiveData) { value ->
-                    recViewLiveData.value = value
-                }
+                updateFilterChips()
+                refreshExpensesList()
             }
         }
+
+        binding.filterComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
         return binding.root
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        if (viewModel.dateFilter != null) {
-            addDateChip(
-                viewModel.dateFilter!!.first,
-                viewModel.dateFilter!!.second
-            )
-        }
-        for (categoryId in viewModel.categoryFilterList) {
-            addCategoryChip(categoryId)
-        }
+        updateFilterChips()
+        refreshExpensesList()
+    }
+
+    private fun refreshExpensesList() {
         recViewLiveData.removeSource(localExpensesLiveData)
         localExpensesLiveData = viewModel.getLocalExpenses()
         recViewLiveData.addSource(localExpensesLiveData) { value ->
             recViewLiveData.value = value
+        }
+    }
+
+    private fun updateFilterChips() {
+        if (viewModel.categoryFilterList.isEmpty() && viewModel.dateFilter == null) {
+            binding.filterComposeView.visibility = View.GONE
+            return
+        }
+        binding.filterComposeView.visibility = View.VISIBLE
+        binding.filterComposeView.setContent {
+            MyFinanceTheme {
+                FilterChipBar(
+                    categories = viewModel.categoryFilterList.toList(),
+                    dateFilter = viewModel.dateFilter,
+                    getDateLabel = { start, end -> getDateChipLabel(start, end) },
+                    onCategoryRemoved = { categoryId ->
+                        viewModel.categoryFilterList.remove(categoryId)
+                        refreshExpensesList()
+                        updateFilterChips()
+                    },
+                    onDateRemoved = {
+                        viewModel.dateFilter = null
+                        refreshExpensesList()
+                        updateFilterChips()
+                    }
+                )
+            }
+        }
+    }
+
+    private fun getDateChipLabel(startDate: LocalDate, endDate: LocalDate): String {
+        return when (startDate.year) {
+            endDate.year if startDate.monthValue == endDate.monthValue -> {
+                val startDayOfMonth = if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+                "$startDayOfMonth - ${dateToExtendedString(endDate)}"
+            }
+            endDate.year -> {
+                val startDayOfMonth = if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+                val startMonth = startDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceFirstChar { it.uppercase() }
+                "$startDayOfMonth $startMonth - ${dateToExtendedString(endDate)}"
+            }
+            else -> "${dateToExtendedString(startDate)} - ${dateToExtendedString(endDate)}"
         }
     }
 
@@ -249,18 +274,12 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             }
 
             ON_LOAD_MORE_REQUEST -> {
-                // Increment elements limit on scroll
                 if (!isListBlocked) {
                     isListBlocked = true
                     binding.listRecyclerView.adapter?.let {
                         (it as ExpenseAdapter).getLimit(true)
                     }
-                    // this trigger the observer
-                    recViewLiveData.removeSource(localExpensesLiveData)
-                    localExpensesLiveData = viewModel.getLocalExpenses()
-                    recViewLiveData.addSource(localExpensesLiveData) { value ->
-                        recViewLiveData.value = value
-                    }
+                    refreshExpensesList()
                 }
             }
         }
@@ -345,90 +364,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
     }
 
-    private fun getCategoryDrawable(categoryId: Int) = ContextCompat.getDrawable(
-        requireContext(),
-        when (categoryId) {
-            FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_home_filled
-            FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart_filled
-            FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care_filled
-            FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy_filled
-            FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school_filled
-            FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant_filled
-            FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines_filled
-            FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_subway_filled
-            FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_grid_3x3_filled
-            else -> R.drawable.ic_grid_3x3_filled
-        }
-    )
-
-    private fun addCategoryChip(categoryId: Int) {
-        val label = resources.getStringArray(R.array.categories)[categoryId]
-        val chip = layoutInflater.inflate(
-            R.layout.layout_chip_input,
-            binding.filterChipGroup,
-            false
-        ) as Chip
-        chip.text = label
-        chip.chipIcon = getCategoryDrawable(categoryId)
-        chip.setOnCloseIconClickListener {
-            binding.filterChipGroup.removeView(chip)
-            viewModel.categoryFilterList.remove(categoryId)
-            if (viewModel.categoryFilterList.isEmpty() && viewModel.dateFilter == null)
-                binding.filterChipGroup.visibility = View.GONE
-
-            recViewLiveData.removeSource(localExpensesLiveData)
-            localExpensesLiveData = viewModel.getLocalExpenses()
-            recViewLiveData.addSource(localExpensesLiveData) { value ->
-                recViewLiveData.value = value
-            }
-        }
-        binding.filterChipGroup.addView(chip)
-        binding.filterChipGroup.visibility = View.VISIBLE
-    }
-
-    private fun addDateChip(startDate: LocalDate, endDate: LocalDate) {
-        val label =
-            when (startDate.year) {
-                endDate.year if startDate.monthValue == endDate.monthValue -> {
-                    val startDayOfMonth =
-                        if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
-                    "$startDayOfMonth - ${dateToExtendedString(endDate)}"
-                }
-                endDate.year -> {
-                    val startDayOfMonth =
-                        if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
-                    val startMonth =
-                        startDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                            .replaceFirstChar { it.uppercase() }
-                    "$startDayOfMonth $startMonth - ${dateToExtendedString(endDate)}"
-                }
-                else -> {
-                    "${dateToExtendedString(startDate)} - ${dateToExtendedString(endDate)}"
-                }
-            }
-        val chip = layoutInflater.inflate(
-            R.layout.layout_chip_input,
-            binding.filterChipGroup,
-            false
-        ) as Chip
-        chip.text = label
-        chip.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_today_filled)
-        chip.setOnCloseIconClickListener {
-            viewModel.dateFilter = null
-            binding.filterChipGroup.removeView(chip)
-            if (viewModel.categoryFilterList.isEmpty() && viewModel.dateFilter == null)
-                binding.filterChipGroup.visibility = View.GONE
-
-            recViewLiveData.removeSource(localExpensesLiveData)
-            localExpensesLiveData = viewModel.getLocalExpenses()
-            recViewLiveData.addSource(localExpensesLiveData) { value ->
-                recViewLiveData.value = value
-            }
-        }
-        binding.filterChipGroup.addView(chip)
-        binding.filterChipGroup.visibility = View.VISIBLE
-    }
-
     private fun getEditExpenseSheetDialogComposeView(
         expense: Expense,
         position: Int,
@@ -496,12 +431,8 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                                 onDismiss = sheetDialog::hide,
                                 onCategorySelected = {
                                     viewModel.categoryFilterList.add(it)
-                                    addCategoryChip(it)
-                                    recViewLiveData.removeSource(localExpensesLiveData)
-                                    localExpensesLiveData = viewModel.getLocalExpenses()
-                                    recViewLiveData.addSource(localExpensesLiveData) { value ->
-                                        recViewLiveData.value = value
-                                    }
+                                    updateFilterChips()
+                                    refreshExpensesList()
                                 }
                             )
                             sheetDialog.setContentView(composeView)

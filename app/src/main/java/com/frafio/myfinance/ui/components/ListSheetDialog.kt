@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.composable.components
+package com.frafio.myfinance.ui.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background

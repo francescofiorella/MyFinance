@@ -1,6 +1,5 @@
-package com.frafio.myfinance.ui.auth
+package com.frafio.myfinance.ui.features.home.profile
 
-import android.util.Patterns
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,39 +24,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.ui.composable.components.SheetDialog
+import com.frafio.myfinance.ui.components.SheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 
 @Composable
-fun ResetPasswordSheet(
+fun EditFullNameSheet(
+    fullName: String,
     onDismiss: () -> Unit,
-    onSend: (String) -> Unit,
+    onEditFullName: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var emailFieldValue by remember {
+    var nameTextFieldValue by remember {
         mutableStateOf(
             TextFieldValue(
-                text = "",
+                text = fullName,
+                selection = TextRange(fullName.length)
             )
         )
     }
 
-    val isEmailValid by remember(emailFieldValue.text) {
-        derivedStateOf {
-            Patterns.EMAIL_ADDRESS.matcher(emailFieldValue.text.trim()).matches()
-        }
-    }
-
     SheetDialog(
-        icon = R.drawable.ic_password_filled,
-        title = stringResource(id = R.string.password),
-        label = stringResource(id = R.string.reset),
+        icon = R.drawable.ic_person_filled,
+        title = stringResource(id = R.string.your_name),
+        label = stringResource(id = R.string.edit),
         modifier = modifier
     ) {
         Row(
@@ -68,11 +62,11 @@ fun ResetPasswordSheet(
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
-                value = emailFieldValue,
-                onValueChange = { emailFieldValue = it },
+                value = nameTextFieldValue,
+                onValueChange = { nameTextFieldValue = it },
                 modifier = Modifier
                     .weight(1f),
-                label = { Text(stringResource(id = R.string.login_signup_email)) },
+                label = { Text(stringResource(id = R.string.signup_name)) },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
@@ -80,18 +74,17 @@ fun ResetPasswordSheet(
                 ),
                 leadingIcon = {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_mail_outline),
+                        painter = painterResource(id = R.drawable.ic_edit_outline),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Email
-                ),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = {
-                    if (isEmailValid) {
-                        onSend(emailFieldValue.text.trim())
+                    if (nameTextFieldValue.text.trim()
+                            .isNotEmpty() && nameTextFieldValue.text.trim() != fullName
+                    ) {
+                        onEditFullName(nameTextFieldValue.text.trim())
                         onDismiss()
                     }
                 })
@@ -99,14 +92,15 @@ fun ResetPasswordSheet(
             Spacer(modifier = Modifier.width(5.dp))
             FilledTonalIconButton(
                 onClick = {
-                    onSend(emailFieldValue.text.trim())
+                    onEditFullName(nameTextFieldValue.text.trim())
                     onDismiss()
                 },
-                enabled = isEmailValid
+                enabled = nameTextFieldValue.text.trim()
+                    .isNotEmpty() && nameTextFieldValue.text.trim() != fullName
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_send_outline),
-                    contentDescription = stringResource(id = R.string.send)
+                    painter = painterResource(id = R.drawable.ic_check_filled),
+                    contentDescription = stringResource(id = R.string.confirm)
                 )
             }
         }
@@ -115,11 +109,12 @@ fun ResetPasswordSheet(
 
 @Preview(showBackground = true)
 @Composable
-fun ResetPasswordSheetPreview() {
+fun EditFullNameSheetPreview() {
     MyFinanceTheme {
-        ResetPasswordSheet(
+        EditFullNameSheet(
+            fullName = "John Doe",
             onDismiss = {},
-            onSend = {},
+            onEditFullName = {},
             modifier = Modifier
                 .background(color = MaterialTheme.colorScheme.surfaceContainerLow)
         )

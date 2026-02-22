@@ -12,6 +12,7 @@
     <string name="cancel">Annulla</string>
     <string name="confirm">Conferma</string>
     <string name="send">Invia</string>
+    <string name="remove">Rimuovi</string>
 
     <string name="login_successful">Hai effettuato l\'accesso come</string>
 

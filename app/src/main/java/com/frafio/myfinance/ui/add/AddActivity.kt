@@ -21,7 +21,7 @@ import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.widget.DatePickerButton
 import com.frafio.myfinance.databinding.ActivityAddBinding
-import com.frafio.myfinance.ui.home.expenses.CategorySheetDialog
+import com.frafio.myfinance.ui.features.home.expenses.CategorySheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.doubleToString

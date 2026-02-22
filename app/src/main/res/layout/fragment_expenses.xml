@@ -104,12 +104,11 @@
 
         </LinearLayout>
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/filterChipGroup"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/filterComposeView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingHorizontal="15dp"
-            android:paddingVertical="10dp"
             android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView

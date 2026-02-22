@@ -15,6 +15,8 @@ import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.databinding.FragmentProfileBinding
 import com.frafio.myfinance.ui.BaseFragment
+import com.frafio.myfinance.ui.features.home.profile.EditFullNameSheet
+import com.frafio.myfinance.ui.features.home.profile.EditProfileSheet
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.setRoundDrawableFromUrl
@@ -94,7 +96,8 @@ class ProfileFragment : BaseFragment(), ProfileListener {
                             } else {
                                 BottomSheetDialog(requireContext())
                             }
-                            val composeView = getEditFullNameSheetDialogComposeView(sheetDialog::hide)
+                            val composeView =
+                                getEditFullNameSheetDialogComposeView(sheetDialog::hide)
                             sheetDialog.setContentView(composeView)
                             onDismiss()
                             sheetDialog.show()

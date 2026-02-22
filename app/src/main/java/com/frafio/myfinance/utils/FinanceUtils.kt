@@ -21,6 +21,21 @@ fun getCategoryIcon(categoryId: Int?): Int {
     }
 }
 
+fun getCategoryName(categoryId: Int?): Int {
+    return when (categoryId) {
+        FirestoreEnums.CATEGORIES.HOUSING.value -> R.string.housing
+        FirestoreEnums.CATEGORIES.GROCERIES.value -> R.string.groceries
+        FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.string.personal_care
+        FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.string.entertainment
+        FirestoreEnums.CATEGORIES.EDUCATION.value -> R.string.education
+        FirestoreEnums.CATEGORIES.DINING.value -> R.string.dining
+        FirestoreEnums.CATEGORIES.HEALTH.value -> R.string.health
+        FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.string.transportation
+        FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.string.miscellaneous
+        else -> R.string.category
+    }
+}
+
 fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
     val expenseList = mutableListOf<Expense>()
     // Create total for the local list

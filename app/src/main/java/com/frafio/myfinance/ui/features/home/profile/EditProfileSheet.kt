@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.home.profile
+package com.frafio.myfinance.ui.features.home.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.model.MenuItem
-import com.frafio.myfinance.ui.composable.components.ListSheetDialog
+import com.frafio.myfinance.ui.components.ListSheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 
 @Composable

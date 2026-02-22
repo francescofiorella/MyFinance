@@ -12,6 +12,7 @@
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
     <string name="send">Send</string>
+    <string name="remove">Remove</string>
 
     <string name="login_successful">You are logged in as</string>
 

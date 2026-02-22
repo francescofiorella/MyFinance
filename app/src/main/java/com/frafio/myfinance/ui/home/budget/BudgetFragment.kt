@@ -29,7 +29,7 @@ import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.budget.IncomeInteractionListener.Companion.ON_LONG_CLICK
-import com.frafio.myfinance.ui.home.expenses.EditTransactionSheet
+import com.frafio.myfinance.ui.features.home.EditTransactionSheet
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.addTotalsToIncomes
 import com.frafio.myfinance.utils.clearText
