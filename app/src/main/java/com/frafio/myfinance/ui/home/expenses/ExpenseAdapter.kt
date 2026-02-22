@@ -15,6 +15,7 @@ import com.frafio.myfinance.databinding.LayoutTotalItemRvBinding
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_BUTTON_CLICK
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
 import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LONG_CLICK
+import com.frafio.myfinance.utils.getCategoryIcon
 import java.time.LocalDate
 
 class ExpenseAdapter(
@@ -86,18 +87,7 @@ class ExpenseAdapter(
         }
         eHolder.binding.categoryIcon.icon = ContextCompat.getDrawable(
             eHolder.binding.categoryIcon.context,
-            when (currentExpense.category) {
-                FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_home_filled
-                FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart_filled
-                FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care_filled
-                FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy_filled
-                FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school_filled
-                FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant_filled
-                FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines_filled
-                FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_subway_filled
-                FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_grid_3x3_filled
-                else -> R.drawable.ic_grid_3x3_filled
-            }
+            getCategoryIcon(currentExpense.category)
         )
         val types = eHolder.binding.root.context.resources.getStringArray(R.array.categories)
         eHolder.binding.categoryTextView.text =

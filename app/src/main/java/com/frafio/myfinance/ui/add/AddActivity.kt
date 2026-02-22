@@ -3,14 +3,12 @@ package com.frafio.myfinance.ui.add
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -23,12 +21,14 @@ import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.widget.DatePickerButton
 import com.frafio.myfinance.databinding.ActivityAddBinding
+import com.frafio.myfinance.ui.home.expenses.CategorySheetDialog
+import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.doubleToString
+import com.frafio.myfinance.utils.getCategoryIcon
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.frafio.myfinance.utils.snackBar
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.button.MaterialButton
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
 import com.google.android.material.sidesheet.SideSheetDialog
 
@@ -346,129 +346,43 @@ class AddActivity : AppCompatActivity(), AddListener {
         binding.nameET.clearFocus()
         binding.priceET.clearFocus()
         binding.categoryET.requestFocus()
-        if (resources.getBoolean(R.bool.is600dp)) {
-            val sideSheetDialog = SideSheetDialog(this)
-            sideSheetDialog.setContentView(R.layout.layout_category_sheet)
-            defineSheetInterface(
-                sideSheetDialog.findViewById(android.R.id.content)!!,
-                sideSheetDialog::hide
-            )
-            sideSheetDialog.show()
+        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+            SideSheetDialog(this)
         } else {
-            val modalBottomSheet = ModalBottomSheet(this)
-            modalBottomSheet.show(supportFragmentManager, ModalBottomSheet.TAG)
+            BottomSheetDialog(this)
         }
+        val composeView = getCategorySheetDialogComposeView(
+            onDismiss = sheetDialog::hide,
+            onCategorySelected = {
+                binding.categoryTIL.error = ""
+                val categories = resources.getStringArray(R.array.categories)
+                binding.categoryET.setText(categories[it])
+                binding.categoryTIL.setStartIconDrawable(getCategoryIcon(it))
+                viewModel.category = it
+            }
+        )
+        sheetDialog.setContentView(composeView)
+        sheetDialog.show()
     }
 
     private fun evaluateExpenseTotalId(day: Int, month: Int, year: Int): String {
         return "${day}_${month}_${year}"
     }
 
-    class ModalBottomSheet(
-        private val activity: AddActivity
-    ) : BottomSheetDialogFragment() {
-
-        companion object {
-            const val TAG = "ModalBottomSheet"
-        }
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-            val layout =
-                inflater.inflate(R.layout.layout_category_sheet, container, false)
-            activity.defineSheetInterface(
-                layout,
-                this::dismiss
-            )
-            return layout
-        }
-    }
-
-    fun defineSheetInterface(
-        layout: View,
-        dismissFun: () -> Unit
-    ) {
-        fun selectCategory(category: Int) {
-            binding.categoryTIL.error = ""
-            val categories = resources.getStringArray(R.array.categories)
-            binding.categoryET.setText(categories[category])
-            binding.categoryTIL.setStartIconDrawable(
-                when (category) {
-                    FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_home_filled
-                    FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart_filled
-                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care_filled
-                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy_filled
-                    FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school_filled
-                    FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant_filled
-                    FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines_filled
-                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_subway_filled
-                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_grid_3x3_filled
-                    else -> R.drawable.ic_grid_3x3_filled
+    private fun getCategorySheetDialogComposeView(
+        onDismiss: () -> Unit,
+        onCategorySelected: (Int) -> Unit
+    ): ComposeView {
+        return ComposeView(this).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    CategorySheetDialog(
+                        onCategorySelected = onCategorySelected,
+                        onDismiss = onDismiss
+                    )
                 }
-            )
-            viewModel.category = category
-        }
-
-        layout.findViewById<ConstraintLayout>(R.id.expenseDetailLayout).visibility =
-            View.GONE
-        layout.findViewById<ConstraintLayout>(R.id.categoryDetailLayout).visibility =
-            View.VISIBLE
-
-        layout.findViewById<MaterialButton>(R.id.expenseCategoryIcon).icon =
-            ContextCompat.getDrawable(
-                applicationContext,
-                when (viewModel.category) {
-                    FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_home_filled
-                    FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart_filled
-                    FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care_filled
-                    FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy_filled
-                    FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school_filled
-                    FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant_filled
-                    FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines_filled
-                    FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_subway_filled
-                    FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_grid_3x3_filled
-                    else -> R.drawable.ic_grid_3x3_filled
-                }
-            )
-
-        layout.findViewById<TextView>(R.id.housingTV).setOnClickListener {
-            selectCategory(FirestoreEnums.CATEGORIES.HOUSING.value)
-            dismissFun()
-        }
-        layout.findViewById<TextView>(R.id.groceriesTV).setOnClickListener {
-            selectCategory(FirestoreEnums.CATEGORIES.GROCERIES.value)
-            dismissFun()
-        }
-        layout.findViewById<TextView>(R.id.personal_careTV).setOnClickListener {
-            selectCategory(FirestoreEnums.CATEGORIES.PERSONAL_CARE.value)
-            dismissFun()
-        }
-        layout.findViewById<TextView>(R.id.entertainmentTV).setOnClickListener {
-            selectCategory(FirestoreEnums.CATEGORIES.ENTERTAINMENT.value)
-            dismissFun()
-        }
-        layout.findViewById<TextView>(R.id.educationTV).setOnClickListener {
-            selectCategory(FirestoreEnums.CATEGORIES.EDUCATION.value)
-            dismissFun()
-        }
-        layout.findViewById<TextView>(R.id.diningTV).setOnClickListener {
-            selectCategory(FirestoreEnums.CATEGORIES.DINING.value)
-            dismissFun()
-        }
-        layout.findViewById<TextView>(R.id.healthTV).setOnClickListener {
-            selectCategory(FirestoreEnums.CATEGORIES.HEALTH.value)
-            dismissFun()
-        }
-        layout.findViewById<TextView>(R.id.transportationTV).setOnClickListener {
-            selectCategory(FirestoreEnums.CATEGORIES.TRANSPORTATION.value)
-            dismissFun()
-        }
-        layout.findViewById<TextView>(R.id.miscellaneousTV).setOnClickListener {
-            selectCategory(FirestoreEnums.CATEGORIES.MISCELLANEOUS.value)
-            dismissFun()
+            }
         }
     }
 }

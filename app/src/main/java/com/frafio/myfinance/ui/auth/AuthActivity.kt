@@ -4,13 +4,12 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -27,16 +26,15 @@ import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.databinding.ActivityAuthBinding
 import com.frafio.myfinance.ui.home.HomeActivity
+import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.animateRoot
 import com.frafio.myfinance.utils.clearText
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.sidesheet.SideSheetDialog
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
 
 class AuthActivity : AppCompatActivity(), AuthListener {
@@ -114,70 +112,32 @@ class AuthActivity : AppCompatActivity(), AuthListener {
     }
 
     fun onResetButtonClick(view: View) {
-        if (resources.getBoolean(R.bool.is600dp)) {
-            val sideSheetDialog = SideSheetDialog(view.context)
-            sideSheetDialog.setContentView(R.layout.layout_reset_password_sheet)
-            defineSheetInterface(
-                sideSheetDialog.findViewById(android.R.id.content)!!,
-                viewModel,
-                sideSheetDialog::hide
-            )
-            sideSheetDialog.show()
+        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+            SideSheetDialog(this)
         } else {
-            val modalBottomSheet = ModalBottomSheet(
-                this,
-                viewModel
-            )
-            modalBottomSheet.show(supportFragmentManager, ModalBottomSheet.TAG)
+            BottomSheetDialog(this)
         }
+        val composeView = getResetPasswordSheetDialogComposeView(sheetDialog::hide)
+        sheetDialog.setContentView(composeView)
+        sheetDialog.show()
     }
 
-    class ModalBottomSheet(
-        private val activity: AuthActivity,
-        private val viewModel: AuthViewModel
-    ) : BottomSheetDialogFragment() {
-        companion object {
-            const val TAG = "ModalBottomSheet"
-        }
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-            val layout =
-                inflater.inflate(R.layout.layout_reset_password_sheet, container, false)
-            activity.defineSheetInterface(layout, viewModel, this::dismiss)
-            return layout
-        }
-    }
-
-    fun defineSheetInterface(
-        layout: View,
-        viewModel: AuthViewModel,
-        dismissFun: () -> Unit
-    ) {
-        val emailInputLayout = layout.findViewById<TextInputLayout>(R.id.reset_password_emailInputLayout)
-        val emailInputText = layout.findViewById<TextInputEditText>(R.id.reset_password_emailInputText)
-        val sendButton = layout.findViewById<Button>(R.id.send_mail_btn)
-
-        emailInputText.doOnTextChanged { text, _, _, _ ->
-            if (!text.isNullOrEmpty() && text.isNotBlank()) {
-                emailInputLayout.isErrorEnabled = false
-                sendButton.isEnabled = true
-            } else {
-                sendButton.isEnabled = false
+    private fun getResetPasswordSheetDialogComposeView(onDismiss: () -> Unit): ComposeView {
+        return ComposeView(this).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    ResetPasswordSheet(
+                        onDismiss = onDismiss,
+                        onSend = {
+                            onAuthStarted()
+                            clearErrors()
+                            viewModel.resetPassword(it)
+                            onDismiss()
+                        }
+                    )
+                }
             }
-        }
-        sendButton.setOnClickListener {
-            onAuthStarted()
-
-            clearErrors()
-            emailInputLayout.isErrorEnabled = false
-
-            val email = emailInputText.text.toString().trim()
-            viewModel.resetPassword(email)
-            dismissFun()
         }
     }
 

@@ -1,34 +1,21 @@
-package com.frafio.myfinance.ui.composable.components
+package com.frafio.myfinance.ui.home.expenses
 
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.booleanResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.MenuItem
+import com.frafio.myfinance.ui.composable.components.GridSheetDialog
+import com.frafio.myfinance.ui.composable.components.ListSheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
+import com.frafio.myfinance.utils.getCategoryIcon
 
 @Composable
 fun CategorySheetDialog(
@@ -114,121 +101,17 @@ fun CategorySheetDialog(
             onDismiss = onDismiss
         )
     } else {
-        CategoryGridSheetDialog(
+        GridSheetDialog(
             modifier = modifier,
             icon = icon,
             title = title,
             label = label,
             labelFirst = labelFirst,
             endContent = endContent,
-            categories = categories,
+            rowSize = 3,
+            items = categories,
             onDismiss = onDismiss
         )
-    }
-}
-
-@Composable
-private fun CategoryGridSheetDialog(
-    modifier: Modifier = Modifier,
-    @DrawableRes icon: Int,
-    title: String,
-    label: String,
-    labelFirst: Boolean = true,
-    endContent: String? = null,
-    categories: List<MenuItem>,
-    onDismiss: () -> Unit,
-) {
-    SheetDialog(
-        icon = icon,
-        title = title,
-        label = label,
-        labelFirst = labelFirst,
-        endContent = endContent,
-        modifier = modifier
-    ) {
-        Column(modifier = Modifier.padding(top = 5.dp)) {
-            categories.chunked(3).forEach { rowItems ->
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    rowItems.forEach { category ->
-                        CategoryGridItem(
-                            modifier = Modifier.weight(1f),
-                            icon = category.iconRes,
-                            text = category.textRes,
-                            enabled = category.enabled,
-                            onClick = category.onClick,
-                            onDismiss = onDismiss
-                        )
-                    }
-                    // Fill remaining space if row is not full
-                    if (rowItems.size < 3) {
-                        repeat(3 - rowItems.size) {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun CategoryGridItem(
-    modifier: Modifier = Modifier,
-    @DrawableRes icon: Int,
-    @StringRes text: Int,
-    enabled: Boolean = true,
-    onClick: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    Surface(
-        modifier = if (enabled) {
-            modifier
-                .fillMaxWidth()
-        } else {
-            modifier
-                .fillMaxWidth()
-                .alpha(0.38f)
-        },
-        onClick = {
-            onClick()
-            onDismiss()
-        },
-        enabled = enabled,
-        color = MaterialTheme.colorScheme.surfaceContainerLow
-    ) {
-        Column(
-            modifier = modifier.padding(vertical = 15.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = stringResource(id = text),
-                style = MaterialTheme.typography.bodyMedium,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-private fun getCategoryIcon(categoryId: Int?): Int {
-    return when (categoryId) {
-        FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_home_filled
-        FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart_filled
-        FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care_filled
-        FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy_filled
-        FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school_filled
-        FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant_filled
-        FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines_filled
-        FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_subway_filled
-        FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_grid_3x3_filled
-        else -> R.drawable.ic_grid_3x3_filled
     }
 }
 
