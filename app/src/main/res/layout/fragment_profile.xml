@@ -59,7 +59,7 @@
                 android:paddingHorizontal="20dp"
                 android:text="@{viewModel.user.fullName}"
                 android:textAlignment="center"
-                android:textColor="@color/primary_text"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="26sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -104,7 +104,7 @@
                     android:fontFamily="@font/nunito"
                     android:gravity="center_vertical"
                     android:text="@string/edit_profile"
-                    android:textColor="@color/primary_text"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="17sp" />
 
             </com.google.android.material.card.MaterialCardView>
@@ -132,7 +132,7 @@
                     android:fontFamily="@font/nunito"
                     android:gravity="center_vertical"
                     android:text="@string/sign_up_provider"
-                    android:textColor="@color/primary_text"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="17sp" />
 
             </com.google.android.material.card.MaterialCardView>
@@ -159,7 +159,7 @@
                     android:fontFamily="@font/nunito"
                     android:gravity="center_vertical"
                     android:text="@string/signUpDate"
-                    android:textColor="@color/primary_text"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="17sp"
                     tools:text="Account created in 01/01/1970" />
 
@@ -195,7 +195,7 @@
                         android:fontFamily="@font/nunito"
                         android:gravity="center_vertical"
                         android:text="@string/use_dynamic_color"
-                        android:textColor="@color/primary_text"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="17sp" />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -233,7 +233,7 @@
                     android:fontFamily="@font/nunito"
                     android:gravity="center_vertical"
                     android:text="@{viewModel.versionName}"
-                    android:textColor="@color/primary_text"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="17sp"
                     tools:text="MyFinance 1.0.0" />
 

@@ -59,7 +59,7 @@
                 android:fontFamily="@font/nunito_semibold"
                 android:text="@string/warning_home"
                 android:textAlignment="textStart"
-                android:textColor="@color/primary_text"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="21sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

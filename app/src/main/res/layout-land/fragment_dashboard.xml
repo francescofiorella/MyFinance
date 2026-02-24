@@ -57,7 +57,7 @@
                 android:fontFamily="@font/nunito_semibold"
                 android:text="@string/warning_home"
                 android:textAlignment="textStart"
-                android:textColor="@color/primary_text"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="21sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -131,7 +131,7 @@
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
-                            android:textColor="@color/primary_text"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="@dimen/card_price_size"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/thisMonth_TV_title"
@@ -209,7 +209,7 @@
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
-                            android:textColor="@color/primary_text"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="@dimen/card_price_size"
                             tools:text="€ 0.00" />
 
@@ -254,7 +254,7 @@
                             android:layout_marginTop="@dimen/card_text_space"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
-                            android:textColor="@color/primary_text"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="@dimen/card_price_size"
                             tools:text="€ 0.00" />
 
@@ -350,7 +350,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito_semibold"
-                            android:textColor="@color/primary_text"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="20sp"
                             app:layout_constraintEnd_toEndOf="@id/balance_guideline"
                             app:layout_constraintStart_toStartOf="parent"
@@ -375,7 +375,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito_semibold"
                             android:maxLines="1"
-                            android:textColor="@color/primary_text"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="20sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -741,7 +741,7 @@
                                 app:layout_constraintStart_toStartOf="@id/bar_0_layout"
                                 tools:fontFamily="@font/nunito_semibold"
                                 tools:text="06/24"
-                                tools:textColor="@color/primary_text" />
+                                tools:textColor="?attr/colorOnSurface" />
 
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/bar_1_label"

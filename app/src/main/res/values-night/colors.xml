@@ -7,7 +7,7 @@
     <color name="md_theme_onPrimaryContainer">#d4e3ff</color>
     <color name="md_theme_secondary">#bcc7db</color>
     <color name="md_theme_onSecondary">#263141</color>
-    <color name="md_theme_secondaryContainer">#3d4758</color>
+    <color name="md_theme_secondaryContainer">#3c4758</color>
     <color name="md_theme_onSecondaryContainer">#d8e3f8</color>
     <color name="md_theme_tertiary">#d9bde3</color>
     <color name="md_theme_onTertiary">#3d2946</color>
@@ -34,10 +34,4 @@
     <color name="md_theme_inversePrimary">#3b608f</color>
     <color name="md_theme_scrim">#000000</color>
     <color name="md_theme_shadow">#000000</color>
-
-    <!--Theme-related custom colors. -->
-    <color name="primary_text_disabled">#6B6B6F</color>
-    <color name="inverted_primary_text_disabled">#9D999E</color>
-    <color name="disabled_text">#3F4952</color>
-    <color name="colorBackground">#141218</color>
 </resources>

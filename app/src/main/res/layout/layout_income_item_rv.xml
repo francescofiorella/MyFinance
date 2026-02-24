@@ -61,7 +61,7 @@
             android:layout_marginStart="10dp"
             android:fontFamily="@font/nunito"
             android:text="@{income.name}"
-            android:textColor="@color/primary_text"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="16sp"
             android:visibility="@{income.category != FirestoreEnums.CATEGORIES.JOLLY.value ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toTopOf="@id/dateTextView"

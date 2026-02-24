@@ -43,6 +43,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.frafio.myfinance.R
+import com.frafio.myfinance.ui.theme.brown500
+import com.frafio.myfinance.ui.theme.indigo500
+import com.frafio.myfinance.ui.theme.lightBlue500
+import com.frafio.myfinance.ui.theme.lightGreen500
+import com.frafio.myfinance.ui.theme.orange500
+import com.frafio.myfinance.ui.theme.purple500
+import com.frafio.myfinance.ui.theme.red500
+import com.frafio.myfinance.ui.theme.teal500
+import com.frafio.myfinance.ui.theme.yellow500
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -70,17 +79,17 @@ fun PieChart(
 ) {
     val colorPrimary = colorResource(R.color.md_theme_primary)
     val colorSecondaryContainer = colorResource(R.color.md_theme_secondaryContainer)
-    val colorInvertedPrimaryText = colorResource(R.color.inverted_primary_text)
+    val colorSurface = colorResource(R.color.md_theme_surface)
     val colors = listOf(
-        colorResource(R.color.red_500),
-        colorResource(R.color.purple_500),
-        colorResource(R.color.indigo_500),
-        colorResource(R.color.light_blue_500),
-        colorResource(R.color.teal_500),
-        colorResource(R.color.light_green_500),
-        colorResource(R.color.yellow_500),
-        colorResource(R.color.orange_500),
-        colorResource(R.color.brown_500)
+        red500,
+        purple500,
+        indigo500,
+        lightBlue500,
+        teal500,
+        lightGreen500,
+        yellow500,
+        orange500,
+        brown500
     )
     val painters = listOf(
         rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_home_filled)),
@@ -293,7 +302,7 @@ fun PieChart(
                                 with(painters[index]) {
                                     draw(
                                         size = Size(innerIconSize.toPx(), innerIconSize.toPx()),
-                                        colorFilter = ColorFilter.tint(colorInvertedPrimaryText)
+                                        colorFilter = ColorFilter.tint(colorSurface)
                                     )
                                 }
                             }

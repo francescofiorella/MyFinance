@@ -54,7 +54,7 @@
                 android:paddingHorizontal="@dimen/title_padding"
                 android:paddingTop="@dimen/title_padding"
                 android:text="@string/app_name"
-                android:textColor="@color/primary_text"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="@dimen/title_size"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

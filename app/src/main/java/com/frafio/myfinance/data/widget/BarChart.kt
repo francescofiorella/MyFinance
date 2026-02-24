@@ -146,7 +146,7 @@ class BarChart(
         typeface = ResourcesCompat.getFont(context, R.font.nunito_semibold)
         labelsTextViews[index].typeface = typeface
         labelsTextViews[index].setTextColor(
-            ContextCompat.getColor(context, R.color.primary_text)
+            ContextCompat.getColor(context, R.color.md_theme_onSurface)
         )
         indicatorTextView.visibility = View.VISIBLE
         indicatorTextView.text = doubleToPrice(values[index])

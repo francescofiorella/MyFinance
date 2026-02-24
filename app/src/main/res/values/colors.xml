@@ -4,19 +4,19 @@
     <color name="md_theme_primary">#3b608f</color>
     <color name="md_theme_onPrimary">#ffffff</color>
     <color name="md_theme_primaryContainer">#d4e3ff</color>
-    <color name="md_theme_onPrimaryContainer">#001c39</color>
+    <color name="md_theme_onPrimaryContainer">#204876</color>
     <color name="md_theme_secondary">#545f71</color>
     <color name="md_theme_onSecondary">#ffffff</color>
     <color name="md_theme_secondaryContainer">#d8e3f8</color>
-    <color name="md_theme_onSecondaryContainer">#111c2b</color>
+    <color name="md_theme_onSecondaryContainer">#3c4758</color>
     <color name="md_theme_tertiary">#6d5677</color>
     <color name="md_theme_onTertiary">#ffffff</color>
     <color name="md_theme_tertiaryContainer">#f6d9ff</color>
-    <color name="md_theme_onTertiaryContainer">#261430</color>
+    <color name="md_theme_onTertiaryContainer">#543f5e</color>
     <color name="md_theme_error">#ba1a1a</color>
     <color name="md_theme_onError">#ffffff</color>
     <color name="md_theme_errorContainer">#ffdad6</color>
-    <color name="md_theme_onErrorContainer">#410002</color>
+    <color name="md_theme_onErrorContainer">#93000a</color>
     <color name="md_theme_surfaceDim">#d9dae0</color>
     <color name="md_theme_surface">#f8f9ff</color>
     <color name="md_theme_surfaceBright">#f8f9ff</color>
@@ -35,31 +35,5 @@
     <color name="md_theme_scrim">#000000</color>
     <color name="md_theme_shadow">#000000</color>
 
-    <!--Custom colors. -->
-    <color name="quantum_grey_600">#757575</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="carmine">#B00020</color>
-    <color name="cinnamon_satin">#cf6679</color>
-    <color name="google_btn_bg_enabled">#f2f2f2</color>
-    <color name="google_btn_text_enabled">#1f1f1f</color>
-
-    <!--Theme-related custom colors. -->
-    <color name="primary_text_disabled">#9D999E</color>
-    <color name="inverted_primary_text_disabled">#6B6B6F</color>
-    <color name="disabled_text">#D4D4D4</color>
     <color name="launcher_icon_bg">#3D5576</color>
-    <color name="colorBackground">#FCF5FD</color>
-
-    <!--Pie chart colors. -->
-    <color name="red_500">#f44336</color>
-    <color name="purple_500">#9c27b0</color>
-    <color name="indigo_500">#3f51b5</color>
-    <color name="light_blue_500">#03a9f4</color>
-    <color name="teal_500">#009688</color>
-    <color name="light_green_500">#8bc34a</color>
-    <color name="yellow_500">#ffeb3b</color>
-    <color name="orange_500">#ff9800</color>
-    <color name="brown_500">#795548</color>
-
 </resources>
