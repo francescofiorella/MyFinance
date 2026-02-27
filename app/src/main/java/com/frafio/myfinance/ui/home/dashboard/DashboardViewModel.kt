@@ -4,7 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.frafio.myfinance.data.model.BarChartEntry
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
@@ -44,8 +45,38 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _lastDateForBarChart = MutableLiveData(
         today.with(TemporalAdjusters.firstDayOfMonth())
     )
-    val lastDateForBarChart: LiveData<LocalDate>
-        get() = _lastDateForBarChart
+
+    val barChartData: LiveData<Pair<List<Double>, List<String>>> = _lastDateForBarChart.switchMap { date ->
+        val nextMonth = date.plusMonths(1)
+        val lastTimestamp = dateToUTCTimestamp(nextMonth.year, nextMonth.monthValue, nextMonth.dayOfMonth)
+        val firstDate = nextMonth.minusYears(1)
+        val firstTimestamp = dateToUTCTimestamp(firstDate.year, firstDate.monthValue, firstDate.dayOfMonth)
+        expensesLocalRepository.getPriceSumAfterAndBefore(firstTimestamp, lastTimestamp).map { entries ->
+            val labels = mutableListOf<String>()
+            val values = mutableListOf<Double>()
+            var currentDate = date
+            var j = 0
+            repeat(12) {
+                if (j < entries.size
+                    && entries[j].year == currentDate.year
+                    && entries[j].month == currentDate.monthValue
+                ) {
+                    val monthString = if (entries[j].month < 10)
+                        "0${entries[j].month}" else entries[j].month.toString()
+                    labels.add("$monthString/${entries[j].year - 2000}")
+                    values.add(entries[j].value)
+                    j++
+                } else {
+                    val monthString = if (currentDate.monthValue < 10)
+                        "0${currentDate.monthValue}" else currentDate.monthValue.toString()
+                    labels.add("$monthString/${currentDate.year - 2000}")
+                    values.add(0.0)
+                }
+                currentDate = currentDate.minusMonths(1)
+            }
+            values.reversed() to labels.reversed()
+        }
+    }
 
     fun nextBalanceYear() {
         _balanceYearShown.postValue(_balanceYearShown.value!! + 1)
@@ -81,14 +112,6 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun getPriceSumFromThisYear(): LiveData<Double?> {
         return expensesLocalRepository.getPriceSumFromYear(today.year)
-    }
-
-    fun getPricesList(): LiveData<List<BarChartEntry>> {
-        var date = _lastDateForBarChart.value!!.plusMonths(1)
-        val lastTimestamp = dateToUTCTimestamp(date.year, date.monthValue, date.dayOfMonth)
-        date = date.minusYears(1)
-        val firstTimestamp = dateToUTCTimestamp(date.year, date.monthValue, date.dayOfMonth)
-        return expensesLocalRepository.getPriceSumAfterAndBefore(firstTimestamp, lastTimestamp)
     }
 
     fun getExpensesOfMonth(): LiveData<List<Expense>> =

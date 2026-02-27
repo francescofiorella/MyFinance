@@ -4,19 +4,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MediatorLiveData
 import com.frafio.myfinance.R
-import com.frafio.myfinance.ui.components.PieChart
-import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.storage.MyFinanceStorage
-import com.frafio.myfinance.data.widget.BarChart
 import com.frafio.myfinance.data.widget.ProgressBar
 import com.frafio.myfinance.databinding.FragmentDashboardBinding
 import com.frafio.myfinance.ui.BaseFragment
+import com.frafio.myfinance.ui.components.BarChart
+import com.frafio.myfinance.ui.components.PieChart
+import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.utils.doubleToString
@@ -28,7 +32,6 @@ class DashboardFragment : BaseFragment() {
     private lateinit var binding: FragmentDashboardBinding
     private val viewModel by viewModels<DashboardViewModel>()
 
-    private lateinit var monthlyBarChart: BarChart
     private lateinit var budgetProgressBar: ProgressBar
 
     private var pieChartAnimationPlayed = false
@@ -44,15 +47,83 @@ class DashboardFragment : BaseFragment() {
 
         budgetProgressBar =
             ProgressBar(binding.monthlyBarChartLayout.barChartLayout, requireContext())
-        monthlyBarChart = BarChart(binding.monthlyChart, requireContext())
 
+        setupBarChart()
+        setupPieChart()
+        setupObservers()
+        setupClickListeners()
+
+        return binding.root
+    }
+
+    private fun setupBarChart() {
+        binding.monthlyChart.setContent {
+            val barData by viewModel.barChartData.observeAsState(initial = emptyList<Double>() to emptyList())
+            MyFinanceTheme {
+                BarChart(
+                    data = barData.first,
+                    labels = barData.second,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+    }
+
+    private fun setupPieChart() {
+        val pieChartLiveData = MediatorLiveData<List<Expense>>()
+        var expensesSource = viewModel.getExpensesOfMonth()
+        pieChartLiveData.addSource(expensesSource) { pieChartLiveData.value = it }
+
+        viewModel.pieChartDate.observe(viewLifecycleOwner) {
+            pieChartLiveData.removeSource(expensesSource)
+            expensesSource = if (viewModel.monthlyShownInPieChart)
+                viewModel.getExpensesOfMonth()
+            else
+                viewModel.getExpensesOfYear()
+            pieChartLiveData.addSource(expensesSource) { pieChartLiveData.value = it }
+        }
+
+        binding.pieChartComposeView.setContent {
+            val expenses by pieChartLiveData.observeAsState(initial = emptyList())
+            val date by viewModel.pieChartDate.observeAsState(initial = java.time.LocalDate.now())
+            
+            // Sync the TV date text (kept for compatibility with current layout)
+            val formatter = DateTimeFormatter.ofPattern(
+                if (viewModel.monthlyShownInPieChart) "MMMM uuuu" else "uuuu"
+            )
+            binding.dataShownTV.text = date.format(formatter)
+
+            val values = rememberPieValues(expenses)
+            
+            MyFinanceTheme {
+                PieChart(
+                    data = values,
+                    chartBarWidth = if (resources.getBoolean(R.bool.isLandscape)) 12.dp else 10.dp,
+                    chartEntryOffset = if (resources.getBoolean(R.bool.isLandscape)) 11 else 9,
+                    animate = !pieChartAnimationPlayed
+                )
+            }
+            pieChartAnimationPlayed = true
+        }
+    }
+
+    private fun rememberPieValues(expenses: List<Expense>): List<Double> {
+        val values = MutableList(9) { 0.0 }
+        expenses.forEach { p ->
+            if (p.category != null && p.category <= 8) {
+                values[p.category] += p.price ?: 0.0
+            }
+        }
+        return values
+    }
+
+    private fun setupObservers() {
         viewModel.getExpensesNumber().observe(viewLifecycleOwner) {
             viewModel.isListEmpty.value = it == 0
         }
 
         viewModel.getPriceSumFromToday().observe(viewLifecycleOwner) {
             val todaySum = it ?: 0.0
-            // Update today TV
             binding.todayTotTV.text = if (todaySum < 1000)
                 doubleToPrice(todaySum)
             else
@@ -61,284 +132,94 @@ class DashboardFragment : BaseFragment() {
 
         viewModel.getPriceSumFromThisMonth().observe(viewLifecycleOwner) {
             viewModel.thisMonthSum = it ?: 0.0
-            if (viewModel.monthShown) {
-                binding.thisMonthTVTitle.text = getString(R.string.this_month)
-                binding.thisMonthTV.text = doubleToPrice(viewModel.thisMonthSum)
-                budgetProgressBar.updateValue(viewModel.thisMonthSum, viewModel.monthlyBudget)
-            } else {
-                binding.thisYearTVTitle.text = getString(R.string.this_month_next)
-                binding.thisYearTV.text = if (viewModel.thisMonthSum < 1000)
-                    doubleToPrice(viewModel.thisMonthSum)
-                else
-                    doubleToPriceWithoutDecimals(viewModel.thisMonthSum)
-            }
+            updateBudgetUI()
         }
 
         viewModel.getPriceSumFromThisYear().observe(viewLifecycleOwner) {
             viewModel.thisYearSum = it ?: 0.0
-            if (viewModel.monthShown) {
-                binding.thisYearTVTitle.text = getString(R.string.this_year_next)
-                binding.thisYearTV.text = if (viewModel.thisYearSum < 1000)
-                    doubleToPrice(viewModel.thisYearSum)
-                else
-                    doubleToPriceWithoutDecimals(viewModel.thisYearSum)
-            } else {
-                binding.thisMonthTVTitle.text = getString(R.string.this_year)
-                binding.thisMonthTV.text = doubleToPrice(viewModel.thisYearSum)
-                budgetProgressBar.updateValue(viewModel.thisYearSum, viewModel.monthlyBudget * 12)
-            }
+            updateBudgetUI()
         }
 
-        val expensesSumLiveData = MediatorLiveData<Double?>()
-        var expensesSumLD = viewModel.getExpensesSumForBalance()
-        expensesSumLiveData.addSource(expensesSumLD) { value ->
-            expensesSumLiveData.value = value
-        }
-        expensesSumLiveData.observe(viewLifecycleOwner) {
-            viewModel.expensesSum = it ?: 0.0
-            binding.balanceExpensesTV.text = doubleToPrice(viewModel.expensesSum)
-            val balance = viewModel.incomesSum - viewModel.expensesSum
-            binding.balanceTV.text = doubleToPrice(abs(balance))
-            val balanceColor = requireContext().getThemeColor(
-                if (balance < 0.0) {
-                    androidx.appcompat.R.attr.colorError
-                } else {
-                    androidx.appcompat.R.attr.colorPrimary
-                }
-            )
-            binding.balanceTV.setTextColor(balanceColor)
-        }
-
-        val incomesSumLiveData = MediatorLiveData<Double?>()
-        var incomesSumLD = viewModel.getIncomesSumForBalance()
-        incomesSumLiveData.addSource(incomesSumLD) { value ->
-            incomesSumLiveData.value = value
-        }
-        incomesSumLiveData.observe(viewLifecycleOwner) {
-            viewModel.incomesSum = it ?: 0.0
-            binding.balanceIncomesTV.text = doubleToPrice(viewModel.incomesSum)
-            val balance = viewModel.incomesSum - viewModel.expensesSum
-            binding.balanceTV.text = doubleToPrice(abs(balance))
-            val balanceColor = requireContext().getThemeColor(
-                if (balance < 0.0) {
-                    androidx.appcompat.R.attr.colorError
-                } else {
-                    androidx.appcompat.R.attr.colorPrimary
-                }
-            )
-            binding.balanceTV.setTextColor(balanceColor)
-        }
-
-        val barChartLiveData = MediatorLiveData<List<BarChartEntry>>()
-        var pricesLiveData = viewModel.getPricesList()
-        barChartLiveData.addSource(pricesLiveData) { value ->
-            barChartLiveData.value = value
-        }
-        barChartLiveData.observe(viewLifecycleOwner) { entries ->
-            if (entries == null) return@observe
-            val labels = mutableListOf<String>()
-            val values = mutableListOf<Double>()
-            var currentDate = viewModel.lastDateForBarChart.value!!
-            var j = 0
-            repeat(12) {
-                if (j < entries.size
-                    && entries[j].year == currentDate.year
-                    && entries[j].month == currentDate.monthValue
-                ) {
-                    val monthString = if (entries[j].month < 10)
-                        "0${entries[j].month}" else entries[j].month.toString()
-                    labels.add("$monthString/${entries[j].year - 2000}")
-                    values.add(entries[j].value)
-                    j++
-                } else {
-                    val monthString = if (currentDate.monthValue < 10)
-                        "0${currentDate.monthValue}" else currentDate.monthValue.toString()
-                    labels.add("$monthString/${currentDate.year - 2000}")
-                    values.add(0.0)
-                }
-                currentDate = currentDate.minusMonths(1)
-            }
-            monthlyBarChart.updateValues(labels, values)
-        }
-        viewModel.lastDateForBarChart.observe(viewLifecycleOwner) {
-            // this trigger the observer
-            barChartLiveData.removeSource(pricesLiveData)
-            pricesLiveData = viewModel.getPricesList()
-            barChartLiveData.addSource(pricesLiveData) { value ->
-                barChartLiveData.value = value
-            }
-        }
-
-        viewModel.balanceYearShown.observe(viewLifecycleOwner) {
-            binding.balanceTVTitle.text = getString(
-                R.string.annual_balance,
-                it.toString()
-            )
-            incomesSumLiveData.removeSource(incomesSumLD)
-            incomesSumLD = viewModel.getIncomesSumForBalance()
-            incomesSumLiveData.addSource(incomesSumLD) { value ->
-                incomesSumLiveData.value = value
-            }
-            expensesSumLiveData.removeSource(expensesSumLD)
-            expensesSumLD = viewModel.getExpensesSumForBalance()
-            expensesSumLiveData.addSource(expensesSumLD) { value ->
-                expensesSumLiveData.value = value
-            }
-        }
-
-        val pieChartLiveData = MediatorLiveData<List<Expense>>()
-        var expensesOfMonthOrYearLiveData = viewModel.getExpensesOfMonth()
-        pieChartLiveData.addSource(expensesOfMonthOrYearLiveData) { value ->
-            pieChartLiveData.value = value
-        }
-        pieChartLiveData.observe(viewLifecycleOwner) { expenses ->
-            // Create a LocalDate with the given month
-            val formatter = DateTimeFormatter.ofPattern(
-                if (viewModel.monthlyShownInPieChart) "MMMM uuuu" else "uuuu"
-            )
-            val dateShownString = viewModel.pieChartDate.value!!.format(formatter)
-            binding.dataShownTV.text = dateShownString
-            val values = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-            expenses.forEach { p ->
-                if (p.category!! <= 8) {
-                    values[p.category] += p.price!!
-                }
-            }
-            binding.pieChartComposeView.disposeComposition()
-            binding.pieChartComposeView.setContent {
-                PieChart(
-                    data = values,
-                    isEmpty = values.sum() == 0.0,
-                    chartBarWidth = if (resources.getBoolean(R.bool.isLandscape)) 12.dp else 10.dp,
-                    chartEntryOffset = if (resources.getBoolean(R.bool.isLandscape)) 11 else 9,
-                    animate = !pieChartAnimationPlayed
-                )
-            }
-            pieChartAnimationPlayed = true
-        }
-        viewModel.pieChartDate.observe(viewLifecycleOwner) {
-            // this trigger the observer
-            pieChartLiveData.removeSource(expensesOfMonthOrYearLiveData)
-            expensesOfMonthOrYearLiveData = if (viewModel.monthlyShownInPieChart)
-                viewModel.getExpensesOfMonth()
-            else
-                viewModel.getExpensesOfYear()
-            pieChartLiveData.addSource(expensesOfMonthOrYearLiveData) { value ->
-                pieChartLiveData.value = value
-            }
-        }
-
-        binding.chipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
-            if (checkedIds.size != 1) return@setOnCheckedStateChangeListener
-            val checkedId = checkedIds[0]
-            when (checkedId) {
-                R.id.monthly_chip -> {
-                    pieChartAnimationPlayed = false
-                    viewModel.switchPieChartData(true)
-                }
-
-                R.id.annual_chip -> {
-                    pieChartAnimationPlayed = false
-                    viewModel.switchPieChartData(false)
-                }
-            }
-        }
-
-        binding.balancePreviousBtn.setOnClickListener {
-            viewModel.previousBalanceYear()
-        }
-
-        binding.balanceNextBtn.setOnClickListener {
-            viewModel.nextBalanceYear()
-        }
-
-        binding.pieChartPreviousBtn.setOnClickListener {
-            pieChartAnimationPlayed = false
-            viewModel.previousPieChartDate()
-        }
-
-        binding.pieChartNextBtn.setOnClickListener {
-            pieChartAnimationPlayed = false
-            viewModel.nextPieChartDate()
-        }
-
-        binding.barChartPreviousBtn.setOnClickListener {
-            viewModel.previousBarChartDate()
-        }
-
-        binding.barChartNextBtn.setOnClickListener {
-            viewModel.nextBarChartDate()
-        }
+        setupBalanceObservers()
 
         MyFinanceStorage.monthlyBudget.observe(viewLifecycleOwner) { monthlyBudget ->
-            if (monthlyBudget == null) return@observe
-            viewModel.monthlyBudget = monthlyBudget
-            if (viewModel.monthlyBudget == 0.0) {
-                binding.onBudgetTV.visibility = View.GONE
-                binding.changeBtn.visibility = View.GONE
-                return@observe
-            }
-            binding.onBudgetTV.visibility = View.VISIBLE
-            binding.changeBtn.visibility = View.VISIBLE
-            if (viewModel.monthShown) {
-                binding.onBudgetTV.text = getString(
-                    R.string.on_total_budget,
-                    doubleToString(monthlyBudget)
-                )
-                budgetProgressBar.updateValue(viewModel.thisMonthSum, monthlyBudget)
-            } else {
-                binding.onBudgetTV.text = getString(
-                    R.string.on_total_budget,
-                    doubleToString(monthlyBudget * 12)
-                )
-                budgetProgressBar.updateValue(
-                    viewModel.thisYearSum,
-                    monthlyBudget * 12
-                )
+            viewModel.monthlyBudget = monthlyBudget ?: 0.0
+            updateBudgetUI()
+        }
+    }
+
+    private fun setupBalanceObservers() {
+        val expensesSumLD = viewModel.getExpensesSumForBalance()
+        val incomesSumLD = viewModel.getIncomesSumForBalance()
+
+        expensesSumLD.observe(viewLifecycleOwner) {
+            viewModel.expensesSum = it ?: 0.0
+            updateBalanceUI()
+        }
+        incomesSumLD.observe(viewLifecycleOwner) {
+            viewModel.incomesSum = it ?: 0.0
+            updateBalanceUI()
+        }
+
+        viewModel.balanceYearShown.observe(viewLifecycleOwner) { year ->
+            binding.balanceTVTitle.text = getString(R.string.annual_balance, year.toString())
+            // Re-observing happens automatically if using LiveData properly in ViewModel
+        }
+    }
+
+    private fun updateBalanceUI() {
+        binding.balanceExpensesTV.text = doubleToPrice(viewModel.expensesSum)
+        binding.balanceIncomesTV.text = doubleToPrice(viewModel.incomesSum)
+        val balance = viewModel.incomesSum - viewModel.expensesSum
+        binding.balanceTV.text = doubleToPrice(abs(balance))
+        val balanceColor = requireContext().getThemeColor(
+            if (balance < 0.0) androidx.appcompat.R.attr.colorError else androidx.appcompat.R.attr.colorPrimary
+        )
+        binding.balanceTV.setTextColor(balanceColor)
+    }
+
+    private fun updateBudgetUI() {
+        if (viewModel.monthShown) {
+            binding.thisMonthTVTitle.text = getString(R.string.this_month)
+            binding.thisMonthTV.text = doubleToPrice(viewModel.thisMonthSum)
+            binding.thisYearTVTitle.text = getString(R.string.this_year_next)
+            binding.thisYearTV.text = if (viewModel.thisYearSum < 1000) doubleToPrice(viewModel.thisYearSum) else doubleToPriceWithoutDecimals(viewModel.thisYearSum)
+            binding.onBudgetTV.text = getString(R.string.on_total_budget, doubleToString(viewModel.monthlyBudget))
+            budgetProgressBar.updateValue(viewModel.thisMonthSum, viewModel.monthlyBudget)
+        } else {
+            binding.thisMonthTVTitle.text = getString(R.string.this_year)
+            binding.thisMonthTV.text = doubleToPrice(viewModel.thisYearSum)
+            binding.thisYearTVTitle.text = getString(R.string.this_month_next)
+            binding.thisYearTV.text = if (viewModel.thisMonthSum < 1000) doubleToPrice(viewModel.thisMonthSum) else doubleToPriceWithoutDecimals(viewModel.thisMonthSum)
+            binding.onBudgetTV.text = getString(R.string.on_total_budget, doubleToString(viewModel.monthlyBudget * 12))
+            budgetProgressBar.updateValue(viewModel.thisYearSum, viewModel.monthlyBudget * 12)
+        }
+        
+        val visibility = if (viewModel.monthlyBudget == 0.0) View.GONE else View.VISIBLE
+        binding.onBudgetTV.visibility = visibility
+        binding.changeBtn.visibility = visibility
+    }
+
+    private fun setupClickListeners() {
+        binding.chipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            if (checkedIds.size == 1) {
+                pieChartAnimationPlayed = false
+                viewModel.switchPieChartData(checkedIds[0] == R.id.monthly_chip)
             }
         }
+
+        binding.balancePreviousBtn.setOnClickListener { viewModel.previousBalanceYear() }
+        binding.balanceNextBtn.setOnClickListener { viewModel.nextBalanceYear() }
+        binding.pieChartPreviousBtn.setOnClickListener { pieChartAnimationPlayed = false; viewModel.previousPieChartDate() }
+        binding.pieChartNextBtn.setOnClickListener { pieChartAnimationPlayed = false; viewModel.nextPieChartDate() }
+        binding.barChartPreviousBtn.setOnClickListener { viewModel.previousBarChartDate() }
+        binding.barChartNextBtn.setOnClickListener { viewModel.nextBarChartDate() }
 
         binding.changeBtn.setOnClickListener {
-            binding.changeBtn.animate().rotationBy(
-                if (viewModel.monthShown) 180f else -180f
-            ).setDuration(200).start()
+            binding.changeBtn.animate().rotationBy(if (viewModel.monthShown) 180f else -180f).setDuration(200).start()
             viewModel.monthShown = !viewModel.monthShown
-            if (viewModel.monthShown) {
-                binding.thisMonthTVTitle.text = getString(R.string.this_month)
-                binding.thisMonthTV.text = doubleToPrice(viewModel.thisMonthSum)
-                binding.thisYearTVTitle.text = getString(R.string.this_year_next)
-                binding.thisYearTV.text = if (viewModel.thisYearSum < 1000)
-                    doubleToPrice(viewModel.thisYearSum)
-                else
-                    doubleToPriceWithoutDecimals(viewModel.thisYearSum)
-                binding.onBudgetTV.text = getString(
-                    R.string.on_total_budget,
-                    doubleToString(viewModel.monthlyBudget)
-                )
-                budgetProgressBar.updateValue(
-                    viewModel.thisMonthSum,
-                    viewModel.monthlyBudget
-                )
-            } else {
-                binding.thisMonthTVTitle.text = getString(R.string.this_year)
-                binding.thisMonthTV.text = doubleToPrice(viewModel.thisYearSum)
-                binding.thisYearTVTitle.text = getString(R.string.this_month_next)
-                binding.thisYearTV.text = if (viewModel.thisMonthSum < 1000)
-                    doubleToPrice(viewModel.thisMonthSum)
-                else
-                    doubleToPriceWithoutDecimals(viewModel.thisMonthSum)
-                binding.onBudgetTV.text = getString(
-                    R.string.on_total_budget,
-                    doubleToString(viewModel.monthlyBudget * 12)
-                )
-                budgetProgressBar.updateValue(
-                    viewModel.thisYearSum,
-                    viewModel.monthlyBudget * 12
-                )
-            }
+            updateBudgetUI()
         }
-
-        return binding.root
     }
 
     override fun scrollUp() {

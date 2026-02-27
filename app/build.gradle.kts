@@ -10,9 +10,7 @@ plugins {
 
 android {
     namespace = "com.frafio.myfinance"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.frafio.myfinance"
@@ -102,6 +100,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.google.fonts)
 }

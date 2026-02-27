@@ -4,16 +4,19 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,152 +31,71 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.ui.theme.brown500
-import com.frafio.myfinance.ui.theme.indigo500
-import com.frafio.myfinance.ui.theme.lightBlue500
-import com.frafio.myfinance.ui.theme.lightGreen500
-import com.frafio.myfinance.ui.theme.orange500
-import com.frafio.myfinance.ui.theme.purple500
-import com.frafio.myfinance.ui.theme.red500
-import com.frafio.myfinance.ui.theme.teal500
-import com.frafio.myfinance.ui.theme.yellow500
+import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
+import com.frafio.myfinance.utils.getCategoryColor
+import com.frafio.myfinance.utils.getCategoryIcon
+import com.frafio.myfinance.utils.getCategoryName
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
-
-@Preview(showBackground = true)
-@Composable
-fun PieChartPreview() {
-    PieChart(
-        data = listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
-        isEmpty = false
-    )
-}
+import kotlin.math.sqrt
 
 @Composable
 fun PieChart(
     data: List<Double>,
-    isEmpty: Boolean,
     radiusOuter: Dp = 80.dp,
     chartEntryOffset: Int = 9,
     chartBarWidth: Dp = 10.dp,
     animDuration: Int = 500,
     animate: Boolean = true
 ) {
-    val colorPrimary = colorResource(R.color.md_theme_primary)
-    val colorSecondaryContainer = colorResource(R.color.md_theme_secondaryContainer)
-    val colorSurface = colorResource(R.color.md_theme_surface)
-    val colors = listOf(
-        red500,
-        purple500,
-        indigo500,
-        lightBlue500,
-        teal500,
-        lightGreen500,
-        yellow500,
-        orange500,
-        brown500
-    )
-    val painters = listOf(
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_home_filled)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_shopping_cart_filled)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_self_care_filled)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_theater_comedy_filled)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_school_filled)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_restaurant_filled)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_vaccines_filled)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_directions_subway_filled)),
-        rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_grid_3x3_filled))
-    )
+    var selectedArc by remember(data) { mutableIntStateOf(-1) }
 
-    val defaultSelectedText = stringResource(R.string.total)
-    val categories = stringArrayResource(R.array.categories)
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val secondaryContainerColor = MaterialTheme.colorScheme.secondaryContainer
 
-    val iconSize = 24.dp
+    val painters: MutableList<Painter> = mutableListOf()
+    for (i in 0..<data.size) {
+        painters.add(painterResource(id = getCategoryIcon(i)))
+    }
+
+    val totalText = stringResource(R.string.total)
+
+    val unselectedIconSize = 24.dp
+    val selectedIconSize = 30.dp
     val iconDistance = 15.dp
 
-    var text by remember { mutableStateOf(doubleToPriceWithoutDecimals(data.sum())) }
-    var selectedText by remember { mutableStateOf(defaultSelectedText) }
-    var selectedTextColor by remember { mutableStateOf(colorPrimary) }
-    var strokeSizes by remember {
-        mutableStateOf(
-            listOf(
-                chartBarWidth,
-                chartBarWidth,
-                chartBarWidth,
-                chartBarWidth,
-                chartBarWidth,
-                chartBarWidth,
-                chartBarWidth,
-                chartBarWidth,
-                chartBarWidth
-            )
-        )
-    }
-    var iconSizes by remember {
-        mutableStateOf(
-            listOf(
-                iconSize,
-                iconSize,
-                iconSize,
-                iconSize,
-                iconSize,
-                iconSize,
-                iconSize,
-                iconSize,
-                iconSize
-            )
-        )
-    }
+    val totalPriceText = doubleToPriceWithoutDecimals(data.sum())
 
     val floatValues = mutableListOf<Float>()
-    val angles = mutableListOf(
-        Pair(0F, 0F),
-        Pair(0F, 0F),
-        Pair(0F, 0F),
-        Pair(0F, 0F),
-        Pair(0F, 0F),
-        Pair(0F, 0F),
-        Pair(0F, 0F),
-        Pair(0F, 0F),
-        Pair(0F, 0F)
-    )
-
-    // To set the value of each Arc according to
-    // the value given in the data, we have used a simple formula.
     val offset = if (data.count { v -> v > 0.0 } == 1) 0 else chartEntryOffset
     val totalOffset = offset * data.count { v -> v > 0.0 }
-    data.forEachIndexed { index, value ->
+    data.forEach { value ->
         val angle = (360 - totalOffset) * value.toFloat() / data.sum().toFloat()
-        angles[index] = Pair(angles[index].first, angles[index].first + angle)
-        if (index < 8 && angle != 0F) {
-            angles[index + 1] = Pair(angles[index].second + offset, 0F)
-        } else if (index < 8) {
-            angles[index + 1] = Pair(angles[index].second, 0F)
-        }
-        floatValues.add(index, angle)
+        floatValues.add(angle)
     }
 
     var animationPlayed by remember { mutableStateOf(!animate) }
 
-    var lastValue = -135f
+    // to play the animation only once when the function is Created or Recomposed
+    LaunchedEffect(key1 = true) {
+        animationPlayed = true
+    }
+
     val animateRotation by animateFloatAsState(
         targetValue = if (animationPlayed) 45f else 0f,
         animationSpec = tween(
@@ -184,23 +106,18 @@ fun PieChart(
         label = "Rotation animation"
     )
 
-    // to play the animation only once when the function is Created or Recomposed
-    LaunchedEffect(key1 = true) {
-        animationPlayed = true
-    }
-
     // Pie Chart using Canvas Arc
     Box(
-        modifier = Modifier.padding(iconSize + iconDistance),
+        modifier = Modifier.padding(unselectedIconSize + iconDistance),
         contentAlignment = Alignment.Center
     ) {
-        if (isEmpty) {
+        if (data.sum() == 0.0) {
             Canvas(
                 modifier = Modifier
                     .size(radiusOuter * 2f)
             ) {
                 drawArc(
-                    color = colorSecondaryContainer,
+                    color = secondaryContainerColor,
                     0F,
                     360F,
                     useCenter = false,
@@ -212,87 +129,89 @@ fun PieChart(
                 modifier = Modifier
                     .size(radiusOuter * 2f)
                     .rotate(animateRotation)
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onTap = { offset ->
-                                // Detect click on arcs here
-                                val center = Offset(size.width / 2f, size.height / 2f)
-                                val clickedAngle = calculateAngle(offset, center)
-                                // You can determine which arc is clicked based on this angle
-                                // Check which arc was clicked and get the index
-                                val clickedArcIndex = isArcClicked(clickedAngle + 135f, angles)
+                    .pointerInput(data) { // Use data as key
+                        detectTapGestures { tapOffset ->
+                            val centerX = size.width / 2f
+                            val centerY = size.height / 2f
 
-                                // Perform an action based on the clicked arc
-                                clickedArcIndex?.let { i ->
-                                    selectedText = categories[i]
-                                    selectedTextColor = colors[i]
-                                    text = doubleToPriceWithoutDecimals(data[i])
-                                    val newStrokeSizes = mutableListOf(
-                                        chartBarWidth,
-                                        chartBarWidth,
-                                        chartBarWidth,
-                                        chartBarWidth,
-                                        chartBarWidth,
-                                        chartBarWidth,
-                                        chartBarWidth,
-                                        chartBarWidth,
-                                        chartBarWidth
-                                    )
-                                    newStrokeSizes[i] = chartBarWidth * 1.2f
-                                    strokeSizes = newStrokeSizes
-                                    val newIconSizes = mutableListOf(
-                                        iconSize,
-                                        iconSize,
-                                        iconSize,
-                                        iconSize,
-                                        iconSize,
-                                        iconSize,
-                                        iconSize,
-                                        iconSize,
-                                        iconSize
-                                    )
-                                    newIconSizes[i] = 30.dp
-                                    iconSizes = newIconSizes
+                            val dx = tapOffset.x - centerX
+                            val dy = tapOffset.y - centerY
+                            val distance = sqrt((dx * dx + dy * dy).toDouble())
+
+                            if (distance <= (radiusOuter + chartBarWidth).toPx()
+                                && distance >= (radiusOuter - chartBarWidth * 2).toPx()
+                            ) {
+                                // Get angle in -180 to 180 range
+                                var touchAngle =
+                                    Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
+
+                                // Normalize touchAngle to be positive if it falls behind the start
+                                while (touchAngle < -135f) touchAngle += 360f
+
+                                var currentStartAngle = -135f
+                                floatValues.forEachIndexed { index, value ->
+                                    if (value > 0f) {
+                                        val endAngle = currentStartAngle + value
+
+                                        // Check if the tap is within this specific slice
+                                        if (touchAngle in (currentStartAngle - offset / 2)..(endAngle + offset / 2)) {
+                                            selectedArc = index
+                                        }
+                                        currentStartAngle = endAngle + offset
+                                    }
                                 }
                             }
-                        )
+                        }
                     }
             ) {
-                // draw each Arc for each data entry in Pie Chart
+                var currentStartAngle = -135f
+                // draw arc and icon for each data entry in Pie Chart
                 floatValues.forEachIndexed { index, value ->
                     if (value != 0F) {
+                        val strokeSize: Float
+                        val iconSize: Dp
+                        if (selectedArc == index) {
+                            strokeSize = chartBarWidth.toPx() * 1.2f
+                            iconSize = selectedIconSize
+                        } else {
+                            strokeSize = chartBarWidth.toPx()
+                            iconSize = unselectedIconSize
+                        }
                         drawArc(
-                            color = colors[index],
-                            lastValue,
+                            color = getCategoryColor(index, default = primaryColor),
+                            currentStartAngle,
                             value,
                             useCenter = false,
                             size = Size(radiusOuter.toPx() * 2f, radiusOuter.toPx() * 2f),
-                            style = Stroke(strokeSizes[index].toPx(), cap = StrokeCap.Round),
+                            style = Stroke(
+                                width = strokeSize,
+                                cap = StrokeCap.Round
+                            ),
                         )
-                        val angleInRadians = ((lastValue + value / 2) * PI / 180).toFloat()
+                        val angleInRadians = ((currentStartAngle + value / 2) * PI / 180).toFloat()
                         val topLeft = Offset(
-                            -iconSizes[index].toPx() / 2 + center.x + (radiusOuter.toPx() + strokeSizes[index].toPx() + iconDistance.toPx()) * cos(
+                            -iconSize.toPx() / 2 + center.x + (radiusOuter.toPx() + strokeSize + iconDistance.toPx()) * cos(
                                 angleInRadians
                             ),
-                            -iconSizes[index].toPx() / 2 + center.y + (radiusOuter.toPx() + strokeSizes[index].toPx() + iconDistance.toPx()) * sin(
+                            -iconSize.toPx() / 2 + center.y + (radiusOuter.toPx() + strokeSize + iconDistance.toPx()) * sin(
                                 angleInRadians
                             )
                         )
-                        // Draw the background fo the icons
+                        // Draw the icon background
                         val paddingSize = 6.dp
-                        val innerIconSize = iconSizes[index] - paddingSize * 2
+                        val innerIconSize = iconSize - paddingSize * 2
                         drawRoundRect(
-                            color = colors[index],
-                            size = Size(iconSizes[index].toPx(), iconSizes[index].toPx()),
+                            color = getCategoryColor(index, default = primaryColor),
+                            size = Size(iconSize.toPx(), iconSize.toPx()),
                             cornerRadius = CornerRadius(160.dp.toPx()),
                             topLeft = topLeft
                         )
-                        // Draw the icons
+                        // Draw the icon
                         rotate(
                             degrees = -45F,
                             pivot = Offset(
-                                topLeft.x + iconSizes[index].toPx() / 2 ,
-                                topLeft.y + iconSizes[index].toPx() / 2
+                                topLeft.x + iconSize.toPx() / 2,
+                                topLeft.y + iconSize.toPx() / 2
                             )
                         ) {
                             translate(
@@ -302,74 +221,48 @@ fun PieChart(
                                 with(painters[index]) {
                                     draw(
                                         size = Size(innerIconSize.toPx(), innerIconSize.toPx()),
-                                        colorFilter = ColorFilter.tint(colorSurface)
+                                        colorFilter = ColorFilter.tint(surfaceColor)
                                     )
                                 }
                             }
                         }
-                        lastValue += value + offset
+                        currentStartAngle += value + offset
                     }
                 }
             }
         }
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.clickable(
+                onClick = { selectedArc = -1 }
+            )
         ) {
             Text(
-                text = selectedText,
-                color = selectedTextColor,
+                text = if (selectedArc != -1) stringResource(id = getCategoryName(selectedArc)) else totalText,
+                color = getCategoryColor(selectedArc, primaryColor),
                 fontSize = 18.sp,
-                fontFamily = FontFamily(Font(R.font.nunito_bold)),
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
             Text(
-                text = text,
-                color = colorResource(R.color.md_theme_onSurface),
+                text = if (selectedArc != -1) doubleToPriceWithoutDecimals(data[selectedArc]) else totalPriceText,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 18.sp,
-                fontFamily = FontFamily(Font(R.font.nunito)),
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
         }
     }
 }
 
-private fun calculateAngle(tapOffset: Offset, center: Offset): Float {
-    // Calculate the difference between the tap position and the center of the canvas
-    val deltaX = tapOffset.x - center.x
-    val deltaY = tapOffset.y - center.y
-
-    // Convert the (x, y) coordinates into an angle in radians
-    val radians = atan2(deltaY, deltaX)
-
-    // Convert radians to degrees
-    var angle = radians * 180 / PI
-
-    // atan2 gives angles from -180 to 180 degrees, so convert it to 0 to 360 degrees
-    if (angle < 0) {
-        angle += 360f
+@Preview(showBackground = true)
+@Composable
+fun PieChartPreview() {
+    MyFinanceTheme {
+        PieChart(
+            data = listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        )
     }
-
-    return angle.toFloat()
-}
-
-fun isArcClicked(angle: Float, angles: List<Pair<Float, Float>>): Int? {
-    for ((index, arc) in angles.withIndex()) {
-        val (arcStartAngle, arcEndAngle) = arc
-
-        // Handle the case where the arc might wrap around 0 degrees
-        if (arcStartAngle <= arcEndAngle) {
-            // Normal case: arc is within 0 to 360 degrees range
-            if (angle in arcStartAngle..arcEndAngle) {
-                return index
-            }
-        } else {
-            // Case where the arc crosses the 0 degree line
-            if (angle >= arcStartAngle || angle <= arcEndAngle) {
-                return index
-            }
-        }
-    }
-    // If no arc matches, return null
-    return null
 }

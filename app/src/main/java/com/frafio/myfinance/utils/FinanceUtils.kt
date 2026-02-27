@@ -1,9 +1,19 @@
 package com.frafio.myfinance.utils
 
+import androidx.compose.ui.graphics.Color
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.model.Expense
+import com.frafio.myfinance.ui.theme.brown500
+import com.frafio.myfinance.ui.theme.indigo500
+import com.frafio.myfinance.ui.theme.lightBlue500
+import com.frafio.myfinance.ui.theme.lightGreen500
+import com.frafio.myfinance.ui.theme.orange500
+import com.frafio.myfinance.ui.theme.purple500
+import com.frafio.myfinance.ui.theme.red500
+import com.frafio.myfinance.ui.theme.teal500
+import com.frafio.myfinance.ui.theme.yellow500
 import java.time.LocalDate
 
 fun getCategoryIcon(categoryId: Int?): Int {
@@ -33,6 +43,21 @@ fun getCategoryName(categoryId: Int?): Int {
         FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.string.transportation
         FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.string.miscellaneous
         else -> R.string.category
+    }
+}
+
+fun getCategoryColor(categoryId: Int?, default: Color): Color {
+    return when (categoryId) {
+        FirestoreEnums.CATEGORIES.HOUSING.value -> red500
+        FirestoreEnums.CATEGORIES.GROCERIES.value -> purple500
+        FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> indigo500
+        FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> lightBlue500
+        FirestoreEnums.CATEGORIES.EDUCATION.value -> teal500
+        FirestoreEnums.CATEGORIES.DINING.value -> lightGreen500
+        FirestoreEnums.CATEGORIES.HEALTH.value -> yellow500
+        FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> orange500
+        FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> brown500
+        else -> default
     }
 }
 
