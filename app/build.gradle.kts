@@ -10,14 +10,16 @@ plugins {
 
 android {
     namespace = "com.frafio.myfinance"
-    compileSdk = 36
+    compileSdk {
+        version = release(36)
+    }
 
     defaultConfig {
         applicationId = "com.frafio.myfinance"
         minSdk = 29
         targetSdk = 36
         versionCode = 4
-        versionName = "4.8.2"
+        versionName = "4.8.3"
 
         vectorDrawables {
             useSupportLibrary = true

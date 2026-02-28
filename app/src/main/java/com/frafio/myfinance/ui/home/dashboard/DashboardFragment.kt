@@ -149,21 +149,41 @@ class DashboardFragment : BaseFragment() {
     }
 
     private fun setupBalanceObservers() {
-        val expensesSumLD = viewModel.getExpensesSumForBalance()
-        val incomesSumLD = viewModel.getIncomesSumForBalance()
-
-        expensesSumLD.observe(viewLifecycleOwner) {
+        val expensesSumLiveData = MediatorLiveData<Double?>()
+        var expensesSumLD = viewModel.getExpensesSumForBalance()
+        expensesSumLiveData.addSource(expensesSumLD) { value ->
+            expensesSumLiveData.value = value
+        }
+        expensesSumLiveData.observe(viewLifecycleOwner) {
             viewModel.expensesSum = it ?: 0.0
             updateBalanceUI()
         }
-        incomesSumLD.observe(viewLifecycleOwner) {
+
+        val incomesSumLiveData = MediatorLiveData<Double?>()
+        var incomesSumLD = viewModel.getIncomesSumForBalance()
+        incomesSumLiveData.addSource(incomesSumLD) { value ->
+            incomesSumLiveData.value = value
+        }
+        incomesSumLiveData.observe(viewLifecycleOwner) {
             viewModel.incomesSum = it ?: 0.0
             updateBalanceUI()
         }
 
-        viewModel.balanceYearShown.observe(viewLifecycleOwner) { year ->
-            binding.balanceTVTitle.text = getString(R.string.annual_balance, year.toString())
-            // Re-observing happens automatically if using LiveData properly in ViewModel
+        viewModel.balanceYearShown.observe(viewLifecycleOwner) {
+            binding.balanceTVTitle.text = getString(
+                R.string.annual_balance,
+                it.toString()
+            )
+            incomesSumLiveData.removeSource(incomesSumLD)
+            incomesSumLD = viewModel.getIncomesSumForBalance()
+            incomesSumLiveData.addSource(incomesSumLD) { value ->
+                incomesSumLiveData.value = value
+            }
+            expensesSumLiveData.removeSource(expensesSumLD)
+            expensesSumLD = viewModel.getExpensesSumForBalance()
+            expensesSumLiveData.addSource(expensesSumLD) { value ->
+                expensesSumLiveData.value = value
+            }
         }
     }
 
