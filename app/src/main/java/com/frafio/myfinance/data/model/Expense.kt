@@ -1,5 +1,6 @@
 package com.frafio.myfinance.data.model
 
+import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.frafio.myfinance.utils.dateToExtendedString
@@ -10,6 +11,7 @@ import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import java.time.LocalDate
 
+@Immutable
 @IgnoreExtraProperties
 @Entity
 data class Expense(

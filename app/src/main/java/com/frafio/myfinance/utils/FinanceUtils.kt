@@ -96,7 +96,7 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
                 month = todayDate.monthValue,
                 day = todayDate.dayOfMonth,
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = totId
+                id = "total_$totId"
             )
             expenseList.add(total)
             // Add empty expense (with random name, jolly category, and price to 0.0)
@@ -107,7 +107,7 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
                 month = todayDate.monthValue,
                 day = todayDate.dayOfMonth,
                 category = FirestoreEnums.CATEGORIES.JOLLY.value,
-                id = totId
+                id = "jolly_$totId"
             )
             expenseList.add(total)
             prevDate = total.getLocalDate()
@@ -122,9 +122,9 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
                 month = expense.month,
                 day = expense.day,
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = expense.getTotalId()
+                id = "total_${expense.getTotalId()}"
             )
-        } else if (total!!.id == expense.getTotalId()) { // If the total should be updated
+        } else if (total!!.id == "total_${expense.getTotalId()}") { // If the total should be updated
             currentExpenses.add(expense)
             total = Expense(
                 name = FirestoreEnums.NAMES.TOTAL.value,
@@ -133,7 +133,7 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
                 month = total.month,
                 day = total.day,
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = total.getTotalId()
+                id = total.id
             )
         } else { // If we need a new total
             // Update the local list with previous day expenses
@@ -153,7 +153,7 @@ fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
                 month = expense.month,
                 day = expense.day,
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = expense.getTotalId()
+                id = "total_${expense.getTotalId()}"
             )
         }
     }
@@ -180,11 +180,11 @@ fun addTotalsToExpensesWithoutToday(expenses: List<Expense>): List<Expense> {
         month = expenses[0].month,
         day = expenses[0].day,
         category = FirestoreEnums.CATEGORIES.TOTAL.value,
-        id = expenses[0].getTotalId()
+        id = "total_${expenses[0].getTotalId()}"
     )
 
     expenses.forEach { expense ->
-        if (total.id == expense.getTotalId()) { // Update the total
+        if (total.id == "total_${expense.getTotalId()}") { // Update the total
             total = Expense(
                 name = FirestoreEnums.NAMES.TOTAL.value,
                 price = total.price!! + expense.price!!,
@@ -192,7 +192,7 @@ fun addTotalsToExpensesWithoutToday(expenses: List<Expense>): List<Expense> {
                 month = expense.month,
                 day = expense.day,
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = expense.getTotalId()
+                id = total.id
             )
             currentExpenses.add(expense)
         } else { // We need a new total
@@ -213,7 +213,7 @@ fun addTotalsToExpensesWithoutToday(expenses: List<Expense>): List<Expense> {
                 month = expense.month,
                 day = expense.day,
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = expense.getTotalId()
+                id = "total_${expense.getTotalId()}"
             )
         }
     }

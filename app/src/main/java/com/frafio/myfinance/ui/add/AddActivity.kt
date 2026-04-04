@@ -366,7 +366,7 @@ class AddActivity : AppCompatActivity(), AddListener {
     }
 
     private fun evaluateExpenseTotalId(day: Int, month: Int, year: Int): String {
-        return "${day}_${month}_${year}"
+        return "total_${day}_${month}_${year}"
     }
 
     private fun getCategorySheetDialogComposeView(

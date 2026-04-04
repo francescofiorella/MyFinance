@@ -3,42 +3,29 @@ package com.frafio.myfinance.ui.home.expenses
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.core.widget.doOnTextChanged
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
-import androidx.recyclerview.widget.RecyclerView
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FinanceCode
-import com.frafio.myfinance.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.widget.DatePickerRangeDialog
-import com.frafio.myfinance.databinding.FragmentExpensesBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.features.home.expenses.CategorySheetDialog
 import com.frafio.myfinance.ui.features.home.EditTransactionSheet
+import com.frafio.myfinance.ui.features.home.expenses.ExpensesScreen
 import com.frafio.myfinance.ui.home.HomeActivity
-import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_BUTTON_CLICK
-import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_CLICK
-import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LOAD_MORE_REQUEST
-import com.frafio.myfinance.ui.home.expenses.ExpenseInteractionListener.Companion.ON_LONG_CLICK
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
-import com.frafio.myfinance.ui.features.home.expenses.FilterChipBar
 import com.frafio.myfinance.ui.features.home.expenses.FilterExpensesSheet
-import com.frafio.myfinance.utils.addTotalsToExpenses
-import com.frafio.myfinance.utils.addTotalsToExpensesWithoutToday
 import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -47,24 +34,15 @@ import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
 
-class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesListener {
+class ExpensesFragment : BaseFragment(), ExpensesListener {
 
-    private lateinit var binding: FragmentExpensesBinding
     private val viewModel by viewModels<ExpensesViewModel>()
     private lateinit var datePickerRangeDialog: DatePickerRangeDialog
-
-    private var isListBlocked = false
-    private var maxExpensesNumber = DEFAULT_LIMIT + 1
-
-    private val recViewLiveData = MediatorLiveData<List<Expense>>()
-    private lateinit var localExpensesLiveData: LiveData<List<Expense>>
-
-    private var toScroll: String? = null
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data: Intent? = result.data
-            val editRequest = data!!.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
+            val editRequest = data?.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
 
             if (editRequest == AddActivity.REQUEST_EXPENSE_CODE) {
                 (activity as HomeActivity).showSnackBar(FinanceCode.EXPENSE_EDIT_SUCCESS.message)
@@ -77,136 +55,94 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_expenses, container, false)
-
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
-
         viewModel.listener = this
-
-        binding.filterIcon.setOnClickListener(onFilterClickListener)
-
-        binding.listRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                when (newState) {
-                    RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        requireActivity().hideSoftKeyboard(binding.root)
-                        binding.searchET.clearFocus()
-                    }
-                }
-            }
-        })
-
-        viewModel.getExpensesNumber().observe(viewLifecycleOwner) {
-            viewModel.isExpensesEmpty.value = it == 0
-        }
-
-        binding.searchET.doOnTextChanged { text, _, _, _ ->
-            viewModel.nameFilter = text.toString()
-            refreshExpensesList()
-        }
-
-        localExpensesLiveData = viewModel.getLocalExpenses()
-        recViewLiveData.addSource(localExpensesLiveData) { value ->
-            recViewLiveData.value = value
-        }
-        recViewLiveData.observe(viewLifecycleOwner) { expenses ->
-            val limit = if (binding.listRecyclerView.adapter != null) {
-                (binding.listRecyclerView.adapter as ExpenseAdapter).getLimit()
-            } else {
-                DEFAULT_LIMIT
-            }
-            var nl = expenses.take(limit.toInt()).map { p -> p.copy() }
-            nl = if (
-                viewModel.nameFilter.isEmpty() &&
-                viewModel.categoryFilterList.isEmpty() &&
-                viewModel.dateFilter == null
-            ) {
-                addTotalsToExpenses(nl)
-            } else {
-                addTotalsToExpensesWithoutToday(nl)
-            }
-            maxExpensesNumber = expenses.size.toLong()
-            binding.listRecyclerView.also {
-                if (it.adapter == null) {
-                    it.adapter = ExpenseAdapter(nl, this)
-                    isListBlocked = limit >= maxExpensesNumber
-                    val position = (it.adapter as ExpenseAdapter).getTodayPosition()
-                    scrollTo(position)
-                } else {
-                    it.post {
-                        (it.adapter as ExpenseAdapter).updateData(nl)
-                        isListBlocked = limit >= maxExpensesNumber
-                    }
-                }
-                toScroll?.let { id ->
-                    scrollToId(id)
-                    toScroll = null
-                }
-            }
-        }
 
         datePickerRangeDialog = object : DatePickerRangeDialog(
             requireActivity()
         ) {
             override fun onStart() {
                 super.onStart()
-                requireActivity().hideSoftKeyboard(binding.root)
+                requireActivity().hideSoftKeyboard(requireView())
             }
 
             override fun onPositiveBtnClickListener() {
                 super.onPositiveBtnClickListener()
-                viewModel.dateFilter = Pair(startDate!!, endDate!!)
-                updateFilterChips()
-                refreshExpensesList()
+                viewModel.onDateFilterChanged(Pair(startDate!!, endDate!!))
             }
         }
 
-        binding.filterComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-
-        return binding.root
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        updateFilterChips()
-        refreshExpensesList()
-    }
-
-    private fun refreshExpensesList() {
-        recViewLiveData.removeSource(localExpensesLiveData)
-        localExpensesLiveData = viewModel.getLocalExpenses()
-        recViewLiveData.addSource(localExpensesLiveData) { value ->
-            recViewLiveData.value = value
-        }
-    }
-
-    private fun updateFilterChips() {
-        if (viewModel.categoryFilterList.isEmpty() && viewModel.dateFilter == null) {
-            binding.filterComposeView.visibility = View.GONE
-            return
-        }
-        binding.filterComposeView.visibility = View.VISIBLE
-        binding.filterComposeView.setContent {
-            MyFinanceTheme {
-                FilterChipBar(
-                    categories = viewModel.categoryFilterList.toList(),
-                    dateFilter = viewModel.dateFilter,
-                    getDateLabel = { start, end -> getDateChipLabel(start, end) },
-                    onCategoryRemoved = { categoryId ->
-                        viewModel.categoryFilterList.remove(categoryId)
-                        refreshExpensesList()
-                        updateFilterChips()
-                    },
-                    onDateRemoved = {
-                        viewModel.dateFilter = null
-                        refreshExpensesList()
-                        updateFilterChips()
-                    }
-                )
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    ExpensesScreen(
+                        viewModel = viewModel,
+                        onFilterClick = { showFilterSheet() },
+                        onItemLongClick = { expense, position ->
+                            showEditExpenseSheet(expense, position)
+                        },
+                        onCategoryClick = { expense, _ ->
+                            showCategorySelectionSheet(expense)
+                        },
+                        getDateLabel = { start, end -> getDateChipLabel(start, end) }
+                    )
+                }
             }
         }
+    }
+
+    fun scrollToId(id: String) {
+        viewModel.scrollToId(id)
+    }
+
+    override fun scrollUp() {
+        val today = LocalDate.now()
+        val todayId = "total_${today.dayOfMonth}_${today.monthValue}_${today.year}"
+        viewModel.scrollToId(todayId)
+    }
+
+    private fun showFilterSheet() {
+        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+            SideSheetDialog(requireContext())
+        } else {
+            BottomSheetDialog(requireContext())
+        }
+        val composeView = getFilterExpensesSheetDialogComposeView(sheetDialog::hide)
+        sheetDialog.setContentView(composeView)
+        sheetDialog.show()
+    }
+
+    private fun showEditExpenseSheet(expense: Expense, position: Int) {
+        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+            SideSheetDialog(requireContext())
+        } else {
+            BottomSheetDialog(requireContext())
+        }
+        val composeView = getEditExpenseSheetDialogComposeView(
+            expense,
+            position,
+            sheetDialog::hide
+        )
+        sheetDialog.setContentView(composeView)
+        sheetDialog.show()
+    }
+
+    private fun showCategorySelectionSheet(expense: Expense) {
+        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+            SideSheetDialog(requireContext())
+        } else {
+            BottomSheetDialog(requireContext())
+        }
+        val composeView = getCategorySheetDialogComposeView(
+            expense = expense,
+            onDismiss = sheetDialog::hide,
+            onCategorySelected = {
+                viewModel.updateCategory(expense, it)
+                sheetDialog.hide()
+            }
+        )
+        sheetDialog.setContentView(composeView)
+        sheetDialog.show()
     }
 
     private fun getDateChipLabel(startDate: LocalDate, endDate: LocalDate): String {
@@ -224,85 +160,14 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
     }
 
-    private val onFilterClickListener = View.OnClickListener {
-        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-            SideSheetDialog(requireContext())
-        } else {
-            BottomSheetDialog(requireContext())
-        }
-        val composeView = getFilterExpensesSheetDialogComposeView(sheetDialog::hide)
-        sheetDialog.setContentView(composeView)
-        sheetDialog.show()
-    }
-
-    override fun onItemInteraction(
-        interactionID: Int,
-        expense: Expense,
-        position: Int
-    ) {
-        when (interactionID) {
-            ON_CLICK -> Unit
-
-            ON_LONG_CLICK -> {
-                val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-                    SideSheetDialog(requireContext())
-                } else {
-                    BottomSheetDialog(requireContext())
-                }
-                val composeView = getEditExpenseSheetDialogComposeView(
-                    expense,
-                    position,
-                    sheetDialog::hide
-                )
-                sheetDialog.setContentView(composeView)
-                sheetDialog.show()
-            }
-
-            ON_BUTTON_CLICK -> {
-                val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-                    SideSheetDialog(requireContext())
-                } else {
-                    BottomSheetDialog(requireContext())
-                }
-                val composeView = getCategorySheetDialogComposeView(
-                    expense = expense,
-                    onDismiss = sheetDialog::hide,
-                    onCategorySelected = { viewModel.updateCategory(expense, it) }
-                )
-                sheetDialog.setContentView(composeView)
-                sheetDialog.show()
-            }
-
-            ON_LOAD_MORE_REQUEST -> {
-                if (!isListBlocked) {
-                    isListBlocked = true
-                    binding.listRecyclerView.adapter?.let {
-                        (it as ExpenseAdapter).getLimit(true)
-                    }
-                    refreshExpensesList()
-                }
-            }
-        }
-    }
-
     override fun onCompleted(response: LiveData<FinanceResult>) {
         response.observe(viewLifecycleOwner) { result ->
             when (result.code) {
-                FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS.code -> {
-                    val limit = if (binding.listRecyclerView.adapter != null) {
-                        (binding.listRecyclerView.adapter as ExpenseAdapter).getLimit()
-                    } else {
-                        DEFAULT_LIMIT
-                    }
-                    isListBlocked = limit >= maxExpensesNumber
-                }
-
+                FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS.code -> {}
                 FinanceCode.EXPENSE_EDIT_SUCCESS.code -> {}
-
                 FinanceCode.EXPENSE_ADD_SUCCESS.code -> {
                     (activity as HomeActivity).showSnackBar(result.message)
                 }
-
                 else -> {
                     (activity as HomeActivity).showSnackBar(result.message)
                 }
@@ -328,42 +193,6 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
         }
     }
 
-    override fun scrollUp() {
-        super.scrollUp()
-        (binding.listRecyclerView.adapter as ExpenseAdapter?)?.apply {
-            val position = getTodayPosition()
-            scrollTo(position)
-        }
-    }
-
-    private fun scrollTo(position: Int, animate: Boolean = false) {
-        binding.listRecyclerView.apply {
-            stopScroll()
-            if (animate) {
-                val linearSmoothScroller: LinearSmoothScroller =
-                    object : LinearSmoothScroller(context) {
-                        override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
-                            return 200.0f / displayMetrics.densityDpi
-                        }
-                    }
-                linearSmoothScroller.targetPosition = position
-                (layoutManager as LinearLayoutManager?)?.startSmoothScroll(linearSmoothScroller)
-            } else {
-                (layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(position, 0)
-            }
-        }
-    }
-
-    fun scrollToId(id: String) {
-        if (::binding.isInitialized) {
-            val position = (binding.listRecyclerView.adapter as ExpenseAdapter)
-                .getItemPositionWithId(id)
-            scrollTo(position)
-        } else {
-            toScroll = id
-        }
-    }
-
     private fun getEditExpenseSheetDialogComposeView(
         expense: Expense,
         position: Int,
@@ -378,14 +207,8 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                         onDismiss = onDismiss,
                         onEdit = {
                             Intent(context, AddActivity::class.java).also {
-                                it.putExtra(
-                                    AddActivity.REQUEST_CODE_KEY,
-                                    AddActivity.REQUEST_EDIT_CODE
-                                )
-                                it.putExtra(
-                                    AddActivity.EXPENSE_REQUEST_KEY,
-                                    AddActivity.REQUEST_EXPENSE_CODE
-                                )
+                                it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
+                                it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_EXPENSE_CODE)
                                 it.putExtra(AddActivity.EXPENSE_ID_KEY, expense.id)
                                 it.putExtra(AddActivity.EXPENSE_NAME_KEY, expense.name)
                                 it.putExtra(AddActivity.EXPENSE_PRICE_KEY, expense.price)
@@ -415,10 +238,12 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MyFinanceTheme {
+                    val selectedCategories by viewModel.selectedCategories.collectAsState()
+                    val dateRange by viewModel.dateRange.collectAsState()
                     FilterExpensesSheet(
                         onDismiss = onDismiss,
-                        categoryEnabled = viewModel.categoryFilterList.size != 9,
-                        dateRangeEnabled = viewModel.dateFilter == null,
+                        categoryEnabled = selectedCategories.size != 9,
+                        dateRangeEnabled = dateRange == null,
                         onSelectCategory = {
                             onDismiss()
                             val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
@@ -427,12 +252,10 @@ class ExpensesFragment : BaseFragment(), ExpenseInteractionListener, ExpensesLis
                                 BottomSheetDialog(requireContext())
                             }
                             val composeView = getCategorySheetDialogComposeView(
-                                disabledCategories = viewModel.categoryFilterList,
+                                disabledCategories = selectedCategories,
                                 onDismiss = sheetDialog::hide,
                                 onCategorySelected = {
-                                    viewModel.categoryFilterList.add(it)
-                                    updateFilterChips()
-                                    refreshExpensesList()
+                                    viewModel.onCategoryFilterChanged(it)
                                 }
                             )
                             sheetDialog.setContentView(composeView)
