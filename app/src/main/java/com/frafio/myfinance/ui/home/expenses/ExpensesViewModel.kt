@@ -47,7 +47,6 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
     val dateRange = _dateRange.asStateFlow()
 
     private val _limit = MutableStateFlow(DEFAULT_LIMIT)
-    val limit = _limit.asStateFlow()
 
     private val _scrollToId = MutableSharedFlow<String?>(replay = 0)
     val scrollToId = _scrollToId.asSharedFlow()
