@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.features.home.expenses
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -177,7 +179,13 @@ fun ExpensesList(
         state = listState,
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 1.dp)
+            .padding(
+                bottom = if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    1.dp
+                } else {
+                    0.dp
+                }
+            )
     ) {
         var i = 0
         var tot = 0
