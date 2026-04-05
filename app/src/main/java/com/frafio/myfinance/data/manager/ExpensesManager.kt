@@ -23,7 +23,7 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
 
     companion object {
         private val TAG = ExpensesManager::class.java.simpleName
-        const val DEFAULT_LIMIT: Long = 100
+        const val DEFAULT_LIMIT: Long = 50
     }
 
     private val fStore: FirebaseFirestore

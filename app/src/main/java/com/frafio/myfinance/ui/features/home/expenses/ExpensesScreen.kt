@@ -23,7 +23,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,6 +66,7 @@ fun ExpensesScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedCategories by viewModel.selectedCategories.collectAsState()
     val dateRange by viewModel.dateRange.collectAsState()
+    val itemMetadata by viewModel.itemMetadata.collectAsState()
 
     ExpensesContent(
         expenses = expenses,
@@ -71,6 +75,7 @@ fun ExpensesScreen(
         selectedCategories = selectedCategories,
         dateRange = dateRange,
         scrollToIdFlow = viewModel.scrollToId,
+        itemMetadata = itemMetadata,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
         onCategoryFilterChanged = viewModel::onCategoryFilterChanged,
         onDateFilterChanged = { viewModel.onDateFilterChanged(it) },
@@ -91,6 +96,7 @@ fun ExpensesContent(
     selectedCategories: List<Int>,
     dateRange: Pair<LocalDate, LocalDate>?,
     scrollToIdFlow: Flow<String?>,
+    itemMetadata: Map<Int, Pair<Int, Int>>,
     onSearchQueryChanged: (String) -> Unit,
     onCategoryFilterChanged: (Int) -> Unit,
     onDateFilterChanged: (Pair<LocalDate, LocalDate>?) -> Unit,
@@ -132,7 +138,8 @@ fun ExpensesContent(
                 onItemLongClick = onItemLongClick,
                 onCategoryClick = onCategoryClick,
                 onLoadMore = onLoadMore,
-                scrollToIdFlow = scrollToIdFlow
+                scrollToIdFlow = scrollToIdFlow,
+                itemMetadata = itemMetadata
             )
         }
     }
@@ -145,10 +152,12 @@ fun ExpensesList(
     onItemLongClick: (Expense, Int) -> Unit,
     onCategoryClick: (Expense, Int) -> Unit,
     onLoadMore: () -> Unit,
-    scrollToIdFlow: Flow<String?>
+    scrollToIdFlow: Flow<String?>,
+    itemMetadata: Map<Int, Pair<Int, Int>>
 ) {
     val listState = rememberLazyListState()
     val currentExpenses by rememberUpdatedState(expenses)
+    var isFirstScroll by remember { mutableStateOf(true) }
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
@@ -163,12 +172,16 @@ fun ExpensesList(
         scrollToIdFlow.collect { id ->
             if (id != null) {
                 snapshotFlow { currentExpenses }
-                    .filter { it.any { expense -> expense.id.startsWith(id) } }
+                    .filter { it.isNotEmpty() }
                     .first()
                     .let { list ->
                         val index = list.indexOfFirst { it.id.startsWith(id) }
-                        if (index != -1) {
-                            listState.animateScrollToItem(index)
+                        val finalIndex = if (index != -1) index else 0
+                        if (isFirstScroll) {
+                            listState.scrollToItem(finalIndex)
+                            isFirstScroll = false
+                        } else {
+                            listState.animateScrollToItem(finalIndex)
                         }
                     }
             }
@@ -187,8 +200,6 @@ fun ExpensesList(
                 }
             )
     ) {
-        var i = 0
-        var tot = 0
         itemsIndexed(
             items = expenses,
             key = { _, expense -> expense.id },
@@ -202,7 +213,7 @@ fun ExpensesList(
         ) { index, expense ->
             when (expense.category) {
                 FirestoreEnums.CATEGORIES.TOTAL.value -> {
-                    TotalItem(expense, index)
+                    TotalItem(expense)
                 }
 
                 FirestoreEnums.CATEGORIES.JOLLY.value -> {
@@ -230,36 +241,21 @@ fun ExpensesList(
                 }
 
                 else -> {
-                    i = 0
-                    tot = 1
-                    for (t in index + 1..<expenses.size) {
-                        if (expenses[t].getLocalDate().isEqual(expense.getLocalDate())) {
-                            tot++
-                        } else {
-                            break
-                        }
-                    }
-                    for (t in index - 1 downTo 0) {
-                        if (expenses[t].category != FirestoreEnums.CATEGORIES.TOTAL.value && expenses[t].getLocalDate()
-                                .isEqual(expense.getLocalDate())
-                        ) {
-                            tot++
-                            i++
-                        } else {
-                            break
-                        }
-                    }
+                    val metadata = itemMetadata[index] ?: Pair(0, 1)
+                    val iInGroup = metadata.first
+                    val totInGroup = metadata.second
+
                     SegmentedListItem(
                         onClick = {},
                         onLongClick = { onItemLongClick(expense, index) },
-                        shapes = if (i == 0 && tot == 1) {
+                        shapes = if (iInGroup == 0 && totInGroup == 1) {
                             ListItemDefaults.shapes().copy(
                                 shape = ListItemDefaults.shapes().selectedShape
                             )
                         } else {
                             ListItemDefaults.segmentedShapes(
-                                index = i,
-                                count = tot,
+                                index = iInGroup,
+                                count = totInGroup,
                                 defaultShapes = ListItemDefaults.shapes()
                             )
                         },
@@ -316,22 +312,12 @@ fun ExpensesList(
 
 @Composable
 fun TotalItem(
-    expense: Expense,
-    index: Int = 0
+    expense: Expense
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(
-                start = 24.dp,
-                end = 24.dp,
-                top = if (index == 0) {
-                    8.dp
-                } else {
-                    16.dp
-                },
-                bottom = 8.dp
-            ),
+            .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -435,7 +421,8 @@ fun ExpensesContentPreview() {
             onFilterClick = {},
             onItemLongClick = { _, _ -> },
             onCategoryClick = { _, _ -> },
-            getDateLabel = { _, _ -> "Oct 27, 2023" }
+            getDateLabel = { _, _ -> "Oct 27, 2023" },
+            itemMetadata = emptyMap()
         )
     }
 }

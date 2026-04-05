@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -48,7 +49,7 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
 
     private val _limit = MutableStateFlow(DEFAULT_LIMIT)
 
-    private val _scrollToId = MutableSharedFlow<String?>(replay = 0)
+    private val _scrollToId = MutableSharedFlow<String?>(replay = 1)
     val scrollToId = _scrollToId.asSharedFlow()
 
     val isExpensesEmpty: StateFlow<Boolean?> = expensesLocalRepository.getCount().asFlow()
@@ -88,14 +89,49 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
             ).asFlow()
         }
     }.combine(_limit) { list, limit ->
-        val limitedList = list.take(limit.toInt()).map { it.copy() }
+        list.take(limit.toInt())
+    }.map { limitedList ->
         if (_searchQuery.value.isEmpty() && _selectedCategories.value.isEmpty() && _dateRange.value == null) {
             addTotalsToExpenses(limitedList)
         } else {
             addTotalsToExpensesWithoutToday(limitedList)
         }
     }.flowOn(Dispatchers.Default)
+        .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val itemMetadata: StateFlow<Map<Int, Pair<Int, Int>>> = expenses
+        .map { list ->
+            val result = mutableMapOf<Int, Pair<Int, Int>>()
+            var start = 0
+            while (start < list.size) {
+                val expense = list[start]
+                if (expense.category == FirestoreEnums.CATEGORIES.TOTAL.value ||
+                    expense.category == FirestoreEnums.CATEGORIES.JOLLY.value
+                ) {
+                    result[start] = Pair(0, 1)
+                    start++
+                } else {
+                    val date = expense.getLocalDate()
+                    var end = start
+                    while (end < list.size &&
+                        list[end].category != FirestoreEnums.CATEGORIES.TOTAL.value &&
+                        list[end].category != FirestoreEnums.CATEGORIES.JOLLY.value &&
+                        list[end].getLocalDate() == date
+                    ) {
+                        end++
+                    }
+                    val count = end - start
+                    for (i in 0 until count) {
+                        result[start + i] = Pair(i, count)
+                    }
+                    start = end
+                }
+            }
+            result
+        }
+        .flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
@@ -116,7 +152,7 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun loadMore() {
-        _limit.value += (DEFAULT_LIMIT / 2)
+        _limit.value += (DEFAULT_LIMIT)
     }
 
     fun scrollToId(id: String) {

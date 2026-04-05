@@ -38,6 +38,7 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
 
     private val viewModel by viewModels<ExpensesViewModel>()
     private lateinit var datePickerRangeDialog: DatePickerRangeDialog
+    private var pendingScrollId: String? = null
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -56,6 +57,13 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
         savedInstanceState: Bundle?
     ): View {
         viewModel.listener = this
+
+        if (pendingScrollId != null) {
+            viewModel.scrollToId(pendingScrollId!!)
+            pendingScrollId = null
+        } else if (savedInstanceState == null) {
+            scrollUp()
+        }
 
         datePickerRangeDialog = object : DatePickerRangeDialog(
             requireActivity()
@@ -92,10 +100,15 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
     }
 
     fun scrollToId(id: String) {
-        viewModel.scrollToId(id)
+        if (isAdded) {
+            viewModel.scrollToId(id)
+        } else {
+            pendingScrollId = id
+        }
     }
 
     override fun scrollUp() {
+        super.scrollUp()
         val today = LocalDate.now()
         val todayId = "total_${today.dayOfMonth}_${today.monthValue}_${today.year}"
         viewModel.scrollToId(todayId)

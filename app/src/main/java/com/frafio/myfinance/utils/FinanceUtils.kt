@@ -62,108 +62,81 @@ fun getCategoryColor(categoryId: Int?, default: Color): Color {
 }
 
 fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
-    val expenseList = mutableListOf<Expense>()
-    // Create total for the local list
-    var total: Expense? = null
-    // Used to keep the order
-    var currentExpenses = mutableListOf<Expense>()
+    if (expenses.isEmpty()) return emptyList()
 
-    var prevDate: LocalDate? = null
+    val result = ArrayList<Expense>(expenses.size + 10)
+    val todayDate = LocalDate.now()
+    var todayAdded = false
 
-    expenses.forEach { expense ->
-        val todayDate = LocalDate.now()
-        val expenseDate = expense.getLocalDate()
-        total?.let {
-            prevDate = total!!.getLocalDate()
-        }
+    var i = 0
+    while (i < expenses.size) {
+        val groupDate = expenses[i].getLocalDate()
 
-        if ((prevDate == null || prevDate.isAfter(todayDate)) &&
-            expenseDate.isBefore(todayDate)
-        ) {
-            if (currentExpenses.isNotEmpty()) {
-                expenseList.add(total!!)
-                currentExpenses.forEach { p ->
-                    expenseList.add(p)
-                }
+        // Insert "Today" if we reached it or passed it
+        if (!todayAdded && !groupDate.isAfter(todayDate)) {
+            if (groupDate.isBefore(todayDate)) {
+                // Today is missing, add empty today block
+                addTodayBlock(result, todayDate)
             }
-            currentExpenses = mutableListOf()
-            // Aggiungi totale a 0 per oggi
-            val totId = "${todayDate.dayOfMonth}_${todayDate.monthValue}_${todayDate.year}"
-            total = Expense(
-                name = FirestoreEnums.NAMES.TOTAL.value,
-                price = 0.0,
-                year = todayDate.year,
-                month = todayDate.monthValue,
-                day = todayDate.dayOfMonth,
-                category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = "total_$totId"
-            )
-            expenseList.add(total)
-            // Add empty expense (with random name, jolly category, and price to 0.0)
-            total = Expense(
-                name = "",
-                price = 0.0,
-                year = todayDate.year,
-                month = todayDate.monthValue,
-                day = todayDate.dayOfMonth,
-                category = FirestoreEnums.CATEGORIES.JOLLY.value,
-                id = "jolly_$totId"
-            )
-            expenseList.add(total)
-            prevDate = total.getLocalDate()
+            todayAdded = true
         }
 
-        if (prevDate == null) { // If is the first total
-            currentExpenses.add(expense)
-            total = Expense(
-                name = FirestoreEnums.NAMES.TOTAL.value,
-                price = expense.price,
-                year = expense.year,
-                month = expense.month,
-                day = expense.day,
-                category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = "total_${expense.getTotalId()}"
-            )
-        } else if (total!!.id == "total_${expense.getTotalId()}") { // If the total should be updated
-            currentExpenses.add(expense)
-            total = Expense(
-                name = FirestoreEnums.NAMES.TOTAL.value,
-                price = total.price!! + expense.price!!,
-                year = total.year,
-                month = total.month,
-                day = total.day,
-                category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = total.id
-            )
-        } else { // If we need a new total
-            // Update the local list with previous day expenses
-            if (currentExpenses.isNotEmpty()) {
-                expenseList.add(total)
-                currentExpenses.forEach { p ->
-                    expenseList.add(p)
-                }
-            }
-            currentExpenses = mutableListOf()
-            currentExpenses.add(expense)
-            // Create new total
-            total = Expense(
-                name = FirestoreEnums.NAMES.TOTAL.value,
-                price = expense.price,
-                year = expense.year,
-                month = expense.month,
-                day = expense.day,
-                category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = "total_${expense.getTotalId()}"
-            )
+        // Find group end and calculate total
+        var j = i
+        var groupTotal = 0.0
+        while (j < expenses.size && expenses[j].getLocalDate() == groupDate) {
+            groupTotal += (expenses[j].price ?: 0.0)
+            j++
         }
-    }
-    if (currentExpenses.isNotEmpty()) {
-        expenseList.add(total!!)
-        currentExpenses.forEach { p ->
-            expenseList.add(p)
+
+        // Add Total for the group
+        val totId = "total_${groupDate.dayOfMonth}_${groupDate.monthValue}_${groupDate.year}"
+        result.add(Expense(
+            name = FirestoreEnums.NAMES.TOTAL.value,
+            price = groupTotal,
+            year = groupDate.year,
+            month = groupDate.monthValue,
+            day = groupDate.dayOfMonth,
+            category = FirestoreEnums.CATEGORIES.TOTAL.value,
+            id = totId
+        ))
+
+        // Add expenses in group
+        for (k in i until j) {
+            result.add(expenses[k])
         }
+
+        i = j
     }
-    return expenseList
+
+    // If today was never reached (all future expenses)
+    if (!todayAdded) {
+        addTodayBlock(result, todayDate)
+    }
+
+    return result
+}
+
+private fun addTodayBlock(result: MutableList<Expense>, todayDate: LocalDate) {
+    val totId = "${todayDate.dayOfMonth}_${todayDate.monthValue}_${todayDate.year}"
+    result.add(Expense(
+        name = FirestoreEnums.NAMES.TOTAL.value,
+        price = 0.0,
+        year = todayDate.year,
+        month = todayDate.monthValue,
+        day = todayDate.dayOfMonth,
+        category = FirestoreEnums.CATEGORIES.TOTAL.value,
+        id = "total_$totId"
+    ))
+    result.add(Expense(
+        name = "",
+        price = 0.0,
+        year = todayDate.year,
+        month = todayDate.monthValue,
+        day = todayDate.dayOfMonth,
+        category = FirestoreEnums.CATEGORIES.JOLLY.value,
+        id = "jolly_$totId"
+    ))
 }
 
 fun addTotalsToExpensesWithoutToday(expenses: List<Expense>): List<Expense> {
