@@ -59,12 +59,14 @@
 
     <string name="your_profile">Il tuo profilo</string>
     <string name="your_name">Il tuo nome</string>
+    <string name="your_budget">Il tuo budget</string>
     <string name="edit_profile">Modifica il tuo profilo</string>
     <string name="edit_propic">Carica la tua foto profilo</string>
     <string name="edit_full_name">Modifica il tuo nome</string>
     <string name="expense_category_icon">Icona di categoria spesa</string>
     <string name="no_expenses">Nessuna spesa</string>
     <string name="no_incomes">Nessuna entrata</string>
+    <string name="enter_your_budget">Inserisci il tuo budget</string>
 
     <string name="monthly_budget">Budget mensile</string>
     <string name="annual_budget">Budget annuale</string>

@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -35,6 +37,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.ui.components.SheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResetPasswordSheet(
     onDismiss: () -> Unit,
@@ -97,12 +100,16 @@ fun ResetPasswordSheet(
                 })
             )
             Spacer(modifier = Modifier.width(5.dp))
-            FilledTonalIconButton(
+            FilledIconButton(
                 onClick = {
                     onSend(emailFieldValue.text.trim())
                     onDismiss()
                 },
-                enabled = isEmailValid
+                enabled = isEmailValid,
+                shapes = IconButtonDefaults.shapes().copy(
+                    shape = IconButtonDefaults.smallSquareShape,
+                    pressedShape = IconButtonDefaults.smallRoundShape
+                )
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_send_outline),

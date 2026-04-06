@@ -84,7 +84,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
 
                 AddActivity.REQUEST_INCOME_CODE -> {
                     showFragment(R.id.budgetFragment)
-                    budgetFragment?.scrollIncomesToId(totalId)
+                    budgetFragment?.scrollToId(totalId)
                     showSnackBar(message)
                 }
             }

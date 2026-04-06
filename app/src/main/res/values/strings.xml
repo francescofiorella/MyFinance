@@ -67,12 +67,14 @@
 
     <string name="your_profile">Your profile</string>
     <string name="your_name">Your name</string>
+    <string name="your_budget">Your budget</string>
     <string name="edit_profile">Edit your profile</string>
     <string name="edit_propic">Upload your profile picture</string>
     <string name="edit_full_name">Edit your full name</string>
     <string name="expense_category_icon">Expense Category Icon</string>
     <string name="no_expenses">No expenses</string>
     <string name="no_incomes">No incomes</string>
+    <string name="enter_your_budget">Enter your budget</string>
 
     <string name="zero_double" translatable="false">0.00</string>
     <string name="zero_price" translatable="false">€ 0.00</string>

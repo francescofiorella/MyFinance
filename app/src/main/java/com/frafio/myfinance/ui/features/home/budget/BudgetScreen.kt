@@ -1,0 +1,362 @@
+package com.frafio.myfinance.ui.features.home.budget
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.frafio.myfinance.R
+import com.frafio.myfinance.data.enums.db.FirestoreEnums
+import com.frafio.myfinance.data.model.Income
+import com.frafio.myfinance.ui.components.JollyListItem
+import com.frafio.myfinance.ui.components.TotalItem
+import com.frafio.myfinance.ui.components.TransactionListItem
+import com.frafio.myfinance.ui.home.budget.BudgetViewModel
+import com.frafio.myfinance.ui.theme.MyFinanceTheme
+import com.frafio.myfinance.utils.doubleToPrice
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+
+@Composable
+fun BudgetScreen(
+    viewModel: BudgetViewModel,
+    onItemLongClick: (Income, Int) -> Unit,
+    onEditBudgetClick: (Double) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val incomes by viewModel.incomes.collectAsState()
+    val isIncomesEmpty by viewModel.isIncomesEmpty.collectAsState()
+    val itemMetadata by viewModel.itemMetadata.collectAsState()
+    val monthlyBudget by viewModel.monthlyBudget.collectAsState()
+    val annualBudget by viewModel.annualBudget.collectAsState()
+
+    BudgetContent(
+        incomes = incomes,
+        isIncomesEmpty = isIncomesEmpty,
+        itemMetadata = itemMetadata,
+        monthlyBudget = monthlyBudget,
+        annualBudget = annualBudget,
+        scrollToIdFlow = viewModel.scrollToId,
+        onLoadMore = viewModel::loadMore,
+        onItemLongClick = onItemLongClick,
+        onEditBudgetClick = { onEditBudgetClick(monthlyBudget) },
+        onDeleteBudget = viewModel::deleteMonthlyBudget,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun BudgetContent(
+    incomes: List<Income>,
+    isIncomesEmpty: Boolean,
+    itemMetadata: Map<Int, Pair<Int, Int>>,
+    monthlyBudget: Double,
+    annualBudget: Double,
+    scrollToIdFlow: Flow<String?>,
+    onLoadMore: () -> Unit,
+    onItemLongClick: (Income, Int) -> Unit,
+    onEditBudgetClick: () -> Unit,
+    onDeleteBudget: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IncomeList(
+        incomes = incomes,
+        isIncomesEmpty = isIncomesEmpty,
+        monthlyBudget = monthlyBudget,
+        annualBudget = annualBudget,
+        onEditBudgetClick = onEditBudgetClick,
+        onDeleteBudget = onDeleteBudget,
+        itemMetadata = itemMetadata,
+        onItemLongClick = onItemLongClick,
+        onLoadMore = onLoadMore,
+        scrollToIdFlow = scrollToIdFlow,
+        modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun IncomeList(
+    incomes: List<Income>,
+    isIncomesEmpty: Boolean,
+    monthlyBudget: Double,
+    annualBudget: Double,
+    onEditBudgetClick: () -> Unit,
+    onDeleteBudget: () -> Unit,
+    itemMetadata: Map<Int, Pair<Int, Int>>,
+    onItemLongClick: (Income, Int) -> Unit,
+    onLoadMore: () -> Unit,
+    scrollToIdFlow: Flow<String?>,
+    modifier: Modifier = Modifier
+) {
+    val listState = rememberLazyListState()
+    val currentIncomes by rememberUpdatedState(incomes)
+    var isFirstScroll by remember { mutableStateOf(true) }
+
+    val headerCount = 2 // Budget Card + Header Text
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .filter { it != null && it >= currentIncomes.size + headerCount - 5 }
+            .distinctUntilChanged()
+            .collect {
+                onLoadMore()
+            }
+    }
+
+    LaunchedEffect(scrollToIdFlow) {
+        scrollToIdFlow.collect { id ->
+            if (id != null) {
+                snapshotFlow { currentIncomes }
+                    .filter { it.isNotEmpty() }
+                    .first()
+                    .let { list ->
+                        val index = list.indexOfFirst { it.id.startsWith(id) }
+                        if (index != -1) {
+                            val finalIndex = index + headerCount
+                            if (isFirstScroll) {
+                                listState.scrollToItem(finalIndex)
+                                isFirstScroll = false
+                            } else {
+                                listState.animateScrollToItem(finalIndex)
+                            }
+                        }
+                    }
+            } else {
+                if (isFirstScroll) {
+                    listState.scrollToItem(0)
+                    isFirstScroll = false
+                } else {
+                    listState.animateScrollToItem(0)
+                }
+            }
+        }
+    }
+
+    LazyColumn(
+        state = listState,
+        modifier = modifier.fillMaxSize()
+    ) {
+        item {
+            // Monthly Budget Card
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 64.dp)
+            ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.currency) + " "
+                            + doubleToPrice(monthlyBudget).replace(
+                        stringResource(R.string.currency),
+                        ""
+                    ).trim(),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.displaySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.annual_budget) + " ",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = doubleToPrice(annualBudget),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    FilledIconButton(
+                        onClick = onEditBudgetClick,
+                        shapes = IconButtonDefaults.shapes().copy(
+                            shape = IconButtonDefaults.smallSquareShape,
+                            pressedShape = IconButtonDefaults.smallRoundShape
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_edit_filled),
+                            contentDescription = null,
+                        )
+                    }
+                    FilledIconButton(
+                        onClick = onDeleteBudget,
+                        enabled = monthlyBudget != 0.0,
+                        shapes = IconButtonDefaults.shapes().copy(
+                            shape = IconButtonDefaults.smallSquareShape,
+                            pressedShape = IconButtonDefaults.smallRoundShape
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_delete_filled),
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 64.dp),
+                text = stringResource(R.string.incomes),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        if (isIncomesEmpty) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillParentMaxSize()
+                        .padding(top = 64.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.warning_budget),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        } else {
+            itemsIndexed(
+                items = incomes,
+                key = { _, income -> income.id },
+                contentType = { _, income ->
+                    when (income.category) {
+                        FirestoreEnums.CATEGORIES.TOTAL.value -> "total"
+                        FirestoreEnums.CATEGORIES.JOLLY.value -> "jolly"
+                        else -> "income"
+                    }
+                }
+            ) { index, income ->
+                when (income.category) {
+                    FirestoreEnums.CATEGORIES.TOTAL.value -> {
+                        TotalItem(income)
+                    }
+
+                    FirestoreEnums.CATEGORIES.JOLLY.value -> {
+                        JollyListItem(messageRes = R.string.no_expenses)
+                    }
+
+                    else -> {
+                        val metadata = itemMetadata[index] ?: Pair(0, 1)
+                        TransactionListItem(
+                            transaction = income,
+                            indexInGroup = metadata.first,
+                            countInGroup = metadata.second,
+                            onClick = { },
+                            onLongClick = { onItemLongClick(income, index) }
+                        )
+                    }
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(88.dp)) // Floating Action Button space
+            }
+        }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewBudgetContent() {
+    MyFinanceTheme {
+        BudgetContent(
+            incomes = listOf(
+                Income(
+                    id = "2024",
+                    year = 2024,
+                    month = 0,
+                    category = FirestoreEnums.CATEGORIES.TOTAL.value,
+                    price = 12000.0
+                ),
+                Income(
+                    id = "1",
+                    name = "Salary",
+                    price = 1000.0,
+                    day = 1,
+                    month = 1,
+                    year = 2024,
+                    category = 0
+                ),
+                Income(
+                    id = "2",
+                    name = "Freelance",
+                    price = 500.0,
+                    day = 15,
+                    month = 1,
+                    year = 2024,
+                    category = 0
+                )
+            ),
+            isIncomesEmpty = false,
+            itemMetadata = mapOf(
+                1 to Pair(0, 2),
+                2 to Pair(1, 2)
+            ),
+            monthlyBudget = 1200.0,
+            annualBudget = 14400.0,
+            scrollToIdFlow = emptyFlow(),
+            onLoadMore = {},
+            onItemLongClick = { _, _ -> },
+            onEditBudgetClick = {},
+            onDeleteBudget = {}
+        )
+    }
+}

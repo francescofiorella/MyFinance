@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.features.home.profile
+package com.frafio.myfinance.ui.features.home.budget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -28,33 +28,41 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.ui.components.SheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
+import com.frafio.myfinance.utils.doubleToString
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun EditFullNameSheet(
-    fullName: String,
+fun EditBudgetSheet(
+    budget: Double,
     onDismiss: () -> Unit,
-    onEditFullName: (String) -> Unit,
+    onEditBudget: (Double) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var nameTextFieldValue by remember {
+    val initialText = if (budget == 0.0) "" else doubleToString(budget)
+    var budgetTextFieldValue by remember {
         mutableStateOf(
             TextFieldValue(
-                text = fullName,
-                selection = TextRange(fullName.length)
+                text = initialText,
+                selection = TextRange(initialText.length)
             )
         )
     }
 
+    val isConfirmEnabled = remember(budgetTextFieldValue.text) {
+        val newBudget = budgetTextFieldValue.text.toDoubleOrNull() ?: 0.0
+        budgetTextFieldValue.text.isNotEmpty() && newBudget != budget
+    }
+
     SheetDialog(
-        icon = R.drawable.ic_person_filled,
-        title = stringResource(id = R.string.your_name),
+        icon = R.drawable.ic_savings_filled,
+        title = stringResource(id = R.string.your_budget),
         label = stringResource(id = R.string.edit),
         modifier = modifier
     ) {
@@ -65,11 +73,20 @@ fun EditFullNameSheet(
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
-                value = nameTextFieldValue,
-                onValueChange = { nameTextFieldValue = it },
+                value = budgetTextFieldValue,
+                onValueChange = {
+                    var filteredValue = it.text
+                    if (it.text.contains(".")) {
+                        val parts = it.text.split(".")
+                        if (parts.size > 1 && parts[1].length > 2) {
+                            filteredValue = "${parts[0]}.${parts[1].substring(0, 2)}"
+                        }
+                    }
+                    budgetTextFieldValue = it.copy(text = filteredValue)
+                },
                 modifier = Modifier
                     .weight(1f),
-                label = { Text(stringResource(id = R.string.signup_name)) },
+                label = { Text(stringResource(id = R.string.enter_your_budget)) },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
@@ -82,24 +99,26 @@ fun EditFullNameSheet(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Decimal
+                ),
                 keyboardActions = KeyboardActions(onDone = {
-                    if (nameTextFieldValue.text.trim()
-                            .isNotEmpty() && nameTextFieldValue.text.trim() != fullName
-                    ) {
-                        onEditFullName(nameTextFieldValue.text.trim())
+                    if (isConfirmEnabled) {
+                        onEditBudget(budgetTextFieldValue.text.toDoubleOrNull() ?: 0.0)
                         onDismiss()
                     }
                 })
             )
-            Spacer(modifier = Modifier.width(5.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             FilledIconButton(
                 onClick = {
-                    onEditFullName(nameTextFieldValue.text.trim())
-                    onDismiss()
+                    if (isConfirmEnabled) {
+                        onEditBudget(budgetTextFieldValue.text.toDoubleOrNull() ?: 0.0)
+                        onDismiss()
+                    }
                 },
-                enabled = nameTextFieldValue.text.trim()
-                    .isNotEmpty() && nameTextFieldValue.text.trim() != fullName,
+                enabled = isConfirmEnabled,
                 shapes = IconButtonDefaults.shapes().copy(
                     shape = IconButtonDefaults.smallSquareShape,
                     pressedShape = IconButtonDefaults.smallRoundShape
@@ -116,12 +135,12 @@ fun EditFullNameSheet(
 
 @Preview(showBackground = true)
 @Composable
-fun EditFullNameSheetPreview() {
+fun EditBudgetSheetPreview() {
     MyFinanceTheme {
-        EditFullNameSheet(
-            fullName = "John Doe",
+        EditBudgetSheet(
+            budget = 0.0,
             onDismiss = {},
-            onEditFullName = {},
+            onEditBudget = {},
             modifier = Modifier
                 .background(color = MaterialTheme.colorScheme.surfaceContainerLow)
         )
