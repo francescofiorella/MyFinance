@@ -61,7 +61,7 @@ fun EditFullNameSheet(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp),
+                .padding(horizontal = 32.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
@@ -92,7 +92,7 @@ fun EditFullNameSheet(
                     }
                 })
             )
-            Spacer(modifier = Modifier.width(5.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             FilledIconButton(
                 onClick = {
                     onEditFullName(nameTextFieldValue.text.trim())

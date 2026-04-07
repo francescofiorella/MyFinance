@@ -41,7 +41,7 @@ fun SheetDialog(
         modifier = modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(vertical = 30.dp)
+            .padding(vertical = 32.dp)
     ) {
         SheetHeader(
             icon = icon,
@@ -69,7 +69,7 @@ private fun SheetHeader(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             FilledTonalIconButton(
@@ -85,7 +85,7 @@ private fun SheetHeader(
                     contentDescription = null
                 )
             }
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Column(modifier = Modifier.weight(1f)) {
                 val labelComposable = @Composable {
                     Text(
@@ -113,7 +113,7 @@ private fun SheetHeader(
                 }
             }
             if (endContent != null) {
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = endContent,
                     style = MaterialTheme.typography.bodyMedium,
@@ -126,7 +126,7 @@ private fun SheetHeader(
         HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 15.dp, horizontal = 16.dp),
+                .padding(vertical = 16.dp, horizontal = 16.dp),
             thickness = 1.dp
         )
     }
@@ -145,7 +145,7 @@ fun SheetDialogPreview() {
         ) {
             Text(
                 text = "This is the content",
-                modifier = Modifier.padding(horizontal = 30.dp)
+                modifier = Modifier.padding(horizontal = 32.dp)
             )
         }
     }
@@ -166,7 +166,7 @@ fun ExpenseSheetDialogPreview() {
         ) {
             Text(
                 text = "This is the content",
-                modifier = Modifier.padding(horizontal = 30.dp)
+                modifier = Modifier.padding(horizontal = 32.dp)
             )
         }
     }

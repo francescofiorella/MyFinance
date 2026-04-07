@@ -47,7 +47,7 @@ fun GridSheetDialog(
         endContent = endContent,
         modifier = modifier
     ) {
-        Column(modifier = Modifier.padding(top = 5.dp)) {
+        Column(modifier = Modifier.padding(top = 8.dp)) {
             items.chunked(rowSize).forEach { rowItems ->
                 Row(modifier = Modifier.fillMaxWidth()) {
                     rowItems.forEach { item ->
@@ -87,7 +87,7 @@ private fun GridItem(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 15.dp),
+                .padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
@@ -95,7 +95,7 @@ private fun GridItem(
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(id = item.textRes),
                 style = MaterialTheme.typography.bodyMedium,

@@ -21,7 +21,7 @@ import com.frafio.myfinance.data.widget.DatePickerRangeDialog
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.features.home.expenses.CategorySheetDialog
-import com.frafio.myfinance.ui.features.home.EditTransactionSheet
+import com.frafio.myfinance.ui.components.EditTransactionSheet
 import com.frafio.myfinance.ui.features.home.expenses.ExpensesScreen
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.theme.MyFinanceTheme

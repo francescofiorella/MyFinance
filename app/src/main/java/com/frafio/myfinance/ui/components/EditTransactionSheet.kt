@@ -1,4 +1,4 @@
-package com.frafio.myfinance.ui.features.home
+package com.frafio.myfinance.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
@@ -9,7 +9,6 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.MenuItem
 import com.frafio.myfinance.data.model.Transaction
-import com.frafio.myfinance.ui.components.ListSheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.getCategoryIcon
 

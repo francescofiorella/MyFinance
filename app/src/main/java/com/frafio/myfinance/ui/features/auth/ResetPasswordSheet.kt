@@ -67,7 +67,7 @@ fun ResetPasswordSheet(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp),
+                .padding(horizontal = 32.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
@@ -99,7 +99,7 @@ fun ResetPasswordSheet(
                     }
                 })
             )
-            Spacer(modifier = Modifier.width(5.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             FilledIconButton(
                 onClick = {
                     onSend(emailFieldValue.text.trim())

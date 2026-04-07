@@ -70,16 +70,16 @@ private fun ListItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp),
+                .padding(horizontal = 32.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 painter = painterResource(id = item.iconRes),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(vertical = 15.dp)
+                modifier = Modifier.padding(vertical = 16.dp)
             )
-            Spacer(modifier = Modifier.width(20.dp))
+            Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = stringResource(id = item.textRes),
                 style = MaterialTheme.typography.bodyMedium,

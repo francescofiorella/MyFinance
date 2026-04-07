@@ -69,7 +69,7 @@ fun EditBudgetSheet(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp),
+                .padding(horizontal = 32.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(

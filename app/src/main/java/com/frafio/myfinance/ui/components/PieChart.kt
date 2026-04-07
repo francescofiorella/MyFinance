@@ -76,8 +76,8 @@ fun PieChart(
     val totalText = stringResource(R.string.total)
 
     val unselectedIconSize = 24.dp
-    val selectedIconSize = 30.dp
-    val iconDistance = 15.dp
+    val selectedIconSize = 32.dp
+    val iconDistance = 16.dp
 
     val totalPriceText = doubleToPriceWithoutDecimals(data.sum())
 

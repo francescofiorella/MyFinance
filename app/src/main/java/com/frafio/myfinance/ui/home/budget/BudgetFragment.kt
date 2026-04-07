@@ -14,7 +14,7 @@ import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
-import com.frafio.myfinance.ui.features.home.EditTransactionSheet
+import com.frafio.myfinance.ui.components.EditTransactionSheet
 import com.frafio.myfinance.ui.features.home.budget.BudgetScreen
 import com.frafio.myfinance.ui.features.home.budget.EditBudgetSheet
 import com.frafio.myfinance.ui.home.HomeActivity
