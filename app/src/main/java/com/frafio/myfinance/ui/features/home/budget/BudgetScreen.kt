@@ -218,7 +218,7 @@ fun IncomeList(
                 ) {
                     FilledIconButton(
                         onClick = onEditBudgetClick,
-                        shapes = IconButtonDefaults.shapes().copy(
+                        shapes = IconButtonDefaults.shapes(
                             shape = IconButtonDefaults.smallSquareShape,
                             pressedShape = IconButtonDefaults.smallRoundShape
                         )
@@ -231,7 +231,7 @@ fun IncomeList(
                     FilledIconButton(
                         onClick = onDeleteBudget,
                         enabled = monthlyBudget != 0.0,
-                        shapes = IconButtonDefaults.shapes().copy(
+                        shapes = IconButtonDefaults.shapes(
                             shape = IconButtonDefaults.smallSquareShape,
                             pressedShape = IconButtonDefaults.smallRoundShape
                         )
@@ -290,7 +290,7 @@ fun IncomeList(
                     }
 
                     FirestoreEnums.CATEGORIES.JOLLY.value -> {
-                        JollyListItem(messageRes = R.string.no_expenses)
+                        JollyListItem(messageRes = R.string.no_incomes)
                     }
 
                     else -> {

@@ -19,6 +19,7 @@
     <color name="md_theme_onErrorContainer">#93000a</color>
     <color name="md_theme_surfaceDim">#d9dae0</color>
     <color name="md_theme_surface">#f8f9ff</color>
+    <color name="md_theme_surfaceVariant">#dfe2eb</color>
     <color name="md_theme_surfaceBright">#f8f9ff</color>
     <color name="md_theme_surfaceContainerLowest">#ffffff</color>
     <color name="md_theme_surfaceContainerLow">#f2f3fa</color>

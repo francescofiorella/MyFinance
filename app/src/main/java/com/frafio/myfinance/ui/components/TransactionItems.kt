@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -76,13 +76,16 @@ fun TransactionListItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onCategoryClick: (() -> Unit) = { }
+    onIconClick: (() -> Unit) = { }
 ) {
+    val colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+    )
     SegmentedListItem(
         onClick = onClick,
         onLongClick = onLongClick,
         shapes = if (indexInGroup == 0 && countInGroup == 1) {
-            ListItemDefaults.shapes().copy(
+            ListItemDefaults.shapes(
                 shape = ListItemDefaults.shapes().selectedShape
             )
         } else {
@@ -92,14 +95,15 @@ fun TransactionListItem(
                 defaultShapes = ListItemDefaults.shapes()
             )
         },
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        ),
+        colors = colors,
         leadingContent = {
             if (transaction is Expense) {
-                IconButton(
-                    onClick = onCategoryClick,
-                    colors = IconButtonDefaults.filledTonalIconButtonColors(),
+                FilledTonalIconButton(
+                    onClick = onIconClick,
+                    shapes = IconButtonDefaults.shapes(
+                        shape = IconButtonDefaults.smallRoundShape,
+                        pressedShape = IconButtonDefaults.smallSquareShape
+                    )
                 ) {
                     Icon(
                         painter = painterResource(getCategoryIcon(transaction.category)),
@@ -114,7 +118,8 @@ fun TransactionListItem(
                         .background(MaterialTheme.colorScheme.secondaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
-                    val firstLetter = transaction.name?.firstOrNull()?.uppercaseChar()?.toString() ?: ""
+                    val firstLetter =
+                        transaction.name?.firstOrNull()?.uppercaseChar()?.toString() ?: ""
                     Text(
                         text = firstLetter,
                         style = MaterialTheme.typography.titleMedium,
@@ -165,15 +170,16 @@ fun JollyListItem(
     messageRes: Int,
     modifier: Modifier = Modifier
 ) {
+    val colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+    )
     SegmentedListItem(
         onClick = {},
         onLongClick = {},
-        shapes = ListItemDefaults.shapes().copy(
+        shapes = ListItemDefaults.shapes(
             shape = ListItemDefaults.shapes().selectedShape
         ),
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        ),
+        colors = colors,
         content = {
             Text(
                 text = stringResource(messageRes),
@@ -220,7 +226,7 @@ fun PreviewExpenseListItem() {
             countInGroup = 1,
             onClick = {},
             onLongClick = {},
-            onCategoryClick = {}
+            onIconClick = {}
         )
     }
 }

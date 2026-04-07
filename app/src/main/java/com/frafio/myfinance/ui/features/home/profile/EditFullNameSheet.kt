@@ -100,7 +100,7 @@ fun EditFullNameSheet(
                 },
                 enabled = nameTextFieldValue.text.trim()
                     .isNotEmpty() && nameTextFieldValue.text.trim() != fullName,
-                shapes = IconButtonDefaults.shapes().copy(
+                shapes = IconButtonDefaults.shapes(
                     shape = IconButtonDefaults.smallSquareShape,
                     pressedShape = IconButtonDefaults.smallRoundShape
                 )

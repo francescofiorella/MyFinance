@@ -120,6 +120,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
                             android:text="@string/this_month"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="@dimen/card_title_size"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -144,6 +145,7 @@
                             android:layout_marginStart="@dimen/card_half_margin"
                             android:fontFamily="@font/nunito"
                             android:text="@string/on_total_budget"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="20sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -199,6 +201,7 @@
                             android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
                             android:text="@string/expenses_today"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
@@ -244,6 +247,7 @@
                             android:layout_gravity="start"
                             android:fontFamily="@font/nunito"
                             android:text="@string/this_year_next"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="@dimen/card_title_size" />
 
                         <com.google.android.material.textview.MaterialTextView
@@ -314,6 +318,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
                             android:text="@string/annual_balance"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="@dimen/card_title_size"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -340,6 +345,7 @@
                             android:fontFamily="@font/nunito"
                             android:maxLines="1"
                             android:text="@string/incomes"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="@dimen/card_title_size"
                             app:layout_constraintEnd_toEndOf="@id/balance_incomes_TV"
                             app:layout_constraintStart_toStartOf="@id/balance_incomes_TV"
@@ -364,6 +370,7 @@
                             android:layout_marginTop="10dp"
                             android:fontFamily="@font/nunito"
                             android:text="@string/expenses"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="@dimen/card_title_size"
                             app:layout_constraintEnd_toEndOf="@id/balance_expenses_TV"
                             app:layout_constraintStart_toStartOf="@id/balance_expenses_TV"
@@ -422,6 +429,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
                             android:text="@string/monthly_expenses"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="@dimen/card_title_size"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -489,6 +497,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
                             android:text="@string/expenses_by_category"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="@dimen/card_title_size"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -561,6 +570,7 @@
                             android:layout_marginTop="5dp"
                             android:fontFamily="@font/nunito"
                             android:text="@string/shown"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="12sp"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/pie_chart_compose_view" />
@@ -571,6 +581,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:fontFamily="@font/nunito"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="@id/tv0"
                             app:layout_constraintStart_toEndOf="@id/tv0"

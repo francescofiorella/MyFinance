@@ -73,6 +73,7 @@
                 android:fontFamily="@font/nunito"
                 android:paddingBottom="10dp"
                 android:text="@{viewModel.user.email}"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -1,24 +1,14 @@
 package com.frafio.myfinance.ui.features.home.expenses
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedListItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,23 +18,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.ui.components.EmptyView
+import com.frafio.myfinance.ui.components.JollyListItem
 import com.frafio.myfinance.ui.components.SearchBar
+import com.frafio.myfinance.ui.components.TotalItem
+import com.frafio.myfinance.ui.components.TransactionListItem
 import com.frafio.myfinance.ui.home.expenses.ExpensesViewModel
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
-import com.frafio.myfinance.utils.getCategoryIcon
-import com.frafio.myfinance.utils.getCategoryName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -192,13 +178,6 @@ fun ExpensesList(
         state = listState,
         modifier = Modifier
             .fillMaxSize()
-            .padding(
-                bottom = if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                    1.dp
-                } else {
-                    0.dp
-                }
-            )
     ) {
         itemsIndexed(
             items = expenses,
@@ -217,123 +196,24 @@ fun ExpensesList(
                 }
 
                 FirestoreEnums.CATEGORIES.JOLLY.value -> {
-                    SegmentedListItem(
-                        onClick = {},
-                        onLongClick = {},
-                        shapes = ListItemDefaults.shapes().copy(
-                            shape = ListItemDefaults.shapes().selectedShape
-                        ),
-                        colors = ListItemDefaults.colors().copy(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
-                        ),
-                        content = {
-                            Text(
-                                text = stringResource(R.string.no_expenses),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 1.dp),
-                    )
+                    JollyListItem(messageRes = R.string.no_expenses)
                 }
 
                 else -> {
                     val metadata = itemMetadata[index] ?: Pair(0, 1)
-                    val iInGroup = metadata.first
-                    val totInGroup = metadata.second
-
-                    SegmentedListItem(
-                        onClick = {},
+                    TransactionListItem(
+                        transaction = expense,
+                        indexInGroup = metadata.first,
+                        countInGroup = metadata.second,
+                        onClick = { },
                         onLongClick = { onItemLongClick(expense, index) },
-                        shapes = if (iInGroup == 0 && totInGroup == 1) {
-                            ListItemDefaults.shapes().copy(
-                                shape = ListItemDefaults.shapes().selectedShape
-                            )
-                        } else {
-                            ListItemDefaults.segmentedShapes(
-                                index = iInGroup,
-                                count = totInGroup,
-                                defaultShapes = ListItemDefaults.shapes()
-                            )
-                        },
-                        colors = ListItemDefaults.colors().copy(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
-                        ),
-                        leadingContent = {
-                            IconButton(
-                                onClick = { onCategoryClick(expense, index) },
-                                colors = IconButtonDefaults.filledTonalIconButtonColors(),
-                            ) {
-                                Icon(
-                                    painter = painterResource(getCategoryIcon(expense.category)),
-                                    contentDescription = null,
-                                )
-                            }
-                        },
-                        content = {
-                            Text(
-                                text = expense.name ?: "",
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Normal,
-                                maxLines = 1
-                            )
-                        },
-                        supportingContent = {
-                            Text(
-                                text = stringResource(getCategoryName(expense.category)),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1
-                            )
-                        },
-                        trailingContent = {
-                            Text(
-                                text = expense.getPriceString(true),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontWeight = FontWeight.Normal
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 1.dp),
+                        onIconClick = { onCategoryClick(expense, index) }
                     )
                 }
             }
         }
         item {
             Spacer(modifier = Modifier.height(88.dp)) // Floating Action Button space
-        }
-    }
-}
-
-@Composable
-fun TotalItem(
-    expense: Expense
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = expense.getDateString(extended = true),
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        if ((expense.price ?: 0.0) >= 0) {
-            Text(
-                text = expense.getPriceString(true),
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }

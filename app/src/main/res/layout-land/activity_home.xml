@@ -18,6 +18,7 @@
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?attr/colorSurface"
         tools:theme="@style/Theme.MyFinance">
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -80,6 +81,7 @@
                 android:fontFamily="@font/nunito"
                 android:paddingHorizontal="@dimen/title_padding"
                 android:text="@string/dashboard"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

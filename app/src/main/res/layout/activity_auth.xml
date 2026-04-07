@@ -15,7 +15,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/authParentLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="?attr/colorSurface">
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/auth_progressIndicator"
@@ -193,7 +194,8 @@
                         android:fontFamily="@font/nunito"
                         android:onClick="onResetButtonClick"
                         android:padding="5dp"
-                        android:text="@string/forgotten_password" />
+                        android:text="@string/forgotten_password"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/googleButton"
@@ -256,6 +258,7 @@
             android:fontFamily="@font/nunito"
             android:padding="5dp"
             android:text="@string/login_signup"
+            android:textColor="?attr/colorOnSurfaceVariant"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

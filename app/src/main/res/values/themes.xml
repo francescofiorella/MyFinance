@@ -20,6 +20,7 @@
         <item name="colorOnErrorContainer">@color/md_theme_onErrorContainer</item>
         <item name="colorSurfaceDim">@color/md_theme_surfaceDim</item>
         <item name="colorSurface">@color/md_theme_surface</item>
+        <item name="colorSurfaceVariant">@color/md_theme_surfaceVariant</item>
         <item name="colorSurfaceBright">@color/md_theme_surfaceBright</item>
         <item name="colorSurfaceContainerLowest">@color/md_theme_surfaceContainerLowest</item>
         <item name="colorSurfaceContainerLow">@color/md_theme_surfaceContainerLow</item>

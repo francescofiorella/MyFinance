@@ -23,7 +23,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
-import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.db.FinanceCode
@@ -37,7 +36,6 @@ import com.frafio.myfinance.ui.home.budget.BudgetFragment
 import com.frafio.myfinance.ui.home.dashboard.DashboardFragment
 import com.frafio.myfinance.ui.home.expenses.ExpensesFragment
 import com.frafio.myfinance.ui.home.profile.ProfileFragment
-import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.setRoundDrawableFromUrl
@@ -127,7 +125,7 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             setTheme(R.style.Theme_MyFinance)
         }
 
-        if (getSharedDynamicColor((application as MyFinanceApplication).sharedPreferences)) {
+        if (viewModel.isDynamicColorOn()) {
             DynamicColors.applyToActivityIfAvailable(this)
         }
 
@@ -154,10 +152,6 @@ class HomeActivity : AppCompatActivity(), HomeListener {
         }
 
         if (savedInstanceState == null) {
-            if (viewModel.isDynamicColorOn()) {
-                DynamicColors.applyToActivityIfAvailable(this)
-            }
-
             if (userRequest) {
                 showProgressIndicator()
                 viewModel.updateUserExpenses()
