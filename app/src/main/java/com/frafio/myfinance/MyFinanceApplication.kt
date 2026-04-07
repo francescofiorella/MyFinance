@@ -3,13 +3,17 @@ package com.frafio.myfinance
 import android.app.Application
 import android.content.SharedPreferences
 import androidx.annotation.StringRes
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.frafio.myfinance.data.manager.AuthManager
 import com.frafio.myfinance.data.manager.IncomesManager
 import com.frafio.myfinance.data.manager.ExpensesManager
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.google.android.material.color.DynamicColors
 
-class MyFinanceApplication : Application() {
+class MyFinanceApplication : Application(), SingletonImageLoader.Factory {
 
     companion object {
         lateinit var instance: MyFinanceApplication private set
@@ -22,6 +26,14 @@ class MyFinanceApplication : Application() {
     lateinit var authManager: AuthManager
     lateinit var expensesManager: ExpensesManager
     lateinit var incomesManager: IncomesManager
+
+    override fun newImageLoader(context: PlatformContext): ImageLoader {
+        return ImageLoader.Builder(context)
+            .components {
+                add(OkHttpNetworkFetcherFactory())
+            }
+            .build()
+    }
 
     override fun onCreate() {
         super.onCreate()

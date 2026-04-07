@@ -7,77 +7,67 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.AuthResult
-import com.frafio.myfinance.databinding.FragmentProfileBinding
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.features.home.profile.EditFullNameSheet
 import com.frafio.myfinance.ui.features.home.profile.EditProfileSheet
+import com.frafio.myfinance.ui.features.home.profile.ProfileScreen
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
-import com.frafio.myfinance.utils.setRoundDrawableFromUrl
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.sidesheet.SideSheetDialog
 
 class ProfileFragment : BaseFragment(), ProfileListener {
 
     private val viewModel by viewModels<ProfileViewModel>()
-    private lateinit var binding: FragmentProfileBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil
-            .inflate(inflater, R.layout.fragment_profile, container, false)
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
         viewModel.listener = this
 
-        viewModel.user?.apply {
-            binding.signupDateTV.text = getString(
-                R.string.signUpDate,
-                getCreationDataString()
-            )
-            binding.profilePropicIv.setRoundDrawableFromUrl(photoUrl)
-        }
-
-        binding.profileEditCard.setOnClickListener {
-            val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-                SideSheetDialog(requireContext())
-            } else {
-                BottomSheetDialog(requireContext())
-            }
-            val composeView = getEditProfileSheetDialogComposeView(sheetDialog::hide)
-            sheetDialog.setContentView(composeView)
-            sheetDialog.show()
-        }
-
-        binding.dynamicColorSwitch.also {
-            it.isChecked = viewModel.isSwitchDynamicColorChecked
-
-            it.setOnCheckedChangeListener { _, isChecked ->
-                viewModel.setDynamicColor(isChecked)
-                (activity as HomeActivity).showSnackBar(
-                    getString(R.string.restart_app_changes),
-                    getString(R.string.restart)
-                ) {
-                    (activity as HomeActivity).applicationContext.also { ctx ->
-                        val intent = ctx.packageManager.getLaunchIntentForPackage(ctx.packageName)
-                        val mainIntent = Intent.makeRestartActivityTask(intent!!.component)
-                        ctx.startActivity(mainIntent)
-                        Runtime.getRuntime().exit(0)
-                    }
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    ProfileScreen(
+                        viewModel = viewModel,
+                        onEditProfileClick = { showEditProfileSheet() },
+                        onDynamicColorChanged = { isChecked ->
+                            viewModel.setDynamicColor(isChecked)
+                            (activity as HomeActivity).showSnackBar(
+                                getString(R.string.restart_app_changes),
+                                getString(R.string.restart)
+                            ) {
+                                (activity as HomeActivity).applicationContext.also { ctx ->
+                                    val intent = ctx.packageManager.getLaunchIntentForPackage(ctx.packageName)
+                                    val mainIntent = Intent.makeRestartActivityTask(intent!!.component)
+                                    ctx.startActivity(mainIntent)
+                                    Runtime.getRuntime().exit(0)
+                                }
+                            }
+                        }
+                    )
                 }
             }
         }
+    }
 
-        return binding.root
+    private fun showEditProfileSheet() {
+        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+            SideSheetDialog(requireContext())
+        } else {
+            BottomSheetDialog(requireContext())
+        }
+        val composeView = getEditProfileSheetDialogComposeView(sheetDialog::hide)
+        sheetDialog.setContentView(composeView)
+        sheetDialog.show()
     }
 
     private fun getEditProfileSheetDialogComposeView(onDismiss: () -> Unit): ComposeView {
@@ -114,10 +104,9 @@ class ProfileFragment : BaseFragment(), ProfileListener {
             setContent {
                 MyFinanceTheme {
                     EditFullNameSheet(
-                        fullName = viewModel.user?.fullName ?: "",
+                        fullName = viewModel.user.value?.fullName ?: "",
                         onDismiss = onDismiss,
                         onEditFullName = { viewModel.editFullName(it) }
-
                     )
                 }
             }
@@ -126,10 +115,7 @@ class ProfileFragment : BaseFragment(), ProfileListener {
 
     override fun scrollUp() {
         super.scrollUp()
-        binding.profileScrollView.apply {
-            fling(0)
-            smoothScrollTo(0, 0)
-        }
+        viewModel.scrollToTop()
     }
 
     override fun onStarted() {
@@ -137,11 +123,10 @@ class ProfileFragment : BaseFragment(), ProfileListener {
     }
 
     override fun onProfileUpdateComplete(response: LiveData<AuthResult>) {
-        response.observe(this) { authResult ->
+        response.observe(viewLifecycleOwner) { authResult ->
             when (authResult.code) {
                 AuthCode.USER_DATA_UPDATED.code -> {
                     viewModel.updateLocalUser()
-                    binding.invalidateAll()
                     (activity as HomeActivity).hideProgressIndicator()
                     (activity as HomeActivity).showSnackBar(authResult.message)
                 }

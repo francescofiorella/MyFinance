@@ -160,7 +160,11 @@ fun TransactionListItem(
         },
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 1.dp),
+            .padding(horizontal = 16.dp)
+            .padding(
+                bottom = if (indexInGroup == countInGroup - 1)
+                    0.dp else 2.dp
+            )
     )
 }
 
@@ -190,7 +194,7 @@ fun JollyListItem(
         },
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 1.dp),
+            .padding(horizontal = 16.dp)
     )
 }
 

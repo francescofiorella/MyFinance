@@ -19,7 +19,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 4
-        versionName = "4.8.5"
+        versionName = "4.8.6"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -88,6 +88,8 @@ dependencies {
 
     // Glide library
     implementation(libs.glide)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)

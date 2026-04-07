@@ -41,7 +41,7 @@ fun SheetDialog(
         modifier = modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(vertical = 32.dp)
+            .padding(vertical = 24.dp)
     ) {
         SheetHeader(
             icon = icon,
@@ -85,7 +85,7 @@ private fun SheetHeader(
                     contentDescription = null
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 val labelComposable = @Composable {
                     Text(
