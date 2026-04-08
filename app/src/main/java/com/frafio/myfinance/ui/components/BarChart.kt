@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,12 +53,16 @@ fun BarChart(
     modifier: Modifier = Modifier,
     onBarClick: (Int) -> Unit = {}
 ) {
-    // We don't use 'data' as a key here so that the selected index persists during "sliding"
-    var selectedIndex by remember { mutableIntStateOf(if (data.isNotEmpty()) data.size - 5 else -1) }
+    // Use rememberSaveable so that the selected index persists during screen rotation.
+    // Also changed the default to the last item (data.size - 1) as it's more standard for charts.
+    var selectedIndex by rememberSaveable { mutableIntStateOf(if (data.isNotEmpty()) data.size - 1 else -1) }
     
     // Max value still needs to be recalculated when data changes for correct scaling
     val maxValue = remember(data) {
-        if (selectedIndex == -1 && data.isNotEmpty()) selectedIndex = data.size - 1
+        // If data was initially empty but now has items, or if the index is out of bounds
+        if (data.isNotEmpty() && (selectedIndex == -1 || selectedIndex >= data.size)) {
+            selectedIndex = data.size - 1
+        }
         val max = data.maxOfOrNull { it } ?: 0.0
         // Use a multiplier (1.25) to ensure the highest bar leaves enough headroom for the popup
         if (max == 0.0) 1.0 else max * 1.25

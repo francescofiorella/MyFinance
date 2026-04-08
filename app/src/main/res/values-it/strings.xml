@@ -90,11 +90,10 @@
     <string name="save">Salva</string>
     <string name="monthly">Mensile</string>
     <string name="annual">Annuale</string>
-    <string name="shown">Mostrato:</string>
     <string name="expenses_by_category">Spese per categoria</string>
     <string name="search">Cerca</string>
     <string name="filter">Filtro</string>
     <string name="date_range">Intervallo di date</string>
     <string name="clear_text">Pulisci testo</string>
-    <string name="annual_balance">Bilancio annuale: %1$s</string>
+    <string name="annual_balance">Bilancio annuale %1$s</string>
 </resources>

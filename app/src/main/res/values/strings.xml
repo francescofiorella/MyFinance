@@ -102,13 +102,12 @@
     <string name="total">Total</string>
     <string name="monthly">Monthly</string>
     <string name="annual">Annual</string>
-    <string name="shown">Shown:</string>
     <string name="expenses_by_category">Expenses by category</string>
     <string name="search">Search</string>
     <string name="filter">Filter</string>
     <string name="date_range">Date range</string>
     <string name="clear_text">Clear text</string>
-    <string name="annual_balance">Annual balance: %1$s</string>
+    <string name="annual_balance">Annual balance %1$s</string>
     <string name="on_total_budget" translatable="false">/ %1$s</string>
 
     <string name="coming_soon" translatable="false">Coming soon!</string>

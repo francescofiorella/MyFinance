@@ -30,7 +30,7 @@ import com.frafio.myfinance.ui.theme.MyFinanceTheme
 @Composable
 fun GridSheetDialog(
     modifier: Modifier = Modifier,
-    @DrawableRes icon: Int,
+    @DrawableRes icon: Int? = null,
     title: String,
     label: String,
     labelFirst: Boolean = true,

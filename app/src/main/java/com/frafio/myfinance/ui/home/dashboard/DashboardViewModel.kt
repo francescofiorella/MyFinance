@@ -2,163 +2,208 @@ package com.frafio.myfinance.ui.home.dashboard
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
+import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.utils.dateToUTCTimestamp
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
     private val expensesLocalRepository = ExpensesLocalRepository()
     private val incomesLocalRepository = IncomesLocalRepository()
     private val today = LocalDate.now()
 
-    var monthShown = true
-    var thisMonthSum = 0.0
-    var thisYearSum = 0.0
-    var monthlyBudget = 0.0
-    var incomesSum = 0.0
-    var expensesSum = 0.0
+    private val _monthShown = MutableStateFlow(true)
+    val monthShown: StateFlow<Boolean> = _monthShown.asStateFlow()
 
-    private val _balanceYearShown = MutableLiveData(
-        today.year
-    )
-    val balanceYearShown: LiveData<Int>
-        get() = _balanceYearShown
+    private val _thisMonthSum = MutableStateFlow(0.0)
+    val thisMonthSum: StateFlow<Double> = _thisMonthSum.asStateFlow()
 
-    val isListEmpty = MutableLiveData<Boolean?>(null)
+    private val _thisYearSum = MutableStateFlow(0.0)
+    val thisYearSum: StateFlow<Double> = _thisYearSum.asStateFlow()
 
-    private var _monthlyShownInPieChart = true
-    val monthlyShownInPieChart
-        get() = _monthlyShownInPieChart
-    private val _monthlyDateForPieChart = MutableLiveData(today)
-    private val _annualDateForPieChart = MutableLiveData(today)
-    private val _pieChartDate = MutableLiveData(today)
-    val pieChartDate: LiveData<LocalDate>
-        get() = _pieChartDate
+    private val _monthlyBudget = MyFinanceStorage.monthlyBudget.asFlow()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+    val monthlyBudget: StateFlow<Double> = _monthlyBudget
 
-    private val _lastDateForBarChart = MutableLiveData(
+    private val _incomesSum = MutableStateFlow(0.0)
+    val incomesSum: StateFlow<Double> = _incomesSum.asStateFlow()
+
+    private val _expensesSum = MutableStateFlow(0.0)
+    val expensesSum: StateFlow<Double> = _expensesSum.asStateFlow()
+
+    private val _balanceYearShown = MutableStateFlow(today.year)
+    val balanceYearShown: StateFlow<Int> = _balanceYearShown.asStateFlow()
+
+    private val _isListEmpty = MutableStateFlow<Boolean?>(null)
+    val isListEmpty: StateFlow<Boolean?> = _isListEmpty.asStateFlow()
+
+    private val _monthlyShownInPieChart = MutableStateFlow(true)
+    val monthlyShownInPieChart: StateFlow<Boolean> = _monthlyShownInPieChart.asStateFlow()
+
+    private val _monthlyDateForPieChart = MutableStateFlow(today)
+    private val _annualDateForPieChart = MutableStateFlow(today)
+    
+    private val _pieChartDate = MutableStateFlow(today)
+    val pieChartDate: StateFlow<LocalDate> = _pieChartDate.asStateFlow()
+
+    private val _lastDateForBarChart = MutableStateFlow(
         today.with(TemporalAdjusters.firstDayOfMonth())
     )
 
-    val barChartData: LiveData<Pair<List<Double>, List<String>>> = _lastDateForBarChart.switchMap { date ->
-        val nextMonth = date.plusMonths(1)
-        val lastTimestamp = dateToUTCTimestamp(nextMonth.year, nextMonth.monthValue, nextMonth.dayOfMonth)
-        val firstDate = nextMonth.minusYears(1)
-        val firstTimestamp = dateToUTCTimestamp(firstDate.year, firstDate.monthValue, firstDate.dayOfMonth)
-        expensesLocalRepository.getPriceSumAfterAndBefore(firstTimestamp, lastTimestamp).map { entries ->
-            val labels = mutableListOf<String>()
-            val values = mutableListOf<Double>()
-            var currentDate = date
-            var j = 0
-            repeat(12) {
-                if (j < entries.size
-                    && entries[j].year == currentDate.year
-                    && entries[j].month == currentDate.monthValue
-                ) {
-                    val monthString = if (entries[j].month < 10)
-                        "0${entries[j].month}" else entries[j].month.toString()
-                    labels.add("$monthString/${entries[j].year - 2000}")
-                    values.add(entries[j].value)
-                    j++
-                } else {
-                    val monthString = if (currentDate.monthValue < 10)
-                        "0${currentDate.monthValue}" else currentDate.monthValue.toString()
-                    labels.add("$monthString/${currentDate.year - 2000}")
-                    values.add(0.0)
+    private val _scrollToTop = MutableSharedFlow<Unit>(replay = 0)
+    val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()
+
+    val barChartData: StateFlow<Pair<List<Double>, List<String>>> = _lastDateForBarChart
+        .flatMapLatest { date ->
+            val nextMonth = date.plusMonths(1)
+            val lastTimestamp = dateToUTCTimestamp(nextMonth.year, nextMonth.monthValue, nextMonth.dayOfMonth)
+            val firstDate = nextMonth.minusYears(1)
+            val firstTimestamp = dateToUTCTimestamp(firstDate.year, firstDate.monthValue, firstDate.dayOfMonth)
+            expensesLocalRepository.getPriceSumAfterAndBefore(firstTimestamp, lastTimestamp).asFlow().flatMapLatest { entries ->
+                val labels = mutableListOf<String>()
+                val values = mutableListOf<Double>()
+                var currentDate = date
+                var j = 0
+                repeat(12) {
+                    if (j < entries.size
+                        && entries[j].year == currentDate.year
+                        && entries[j].month == currentDate.monthValue
+                    ) {
+                        val monthString = if (entries[j].month < 10)
+                            "0${entries[j].month}" else entries[j].month.toString()
+                        labels.add("$monthString/${entries[j].year - 2000}")
+                        values.add(entries[j].value)
+                        j++
+                    } else {
+                        val monthString = if (currentDate.monthValue < 10)
+                            "0${currentDate.monthValue}" else currentDate.monthValue.toString()
+                        labels.add("$monthString/${currentDate.year - 2000}")
+                        values.add(0.0)
+                    }
+                    currentDate = currentDate.minusMonths(1)
                 }
-                currentDate = currentDate.minusMonths(1)
+                flowOf(values.reversed() to labels.reversed())
             }
-            values.reversed() to labels.reversed()
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList<Double>() to emptyList())
+
+    val pieChartExpenses: StateFlow<List<Expense>> = combine(_pieChartDate, _monthlyShownInPieChart) { date, isMonthly ->
+        date to isMonthly
+    }.flatMapLatest { (date, isMonthly) ->
+        if (isMonthly) {
+            expensesLocalRepository.getExpensesOfMonth(date.year, date.monthValue).asFlow()
+        } else {
+            expensesLocalRepository.getExpensesOfYear(date.year).asFlow()
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val todaySum: StateFlow<Double> = expensesLocalRepository.getPriceSumFromDay(today.year, today.monthValue, today.dayOfMonth)
+        .asFlow().flatMapLatest { 
+            flowOf(it ?: 0.0)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+
+    init {
+        viewModelScope.launch {
+            expensesLocalRepository.getCount().asFlow().collect {
+                _isListEmpty.value = it == 0
+            }
+        }
+        viewModelScope.launch {
+            expensesLocalRepository.getPriceSumFromMonth(today.year, today.monthValue).asFlow().collect {
+                _thisMonthSum.value = it ?: 0.0
+            }
+        }
+        viewModelScope.launch {
+            expensesLocalRepository.getPriceSumFromYear(today.year).asFlow().collect {
+                _thisYearSum.value = it ?: 0.0
+            }
+        }
+        viewModelScope.launch {
+            _balanceYearShown.flatMapLatest { year ->
+                expensesLocalRepository.getPriceSumFromYear(year).asFlow()
+            }.collect {
+                _expensesSum.value = it ?: 0.0
+            }
+        }
+        viewModelScope.launch {
+            _balanceYearShown.flatMapLatest { year ->
+                incomesLocalRepository.getPriceSumFromYear(year).asFlow()
+            }.collect {
+                _incomesSum.value = it ?: 0.0
+            }
         }
     }
 
+    fun toggleMonthShown() {
+        _monthShown.value = !_monthShown.value
+    }
+
     fun nextBalanceYear() {
-        _balanceYearShown.postValue(_balanceYearShown.value!! + 1)
+        _balanceYearShown.value += 1
     }
 
     fun previousBalanceYear() {
-        _balanceYearShown.postValue(_balanceYearShown.value!! - 1)
+        _balanceYearShown.value -= 1
     }
 
     fun nextBarChartDate() {
-        _lastDateForBarChart.postValue(_lastDateForBarChart.value!!.plusMonths(1))
+        _lastDateForBarChart.value = _lastDateForBarChart.value.plusMonths(1)
     }
 
     fun previousBarChartDate() {
-        _lastDateForBarChart.postValue(_lastDateForBarChart.value!!.minusMonths(1))
-    }
-
-    fun getExpensesNumber(): LiveData<Int> {
-        return expensesLocalRepository.getCount()
-    }
-
-    fun getPriceSumFromToday(): LiveData<Double?> {
-        return expensesLocalRepository.getPriceSumFromDay(
-            today.year,
-            today.monthValue,
-            today.dayOfMonth
-        )
-    }
-
-    fun getPriceSumFromThisMonth(): LiveData<Double?> {
-        return expensesLocalRepository.getPriceSumFromMonth(today.year, today.monthValue)
-    }
-
-    fun getPriceSumFromThisYear(): LiveData<Double?> {
-        return expensesLocalRepository.getPriceSumFromYear(today.year)
-    }
-
-    fun getExpensesOfMonth(): LiveData<List<Expense>> =
-        expensesLocalRepository.getExpensesOfMonth(
-            year = _pieChartDate.value!!.year,
-            month = _pieChartDate.value!!.monthValue
-        )
-
-    fun getExpensesOfYear(): LiveData<List<Expense>> =
-        expensesLocalRepository.getExpensesOfYear(
-            year = _pieChartDate.value!!.year
-        )
-
-    fun getExpensesSumForBalance(): LiveData<Double?> {
-        return expensesLocalRepository.getPriceSumFromYear(balanceYearShown.value!!)
-    }
-
-    fun getIncomesSumForBalance(): LiveData<Double?> {
-        return incomesLocalRepository.getPriceSumFromYear(balanceYearShown.value!!)
+        _lastDateForBarChart.value = _lastDateForBarChart.value.minusMonths(1)
     }
 
     fun switchPieChartData(setMonthly: Boolean) {
-        _monthlyShownInPieChart = setMonthly
+        _monthlyShownInPieChart.value = setMonthly
         if (setMonthly) {
-            _pieChartDate.postValue(_monthlyDateForPieChart.value)
+            _pieChartDate.value = _monthlyDateForPieChart.value
         } else {
-            _pieChartDate.postValue(_annualDateForPieChart.value)
+            _pieChartDate.value = _annualDateForPieChart.value
         }
     }
 
     fun nextPieChartDate() {
-        if (_monthlyShownInPieChart) {
-            _monthlyDateForPieChart.value = _pieChartDate.value!!.plusMonths(1)
-            _pieChartDate.postValue(_monthlyDateForPieChart.value)
+        if (_monthlyShownInPieChart.value) {
+            _monthlyDateForPieChart.value = _pieChartDate.value.plusMonths(1)
+            _pieChartDate.value = _monthlyDateForPieChart.value
         } else {
-            _annualDateForPieChart.value = _pieChartDate.value!!.plusYears(1)
-            _pieChartDate.postValue(_annualDateForPieChart.value)
+            _annualDateForPieChart.value = _pieChartDate.value.plusYears(1)
+            _pieChartDate.value = _annualDateForPieChart.value
         }
     }
 
     fun previousPieChartDate() {
-        if (_monthlyShownInPieChart) {
-            _monthlyDateForPieChart.value = _pieChartDate.value!!.minusMonths(1)
-            _pieChartDate.postValue(_monthlyDateForPieChart.value)
+        if (_monthlyShownInPieChart.value) {
+            _monthlyDateForPieChart.value = _pieChartDate.value.minusMonths(1)
+            _pieChartDate.value = _monthlyDateForPieChart.value
         } else {
-            _annualDateForPieChart.value = _pieChartDate.value!!.minusYears(1)
-            _pieChartDate.postValue(_annualDateForPieChart.value)
+            _annualDateForPieChart.value = _pieChartDate.value.minusYears(1)
+            _pieChartDate.value = _annualDateForPieChart.value
+        }
+    }
+
+    fun scrollToTop() {
+        viewModelScope.launch {
+            _scrollToTop.emit(Unit)
         }
     }
 }

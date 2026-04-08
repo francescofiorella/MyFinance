@@ -19,7 +19,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 4
-        versionName = "4.8.6"
+        versionName = "4.8.7"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -86,7 +86,7 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.play.services.auth)
 
-    // Glide library
+    // Graphic library
     implementation(libs.glide)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)

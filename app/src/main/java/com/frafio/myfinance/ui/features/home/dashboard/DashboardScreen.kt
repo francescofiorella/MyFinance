@@ -1,0 +1,681 @@
+package com.frafio.myfinance.ui.features.home.dashboard
+
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.frafio.myfinance.R
+import com.frafio.myfinance.data.model.Expense
+import com.frafio.myfinance.ui.components.BarChart
+import com.frafio.myfinance.ui.components.PieChart
+import com.frafio.myfinance.ui.components.ProgressBar
+import com.frafio.myfinance.utils.doubleToPrice
+import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
+import com.frafio.myfinance.utils.doubleToString
+import kotlinx.coroutines.flow.collectLatest
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import kotlin.math.abs
+import androidx.compose.ui.tooling.preview.Preview
+import com.frafio.myfinance.ui.components.EmptyView
+import com.frafio.myfinance.ui.home.dashboard.DashboardViewModel
+import com.frafio.myfinance.ui.theme.MyFinanceTheme
+
+@Composable
+fun DashboardScreen(
+    viewModel: DashboardViewModel,
+    modifier: Modifier = Modifier
+) {
+    val isListEmpty by viewModel.isListEmpty.collectAsState()
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(viewModel.scrollToTop) {
+        viewModel.scrollToTop.collectLatest {
+            scrollState.animateScrollTo(0)
+        }
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        when (isListEmpty) {
+            true -> EmptyView(
+                imageResLight = R.drawable.image_audit_amico,
+                imageResDark = R.drawable.image_late_at_night_amico,
+                messageRes = R.string.warning_home
+            )
+
+            false -> {
+                DashboardContent(viewModel, scrollState)
+            }
+
+            null -> { /* Loading or Initial state */
+            }
+        }
+    }
+}
+
+@Composable
+fun DashboardContent(
+    viewModel: DashboardViewModel,
+    scrollState: ScrollState
+) {
+    val monthShown by viewModel.monthShown.collectAsState()
+    val thisMonthSum by viewModel.thisMonthSum.collectAsState()
+    val thisYearSum by viewModel.thisYearSum.collectAsState()
+    val monthlyBudget by viewModel.monthlyBudget.collectAsState()
+    val todaySum by viewModel.todaySum.collectAsState()
+    val balanceYear by viewModel.balanceYearShown.collectAsState()
+    val incomesSum by viewModel.incomesSum.collectAsState()
+    val expensesSum by viewModel.expensesSum.collectAsState()
+    val barChartData by viewModel.barChartData.collectAsState()
+    val pieExpenses by viewModel.pieChartExpenses.collectAsState()
+    val pieDate by viewModel.pieChartDate.collectAsState()
+    val monthlyShownInPie by viewModel.monthlyShownInPieChart.collectAsState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .padding(bottom = 88.dp) // dashboard_bottom_margin
+    ) {
+        BudgetCard(
+            monthShown = monthShown,
+            thisMonthSum = thisMonthSum,
+            thisYearSum = thisYearSum,
+            monthlyBudget = monthlyBudget,
+            onToggleMonthShown = { viewModel.toggleMonthShown() }
+        )
+        Row(modifier = Modifier.padding(horizontal = 8.dp)) {
+            TodayExpensesCard(todaySum = todaySum, modifier = Modifier.weight(1f))
+            ThisYearExpensesCard(
+                monthShown = monthShown,
+                thisMonthSum = thisMonthSum,
+                thisYearSum = thisYearSum,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        AnnualBalanceCard(
+            balanceYear = balanceYear,
+            incomesSum = incomesSum,
+            expensesSum = expensesSum,
+            onPreviousYear = { viewModel.previousBalanceYear() },
+            onNextYear = { viewModel.nextBalanceYear() }
+        )
+        MonthlyExpensesChartCard(
+            barChartData = barChartData,
+            onPreviousDate = { viewModel.previousBarChartDate() },
+            onNextDate = { viewModel.nextBarChartDate() }
+        )
+        ExpensesByCategoryCard(
+            expenses = pieExpenses,
+            date = pieDate,
+            monthlyShown = monthlyShownInPie,
+            onSwitchData = { viewModel.switchPieChartData(it) },
+            onPreviousDate = { viewModel.previousPieChartDate() },
+            onNextDate = { viewModel.nextPieChartDate() }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun BudgetCard(
+    monthShown: Boolean,
+    thisMonthSum: Double,
+    thisYearSum: Double,
+    monthlyBudget: Double,
+    onToggleMonthShown: () -> Unit
+) {
+    val title =
+        if (monthShown) stringResource(R.string.this_month) else stringResource(R.string.this_year)
+    val amount = if (monthShown) thisMonthSum else thisYearSum
+    val totalBudget = if (monthShown) monthlyBudget else monthlyBudget * 12
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(top = 8.dp, bottom = 16.dp),
+        shape = ListItemDefaults.shapes().selectedShape,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (monthlyBudget > 0.0) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f)
+                    )
+                    FilledTonalIconButton(
+                        onClick = onToggleMonthShown,
+                        shapes = IconButtonDefaults.shapes(
+                            shape = IconButtonDefaults.smallSquareShape,
+                            pressedShape = IconButtonDefaults.smallRoundShape
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_swap_horiz_filled),
+                            contentDescription = stringResource(R.string.change_content)
+                        )
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = doubleToPrice(amount),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    if (monthlyBudget > 0.0) {
+                        Text(
+                            text = stringResource(
+                                R.string.on_total_budget,
+                                doubleToString(totalBudget)
+                            ),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                if (monthlyBudget > 0.0) {
+                    ProgressBar(
+                        value = amount,
+                        maxValue = totalBudget,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 16.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun TodayExpensesCard(todaySum: Double, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .padding(horizontal = 8.dp)
+            .padding(bottom = 16.dp),
+        shape = ListItemDefaults.shapes().selectedShape,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        )
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
+            Text(
+                text = stringResource(R.string.expenses_today),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Text(
+                text = if (todaySum < 1000) doubleToPrice(todaySum) else doubleToPriceWithoutDecimals(
+                    todaySum
+                ),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun ThisYearExpensesCard(
+    monthShown: Boolean,
+    thisMonthSum: Double,
+    thisYearSum: Double,
+    modifier: Modifier = Modifier
+) {
+    val title =
+        if (monthShown) stringResource(R.string.this_year_next) else stringResource(R.string.this_month_next)
+    val amount = if (monthShown) thisYearSum else thisMonthSum
+
+    Card(
+        modifier = modifier
+            .padding(horizontal = 8.dp)
+            .padding(bottom = 16.dp),
+        shape = ListItemDefaults.shapes().selectedShape,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        )
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Text(
+                text = if (amount < 1000) doubleToPrice(amount) else doubleToPriceWithoutDecimals(
+                    amount
+                ),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun AnnualBalanceCard(
+    balanceYear: Int,
+    incomesSum: Double,
+    expensesSum: Double,
+    onPreviousYear: () -> Unit,
+    onNextYear: () -> Unit
+) {
+    val balance = incomesSum - expensesSum
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 16.dp),
+        shape = ListItemDefaults.shapes().selectedShape,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        )
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.annual_balance, balanceYear.toString()),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+                FilledTonalIconButton(
+                    onClick = onPreviousYear,
+                    shapes = IconButtonDefaults.shapes(
+                        shape = IconButtonDefaults.smallSquareShape,
+                        pressedShape = IconButtonDefaults.smallRoundShape
+                    )
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
+                        contentDescription = null
+                    )
+                }
+                FilledTonalIconButton(
+                    onClick = onNextYear,
+                    shapes = IconButtonDefaults.shapes(
+                        shape = IconButtonDefaults.smallSquareShape,
+                        pressedShape = IconButtonDefaults.smallRoundShape
+                    )
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
+                        contentDescription = null
+                    )
+                }
+            }
+
+            Text(
+                text = doubleToPrice(abs(balance)),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = if (balance < 0.0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.incomes),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = doubleToPrice(incomesSum),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.expenses),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = doubleToPrice(expensesSum),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun MonthlyExpensesChartCard(
+    barChartData: Pair<List<Double>, List<String>>,
+    onPreviousDate: () -> Unit,
+    onNextDate: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 16.dp),
+        shape = ListItemDefaults.shapes().selectedShape,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        )
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(R.string.monthly_expenses),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                FilledTonalIconButton(
+                    onClick = onPreviousDate,
+                    shapes = IconButtonDefaults.shapes(
+                        shape = IconButtonDefaults.smallSquareShape,
+                        pressedShape = IconButtonDefaults.smallRoundShape
+                    )
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
+                        contentDescription = null
+                    )
+                }
+                FilledTonalIconButton(
+                    onClick = onNextDate,
+                    shapes = IconButtonDefaults.shapes(
+                        shape = IconButtonDefaults.smallSquareShape,
+                        pressedShape = IconButtonDefaults.smallRoundShape
+                    )
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
+                        contentDescription = null
+                    )
+                }
+            }
+
+            Box(modifier = Modifier.height(150.dp)) {
+                BarChart(
+                    data = barChartData.first,
+                    labels = barChartData.second,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun ExpensesByCategoryCard(
+    expenses: List<Expense>,
+    date: LocalDate,
+    monthlyShown: Boolean,
+    onSwitchData: (Boolean) -> Unit,
+    onPreviousDate: () -> Unit,
+    onNextDate: () -> Unit
+) {
+    val values = remember(expenses) {
+        val vals = MutableList(9) { 0.0 }
+        expenses.forEach { p ->
+            if (p.category != null && p.category <= 8) {
+                vals[p.category] += p.price ?: 0.0
+            }
+        }
+        vals
+    }
+
+    val formatter = remember(monthlyShown) {
+        DateTimeFormatter.ofPattern(if (monthlyShown) "MMMM uuuu" else "uuuu")
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = ListItemDefaults.shapes().selectedShape,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        )
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(R.string.expenses_by_category),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                FilledTonalIconButton(
+                    onClick = onPreviousDate,
+                    shapes = IconButtonDefaults.shapes(
+                        shape = IconButtonDefaults.smallSquareShape,
+                        pressedShape = IconButtonDefaults.smallRoundShape
+                    )
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
+                        contentDescription = null
+                    )
+                }
+                FilledTonalIconButton(
+                    onClick = onNextDate,
+                    shapes = IconButtonDefaults.shapes(
+                        shape = IconButtonDefaults.smallSquareShape,
+                        pressedShape = IconButtonDefaults.smallRoundShape
+                    )
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
+                        contentDescription = null
+                    )
+                }
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                FilterChip(
+                    selected = monthlyShown,
+                    onClick = { onSwitchData(true) },
+                    label = { Text(stringResource(R.string.monthly)) }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                FilterChip(
+                    selected = !monthlyShown,
+                    onClick = { onSwitchData(false) },
+                    label = { Text(stringResource(R.string.annual)) }
+                )
+            }
+
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                PieChart(
+                    data = values,
+                    animate = true
+                )
+            }
+
+            Text(
+                modifier = Modifier.padding(top = 8.dp),
+                text = date.format(formatter).replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase() else it.toString()
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DashboardPreview() {
+    MyFinanceTheme {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
+            DashboardContent(
+                monthShown = true,
+                thisMonthSum = 450.0,
+                thisYearSum = 5400.0,
+                monthlyBudget = 1000.0,
+                todaySum = 25.0,
+                balanceYear = 2024,
+                incomesSum = 2000.0,
+                expensesSum = 1500.0,
+                barChartData = listOf(100.0, 200.0, 150.0, 120.0, 180.0, 90.0) to listOf(
+                    "01/24",
+                    "02/24",
+                    "03/24",
+                    "04/24",
+                    "05/24",
+                    "06/24"
+                ),
+                pieExpenses = emptyList(),
+                pieDate = LocalDate.now(),
+                monthlyShownInPie = true,
+                scrollState = rememberScrollState(),
+                onToggleMonthShown = {},
+                onPreviousYear = {},
+                onNextYear = {},
+                onPreviousBarDate = {},
+                onNextBarDate = {},
+                onSwitchPieData = {},
+                onPreviousPieDate = {},
+                onNextPieDate = {}
+            )
+        }
+    }
+}
+
+@Composable
+fun DashboardContent(
+    monthShown: Boolean,
+    thisMonthSum: Double,
+    thisYearSum: Double,
+    monthlyBudget: Double,
+    todaySum: Double,
+    balanceYear: Int,
+    incomesSum: Double,
+    expensesSum: Double,
+    barChartData: Pair<List<Double>, List<String>>,
+    pieExpenses: List<Expense>,
+    pieDate: LocalDate,
+    monthlyShownInPie: Boolean,
+    scrollState: ScrollState,
+    onToggleMonthShown: () -> Unit,
+    onPreviousYear: () -> Unit,
+    onNextYear: () -> Unit,
+    onPreviousBarDate: () -> Unit,
+    onNextBarDate: () -> Unit,
+    onSwitchPieData: (Boolean) -> Unit,
+    onPreviousPieDate: () -> Unit,
+    onNextPieDate: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .padding(bottom = 88.dp)
+    ) {
+        BudgetCard(
+            monthShown = monthShown,
+            thisMonthSum = thisMonthSum,
+            thisYearSum = thisYearSum,
+            monthlyBudget = monthlyBudget,
+            onToggleMonthShown = onToggleMonthShown
+        )
+        Row(modifier = Modifier.padding(horizontal = 8.dp)) {
+            TodayExpensesCard(todaySum = todaySum, modifier = Modifier.weight(1f))
+            ThisYearExpensesCard(
+                monthShown = monthShown,
+                thisMonthSum = thisMonthSum,
+                thisYearSum = thisYearSum,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        AnnualBalanceCard(
+            balanceYear = balanceYear,
+            incomesSum = incomesSum,
+            expensesSum = expensesSum,
+            onPreviousYear = onPreviousYear,
+            onNextYear = onNextYear
+        )
+        MonthlyExpensesChartCard(
+            barChartData = barChartData,
+            onPreviousDate = onPreviousBarDate,
+            onNextDate = onNextBarDate
+        )
+        ExpensesByCategoryCard(
+            expenses = pieExpenses,
+            date = pieDate,
+            monthlyShown = monthlyShownInPie,
+            onSwitchData = onSwitchPieData,
+            onPreviousDate = onPreviousPieDate,
+            onNextDate = onNextPieDate
+        )
+    }
+}

@@ -21,7 +21,11 @@ fun EditTransactionSheet(
     modifier: Modifier = Modifier
 ) {
     ListSheetDialog(
-        icon = getCategoryIcon(transaction.category ?: 0),
+        icon = if (transaction is Expense) {
+            getCategoryIcon(transaction.category ?: 0)
+        } else {
+            null
+        },
         title = transaction.name ?: "",
         label = transaction.getDateString(),
         labelFirst = false,
