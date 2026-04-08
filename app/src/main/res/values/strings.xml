@@ -40,8 +40,8 @@
     <string name="warning_budget">No income to show</string>
 
     <string name="expenses_today">Expenses \ntoday</string>
+    <string name="expenses_budget">Expense on budget</string>
     <string name="this_month">Expenses this month</string>
-    <string name="this_year">Expenses this year</string>
     <string name="this_month_next">Expenses \nthis month</string>
     <string name="this_year_next">Expenses \nthis year</string>
     <string name="monthly_expenses">Monthly expenses</string>

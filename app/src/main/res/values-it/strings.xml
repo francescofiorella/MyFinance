@@ -40,8 +40,8 @@
     <string name="warning_budget">Nessuna entrata da mostrare</string>
 
     <string name="expenses_today">Spese \noggi</string>
+    <string name="expenses_budget">Spesa su budget</string>
     <string name="this_month">Spese questo mese</string>
-    <string name="this_year">Spese quest\'anno</string>
     <string name="this_month_next">Spese \nquesto mese</string>
     <string name="this_year_next">Spese \nquest\'anno</string>
     <string name="monthly_expenses">Spese mensili</string>

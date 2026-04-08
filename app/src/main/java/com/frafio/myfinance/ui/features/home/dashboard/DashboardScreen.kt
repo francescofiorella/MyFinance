@@ -92,7 +92,7 @@ fun DashboardContent(
             thisMonthSum = thisMonthSum,
             thisYearSum = thisYearSum,
             monthlyBudget = monthlyBudget,
-            onToggleMonthShown = { viewModel.toggleMonthShown() }
+            onToggleMonthShown = { viewModel.toggleMonthShown(it) }
         )
         Row(modifier = Modifier.padding(horizontal = 8.dp)) {
             TodayExpensesCard(todaySum = todaySum, modifier = Modifier.weight(1f))
@@ -133,12 +133,16 @@ fun BudgetCard(
     thisMonthSum: Double,
     thisYearSum: Double,
     monthlyBudget: Double,
-    onToggleMonthShown: () -> Unit
+    onToggleMonthShown: (Boolean) -> Unit
 ) {
-    val title =
-        if (monthShown) stringResource(R.string.this_month) else stringResource(R.string.this_year)
+    val title = if (monthlyBudget > 0.0)
+        stringResource(R.string.expenses_budget)
+    else
+        stringResource(R.string.this_month)
     val amount = if (monthShown) thisMonthSum else thisYearSum
     val totalBudget = if (monthShown) monthlyBudget else monthlyBudget * 12
+
+    var selectedIndex by remember { mutableIntStateOf(0) }
 
     Card(
         modifier = Modifier
@@ -154,33 +158,14 @@ fun BudgetCard(
             modifier = Modifier
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            Row(
+            Text(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (monthlyBudget > 0.0) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.weight(1f)
-                    )
-                    FilledTonalIconButton(
-                        onClick = onToggleMonthShown,
-                        shapes = IconButtonDefaults.shapes(
-                            shape = IconButtonDefaults.smallSquareShape,
-                            pressedShape = IconButtonDefaults.smallRoundShape
-                        )
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_swap_horiz_filled),
-                            contentDescription = stringResource(R.string.change_content)
-                        )
-                    }
-                }
-            }
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -215,10 +200,45 @@ fun BudgetCard(
                     )
                 }
             }
+
+            if (monthlyBudget > 0.0) {
+                Row(
+                    modifier = Modifier
+                        .width(IntrinsicSize.Max)
+                        .padding(top = 16.dp)
+                ) {
+                    TonalToggleButton(
+                        modifier = Modifier.weight(1f),
+                        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                        checked = selectedIndex == 0,
+                        onCheckedChange = {
+                            selectedIndex = 0
+                            onToggleMonthShown(true)
+                        },
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.monthly)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(ButtonGroupDefaults.ConnectedSpaceBetween))
+                    TonalToggleButton(
+                        modifier = Modifier.weight(1f),
+                        shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                        checked = selectedIndex == 1,
+                        onCheckedChange = {
+                            selectedIndex = 1
+                            onToggleMonthShown(false)
+                        },
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.annual)
+                        )
+                    }
+                }
+            }
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -539,18 +559,32 @@ fun ExpensesByCategoryCard(
                 }
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                FilterChip(
-                    selected = monthlyShown,
-                    onClick = { onSwitchData(true) },
-                    label = { Text(stringResource(R.string.monthly)) }
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                FilterChip(
-                    selected = !monthlyShown,
-                    onClick = { onSwitchData(false) },
-                    label = { Text(stringResource(R.string.annual)) }
-                )
+            Row(modifier = Modifier.width(IntrinsicSize.Max)) {
+                TonalToggleButton(
+                    modifier = Modifier.weight(1f),
+                    shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                    checked = monthlyShown,
+                    onCheckedChange = {
+                        onSwitchData(true)
+                    },
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.monthly)
+                    )
+                }
+                Spacer(modifier = Modifier.width(ButtonGroupDefaults.ConnectedSpaceBetween))
+                TonalToggleButton(
+                    modifier = Modifier.weight(1f),
+                    shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                    checked = !monthlyShown,
+                    onCheckedChange = {
+                        onSwitchData(false)
+                    },
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.annual)
+                    )
+                }
             }
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -626,7 +660,7 @@ fun DashboardContent(
     pieDate: LocalDate,
     monthlyShownInPie: Boolean,
     scrollState: ScrollState,
-    onToggleMonthShown: () -> Unit,
+    onToggleMonthShown: (Boolean) -> Unit,
     onPreviousYear: () -> Unit,
     onNextYear: () -> Unit,
     onPreviousBarDate: () -> Unit,

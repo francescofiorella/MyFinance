@@ -152,9 +152,10 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    fun toggleMonthShown() {
-        _monthShown.value = !_monthShown.value
+    fun toggleMonthShown(monthShown: Boolean) {
+        _monthShown.value = monthShown
     }
+
 
     fun nextBalanceYear() {
         _balanceYearShown.value += 1
