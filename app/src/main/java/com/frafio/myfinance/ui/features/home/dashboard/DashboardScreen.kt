@@ -27,9 +27,11 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.abs
 import androidx.compose.ui.tooling.preview.Preview
+import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.ui.components.EmptyView
 import com.frafio.myfinance.ui.home.dashboard.DashboardViewModel
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
+import kotlin.collections.listOf
 
 @Composable
 fun DashboardScreen(
@@ -112,8 +114,10 @@ fun DashboardContent(
         )
         MonthlyExpensesChartCard(
             barChartData = barChartData,
+            monthlyBudget = monthlyBudget,
             onPreviousDate = { viewModel.previousBarChartDate() },
-            onNextDate = { viewModel.nextBarChartDate() }
+            onNextDate = { viewModel.nextBarChartDate() },
+            onToday = { viewModel.todayBarChartDate() }
         )
         ExpensesByCategoryCard(
             expenses = pieExpenses,
@@ -421,10 +425,14 @@ fun AnnualBalanceCard(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MonthlyExpensesChartCard(
-    barChartData: Pair<List<Double>, List<String>>,
+    barChartData: List<BarChartEntry>,
+    monthlyBudget: Double,
     onPreviousDate: () -> Unit,
-    onNextDate: () -> Unit
+    onNextDate: () -> Unit,
+    onToday: () -> Unit
 ) {
+    var resetBarChart by remember { mutableIntStateOf(0) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -473,15 +481,28 @@ fun MonthlyExpensesChartCard(
                         contentDescription = null
                     )
                 }
+                Spacer(modifier = Modifier.width(4.dp))
+                FilledTonalButton(
+                    onClick = {
+                        onToday()
+                        resetBarChart++
+                    },
+                    shapes = ButtonDefaults.shapes(
+                        pressedShape = ButtonDefaults.squareShape
+                    )
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_today_filled),
+                        contentDescription = null
+                    )
+                }
             }
 
-            Box(modifier = Modifier.height(150.dp)) {
-                BarChart(
-                    data = barChartData.first,
-                    labels = barChartData.second,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+            BarChart(
+                entries = barChartData,
+                referenceValue = monthlyBudget,
+                resetIndicatorHook = resetBarChart
+            )
         }
     }
 }
@@ -620,13 +641,19 @@ fun DashboardPreview() {
                 balanceYear = 2024,
                 incomesSum = 2000.0,
                 expensesSum = 1500.0,
-                barChartData = listOf(100.0, 200.0, 150.0, 120.0, 180.0, 90.0) to listOf(
-                    "01/24",
-                    "02/24",
-                    "03/24",
-                    "04/24",
-                    "05/24",
-                    "06/24"
+                barChartData = listOf(
+                    BarChartEntry(100.0, 2024, 1),
+                    BarChartEntry(150.0, 2024, 2),
+                    BarChartEntry(80.0, 2024, 3),
+                    BarChartEntry(200.0, 2024, 4),
+                    BarChartEntry(120.0, 2024, 5),
+                    BarChartEntry(90.0, 2024, 6),
+                    BarChartEntry(180.0, 2024, 7),
+                    BarChartEntry(250.0, 2024, 8),
+                    BarChartEntry(60.0, 2024, 9),
+                    BarChartEntry(140.0, 2024, 10),
+                    BarChartEntry(110.0, 2024, 11),
+                    BarChartEntry(170.0, 2024, 12)
                 ),
                 pieExpenses = emptyList(),
                 pieDate = LocalDate.now(),
@@ -636,6 +663,7 @@ fun DashboardPreview() {
                 onPreviousYear = {},
                 onNextYear = {},
                 onPreviousBarDate = {},
+                onTodayBarDate = {},
                 onNextBarDate = {},
                 onSwitchPieData = {},
                 onPreviousPieDate = {},
@@ -655,7 +683,7 @@ fun DashboardContent(
     balanceYear: Int,
     incomesSum: Double,
     expensesSum: Double,
-    barChartData: Pair<List<Double>, List<String>>,
+    barChartData: List<BarChartEntry>,
     pieExpenses: List<Expense>,
     pieDate: LocalDate,
     monthlyShownInPie: Boolean,
@@ -665,6 +693,7 @@ fun DashboardContent(
     onNextYear: () -> Unit,
     onPreviousBarDate: () -> Unit,
     onNextBarDate: () -> Unit,
+    onTodayBarDate: () -> Unit,
     onSwitchPieData: (Boolean) -> Unit,
     onPreviousPieDate: () -> Unit,
     onNextPieDate: () -> Unit
@@ -700,8 +729,10 @@ fun DashboardContent(
         )
         MonthlyExpensesChartCard(
             barChartData = barChartData,
+            monthlyBudget = monthlyBudget,
             onPreviousDate = onPreviousBarDate,
-            onNextDate = onNextBarDate
+            onNextDate = onNextBarDate,
+            onToday = onTodayBarDate
         )
         ExpensesByCategoryCard(
             expenses = pieExpenses,

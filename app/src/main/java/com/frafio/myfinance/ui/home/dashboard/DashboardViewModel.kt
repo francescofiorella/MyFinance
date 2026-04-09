@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
@@ -27,6 +28,9 @@ import java.time.temporal.TemporalAdjusters
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val pieChartEntriesSize = 24
+
     private val expensesLocalRepository = ExpensesLocalRepository()
     private val incomesLocalRepository = IncomesLocalRepository()
     private val today = LocalDate.now()
@@ -72,38 +76,39 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _scrollToTop = MutableSharedFlow<Unit>(replay = 0)
     val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()
 
-    val barChartData: StateFlow<Pair<List<Double>, List<String>>> = _lastDateForBarChart
+    val barChartData: StateFlow<List<BarChartEntry>> = _lastDateForBarChart
         .flatMapLatest { date ->
             val nextMonth = date.plusMonths(1)
             val lastTimestamp = dateToUTCTimestamp(nextMonth.year, nextMonth.monthValue, nextMonth.dayOfMonth)
-            val firstDate = nextMonth.minusYears(1)
+            val firstDate = nextMonth.minusMonths(pieChartEntriesSize.toLong())
             val firstTimestamp = dateToUTCTimestamp(firstDate.year, firstDate.monthValue, firstDate.dayOfMonth)
             expensesLocalRepository.getPriceSumAfterAndBefore(firstTimestamp, lastTimestamp).asFlow().flatMapLatest { entries ->
-                val labels = mutableListOf<String>()
-                val values = mutableListOf<Double>()
+                val values = mutableListOf<BarChartEntry>()
                 var currentDate = date
                 var j = 0
-                repeat(12) {
+                repeat(pieChartEntriesSize) {
                     if (j < entries.size
                         && entries[j].year == currentDate.year
                         && entries[j].month == currentDate.monthValue
                     ) {
-                        val monthString = if (entries[j].month < 10)
-                            "0${entries[j].month}" else entries[j].month.toString()
-                        labels.add("$monthString/${entries[j].year - 2000}")
-                        values.add(entries[j].value)
+                        values.add(BarChartEntry(
+                            value = entries[j].value,
+                            year = entries[j].year,
+                            month = entries[j].month
+                        ))
                         j++
                     } else {
-                        val monthString = if (currentDate.monthValue < 10)
-                            "0${currentDate.monthValue}" else currentDate.monthValue.toString()
-                        labels.add("$monthString/${currentDate.year - 2000}")
-                        values.add(0.0)
+                        values.add(BarChartEntry(
+                            value = 0.0,
+                            year = currentDate.year,
+                            month = currentDate.monthValue
+                        ))
                     }
                     currentDate = currentDate.minusMonths(1)
                 }
-                flowOf(values.reversed() to labels.reversed())
+                flowOf(values.reversed())
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList<Double>() to emptyList())
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList<BarChartEntry>())
 
     val pieChartExpenses: StateFlow<List<Expense>> = combine(_pieChartDate, _monthlyShownInPieChart) { date, isMonthly ->
         date to isMonthly
@@ -171,6 +176,10 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun previousBarChartDate() {
         _lastDateForBarChart.value = _lastDateForBarChart.value.minusMonths(1)
+    }
+
+    fun todayBarChartDate() {
+        _lastDateForBarChart.value = today.with(TemporalAdjusters.firstDayOfMonth())
     }
 
     fun switchPieChartData(setMonthly: Boolean) {

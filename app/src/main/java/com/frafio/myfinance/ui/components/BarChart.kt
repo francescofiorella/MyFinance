@@ -12,12 +12,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -43,102 +41,157 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.doubleToPrice
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun BarChart(
-    data: List<Double>,
-    labels: List<String>,
     modifier: Modifier = Modifier,
-    onBarClick: (Int) -> Unit = {}
+    entries: List<BarChartEntry>,
+    referenceValue: Double? = null,
+    barWidth: Dp = 40.dp,
+    barPadding: Dp = 2.dp,
+    barMaxHeight: Dp = 160.dp,
+    onBarClick: (Int) -> Unit = {},
+    resetIndicatorHook: Int = 0
 ) {
-    // Use rememberSaveable so that the selected index persists during screen rotation.
-    // Also changed the default to the last item (data.size - 1) as it's more standard for charts.
-    var selectedIndex by rememberSaveable { mutableIntStateOf(if (data.isNotEmpty()) data.size - 1 else -1) }
-    
-    // Max value still needs to be recalculated when data changes for correct scaling
-    val maxValue = remember(data) {
-        // If data was initially empty but now has items, or if the index is out of bounds
-        if (data.isNotEmpty() && (selectedIndex == -1 || selectedIndex >= data.size)) {
-            selectedIndex = data.size - 1
-        }
-        val max = data.maxOfOrNull { it } ?: 0.0
-        // Use a multiplier (1.25) to ensure the highest bar leaves enough headroom for the popup
-        if (max == 0.0) 1.0 else max * 1.25
-    }
+    BoxWithConstraints(modifier = modifier) {
+        val maxWidth = maxWidth
+        val barItemWidth = barWidth + barPadding * 2
+        val maxVisibleItems = (maxWidth / barItemWidth).toInt().coerceAtLeast(1)
 
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-        ) {
-            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                val chartHeight = maxHeight
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    data.forEachIndexed { index, value ->
-                        val isSelected = selectedIndex == index
-                        val barHeightFraction = (value / maxValue).toFloat().coerceIn(0.01f, 1f)
-                        val indicatorOnRightCorner = index >= data.size / 2
+        val startIndex = (entries.size - maxVisibleItems).coerceAtLeast(0)
+        val visibleEntries = remember(entries, startIndex) { entries.drop(startIndex) }
 
-                        ChartBar(
-                            heightFraction = barHeightFraction,
-                            isSelected = isSelected,
-                            valueLabel = doubleToPrice(value),
-                            showIndicator = isSelected,
-                            indicatorOnRightCorner = indicatorOnRightCorner,
-                            chartHeight = chartHeight,
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ) {
-                                    selectedIndex = index
-                                    onBarClick(index)
-                                }
-                        )
-                    }
+        // Use rememberSaveable so that the selected index persists during screen rotation.
+        var selectedIndex by rememberSaveable(resetIndicatorHook) {
+            mutableIntStateOf(
+                if (entries.isNotEmpty()) {
+                    entries.size - 1
+                } else {
+                    -1
                 }
+            )
+        }
+
+        // Max value based on visible data for better scaling
+        val maxValue = remember(visibleEntries, referenceValue) {
+            // Ensure selectedIndex is within the visible range or valid for data
+            if (entries.isNotEmpty() && (selectedIndex < startIndex || selectedIndex >= entries.size)) {
+                selectedIndex = entries.size - 1
+            }
+            val entriesMax = visibleEntries.maxOfOrNull { it.value } ?: 0.0
+            val max = maxOf(entriesMax, referenceValue ?: 0.0)
+            if (max == 0.0) 1.0 else max
+        }
+
+        val extendedLabel = remember(selectedIndex, visibleEntries) {
+            if (selectedIndex == -1) {
+                ""
+            } else {
+                val yearMonth =
+                    YearMonth.of(entries[selectedIndex].year, entries[selectedIndex].month)
+
+                val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+
+                yearMonth.format(formatter)
             }
         }
 
-        HorizontalDivider(
-            modifier = Modifier.fillMaxWidth(),
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            labels.forEachIndexed { index, label ->
-                val isSelected = selectedIndex == index
+            Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                    text = if (isSelected) label else label.take(2),
-                    fontSize = 11.sp,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .weight(1f)
-                        .wrapContentWidth(align = Alignment.CenterHorizontally, unbounded = true),
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    softWrap = false,
-                    overflow = TextOverflow.Visible
+                    text = if (selectedIndex == -1)
+                        "" else doubleToPrice(entries[selectedIndex].value),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.SemiBold
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    modifier = Modifier.padding(bottom = 5.dp),
+                    text = extendedLabel,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.BottomStart
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    visibleEntries.forEachIndexed { index, entry ->
+                        val originalIndex = index + startIndex
+                        val isSelected = selectedIndex == originalIndex
+                        val barHeightFraction =
+                            (entry.value / maxValue).toFloat().coerceIn(0.01f, 1f)
+
+                        ChartBar(
+                            modifier = Modifier.weight(1f),
+                            barWidth = barWidth,
+                            barPadding = barPadding,
+                            barMaxHeight = barMaxHeight,
+                            heightFraction = barHeightFraction,
+                            isSelected = isSelected,
+                            onClick = {
+                                selectedIndex = originalIndex
+                                onBarClick(originalIndex)
+                            }
+                        )
+                    }
+                }
+
+                if (referenceValue != null && referenceValue > 0) {
+                    val valueHeightFraction = (referenceValue / maxValue).toFloat().coerceIn(0f, 1f)
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .zIndex(-1f)
+                            .fillMaxWidth()
+                            .padding(bottom = barMaxHeight * valueHeightFraction),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                visibleEntries.forEachIndexed { index, entry ->
+                    val originalIndex = index + startIndex
+                    val isSelected = selectedIndex == originalIndex
+                    val shortLabel = "%02d".format(entry.month).takeLast(2)
+                    val extendedLabel = shortLabel + "/" + "%02d".format(entry.year).takeLast(2)
+                    Text(
+                        text = if (isSelected) extendedLabel else shortLabel,
+                        fontSize = 11.sp,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                        color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .weight(1f)
+                            .wrapContentWidth(
+                                align = Alignment.CenterHorizontally,
+                                unbounded = true
+                            ),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Visible
+                    )
+                }
             }
         }
     }
@@ -146,13 +199,13 @@ fun BarChart(
 
 @Composable
 private fun ChartBar(
+    modifier: Modifier = Modifier,
+    barWidth: Dp = 40.dp,
+    barPadding: Dp = 2.dp,
+    barMaxHeight: Dp = 160.dp,
     heightFraction: Float,
     isSelected: Boolean,
-    valueLabel: String,
-    showIndicator: Boolean,
-    indicatorOnRightCorner: Boolean,
-    chartHeight: Dp,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit
 ) {
     val animatedHeightFraction by animateFloatAsState(
         targetValue = heightFraction,
@@ -161,66 +214,50 @@ private fun ChartBar(
     )
 
     val barCornerRadius = dimensionResource(id = R.dimen.card_corner_radius)
-    val popupRadius = 15.dp
 
-    Box(
-        modifier = modifier.zIndex(if (isSelected) 2f else 1f),
-        contentAlignment = Alignment.BottomCenter
+    Row(
+        modifier = modifier
+            .height(barMaxHeight)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            ),
+        verticalAlignment = Alignment.Bottom
     ) {
+        Spacer(modifier = Modifier.width(barPadding))
         Box(
             modifier = Modifier
                 .fillMaxHeight(animatedHeightFraction)
-                .width(10.dp)
+                .width(barWidth)
                 .clip(RoundedCornerShape(barCornerRadius))
                 .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer)
         )
-
-        if (showIndicator) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(bottom = (chartHeight * animatedHeightFraction) + 5.dp)
-                    .width(10.dp)
-                    .wrapContentSize(
-                        align = if (indicatorOnRightCorner) Alignment.BottomEnd else Alignment.BottomStart,
-                        unbounded = true
-                    )
-            ) {
-                Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
-                    shape = if (indicatorOnRightCorner)
-                        RoundedCornerShape(topStart = popupRadius, topEnd = popupRadius, bottomStart = popupRadius, bottomEnd = 0.dp)
-                    else
-                        RoundedCornerShape(topStart = popupRadius, topEnd = popupRadius, bottomStart = 0.dp, bottomEnd = popupRadius),
-                ) {
-                    Text(
-                        text = valueLabel,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.padding(horizontal = 6.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = 1,
-                        softWrap = false
-                    )
-                }
-            }
-        }
+        Spacer(modifier = Modifier.width(barPadding))
     }
 }
 
-@Preview(showBackground = true, widthDp = 360, heightDp = 200)
+@Preview(showBackground = true, widthDp = 360)
 @Composable
 fun BarChartPreview() {
-    val data = listOf(100.0, 150.0, 80.0, 200.0, 120.0, 90.0, 180.0, 250.0, 60.0, 140.0, 110.0, 170.0)
-    val labels = listOf("01/24", "02/24", "03/24", "04/24", "05/24", "06/24", "07/24", "08/24", "09/24", "10/24", "11/24", "12/24")
+    val entries = listOf(
+        BarChartEntry(100.0, 2024, 1),
+        BarChartEntry(150.0, 2024, 2),
+        BarChartEntry(80.0, 2024, 3),
+        BarChartEntry(200.0, 2024, 4),
+        BarChartEntry(120.0, 2024, 5),
+        BarChartEntry(90.0, 2024, 6),
+        BarChartEntry(180.0, 2024, 7),
+        BarChartEntry(250.0, 2024, 8),
+        BarChartEntry(60.0, 2024, 9),
+        BarChartEntry(140.0, 2024, 10),
+        BarChartEntry(110.0, 2024, 11),
+        BarChartEntry(170.0, 2024, 12)
+    )
 
     MyFinanceTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
-            BarChart(
-                data = data,
-                labels = labels,
-                modifier = Modifier.fillMaxSize()
-            )
+            BarChart(entries = entries)
         }
     }
 }
