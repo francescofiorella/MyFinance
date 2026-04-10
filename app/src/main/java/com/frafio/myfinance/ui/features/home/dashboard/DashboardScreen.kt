@@ -527,7 +527,7 @@ fun MonthlyExpensesChartCard(
     onNextDate: () -> Unit,
     onToday: () -> Unit
 ) {
-    var resetBarChart by remember { mutableIntStateOf(0) }
+    var resetBarChart by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -581,7 +581,7 @@ fun MonthlyExpensesChartCard(
                 FilledTonalButton(
                     onClick = {
                         onToday()
-                        resetBarChart++
+                        resetBarChart = !resetBarChart
                     },
                     shapes = ButtonDefaults.shapes(
                         pressedShape = ButtonDefaults.squareShape
@@ -720,7 +720,7 @@ fun ExpensesByCategoryCard(
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 PieChart(
                     data = values,
-                    animate = true
+                    animate = false
                 )
             }
 

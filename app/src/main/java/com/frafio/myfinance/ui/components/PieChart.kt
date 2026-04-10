@@ -1,7 +1,7 @@
 package com.frafio.myfinance.ui.components
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -63,8 +62,12 @@ fun PieChart(
     radiusOuter: Dp = 80.dp,
     chartEntryOffset: Int = 12,
     chartBarWidth: Dp = 12.dp,
-    animDuration: Int = 500,
-    animate: Boolean = true
+    unselectedIconSize: Dp = 32.dp,
+    selectedIconSize: Dp = 36.dp,
+    iconDistance: Dp = 16.dp,
+    animate: Boolean = true,
+    animDuration: Int = 1000,
+    animAngle: Float = 45f
 ) {
     var selectedArc by remember(data) { mutableIntStateOf(-1) }
 
@@ -81,10 +84,6 @@ fun PieChart(
 
     val totalText = stringResource(R.string.total)
 
-    val unselectedIconSize = 32.dp
-    val selectedIconSize = 36.dp
-    val iconDistance = 16.dp
-
     val totalPriceText = doubleToPriceWithoutDecimals(data.sum())
 
     val floatValues = mutableListOf<Float>()
@@ -95,22 +94,24 @@ fun PieChart(
         floatValues.add(angle)
     }
 
-    var animationPlayed by remember { mutableStateOf(!animate) }
+    val animationProgress = remember { Animatable(0f) }
 
-    // to play the animation only once when the function is Created or Recomposed
-    LaunchedEffect(key1 = true) {
-        animationPlayed = true
+    LaunchedEffect(data) {
+        if (animate) {
+            animationProgress.snapTo(0f)
+            animationProgress.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(
+                    durationMillis = animDuration,
+                    easing = LinearOutSlowInEasing
+                )
+            )
+        } else {
+            animationProgress.snapTo(1f)
+        }
     }
 
-    val animateRotation by animateFloatAsState(
-        targetValue = if (animationPlayed) 45f else 0f,
-        animationSpec = tween(
-            durationMillis = animDuration,
-            delayMillis = 0,
-            easing = LinearOutSlowInEasing
-        ),
-        label = "Rotation animation"
-    )
+    val animateRotation = animationProgress.value * animAngle
 
     // Pie Chart using Canvas Arc
     Box(
@@ -135,7 +136,7 @@ fun PieChart(
                 modifier = Modifier
                     .size(radiusOuter * 2f)
                     .rotate(animateRotation)
-                    .pointerInput(data) { // Use data as key
+                    .pointerInput(data) {
                         detectTapGestures { tapOffset ->
                             val centerX = size.width / 2f
                             val centerY = size.height / 2f
@@ -152,9 +153,9 @@ fun PieChart(
                                     Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
 
                                 // Normalize touchAngle to be positive if it falls behind the start
-                                while (touchAngle < -135f) touchAngle += 360f
+                                while (touchAngle < -90f - animAngle) touchAngle += 360f
 
-                                var currentStartAngle = -135f
+                                var currentStartAngle = -90f - animAngle
                                 floatValues.forEachIndexed { index, value ->
                                     if (value > 0f) {
                                         val endAngle = currentStartAngle + value
@@ -170,7 +171,7 @@ fun PieChart(
                         }
                     }
             ) {
-                var currentStartAngle = -135f
+                var currentStartAngle = -90f - animAngle
                 // draw arc and icon for each data entry in Pie Chart
                 floatValues.forEachIndexed { index, value ->
                     if (value != 0F) {
@@ -214,7 +215,7 @@ fun PieChart(
                         )
                         // Draw the icon
                         rotate(
-                            degrees = -45F,
+                            degrees = -animAngle,
                             pivot = Offset(
                                 topLeft.x + iconSize.toPx() / 2,
                                 topLeft.y + iconSize.toPx() / 2

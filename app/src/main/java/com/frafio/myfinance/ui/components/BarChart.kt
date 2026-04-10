@@ -56,7 +56,7 @@ fun BarChart(
     barPadding: Dp = 3.dp,
     barMaxHeight: Dp = 160.dp,
     onBarClick: (Int) -> Unit = {},
-    resetIndicatorHook: Int = 0
+    resetIndicatorHook: Boolean = false
 ) {
     BoxWithConstraints(modifier = modifier) {
         val maxWidth = maxWidth
@@ -157,7 +157,7 @@ fun BarChart(
                         animationSpec = tween(durationMillis = 500),
                         label = "ReferenceHeight"
                     )
-                    if (animatedHeightFraction in 0f..1f) {
+                    if (visibleEntries.isNotEmpty() && animatedHeightFraction in 0f..1f) {
                         HorizontalDivider(
                             modifier = Modifier
                                 .zIndex(-1f)
