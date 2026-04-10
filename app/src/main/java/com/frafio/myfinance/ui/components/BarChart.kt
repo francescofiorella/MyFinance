@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -34,14 +35,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.doubleToPrice
+import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import kotlin.math.roundToInt
 
 @Composable
 fun BarChart(
@@ -49,7 +53,7 @@ fun BarChart(
     entries: List<BarChartEntry>,
     referenceValue: Double? = null,
     barWidth: Dp = 40.dp,
-    barPadding: Dp = 2.dp,
+    barPadding: Dp = 3.dp,
     barMaxHeight: Dp = 160.dp,
     onBarClick: (Int) -> Unit = {},
     resetIndicatorHook: Int = 0
@@ -118,7 +122,7 @@ fun BarChart(
             }
             Spacer(modifier = Modifier.height(16.dp))
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(barMaxHeight),
                 contentAlignment = Alignment.BottomStart
             ) {
                 Row(
@@ -147,15 +151,37 @@ fun BarChart(
                 }
 
                 if (referenceValue != null && referenceValue > 0) {
-                    val valueHeightFraction = (referenceValue / maxValue).toFloat()
-                    if (valueHeightFraction in 0f..1f) {
+
+                    val animatedHeightFraction by animateFloatAsState(
+                        targetValue = (referenceValue / maxValue).toFloat(),
+                        animationSpec = tween(durationMillis = 500),
+                        label = "ReferenceHeight"
+                    )
+                    if (animatedHeightFraction in 0f..1f) {
                         HorizontalDivider(
                             modifier = Modifier
                                 .zIndex(-1f)
                                 .fillMaxWidth()
-                                .padding(bottom = barMaxHeight * valueHeightFraction),
+                                .padding(bottom = barMaxHeight * animatedHeightFraction),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        if (visibleEntries[visibleEntries.size-1].value <= referenceValue) {
+                            Text(
+                                modifier = Modifier
+                                    .zIndex(-1f)
+                                    .fillMaxWidth()
+                                    .offset {
+                                        IntOffset(
+                                            0,
+                                            -(barMaxHeight * animatedHeightFraction).toPx().roundToInt()
+                                        )
+                                    },
+                                text = doubleToPriceWithoutDecimals(referenceValue),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.labelSmall,
+                                textAlign = TextAlign.End
+                            )
+                        }
                     }
                 }
             }
@@ -199,7 +225,7 @@ fun BarChart(
 private fun ChartBar(
     modifier: Modifier = Modifier,
     barWidth: Dp = 40.dp,
-    barPadding: Dp = 2.dp,
+    barPadding: Dp = 3.dp,
     barMaxHeight: Dp = 160.dp,
     heightFraction: Float,
     isSelected: Boolean,
@@ -255,7 +281,7 @@ fun BarChartPreview() {
 
     MyFinanceTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
-            BarChart(entries = entries)
+            BarChart(entries = entries, referenceValue = 190.0)
         }
     }
 }
