@@ -170,6 +170,10 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         _balanceYearShown.value -= 1
     }
 
+    fun todayBalanceYear() {
+        _balanceYearShown.value = today.year
+    }
+
     fun nextBarChartDate() {
         _lastDateForBarChart.value = _lastDateForBarChart.value.plusMonths(1)
     }
@@ -207,6 +211,16 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
             _pieChartDate.value = _monthlyDateForPieChart.value
         } else {
             _annualDateForPieChart.value = _pieChartDate.value.minusYears(1)
+            _pieChartDate.value = _annualDateForPieChart.value
+        }
+    }
+
+    fun todayPieChartDate() {
+        if (_monthlyShownInPieChart.value) {
+            _monthlyDateForPieChart.value = today
+            _pieChartDate.value = _monthlyDateForPieChart.value
+        } else {
+            _annualDateForPieChart.value = today
             _pieChartDate.value = _annualDateForPieChart.value
         }
     }

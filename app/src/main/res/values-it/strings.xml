@@ -39,11 +39,10 @@
     <string name="warning_home">Aggiungi la tua prima spesa!</string>
     <string name="warning_budget">Nessuna entrata da mostrare</string>
 
-    <string name="expenses_today">Spese \noggi</string>
+    <string name="expenses_today">Spese oggi</string>
     <string name="expenses_budget">Spesa su budget</string>
     <string name="this_month">Spese questo mese</string>
-    <string name="this_month_next">Spese \nquesto mese</string>
-    <string name="this_year_next">Spese \nquest\'anno</string>
+    <string name="this_year_next">Spese quest\'anno</string>
     <string name="monthly_expenses">Spese mensili</string>
 
     <string name="profile_picture">Immagine di profilo</string>
@@ -95,5 +94,5 @@
     <string name="filter">Filtro</string>
     <string name="date_range">Intervallo di date</string>
     <string name="clear_text">Pulisci testo</string>
-    <string name="annual_balance">Bilancio annuale %1$s</string>
+    <string name="annual_balance">Bilancio annuale</string>
 </resources>
