@@ -124,111 +124,119 @@ fun PieChart(
         )
     }
 
+    val emptyCircleAlpha by animateFloatAsState(
+        targetValue = if (data.sum() == 0.0) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = if (animate) animDuration else 0,
+            easing = LinearOutSlowInEasing
+        ),
+        label = "empty_alpha"
+    )
+
     val targetOffset = if (data.count { v -> v > 0.0 } <= 1) 0 else chartEntryOffset
 
     Box(
         modifier = Modifier.padding(unselectedIconSize + iconDistance),
         contentAlignment = Alignment.Center
     ) {
-        if (data.sum() == 0.0) {
-            Canvas(modifier = Modifier.size(radiusOuter * 2f)) {
+        Canvas(
+            modifier = Modifier
+                .size(radiusOuter * 2f)
+                .pointerInput(data) {
+                    detectTapGestures { tapOffset ->
+                        val centerX = size.width / 2f
+                        val centerY = size.height / 2f
+                        val dx = tapOffset.x - centerX
+                        val dy = tapOffset.y - centerY
+                        val distance = sqrt((dx * dx + dy * dy).toDouble())
+
+                        if (distance <= (radiusOuter + chartBarWidth).toPx() &&
+                            distance >= (radiusOuter - chartBarWidth * 2).toPx()
+                        ) {
+                            var touchAngle = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
+                            while (touchAngle < -90f) touchAngle += 360f
+
+                            var currentStartAngle = -90f
+                            floatValues.forEachIndexed { index, value ->
+                                if (value > 0f) {
+                                    val endAngle = currentStartAngle + value
+                                    if (touchAngle in (currentStartAngle - targetOffset / 2)..(endAngle + targetOffset / 2)) {
+                                        selectedArc = index
+                                    }
+                                    currentStartAngle = endAngle + targetOffset
+                                }
+                            }
+                        }
+                    }
+                }
+        ) {
+            // Draw background gray circle for empty state with fade animation
+            if (emptyCircleAlpha > 0.001f) {
                 drawArc(
-                    color = secondaryContainerColor,
+                    color = secondaryContainerColor.copy(alpha = emptyCircleAlpha),
                     startAngle = 0f,
                     sweepAngle = 360f,
                     useCenter = false,
                     style = Stroke(chartBarWidth.toPx())
                 )
             }
-        } else {
-            Canvas(
-                modifier = Modifier
-                    .size(radiusOuter * 2f)
-                    .pointerInput(data) {
-                        detectTapGestures { tapOffset ->
-                            val centerX = size.width / 2f
-                            val centerY = size.height / 2f
-                            val dx = tapOffset.x - centerX
-                            val dy = tapOffset.y - centerY
-                            val distance = sqrt((dx * dx + dy * dy).toDouble())
 
-                            if (distance <= (radiusOuter + chartBarWidth).toPx() &&
-                                distance >= (radiusOuter - chartBarWidth * 2).toPx()
-                            ) {
-                                var touchAngle = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
-                                while (touchAngle < -90f) touchAngle += 360f
+            var currentStartAngle = -90f
+            animatedValues.forEachIndexed { index, animatedValueState ->
+                val sweepAngle = animatedValueState.value
+                val animatedOffset = animatedOffsets[index].value
+                val alpha = animatedAlphas[index].value
+                if (alpha > 0.001f && sweepAngle > 0.001f) {
+                    val strokeSize: Float
+                    val iconSize: Dp
+                    if (selectedArc == index) {
+                        strokeSize = chartBarWidth.toPx() * 1.2f
+                        iconSize = selectedIconSize
+                    } else {
+                        strokeSize = chartBarWidth.toPx()
+                        iconSize = unselectedIconSize
+                    }
 
-                                var currentStartAngle = -90f
-                                floatValues.forEachIndexed { index, value ->
-                                    if (value > 0f) {
-                                        val endAngle = currentStartAngle + value
-                                        if (touchAngle in (currentStartAngle - targetOffset / 2)..(endAngle + targetOffset / 2)) {
-                                            selectedArc = index
-                                        }
-                                        currentStartAngle = endAngle + targetOffset
-                                    }
-                                }
-                            }
+                    drawArc(
+                        color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark).copy(alpha = alpha),
+                        startAngle = currentStartAngle,
+                        sweepAngle = sweepAngle,
+                        useCenter = false,
+                        size = Size(radiusOuter.toPx() * 2f, radiusOuter.toPx() * 2f),
+                        style = Stroke(width = strokeSize, cap = StrokeCap.Round),
+                    )
+
+                    val angleInRadians = ((currentStartAngle + sweepAngle / 2) * PI / 180).toFloat()
+                    val iconRadius = radiusOuter.toPx() + strokeSize + iconDistance.toPx()
+                    val topLeft = Offset(
+                        x = center.x + iconRadius * cos(angleInRadians) - iconSize.toPx() / 2,
+                        y = center.y + iconRadius * sin(angleInRadians) - iconSize.toPx() / 2
+                    )
+
+                    val paddingSize = 6.dp
+                    val innerIconSize = iconSize - paddingSize * 2
+
+                    drawRoundRect(
+                        color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark).copy(alpha = alpha),
+                        size = Size(iconSize.toPx(), iconSize.toPx()),
+                        cornerRadius = CornerRadius(160.dp.toPx()),
+                        topLeft = topLeft
+                    )
+
+                    translate(
+                        left = topLeft.x + paddingSize.toPx(),
+                        top = topLeft.y + paddingSize.toPx()
+                    ) {
+                        with(painters[index]) {
+                            draw(
+                                size = Size(innerIconSize.toPx(), innerIconSize.toPx()),
+                                colorFilter = ColorFilter.tint(getCategoryOnContainerColor(index, default = surfaceColor, isDark = isDark)),
+                                alpha = alpha
+                            )
                         }
                     }
-            ) {
-                var currentStartAngle = -90f
-                animatedValues.forEachIndexed { index, animatedValueState ->
-                    val sweepAngle = animatedValueState.value
-                    val animatedOffset = animatedOffsets[index].value
-                    val alpha = animatedAlphas[index].value
-                    if (alpha > 0.001f && sweepAngle > 0.001f) {
-                        val strokeSize: Float
-                        val iconSize: Dp
-                        if (selectedArc == index) {
-                            strokeSize = chartBarWidth.toPx() * 1.2f
-                            iconSize = selectedIconSize
-                        } else {
-                            strokeSize = chartBarWidth.toPx()
-                            iconSize = unselectedIconSize
-                        }
-
-                        drawArc(
-                            color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark).copy(alpha = alpha),
-                            startAngle = currentStartAngle,
-                            sweepAngle = sweepAngle,
-                            useCenter = false,
-                            size = Size(radiusOuter.toPx() * 2f, radiusOuter.toPx() * 2f),
-                            style = Stroke(width = strokeSize, cap = StrokeCap.Round),
-                        )
-
-                        val angleInRadians = ((currentStartAngle + sweepAngle / 2) * PI / 180).toFloat()
-                        val iconRadius = radiusOuter.toPx() + strokeSize + iconDistance.toPx()
-                        val topLeft = Offset(
-                            x = center.x + iconRadius * cos(angleInRadians) - iconSize.toPx() / 2,
-                            y = center.y + iconRadius * sin(angleInRadians) - iconSize.toPx() / 2
-                        )
-
-                        val paddingSize = 6.dp
-                        val innerIconSize = iconSize - paddingSize * 2
-
-                        drawRoundRect(
-                            color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark).copy(alpha = alpha),
-                            size = Size(iconSize.toPx(), iconSize.toPx()),
-                            cornerRadius = CornerRadius(160.dp.toPx()),
-                            topLeft = topLeft
-                        )
-
-                        translate(
-                            left = topLeft.x + paddingSize.toPx(),
-                            top = topLeft.y + paddingSize.toPx()
-                        ) {
-                            with(painters[index]) {
-                                draw(
-                                    size = Size(innerIconSize.toPx(), innerIconSize.toPx()),
-                                    colorFilter = ColorFilter.tint(getCategoryOnContainerColor(index, default = surfaceColor, isDark = isDark)),
-                                    alpha = alpha
-                                )
-                            }
-                        }
-                    }
-                    currentStartAngle += sweepAngle + animatedOffset
                 }
+                currentStartAngle += sweepAngle + animatedOffset
             }
         }
 
