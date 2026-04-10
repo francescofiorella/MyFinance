@@ -32,7 +32,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:showAnimationBehavior="inward"
-            app:trackThickness="4dp"
+            app:trackThickness="8dp"
             app:waveAmplitude="3dp"
             app:wavelength="40dp" />
 
@@ -109,8 +109,7 @@
             app:layout_constraintBottom_toTopOf="@+id/nav_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/titleLayout"
-            tools:layout="@layout/fragment_dashboard" />
+            app:layout_constraintTop_toBottomOf="@+id/titleLayout" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/home_addBtn"

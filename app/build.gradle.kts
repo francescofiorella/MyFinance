@@ -19,7 +19,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 4
-        versionName = "4.8.8"
+        versionName = "4.8.9"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.lifecycle.extensions)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.animation.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

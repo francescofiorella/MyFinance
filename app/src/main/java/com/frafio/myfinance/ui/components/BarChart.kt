@@ -2,9 +2,6 @@ package com.frafio.myfinance.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -17,11 +14,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -30,8 +29,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,7 +37,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.frafio.myfinance.R
 import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.doubleToPrice
@@ -83,8 +79,7 @@ fun BarChart(
             if (entries.isNotEmpty() && (selectedIndex < startIndex || selectedIndex >= entries.size)) {
                 selectedIndex = entries.size - 1
             }
-            val entriesMax = visibleEntries.maxOfOrNull { it.value } ?: 0.0
-            val max = maxOf(entriesMax, referenceValue ?: 0.0)
+            val max = visibleEntries.maxOfOrNull { it.value } ?: 0.0
             if (max == 0.0) 1.0 else max
         }
 
@@ -152,14 +147,16 @@ fun BarChart(
                 }
 
                 if (referenceValue != null && referenceValue > 0) {
-                    val valueHeightFraction = (referenceValue / maxValue).toFloat().coerceIn(0f, 1f)
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .zIndex(-1f)
-                            .fillMaxWidth()
-                            .padding(bottom = barMaxHeight * valueHeightFraction),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    val valueHeightFraction = (referenceValue / maxValue).toFloat()
+                    if (valueHeightFraction in 0f..1f) {
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .zIndex(-1f)
+                                .fillMaxWidth()
+                                .padding(bottom = barMaxHeight * valueHeightFraction),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
 
@@ -197,6 +194,7 @@ fun BarChart(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ChartBar(
     modifier: Modifier = Modifier,
@@ -213,25 +211,25 @@ private fun ChartBar(
         label = "BarHeight"
     )
 
-    val barCornerRadius = dimensionResource(id = R.dimen.card_corner_radius)
-
     Row(
         modifier = modifier
-            .height(barMaxHeight)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            ),
+            .height(barMaxHeight),
         verticalAlignment = Alignment.Bottom
     ) {
         Spacer(modifier = Modifier.width(barPadding))
-        Box(
+        ToggleButton(
+            checked = isSelected,
+            onCheckedChange = {
+                if (it) onClick()
+            },
+            content = {},
+            colors = ToggleButtonDefaults.toggleButtonColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                checkedContainerColor = MaterialTheme.colorScheme.primary
+            ),
             modifier = Modifier
                 .fillMaxHeight(animatedHeightFraction)
                 .width(barWidth)
-                .clip(RoundedCornerShape(barCornerRadius))
-                .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer)
         )
         Spacer(modifier = Modifier.width(barPadding))
     }

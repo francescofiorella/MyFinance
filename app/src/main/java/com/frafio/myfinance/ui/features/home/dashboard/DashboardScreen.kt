@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.features.home.dashboard
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,6 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -18,10 +22,8 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.ui.components.BarChart
 import com.frafio.myfinance.ui.components.PieChart
-import com.frafio.myfinance.ui.components.ProgressBar
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
-import com.frafio.myfinance.utils.doubleToString
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -148,70 +150,77 @@ fun BudgetCard(
 
     var selectedIndex by remember { mutableIntStateOf(0) }
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(top = 8.dp, bottom = 16.dp),
-        shape = ListItemDefaults.shapes().selectedShape,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        )
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
-                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .fillMaxWidth(0.7f)
+                .padding(top = 32.dp, bottom = 64.dp),
         ) {
             Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = doubleToPrice(amount),
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = doubleToPrice(amount),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    if (monthlyBudget > 0.0) {
-                        Text(
-                            text = stringResource(
-                                R.string.on_total_budget,
-                                doubleToString(totalBudget)
-                            ),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                if (monthlyBudget > 0.0) {
-                    ProgressBar(
-                        value = amount,
-                        maxValue = totalBudget,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 16.dp)
-                    )
-                }
-            }
-
             if (monthlyBudget > 0.0) {
+                val stroke = Stroke(
+                    width =
+                        with(LocalDensity.current) {
+                            12.dp.toPx()
+                        },
+                    cap = StrokeCap.Round,
+                )
+                val amplitude = with(LocalDensity.current) {
+                    0.2.dp.toPx()
+                }
+                val progress = (amount / totalBudget).toFloat()
+                val animatedProgress by animateFloatAsState(
+                    targetValue = progress.coerceIn(0f, 1f),
+                    animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+                    label = "progressAnimation"
+                )
+                LinearWavyProgressIndicator(
+                    color = if (progress <= 1f)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.error,
+                    stopSize = 8.dp,
+                    amplitude = { amplitude },
+                    waveSpeed = 0.dp,
+                    stroke = stroke,
+                    trackStroke = stroke,
+                    progress = { animatedProgress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(36.dp)
+                )
+
+                Row {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = title,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        modifier = Modifier,
+                        text = doubleToPrice(totalBudget),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
                 Row(
                     modifier = Modifier
                         .width(IntrinsicSize.Max)
                         .padding(top = 16.dp)
+                        .align(Alignment.CenterHorizontally)
                 ) {
-                    TonalToggleButton(
+                    ToggleButton(
                         modifier = Modifier.weight(1f),
                         shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
                         checked = selectedIndex == 0,
@@ -225,7 +234,7 @@ fun BudgetCard(
                         )
                     }
                     Spacer(modifier = Modifier.width(ButtonGroupDefaults.ConnectedSpaceBetween))
-                    TonalToggleButton(
+                    ToggleButton(
                         modifier = Modifier.weight(1f),
                         shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
                         checked = selectedIndex == 1,

@@ -7,10 +7,10 @@ constraintlayout = "2.2.1"
 constraintlayoutCompose = "1.1.1"
 coreKtx = "1.18.0"
 coreSplashscreen = "1.2.0"
-credentials = "1.5.0"
+credentials = "1.6.0"
 espressoCore = "3.7.0"
-firebaseBom = "34.11.0"
-firebaseCrashlytics = "3.0.6"
+firebaseBom = "34.12.0"
+firebaseCrashlytics = "3.0.7"
 fragmentKtx = "1.8.9"
 glide = "5.0.5"
 googleServices = "4.4.4"
@@ -24,12 +24,13 @@ ksp = "2.3.6"
 lifecycleExtensions = "2.2.0"
 lifecycleLivedataKtx = "2.10.0"
 material = "1.13.0"
-material3 = "1.5.0-alpha16"
+material3 = "1.5.0-alpha17"
 playServicesAuth = "21.5.1"
 roomRuntime = "2.8.4"
 ui = "1.10.6"
 runtimeLivedata = "1.10.6"
 coil = "3.4.0"
+animationCore = "1.10.6"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -69,6 +70,7 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+androidx-compose-animation-core = { group = "androidx.compose.animation", name = "animation-core", version.ref = "animationCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

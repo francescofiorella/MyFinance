@@ -29,7 +29,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:showAnimationBehavior="inward"
-            app:trackThickness="4dp"
+            app:trackThickness="8dp"
             app:waveAmplitude="3dp"
             app:wavelength="40dp" />
 

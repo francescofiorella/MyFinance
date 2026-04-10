@@ -7,6 +7,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,9 +46,11 @@ import androidx.compose.ui.unit.sp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
-import com.frafio.myfinance.utils.getCategoryColor
+import com.frafio.myfinance.utils.getCategoryContainerColor
 import com.frafio.myfinance.utils.getCategoryIcon
 import com.frafio.myfinance.utils.getCategoryName
+import com.frafio.myfinance.utils.getCategoryOnContainerColor
+import com.frafio.myfinance.utils.getCategoryTextColor
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -58,12 +61,14 @@ import kotlin.math.sqrt
 fun PieChart(
     data: List<Double>,
     radiusOuter: Dp = 80.dp,
-    chartEntryOffset: Int = 9,
-    chartBarWidth: Dp = 10.dp,
+    chartEntryOffset: Int = 12,
+    chartBarWidth: Dp = 12.dp,
     animDuration: Int = 500,
     animate: Boolean = true
 ) {
     var selectedArc by remember(data) { mutableIntStateOf(-1) }
+
+    val isDark = isSystemInDarkTheme()
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val surfaceColor = MaterialTheme.colorScheme.surface
@@ -76,8 +81,8 @@ fun PieChart(
 
     val totalText = stringResource(R.string.total)
 
-    val unselectedIconSize = 24.dp
-    val selectedIconSize = 32.dp
+    val unselectedIconSize = 32.dp
+    val selectedIconSize = 36.dp
     val iconDistance = 16.dp
 
     val totalPriceText = doubleToPriceWithoutDecimals(data.sum())
@@ -179,7 +184,7 @@ fun PieChart(
                             iconSize = unselectedIconSize
                         }
                         drawArc(
-                            color = getCategoryColor(index, default = primaryColor),
+                            color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark),
                             currentStartAngle,
                             value,
                             useCenter = false,
@@ -202,7 +207,7 @@ fun PieChart(
                         val paddingSize = 6.dp
                         val innerIconSize = iconSize - paddingSize * 2
                         drawRoundRect(
-                            color = getCategoryColor(index, default = primaryColor),
+                            color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark),
                             size = Size(iconSize.toPx(), iconSize.toPx()),
                             cornerRadius = CornerRadius(160.dp.toPx()),
                             topLeft = topLeft
@@ -222,7 +227,7 @@ fun PieChart(
                                 with(painters[index]) {
                                     draw(
                                         size = Size(innerIconSize.toPx(), innerIconSize.toPx()),
-                                        colorFilter = ColorFilter.tint(surfaceColor)
+                                        colorFilter = ColorFilter.tint(getCategoryOnContainerColor(index, default = surfaceColor, isDark = isDark))
                                     )
                                 }
                             }
@@ -243,7 +248,7 @@ fun PieChart(
         ) {
             Text(
                 text = if (selectedArc != -1) stringResource(id = getCategoryName(selectedArc)) else totalText,
-                color = getCategoryColor(selectedArc, primaryColor),
+                color = getCategoryTextColor(selectedArc, MaterialTheme.colorScheme.onSurface, isDark = isDark),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodyMedium,
