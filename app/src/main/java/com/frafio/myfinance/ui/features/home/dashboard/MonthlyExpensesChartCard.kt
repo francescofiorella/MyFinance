@@ -73,7 +73,6 @@ fun MonthlyExpensesChartCard(
                     onClick = onPreviousDate,
                     shapes = IconButtonDefaults.shapes(
                         shape = IconButtonDefaults.smallSquareShape,
-                        pressedShape = IconButtonDefaults.smallRoundShape
                     )
                 ) {
                     Icon(
@@ -85,7 +84,6 @@ fun MonthlyExpensesChartCard(
                     onClick = onNextDate,
                     shapes = IconButtonDefaults.shapes(
                         shape = IconButtonDefaults.smallSquareShape,
-                        pressedShape = IconButtonDefaults.smallRoundShape
                     )
                 ) {
                     Icon(

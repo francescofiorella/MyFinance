@@ -108,7 +108,6 @@ fun ResetPasswordSheet(
                 enabled = isEmailValid,
                 shapes = IconButtonDefaults.shapes(
                     shape = IconButtonDefaults.smallSquareShape,
-                    pressedShape = IconButtonDefaults.smallRoundShape
                 )
             ) {
                 Icon(

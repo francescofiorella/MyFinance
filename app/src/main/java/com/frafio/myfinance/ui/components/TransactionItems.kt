@@ -102,7 +102,6 @@ fun TransactionListItem(
                     onClick = onIconClick,
                     shapes = IconButtonDefaults.shapes(
                         shape = IconButtonDefaults.smallRoundShape,
-                        pressedShape = IconButtonDefaults.smallSquareShape
                     )
                 ) {
                     Icon(

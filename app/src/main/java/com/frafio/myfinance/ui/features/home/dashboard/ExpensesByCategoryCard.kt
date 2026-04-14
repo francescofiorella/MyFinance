@@ -91,7 +91,6 @@ fun ExpensesByCategoryCard(
                     onClick = onPreviousDate,
                     shapes = IconButtonDefaults.shapes(
                         shape = IconButtonDefaults.smallSquareShape,
-                        pressedShape = IconButtonDefaults.smallRoundShape
                     )
                 ) {
                     Icon(
@@ -103,7 +102,6 @@ fun ExpensesByCategoryCard(
                     onClick = onNextDate,
                     shapes = IconButtonDefaults.shapes(
                         shape = IconButtonDefaults.smallSquareShape,
-                        pressedShape = IconButtonDefaults.smallRoundShape
                     )
                 ) {
                     Icon(

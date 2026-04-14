@@ -121,7 +121,6 @@ fun EditBudgetSheet(
                 enabled = isConfirmEnabled,
                 shapes = IconButtonDefaults.shapes(
                     shape = IconButtonDefaults.smallSquareShape,
-                    pressedShape = IconButtonDefaults.smallRoundShape
                 )
             ) {
                 Icon(

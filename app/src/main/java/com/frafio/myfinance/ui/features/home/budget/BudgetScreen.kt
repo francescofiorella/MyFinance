@@ -220,7 +220,6 @@ fun IncomeList(
                         onClick = onEditBudgetClick,
                         shapes = IconButtonDefaults.shapes(
                             shape = IconButtonDefaults.smallSquareShape,
-                            pressedShape = IconButtonDefaults.smallRoundShape
                         )
                     ) {
                         Icon(
@@ -233,7 +232,6 @@ fun IncomeList(
                         enabled = monthlyBudget != 0.0,
                         shapes = IconButtonDefaults.shapes(
                             shape = IconButtonDefaults.smallSquareShape,
-                            pressedShape = IconButtonDefaults.smallRoundShape
                         )
                     ) {
                         Icon(

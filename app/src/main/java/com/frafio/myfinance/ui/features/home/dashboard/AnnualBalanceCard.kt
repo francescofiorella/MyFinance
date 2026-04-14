@@ -86,7 +86,6 @@ fun AnnualBalanceCard(
                     onClick = onPreviousYear,
                     shapes = IconButtonDefaults.shapes(
                         shape = IconButtonDefaults.smallSquareShape,
-                        pressedShape = IconButtonDefaults.smallRoundShape
                     )
                 ) {
                     Icon(
@@ -98,7 +97,6 @@ fun AnnualBalanceCard(
                     onClick = onNextYear,
                     shapes = IconButtonDefaults.shapes(
                         shape = IconButtonDefaults.smallSquareShape,
-                        pressedShape = IconButtonDefaults.smallRoundShape
                     )
                 ) {
                     Icon(
