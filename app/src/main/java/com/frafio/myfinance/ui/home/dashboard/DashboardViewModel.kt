@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -69,9 +70,21 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _pieChartDate = MutableStateFlow(today)
     val pieChartDate: StateFlow<LocalDate> = _pieChartDate.asStateFlow()
 
+    val isNextPieChartDateEnabled: StateFlow<Boolean> = combine(_pieChartDate, _monthlyShownInPieChart) { date, isMonthly ->
+        if (isMonthly) {
+            date.isBefore(today.with(TemporalAdjusters.firstDayOfMonth()))
+        } else {
+            date.year < today.year
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     private val _lastDateForBarChart = MutableStateFlow(
         today.with(TemporalAdjusters.firstDayOfMonth())
     )
+
+    val isNextBarChartDateEnabled: StateFlow<Boolean> = _lastDateForBarChart
+        .map { it.isBefore(today.with(TemporalAdjusters.firstDayOfMonth())) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val _scrollToTop = MutableSharedFlow<Unit>(replay = 0)
     val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()
@@ -163,7 +176,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
 
     fun nextBalanceYear() {
-        _balanceYearShown.value += 1
+        if (_balanceYearShown.value < today.year) {
+            _balanceYearShown.value += 1
+        }
     }
 
     fun previousBalanceYear() {
@@ -175,7 +190,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun nextBarChartDate() {
-        _lastDateForBarChart.value = _lastDateForBarChart.value.plusMonths(1)
+        if (_lastDateForBarChart.value.isBefore(today.with(TemporalAdjusters.firstDayOfMonth()))) {
+            _lastDateForBarChart.value = _lastDateForBarChart.value.plusMonths(1)
+        }
     }
 
     fun previousBarChartDate() {
@@ -197,11 +214,15 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun nextPieChartDate() {
         if (_monthlyShownInPieChart.value) {
-            _monthlyDateForPieChart.value = _pieChartDate.value.plusMonths(1)
-            _pieChartDate.value = _monthlyDateForPieChart.value
+            if (_pieChartDate.value.isBefore(today.with(TemporalAdjusters.firstDayOfMonth()))) {
+                _monthlyDateForPieChart.value = _pieChartDate.value.plusMonths(1)
+                _pieChartDate.value = _monthlyDateForPieChart.value
+            }
         } else {
-            _annualDateForPieChart.value = _pieChartDate.value.plusYears(1)
-            _pieChartDate.value = _annualDateForPieChart.value
+            if (_pieChartDate.value.year < today.year) {
+                _annualDateForPieChart.value = _pieChartDate.value.plusYears(1)
+                _pieChartDate.value = _annualDateForPieChart.value
+            }
         }
     }
 

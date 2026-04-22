@@ -67,9 +67,11 @@ fun DashboardContent(
     val incomesSum by viewModel.incomesSum.collectAsState()
     val expensesSum by viewModel.expensesSum.collectAsState()
     val barChartData by viewModel.barChartData.collectAsState()
+    val isNextBarDateEnabled by viewModel.isNextBarChartDateEnabled.collectAsState()
     val pieExpenses by viewModel.pieChartExpenses.collectAsState()
     val pieDate by viewModel.pieChartDate.collectAsState()
     val monthlyShownInPie by viewModel.monthlyShownInPieChart.collectAsState()
+    val isNextPieDateEnabled by viewModel.isNextPieChartDateEnabled.collectAsState()
 
     Column(
         modifier = Modifier
@@ -95,7 +97,8 @@ fun DashboardContent(
             monthlyBudget = monthlyBudget,
             onPreviousDate = { viewModel.previousBarChartDate() },
             onNextDate = { viewModel.nextBarChartDate() },
-            onToday = { viewModel.todayBarChartDate() }
+            onToday = { viewModel.todayBarChartDate() },
+            isNextDateEnabled = isNextBarDateEnabled
         )
         AnnualBalanceCard(
             balanceYear = balanceYear,
@@ -112,7 +115,8 @@ fun DashboardContent(
             onSwitchData = { viewModel.switchPieChartData(it) },
             onPreviousDate = { viewModel.previousPieChartDate() },
             onNextDate = { viewModel.nextPieChartDate() },
-            onToday = { viewModel.todayPieChartDate() }
+            onToday = { viewModel.todayPieChartDate() },
+            isNextDateEnabled = isNextPieDateEnabled
         )
     }
 }
@@ -187,10 +191,12 @@ fun DashboardContent(
     onPreviousBarDate: () -> Unit,
     onNextBarDate: () -> Unit,
     onTodayBarDate: () -> Unit,
+    isNextBarDateEnabled: Boolean = true,
     onSwitchPieData: (Boolean) -> Unit,
     onPreviousPieDate: () -> Unit,
     onNextPieDate: () -> Unit,
-    onTodayPieData: () -> Unit
+    onTodayPieData: () -> Unit,
+    isNextPieDateEnabled: Boolean = true
 ) {
     Column(
         modifier = Modifier
@@ -216,7 +222,8 @@ fun DashboardContent(
             monthlyBudget = monthlyBudget,
             onPreviousDate = onPreviousBarDate,
             onNextDate = onNextBarDate,
-            onToday = onTodayBarDate
+            onToday = onTodayBarDate,
+            isNextDateEnabled = isNextBarDateEnabled
         )
         AnnualBalanceCard(
             balanceYear = balanceYear,
@@ -233,7 +240,8 @@ fun DashboardContent(
             onSwitchData = onSwitchPieData,
             onPreviousDate = onPreviousPieDate,
             onNextDate = onNextPieDate,
-            onToday = onTodayPieData
+            onToday = onTodayPieData,
+            isNextDateEnabled = isNextPieDateEnabled
         )
     }
 }

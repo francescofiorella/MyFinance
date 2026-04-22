@@ -39,6 +39,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
+import java.time.LocalDate
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -95,6 +96,7 @@ fun AnnualBalanceCard(
                 }
                 FilledTonalIconButton(
                     onClick = onNextYear,
+                    enabled = balanceYear < LocalDate.now().year,
                     shapes = IconButtonDefaults.shapes(
                         shape = IconButtonDefaults.smallSquareShape,
                     )
@@ -107,9 +109,7 @@ fun AnnualBalanceCard(
                 Spacer(modifier = Modifier.width(4.dp))
                 FilledTonalButton(
                     onClick = onToday,
-                    shapes = ButtonDefaults.shapes(
-                        pressedShape = ButtonDefaults.squareShape
-                    )
+                    shapes = ButtonDefaults.shapes()
                 ) {
                     Icon(
                         painterResource(id = R.drawable.ic_today_filled),

@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +50,7 @@ import com.frafio.myfinance.utils.getCategoryTextColor
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.sqrt
 
@@ -56,7 +58,7 @@ import kotlin.math.sqrt
 fun PieChart(
     data: List<Double>,
     radiusOuter: Dp = 80.dp,
-    chartEntryOffset: Int = 12,
+    chartBarOffset: Dp = 1.dp,
     chartBarWidth: Dp = 12.dp,
     unselectedIconSize: Dp = 32.dp,
     selectedIconSize: Dp = 36.dp,
@@ -64,6 +66,9 @@ fun PieChart(
     animate: Boolean = true,
     animDuration: Int = 1000
 ) {
+    val chartEntryOffset = with(LocalDensity.current) {
+        chartBarOffset.toPx().roundToInt() + (chartBarWidth.toPx().roundToInt() / 4)
+    }
     var selectedArc by remember(data) { mutableIntStateOf(-1) }
 
     val isDark = isSystemInDarkTheme()

@@ -48,7 +48,8 @@ fun ExpensesByCategoryCard(
     onSwitchData: (Boolean) -> Unit,
     onPreviousDate: () -> Unit,
     onNextDate: () -> Unit,
-    onToday: () -> Unit
+    onToday: () -> Unit,
+    isNextDateEnabled: Boolean = true
 ) {
     val values = remember(expenses) {
         val vals = MutableList(9) { 0.0 }
@@ -100,6 +101,7 @@ fun ExpensesByCategoryCard(
                 }
                 FilledTonalIconButton(
                     onClick = onNextDate,
+                    enabled = isNextDateEnabled,
                     shapes = IconButtonDefaults.shapes(
                         shape = IconButtonDefaults.smallSquareShape,
                     )
@@ -112,9 +114,7 @@ fun ExpensesByCategoryCard(
                 Spacer(modifier = Modifier.width(4.dp))
                 FilledTonalButton(
                     onClick = onToday,
-                    shapes = ButtonDefaults.shapes(
-                        pressedShape = ButtonDefaults.squareShape
-                    )
+                    shapes = ButtonDefaults.shapes()
                 ) {
                     Icon(
                         painterResource(id = R.drawable.ic_today_filled),

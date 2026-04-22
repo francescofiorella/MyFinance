@@ -41,7 +41,8 @@ fun MonthlyExpensesChartCard(
     monthlyBudget: Double,
     onPreviousDate: () -> Unit,
     onNextDate: () -> Unit,
-    onToday: () -> Unit
+    onToday: () -> Unit,
+    isNextDateEnabled: Boolean = true
 ) {
     var resetBarChart by remember { mutableStateOf(false) }
 
@@ -82,6 +83,7 @@ fun MonthlyExpensesChartCard(
                 }
                 FilledTonalIconButton(
                     onClick = onNextDate,
+                    enabled = isNextDateEnabled,
                     shapes = IconButtonDefaults.shapes(
                         shape = IconButtonDefaults.smallSquareShape,
                     )
@@ -97,9 +99,7 @@ fun MonthlyExpensesChartCard(
                         onToday()
                         resetBarChart = !resetBarChart
                     },
-                    shapes = ButtonDefaults.shapes(
-                        pressedShape = ButtonDefaults.squareShape
-                    )
+                    shapes = ButtonDefaults.shapes()
                 ) {
                     Icon(
                         painterResource(id = R.drawable.ic_today_filled),

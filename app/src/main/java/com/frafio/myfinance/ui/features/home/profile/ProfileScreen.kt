@@ -1,5 +1,8 @@
 package com.frafio.myfinance.ui.features.home.profile
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,9 +17,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
@@ -28,6 +36,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,7 +62,8 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
-    onEditProfileClick: () -> Unit,
+    onUploadProPic: () -> Unit,
+    onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -76,7 +88,8 @@ fun ProfileScreen(
                 isDynamicColorAvailable = viewModel.isDynamicColorAvailable,
                 isDynamicColorChecked = isDynamicColorChecked,
                 scrollState = scrollState,
-                onEditProfileClick = onEditProfileClick,
+                onUploadProPic = onUploadProPic,
+                onEditFullName = onEditFullName,
                 onDynamicColorChanged = onDynamicColorChanged
             )
         } else {
@@ -87,7 +100,8 @@ fun ProfileScreen(
                 isDynamicColorAvailable = viewModel.isDynamicColorAvailable,
                 isDynamicColorChecked = isDynamicColorChecked,
                 scrollState = scrollState,
-                onEditProfileClick = onEditProfileClick,
+                onUploadProPic = onUploadProPic,
+                onEditFullName = onEditFullName,
                 onDynamicColorChanged = onDynamicColorChanged
             )
         }
@@ -102,7 +116,8 @@ private fun ProfileContentPortrait(
     isDynamicColorAvailable: Boolean,
     isDynamicColorChecked: Boolean,
     scrollState: ScrollState,
-    onEditProfileClick: () -> Unit,
+    onUploadProPic: () -> Unit,
+    onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit
 ) {
     Column(
@@ -123,7 +138,8 @@ private fun ProfileContentPortrait(
             versionName = versionName,
             isDynamicColorAvailable = isDynamicColorAvailable,
             isDynamicColorChecked = isDynamicColorChecked,
-            onEditProfileClick = onEditProfileClick,
+            onUploadProPic = onUploadProPic,
+            onEditFullName = onEditFullName,
             onDynamicColorChanged = onDynamicColorChanged
         )
     }
@@ -137,7 +153,8 @@ private fun ProfileContentLandscape(
     isDynamicColorAvailable: Boolean,
     isDynamicColorChecked: Boolean,
     scrollState: ScrollState,
-    onEditProfileClick: () -> Unit,
+    onUploadProPic: () -> Unit,
+    onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit
 ) {
     Row(modifier = Modifier.fillMaxSize()) {
@@ -164,7 +181,8 @@ private fun ProfileContentLandscape(
                 versionName = versionName,
                 isDynamicColorAvailable = isDynamicColorAvailable,
                 isDynamicColorChecked = isDynamicColorChecked,
-                onEditProfileClick = onEditProfileClick,
+                onUploadProPic = onUploadProPic,
+                onEditFullName = onEditFullName,
                 onDynamicColorChanged = onDynamicColorChanged
             )
         }
@@ -213,7 +231,8 @@ private fun ProfileCards(
     versionName: String,
     isDynamicColorAvailable: Boolean,
     isDynamicColorChecked: Boolean,
-    onEditProfileClick: () -> Unit,
+    onUploadProPic: () -> Unit,
+    onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit
 ) {
     val colors = ListItemDefaults.colors(
@@ -230,12 +249,14 @@ private fun ProfileCards(
         color = MaterialTheme.colorScheme.onSurface
     )
 
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
     SegmentedListItem(
-        onClick = onEditProfileClick,
+        onClick = { expanded = !expanded },
         colors = colors,
         shapes = ListItemDefaults.segmentedShapes(
             index = 0,
-            count = if (googleSignIn) 3 else 2,
+            count = if (expanded || googleSignIn) 3 else 2,
             defaultShapes = ListItemDefaults.shapes()
         ),
         leadingContent = {
@@ -262,18 +283,137 @@ private fun ProfileCards(
             )
         },
         trailingContent = {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_drop_down_filled),
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface
-            )
+            Box(
+                modifier = Modifier
+                    .width(32.dp)
+                    .height(40.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (expanded)
+                            MaterialTheme.colorScheme.surface
+                        else
+                            MaterialTheme.colorScheme.surfaceContainer
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                    contentDescription = null,
+                )
+            }
         },
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .padding(bottom = 2.dp),
     )
+    AnimatedVisibility(
+        visible = expanded,
+        enter = expandVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
+        exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
+    ) {
+        Column {
+            SegmentedListItem(
+                onClick = onUploadProPic,
+                colors = colors,
+                shapes = ListItemDefaults.segmentedShapes(
+                    index = 1,
+                    count = 3,
+                    defaultShapes = ListItemDefaults.shapes()
+                ),
+                leadingContent = {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.secondaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_upload_filled),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                },
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.edit_propic),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                trailingContent = {
+                    Box(
+                        modifier = Modifier
+                            .width(32.dp)
+                            .height(40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.ChevronRight,
+                            contentDescription = null,
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 2.dp),
+            )
+
+            SegmentedListItem(
+                onClick = onEditFullName,
+                colors = colors,
+                shapes = ListItemDefaults.segmentedShapes(
+                    index = 2,
+                    count = 3,
+                    defaultShapes = ListItemDefaults.shapes()
+                ),
+                leadingContent = {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.secondaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_edit_filled),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                },
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.edit_full_name),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                trailingContent = {
+                    Box(
+                        modifier = Modifier
+                            .width(32.dp)
+                            .height(40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.ChevronRight,
+                            contentDescription = null,
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
+            )
+        }
+    }
 
     // Provider Card
     if (googleSignIn) {
@@ -281,8 +421,8 @@ private fun ProfileCards(
             onClick = {},
             colors = colors,
             shapes = ListItemDefaults.segmentedShapes(
-                index = 1,
-                count = 3,
+                index = if (expanded) 0 else 1,
+                count = if (expanded) 2 else 3,
                 defaultShapes = ListItemDefaults.shapes()
             ),
             leadingContent = {
@@ -315,14 +455,23 @@ private fun ProfileCards(
         )
     }
 
+    val itemCount = (if (expanded) 2 else 3) - (if (googleSignIn) 0 else 1)
+    val itemIndex = itemCount - 1
+
     SegmentedListItem(
         onClick = {},
         colors = colors,
-        shapes = ListItemDefaults.segmentedShapes(
-            index = if (googleSignIn) 2 else 1,
-            count = if (googleSignIn) 3 else 2,
-            defaultShapes = ListItemDefaults.shapes()
-        ),
+        shapes = if (itemIndex == 0 && itemCount == 1) {
+            ListItemDefaults.shapes(
+                shape = ListItemDefaults.shapes().selectedShape
+            )
+        } else {
+            ListItemDefaults.segmentedShapes(
+                index = itemIndex,
+                count = itemCount,
+                defaultShapes = ListItemDefaults.shapes()
+            )
+        },
         leadingContent = {
             Box(
                 modifier = Modifier
@@ -473,7 +622,8 @@ fun ProfilePortraitPreview() {
             isDynamicColorAvailable = true,
             isDynamicColorChecked = false,
             scrollState = rememberScrollState(),
-            onEditProfileClick = {},
+            onUploadProPic = {},
+            onEditFullName =  {},
             onDynamicColorChanged = {}
         )
     }
@@ -497,7 +647,8 @@ fun ProfileLandscapePreview() {
             isDynamicColorAvailable = true,
             isDynamicColorChecked = true,
             scrollState = rememberScrollState(),
-            onEditProfileClick = {},
+            onUploadProPic = {},
+            onEditFullName =  {},
             onDynamicColorChanged = {}
         )
     }

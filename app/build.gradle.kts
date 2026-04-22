@@ -19,7 +19,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 4
-        versionName = "4.8.10"
+        versionName = "4.8.11"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
+    implementation(libs.material.icons.extended)
 
     // SplashScreen API
     implementation(libs.androidx.core.splashscreen)

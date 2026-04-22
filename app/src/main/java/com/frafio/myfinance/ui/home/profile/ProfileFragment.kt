@@ -14,7 +14,6 @@ import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.features.home.profile.EditFullNameSheet
-import com.frafio.myfinance.ui.features.home.profile.EditProfileSheet
 import com.frafio.myfinance.ui.features.home.profile.ProfileScreen
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
@@ -38,7 +37,20 @@ class ProfileFragment : BaseFragment(), ProfileListener {
                 MyFinanceTheme {
                     ProfileScreen(
                         viewModel = viewModel,
-                        onEditProfileClick = { showEditProfileSheet() },
+                        onUploadProPic = {
+                            (activity as HomeActivity).showSnackBar(getString(R.string.coming_soon))
+                        },
+                        onEditFullName = {
+                            val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+                                SideSheetDialog(requireContext())
+                            } else {
+                                BottomSheetDialog(requireContext())
+                            }
+                            val composeView =
+                                getEditFullNameSheetDialogComposeView(sheetDialog::hide)
+                            sheetDialog.setContentView(composeView)
+                            sheetDialog.show()
+                        },
                         onDynamicColorChanged = { isChecked ->
                             viewModel.setDynamicColor(isChecked)
                             (activity as HomeActivity).showSnackBar(
@@ -52,45 +64,6 @@ class ProfileFragment : BaseFragment(), ProfileListener {
                                     Runtime.getRuntime().exit(0)
                                 }
                             }
-                        }
-                    )
-                }
-            }
-        }
-    }
-
-    private fun showEditProfileSheet() {
-        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-            SideSheetDialog(requireContext())
-        } else {
-            BottomSheetDialog(requireContext())
-        }
-        val composeView = getEditProfileSheetDialogComposeView(sheetDialog::hide)
-        sheetDialog.setContentView(composeView)
-        sheetDialog.show()
-    }
-
-    private fun getEditProfileSheetDialogComposeView(onDismiss: () -> Unit): ComposeView {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MyFinanceTheme {
-                    EditProfileSheet(
-                        onDismiss = onDismiss,
-                        onUploadProPic = {
-                            (activity as HomeActivity).showSnackBar(getString(R.string.coming_soon))
-                        },
-                        onEditFullName = {
-                            val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-                                SideSheetDialog(requireContext())
-                            } else {
-                                BottomSheetDialog(requireContext())
-                            }
-                            val composeView =
-                                getEditFullNameSheetDialogComposeView(sheetDialog::hide)
-                            sheetDialog.setContentView(composeView)
-                            onDismiss()
-                            sheetDialog.show()
                         }
                     )
                 }
