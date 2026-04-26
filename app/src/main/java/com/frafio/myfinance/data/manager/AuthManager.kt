@@ -232,6 +232,7 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
         }
         setSharedMonthlyBudget(sharedPreferences, 0.0)
         MyFinanceStorage.resetBudget()
+        MyFinanceStorage.resetLabels()
         MyFinanceStorage.resetUser()
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
