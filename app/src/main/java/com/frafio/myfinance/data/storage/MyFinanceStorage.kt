@@ -15,6 +15,10 @@ object MyFinanceStorage {
     val monthlyBudget: LiveData<Double>
         get() = _monthlyBudget
 
+    private val _labels = MutableLiveData<List<String>>()
+    val labels: LiveData<List<String>>
+        get() = _labels
+
     fun updateUser(fUser: FirebaseUser) {
         var userPic = ""
         fUser.providerId
@@ -50,5 +54,13 @@ object MyFinanceStorage {
 
     fun updateBudget(value: Double) {
         _monthlyBudget.value = value
+    }
+
+    fun resetLabels() {
+        _labels.value = emptyList()
+    }
+
+    fun updateLabels(value: List<String>) {
+        _labels.value = value
     }
 }

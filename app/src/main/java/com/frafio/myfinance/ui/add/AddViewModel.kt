@@ -29,6 +29,9 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
     var priceString: String? = null
     var category: Int? = null
 
+    // TODO modify in AddActivity
+    var labels: List<String> = emptyList()
+
     var dateString: String? = null
 
     var year: Int? = LocalDate.now().year
@@ -118,6 +121,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                         day,
                         dateToUTCTimestamp(year!!, month!!, day!!),
                         category,
+                        labels,
                         expenseId!!
                     )
                     expensesRepository.editExpense(expense)
@@ -130,6 +134,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                         day,
                         dateToUTCTimestamp(year!!, month!!, day!!),
                         category,
+                        labels,
                         expenseId!!
                     )
                     incomeRepository.editIncome(income)

@@ -25,7 +25,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.ui.components.EmptyView
-import com.frafio.myfinance.ui.components.JollyListItem
+import com.frafio.myfinance.ui.components.EmptyListItem
 import com.frafio.myfinance.ui.components.SearchBar
 import com.frafio.myfinance.ui.components.TotalItem
 import com.frafio.myfinance.ui.components.TransactionListItem
@@ -192,11 +192,11 @@ fun ExpensesList(
         ) { index, expense ->
             when (expense.category) {
                 FirestoreEnums.CATEGORIES.TOTAL.value -> {
-                    TotalItem(expense)
+                    TotalItem(transaction = expense)
                 }
 
                 FirestoreEnums.CATEGORIES.JOLLY.value -> {
-                    JollyListItem(messageRes = R.string.no_expenses)
+                    EmptyListItem(messageRes = R.string.no_expenses)
                 }
 
                 else -> {

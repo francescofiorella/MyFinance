@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.Income
-import com.frafio.myfinance.ui.components.JollyListItem
+import com.frafio.myfinance.ui.components.EmptyListItem
 import com.frafio.myfinance.ui.components.TotalItem
 import com.frafio.myfinance.ui.components.TransactionListItem
 import com.frafio.myfinance.ui.home.budget.BudgetViewModel
@@ -284,11 +284,11 @@ fun IncomeList(
             ) { index, income ->
                 when (income.category) {
                     FirestoreEnums.CATEGORIES.TOTAL.value -> {
-                        TotalItem(income)
+                        TotalItem(transaction = income)
                     }
 
                     FirestoreEnums.CATEGORIES.JOLLY.value -> {
-                        JollyListItem(messageRes = R.string.no_incomes)
+                        EmptyListItem(messageRes = R.string.no_incomes)
                     }
 
                     else -> {

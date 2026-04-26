@@ -22,7 +22,8 @@ data class Expense(
     override val day: Int? = null,
     override var timestamp: Long? = null,
     override val category: Int? = null,
-    @PrimaryKey @get:Exclude override var id: String = "$name$price$timestamp$category"
+    override val labels: List<String> = emptyList(),
+    @PrimaryKey @get:Exclude override var id: String = "$name$price$timestamp$category$labels"
 ) : Transaction {
     @Exclude
     fun getTotalId(): String {

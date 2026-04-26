@@ -20,6 +20,9 @@
     <string name="amount">Amount</string>
     <string name="date">Date</string>
     <string name="category">Category</string>
+    <string name="labels">Labels</string>
+    <string name="label">Label</string>
+    <string name="create_label">Create new label</string>
 
     <string name="login_signup_email">Enter your email</string>
     <string name="login_password">Enter your password</string>

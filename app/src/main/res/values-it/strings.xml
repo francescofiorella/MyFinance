@@ -20,6 +20,9 @@
     <string name="amount">Importo</string>
     <string name="date">Data</string>
     <string name="category">Categoria</string>
+    <string name="labels">Etichette</string>
+    <string name="label">Etichetta</string>
+    <string name="create_label">Crea nuova etichetta</string>
 
     <string name="login_signup_email">Inserisci la tua email</string>
     <string name="login_password">Inserisci la tua password</string>

@@ -10,6 +10,7 @@ import com.frafio.myfinance.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.repository.ExpensesRepository
+import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.utils.addTotalsToExpenses
 import com.frafio.myfinance.utils.addTotalsToExpensesWithoutToday
 import com.frafio.myfinance.utils.dateToUTCTimestamp
@@ -51,6 +52,10 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
 
     private val _scrollToId = MutableSharedFlow<String?>(replay = 1)
     val scrollToId = _scrollToId.asSharedFlow()
+
+    val labels: StateFlow<List<String>> = MyFinanceStorage.labels.asFlow()
+        .map { it.sorted() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val isExpensesEmpty: StateFlow<Boolean?> = expensesLocalRepository.getCount().asFlow()
         .map { it == 0 }
@@ -170,6 +175,38 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
         val updated = expense.copy(
             timestamp = dateToUTCTimestamp(expense.year!!, expense.month!!, expense.day!!),
             category = newCategory
+        )
+        val response = expensesRepository.editExpense(updated)
+        listener?.onCompleted(response)
+    }
+
+    fun addLabel(label: String) {
+        val currentLabels = labels.value
+
+        if (currentLabels.contains(label)) return
+
+        val response = expensesRepository.setLabels(currentLabels + label)
+        listener?.onCompleted(response)
+    }
+
+    fun addLabelToExpense(expense: Expense, label: String) {
+        if (expense.labels.contains(label)) return
+        val labels = expense.labels.toMutableList()
+        labels.add(label)
+        val updated = expense.copy(
+            timestamp = dateToUTCTimestamp(expense.year!!, expense.month!!, expense.day!!),
+            labels = labels
+        )
+        val response = expensesRepository.editExpense(updated)
+        listener?.onCompleted(response)
+    }
+
+    fun removeLabelFromExpense(expense: Expense, label: String) {
+        val labels = expense.labels.toMutableList()
+        if (!labels.remove(label)) return
+        val updated = expense.copy(
+            timestamp = dateToUTCTimestamp(expense.year!!, expense.month!!, expense.day!!),
+            labels = labels
         )
         val response = expensesRepository.editExpense(updated)
         listener?.onCompleted(response)

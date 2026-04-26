@@ -18,7 +18,7 @@ import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.getCategoryIcon
 
 @Composable
-fun CategorySheetDialog(
+fun CategorySheet(
     modifier: Modifier = Modifier,
     expense: Expense? = null,
     disabledCategories: List<Int> = listOf(),
@@ -117,9 +117,9 @@ fun CategorySheetDialog(
 
 @Preview(showBackground = true)
 @Composable
-fun CategorySheetDialogPreview() {
+fun CategorySheetPreview() {
     MyFinanceTheme {
-        CategorySheetDialog(
+        CategorySheet(
             disabledCategories = listOf(
                 FirestoreEnums.CATEGORIES.ENTERTAINMENT.value,
                 FirestoreEnums.CATEGORIES.MISCELLANEOUS.value
@@ -133,9 +133,9 @@ fun CategorySheetDialogPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExpenseCategorySheetDialogPreview() {
+fun ExpenseCategorySheetPreview() {
     MyFinanceTheme {
-        CategorySheetDialog(
+        CategorySheet(
             expense = Expense(
                 name = "Expense",
                 price = 0.0,

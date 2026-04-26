@@ -4,16 +4,24 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.frafio.myfinance.data.converters.Converters
 import com.frafio.myfinance.data.dao.IncomeDao
 import com.frafio.myfinance.data.dao.ExpenseDao
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.model.Expense
 
+/**
+ * DB Versions:
+ * 1 - Initial version
+ * 2 - "labels" attribute added to Expense and Income
+ */
 @Database(
     entities = [Expense::class, Income::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class MyFinanceDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
     abstract fun incomeDao(): IncomeDao
@@ -29,8 +37,9 @@ abstract class MyFinanceDatabase : RoomDatabase() {
                     MyFinanceDatabase::class.java,
                     "myFinanceLocal"
                 )
-                    //.allowMainThreadQueries()
-                    .createFromAsset("database/myFinanceDatabase.db").build()
+                    .fallbackToDestructiveMigration(true)
+                    .createFromAsset("database/myFinanceDatabase.db")
+                    .build()
                 INSTANCE = i
                 INSTANCE
             })!!

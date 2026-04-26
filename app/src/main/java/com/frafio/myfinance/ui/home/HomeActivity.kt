@@ -157,7 +157,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 viewModel.updateUserExpenses()
                 viewModel.updateUserIncomes()
                 viewModel.updateMonthlyBudget()
+                viewModel.updateLabels()
                 viewModel.updateLocalMonthlyBudget()
+                viewModel.updateLocalLabels()
                 initFragments()
                 intent.extras?.getString(AuthActivity.INTENT_USER_NAME).also { userName ->
                     showSnackBar("${getString(R.string.login_successful)} $userName")
@@ -398,7 +400,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     viewModel.updateUserExpenses()
                     viewModel.updateUserIncomes()
                     viewModel.updateMonthlyBudget()
+                    viewModel.updateLabels()
                     viewModel.updateLocalMonthlyBudget()
+                    viewModel.updateLocalLabels()
                     initFragments()
                     if (userRequest) {
                         hideProgressIndicator()

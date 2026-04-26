@@ -41,4 +41,16 @@ class ExpensesRepository(private val expensesManager: ExpensesManager) {
     fun updateLocalMonthlyBudget() {
         expensesManager.updateLocalMonthlyBudget()
     }
+
+    fun getLabels(): LiveData<FinanceResult> {
+        return expensesManager.getLabels()
+    }
+
+    fun setLabels(labels: List<String>): LiveData<FinanceResult> {
+        return expensesManager.setLabels(labels)
+    }
+
+    fun updateLocalLabels() {
+        expensesManager.updateLocalLabels()
+    }
 }

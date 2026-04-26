@@ -15,6 +15,7 @@ object FirestoreEnums {
         TIMESTAMP("timestamp"),
         PRICE("price"),
         CATEGORY("category"),
+        LABELS("labels"),
         ID("id")
     }
 

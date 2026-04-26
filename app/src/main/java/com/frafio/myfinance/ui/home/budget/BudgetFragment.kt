@@ -141,6 +141,7 @@ class BudgetFragment : BaseFragment(), BudgetListener {
                     EditTransactionSheet(
                         transaction = income,
                         onDismiss = onDismiss,
+                        onLabels = {},
                         onEdit = {
                             Intent(context, AddActivity::class.java).also {
                                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)

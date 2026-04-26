@@ -20,12 +20,13 @@ import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.widget.DatePickerRangeDialog
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
-import com.frafio.myfinance.ui.features.home.expenses.CategorySheetDialog
+import com.frafio.myfinance.ui.features.home.expenses.CategorySheet
 import com.frafio.myfinance.ui.components.EditTransactionSheet
 import com.frafio.myfinance.ui.features.home.expenses.ExpensesScreen
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.ui.features.home.expenses.FilterExpensesSheet
+import com.frafio.myfinance.ui.features.home.expenses.LabelsSheet
 import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -158,6 +159,27 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
         sheetDialog.show()
     }
 
+    private fun showLabelsSheet(expense: Expense) {
+        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+            SideSheetDialog(requireContext())
+        } else {
+            BottomSheetDialog(requireContext())
+        }
+        val composeView = getLabelsSheetDialogComposeView(
+            expenseId = expense.id,
+            onNewLabel = viewModel::addLabel,
+            onLabelCheckedChanged = { updatedExpense, label, checked ->
+                if (checked) {
+                    viewModel.addLabelToExpense(updatedExpense, label)
+                } else {
+                    viewModel.removeLabelFromExpense(updatedExpense, label)
+                }
+            }
+        )
+        sheetDialog.setContentView(composeView)
+        sheetDialog.show()
+    }
+
     private fun getDateChipLabel(startDate: LocalDate, endDate: LocalDate): String {
         return when (startDate.year) {
             endDate.year if startDate.monthValue == endDate.monthValue -> {
@@ -218,6 +240,7 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                     EditTransactionSheet(
                         transaction = expense,
                         onDismiss = onDismiss,
+                        onLabels = { showLabelsSheet(expense) },
                         onEdit = {
                             Intent(context, AddActivity::class.java).also {
                                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
@@ -294,11 +317,36 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MyFinanceTheme {
-                    CategorySheetDialog(
+                    CategorySheet(
                         expense = expense,
                         disabledCategories = disabledCategories,
                         onCategorySelected = onCategorySelected,
                         onDismiss = onDismiss
+                    )
+                }
+            }
+        }
+    }
+
+    private fun getLabelsSheetDialogComposeView(
+        expenseId: String,
+        onNewLabel: (String) -> Unit,
+        onLabelCheckedChanged: (Expense, String, Boolean) -> Unit
+    ): ComposeView {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    val labels by viewModel.labels.collectAsState()
+                    val expenses by viewModel.expenses.collectAsState()
+                    val currentExpense = expenses.find { it.id == expenseId }
+                    LabelsSheet(
+                        expense = currentExpense,
+                        labels = labels,
+                        onNewLabel = onNewLabel,
+                        onLabelCheckedChanged = { label, checked ->
+                            currentExpense?.let { onLabelCheckedChanged(it, label, checked) }
+                        },
                     )
                 }
             }

@@ -1,13 +1,18 @@
 package com.frafio.myfinance.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -36,8 +41,8 @@ import com.frafio.myfinance.utils.getCategoryName
 
 @Composable
 fun TotalItem(
-    transaction: Transaction,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    transaction: Transaction
 ) {
     Row(
         modifier = modifier
@@ -46,7 +51,7 @@ fun TotalItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = if (transaction.category == FirestoreEnums.CATEGORIES.TOTAL.value && transaction.month == 0) {
+            text = if (transaction is Income) {
                 transaction.year.toString()
             } else {
                 transaction.getDateString(extended = true)
@@ -70,12 +75,12 @@ fun TotalItem(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TransactionListItem(
+    modifier: Modifier = Modifier,
     transaction: Transaction,
     indexInGroup: Int,
     countInGroup: Int,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    modifier: Modifier = Modifier,
     onIconClick: (() -> Unit) = { }
 ) {
     val colors = ListItemDefaults.colors(
@@ -137,17 +142,44 @@ fun TransactionListItem(
             )
         },
         supportingContent = {
-            val supportingText = if (transaction is Income) {
-                transaction.getDateString(extended = false)
-            } else {
-                stringResource(getCategoryName(transaction.category))
+            Column {
+                val supportingText = if (transaction is Income) {
+                    transaction.getDateString(extended = false)
+                } else {
+                    stringResource(getCategoryName(transaction.category))
+                }
+                Text(
+                    text = supportingText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1
+                )
+                if (transaction is Expense && transaction.labels.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .padding(top = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        transaction.labels.forEach { label ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(AssistChipDefaults.shape)
+                                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    text = label,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                )
+                            }
+                        }
+                    }
+                }
             }
-            Text(
-                text = supportingText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1
-            )
         },
         trailingContent = {
             Text(
@@ -169,7 +201,7 @@ fun TransactionListItem(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun JollyListItem(
+fun EmptyListItem(
     messageRes: Int,
     modifier: Modifier = Modifier
 ) {
@@ -199,66 +231,93 @@ fun JollyListItem(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewTotalItem() {
+fun PreviewExpenseListItems() {
     MyFinanceTheme {
-        TotalItem(
-            transaction = Income(
-                year = 2024,
-                month = 0,
-                category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                price = 1200.0
+        Column(modifier = Modifier.padding(bottom = 16.dp)) {
+            TotalItem(
+                transaction = Expense(
+                    day = 2,
+                    month = 1,
+                    year = 2024,
+                    category = FirestoreEnums.CATEGORIES.TOTAL.value,
+                    price = 0.0
+                )
             )
-        )
+            EmptyListItem(messageRes = R.string.no_expenses)
+            TotalItem(
+                transaction = Expense(
+                    day = 1,
+                    month = 1,
+                    year = 2024,
+                    category = FirestoreEnums.CATEGORIES.TOTAL.value,
+                    price = 15.0
+                )
+            )
+            TransactionListItem(
+                transaction = Expense(
+                    name = "Pizza",
+                    price = 13.0,
+                    category = FirestoreEnums.CATEGORIES.DINING.value,
+                    day = 1,
+                    month = 1,
+                    year = 2024,
+                    labels = listOf("Dinner", "Cheat Meal")
+                ),
+                indexInGroup = 0,
+                countInGroup = 2,
+                onClick = {},
+                onLongClick = {},
+                onIconClick = {}
+            )
+            TransactionListItem(
+                transaction = Expense(
+                    name = "Cola",
+                    price = 2.0,
+                    category = FirestoreEnums.CATEGORIES.DINING.value,
+                    day = 1,
+                    month = 1,
+                    year = 2024,
+                    labels = emptyList()
+                ),
+                indexInGroup = 1,
+                countInGroup = 2,
+                onClick = {},
+                onLongClick = {},
+                onIconClick = {}
+            )
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewExpenseListItem() {
+fun PreviewIncomeListItems() {
     MyFinanceTheme {
-        TransactionListItem(
-            transaction = Expense(
-                name = "Pizza",
-                price = 15.0,
-                category = 1,
-                day = 1,
-                month = 1,
-                year = 2024
-            ),
-            indexInGroup = 0,
-            countInGroup = 1,
-            onClick = {},
-            onLongClick = {},
-            onIconClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewIncomeListItem() {
-    MyFinanceTheme {
-        TransactionListItem(
-            transaction = Income(
-                name = "Salary",
-                price = 2500.0,
-                category = 0,
-                day = 1,
-                month = 1,
-                year = 2024
-            ),
-            indexInGroup = 0,
-            countInGroup = 1,
-            onClick = {},
-            onLongClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewJollyListItem() {
-    MyFinanceTheme {
-        JollyListItem(messageRes = R.string.no_expenses)
+        Column(modifier = Modifier.padding(bottom = 16.dp)) {
+            TotalItem(
+                transaction = Income(
+                    year = 2024,
+                    month = 1,
+                    day = 1,
+                    category = FirestoreEnums.CATEGORIES.TOTAL.value,
+                    price = 2500.0
+                )
+            )
+            TransactionListItem(
+                transaction = Income(
+                    name = "Salary",
+                    price = 2500.0,
+                    category = FirestoreEnums.CATEGORIES.INCOME.value,
+                    day = 1,
+                    month = 1,
+                    year = 2024,
+                    labels = emptyList()
+                ),
+                indexInGroup = 0,
+                countInGroup = 1,
+                onClick = {},
+                onLongClick = {}
+            )
+        }
     }
 }

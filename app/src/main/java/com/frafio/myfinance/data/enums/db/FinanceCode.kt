@@ -185,5 +185,21 @@ enum class FinanceCode(val code: Int, val message: String) {
             Languages.ITALIANO.value -> "Budget non aggiornato"
             else -> "Budget not updated!" // english
         }
+    ),
+
+    LABELS_UPDATE_SUCCESS(
+        40, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Labels updated!"
+            Languages.ITALIANO.value -> "Etichette aggiornate"
+            else -> "Labels updated!" // english
+        }
+    ),
+
+    LABELS_UPDATE_FAILURE(
+        41, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Labels not updated!"
+            Languages.ITALIANO.value -> "Etichette non aggiornate"
+            else -> "Labels not updated!" // english
+        }
     )
 }

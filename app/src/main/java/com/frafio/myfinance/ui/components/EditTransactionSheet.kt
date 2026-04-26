@@ -16,10 +16,34 @@ import com.frafio.myfinance.utils.getCategoryIcon
 fun EditTransactionSheet(
     transaction: Transaction,
     onDismiss: () -> Unit,
+    onLabels: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val items = mutableListOf(
+        MenuItem(
+            iconRes = R.drawable.ic_edit_outline,
+            textRes = R.string.edit,
+            onClick = onEdit
+        ),
+        MenuItem(
+            iconRes = R.drawable.ic_delete_outline,
+            textRes = R.string.delete,
+            onClick = onDelete
+        )
+    )
+    if (transaction is Expense) {
+        items.add(
+            0,
+            MenuItem(
+                iconRes = R.drawable.ic_sell_outline,
+                textRes = R.string.labels,
+                onClick = onLabels
+            )
+        )
+    }
+
     ListSheetDialog(
         icon = if (transaction is Expense) {
             getCategoryIcon(transaction.category ?: 0)
@@ -31,18 +55,7 @@ fun EditTransactionSheet(
         labelFirst = false,
         endContent = transaction.getPriceString(),
         onDismiss = onDismiss,
-        items = listOf(
-            MenuItem(
-                iconRes = R.drawable.ic_edit_outline,
-                textRes = R.string.edit,
-                onClick = onEdit
-            ),
-            MenuItem(
-                iconRes = R.drawable.ic_delete_outline,
-                textRes = R.string.delete,
-                onClick = onDelete
-            )
-        ),
+        items = items,
         modifier = modifier
     )
 }
@@ -60,6 +73,7 @@ fun EditTransactionSheetPreview() {
                 day = 1
             ),
             onDismiss = {},
+            onLabels = {},
             onEdit = {},
             onDelete = {},
             modifier = Modifier

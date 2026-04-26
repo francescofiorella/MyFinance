@@ -55,4 +55,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun updateLocalMonthlyBudget() {
         expensesRepository.updateLocalMonthlyBudget()
     }
+
+    fun updateLabels() {
+        val response = expensesRepository.getLabels()
+        listener?.onUserDataUpdated(response)
+    }
+
+    fun updateLocalLabels() {
+        expensesRepository.updateLocalLabels()
+    }
 }

@@ -20,6 +20,7 @@ class MyFinanceApplication : Application(), SingletonImageLoader.Factory {
         const val PREFERENCES_KEY = "SHARED_PREFERENCES"
         const val DYNAMIC_COLOR_KEY = "DYNAMIC_COLOR_OPTIONS"
         const val MONTHLY_BUDGET_KEY = "MONTHLY_BUDGET_KEY"
+        const val LABELS_KEY = "LABELS_KEY"
     }
 
     lateinit var sharedPreferences: SharedPreferences

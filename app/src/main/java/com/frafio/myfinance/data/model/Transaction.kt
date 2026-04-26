@@ -10,6 +10,7 @@ interface Transaction {
     val day: Int?
     var timestamp: Long?
     val category: Int?
+    val labels: List<String>
     val id: String
 
     fun getDateString(extended: Boolean = false): String

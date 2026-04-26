@@ -11,10 +11,13 @@ import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.utils.getSharedDynamicColor
+import com.frafio.myfinance.utils.getSharedLabels
 import com.frafio.myfinance.utils.getSharedMonthlyBudget
 import com.frafio.myfinance.utils.setSharedDynamicColor
+import com.frafio.myfinance.utils.setSharedLabels
 import com.frafio.myfinance.utils.setSharedMonthlyBudget
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,7 +54,7 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
         val response = MutableLiveData<FinanceResult>()
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(MyFinanceStorage.user!!.email!!)
-            .set(hashMapOf(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value to budget))
+            .set(hashMapOf(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value to budget), SetOptions.merge())
             .addOnSuccessListener {
                 setLocalMonthlyBudget(budget)
                 MyFinanceStorage.updateBudget(budget)
@@ -59,6 +62,40 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
             }
             .addOnFailureListener {
                 response.value = FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
+            }
+        return response
+    }
+
+    fun getLabels(): LiveData<FinanceResult> {
+        val response = MutableLiveData<FinanceResult>()
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+            .document(MyFinanceStorage.user!!.email!!).get()
+            .addOnSuccessListener {
+                val value = it.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
+                val labels = (value?.filterIsInstance<String>() ?: emptyList()).sorted()
+                setLocalLabels(labels)
+                MyFinanceStorage.updateLabels(labels)
+                response.value = FinanceResult(FinanceCode.LABELS_UPDATE_SUCCESS)
+            }
+            .addOnFailureListener {
+                response.value = FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
+            }
+        return response
+    }
+
+    fun setLabels(labels: List<String>): LiveData<FinanceResult> {
+        val response = MutableLiveData<FinanceResult>()
+        val sortedLabels = labels.sorted()
+        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+            .document(MyFinanceStorage.user!!.email!!)
+            .set(hashMapOf(FirestoreEnums.FIELDS.LABELS.value to sortedLabels), SetOptions.merge())
+            .addOnSuccessListener {
+                setLocalLabels(sortedLabels)
+                MyFinanceStorage.updateLabels(sortedLabels)
+                response.value = FinanceResult(FinanceCode.LABELS_UPDATE_SUCCESS)
+            }
+            .addOnFailureListener {
+                response.value = FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
             }
         return response
     }
@@ -165,5 +202,13 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
 
     fun updateLocalMonthlyBudget() {
         MyFinanceStorage.updateBudget(getSharedMonthlyBudget(sharedPreferences))
+    }
+
+    private fun setLocalLabels(value: List<String>) {
+        setSharedLabels(sharedPreferences, value)
+    }
+
+    fun updateLocalLabels() {
+        MyFinanceStorage.updateLabels(getSharedLabels(sharedPreferences))
     }
 }
