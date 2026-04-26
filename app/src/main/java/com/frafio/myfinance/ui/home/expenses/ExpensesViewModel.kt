@@ -16,6 +16,7 @@ import com.frafio.myfinance.utils.addTotalsToExpensesWithoutToday
 import com.frafio.myfinance.utils.dateToUTCTimestamp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -45,6 +46,9 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
     private val _selectedCategories = MutableStateFlow<List<Int>>(emptyList())
     val selectedCategories = _selectedCategories.asStateFlow()
 
+    private val _selectedLabels = MutableStateFlow<List<String>>(emptyList())
+    val selectedLabels = _selectedLabels.asStateFlow()
+
     private val _dateRange = MutableStateFlow<Pair<LocalDate, LocalDate>?>(null)
     val dateRange = _dateRange.asStateFlow()
 
@@ -62,14 +66,15 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val expenses: StateFlow<List<Expense>> = combine(
+    private val allFilteredExpenses: Flow<List<Expense>> = combine(
         _searchQuery,
         _selectedCategories,
+        _selectedLabels,
         _dateRange
-    ) { query, categories, dateRange ->
-        Triple(query, categories, dateRange)
-    }.flatMapLatest { (query, categories, dateRange) ->
-        val effectiveCategories = categories.ifEmpty {
+    ) { query, categories, labels, dateRange ->
+        FilterParams(query, categories, labels, dateRange)
+    }.flatMapLatest { params ->
+        val effectiveCategories = params.categories.ifEmpty {
             listOf(
                 FirestoreEnums.CATEGORIES.HOUSING.value,
                 FirestoreEnums.CATEGORIES.GROCERIES.value,
@@ -83,27 +88,47 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
             )
         }
 
-        if (dateRange == null) {
-            expensesLocalRepository.getWithFilter(query, effectiveCategories).asFlow()
+        val flow = if (params.dateRange == null) {
+            expensesLocalRepository.getWithFilter(params.query, effectiveCategories).asFlow()
         } else {
             expensesLocalRepository.getWithFilterDate(
-                query,
+                params.query,
                 effectiveCategories,
-                dateToUTCTimestamp(dateRange.first),
-                dateToUTCTimestamp(dateRange.second.plusDays(1))
+                dateToUTCTimestamp(params.dateRange.first),
+                dateToUTCTimestamp(params.dateRange.second.plusDays(1))
             ).asFlow()
         }
-    }.combine(_limit) { list, limit ->
-        list.take(limit.toInt())
-    }.map { limitedList ->
-        if (_searchQuery.value.isEmpty() && _selectedCategories.value.isEmpty() && _dateRange.value == null) {
-            addTotalsToExpenses(limitedList)
+
+        if (params.labels.isEmpty()) {
+            flow
         } else {
-            addTotalsToExpensesWithoutToday(limitedList)
+            flow.map { list ->
+                list.filter { expense ->
+                    expense.labels.any { it in params.labels }
+                }
+            }
         }
-    }.flowOn(Dispatchers.Default)
+    }
+
+    val expenses: StateFlow<List<Expense>> = allFilteredExpenses
+        .combine(_limit) { list, limit ->
+            list.take(limit.toInt())
+        }.map { limitedList ->
+            if (_searchQuery.value.isEmpty() && _selectedCategories.value.isEmpty() &&
+                _selectedLabels.value.isEmpty() && _dateRange.value == null
+            ) {
+                addTotalsToExpenses(limitedList)
+            } else {
+                addTotalsToExpensesWithoutToday(limitedList)
+            }
+        }.flowOn(Dispatchers.Default)
         .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val totalFilteredExpenses: StateFlow<Double> = allFilteredExpenses
+        .map { list -> list.sumOf { it.price ?: 0.0 } }
+        .flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
     val itemMetadata: StateFlow<Map<Int, Pair<Int, Int>>> = expenses
         .map { list ->
@@ -150,6 +175,18 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
             current.add(categoryId)
         }
         _selectedCategories.value = current
+    }
+
+    fun onLabelFilterChanged(label: String, active: Boolean) {
+        val current = _selectedLabels.value.toMutableList()
+        if (active) {
+            if (!current.contains(label)) {
+                current.add(label)
+            }
+        } else {
+            current.remove(label)
+        }
+        _selectedLabels.value = current
     }
 
     fun onDateFilterChanged(dateRange: Pair<LocalDate, LocalDate>?) {
@@ -217,3 +254,10 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
         listener?.onCompleted(response)
     }
 }
+
+private data class FilterParams(
+    val query: String,
+    val categories: List<Int>,
+    val labels: List<String>,
+    val dateRange: Pair<LocalDate, LocalDate>?
+)

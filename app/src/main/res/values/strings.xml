@@ -24,6 +24,9 @@
     <string name="label">Label</string>
     <string name="create_label">Create new label</string>
 
+    <string name="total_expenses">Total expenses</string>
+    <string name="on_filters">Based on filters</string>
+
     <string name="login_signup_email">Enter your email</string>
     <string name="login_password">Enter your password</string>
     <string name="login">Sign in</string>

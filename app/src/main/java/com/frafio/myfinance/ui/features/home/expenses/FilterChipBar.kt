@@ -2,11 +2,13 @@ package com.frafio.myfinance.ui.features.home.expenses
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
@@ -30,16 +32,25 @@ import java.time.LocalDate
 fun FilterChipBar(
     modifier: Modifier = Modifier,
     categories: List<Int>,
+    labels: List<String>,
     dateFilter: Pair<LocalDate, LocalDate>?,
     getDateLabel: (LocalDate, LocalDate) -> String,
     onCategoryRemoved: (Int) -> Unit,
+    onLabelRemoved: (String) -> Unit,
     onDateRemoved: () -> Unit
 ) {
-    FlowRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy((-8).dp)
+    Row(
+        modifier = modifier
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        labels.forEach { label ->
+            FilterInputChip(
+                text = label,
+                icon = R.drawable.ic_sell_filled,
+                onDismiss = { onLabelRemoved(label) }
+            )
+        }
         dateFilter?.let {
             FilterInputChip(
                 text = getDateLabel(it.first, it.second),
@@ -111,9 +122,11 @@ fun FilterChipBarPreview() {
                 FirestoreEnums.CATEGORIES.GROCERIES.value,
                 FirestoreEnums.CATEGORIES.PERSONAL_CARE.value
             ),
+            labels = listOf("Label 1", "Label 2"),
             dateFilter = Pair(LocalDate.now().minusDays(7), LocalDate.now()),
             getDateLabel = { _, _ -> "Last 7 days" },
             onCategoryRemoved = {},
+            onLabelRemoved = {},
             onDateRemoved = {}
         )
     }

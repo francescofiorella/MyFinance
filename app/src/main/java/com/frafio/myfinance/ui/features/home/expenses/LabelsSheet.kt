@@ -55,6 +55,7 @@ fun LabelsSheet(
     modifier: Modifier = Modifier,
     expense: Expense? = null,
     labels: List<String> = listOf(),
+    showNewLabel: Boolean = true,
     onNewLabel: (String) -> Unit,
     onLabelCheckedChanged: (String, Boolean) -> Unit
 ) {
@@ -94,78 +95,80 @@ fun LabelsSheet(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         )
         Column {
-            SegmentedListItem(
-                onClick = { },
-                colors = colors,
-                shapes = ListItemDefaults.shapes(
-                    shape = ListItemDefaults.shapes().selectedShape
-                ),
-                leadingContent = {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(MaterialShapes.Cookie12Sided.toShape())
-                            .background(MaterialTheme.colorScheme.secondaryContainer),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_add_filled),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+            if (showNewLabel) {
+                SegmentedListItem(
+                    onClick = { },
+                    colors = colors,
+                    shapes = ListItemDefaults.shapes(
+                        shape = ListItemDefaults.shapes().selectedShape
+                    ),
+                    leadingContent = {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(MaterialShapes.Cookie12Sided.toShape())
+                                .background(MaterialTheme.colorScheme.secondaryContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_add_filled),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    },
+                    content = {
+                        BasicTextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = labelFieldValue,
+                            onValueChange = { labelFieldValue = it },
+                            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Words,
+                                imeAction = ImeAction.Done,
+                                keyboardType = KeyboardType.Text
+                            ),
+                            keyboardActions = KeyboardActions(onDone = {
+                                if (isLabelValid) {
+                                    onNewLabel(labelFieldValue.text.trim())
+                                    labelFieldValue = TextFieldValue("")
+                                }
+                            }),
+                            decorationBox = { innerTextField ->
+                                if (labelFieldValue.text.isEmpty()) {
+                                    Text(
+                                        text = stringResource(id = R.string.create_label),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                innerTextField()
+                            }
                         )
-                    }
-                },
-                content = {
-                    BasicTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = labelFieldValue,
-                        onValueChange = { labelFieldValue = it },
-                        textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Words,
-                            imeAction = ImeAction.Done,
-                            keyboardType = KeyboardType.Text
-                        ),
-                        keyboardActions = KeyboardActions(onDone = {
-                            if (isLabelValid) {
+                    },
+                    trailingContent = {
+                        FilledIconButton(
+                            onClick = {
                                 onNewLabel(labelFieldValue.text.trim())
                                 labelFieldValue = TextFieldValue("")
-                            }
-                        }),
-                        decorationBox = { innerTextField ->
-                            if (labelFieldValue.text.isEmpty()) {
-                                Text(
-                                    text = stringResource(id = R.string.create_label),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            innerTextField()
+                            },
+                            enabled = isLabelValid,
+                            shapes = IconButtonDefaults.shapes(
+                                shape = IconButtonDefaults.smallSquareShape,
+                            )
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_check_filled),
+                                contentDescription = stringResource(id = R.string.confirm)
+                            )
                         }
-                    )
-                },
-                trailingContent = {
-                    FilledIconButton(
-                        onClick = {
-                            onNewLabel(labelFieldValue.text.trim())
-                            labelFieldValue = TextFieldValue("")
-                        },
-                        enabled = isLabelValid,
-                        shapes = IconButtonDefaults.shapes(
-                            shape = IconButtonDefaults.smallSquareShape,
-                        )
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_check_filled),
-                            contentDescription = stringResource(id = R.string.confirm)
-                        )
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 16.dp)
-            )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 16.dp)
+                )
+            }
             labels.forEachIndexed { index, label ->
                 var checked by remember(expense?.labels) {
                     mutableStateOf(
@@ -263,6 +266,7 @@ fun LabelsSheetPreview() {
                 "Travel",
                 "Dinner"
             ),
+            showNewLabel = true,
             onNewLabel = {},
             onLabelCheckedChanged = { _, _ -> }
         )

@@ -167,12 +167,15 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
         }
         val composeView = getLabelsSheetDialogComposeView(
             expenseId = expense.id,
+            showNewLabel = true,
             onNewLabel = viewModel::addLabel,
             onLabelCheckedChanged = { updatedExpense, label, checked ->
-                if (checked) {
-                    viewModel.addLabelToExpense(updatedExpense, label)
-                } else {
-                    viewModel.removeLabelFromExpense(updatedExpense, label)
+                updatedExpense?.let {
+                    if (checked) {
+                        viewModel.addLabelToExpense(it, label)
+                    } else {
+                        viewModel.removeLabelFromExpense(it, label)
+                    }
                 }
             }
         )
@@ -183,14 +186,20 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
     private fun getDateChipLabel(startDate: LocalDate, endDate: LocalDate): String {
         return when (startDate.year) {
             endDate.year if startDate.monthValue == endDate.monthValue -> {
-                val startDayOfMonth = if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+                val startDayOfMonth =
+                    if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
                 "$startDayOfMonth - ${dateToExtendedString(endDate)}"
             }
+
             endDate.year -> {
-                val startDayOfMonth = if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
-                val startMonth = startDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceFirstChar { it.uppercase() }
+                val startDayOfMonth =
+                    if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+                val startMonth =
+                    startDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                        .replaceFirstChar { it.uppercase() }
                 "$startDayOfMonth $startMonth - ${dateToExtendedString(endDate)}"
             }
+
             else -> "${dateToExtendedString(startDate)} - ${dateToExtendedString(endDate)}"
         }
     }
@@ -203,6 +212,7 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                 FinanceCode.EXPENSE_ADD_SUCCESS.code -> {
                     (activity as HomeActivity).showSnackBar(result.message)
                 }
+
                 else -> {
                     (activity as HomeActivity).showSnackBar(result.message)
                 }
@@ -243,8 +253,14 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                         onLabels = { showLabelsSheet(expense) },
                         onEdit = {
                             Intent(context, AddActivity::class.java).also {
-                                it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
-                                it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_EXPENSE_CODE)
+                                it.putExtra(
+                                    AddActivity.REQUEST_CODE_KEY,
+                                    AddActivity.REQUEST_EDIT_CODE
+                                )
+                                it.putExtra(
+                                    AddActivity.EXPENSE_REQUEST_KEY,
+                                    AddActivity.REQUEST_EXPENSE_CODE
+                                )
                                 it.putExtra(AddActivity.EXPENSE_ID_KEY, expense.id)
                                 it.putExtra(AddActivity.EXPENSE_NAME_KEY, expense.name)
                                 it.putExtra(AddActivity.EXPENSE_PRICE_KEY, expense.price)
@@ -279,6 +295,7 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                     FilterExpensesSheet(
                         onDismiss = onDismiss,
                         categoryEnabled = selectedCategories.size != 9,
+                        labelEnabled = true,
                         dateRangeEnabled = dateRange == null,
                         onSelectCategory = {
                             onDismiss()
@@ -292,6 +309,24 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                                 onDismiss = sheetDialog::hide,
                                 onCategorySelected = {
                                     viewModel.onCategoryFilterChanged(it)
+                                }
+                            )
+                            sheetDialog.setContentView(composeView)
+                            sheetDialog.show()
+                        },
+                        onSelectLabel = {
+                            onDismiss()
+                            val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
+                                SideSheetDialog(requireContext())
+                            } else {
+                                BottomSheetDialog(requireContext())
+                            }
+                            val composeView = getLabelsSheetDialogComposeView(
+                                expenseId = null,
+                                showNewLabel = false,
+                                onNewLabel = {},
+                                onLabelCheckedChanged = { _, label, active ->
+                                    viewModel.onLabelFilterChanged(label, active)
                                 }
                             )
                             sheetDialog.setContentView(composeView)
@@ -329,9 +364,10 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
     }
 
     private fun getLabelsSheetDialogComposeView(
-        expenseId: String,
+        expenseId: String?,
+        showNewLabel: Boolean,
         onNewLabel: (String) -> Unit,
-        onLabelCheckedChanged: (Expense, String, Boolean) -> Unit
+        onLabelCheckedChanged: (Expense?, String, Boolean) -> Unit
     ): ComposeView {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -339,13 +375,17 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                 MyFinanceTheme {
                     val labels by viewModel.labels.collectAsState()
                     val expenses by viewModel.expenses.collectAsState()
-                    val currentExpense = expenses.find { it.id == expenseId }
+                    val currentExpense = if (expenseId != null)
+                        expenses.find { it.id == expenseId }
+                    else
+                        null
                     LabelsSheet(
                         expense = currentExpense,
                         labels = labels,
+                        showNewLabel = showNewLabel,
                         onNewLabel = onNewLabel,
                         onLabelCheckedChanged = { label, checked ->
-                            currentExpense?.let { onLabelCheckedChanged(it, label, checked) }
+                            onLabelCheckedChanged(currentExpense, label, checked)
                         },
                     )
                 }

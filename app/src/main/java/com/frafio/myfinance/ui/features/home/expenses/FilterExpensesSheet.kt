@@ -15,8 +15,10 @@ import com.frafio.myfinance.ui.theme.MyFinanceTheme
 fun FilterExpensesSheet(
     onDismiss: () -> Unit,
     categoryEnabled: Boolean,
+    labelEnabled: Boolean,
     dateRangeEnabled: Boolean,
     onSelectCategory: () -> Unit,
+    onSelectLabel: () -> Unit,
     onSelectDateRange: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -31,6 +33,12 @@ fun FilterExpensesSheet(
                 textRes = R.string.category,
                 enabled = categoryEnabled,
                 onClick = onSelectCategory
+            ),
+            MenuItem(
+                iconRes = R.drawable.ic_sell_outline,
+                textRes = R.string.label,
+                enabled = labelEnabled,
+                onClick = onSelectLabel
             ),
             MenuItem(
                 iconRes = R.drawable.ic_today_outline,
@@ -50,8 +58,10 @@ fun FilterExpensesSheetPreview() {
         FilterExpensesSheet(
             onDismiss = {},
             onSelectCategory = {},
+            onSelectLabel = {},
             onSelectDateRange = {},
             categoryEnabled = false,
+            labelEnabled = true,
             dateRangeEnabled = true,
             modifier = Modifier
                 .background(color = MaterialTheme.colorScheme.surfaceContainerLow)

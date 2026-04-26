@@ -24,6 +24,9 @@
     <string name="label">Etichetta</string>
     <string name="create_label">Crea nuova etichetta</string>
 
+    <string name="total_expenses">Totale spese</string>
+    <string name="on_filters">In base ai filtri</string>
+
     <string name="login_signup_email">Inserisci la tua email</string>
     <string name="login_password">Inserisci la tua password</string>
     <string name="login">Accedi</string>

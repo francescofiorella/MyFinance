@@ -104,26 +104,48 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
         val response = MutableLiveData<FinanceResult>()
 
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(MyFinanceStorage.user!!.email!!)
-            .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
-            .get().addOnSuccessListener { queryDocumentSnapshots ->
-            val expenseList = mutableListOf<Expense>()
-            queryDocumentSnapshots.forEach { document ->
-                val expense = document.toObject(Expense::class.java)
-                // set id
-                expense.id = document.id
-                expenseList.add(expense)
-            }
-            CoroutineScope(Dispatchers.IO).launch {
-                expensesLocalRepository.updateTable(expenseList)
-            }
-            response.value = FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS)
-        }.addOnFailureListener { e ->
-            val error = "Error! ${e.localizedMessage}"
-            Log.e(TAG, error)
+            .document(MyFinanceStorage.user!!.email!!).get()
+            .addOnSuccessListener { documentSnapshot ->
+                val labelsValue = documentSnapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
+                val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()
+                setLocalLabels(labels)
+                MyFinanceStorage.updateLabels(labels)
 
-            response.value = FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_FAILURE)
-        }
+                fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                    .document(MyFinanceStorage.user!!.email!!)
+                    .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
+                    .get().addOnSuccessListener { queryDocumentSnapshots ->
+                        val expenseList = mutableListOf<Expense>()
+                        queryDocumentSnapshots.forEach { document ->
+                            var expense = document.toObject(Expense::class.java)
+                            expense.id = document.id
+                            val newLabels = expense.labels.toMutableList()
+                            for (label in expense.labels) {
+                                if (!labels.contains(label)) {
+                                    newLabels.remove(label)
+                                }
+                            }
+                            if (newLabels.size != expense.labels.size) {
+                                val updatedExpense = expense.copy(labels = newLabels)
+                                editExpense(updatedExpense)
+                                expense = updatedExpense
+                            }
+
+                            expenseList.add(expense)
+                        }
+                        CoroutineScope(Dispatchers.IO).launch {
+                            expensesLocalRepository.updateTable(expenseList)
+                        }
+                        response.value = FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS)
+                    }.addOnFailureListener { e ->
+                        val error = "Error! ${e.localizedMessage}"
+                        Log.e(TAG, error)
+                        response.value = FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_FAILURE)
+                    }
+            }.addOnFailureListener { e ->
+                Log.e(TAG, "Error fetching labels! ${e.localizedMessage}")
+                response.value = FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_FAILURE)
+            }
 
         return response
     }

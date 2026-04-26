@@ -29,7 +29,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
     var priceString: String? = null
     var category: Int? = null
 
-    // TODO modify in AddActivity
+    // TODO add labels in AddActivity
     var labels: List<String> = emptyList()
 
     var dateString: String? = null
