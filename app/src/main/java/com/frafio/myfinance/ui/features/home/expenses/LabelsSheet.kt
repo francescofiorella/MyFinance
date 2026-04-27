@@ -60,13 +60,7 @@ fun LabelsSheet(
     onLabelCheckedChanged: (String, Boolean) -> Unit
 ) {
 
-    var labelFieldValue by remember {
-        mutableStateOf(
-            TextFieldValue(
-                text = "",
-            )
-        )
-    }
+    var labelFieldValue by remember { mutableStateOf(TextFieldValue(text = "")) }
 
     val isLabelValid by remember(labelFieldValue.text) {
         derivedStateOf {

@@ -1,5 +1,8 @@
 package com.frafio.myfinance.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -18,10 +21,16 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
@@ -83,6 +93,11 @@ fun TransactionListItem(
     onLongClick: () -> Unit,
     onIconClick: (() -> Unit) = { }
 ) {
+    var labelsToDisplay by remember(transaction.id) { mutableStateOf(transaction.labels) }
+    if (transaction.labels.isNotEmpty()) {
+        labelsToDisplay = transaction.labels
+    }
+
     val colors = ListItemDefaults.colors(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     )
@@ -101,93 +116,107 @@ fun TransactionListItem(
             )
         },
         colors = colors,
-        leadingContent = {
-            if (transaction is Expense) {
-                FilledTonalIconButton(
-                    onClick = onIconClick,
-                    shapes = IconButtonDefaults.shapes(
-                        shape = IconButtonDefaults.smallRoundShape,
-                    )
-                ) {
-                    Icon(
-                        painter = painterResource(getCategoryIcon(transaction.category)),
-                        contentDescription = null,
-                    )
+        content = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Leading Content
+                if (transaction is Expense) {
+                    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
+                        FilledTonalIconButton(
+                            modifier = Modifier
+                                .padding(end = 12.dp),
+                            onClick = onIconClick,
+                            shapes = IconButtonDefaults.shapes(
+                                shape = IconButtonDefaults.smallRoundShape,
+                            )
+                        ) {
+                            Icon(
+                                painter = painterResource(getCategoryIcon(transaction.category)),
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 12.dp)
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.secondaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val firstLetter =
+                            transaction.name?.firstOrNull()?.uppercaseChar()?.toString() ?: ""
+                        Text(
+                            text = firstLetter,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.secondaryContainer),
-                    contentAlignment = Alignment.Center
+
+                // Content
+                Column(
+                    modifier = Modifier.weight(1f)
                 ) {
-                    val firstLetter =
-                        transaction.name?.firstOrNull()?.uppercaseChar()?.toString() ?: ""
                     Text(
-                        text = firstLetter,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        fontWeight = FontWeight.Bold
+                        text = transaction.name ?: "",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Normal
+                    )
+                    val supportingText = if (transaction is Income) {
+                        transaction.getDateString(extended = false)
+                    } else {
+                        stringResource(getCategoryName(transaction.category))
+                    }
+                    Text(
+                        text = supportingText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+
+                Text(
+                    modifier = Modifier
+                        .padding(start = 12.dp),
+                    text = transaction.getPriceString(true),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Normal
+                )
             }
         },
-        content = {
-            Text(
-                text = transaction.name ?: "",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Normal,
-                maxLines = 1
-            )
-        },
         supportingContent = {
-            Column {
-                val supportingText = if (transaction is Income) {
-                    transaction.getDateString(extended = false)
-                } else {
-                    stringResource(getCategoryName(transaction.category))
-                }
-                Text(
-                    text = supportingText,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1
-                )
-                if (transaction is Expense && transaction.labels.isNotEmpty()) {
-                    Row(
-                        modifier = Modifier
-                            .horizontalScroll(rememberScrollState())
-                            .padding(top = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        transaction.labels.forEach { label ->
-                            Box(
-                                modifier = Modifier
-                                    .clip(AssistChipDefaults.shape)
-                                    .background(MaterialTheme.colorScheme.secondaryContainer),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    text = label,
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                )
-                            }
+            val showLabels = transaction is Expense && transaction.labels.isNotEmpty()
+            AnimatedVisibility(
+                visible = showLabels,
+                enter = expandVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
+                exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec())
+            ) {
+                Row(
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .padding(top = 4.dp, start = 52.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    labelsToDisplay.forEach { label ->
+                        Box(
+                            modifier = Modifier
+                                .clip(AssistChipDefaults.shape)
+                                .background(MaterialTheme.colorScheme.secondaryContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                text = label,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            )
                         }
                     }
                 }
             }
-        },
-        trailingContent = {
-            Text(
-                text = transaction.getPriceString(true),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Normal
-            )
         },
         modifier = modifier
             .fillMaxWidth()
