@@ -5,10 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -240,7 +241,6 @@ fun LabelsSheet(
                                         )
                                     }
                                     DropdownMenuPopup(
-                                        modifier = Modifier.widthIn(min = 216.dp),
                                         expanded = menuExpanded,
                                         onDismissRequest = { menuExpanded = false }
                                     ) {
@@ -256,6 +256,7 @@ fun LabelsSheet(
                                                     )
                                                 },
                                                 text = { Text(text = stringResource(id = R.string.edit)) },
+                                                trailingIcon = { Spacer(modifier = Modifier.width(40.dp))},
                                                 onClick = { menuExpanded = false }
                                             )
                                             DropdownMenuItem(
@@ -266,6 +267,7 @@ fun LabelsSheet(
                                                     )
                                                 },
                                                 text = { Text(text = stringResource(id = R.string.delete)) },
+                                                trailingIcon = { Spacer(modifier = Modifier.width(40.dp))},
                                                 onClick = {
                                                     onDeleteLabel(label)
                                                     menuExpanded = false
