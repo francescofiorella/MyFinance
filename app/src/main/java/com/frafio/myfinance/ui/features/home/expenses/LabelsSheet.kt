@@ -8,19 +8,25 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuGroup
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
@@ -56,9 +62,10 @@ fun LabelsSheet(
     expense: Expense? = null,
     labels: List<String> = listOf(),
     selectedLabels: List<String> = listOf(),
-    showNewLabel: Boolean = true,
+    showEditLabel: Boolean = true,
     onNewLabel: (String) -> Unit,
-    onLabelCheckedChanged: (String, Boolean) -> Unit
+    onLabelCheckedChanged: (String, Boolean) -> Unit,
+    onDeleteLabel: (String) -> Unit
 ) {
 
     var labelFieldValue by remember { mutableStateOf(TextFieldValue(text = "")) }
@@ -90,7 +97,7 @@ fun LabelsSheet(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         )
         Column {
-            if (showNewLabel) {
+            if (showEditLabel) {
                 SegmentedListItem(
                     onClick = { },
                     colors = colors,
@@ -221,13 +228,53 @@ fun LabelsSheet(
                     },
                     trailingContent = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            /*Icon(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .padding(8.dp),
-                                painter = painterResource(id = R.drawable.ic_more_vert),
-                                contentDescription = null
-                            )*/
+                            if (showEditLabel) {
+                                var menuExpanded by remember { mutableStateOf(false) }
+                                Box {
+                                    IconButton(
+                                        onClick = { menuExpanded = true }
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_more_vert),
+                                            contentDescription = null
+                                        )
+                                    }
+                                    DropdownMenuPopup(
+                                        modifier = Modifier.widthIn(min = 216.dp),
+                                        expanded = menuExpanded,
+                                        onDismissRequest = { menuExpanded = false }
+                                    ) {
+                                        DropdownMenuGroup(
+                                            shapes = MenuDefaults.groupShapes(),
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                                        ) {
+                                            DropdownMenuItem(
+                                                leadingIcon = {
+                                                    Icon(
+                                                        painter = painterResource(id = R.drawable.ic_edit_filled),
+                                                        contentDescription = null
+                                                    )
+                                                },
+                                                text = { Text(text = stringResource(id = R.string.edit)) },
+                                                onClick = { menuExpanded = false }
+                                            )
+                                            DropdownMenuItem(
+                                                leadingIcon = {
+                                                    Icon(
+                                                        painter = painterResource(id = R.drawable.ic_delete_filled),
+                                                        contentDescription = null
+                                                    )
+                                                },
+                                                text = { Text(text = stringResource(id = R.string.delete)) },
+                                                onClick = {
+                                                    onDeleteLabel(label)
+                                                    menuExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                             Checkbox(
                                 modifier = Modifier.padding(8.dp),
                                 checked = checked,
@@ -261,9 +308,10 @@ fun LabelsSheetPreview() {
                 "Travel",
                 "Dinner"
             ),
-            showNewLabel = true,
+            showEditLabel = true,
             onNewLabel = {},
-            onLabelCheckedChanged = { _, _ -> }
+            onLabelCheckedChanged = { _, _ -> },
+            onDeleteLabel = {}
         )
     }
 }

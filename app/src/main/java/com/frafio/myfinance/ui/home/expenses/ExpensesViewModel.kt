@@ -253,6 +253,59 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
         val response = expensesRepository.addExpense(expense)
         listener?.onCompleted(response)
     }
+
+    private var lastDeletedLabel: String? = null
+    private var expensesWithDeletedLabel: List<Expense> = emptyList()
+
+    fun deleteLabel(label: String) {
+        val currentLabels = labels.value.toMutableList()
+        if (currentLabels.remove(label)) {
+            lastDeletedLabel = label
+            val response = expensesRepository.setLabels(currentLabels, isRemoving = true)
+            listener?.onDeleteCompleted(response, label)
+
+            viewModelScope.launch(Dispatchers.IO) {
+                val allExpenses = expensesLocalRepository.getAllSync()
+                expensesWithDeletedLabel = allExpenses.filter { it.labels.contains(label) }
+
+                expensesWithDeletedLabel.forEach { expense ->
+                    val updatedLabels = expense.labels.toMutableList()
+                    updatedLabels.remove(label)
+                    val updatedExpense = expense.copy(
+                        timestamp = dateToUTCTimestamp(
+                            expense.year!!,
+                            expense.month!!,
+                            expense.day!!
+                        ),
+                        labels = updatedLabels
+                    )
+                    expensesRepository.editExpense(updatedExpense)
+                }
+            }
+        }
+    }
+
+    fun undoDeleteLabel() {
+        val label = lastDeletedLabel ?: return
+        val currentLabels = labels.value.toMutableList()
+        if (!currentLabels.contains(label)) {
+            currentLabels.add(label)
+            val response = expensesRepository.setLabels(currentLabels)
+            listener?.onCompleted(response)
+
+            viewModelScope.launch(Dispatchers.IO) {
+                expensesWithDeletedLabel.forEach { expense ->
+                    expensesRepository.editExpense(expense)
+                }
+                resetLastDeletedLabel()
+            }
+        }
+    }
+
+    fun resetLastDeletedLabel() {
+        lastDeletedLabel = null
+        expensesWithDeletedLabel = emptyList()
+    }
 }
 
 private data class FilterParams(

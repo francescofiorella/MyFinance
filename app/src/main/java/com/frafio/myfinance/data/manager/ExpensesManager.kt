@@ -54,7 +54,10 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
         val response = MutableLiveData<FinanceResult>()
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(MyFinanceStorage.user!!.email!!)
-            .set(hashMapOf(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value to budget), SetOptions.merge())
+            .set(
+                hashMapOf(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value to budget),
+                SetOptions.merge()
+            )
             .addOnSuccessListener {
                 setLocalMonthlyBudget(budget)
                 MyFinanceStorage.updateBudget(budget)
@@ -83,7 +86,7 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun setLabels(labels: List<String>): LiveData<FinanceResult> {
+    fun setLabels(labels: List<String>, isRemoving: Boolean = false): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
         val sortedLabels = labels.sorted()
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
@@ -92,7 +95,12 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
             .addOnSuccessListener {
                 setLocalLabels(sortedLabels)
                 MyFinanceStorage.updateLabels(sortedLabels)
-                response.value = FinanceResult(FinanceCode.LABELS_UPDATE_SUCCESS)
+                response.value = FinanceResult(
+                    if (isRemoving)
+                        FinanceCode.LABEL_DELETE_SUCCESS
+                    else
+                        FinanceCode.LABELS_UPDATE_SUCCESS
+                )
             }
             .addOnFailureListener {
                 response.value = FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
@@ -106,7 +114,8 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
             .document(MyFinanceStorage.user!!.email!!).get()
             .addOnSuccessListener { documentSnapshot ->
-                val labelsValue = documentSnapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
+                val labelsValue =
+                    documentSnapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
                 val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()
                 setLocalLabels(labels)
                 MyFinanceStorage.updateLabels(labels)

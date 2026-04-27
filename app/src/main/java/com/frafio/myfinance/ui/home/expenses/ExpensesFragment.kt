@@ -31,6 +31,8 @@ import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.sidesheet.SideSheetDialog
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
@@ -177,6 +179,9 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                         viewModel.removeLabelFromExpense(it, label)
                     }
                 }
+            },
+            onDeleteLabel = { label ->
+                viewModel.deleteLabel(label)
             }
         )
         sheetDialog.setContentView(composeView)
@@ -232,6 +237,30 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                 ) {
                     viewModel.addExpense(expense)
                 }
+            } else {
+                (activity as HomeActivity).showSnackBar(result.message)
+            }
+        }
+    }
+
+    override fun onDeleteCompleted(
+        response: LiveData<FinanceResult>,
+        label: String
+    ) {
+        response.observe(viewLifecycleOwner) { result ->
+            if (result.code == FinanceCode.LABEL_DELETE_SUCCESS.code) {
+                (activity as HomeActivity).showSnackBar(
+                    message = result.message,
+                    actionText = getString(R.string.cancel),
+                    actionFun = { viewModel.undoDeleteLabel() }
+                ).addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                        super.onDismissed(transientBottomBar, event)
+                        if (event != DISMISS_EVENT_ACTION) {
+                            viewModel.resetLastDeletedLabel()
+                        }
+                    }
+                })
             } else {
                 (activity as HomeActivity).showSnackBar(result.message)
             }
@@ -368,7 +397,8 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
         expenseId: String?,
         showNewLabel: Boolean,
         onNewLabel: (String) -> Unit,
-        onLabelCheckedChanged: (Expense?, String, Boolean) -> Unit
+        onLabelCheckedChanged: (Expense?, String, Boolean) -> Unit,
+        onDeleteLabel: (String) -> Unit = {}
     ): ComposeView {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -385,11 +415,12 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                         expense = currentExpense,
                         labels = labels,
                         selectedLabels = selectedLabels,
-                        showNewLabel = showNewLabel,
+                        showEditLabel = showNewLabel,
                         onNewLabel = onNewLabel,
                         onLabelCheckedChanged = { label, checked ->
                             onLabelCheckedChanged(currentExpense, label, checked)
                         },
+                        onDeleteLabel = onDeleteLabel
                     )
                 }
             }

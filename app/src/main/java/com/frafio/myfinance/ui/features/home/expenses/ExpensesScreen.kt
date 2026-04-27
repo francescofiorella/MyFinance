@@ -198,7 +198,7 @@ fun ExpensesContent(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        painter = painterResource(R.drawable.ic_payments_filled),
+                                        painter = painterResource(R.drawable.ic_bar_chart_4_bars),
                                         contentDescription = null,
                                     )
                                 }

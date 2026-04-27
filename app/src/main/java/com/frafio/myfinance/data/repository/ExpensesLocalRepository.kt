@@ -39,6 +39,8 @@ class ExpensesLocalRepository {
     fun getExpensesOfYear(year: Int): LiveData<List<Expense>> =
         expenseDao.getExpensesOfYear(year)
 
+    fun getAllSync(): List<Expense> = expenseDao.getAllSync()
+
     fun insertExpense(expense: Expense) = expenseDao.insertExpense(expense)
 
     fun updateExpense(expense: Expense) = expenseDao.updateExpense(expense)

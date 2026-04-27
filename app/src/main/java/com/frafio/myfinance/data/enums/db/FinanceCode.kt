@@ -201,5 +201,13 @@ enum class FinanceCode(val code: Int, val message: String) {
             Languages.ITALIANO.value -> "Etichette non aggiornate"
             else -> "Labels not updated!" // english
         }
+    ),
+
+    LABEL_DELETE_SUCCESS(
+        42, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Label deleted!"
+            Languages.ITALIANO.value -> "Etichetta rimossa"
+            else -> "Label deleted!" // english
+        }
     )
 }

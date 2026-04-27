@@ -61,6 +61,9 @@ interface ExpenseDao {
             "WHERE year=:year")
     fun getExpensesOfYear(year: Int): LiveData<List<Expense>>
 
+    @Query("SELECT * FROM expense")
+    fun getAllSync(): List<Expense>
+
     @Insert
     fun insertExpense(expense: Expense)
 
