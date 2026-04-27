@@ -55,6 +55,7 @@ fun LabelsSheet(
     modifier: Modifier = Modifier,
     expense: Expense? = null,
     labels: List<String> = listOf(),
+    selectedLabels: List<String> = listOf(),
     showNewLabel: Boolean = true,
     onNewLabel: (String) -> Unit,
     onLabelCheckedChanged: (String, Boolean) -> Unit
@@ -164,9 +165,9 @@ fun LabelsSheet(
                 )
             }
             labels.forEachIndexed { index, label ->
-                var checked by remember(expense?.labels) {
+                var checked by remember(expense?.labels, selectedLabels) {
                     mutableStateOf(
-                        expense?.labels?.contains(label) ?: false
+                        expense?.labels?.contains(label) ?: selectedLabels.contains(label)
                     )
                 }
                 SegmentedListItem(

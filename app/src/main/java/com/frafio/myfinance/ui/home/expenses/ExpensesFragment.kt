@@ -292,10 +292,11 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                 MyFinanceTheme {
                     val selectedCategories by viewModel.selectedCategories.collectAsState()
                     val dateRange by viewModel.dateRange.collectAsState()
+                    val labels by viewModel.labels.collectAsState()
                     FilterExpensesSheet(
                         onDismiss = onDismiss,
                         categoryEnabled = selectedCategories.size != 9,
-                        labelEnabled = true,
+                        labelEnabled = labels.isNotEmpty(),
                         dateRangeEnabled = dateRange == null,
                         onSelectCategory = {
                             onDismiss()
@@ -374,6 +375,7 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
             setContent {
                 MyFinanceTheme {
                     val labels by viewModel.labels.collectAsState()
+                    val selectedLabels by viewModel.selectedLabels.collectAsState()
                     val expenses by viewModel.expenses.collectAsState()
                     val currentExpense = if (expenseId != null)
                         expenses.find { it.id == expenseId }
@@ -382,6 +384,7 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                     LabelsSheet(
                         expense = currentExpense,
                         labels = labels,
+                        selectedLabels = selectedLabels,
                         showNewLabel = showNewLabel,
                         onNewLabel = onNewLabel,
                         onLabelCheckedChanged = { label, checked ->
