@@ -29,16 +29,16 @@ fun FilterExpensesSheet(
         onDismiss = onDismiss,
         items = listOf(
             MenuItem(
-                iconRes = R.drawable.ic_grid_3x3_filled,
-                textRes = R.string.category,
-                enabled = categoryEnabled,
-                onClick = onSelectCategory
-            ),
-            MenuItem(
                 iconRes = R.drawable.ic_sell_outline,
                 textRes = R.string.label,
                 enabled = labelEnabled,
                 onClick = onSelectLabel
+            ),
+            MenuItem(
+                iconRes = R.drawable.ic_grid_3x3_filled,
+                textRes = R.string.category,
+                enabled = categoryEnabled,
+                onClick = onSelectCategory
             ),
             MenuItem(
                 iconRes = R.drawable.ic_today_outline,
@@ -60,7 +60,7 @@ fun FilterExpensesSheetPreview() {
             onSelectCategory = {},
             onSelectLabel = {},
             onSelectDateRange = {},
-            categoryEnabled = false,
+            categoryEnabled = true,
             labelEnabled = true,
             dateRangeEnabled = true,
             modifier = Modifier

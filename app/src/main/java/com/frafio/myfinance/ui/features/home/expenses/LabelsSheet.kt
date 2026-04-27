@@ -114,70 +114,267 @@ fun LabelsSheet(
         labelFirst = labelFirst,
         endContent = endContent
     ) {
-        val colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        )
         Column(modifier = Modifier.animateContentSize()) {
             if (showEditLabel) {
-                SegmentedListItem(
-                    onClick = { },
-                    colors = colors,
-                    shapes = ListItemDefaults.shapes(
-                        shape = ListItemDefaults.shapes().selectedShape
-                    ),
-                    leadingContent = {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(MaterialShapes.Cookie12Sided.toShape())
-                                .background(MaterialTheme.colorScheme.secondaryContainer),
-                            contentAlignment = Alignment.Center
+                NewLabelItem(
+                    value = labelFieldValue,
+                    onValueChange = { labelFieldValue = it },
+                    isValid = isLabelValid,
+                    onConfirm = {
+                        onNewLabel(labelFieldValue.text.trim())
+                        labelFieldValue = TextFieldValue("")
+                        focusManager.clearFocus()
+                    }
+                )
+            }
+            labels.forEachIndexed { index, label ->
+                LabelItem(
+                    label = label,
+                    initialSelected = expense?.labels?.contains(label) ?: selectedLabels.contains(label),
+                    isEditing = editingLabel == label,
+                    editLabelValue = editLabelFieldValue,
+                    onEditLabelValueChange = { editLabelFieldValue = it },
+                    onLabelCheckedChanged = onLabelCheckedChanged,
+                    onEditClick = {
+                        editLabelFieldValue = TextFieldValue(
+                            text = label,
+                            selection = TextRange(label.length)
+                        )
+                        editingLabel = label
+                    },
+                    onDeleteClick = { onDeleteLabel(label) },
+                    onConfirmEdit = {
+                        onEditLabel(label, editLabelFieldValue.text.trim())
+                        editingLabel = null
+                    },
+                    onCancelEdit = {
+                        editingLabel = null
+                        editLabelFieldValue = TextFieldValue(text = "")
+                    },
+                    focusRequester = focusRequester,
+                    showEditOptions = showEditLabel,
+                    index = index,
+                    count = labels.size
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun NewLabelItem(
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    isValid: Boolean,
+    onConfirm: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    SegmentedListItem(
+        onClick = { },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
+        shapes = ListItemDefaults.shapes(
+            shape = ListItemDefaults.shapes().selectedShape
+        ),
+        leadingContent = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(MaterialShapes.Cookie12Sided.toShape())
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_add_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+        },
+        content = {
+            BasicTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = value,
+                onValueChange = onValueChange,
+                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words,
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Text
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    if (isValid) {
+                        onConfirm()
+                    }
+                }),
+                decorationBox = { innerTextField ->
+                    if (value.text.isEmpty()) {
+                        Text(
+                            text = stringResource(id = R.string.create_label),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    innerTextField()
+                }
+            )
+        },
+        trailingContent = {
+            FilledIconButton(
+                onClick = onConfirm,
+                enabled = isValid,
+                shapes = IconButtonDefaults.shapes(
+                    shape = IconButtonDefaults.smallSquareShape,
+                )
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_check_filled),
+                    contentDescription = stringResource(id = R.string.confirm)
+                )
+            }
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 16.dp)
+    )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun LabelItem(
+    label: String,
+    initialSelected: Boolean,
+    isEditing: Boolean,
+    editLabelValue: TextFieldValue,
+    onEditLabelValueChange: (TextFieldValue) -> Unit,
+    onLabelCheckedChanged: (String, Boolean) -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onConfirmEdit: () -> Unit,
+    onCancelEdit: () -> Unit,
+    focusRequester: FocusRequester,
+    showEditOptions: Boolean,
+    index: Int,
+    count: Int,
+    modifier: Modifier = Modifier
+) {
+    var checked by remember(initialSelected) {
+        mutableStateOf(initialSelected)
+    }
+
+    AnimatedVisibility(
+        visible = true,
+        enter = expandVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
+        exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
+    ) {
+        SegmentedListItem(
+            checked = checked,
+            onCheckedChange = {
+                onLabelCheckedChanged(label, it)
+                checked = it
+            },
+            colors = if (isEditing)
+                ListItemDefaults.colors(
+                    containerColor = ListItemDefaults.colors().selectedContainerColor
+                )
+            else
+                ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+            shapes = if (count > 1) {
+                ListItemDefaults.segmentedShapes(
+                    index = index,
+                    count = count,
+                    defaultShapes = ListItemDefaults.shapes(
+                        shape = if (isEditing) {
+                            ListItemDefaults.shapes().selectedShape
+                        } else {
+                            ListItemDefaults.shapes().shape
+                        }
+                    )
+                )
+            } else {
+                ListItemDefaults.shapes(
+                    shape = ListItemDefaults.shapes().selectedShape
+                )
+            },
+            leadingContent = {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (isEditing || checked)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.secondaryContainer
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(
+                            id = if (isEditing)
+                                R.drawable.ic_edit_outline
+                            else
+                                R.drawable.ic_sell_outline
+                        ),
+                        contentDescription = null,
+                        tint = if (isEditing || checked)
+                            MaterialTheme.colorScheme.onPrimary
+                        else
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
+            },
+            content = {
+                if (isEditing) {
+                    BasicTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester),
+                        value = editLabelValue,
+                        onValueChange = onEditLabelValueChange,
+                        textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Text
+                        ),
+                        keyboardActions = KeyboardActions(onDone = {
+                            if (editLabelValue.text.isNotEmpty() && editLabelValue.text != label) {
+                                onConfirmEdit()
+                            }
+                        })
+                    )
+                } else {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            },
+            trailingContent = {
+                if (isEditing) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        FilledIconButton(
+                            modifier = Modifier.width(52.dp),
+                            onClick = onCancelEdit
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_add_filled),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                painter = painterResource(id = R.drawable.ic_close_filled),
+                                contentDescription = null
                             )
                         }
-                    },
-                    content = {
-                        BasicTextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = labelFieldValue,
-                            onValueChange = { labelFieldValue = it },
-                            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                            keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Words,
-                                imeAction = ImeAction.Done,
-                                keyboardType = KeyboardType.Text
-                            ),
-                            keyboardActions = KeyboardActions(onDone = {
-                                if (isLabelValid) {
-                                    onNewLabel(labelFieldValue.text.trim())
-                                    labelFieldValue = TextFieldValue("")
-                                    focusManager.clearFocus()
-                                }
-                            }),
-                            decorationBox = { innerTextField ->
-                                if (labelFieldValue.text.isEmpty()) {
-                                    Text(
-                                        text = stringResource(id = R.string.create_label),
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                innerTextField()
-                            }
-                        )
-                    },
-                    trailingContent = {
                         FilledIconButton(
-                            onClick = {
-                                onNewLabel(labelFieldValue.text.trim())
-                                labelFieldValue = TextFieldValue("")
-                                focusManager.clearFocus()
-                            },
-                            enabled = isLabelValid,
+                            modifier = Modifier.padding(start = 4.dp),
+                            onClick = onConfirmEdit,
+                            enabled = editLabelValue.text.isNotEmpty() && editLabelValue.text != label,
                             shapes = IconButtonDefaults.shapes(
                                 shape = IconButtonDefaults.smallSquareShape,
                             )
@@ -187,233 +384,88 @@ fun LabelsSheet(
                                 contentDescription = stringResource(id = R.string.confirm)
                             )
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp)
-                )
-            }
-            labels.forEachIndexed { index, label ->
-                var checked by remember(expense?.labels, selectedLabels) {
-                    mutableStateOf(
-                        expense?.labels?.contains(label) ?: selectedLabels.contains(label)
-                    )
-                }
-                AnimatedVisibility(
-                    visible = true,
-                    enter = expandVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
-                    exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
-                ) {
-                    SegmentedListItem(
-                        checked = checked,
-                        onCheckedChange = {
-                            onLabelCheckedChanged(label, it)
-                            checked = it
-                        },
-                        colors = if (editingLabel == label)
-                            ListItemDefaults.colors(
-                                containerColor = ListItemDefaults.colors().selectedContainerColor
-                            )
-                        else
-                            colors,
-                        shapes = if (labels.size > 1) {
-                            ListItemDefaults.segmentedShapes(
-                                index = index,
-                                count = labels.size,
-                                defaultShapes = ListItemDefaults.shapes(
-                                    shape = if (editingLabel == label) {
-                                        ListItemDefaults.shapes().selectedShape
-                                    } else {
-                                        ListItemDefaults.shapes().shape
-                                    }
-                                )
-                            )
-                        } else {
-                            ListItemDefaults.shapes(
-                                shape = ListItemDefaults.shapes().selectedShape
-                            )
-                        },
-                        leadingContent = {
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        if (editingLabel == label || checked)
-                                            MaterialTheme.colorScheme.primary
-                                        else
-                                            MaterialTheme.colorScheme.secondaryContainer
-                                    ),
-                                contentAlignment = Alignment.Center
+                    }
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (showEditOptions) {
+                            var menuExpanded by remember { mutableStateOf(false) }
+                            IconButton(
+                                onClick = { menuExpanded = true }
                             ) {
                                 Icon(
-                                    painter = painterResource(
-                                        id = if (editingLabel == label)
-                                            R.drawable.ic_edit_outline
-                                        else
-                                            R.drawable.ic_sell_outline
-                                    ),
-                                    contentDescription = null,
-                                    tint = if (editingLabel == label || checked)
-                                        MaterialTheme.colorScheme.onPrimary
-                                    else
-                                        MaterialTheme.colorScheme.onSecondaryContainer
+                                    painter = painterResource(id = R.drawable.ic_more_vert),
+                                    contentDescription = null
                                 )
                             }
-                        },
-                        content = {
-                            if (editingLabel == label) {
-                                BasicTextField(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .focusRequester(focusRequester),
-                                    value = editLabelFieldValue,
-                                    onValueChange = { editLabelFieldValue = it },
-                                    textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
-                                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                                    keyboardOptions = KeyboardOptions(
-                                        capitalization = KeyboardCapitalization.Words,
-                                        imeAction = ImeAction.Done,
-                                        keyboardType = KeyboardType.Text
-                                    ),
-                                    keyboardActions = KeyboardActions(onDone = {
-                                        if (editLabelFieldValue.text.isNotEmpty() && editLabelFieldValue.text != label) {
-                                            onEditLabel(label, editLabelFieldValue.text.trim())
-                                            editingLabel = null
-                                        }
-                                    })
-                                )
-                            } else {
-                                Text(
-                                    text = label,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.Normal,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        },
-                        trailingContent = {
-                            if (editingLabel == label) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    FilledIconButton(
-                                        modifier = Modifier.width(52.dp),
-                                        onClick = {
-                                            editingLabel = null
-                                            editLabelFieldValue = TextFieldValue(text = "")
-                                        }
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_close_filled),
-                                            contentDescription = null
-                                        )
-                                    }
-                                    FilledIconButton(
-                                        modifier = Modifier.padding(start = 4.dp),
-                                        onClick = {
-                                            onEditLabel(label, editLabelFieldValue.text.trim())
-                                            editingLabel = null
-                                        },
-                                        enabled = editLabelFieldValue.text.isNotEmpty() && editLabelFieldValue.text != label,
-                                        shapes = IconButtonDefaults.shapes(
-                                            shape = IconButtonDefaults.smallSquareShape,
-                                        )
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_check_filled),
-                                            contentDescription = stringResource(id = R.string.confirm)
-                                        )
-                                    }
-                                }
-                            } else {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    if (showEditLabel) {
-                                        var menuExpanded by remember { mutableStateOf(false) }
-                                        IconButton(
-                                            onClick = { menuExpanded = true }
-                                        ) {
+                            DropdownMenuPopup(
+                                expanded = menuExpanded,
+                                onDismissRequest = { menuExpanded = false }
+                            ) {
+                                DropdownMenuGroup(
+                                    shapes = MenuDefaults.groupShapes(),
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                                ) {
+                                    DropdownMenuItem(
+                                        leadingIcon = {
                                             Icon(
-                                                painter = painterResource(id = R.drawable.ic_more_vert),
+                                                painter = painterResource(id = R.drawable.ic_edit_outline),
                                                 contentDescription = null
                                             )
-                                        }
-                                        DropdownMenuPopup(
-                                            expanded = menuExpanded,
-                                            onDismissRequest = { menuExpanded = false }
-                                        ) {
-                                            DropdownMenuGroup(
-                                                shapes = MenuDefaults.groupShapes(),
-                                                containerColor = MaterialTheme.colorScheme.primaryContainer
-                                            ) {
-                                                DropdownMenuItem(
-                                                    leadingIcon = {
-                                                        Icon(
-                                                            painter = painterResource(id = R.drawable.ic_edit_outline),
-                                                            contentDescription = null
-                                                        )
-                                                    },
-                                                    text = { Text(text = stringResource(id = R.string.edit)) },
-                                                    trailingIcon = {
-                                                        Spacer(
-                                                            modifier = Modifier.width(
-                                                                40.dp
-                                                            )
-                                                        )
-                                                    },
-                                                    onClick = {
-                                                        editLabelFieldValue =
-                                                            TextFieldValue(
-                                                                text = label,
-                                                                selection = TextRange(label.length)
-                                                            )
-                                                        editingLabel = label
-                                                        menuExpanded = false
-                                                    }
+                                        },
+                                        text = { Text(text = stringResource(id = R.string.edit)) },
+                                        trailingIcon = {
+                                            Spacer(
+                                                modifier = Modifier.width(
+                                                    40.dp
                                                 )
-                                                DropdownMenuItem(
-                                                    leadingIcon = {
-                                                        Icon(
-                                                            painter = painterResource(id = R.drawable.ic_delete_outline),
-                                                            contentDescription = null
-                                                        )
-                                                    },
-                                                    text = { Text(text = stringResource(id = R.string.delete)) },
-                                                    trailingIcon = {
-                                                        Spacer(
-                                                            modifier = Modifier.width(
-                                                                40.dp
-                                                            )
-                                                        )
-                                                    },
-                                                    onClick = {
-                                                        onDeleteLabel(label)
-                                                        menuExpanded = false
-                                                    }
-                                                )
-                                            }
+                                            )
+                                        },
+                                        onClick = {
+                                            onEditClick()
+                                            menuExpanded = false
                                         }
-                                    }
-                                    Checkbox(
-                                        modifier = Modifier.padding(8.dp),
-                                        checked = checked,
-                                        onCheckedChange = null
+                                    )
+                                    DropdownMenuItem(
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.ic_delete_outline),
+                                                contentDescription = null
+                                            )
+                                        },
+                                        text = { Text(text = stringResource(id = R.string.delete)) },
+                                        trailingIcon = {
+                                            Spacer(
+                                                modifier = Modifier.width(
+                                                    40.dp
+                                                )
+                                            )
+                                        },
+                                        onClick = {
+                                            onDeleteClick()
+                                            menuExpanded = false
+                                        }
                                     )
                                 }
                             }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .padding(
-                                bottom = if (index == labels.size - 1)
-                                    0.dp
-                                else
-                                    2.dp
-                            ),
-                    )
+                        }
+                        Checkbox(
+                            modifier = Modifier.padding(8.dp),
+                            checked = checked,
+                            onCheckedChange = null
+                        )
+                    }
                 }
-            }
-        }
+            },
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(
+                    bottom = if (index == count - 1)
+                        0.dp
+                    else
+                        2.dp
+                ),
+        )
     }
 }
 
