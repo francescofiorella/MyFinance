@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.MyFinanceApplication
+import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Expense
@@ -261,7 +262,7 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
         val currentLabels = labels.value.toMutableList()
         if (currentLabels.remove(label)) {
             lastDeletedLabel = label
-            val response = expensesRepository.setLabels(currentLabels, isRemoving = true)
+            val response = expensesRepository.setLabels(currentLabels, FinanceCode.LABEL_DELETE_SUCCESS)
             listener?.onDeleteCompleted(response, label)
 
             viewModelScope.launch(Dispatchers.IO) {
@@ -305,6 +306,39 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
     fun resetLastDeletedLabel() {
         lastDeletedLabel = null
         expensesWithDeletedLabel = emptyList()
+    }
+
+    fun editLabel(oldName: String, newName: String) {
+        val currentLabels = labels.value.toMutableList()
+        val index = currentLabels.indexOf(oldName)
+        if (index != -1) {
+            currentLabels[index] = newName
+            val response =
+                expensesRepository.setLabels(currentLabels, FinanceCode.LABEL_UPDATE_SUCCESS)
+            listener?.onCompleted(response)
+
+            viewModelScope.launch(Dispatchers.IO) {
+                val allExpenses = expensesLocalRepository.getAllSync()
+                val expensesToUpdate = allExpenses.filter { it.labels.contains(oldName) }
+
+                expensesToUpdate.forEach { expense ->
+                    val updatedLabels = expense.labels.toMutableList()
+                    val labelIndex = updatedLabels.indexOf(oldName)
+                    if (labelIndex != -1) {
+                        updatedLabels[labelIndex] = newName
+                        val updatedExpense = expense.copy(
+                            timestamp = dateToUTCTimestamp(
+                                expense.year!!,
+                                expense.month!!,
+                                expense.day!!
+                            ),
+                            labels = updatedLabels
+                        )
+                        expensesRepository.editExpense(updatedExpense)
+                    }
+                }
+            }
+        }
     }
 }
 

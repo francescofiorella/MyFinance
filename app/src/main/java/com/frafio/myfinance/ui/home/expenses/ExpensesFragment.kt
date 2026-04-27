@@ -180,6 +180,9 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                     }
                 }
             },
+            onEditLabel = { oldLabel, newLabel ->
+                viewModel.editLabel(oldLabel, newLabel)
+            },
             onDeleteLabel = { label ->
                 viewModel.deleteLabel(label)
             }
@@ -398,7 +401,8 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
         showNewLabel: Boolean,
         onNewLabel: (String) -> Unit,
         onLabelCheckedChanged: (Expense?, String, Boolean) -> Unit,
-        onDeleteLabel: (String) -> Unit = {}
+        onDeleteLabel: (String) -> Unit = {},
+        onEditLabel: (String, String) -> Unit = { _, _ -> }
     ): ComposeView {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -420,7 +424,8 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                         onLabelCheckedChanged = { label, checked ->
                             onLabelCheckedChanged(currentExpense, label, checked)
                         },
-                        onDeleteLabel = onDeleteLabel
+                        onDeleteLabel = onDeleteLabel,
+                        onEditLabel = onEditLabel
                     )
                 }
             }

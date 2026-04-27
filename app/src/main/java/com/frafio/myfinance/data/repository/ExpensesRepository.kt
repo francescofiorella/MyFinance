@@ -1,6 +1,7 @@
 package com.frafio.myfinance.data.repository
 
 import androidx.lifecycle.LiveData
+import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.manager.ExpensesManager
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
@@ -46,8 +47,11 @@ class ExpensesRepository(private val expensesManager: ExpensesManager) {
         return expensesManager.getLabels()
     }
 
-    fun setLabels(labels: List<String>, isRemoving: Boolean = false): LiveData<FinanceResult> {
-        return expensesManager.setLabels(labels, isRemoving)
+    fun setLabels(
+        labels: List<String>,
+        successCode: FinanceCode = FinanceCode.LABELS_UPDATE_SUCCESS
+    ): LiveData<FinanceResult> {
+        return expensesManager.setLabels(labels, successCode)
     }
 
     fun updateLocalLabels() {

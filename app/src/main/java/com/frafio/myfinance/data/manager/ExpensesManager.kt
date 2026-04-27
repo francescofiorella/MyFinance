@@ -86,7 +86,10 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
         return response
     }
 
-    fun setLabels(labels: List<String>, isRemoving: Boolean = false): LiveData<FinanceResult> {
+    fun setLabels(
+        labels: List<String>,
+        successCode: FinanceCode = FinanceCode.LABELS_UPDATE_SUCCESS
+    ): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()
         val sortedLabels = labels.sorted()
         fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
@@ -95,12 +98,7 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
             .addOnSuccessListener {
                 setLocalLabels(sortedLabels)
                 MyFinanceStorage.updateLabels(sortedLabels)
-                response.value = FinanceResult(
-                    if (isRemoving)
-                        FinanceCode.LABEL_DELETE_SUCCESS
-                    else
-                        FinanceCode.LABELS_UPDATE_SUCCESS
-                )
+                response.value = FinanceResult(successCode)
             }
             .addOnFailureListener {
                 response.value = FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
