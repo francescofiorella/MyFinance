@@ -146,14 +146,8 @@ class BudgetFragment : BaseFragment(), BudgetListener {
                             Intent(context, AddActivity::class.java).also {
                                 it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
                                 it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_INCOME_CODE)
-                                it.putExtra(AddActivity.EXPENSE_ID_KEY, income.id)
-                                it.putExtra(AddActivity.EXPENSE_NAME_KEY, income.name)
-                                it.putExtra(AddActivity.EXPENSE_PRICE_KEY, income.price)
-                                it.putExtra(AddActivity.EXPENSE_CATEGORY_KEY, income.category)
+                                it.putExtra(AddActivity.EXTRA_TRANSACTION, income)
                                 it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                                it.putExtra(AddActivity.EXPENSE_YEAR_KEY, income.year)
-                                it.putExtra(AddActivity.EXPENSE_MONTH_KEY, income.month)
-                                it.putExtra(AddActivity.EXPENSE_DAY_KEY, income.day)
                                 editResultLauncher.launch(it)
                             }
                             onDismiss()

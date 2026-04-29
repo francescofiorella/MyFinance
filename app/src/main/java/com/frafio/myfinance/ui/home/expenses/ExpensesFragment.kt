@@ -293,14 +293,8 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                                     AddActivity.EXPENSE_REQUEST_KEY,
                                     AddActivity.REQUEST_EXPENSE_CODE
                                 )
-                                it.putExtra(AddActivity.EXPENSE_ID_KEY, expense.id)
-                                it.putExtra(AddActivity.EXPENSE_NAME_KEY, expense.name)
-                                it.putExtra(AddActivity.EXPENSE_PRICE_KEY, expense.price)
-                                it.putExtra(AddActivity.EXPENSE_CATEGORY_KEY, expense.category)
+                                it.putExtra(AddActivity.EXTRA_TRANSACTION, expense)
                                 it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                                it.putExtra(AddActivity.EXPENSE_YEAR_KEY, expense.year)
-                                it.putExtra(AddActivity.EXPENSE_MONTH_KEY, expense.month)
-                                it.putExtra(AddActivity.EXPENSE_DAY_KEY, expense.day)
                                 editResultLauncher.launch(it)
                             }
                             onDismiss()

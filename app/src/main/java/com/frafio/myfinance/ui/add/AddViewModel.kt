@@ -30,7 +30,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
     var category: Int? = null
 
     // TODO add labels in AddActivity
-    var labels: List<String> = emptyList()
+    var labels: List<String>? = null
 
     var dateString: String? = null
 
@@ -121,7 +121,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                         day,
                         dateToUTCTimestamp(year!!, month!!, day!!),
                         category,
-                        labels,
+                        labels ?: emptyList(),
                         expenseId!!
                     )
                     expensesRepository.editExpense(expense)
@@ -134,7 +134,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                         day,
                         dateToUTCTimestamp(year!!, month!!, day!!),
                         category,
-                        labels,
+                        labels ?: emptyList(),
                         expenseId!!
                     )
                     incomeRepository.editIncome(income)

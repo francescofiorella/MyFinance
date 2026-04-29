@@ -1,5 +1,6 @@
 package com.frafio.myfinance.data.model
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.frafio.myfinance.utils.dateToExtendedString
@@ -8,8 +9,10 @@ import com.frafio.myfinance.utils.doubleToPrice
 import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
+import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
+@Parcelize
 @IgnoreExtraProperties
 @Entity
 data class Income(
@@ -22,7 +25,7 @@ data class Income(
     override val category: Int? = null,
     override val labels: List<String> = emptyList(),
     @PrimaryKey @get:Exclude override var id: String = "$name$price$timestamp$category$labels"
-) : Transaction {
+) : Transaction, Parcelable {
     @Exclude
     override fun getDateString(extended: Boolean): String {
         return if (extended) {

@@ -21,10 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ChevronRight
-import androidx.compose.material.icons.rounded.ExpandLess
-import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
@@ -297,7 +293,12 @@ private fun ProfileCards(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                    painter = painterResource(
+                        id = if (expanded)
+                            R.drawable.ic_keyboard_arrow_up
+                        else
+                            R.drawable.ic_keyboard_arrow_down
+                    ),
                     contentDescription = null,
                 )
             }
@@ -352,7 +353,7 @@ private fun ProfileCards(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Rounded.ChevronRight,
+                            painter = painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
                             contentDescription = null,
                         )
                     }
@@ -402,7 +403,7 @@ private fun ProfileCards(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Rounded.ChevronRight,
+                            painter = painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
                             contentDescription = null,
                         )
                     }
@@ -623,7 +624,7 @@ fun ProfilePortraitPreview() {
             isDynamicColorChecked = false,
             scrollState = rememberScrollState(),
             onUploadProPic = {},
-            onEditFullName =  {},
+            onEditFullName = {},
             onDynamicColorChanged = {}
         )
     }
@@ -648,7 +649,7 @@ fun ProfileLandscapePreview() {
             isDynamicColorChecked = true,
             scrollState = rememberScrollState(),
             onUploadProPic = {},
-            onEditFullName =  {},
+            onEditFullName = {},
             onDynamicColorChanged = {}
         )
     }

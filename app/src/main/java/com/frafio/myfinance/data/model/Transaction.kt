@@ -1,8 +1,9 @@
 package com.frafio.myfinance.data.model
 
+import android.os.Parcelable
 import java.time.LocalDate
 
-interface Transaction {
+interface Transaction : Parcelable {
     val name: String?
     val price: Double?
     val year: Int?

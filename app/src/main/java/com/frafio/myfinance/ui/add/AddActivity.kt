@@ -19,6 +19,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.FinanceResult
+import com.frafio.myfinance.data.model.Transaction
 import com.frafio.myfinance.data.widget.DatePickerButton
 import com.frafio.myfinance.databinding.ActivityAddBinding
 import com.frafio.myfinance.ui.features.home.expenses.CategorySheet
@@ -41,14 +42,8 @@ class AddActivity : AppCompatActivity(), AddListener {
         const val REQUEST_INCOME_CODE: Int = 11
         const val REQUEST_CODE_KEY: String = "com.frafio.myfinance.REQUEST_CODE"
         const val EXPENSE_REQUEST_KEY: String = "com.frafio.myfinance.EXPENSE_REQUEST"
-        const val EXPENSE_ID_KEY: String = "com.frafio.myfinance.EXPENSE_ID"
-        const val EXPENSE_NAME_KEY: String = "com.frafio.myfinance.EXPENSE_NAME"
-        const val EXPENSE_PRICE_KEY: String = "com.frafio.myfinance.EXPENSE_PRICE"
-        const val EXPENSE_CATEGORY_KEY: String = "com.frafio.myfinance.EXPENSE_CATEGORY"
         const val EXPENSE_POSITION_KEY: String = "com.frafio.myfinance.EXPENSE_POSITION"
-        const val EXPENSE_YEAR_KEY: String = "com.frafio.myfinance.EXPENSE_YEAR"
-        const val EXPENSE_MONTH_KEY: String = "com.frafio.myfinance.EXPENSE_MONTH"
-        const val EXPENSE_DAY_KEY: String = "com.frafio.myfinance.EXPENSE_DAY"
+        const val EXTRA_TRANSACTION: String = "com.frafio.myfinance.EXTRA_TRANSACTION"
         const val ADD_RESULT_MESSAGE: String = "com.frafio.myfinance.ADD_RESULT_MESSAGE"
         const val ADD_RESULT_TOTAL_ID: String = "com.frafio.myfinance.ADD_RESULT_TOTAL_ID"
     }
@@ -186,34 +181,31 @@ class AddActivity : AppCompatActivity(), AddListener {
             }
 
             REQUEST_EDIT_CODE -> {
+                val transaction = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(EXTRA_TRANSACTION, Transaction::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableExtra(EXTRA_TRANSACTION) as? Transaction
+                }
+
                 intent.apply {
                     getIntExtra(EXPENSE_REQUEST_KEY, -1).also {
                         viewModel.expenseCode = it
                     }
-                    getStringExtra(EXPENSE_ID_KEY)?.let {
-                        viewModel.expenseId = it
-                    }
-                    getStringExtra(EXPENSE_NAME_KEY)?.let {
-                        viewModel.name = it
-                    }
-                    getDoubleExtra(EXPENSE_PRICE_KEY, 0.0).also {
-                        viewModel.priceString = doubleToString(it)
-                    }
-                    getIntExtra(EXPENSE_CATEGORY_KEY, 0).also {
-                        viewModel.category = it
-                    }
                     getIntExtra(EXPENSE_POSITION_KEY, 0).also {
                         viewModel.expensePosition = it
                     }
-                    getIntExtra(EXPENSE_YEAR_KEY, 0).also {
-                        datePickerBtn.year = it
-                    }
-                    getIntExtra(EXPENSE_MONTH_KEY, 0).also {
-                        datePickerBtn.month = it
-                    }
-                    getIntExtra(EXPENSE_DAY_KEY, 0).also {
-                        datePickerBtn.day = it
-                    }
+                }
+
+                transaction?.let {
+                    viewModel.expenseId = it.id
+                    viewModel.name = it.name
+                    viewModel.priceString = doubleToString(it.price ?: 0.0)
+                    viewModel.category = it.category
+                    viewModel.labels = it.labels
+                    datePickerBtn.year = it.year ?: 0
+                    datePickerBtn.month = it.month ?: 0
+                    datePickerBtn.day = it.day ?: 0
                 }
 
                 if (viewModel.expenseCode == REQUEST_EXPENSE_CODE) {
