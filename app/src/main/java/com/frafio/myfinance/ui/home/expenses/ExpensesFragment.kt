@@ -25,7 +25,6 @@ import com.frafio.myfinance.ui.components.EditTransactionSheet
 import com.frafio.myfinance.ui.features.home.expenses.ExpensesScreen
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
-import com.frafio.myfinance.ui.features.home.expenses.FilterExpensesSheet
 import com.frafio.myfinance.ui.features.home.expenses.LabelsSheet
 import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.hideSoftKeyboard
@@ -86,14 +85,33 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MyFinanceTheme {
+                    val selectedCategories by viewModel.selectedCategories.collectAsState()
                     ExpensesScreen(
                         viewModel = viewModel,
-                        onFilterClick = { showFilterSheet() },
+                        onSelectCategory = {
+                            showCategorySelectionSheet(
+                                disabledCategories = selectedCategories,
+                                onCategorySelected = { viewModel.onCategoryFilterChanged(it) }
+                            )
+                        },
+                        onSelectLabel = {
+                            showLabelsSheet(
+                                showNewLabel = false,
+                                onLabelCheckedChanged = { _, label, active ->
+                                    viewModel.onLabelFilterChanged(label, active)
+                                }
+                            )
+                        },
+                        onSelectDateRange = {
+                            datePickerRangeDialog.show()
+                        },
                         onItemLongClick = { expense, position ->
                             showEditExpenseSheet(expense, position)
                         },
                         onCategoryClick = { expense, _ ->
-                            showCategorySelectionSheet(expense)
+                            showCategorySelectionSheet(expense = expense) {
+                                viewModel.updateCategory(expense, it)
+                            }
                         },
                         getDateLabel = { start, end -> getDateChipLabel(start, end) }
                     )
@@ -117,17 +135,6 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
         viewModel.scrollToId(todayId)
     }
 
-    private fun showFilterSheet() {
-        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-            SideSheetDialog(requireContext())
-        } else {
-            BottomSheetDialog(requireContext())
-        }
-        val composeView = getFilterExpensesSheetDialogComposeView(sheetDialog::hide)
-        sheetDialog.setContentView(composeView)
-        sheetDialog.show()
-    }
-
     private fun showEditExpenseSheet(expense: Expense, position: Int) {
         val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
             SideSheetDialog(requireContext())
@@ -143,7 +150,11 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
         sheetDialog.show()
     }
 
-    private fun showCategorySelectionSheet(expense: Expense) {
+    private fun showCategorySelectionSheet(
+        expense: Expense? = null,
+        disabledCategories: List<Int> = emptyList(),
+        onCategorySelected: (Int) -> Unit
+    ) {
         val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
             SideSheetDialog(requireContext())
         } else {
@@ -151,9 +162,10 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
         }
         val composeView = getCategorySheetDialogComposeView(
             expense = expense,
+            disabledCategories = disabledCategories,
             onDismiss = sheetDialog::hide,
             onCategorySelected = {
-                viewModel.updateCategory(expense, it)
+                onCategorySelected(it)
                 sheetDialog.hide()
             }
         )
@@ -161,25 +173,21 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
         sheetDialog.show()
     }
 
-    private fun showLabelsSheet(expense: Expense) {
+    private fun showLabelsSheet(
+        expense: Expense? = null,
+        showNewLabel: Boolean = true,
+        onLabelCheckedChanged: (Expense?, String, Boolean) -> Unit
+    ) {
         val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
             SideSheetDialog(requireContext())
         } else {
             BottomSheetDialog(requireContext())
         }
         val composeView = getLabelsSheetDialogComposeView(
-            expenseId = expense.id,
-            showNewLabel = true,
+            expenseId = expense?.id,
+            showNewLabel = showNewLabel,
             onNewLabel = viewModel::addLabel,
-            onLabelCheckedChanged = { updatedExpense, label, checked ->
-                updatedExpense?.let {
-                    if (checked) {
-                        viewModel.addLabelToExpense(it, label)
-                    } else {
-                        viewModel.removeLabelFromExpense(it, label)
-                    }
-                }
-            },
+            onLabelCheckedChanged = onLabelCheckedChanged,
             onEditLabel = { oldLabel, newLabel ->
                 viewModel.editLabel(oldLabel, newLabel)
             },
@@ -282,7 +290,17 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                     EditTransactionSheet(
                         transaction = expense,
                         onDismiss = onDismiss,
-                        onLabels = { showLabelsSheet(expense) },
+                        onLabels = {
+                            showLabelsSheet(expense = expense) { updatedExpense, label, checked ->
+                                updatedExpense?.let {
+                                    if (checked) {
+                                        viewModel.addLabelToExpense(it, label)
+                                    } else {
+                                        viewModel.removeLabelFromExpense(it, label)
+                                    }
+                                }
+                            }
+                        },
                         onEdit = {
                             Intent(context, AddActivity::class.java).also {
                                 it.putExtra(
@@ -302,66 +320,6 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                         onDelete = {
                             viewModel.deleteExpense(expense)
                             onDismiss()
-                        }
-                    )
-                }
-            }
-        }
-    }
-
-    private fun getFilterExpensesSheetDialogComposeView(
-        onDismiss: () -> Unit
-    ): ComposeView {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MyFinanceTheme {
-                    val selectedCategories by viewModel.selectedCategories.collectAsState()
-                    val dateRange by viewModel.dateRange.collectAsState()
-                    val labels by viewModel.labels.collectAsState()
-                    FilterExpensesSheet(
-                        onDismiss = onDismiss,
-                        categoryEnabled = selectedCategories.size != 9,
-                        labelEnabled = labels.isNotEmpty(),
-                        dateRangeEnabled = dateRange == null,
-                        onSelectCategory = {
-                            onDismiss()
-                            val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-                                SideSheetDialog(requireContext())
-                            } else {
-                                BottomSheetDialog(requireContext())
-                            }
-                            val composeView = getCategorySheetDialogComposeView(
-                                disabledCategories = selectedCategories,
-                                onDismiss = sheetDialog::hide,
-                                onCategorySelected = {
-                                    viewModel.onCategoryFilterChanged(it)
-                                }
-                            )
-                            sheetDialog.setContentView(composeView)
-                            sheetDialog.show()
-                        },
-                        onSelectLabel = {
-                            onDismiss()
-                            val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-                                SideSheetDialog(requireContext())
-                            } else {
-                                BottomSheetDialog(requireContext())
-                            }
-                            val composeView = getLabelsSheetDialogComposeView(
-                                expenseId = null,
-                                showNewLabel = false,
-                                onNewLabel = {},
-                                onLabelCheckedChanged = { _, label, active ->
-                                    viewModel.onLabelFilterChanged(label, active)
-                                }
-                            )
-                            sheetDialog.setContentView(composeView)
-                            sheetDialog.show()
-                        },
-                        onSelectDateRange = {
-                            onDismiss()
-                            datePickerRangeDialog.show()
                         }
                     )
                 }

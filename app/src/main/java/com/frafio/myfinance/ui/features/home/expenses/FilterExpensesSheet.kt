@@ -8,11 +8,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.model.MenuItem
+import com.frafio.myfinance.ui.components.AdaptiveSheet
 import com.frafio.myfinance.ui.components.ListSheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 
 @Composable
 fun FilterExpensesSheet(
+    show: Boolean,
     onDismiss: () -> Unit,
     categoryEnabled: Boolean,
     labelEnabled: Boolean,
@@ -20,35 +22,40 @@ fun FilterExpensesSheet(
     onSelectCategory: () -> Unit,
     onSelectLabel: () -> Unit,
     onSelectDateRange: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    ListSheetDialog(
-        icon = R.drawable.ic_filter_list_filled,
-        title = stringResource(id = R.string.filter),
-        label = stringResource(id = R.string.select),
-        onDismiss = onDismiss,
-        items = listOf(
-            MenuItem(
-                iconRes = R.drawable.ic_sell_outline,
-                textRes = R.string.label,
-                enabled = labelEnabled,
-                onClick = onSelectLabel
+    AdaptiveSheet(
+        show = show,
+        onDismiss = onDismiss
+    ) {
+        ListSheetDialog(
+            icon = R.drawable.ic_filter_list_filled,
+            title = stringResource(id = R.string.filter),
+            label = stringResource(id = R.string.select),
+            onDismiss = onDismiss,
+            items = listOf(
+                MenuItem(
+                    iconRes = R.drawable.ic_sell_outline,
+                    textRes = R.string.label,
+                    enabled = labelEnabled,
+                    onClick = onSelectLabel
+                ),
+                MenuItem(
+                    iconRes = R.drawable.ic_grid_3x3_filled,
+                    textRes = R.string.category,
+                    enabled = categoryEnabled,
+                    onClick = onSelectCategory
+                ),
+                MenuItem(
+                    iconRes = R.drawable.ic_today_outline,
+                    textRes = R.string.date_range,
+                    enabled = dateRangeEnabled,
+                    onClick = onSelectDateRange
+                )
             ),
-            MenuItem(
-                iconRes = R.drawable.ic_grid_3x3_filled,
-                textRes = R.string.category,
-                enabled = categoryEnabled,
-                onClick = onSelectCategory
-            ),
-            MenuItem(
-                iconRes = R.drawable.ic_today_outline,
-                textRes = R.string.date_range,
-                enabled = dateRangeEnabled,
-                onClick = onSelectDateRange
-            )
-        ),
-        modifier = modifier
-    )
+            modifier = modifier
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -56,6 +63,7 @@ fun FilterExpensesSheet(
 fun FilterExpensesSheetPreview() {
     MyFinanceTheme {
         FilterExpensesSheet(
+            show = true,
             onDismiss = {},
             onSelectCategory = {},
             onSelectLabel = {},

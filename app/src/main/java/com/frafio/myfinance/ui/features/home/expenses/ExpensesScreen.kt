@@ -65,11 +65,13 @@ import java.time.LocalDate
 @Composable
 fun ExpensesScreen(
     viewModel: ExpensesViewModel,
-    onFilterClick: () -> Unit,
+    onSelectCategory: () -> Unit,
+    onSelectLabel: () -> Unit,
+    onSelectDateRange: () -> Unit,
     onItemLongClick: (Expense, Int) -> Unit,
     onCategoryClick: (Expense, Int) -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val expenses by viewModel.expenses.collectAsState()
     val totalFilteredExpenses by viewModel.totalFilteredExpenses.collectAsState()
@@ -79,6 +81,24 @@ fun ExpensesScreen(
     val selectedLabels by viewModel.selectedLabels.collectAsState()
     val dateRange by viewModel.dateRange.collectAsState()
     val itemMetadata by viewModel.itemMetadata.collectAsState()
+    val labels by viewModel.labels.collectAsState()
+
+    var showFilterSheet by remember { mutableStateOf(false) }
+
+    FilterExpensesSheet(
+        show = showFilterSheet,
+        onDismiss = {
+            if (showFilterSheet) {
+                showFilterSheet = false
+            }
+        },
+        categoryEnabled = selectedCategories.size != 9,
+        labelEnabled = labels.isNotEmpty(),
+        dateRangeEnabled = dateRange == null,
+        onSelectCategory = onSelectCategory,
+        onSelectLabel = onSelectLabel,
+        onSelectDateRange = onSelectDateRange,
+    )
 
     ExpensesContent(
         expenses = expenses,
@@ -95,7 +115,7 @@ fun ExpensesScreen(
         onLabelFilterChanged = viewModel::onLabelFilterChanged,
         onDateFilterChanged = { viewModel.onDateFilterChanged(it) },
         onLoadMore = { viewModel.loadMore() },
-        onFilterClick = onFilterClick,
+        onFilterClick = { showFilterSheet = true },
         onItemLongClick = onItemLongClick,
         onCategoryClick = onCategoryClick,
         getDateLabel = getDateLabel,
@@ -124,7 +144,7 @@ fun ExpensesContent(
     onItemLongClick: (Expense, Int) -> Unit,
     onCategoryClick: (Expense, Int) -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         if (isExpensesEmpty == true) {
@@ -256,7 +276,7 @@ fun ExpensesList(
     onCategoryClick: (Expense, Int) -> Unit,
     onLoadMore: () -> Unit,
     scrollToIdFlow: Flow<String?>,
-    itemMetadata: Map<Int, Pair<Int, Int>>
+    itemMetadata: Map<Int, Pair<Int, Int>>,
 ) {
     val listState = rememberLazyListState()
     val currentExpenses by rememberUpdatedState(expenses)
