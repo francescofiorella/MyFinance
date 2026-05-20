@@ -1,7 +1,6 @@
 package com.frafio.myfinance.ui.features.home.dashboard
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -120,8 +119,6 @@ fun BudgetIndicatorCard(
                     )
                 }
 
-                val monthlyInteractionSource = remember { MutableInteractionSource() }
-                val annualInteractionSource = remember { MutableInteractionSource() }
                 ButtonGroup(
                     modifier = Modifier
                         .padding(top = 16.dp),
@@ -134,15 +131,12 @@ fun BudgetIndicatorCard(
                     customItem(
                         {
                             ToggleButton(
-                                modifier = Modifier
-                                    .animateWidth(monthlyInteractionSource),
                                 shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
                                 checked = selectedIndex == 0,
                                 onCheckedChange = {
                                     selectedIndex = 0
                                     onToggleMonthShown(true)
-                                },
-                                interactionSource = monthlyInteractionSource
+                                }
                             ) {
                                 Text(
                                     text = stringResource(id = R.string.monthly),
@@ -157,15 +151,12 @@ fun BudgetIndicatorCard(
                     customItem(
                         {
                             ToggleButton(
-                                modifier = Modifier
-                                    .animateWidth(annualInteractionSource),
                                 shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
                                 checked = selectedIndex == 1,
                                 onCheckedChange = {
                                     selectedIndex = 1
                                     onToggleMonthShown(false)
-                                },
-                                interactionSource = annualInteractionSource
+                                }
                             ) {
                                 Text(
                                     text = stringResource(id = R.string.annual),

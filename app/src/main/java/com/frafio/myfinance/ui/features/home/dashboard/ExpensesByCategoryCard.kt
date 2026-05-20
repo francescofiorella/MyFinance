@@ -158,8 +158,6 @@ fun ExpensesByCategoryCard(
                 }
             }
 
-            val monthlyInteractionSource = remember { MutableInteractionSource() }
-            val annualInteractionSource = remember { MutableInteractionSource() }
             ButtonGroup(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
@@ -170,14 +168,11 @@ fun ExpensesByCategoryCard(
                 customItem(
                     {
                         TonalToggleButton(
-                            modifier = Modifier
-                                .animateWidth(monthlyInteractionSource),
                             shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
                             checked = monthlyShown,
                             onCheckedChange = {
                                 onSwitchData(true)
-                            },
-                            interactionSource = monthlyInteractionSource
+                            }
                         ) {
                             Text(
                                 text = stringResource(id = R.string.monthly),
@@ -192,14 +187,11 @@ fun ExpensesByCategoryCard(
                 customItem(
                     {
                         TonalToggleButton(
-                            modifier = Modifier
-                                .animateWidth(annualInteractionSource),
                             shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
                             checked = !monthlyShown,
                             onCheckedChange = {
                                 onSwitchData(false)
-                            },
-                            interactionSource = annualInteractionSource
+                            }
                         ) {
                             Text(
                                 text = stringResource(id = R.string.annual),
