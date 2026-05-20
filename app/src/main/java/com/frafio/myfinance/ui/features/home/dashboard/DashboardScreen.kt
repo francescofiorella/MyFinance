@@ -52,7 +52,6 @@ fun DashboardScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DashboardContent(
     viewModel: DashboardViewModel,

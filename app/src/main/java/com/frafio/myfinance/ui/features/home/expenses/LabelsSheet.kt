@@ -6,6 +6,8 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +20,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
@@ -65,7 +69,6 @@ import com.frafio.myfinance.ui.components.SheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.getCategoryIcon
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LabelsSheet(
     modifier: Modifier = Modifier,
@@ -361,29 +364,54 @@ private fun LabelItem(
             },
             trailingContent = {
                 if (isEditing) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        FilledIconButton(
-                            modifier = Modifier.width(52.dp),
-                            onClick = onCancelEdit
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_close_filled),
-                                contentDescription = null
-                            )
+                    val cancelInteractionSource = remember { MutableInteractionSource() }
+                    val confirmInteractionSource = remember { MutableInteractionSource() }
+                    ButtonGroup(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        overflowIndicator = { menuState ->
+                            ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
                         }
-                        FilledIconButton(
-                            modifier = Modifier.padding(start = 4.dp),
-                            onClick = onConfirmEdit,
-                            enabled = editLabelValue.text.isNotEmpty() && editLabelValue.text != label,
-                            shapes = IconButtonDefaults.shapes(
-                                shape = IconButtonDefaults.smallSquareShape,
-                            )
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_check_filled),
-                                contentDescription = stringResource(id = R.string.confirm)
-                            )
-                        }
+                    ) {
+                        customItem(
+                            {
+                                FilledIconButton(
+                                    modifier = Modifier
+                                        .width(52.dp)
+                                        .animateWidth(cancelInteractionSource),
+                                    onClick = onCancelEdit,
+                                    shapes = IconButtonDefaults.shapes(),
+                                    interactionSource = cancelInteractionSource
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_close_filled),
+                                        contentDescription = null,
+                                    )
+                                }
+                            },
+                            {}
+                        )
+                        customItem(
+                            {
+                                FilledIconButton(
+                                    modifier = Modifier
+                                        .size(IconButtonDefaults.smallContainerSize())
+                                        .animateWidth(confirmInteractionSource),
+                                    onClick = onConfirmEdit,
+                                    enabled = editLabelValue.text.isNotEmpty() && editLabelValue.text != label,
+                                    shapes = IconButtonDefaults.shapes(
+                                        shape = IconButtonDefaults.smallSquareShape,
+                                    ),
+                                    interactionSource = confirmInteractionSource
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_check_filled),
+                                        contentDescription = stringResource(id = R.string.confirm)
+                                    )
+                                }
+                            },
+                            {}
+                        )
                     }
                 } else {
                     Row(verticalAlignment = Alignment.CenterVertically) {

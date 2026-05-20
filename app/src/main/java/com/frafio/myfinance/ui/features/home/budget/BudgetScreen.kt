@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.features.home.budget
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,9 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -63,7 +67,7 @@ fun BudgetScreen(
     val monthlyBudget by viewModel.monthlyBudget.collectAsState()
     val annualBudget by viewModel.annualBudget.collectAsState()
 
-    BudgetContent(
+    IncomeList(
         incomes = incomes,
         isIncomesEmpty = isIncomesEmpty,
         itemMetadata = itemMetadata,
@@ -74,35 +78,6 @@ fun BudgetScreen(
         onItemLongClick = onItemLongClick,
         onEditBudgetClick = { onEditBudgetClick(monthlyBudget) },
         onDeleteBudget = viewModel::deleteMonthlyBudget,
-        modifier = modifier
-    )
-}
-
-@Composable
-fun BudgetContent(
-    incomes: List<Income>,
-    isIncomesEmpty: Boolean,
-    itemMetadata: Map<Int, Pair<Int, Int>>,
-    monthlyBudget: Double,
-    annualBudget: Double,
-    scrollToIdFlow: Flow<String?>,
-    onLoadMore: () -> Unit,
-    onItemLongClick: (Income, Int) -> Unit,
-    onEditBudgetClick: () -> Unit,
-    onDeleteBudget: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    IncomeList(
-        incomes = incomes,
-        isIncomesEmpty = isIncomesEmpty,
-        monthlyBudget = monthlyBudget,
-        annualBudget = annualBudget,
-        onEditBudgetClick = onEditBudgetClick,
-        onDeleteBudget = onDeleteBudget,
-        itemMetadata = itemMetadata,
-        onItemLongClick = onItemLongClick,
-        onLoadMore = onLoadMore,
-        scrollToIdFlow = scrollToIdFlow,
         modifier = modifier
     )
 }
@@ -173,13 +148,13 @@ fun IncomeList(
         item {
             // Monthly Budget Card
             Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
                     .padding(top = 64.dp)
             ) {
                 Text(
-                    modifier = Modifier.fillMaxWidth(),
                     text = stringResource(R.string.currency) + " "
                             + doubleToPrice(monthlyBudget).replace(
                         stringResource(R.string.currency),
@@ -193,8 +168,7 @@ fun IncomeList(
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = stringResource(R.string.annual_budget) + " ",
@@ -211,34 +185,56 @@ fun IncomeList(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(
+                val editInteractionSource = remember { MutableInteractionSource() }
+                val deleteInteractionSource = remember { MutableInteractionSource() }
+                ButtonGroup(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    overflowIndicator = { menuState ->
+                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+                    }
                 ) {
-                    FilledIconButton(
-                        onClick = onEditBudgetClick,
-                        shapes = IconButtonDefaults.shapes(
-                            shape = IconButtonDefaults.smallSquareShape,
-                        )
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_edit_filled),
-                            contentDescription = null,
-                        )
-                    }
-                    FilledIconButton(
-                        onClick = onDeleteBudget,
-                        enabled = monthlyBudget != 0.0,
-                        shapes = IconButtonDefaults.shapes(
-                            shape = IconButtonDefaults.smallSquareShape,
-                        )
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_delete_filled),
-                            contentDescription = null
-                        )
-                    }
+                    customItem(
+                        {
+                            FilledIconButton(
+                                modifier = Modifier
+                                    .size(IconButtonDefaults.smallContainerSize())
+                                    .animateWidth(editInteractionSource),
+                                onClick = onEditBudgetClick,
+                                shapes = IconButtonDefaults.shapes(
+                                    shape = IconButtonDefaults.smallSquareShape,
+                                ),
+                                interactionSource = editInteractionSource
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_edit_filled),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        {}
+                    )
+                    customItem(
+                        {
+                            FilledIconButton(
+                                modifier = Modifier
+                                    .size(IconButtonDefaults.smallContainerSize())
+                                    .animateWidth(deleteInteractionSource),
+                                onClick = onDeleteBudget,
+                                enabled = monthlyBudget != 0.0,
+                                shapes = IconButtonDefaults.shapes(
+                                    shape = IconButtonDefaults.smallSquareShape,
+                                ),
+                                interactionSource = deleteInteractionSource
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_delete_filled),
+                                    contentDescription = null
+                                )
+                            }
+                        },
+                        {}
+                    )
                 }
             }
         }
@@ -315,7 +311,7 @@ fun IncomeList(
 @Composable
 fun PreviewBudgetContent() {
     MyFinanceTheme {
-        BudgetContent(
+        IncomeList(
             incomes = listOf(
                 Income(
                     id = "2024",

@@ -249,7 +249,6 @@ fun ExpensesContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ExpensesList(
     expenses: List<Expense>,

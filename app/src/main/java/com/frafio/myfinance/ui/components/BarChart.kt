@@ -2,6 +2,7 @@ package com.frafio.myfinance.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +50,7 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BarChart(
     modifier: Modifier = Modifier,
@@ -122,12 +126,22 @@ fun BarChart(
             }
             Spacer(modifier = Modifier.height(16.dp))
             Box(
-                modifier = Modifier.fillMaxWidth().height(barMaxHeight),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(barMaxHeight),
                 contentAlignment = Alignment.BottomStart
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                val interactionSources = remember(visibleEntries.size) {
+                    List(visibleEntries.size) { MutableInteractionSource() }
+                }
+                ButtonGroup(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.Bottom,
+                    overflowIndicator = { menuState ->
+                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+                    }
                 ) {
                     visibleEntries.forEachIndexed { index, entry ->
                         val originalIndex = index + startIndex
@@ -135,17 +149,24 @@ fun BarChart(
                         val barHeightFraction =
                             (entry.value / maxValue).toFloat().coerceIn(0.01f, 1f)
 
-                        ChartBar(
-                            modifier = Modifier.weight(1f),
-                            barWidth = barWidth,
-                            barPadding = barPadding,
-                            barMaxHeight = barMaxHeight,
-                            heightFraction = barHeightFraction,
-                            isSelected = isSelected,
-                            onClick = {
-                                selectedIndex = originalIndex
-                                onBarClick(originalIndex)
-                            }
+                        customItem(
+                            {
+                                ChartBar(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .animateWidth(interactionSources[index]),
+                                    barWidth = barWidth,
+                                    barPadding = barPadding,
+                                    heightFraction = barHeightFraction,
+                                    isSelected = isSelected,
+                                    onClick = {
+                                        selectedIndex = originalIndex
+                                        onBarClick(originalIndex)
+                                    },
+                                    interactionSource = interactionSources[index]
+                                )
+                            },
+                            {}
                         )
                     }
                 }
@@ -165,7 +186,7 @@ fun BarChart(
                                 .padding(bottom = barMaxHeight * animatedHeightFraction),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        if (visibleEntries[visibleEntries.size-1].value <= referenceValue) {
+                        if (visibleEntries[visibleEntries.size - 1].value <= referenceValue) {
                             Text(
                                 modifier = Modifier
                                     .zIndex(-1f)
@@ -173,7 +194,8 @@ fun BarChart(
                                     .offset {
                                         IntOffset(
                                             0,
-                                            -(barMaxHeight * animatedHeightFraction).toPx().roundToInt()
+                                            -(barMaxHeight * animatedHeightFraction).toPx()
+                                                .roundToInt()
                                         )
                                     },
                                 text = doubleToPriceWithoutDecimals(referenceValue),
@@ -220,45 +242,37 @@ fun BarChart(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ChartBar(
     modifier: Modifier = Modifier,
     barWidth: Dp = 40.dp,
     barPadding: Dp = 3.dp,
-    barMaxHeight: Dp = 160.dp,
     heightFraction: Float,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    interactionSource: MutableInteractionSource
 ) {
     val animatedHeightFraction by animateFloatAsState(
         targetValue = heightFraction,
         animationSpec = tween(durationMillis = 500),
         label = "BarHeight"
     )
-
-    Row(
+    ToggleButton(
+        checked = isSelected,
+        onCheckedChange = {
+            if (it) onClick()
+        },
+        content = {},
+        colors = ToggleButtonDefaults.toggleButtonColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            checkedContainerColor = MaterialTheme.colorScheme.primary
+        ),
         modifier = modifier
-            .height(barMaxHeight),
-        verticalAlignment = Alignment.Bottom
-    ) {
-        Spacer(modifier = Modifier.width(barPadding))
-        ToggleButton(
-            checked = isSelected,
-            onCheckedChange = {
-                if (it) onClick()
-            },
-            content = {},
-            colors = ToggleButtonDefaults.toggleButtonColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                checkedContainerColor = MaterialTheme.colorScheme.primary
-            ),
-            modifier = Modifier
-                .fillMaxHeight(animatedHeightFraction)
-                .width(barWidth)
-        )
-        Spacer(modifier = Modifier.width(barPadding))
-    }
+            .fillMaxHeight(animatedHeightFraction)
+            .padding(horizontal = barPadding)
+            .width(barWidth),
+        interactionSource = interactionSource
+    )
 }
 
 @Preview(showBackground = true, widthDp = 360)

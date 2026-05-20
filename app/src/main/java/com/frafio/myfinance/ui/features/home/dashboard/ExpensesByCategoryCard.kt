@@ -1,21 +1,19 @@
 package com.frafio.myfinance.ui.features.home.dashboard
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -29,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
@@ -37,9 +36,8 @@ import com.frafio.myfinance.ui.components.PieChart
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import kotlin.collections.forEach
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ExpensesByCategoryCard(
     expenses: List<Expense>,
@@ -88,67 +86,131 @@ fun ExpensesByCategoryCard(
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                FilledTonalIconButton(
-                    onClick = onPreviousDate,
-                    shapes = IconButtonDefaults.shapes(
-                        shape = IconButtonDefaults.smallSquareShape,
-                    )
+                val previousInteractionSource = remember { MutableInteractionSource() }
+                val nextInteractionSource = remember { MutableInteractionSource() }
+                val todayInteractionSource = remember { MutableInteractionSource() }
+                ButtonGroup(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    overflowIndicator = { menuState ->
+                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+                    }
                 ) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
-                        contentDescription = null
+                    customItem(
+                        {
+                            FilledTonalIconButton(
+                                modifier = Modifier
+                                    .size(IconButtonDefaults.smallContainerSize())
+                                    .animateWidth(previousInteractionSource),
+                                onClick = onPreviousDate,
+                                shapes = IconButtonDefaults.shapes(
+                                    shape = IconButtonDefaults.smallSquareShape,
+                                ),
+                                interactionSource = previousInteractionSource
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_keyboard_arrow_left_filled),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        {}
                     )
-                }
-                FilledTonalIconButton(
-                    onClick = onNextDate,
-                    enabled = isNextDateEnabled,
-                    shapes = IconButtonDefaults.shapes(
-                        shape = IconButtonDefaults.smallSquareShape,
+                    customItem(
+                        {
+                            FilledTonalIconButton(
+                                modifier = Modifier
+                                    .size(IconButtonDefaults.smallContainerSize())
+                                    .animateWidth(nextInteractionSource),
+                                onClick = onNextDate,
+                                enabled = isNextDateEnabled,
+                                shapes = IconButtonDefaults.shapes(
+                                    shape = IconButtonDefaults.smallSquareShape,
+                                ),
+                                interactionSource = nextInteractionSource
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_keyboard_arrow_right_filled),
+                                    contentDescription = null
+                                )
+                            }
+                        },
+                        {}
                     )
-                ) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
-                        contentDescription = null
-                    )
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                FilledTonalButton(
-                    onClick = onToday,
-                    shapes = ButtonDefaults.shapes()
-                ) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_today_filled),
-                        contentDescription = null
+                    customItem(
+                        {
+                            FilledTonalIconButton(
+                                modifier = Modifier
+                                    .width(52.dp)
+                                    .animateWidth(todayInteractionSource),
+                                onClick = onToday,
+                                shapes = IconButtonDefaults.shapes(),
+                                interactionSource = todayInteractionSource
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_today_filled),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        {}
                     )
                 }
             }
 
-            Row(modifier = Modifier.width(IntrinsicSize.Max)) {
-                TonalToggleButton(
-                    modifier = Modifier.weight(1f),
-                    shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
-                    checked = monthlyShown,
-                    onCheckedChange = {
-                        onSwitchData(true)
-                    },
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.monthly)
-                    )
+            val monthlyInteractionSource = remember { MutableInteractionSource() }
+            val annualInteractionSource = remember { MutableInteractionSource() }
+            ButtonGroup(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+                overflowIndicator = { menuState ->
+                    ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
                 }
-                Spacer(modifier = Modifier.width(ButtonGroupDefaults.ConnectedSpaceBetween))
-                TonalToggleButton(
-                    modifier = Modifier.weight(1f),
-                    shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
-                    checked = !monthlyShown,
-                    onCheckedChange = {
-                        onSwitchData(false)
+            ) {
+                customItem(
+                    {
+                        TonalToggleButton(
+                            modifier = Modifier
+                                .animateWidth(monthlyInteractionSource),
+                            shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                            checked = monthlyShown,
+                            onCheckedChange = {
+                                onSwitchData(true)
+                            },
+                            interactionSource = monthlyInteractionSource
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.monthly),
+                                maxLines = 1,
+                                softWrap = false,
+                                overflow = TextOverflow.Visible
+                            )
+                        }
                     },
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.annual)
-                    )
-                }
+                    {}
+                )
+                customItem(
+                    {
+                        TonalToggleButton(
+                            modifier = Modifier
+                                .animateWidth(annualInteractionSource),
+                            shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                            checked = !monthlyShown,
+                            onCheckedChange = {
+                                onSwitchData(false)
+                            },
+                            interactionSource = annualInteractionSource
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.annual),
+                                maxLines = 1,
+                                softWrap = false,
+                                overflow = TextOverflow.Visible
+                            )
+                        }
+                    },
+                    {}
+                )
             }
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {

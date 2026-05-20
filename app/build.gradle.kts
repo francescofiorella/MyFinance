@@ -12,15 +12,15 @@ plugins {
 android {
     namespace = "com.frafio.myfinance"
     compileSdk {
-        version = release(36)
+        version = release(37)
     }
 
     defaultConfig {
         applicationId = "com.frafio.myfinance"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 4
-        versionName = "4.9.2"
+        versionName = "4.9.3"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -54,6 +54,7 @@ android {
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_17
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
 }
 

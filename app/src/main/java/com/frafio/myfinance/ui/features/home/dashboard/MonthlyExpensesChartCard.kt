@@ -1,17 +1,18 @@
 package com.frafio.myfinance.ui.features.home.dashboard
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -70,40 +71,77 @@ fun MonthlyExpensesChartCard(
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                FilledTonalIconButton(
-                    onClick = onPreviousDate,
-                    shapes = IconButtonDefaults.shapes(
-                        shape = IconButtonDefaults.smallSquareShape,
-                    )
+                val previousInteractionSource = remember { MutableInteractionSource() }
+                val nextInteractionSource = remember { MutableInteractionSource() }
+                val todayInteractionSource = remember { MutableInteractionSource() }
+                ButtonGroup(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    overflowIndicator = { menuState ->
+                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+                    }
                 ) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
-                        contentDescription = null
+                    customItem(
+                        {
+                            FilledTonalIconButton(
+                                modifier = Modifier
+                                    .size(IconButtonDefaults.smallContainerSize())
+                                    .animateWidth(previousInteractionSource),
+                                onClick = onPreviousDate,
+                                shapes = IconButtonDefaults.shapes(
+                                    shape = IconButtonDefaults.smallSquareShape,
+                                ),
+                                interactionSource = previousInteractionSource
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_keyboard_arrow_left_filled),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        {}
                     )
-                }
-                FilledTonalIconButton(
-                    onClick = onNextDate,
-                    enabled = isNextDateEnabled,
-                    shapes = IconButtonDefaults.shapes(
-                        shape = IconButtonDefaults.smallSquareShape,
+                    customItem(
+                        {
+                            FilledTonalIconButton(
+                                modifier = Modifier
+                                    .size(IconButtonDefaults.smallContainerSize())
+                                    .animateWidth(nextInteractionSource),
+                                onClick = onNextDate,
+                                enabled = isNextDateEnabled,
+                                shapes = IconButtonDefaults.shapes(
+                                    shape = IconButtonDefaults.smallSquareShape,
+                                ),
+                                interactionSource = nextInteractionSource
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_keyboard_arrow_right_filled),
+                                    contentDescription = null
+                                )
+                            }
+                        },
+                        {}
                     )
-                ) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
-                        contentDescription = null
-                    )
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                FilledTonalButton(
-                    onClick = {
-                        onToday()
-                        resetBarChart = !resetBarChart
-                    },
-                    shapes = ButtonDefaults.shapes()
-                ) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_today_filled),
-                        contentDescription = null
+                    customItem(
+                        {
+                            FilledTonalIconButton(
+                                modifier = Modifier
+                                    .width(52.dp)
+                                    .animateWidth(todayInteractionSource),
+                                onClick = {
+                                    onToday()
+                                    resetBarChart = !resetBarChart
+                                },
+                                shapes = IconButtonDefaults.shapes(),
+                                interactionSource = todayInteractionSource
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_today_filled),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        {}
                     )
                 }
             }

@@ -1,15 +1,15 @@
 package com.frafio.myfinance.ui.features.home.dashboard
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearWavyProgressIndicator
@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
@@ -58,11 +59,13 @@ fun BudgetIndicatorCard(
         contentAlignment = Alignment.Center
     ) {
         Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .padding(top = 32.dp, bottom = 64.dp),
         ) {
             Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = doubleToPrice(amount),
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.SemiBold,
@@ -102,7 +105,7 @@ fun BudgetIndicatorCard(
                         .height(36.dp)
                 )
 
-                Row {
+                Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         modifier = Modifier.weight(1f),
                         text = title,
@@ -117,39 +120,63 @@ fun BudgetIndicatorCard(
                     )
                 }
 
-                Row(
+                val monthlyInteractionSource = remember { MutableInteractionSource() }
+                val annualInteractionSource = remember { MutableInteractionSource() }
+                ButtonGroup(
                     modifier = Modifier
-                        .width(IntrinsicSize.Max)
-                        .padding(top = 16.dp)
-                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+                    overflowIndicator = { menuState ->
+                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+                    }
                 ) {
-                    ToggleButton(
-                        modifier = Modifier.weight(1f),
-                        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
-                        checked = selectedIndex == 0,
-                        onCheckedChange = {
-                            selectedIndex = 0
-                            onToggleMonthShown(true)
+                    customItem(
+                        {
+                            ToggleButton(
+                                modifier = Modifier
+                                    .animateWidth(monthlyInteractionSource),
+                                shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                                checked = selectedIndex == 0,
+                                onCheckedChange = {
+                                    selectedIndex = 0
+                                    onToggleMonthShown(true)
+                                },
+                                interactionSource = monthlyInteractionSource
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.monthly),
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Visible
+                                )
+                            }
                         },
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.monthly)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(ButtonGroupDefaults.ConnectedSpaceBetween))
-                    ToggleButton(
-                        modifier = Modifier.weight(1f),
-                        shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
-                        checked = selectedIndex == 1,
-                        onCheckedChange = {
-                            selectedIndex = 1
-                            onToggleMonthShown(false)
+                        {}
+                    )
+                    customItem(
+                        {
+                            ToggleButton(
+                                modifier = Modifier
+                                    .animateWidth(annualInteractionSource),
+                                shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                                checked = selectedIndex == 1,
+                                onCheckedChange = {
+                                    selectedIndex = 1
+                                    onToggleMonthShown(false)
+                                },
+                                interactionSource = annualInteractionSource
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.annual),
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Visible
+                                )
+                            }
                         },
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.annual)
-                        )
-                    }
+                        {}
+                    )
                 }
             }
         }
