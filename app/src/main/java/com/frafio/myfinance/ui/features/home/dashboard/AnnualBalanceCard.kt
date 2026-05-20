@@ -170,12 +170,13 @@ fun AnnualBalanceCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
-                    modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier
+                        .weight(1f)
                 ) {
                     Box(
                         modifier = Modifier
@@ -199,28 +200,31 @@ fun AnnualBalanceCard(
                                 MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
-                    Column(
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Text(
-                            text = stringResource(R.string.incomes),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = if (incomesSum < 1000)
-                                doubleToPrice(incomesSum)
-                            else
-                                doubleToPriceWithoutDecimals(incomesSum),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Normal
-                        )
-                    }
+                }
+                Column(
+                    Modifier.weight(2f),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = stringResource(R.string.incomes),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = if (incomesSum < 1000)
+                            doubleToPrice(incomesSum)
+                        else
+                            doubleToPriceWithoutDecimals(incomesSum),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Normal,
+                        maxLines = 1,
+                        softWrap = false
+                    )
                 }
                 Row(
-                    modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier
+                        .weight(1f)
                 ) {
                     Box(
                         modifier = Modifier
@@ -244,23 +248,26 @@ fun AnnualBalanceCard(
                                 MaterialTheme.colorScheme.onErrorContainer
                         )
                     }
-                    Column(
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Text(
-                            text = stringResource(R.string.expenses),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = if (expensesSum < 1000)
-                                doubleToPrice(expensesSum)
-                            else
-                                doubleToPriceWithoutDecimals(expensesSum),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Normal
-                        )
-                    }
+                }
+                Column(
+                    Modifier.weight(2f),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = stringResource(R.string.expenses),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = if (expensesSum < 1000)
+                            doubleToPrice(expensesSum)
+                        else
+                            doubleToPriceWithoutDecimals(expensesSum),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Normal,
+                        maxLines = 1,
+                        softWrap = false
+                    )
                 }
             }
         }
