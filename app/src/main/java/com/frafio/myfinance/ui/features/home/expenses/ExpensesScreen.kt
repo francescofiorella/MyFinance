@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.Expense
+import com.frafio.myfinance.ui.components.AppDateRangePickerDialog
 import com.frafio.myfinance.ui.components.EditTransactionSheet
 import com.frafio.myfinance.ui.components.EmptyView
 import com.frafio.myfinance.ui.components.EmptyListItem
@@ -66,7 +67,6 @@ import java.time.LocalDate
 @Composable
 fun ExpensesScreen(
     viewModel: ExpensesViewModel,
-    onSelectDateRange: () -> Unit,
     onItemLongClick: (Expense, Int) -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
     modifier: Modifier = Modifier,
@@ -89,6 +89,7 @@ fun ExpensesScreen(
     var showLabelsSheet by remember { mutableStateOf(value = false) }
     var labelsTargetExpense by remember { mutableStateOf<Expense?>(value = null) }
     var showNewLabelInLabels by remember { mutableStateOf(value = true) }
+    var showDatePickerRange by remember { mutableStateOf(value = false) }
 
     FilterExpensesSheet(
         show = showFilterSheet,
@@ -109,7 +110,23 @@ fun ExpensesScreen(
             showNewLabelInLabels = false
             showLabelsSheet = true
         },
-        onSelectDateRange = onSelectDateRange,
+        onSelectDateRange = {
+            showDatePickerRange = true
+        },
+    )
+
+    AppDateRangePickerDialog(
+        show = showDatePickerRange,
+        onDismiss = {
+            if (showDatePickerRange) {
+                showDatePickerRange = false
+            }
+        },
+        onRangeSelected = { start, end ->
+            viewModel.onDateFilterChanged(Pair(start, end))
+        },
+        initialStartDate = dateRange?.first,
+        initialEndDate = dateRange?.second,
     )
 
     CategorySheet(

@@ -15,14 +15,12 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
-import com.frafio.myfinance.data.widget.DatePickerRangeDialog
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.features.home.expenses.ExpensesScreen
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.dateToExtendedString
-import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.time.LocalDate
@@ -32,7 +30,6 @@ import java.util.Locale
 class ExpensesFragment : BaseFragment(), ExpensesListener {
 
     private val viewModel by viewModels<ExpensesViewModel>()
-    private lateinit var datePickerRangeDialog: DatePickerRangeDialog
     private var pendingScrollId: String? = null
 
     private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -60,29 +57,12 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
             scrollUp()
         }
 
-        datePickerRangeDialog = object : DatePickerRangeDialog(
-            requireActivity()
-        ) {
-            override fun onStart() {
-                super.onStart()
-                requireActivity().hideSoftKeyboard(requireView())
-            }
-
-            override fun onPositiveBtnClickListener() {
-                super.onPositiveBtnClickListener()
-                viewModel.onDateFilterChanged(Pair(startDate!!, endDate!!))
-            }
-        }
-
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MyFinanceTheme {
                     ExpensesScreen(
                         viewModel = viewModel,
-                        onSelectDateRange = {
-                            datePickerRangeDialog.show()
-                        },
                         onItemLongClick = { expense, position ->
                             Intent(context, AddActivity::class.java).also {
                                 it.putExtra(

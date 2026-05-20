@@ -6,12 +6,12 @@ import androidx.lifecycle.AndroidViewModel
 import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
-import com.frafio.myfinance.data.widget.DatePickerButton
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.repository.IncomeRepository
 import com.frafio.myfinance.data.repository.ExpensesRepository
+import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.dateToUTCTimestamp
 import java.time.LocalDate
 
@@ -32,7 +32,8 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
     // TODO add labels in AddActivity
     var labels: List<String>? = null
 
-    var dateString: String? = null
+    val dateString: String?
+        get() = dateToExtendedString(day, month, year)
 
     var year: Int? = LocalDate.now().year
     var month: Int? = LocalDate.now().monthValue
@@ -43,13 +44,6 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
 
     var requestCode: Int? = null
     var expenseCode: Int? = null
-
-    fun updateTime(datePickerBtn: DatePickerButton) {
-        year = datePickerBtn.year
-        month = datePickerBtn.month
-        day = datePickerBtn.day
-        dateString = datePickerBtn.dateString
-    }
 
     fun onAddButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         listener?.onAddStart()

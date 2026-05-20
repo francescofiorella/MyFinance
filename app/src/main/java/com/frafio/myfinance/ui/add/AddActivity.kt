@@ -22,8 +22,8 @@ import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.model.Transaction
-import com.frafio.myfinance.data.widget.DatePickerButton
 import com.frafio.myfinance.databinding.ActivityAddBinding
+import com.frafio.myfinance.ui.components.AppDatePickerDialog
 import com.frafio.myfinance.ui.features.home.expenses.CategorySheet
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.clearText
@@ -32,6 +32,7 @@ import com.frafio.myfinance.utils.getCategoryIcon
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.chip.Chip
+import java.time.LocalDate
 
 class AddActivity : AppCompatActivity(), AddListener {
 
@@ -51,9 +52,7 @@ class AddActivity : AppCompatActivity(), AddListener {
     private lateinit var binding: ActivityAddBinding
     private val viewModel by viewModels<AddViewModel>()
     private var showCategorySheet by mutableStateOf(false)
-
-    // custom datePicker layout
-    private lateinit var datePickerBtn: DatePickerButton
+    private var showDatePicker by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,32 +143,41 @@ class AddActivity : AppCompatActivity(), AddListener {
                             showCategorySheet = false
                         }
                     )
+                    AppDatePickerDialog(
+                        show = showDatePicker,
+                        onDismiss = {
+                            if (showDatePicker) {
+                                showDatePicker = false
+                            }
+                        },
+                        onDateSelected = {
+                            viewModel.year = it.year
+                            viewModel.month = it.monthValue
+                            viewModel.day = it.dayOfMonth
+                            binding.dateET.setText(viewModel.dateString)
+                            showDatePicker = false
+                        },
+                        initialDate = LocalDate.of(
+                            viewModel.year ?: LocalDate.now().year,
+                            viewModel.month ?: LocalDate.now().monthValue,
+                            viewModel.day ?: LocalDate.now().dayOfMonth
+                        )
+                    )
                 }
             }
         }
     }
 
     private fun initLayout(code: Int) {
-        datePickerBtn = object : DatePickerButton(
-            binding.dateTIL,
-            binding.dateET,
-            this@AddActivity
-        ) {
-            override fun onStart() {
-                super.onStart()
-                binding.nameET.clearFocus()
-                binding.priceET.clearFocus()
-                hideSoftKeyboard(binding.root)
-            }
-
-            override fun onPositiveBtnClickListener() {
-                super.onPositiveBtnClickListener()
-                viewModel.year = year
-                viewModel.month = month
-                viewModel.day = day
-                viewModel.dateString = dateString
-            }
+        val dateClickListener = View.OnClickListener {
+            binding.nameET.clearFocus()
+            binding.priceET.clearFocus()
+            hideSoftKeyboard(binding.root)
+            showDatePicker = true
         }
+
+        binding.dateTIL.setOnClickListener(dateClickListener)
+        binding.dateET.setOnClickListener(dateClickListener)
 
         binding.categoryTIL.setOnClickListener(categoryInputListener)
         binding.categoryET.setOnClickListener(categoryInputListener)
@@ -228,9 +236,10 @@ class AddActivity : AppCompatActivity(), AddListener {
                     viewModel.priceString = doubleToString(it.price ?: 0.0)
                     viewModel.category = it.category
                     viewModel.labels = it.labels
-                    datePickerBtn.year = it.year ?: 0
-                    datePickerBtn.month = it.month ?: 0
-                    datePickerBtn.day = it.day ?: 0
+                    viewModel.year = it.year ?: LocalDate.now().year
+                    viewModel.month = it.month ?: LocalDate.now().monthValue
+                    viewModel.day = it.day ?: LocalDate.now().dayOfMonth
+                    binding.dateET.setText(viewModel.dateString)
                 }
 
                 if (viewModel.expenseCode == REQUEST_EXPENSE_CODE) {
@@ -266,8 +275,8 @@ class AddActivity : AppCompatActivity(), AddListener {
                 }
             }
         }
-
-        viewModel.updateTime(datePickerBtn)
+        
+        binding.dateET.setText(viewModel.dateString)
     }
 
     fun onBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
