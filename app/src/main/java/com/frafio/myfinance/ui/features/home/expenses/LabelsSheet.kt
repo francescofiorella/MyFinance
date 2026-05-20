@@ -65,12 +65,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.model.Expense
+import com.frafio.myfinance.ui.components.AdaptiveSheet
 import com.frafio.myfinance.ui.components.SheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.getCategoryIcon
 
 @Composable
 fun LabelsSheet(
+    show: Boolean,
+    onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     expense: Expense? = null,
     labels: List<String> = listOf(),
@@ -79,7 +82,7 @@ fun LabelsSheet(
     onNewLabel: (String) -> Unit,
     onLabelCheckedChanged: (String, Boolean) -> Unit,
     onDeleteLabel: (String) -> Unit,
-    onEditLabel: (String, String) -> Unit
+    onEditLabel: (String, String) -> Unit,
 ) {
 
     var labelFieldValue by remember { mutableStateOf(TextFieldValue(text = "")) }
@@ -109,56 +112,61 @@ fun LabelsSheet(
     val labelFirst = expense == null
     val endContent = expense?.getPriceString()
 
-    SheetDialog(
-        modifier = modifier,
-        icon = icon,
-        label = dialogLabel,
-        title = title,
-        labelFirst = labelFirst,
-        endContent = endContent
+    AdaptiveSheet(
+        show = show,
+        onDismiss = onDismiss
     ) {
-        Column(modifier = Modifier.animateContentSize()) {
-            if (showEditLabel) {
-                NewLabelItem(
-                    value = labelFieldValue,
-                    onValueChange = { labelFieldValue = it },
-                    isValid = isLabelValid,
-                    onConfirm = {
-                        onNewLabel(labelFieldValue.text.trim())
-                        labelFieldValue = TextFieldValue("")
-                        focusManager.clearFocus()
-                    }
-                )
-            }
-            labels.forEachIndexed { index, label ->
-                LabelItem(
-                    label = label,
-                    initialSelected = expense?.labels?.contains(label) ?: selectedLabels.contains(label),
-                    isEditing = editingLabel == label,
-                    editLabelValue = editLabelFieldValue,
-                    onEditLabelValueChange = { editLabelFieldValue = it },
-                    onLabelCheckedChanged = onLabelCheckedChanged,
-                    onEditClick = {
-                        editLabelFieldValue = TextFieldValue(
-                            text = label,
-                            selection = TextRange(label.length)
-                        )
-                        editingLabel = label
-                    },
-                    onDeleteClick = { onDeleteLabel(label) },
-                    onConfirmEdit = {
-                        onEditLabel(label, editLabelFieldValue.text.trim())
-                        editingLabel = null
-                    },
-                    onCancelEdit = {
-                        editingLabel = null
-                        editLabelFieldValue = TextFieldValue(text = "")
-                    },
-                    focusRequester = focusRequester,
-                    showEditOptions = showEditLabel,
-                    index = index,
-                    count = labels.size
-                )
+        SheetDialog(
+            modifier = modifier,
+            icon = icon,
+            label = dialogLabel,
+            title = title,
+            labelFirst = labelFirst,
+            endContent = endContent
+        ) {
+            Column(modifier = Modifier.animateContentSize()) {
+                if (showEditLabel) {
+                    NewLabelItem(
+                        value = labelFieldValue,
+                        onValueChange = { labelFieldValue = it },
+                        isValid = isLabelValid,
+                        onConfirm = {
+                            onNewLabel(labelFieldValue.text.trim())
+                            labelFieldValue = TextFieldValue("")
+                            focusManager.clearFocus()
+                        }
+                    )
+                }
+                labels.forEachIndexed { index, label ->
+                    LabelItem(
+                        label = label,
+                        initialSelected = expense?.labels?.contains(label) ?: selectedLabels.contains(label),
+                        isEditing = editingLabel == label,
+                        editLabelValue = editLabelFieldValue,
+                        onEditLabelValueChange = { editLabelFieldValue = it },
+                        onLabelCheckedChanged = onLabelCheckedChanged,
+                        onEditClick = {
+                            editLabelFieldValue = TextFieldValue(
+                                text = label,
+                                selection = TextRange(label.length)
+                            )
+                            editingLabel = label
+                        },
+                        onDeleteClick = { onDeleteLabel(label) },
+                        onConfirmEdit = {
+                            onEditLabel(label, editLabelFieldValue.text.trim())
+                            editingLabel = null
+                        },
+                        onCancelEdit = {
+                            editingLabel = null
+                            editLabelFieldValue = TextFieldValue(text = "")
+                        },
+                        focusRequester = focusRequester,
+                        showEditOptions = showEditLabel,
+                        index = index,
+                        count = labels.size
+                    )
+                }
             }
         }
     }
@@ -502,6 +510,8 @@ private fun LabelItem(
 fun LabelsSheetPreview() {
     MyFinanceTheme {
         LabelsSheet(
+            show = true,
+            onDismiss = {},
             modifier = Modifier
                 .background(color = MaterialTheme.colorScheme.surfaceContainerLow),
             labels = listOf(

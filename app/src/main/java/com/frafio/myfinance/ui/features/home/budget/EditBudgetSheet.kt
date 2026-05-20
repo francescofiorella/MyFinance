@@ -32,16 +32,18 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
+import com.frafio.myfinance.ui.components.AdaptiveSheet
 import com.frafio.myfinance.ui.components.SheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.doubleToString
 
 @Composable
 fun EditBudgetSheet(
+    show: Boolean,
     budget: Double,
     onDismiss: () -> Unit,
     onEditBudget: (Double) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val initialText = if (budget == 0.0) "" else doubleToString(budget)
     var budgetTextFieldValue by remember {
@@ -58,73 +60,78 @@ fun EditBudgetSheet(
         budgetTextFieldValue.text.isNotEmpty() && newBudget != budget
     }
 
-    SheetDialog(
-        icon = R.drawable.ic_savings_filled,
-        title = stringResource(id = R.string.your_budget),
-        label = stringResource(id = R.string.edit),
-        modifier = modifier
+    AdaptiveSheet(
+        show = show,
+        onDismiss = onDismiss
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
-            verticalAlignment = Alignment.CenterVertically
+        SheetDialog(
+            icon = R.drawable.ic_savings_filled,
+            title = stringResource(id = R.string.your_budget),
+            label = stringResource(id = R.string.edit),
+            modifier = modifier
         ) {
-            TextField(
-                value = budgetTextFieldValue,
-                onValueChange = {
-                    var filteredValue = it.text
-                    if (it.text.contains(".")) {
-                        val parts = it.text.split(".")
-                        if (parts.size > 1 && parts[1].length > 2) {
-                            filteredValue = "${parts[0]}.${parts[1].substring(0, 2)}"
-                        }
-                    }
-                    budgetTextFieldValue = it.copy(text = filteredValue)
-                },
+            Row(
                 modifier = Modifier
-                    .weight(1f),
-                label = { Text(stringResource(id = R.string.enter_your_budget)) },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                ),
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_edit_outline),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Decimal
-                ),
-                keyboardActions = KeyboardActions(onDone = {
-                    if (isConfirmEnabled) {
-                        onEditBudget(budgetTextFieldValue.text.toDoubleOrNull() ?: 0.0)
-                        onDismiss()
-                    }
-                })
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            FilledIconButton(
-                onClick = {
-                    if (isConfirmEnabled) {
-                        onEditBudget(budgetTextFieldValue.text.toDoubleOrNull() ?: 0.0)
-                        onDismiss()
-                    }
-                },
-                enabled = isConfirmEnabled,
-                shapes = IconButtonDefaults.shapes(
-                    shape = IconButtonDefaults.smallSquareShape,
-                )
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_check_filled),
-                    contentDescription = stringResource(id = R.string.confirm)
+                TextField(
+                    value = budgetTextFieldValue,
+                    onValueChange = {
+                        var filteredValue = it.text
+                        if (it.text.contains(".")) {
+                            val parts = it.text.split(".")
+                            if (parts.size > 1 && parts[1].length > 2) {
+                                filteredValue = "${parts[0]}.${parts[1].substring(0, 2)}"
+                            }
+                        }
+                        budgetTextFieldValue = it.copy(text = filteredValue)
+                    },
+                    modifier = Modifier
+                        .weight(1f),
+                    label = { Text(stringResource(id = R.string.enter_your_budget)) },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                    ),
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_edit_outline),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Decimal
+                    ),
+                    keyboardActions = KeyboardActions(onDone = {
+                        if (isConfirmEnabled) {
+                            onEditBudget(budgetTextFieldValue.text.toDoubleOrNull() ?: 0.0)
+                            onDismiss()
+                        }
+                    })
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                FilledIconButton(
+                    onClick = {
+                        if (isConfirmEnabled) {
+                            onEditBudget(budgetTextFieldValue.text.toDoubleOrNull() ?: 0.0)
+                            onDismiss()
+                        }
+                    },
+                    enabled = isConfirmEnabled,
+                    shapes = IconButtonDefaults.shapes(
+                        shape = IconButtonDefaults.smallSquareShape,
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_check_filled),
+                        contentDescription = stringResource(id = R.string.confirm)
+                    )
+                }
             }
         }
     }
@@ -135,6 +142,7 @@ fun EditBudgetSheet(
 fun EditBudgetSheetPreview() {
     MyFinanceTheme {
         EditBudgetSheet(
+            show = true,
             budget = 0.0,
             onDismiss = {},
             onEditBudget = {},

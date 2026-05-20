@@ -7,7 +7,9 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -29,9 +31,7 @@ import com.frafio.myfinance.utils.doubleToString
 import com.frafio.myfinance.utils.getCategoryIcon
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.frafio.myfinance.utils.snackBar
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
-import com.google.android.material.sidesheet.SideSheetDialog
 
 class AddActivity : AppCompatActivity(), AddListener {
 
@@ -50,6 +50,7 @@ class AddActivity : AppCompatActivity(), AddListener {
 
     private lateinit var binding: ActivityAddBinding
     private val viewModel by viewModels<AddViewModel>()
+    private var showCategorySheet by mutableStateOf(false)
 
     // custom datePicker layout
     private lateinit var datePickerBtn: DatePickerButton
@@ -119,6 +120,30 @@ class AddActivity : AppCompatActivity(), AddListener {
                         else
                             binding.priceET.setSelection(selection)
                     }
+                }
+            }
+        }
+
+        binding.addComposeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MyFinanceTheme {
+                    CategorySheet(
+                        show = showCategorySheet,
+                        onDismiss = {
+                            if (showCategorySheet) {
+                                showCategorySheet = false
+                            }
+                        },
+                        onCategorySelected = {
+                            binding.categoryTIL.error = ""
+                            val categories = resources.getStringArray(R.array.categories)
+                            binding.categoryET.setText(categories[it])
+                            binding.categoryTIL.setStartIconDrawable(getCategoryIcon(it))
+                            viewModel.category = it
+                            showCategorySheet = false
+                        }
+                    )
                 }
             }
         }
@@ -338,43 +363,10 @@ class AddActivity : AppCompatActivity(), AddListener {
         binding.nameET.clearFocus()
         binding.priceET.clearFocus()
         binding.categoryET.requestFocus()
-        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-            SideSheetDialog(this)
-        } else {
-            BottomSheetDialog(this)
-        }
-        val composeView = getCategorySheetDialogComposeView(
-            onDismiss = sheetDialog::hide,
-            onCategorySelected = {
-                binding.categoryTIL.error = ""
-                val categories = resources.getStringArray(R.array.categories)
-                binding.categoryET.setText(categories[it])
-                binding.categoryTIL.setStartIconDrawable(getCategoryIcon(it))
-                viewModel.category = it
-            }
-        )
-        sheetDialog.setContentView(composeView)
-        sheetDialog.show()
+        showCategorySheet = true
     }
 
     private fun evaluateExpenseTotalId(day: Int, month: Int, year: Int): String {
         return "total_${day}_${month}_${year}"
-    }
-
-    private fun getCategorySheetDialogComposeView(
-        onDismiss: () -> Unit,
-        onCategorySelected: (Int) -> Unit
-    ): ComposeView {
-        return ComposeView(this).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MyFinanceTheme {
-                    CategorySheet(
-                        onCategorySelected = onCategorySelected,
-                        onDismiss = onDismiss
-                    )
-                }
-            }
-        }
     }
 }

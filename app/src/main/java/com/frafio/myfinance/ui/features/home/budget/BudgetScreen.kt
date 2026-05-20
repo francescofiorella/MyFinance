@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.Income
+import com.frafio.myfinance.ui.components.EditTransactionSheet
 import com.frafio.myfinance.ui.components.EmptyListItem
 import com.frafio.myfinance.ui.components.TotalItem
 import com.frafio.myfinance.ui.components.TransactionListItem
@@ -57,15 +58,54 @@ import kotlinx.coroutines.flow.first
 @Composable
 fun BudgetScreen(
     viewModel: BudgetViewModel,
-    onItemLongClick: (Income, Int) -> Unit,
-    onEditBudgetClick: (Double) -> Unit,
-    modifier: Modifier = Modifier
+    onEditIncome: (Income, Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val incomes by viewModel.incomes.collectAsState()
     val isIncomesEmpty by viewModel.isIncomesEmpty.collectAsState()
     val itemMetadata by viewModel.itemMetadata.collectAsState()
     val monthlyBudget by viewModel.monthlyBudget.collectAsState()
     val annualBudget by viewModel.annualBudget.collectAsState()
+
+    var showEditBudgetSheet by remember { mutableStateOf(value = false) }
+    var showEditIncomeSheet by remember { mutableStateOf(value = false) }
+    var editTargetIncome by remember { mutableStateOf<Income?>(value = null) }
+
+    EditBudgetSheet(
+        show = showEditBudgetSheet,
+        budget = monthlyBudget,
+        onDismiss = {
+            if (showEditBudgetSheet) {
+                showEditBudgetSheet = false
+            }
+        },
+        onEditBudget = { viewModel.setMonthlyBudget(it, getOldBudget = true) },
+    )
+
+    EditTransactionSheet(
+        show = showEditIncomeSheet,
+        transaction = editTargetIncome ?: Income(),
+        onDismiss = {
+            if (showEditIncomeSheet) {
+                showEditIncomeSheet = false
+            }
+        },
+        onLabels = {},
+        onEdit = {
+            editTargetIncome?.let {
+                onEditIncome(it, incomes.indexOf(it))
+            }
+            if (showEditIncomeSheet) {
+                showEditIncomeSheet = false
+            }
+        },
+        onDelete = {
+            editTargetIncome?.let { viewModel.deleteIncome(it) }
+            if (showEditIncomeSheet) {
+                showEditIncomeSheet = false
+            }
+        },
+    )
 
     IncomeList(
         incomes = incomes,
@@ -75,8 +115,11 @@ fun BudgetScreen(
         annualBudget = annualBudget,
         scrollToIdFlow = viewModel.scrollToId,
         onLoadMore = viewModel::loadMore,
-        onItemLongClick = onItemLongClick,
-        onEditBudgetClick = { onEditBudgetClick(monthlyBudget) },
+        onItemLongClick = { income, _ ->
+            editTargetIncome = income
+            showEditIncomeSheet = true
+        },
+        onEditBudgetClick = { showEditBudgetSheet = true },
         onDeleteBudget = viewModel::deleteMonthlyBudget,
         modifier = modifier
     )
@@ -95,17 +138,20 @@ fun IncomeList(
     onItemLongClick: (Income, Int) -> Unit,
     onLoadMore: () -> Unit,
     scrollToIdFlow: Flow<String?>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
-    val currentIncomes by rememberUpdatedState(incomes)
-    var isFirstScroll by remember { mutableStateOf(true) }
+    val currentIncomes by rememberUpdatedState(newValue = incomes)
+    var isFirstScroll by remember { mutableStateOf(value = true) }
 
     val headerCount = 2 // Budget Card + Header Text
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .filter { it != null && it >= currentIncomes.size + headerCount - 5 }
+            .filter { index ->
+                val threshold = (currentIncomes.size + headerCount) - 5
+                (index != null) && (index >= threshold)
+            }
             .distinctUntilChanged()
             .collect {
                 onLoadMore()
@@ -179,7 +225,7 @@ fun IncomeList(
                         text = doubleToPrice(annualBudget),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
 
@@ -257,7 +303,7 @@ fun IncomeList(
                     modifier = Modifier
                         .fillParentMaxSize()
                         .padding(top = 64.dp),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = stringResource(R.string.warning_budget),
@@ -318,7 +364,7 @@ fun PreviewBudgetContent() {
                     year = 2024,
                     month = 0,
                     category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                    price = 12000.0
+                    price = 12000.0,
                 ),
                 Income(
                     id = "1",
@@ -327,7 +373,7 @@ fun PreviewBudgetContent() {
                     day = 1,
                     month = 1,
                     year = 2024,
-                    category = 0
+                    category = 0,
                 ),
                 Income(
                     id = "2",
@@ -336,7 +382,7 @@ fun PreviewBudgetContent() {
                     day = 15,
                     month = 1,
                     year = 2024,
-                    category = 0
+                    category = 0,
                 )
             ),
             isIncomesEmpty = false,
@@ -350,7 +396,7 @@ fun PreviewBudgetContent() {
             onLoadMore = {},
             onItemLongClick = { _, _ -> },
             onEditBudgetClick = {},
-            onDeleteBudget = {}
+            onDeleteBudget = {},
         )
     }
 }

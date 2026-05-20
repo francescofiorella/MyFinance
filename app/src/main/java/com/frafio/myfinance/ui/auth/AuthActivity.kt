@@ -8,7 +8,9 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -34,8 +36,6 @@ import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.sidesheet.SideSheetDialog
 import kotlinx.coroutines.launch
 
 class AuthActivity : AppCompatActivity(), AuthListener {
@@ -51,6 +51,8 @@ class AuthActivity : AppCompatActivity(), AuthListener {
 
     // viewModel
     private val viewModel by viewModels<AuthViewModel>()
+
+    private var showResetPasswordSheet by mutableStateOf(false)
 
     private var backPressedCallback: OnBackPressedCallback? = null
 
@@ -110,36 +112,32 @@ class AuthActivity : AppCompatActivity(), AuthListener {
         }
 
         viewModel.credentialManager = CredentialManager.create(baseContext)
-    }
 
-    fun onResetButtonClick(view: View) {
-        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-            SideSheetDialog(this)
-        } else {
-            BottomSheetDialog(this)
-        }
-        val composeView = getResetPasswordSheetDialogComposeView(sheetDialog::hide)
-        sheetDialog.setContentView(composeView)
-        sheetDialog.show()
-    }
-
-    private fun getResetPasswordSheetDialogComposeView(onDismiss: () -> Unit): ComposeView {
-        return ComposeView(this).apply {
+        binding.authComposeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MyFinanceTheme {
                     ResetPasswordSheet(
-                        onDismiss = onDismiss,
+                        show = showResetPasswordSheet,
+                        onDismiss = {
+                            if (showResetPasswordSheet) {
+                                showResetPasswordSheet = false
+                            }
+                        },
                         onSend = {
                             onAuthStarted()
                             clearErrors()
                             viewModel.resetPassword(it)
-                            onDismiss()
+                            showResetPasswordSheet = false
                         }
                     )
                 }
             }
         }
+    }
+
+    fun onResetButtonClick(view: View) {
+        showResetPasswordSheet = true
     }
 
     private fun clearErrors() {

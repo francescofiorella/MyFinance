@@ -14,13 +14,9 @@ import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
-import com.frafio.myfinance.ui.components.EditTransactionSheet
 import com.frafio.myfinance.ui.features.home.budget.BudgetScreen
-import com.frafio.myfinance.ui.features.home.budget.EditBudgetSheet
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.sidesheet.SideSheetDialog
 
 class BudgetFragment : BaseFragment(), BudgetListener {
     private val viewModel by viewModels<BudgetViewModel>()
@@ -57,11 +53,14 @@ class BudgetFragment : BaseFragment(), BudgetListener {
                 MyFinanceTheme {
                     BudgetScreen(
                         viewModel = viewModel,
-                        onItemLongClick = { income, position ->
-                            showEditIncomeSheet(income, position)
-                        },
-                        onEditBudgetClick = { budget ->
-                            showEditBudgetSheet(budget)
+                        onEditIncome = { income, position ->
+                            Intent(context, AddActivity::class.java).also {
+                                it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
+                                it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_INCOME_CODE)
+                                it.putExtra(AddActivity.EXTRA_TRANSACTION, income)
+                                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                                editResultLauncher.launch(it)
+                            }
                         }
                     )
                 }
@@ -80,86 +79,6 @@ class BudgetFragment : BaseFragment(), BudgetListener {
     override fun scrollUp() {
         super.scrollUp()
         viewModel.scrollToId(null)
-    }
-
-    private fun showEditBudgetSheet(budget: Double) {
-        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-            SideSheetDialog(requireContext())
-        } else {
-            BottomSheetDialog(requireContext())
-        }
-        val composeView = getEditBudgetSheetDialogComposeView(
-            budget,
-            sheetDialog::hide
-        )
-        sheetDialog.setContentView(composeView)
-        sheetDialog.show()
-    }
-
-    private fun getEditBudgetSheetDialogComposeView(
-        budget: Double,
-        onDismiss: () -> Unit
-    ): ComposeView {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MyFinanceTheme {
-                    EditBudgetSheet(
-                        budget = budget,
-                        onDismiss = onDismiss,
-                        onEditBudget = { viewModel.setMonthlyBudget(it, true) }
-                    )
-                }
-            }
-        }
-    }
-
-    private fun showEditIncomeSheet(income: Income, position: Int) {
-        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-            SideSheetDialog(requireContext())
-        } else {
-            BottomSheetDialog(requireContext())
-        }
-        val composeView = getEditIncomeSheetDialogComposeView(
-            income,
-            position,
-            sheetDialog::hide
-        )
-        sheetDialog.setContentView(composeView)
-        sheetDialog.show()
-    }
-
-    private fun getEditIncomeSheetDialogComposeView(
-        income: Income,
-        position: Int,
-        onDismiss: () -> Unit
-    ): ComposeView {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MyFinanceTheme {
-                    EditTransactionSheet(
-                        transaction = income,
-                        onDismiss = onDismiss,
-                        onLabels = {},
-                        onEdit = {
-                            Intent(context, AddActivity::class.java).also {
-                                it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
-                                it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_INCOME_CODE)
-                                it.putExtra(AddActivity.EXTRA_TRANSACTION, income)
-                                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                                editResultLauncher.launch(it)
-                            }
-                            onDismiss()
-                        },
-                        onDelete = {
-                            viewModel.deleteIncome(income)
-                            onDismiss()
-                        }
-                    )
-                }
-            }
-        }
     }
 
     override fun onCompleted(response: androidx.lifecycle.LiveData<com.frafio.myfinance.data.model.FinanceResult>, previousBudget: Double?) {

@@ -34,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,13 +60,25 @@ import kotlinx.coroutines.flow.collectLatest
 fun ProfileScreen(
     viewModel: ProfileViewModel,
     onUploadProPic: () -> Unit,
-    onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val user by viewModel.user.collectAsState()
     val isDynamicColorChecked by viewModel.isSwitchDynamicColorChecked.collectAsState()
     val scrollState = rememberScrollState()
+
+    var showEditFullNameSheet by remember { mutableStateOf(false) }
+
+    EditFullNameSheet(
+        show = showEditFullNameSheet,
+        fullName = user?.fullName ?: "",
+        onDismiss = {
+            if (showEditFullNameSheet) {
+                showEditFullNameSheet = false
+            }
+        },
+        onEditFullName = { viewModel.editFullName(it) }
+    )
 
     LaunchedEffect(viewModel.scrollToTop) {
         viewModel.scrollToTop.collectLatest {
@@ -85,7 +98,7 @@ fun ProfileScreen(
                 isDynamicColorChecked = isDynamicColorChecked,
                 scrollState = scrollState,
                 onUploadProPic = onUploadProPic,
-                onEditFullName = onEditFullName,
+                onEditFullName = { showEditFullNameSheet = true },
                 onDynamicColorChanged = onDynamicColorChanged
             )
         } else {
@@ -97,7 +110,7 @@ fun ProfileScreen(
                 isDynamicColorChecked = isDynamicColorChecked,
                 scrollState = scrollState,
                 onUploadProPic = onUploadProPic,
-                onEditFullName = onEditFullName,
+                onEditFullName = { showEditFullNameSheet = true },
                 onDynamicColorChanged = onDynamicColorChanged
             )
         }

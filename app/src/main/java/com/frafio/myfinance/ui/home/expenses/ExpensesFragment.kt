@@ -7,8 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
@@ -20,16 +18,11 @@ import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.widget.DatePickerRangeDialog
 import com.frafio.myfinance.ui.BaseFragment
 import com.frafio.myfinance.ui.add.AddActivity
-import com.frafio.myfinance.ui.features.home.expenses.CategorySheet
-import com.frafio.myfinance.ui.components.EditTransactionSheet
 import com.frafio.myfinance.ui.features.home.expenses.ExpensesScreen
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
-import com.frafio.myfinance.ui.features.home.expenses.LabelsSheet
 import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.hideSoftKeyboard
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.time.LocalDate
@@ -85,32 +78,24 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MyFinanceTheme {
-                    val selectedCategories by viewModel.selectedCategories.collectAsState()
                     ExpensesScreen(
                         viewModel = viewModel,
-                        onSelectCategory = {
-                            showCategorySelectionSheet(
-                                disabledCategories = selectedCategories,
-                                onCategorySelected = { viewModel.onCategoryFilterChanged(it) }
-                            )
-                        },
-                        onSelectLabel = {
-                            showLabelsSheet(
-                                showNewLabel = false,
-                                onLabelCheckedChanged = { _, label, active ->
-                                    viewModel.onLabelFilterChanged(label, active)
-                                }
-                            )
-                        },
                         onSelectDateRange = {
                             datePickerRangeDialog.show()
                         },
                         onItemLongClick = { expense, position ->
-                            showEditExpenseSheet(expense, position)
-                        },
-                        onCategoryClick = { expense, _ ->
-                            showCategorySelectionSheet(expense = expense) {
-                                viewModel.updateCategory(expense, it)
+                            Intent(context, AddActivity::class.java).also {
+                                it.putExtra(
+                                    AddActivity.REQUEST_CODE_KEY,
+                                    AddActivity.REQUEST_EDIT_CODE
+                                )
+                                it.putExtra(
+                                    AddActivity.EXPENSE_REQUEST_KEY,
+                                    AddActivity.REQUEST_EXPENSE_CODE
+                                )
+                                it.putExtra(AddActivity.EXTRA_TRANSACTION, expense)
+                                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                                editResultLauncher.launch(it)
                             }
                         },
                         getDateLabel = { start, end -> getDateChipLabel(start, end) }
@@ -133,70 +118,6 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
         val today = LocalDate.now()
         val todayId = "total_${today.dayOfMonth}_${today.monthValue}_${today.year}"
         viewModel.scrollToId(todayId)
-    }
-
-    private fun showEditExpenseSheet(expense: Expense, position: Int) {
-        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-            SideSheetDialog(requireContext())
-        } else {
-            BottomSheetDialog(requireContext())
-        }
-        val composeView = getEditExpenseSheetDialogComposeView(
-            expense,
-            position,
-            sheetDialog::hide
-        )
-        sheetDialog.setContentView(composeView)
-        sheetDialog.show()
-    }
-
-    private fun showCategorySelectionSheet(
-        expense: Expense? = null,
-        disabledCategories: List<Int> = emptyList(),
-        onCategorySelected: (Int) -> Unit
-    ) {
-        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-            SideSheetDialog(requireContext())
-        } else {
-            BottomSheetDialog(requireContext())
-        }
-        val composeView = getCategorySheetDialogComposeView(
-            expense = expense,
-            disabledCategories = disabledCategories,
-            onDismiss = sheetDialog::hide,
-            onCategorySelected = {
-                onCategorySelected(it)
-                sheetDialog.hide()
-            }
-        )
-        sheetDialog.setContentView(composeView)
-        sheetDialog.show()
-    }
-
-    private fun showLabelsSheet(
-        expense: Expense? = null,
-        showNewLabel: Boolean = true,
-        onLabelCheckedChanged: (Expense?, String, Boolean) -> Unit
-    ) {
-        val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-            SideSheetDialog(requireContext())
-        } else {
-            BottomSheetDialog(requireContext())
-        }
-        val composeView = getLabelsSheetDialogComposeView(
-            expenseId = expense?.id,
-            showNewLabel = showNewLabel,
-            onNewLabel = viewModel::addLabel,
-            onLabelCheckedChanged = onLabelCheckedChanged,
-            onEditLabel = { oldLabel, newLabel ->
-                viewModel.editLabel(oldLabel, newLabel)
-            },
-            onDeleteLabel = { label ->
-                viewModel.deleteLabel(label)
-            }
-        )
-        sheetDialog.setContentView(composeView)
-        sheetDialog.show()
     }
 
     private fun getDateChipLabel(startDate: LocalDate, endDate: LocalDate): String {
@@ -274,112 +195,6 @@ class ExpensesFragment : BaseFragment(), ExpensesListener {
                 })
             } else {
                 (activity as HomeActivity).showSnackBar(result.message)
-            }
-        }
-    }
-
-    private fun getEditExpenseSheetDialogComposeView(
-        expense: Expense,
-        position: Int,
-        onDismiss: () -> Unit
-    ): ComposeView {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MyFinanceTheme {
-                    EditTransactionSheet(
-                        transaction = expense,
-                        onDismiss = onDismiss,
-                        onLabels = {
-                            showLabelsSheet(expense = expense) { updatedExpense, label, checked ->
-                                updatedExpense?.let {
-                                    if (checked) {
-                                        viewModel.addLabelToExpense(it, label)
-                                    } else {
-                                        viewModel.removeLabelFromExpense(it, label)
-                                    }
-                                }
-                            }
-                        },
-                        onEdit = {
-                            Intent(context, AddActivity::class.java).also {
-                                it.putExtra(
-                                    AddActivity.REQUEST_CODE_KEY,
-                                    AddActivity.REQUEST_EDIT_CODE
-                                )
-                                it.putExtra(
-                                    AddActivity.EXPENSE_REQUEST_KEY,
-                                    AddActivity.REQUEST_EXPENSE_CODE
-                                )
-                                it.putExtra(AddActivity.EXTRA_TRANSACTION, expense)
-                                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                                editResultLauncher.launch(it)
-                            }
-                            onDismiss()
-                        },
-                        onDelete = {
-                            viewModel.deleteExpense(expense)
-                            onDismiss()
-                        }
-                    )
-                }
-            }
-        }
-    }
-
-    private fun getCategorySheetDialogComposeView(
-        expense: Expense? = null,
-        disabledCategories: List<Int> = listOf(),
-        onDismiss: () -> Unit,
-        onCategorySelected: (Int) -> Unit
-    ): ComposeView {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MyFinanceTheme {
-                    CategorySheet(
-                        expense = expense,
-                        disabledCategories = disabledCategories,
-                        onCategorySelected = onCategorySelected,
-                        onDismiss = onDismiss
-                    )
-                }
-            }
-        }
-    }
-
-    private fun getLabelsSheetDialogComposeView(
-        expenseId: String?,
-        showNewLabel: Boolean,
-        onNewLabel: (String) -> Unit,
-        onLabelCheckedChanged: (Expense?, String, Boolean) -> Unit,
-        onDeleteLabel: (String) -> Unit = {},
-        onEditLabel: (String, String) -> Unit = { _, _ -> }
-    ): ComposeView {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MyFinanceTheme {
-                    val labels by viewModel.labels.collectAsState()
-                    val selectedLabels by viewModel.selectedLabels.collectAsState()
-                    val expenses by viewModel.expenses.collectAsState()
-                    val currentExpense = if (expenseId != null)
-                        expenses.find { it.id == expenseId }
-                    else
-                        null
-                    LabelsSheet(
-                        expense = currentExpense,
-                        labels = labels,
-                        selectedLabels = selectedLabels,
-                        showEditLabel = showNewLabel,
-                        onNewLabel = onNewLabel,
-                        onLabelCheckedChanged = { label, checked ->
-                            onLabelCheckedChanged(currentExpense, label, checked)
-                        },
-                        onDeleteLabel = onDeleteLabel,
-                        onEditLabel = onEditLabel
-                    )
-                }
             }
         }
     }

@@ -13,12 +13,9 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.ui.BaseFragment
-import com.frafio.myfinance.ui.features.home.profile.EditFullNameSheet
 import com.frafio.myfinance.ui.features.home.profile.ProfileScreen
 import com.frafio.myfinance.ui.home.HomeActivity
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.sidesheet.SideSheetDialog
 
 class ProfileFragment : BaseFragment(), ProfileListener {
 
@@ -40,17 +37,6 @@ class ProfileFragment : BaseFragment(), ProfileListener {
                         onUploadProPic = {
                             (activity as HomeActivity).showSnackBar(getString(R.string.coming_soon))
                         },
-                        onEditFullName = {
-                            val sheetDialog = if (resources.getBoolean(R.bool.is600dp)) {
-                                SideSheetDialog(requireContext())
-                            } else {
-                                BottomSheetDialog(requireContext())
-                            }
-                            val composeView =
-                                getEditFullNameSheetDialogComposeView(sheetDialog::hide)
-                            sheetDialog.setContentView(composeView)
-                            sheetDialog.show()
-                        },
                         onDynamicColorChanged = { isChecked ->
                             viewModel.setDynamicColor(isChecked)
                             (activity as HomeActivity).showSnackBar(
@@ -65,21 +51,6 @@ class ProfileFragment : BaseFragment(), ProfileListener {
                                 }
                             }
                         }
-                    )
-                }
-            }
-        }
-    }
-
-    private fun getEditFullNameSheetDialogComposeView(onDismiss: () -> Unit): ComposeView {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MyFinanceTheme {
-                    EditFullNameSheet(
-                        fullName = viewModel.user.value?.fullName ?: "",
-                        onDismiss = onDismiss,
-                        onEditFullName = { viewModel.editFullName(it) }
                     )
                 }
             }

@@ -14,12 +14,13 @@ import com.frafio.myfinance.utils.getCategoryIcon
 
 @Composable
 fun EditTransactionSheet(
+    show: Boolean,
     transaction: Transaction,
     onDismiss: () -> Unit,
     onLabels: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val items = mutableListOf(
         MenuItem(
@@ -44,20 +45,25 @@ fun EditTransactionSheet(
         )
     }
 
-    ListSheetDialog(
-        icon = if (transaction is Expense) {
-            getCategoryIcon(transaction.category ?: 0)
-        } else {
-            null
-        },
-        title = transaction.name ?: "",
-        label = transaction.getDateString(),
-        labelFirst = false,
-        endContent = transaction.getPriceString(),
-        onDismiss = onDismiss,
-        items = items,
-        modifier = modifier
-    )
+    AdaptiveSheet(
+        show = show,
+        onDismiss = onDismiss
+    ) {
+        ListSheetDialog(
+            icon = if (transaction is Expense) {
+                getCategoryIcon(transaction.category ?: 0)
+            } else {
+                null
+            },
+            title = transaction.name ?: "",
+            label = transaction.getDateString(),
+            labelFirst = false,
+            endContent = transaction.getPriceString(),
+            onDismiss = onDismiss,
+            items = items,
+            modifier = modifier
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -65,6 +71,7 @@ fun EditTransactionSheet(
 fun EditTransactionSheetPreview() {
     MyFinanceTheme {
         EditTransactionSheet(
+            show = true,
             transaction = Expense(
                 name = "Expense",
                 price = 0.00,

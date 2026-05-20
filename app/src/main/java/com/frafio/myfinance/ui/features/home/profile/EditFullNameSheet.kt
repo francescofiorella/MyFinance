@@ -31,15 +31,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
+import com.frafio.myfinance.ui.components.AdaptiveSheet
 import com.frafio.myfinance.ui.components.SheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 
 @Composable
 fun EditFullNameSheet(
+    show: Boolean,
     fullName: String,
     onDismiss: () -> Unit,
     onEditFullName: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var nameTextFieldValue by remember {
         mutableStateOf(
@@ -50,62 +52,67 @@ fun EditFullNameSheet(
         )
     }
 
-    SheetDialog(
-        icon = R.drawable.ic_person_filled,
-        title = stringResource(id = R.string.your_name),
-        label = stringResource(id = R.string.edit),
-        modifier = modifier
+    AdaptiveSheet(
+        show = show,
+        onDismiss = onDismiss
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
-            verticalAlignment = Alignment.CenterVertically
+        SheetDialog(
+            icon = R.drawable.ic_person_filled,
+            title = stringResource(id = R.string.your_name),
+            label = stringResource(id = R.string.edit),
+            modifier = modifier
         ) {
-            TextField(
-                value = nameTextFieldValue,
-                onValueChange = { nameTextFieldValue = it },
+            Row(
                 modifier = Modifier
-                    .weight(1f),
-                label = { Text(stringResource(id = R.string.signup_name)) },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                ),
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_edit_outline),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = {
-                    if (nameTextFieldValue.text.trim()
-                            .isNotEmpty() && nameTextFieldValue.text.trim() != fullName
-                    ) {
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextField(
+                    value = nameTextFieldValue,
+                    onValueChange = { nameTextFieldValue = it },
+                    modifier = Modifier
+                        .weight(1f),
+                    label = { Text(stringResource(id = R.string.signup_name)) },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                    ),
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_edit_outline),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = {
+                        if (nameTextFieldValue.text.trim()
+                                .isNotEmpty() && nameTextFieldValue.text.trim() != fullName
+                        ) {
+                            onEditFullName(nameTextFieldValue.text.trim())
+                            onDismiss()
+                        }
+                    })
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                FilledIconButton(
+                    onClick = {
                         onEditFullName(nameTextFieldValue.text.trim())
                         onDismiss()
-                    }
-                })
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            FilledIconButton(
-                onClick = {
-                    onEditFullName(nameTextFieldValue.text.trim())
-                    onDismiss()
-                },
-                enabled = nameTextFieldValue.text.trim()
-                    .isNotEmpty() && nameTextFieldValue.text.trim() != fullName,
-                shapes = IconButtonDefaults.shapes(
-                    shape = IconButtonDefaults.smallSquareShape,
-                )
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_check_filled),
-                    contentDescription = stringResource(id = R.string.confirm)
-                )
+                    },
+                    enabled = nameTextFieldValue.text.trim()
+                        .isNotEmpty() && nameTextFieldValue.text.trim() != fullName,
+                    shapes = IconButtonDefaults.shapes(
+                        shape = IconButtonDefaults.smallSquareShape,
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_check_filled),
+                        contentDescription = stringResource(id = R.string.confirm)
+                    )
+                }
             }
         }
     }
@@ -116,6 +123,7 @@ fun EditFullNameSheet(
 fun EditFullNameSheetPreview() {
     MyFinanceTheme {
         EditFullNameSheet(
+            show = true,
             fullName = "John Doe",
             onDismiss = {},
             onEditFullName = {},

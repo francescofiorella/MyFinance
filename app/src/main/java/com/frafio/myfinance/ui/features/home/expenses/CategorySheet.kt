@@ -5,25 +5,25 @@ import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.MenuItem
+import com.frafio.myfinance.ui.components.AdaptiveSheet
 import com.frafio.myfinance.ui.components.GridSheetDialog
-import com.frafio.myfinance.ui.components.ListSheetDialog
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.getCategoryIcon
 
 @Composable
 fun CategorySheet(
+    show: Boolean,
+    onDismiss: () -> Unit,
+    onCategorySelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
     expense: Expense? = null,
     disabledCategories: List<Int> = listOf(),
-    onCategorySelected: (Int) -> Unit,
-    onDismiss: () -> Unit
 ) {
     val categories = listOf(
         MenuItem(
@@ -82,25 +82,16 @@ fun CategorySheet(
         )
     )
 
-    val is600dp = booleanResource(id = R.bool.is600dp)
-
     @DrawableRes val icon = getCategoryIcon(expense?.category)
     val title = expense?.name ?: stringResource(id = R.string.category)
     val label = expense?.getDateString() ?: stringResource(id = R.string.select)
     val labelFirst = expense == null
     val endContent = expense?.getPriceString()
-    if (is600dp) {
-        ListSheetDialog(
-            modifier = modifier,
-            icon = icon,
-            title = title,
-            label = label,
-            labelFirst = labelFirst,
-            endContent = endContent,
-            items = categories,
-            onDismiss = onDismiss
-        )
-    } else {
+
+    AdaptiveSheet(
+        show = show,
+        onDismiss = onDismiss
+    ) {
         GridSheetDialog(
             modifier = modifier,
             icon = icon,
@@ -120,12 +111,13 @@ fun CategorySheet(
 fun CategorySheetPreview() {
     MyFinanceTheme {
         CategorySheet(
+            show = true,
+            onDismiss = {},
             disabledCategories = listOf(
                 FirestoreEnums.CATEGORIES.ENTERTAINMENT.value,
                 FirestoreEnums.CATEGORIES.MISCELLANEOUS.value
             ),
             onCategorySelected = {},
-            onDismiss = {},
             modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
         )
     }
@@ -136,6 +128,8 @@ fun CategorySheetPreview() {
 fun ExpenseCategorySheetPreview() {
     MyFinanceTheme {
         CategorySheet(
+            show = true,
+            onDismiss = {},
             expense = Expense(
                 name = "Expense",
                 price = 0.0,
@@ -145,7 +139,6 @@ fun ExpenseCategorySheetPreview() {
                 category = FirestoreEnums.CATEGORIES.HOUSING.value
             ),
             onCategorySelected = {},
-            onDismiss = {},
             modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
         )
     }

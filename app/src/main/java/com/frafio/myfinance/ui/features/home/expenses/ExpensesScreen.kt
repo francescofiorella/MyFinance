@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.model.Expense
+import com.frafio.myfinance.ui.components.EditTransactionSheet
 import com.frafio.myfinance.ui.components.EmptyView
 import com.frafio.myfinance.ui.components.EmptyListItem
 import com.frafio.myfinance.ui.components.SearchBar
@@ -65,11 +66,8 @@ import java.time.LocalDate
 @Composable
 fun ExpensesScreen(
     viewModel: ExpensesViewModel,
-    onSelectCategory: () -> Unit,
-    onSelectLabel: () -> Unit,
     onSelectDateRange: () -> Unit,
     onItemLongClick: (Expense, Int) -> Unit,
-    onCategoryClick: (Expense, Int) -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
     modifier: Modifier = Modifier,
 ) {
@@ -83,7 +81,14 @@ fun ExpensesScreen(
     val itemMetadata by viewModel.itemMetadata.collectAsState()
     val labels by viewModel.labels.collectAsState()
 
-    var showFilterSheet by remember { mutableStateOf(false) }
+    var showFilterSheet by remember { mutableStateOf(value = false) }
+    var showCategorySheet by remember { mutableStateOf(value = false) }
+    var categoryTargetExpense by remember { mutableStateOf<Expense?>(value = null) }
+    var showEditSheet by remember { mutableStateOf(value = false) }
+    var editTargetExpense by remember { mutableStateOf<Expense?>(value = null) }
+    var showLabelsSheet by remember { mutableStateOf(value = false) }
+    var labelsTargetExpense by remember { mutableStateOf<Expense?>(value = null) }
+    var showNewLabelInLabels by remember { mutableStateOf(value = true) }
 
     FilterExpensesSheet(
         show = showFilterSheet,
@@ -95,9 +100,96 @@ fun ExpensesScreen(
         categoryEnabled = selectedCategories.size != 9,
         labelEnabled = labels.isNotEmpty(),
         dateRangeEnabled = dateRange == null,
-        onSelectCategory = onSelectCategory,
-        onSelectLabel = onSelectLabel,
+        onSelectCategory = {
+            categoryTargetExpense = null
+            showCategorySheet = true
+        },
+        onSelectLabel = {
+            labelsTargetExpense = null
+            showNewLabelInLabels = false
+            showLabelsSheet = true
+        },
         onSelectDateRange = onSelectDateRange,
+    )
+
+    CategorySheet(
+        show = showCategorySheet,
+        onDismiss = {
+            if (showCategorySheet) {
+                showCategorySheet = false
+            }
+        },
+        expense = categoryTargetExpense,
+        disabledCategories = if (categoryTargetExpense == null) selectedCategories else emptyList(),
+        onCategorySelected = { categoryId ->
+            if (categoryTargetExpense == null) {
+                viewModel.onCategoryFilterChanged(categoryId)
+            } else {
+                viewModel.updateCategory(categoryTargetExpense!!, categoryId)
+            }
+            if (showCategorySheet) {
+                showCategorySheet = false
+            }
+        },
+    )
+
+    EditTransactionSheet(
+        show = showEditSheet,
+        transaction = editTargetExpense ?: Expense(),
+        onDismiss = {
+            if (showEditSheet) {
+                showEditSheet = false
+            }
+        },
+        onLabels = {
+            labelsTargetExpense = editTargetExpense
+            showNewLabelInLabels = true
+            showLabelsSheet = true
+            if (showEditSheet) {
+                showEditSheet = false
+            }
+        },
+        onEdit = {
+            editTargetExpense?.let {
+                onItemLongClick(it, expenses.indexOf(it))
+            }
+            if (showEditSheet) {
+                showEditSheet = false
+            }
+        },
+        onDelete = {
+            editTargetExpense?.let { viewModel.deleteExpense(it) }
+            if (showEditSheet) {
+                showEditSheet = false
+            }
+        },
+    )
+
+    LabelsSheet(
+        show = showLabelsSheet,
+        onDismiss = {
+            if (showLabelsSheet) {
+                showLabelsSheet = false
+            }
+        },
+        expense = labelsTargetExpense,
+        labels = labels,
+        selectedLabels = selectedLabels,
+        showEditLabel = showNewLabelInLabels,
+        onNewLabel = viewModel::addLabel,
+        onLabelCheckedChanged = { label, checked ->
+            if (labelsTargetExpense == null) {
+                viewModel.onLabelFilterChanged(label, checked)
+            } else {
+                if (checked) {
+                    viewModel.addLabelToExpense(labelsTargetExpense!!, label)
+                } else {
+                    viewModel.removeLabelFromExpense(labelsTargetExpense!!, label)
+                }
+            }
+        },
+        onDeleteLabel = viewModel::deleteLabel,
+        onEditLabel = viewModel::editLabel,
     )
 
     ExpensesContent(
@@ -116,8 +208,14 @@ fun ExpensesScreen(
         onDateFilterChanged = { viewModel.onDateFilterChanged(it) },
         onLoadMore = { viewModel.loadMore() },
         onFilterClick = { showFilterSheet = true },
-        onItemLongClick = onItemLongClick,
-        onCategoryClick = onCategoryClick,
+        onItemLongClick = { expense, _ ->
+            editTargetExpense = expense
+            showEditSheet = true
+        },
+        onCategoryClick = { expense, _ ->
+            categoryTargetExpense = expense
+            showCategorySheet = true
+        },
         getDateLabel = getDateLabel,
         modifier = modifier
     )
@@ -162,12 +260,12 @@ fun ExpensesContent(
             )
 
             AnimatedVisibility(
-                visible = selectedCategories.isNotEmpty() || selectedLabels.isNotEmpty() || dateRange != null,
+                visible = (selectedCategories.isNotEmpty()) || (selectedLabels.isNotEmpty()) || (dateRange != null),
                 enter = expandVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
                 exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
             ) {
                 Column {
-                    var checked by remember { mutableStateOf(false) }
+                    var checked by remember { mutableStateOf(value = false) }
                     val colors = ListItemDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer
                     )
@@ -185,8 +283,9 @@ fun ExpensesContent(
                             getDateLabel = getDateLabel,
                             onCategoryRemoved = onCategoryFilterChanged,
                             onLabelRemoved = { onLabelFilterChanged(it, false) },
-                            onDateRemoved = { onDateFilterChanged(null) }
-                        )
+                        ) {
+                            onDateFilterChanged(null)
+                        }
                         FilledTonalIconToggleButton(
                             checked = checked,
                             onCheckedChange = { checked = it },
@@ -236,7 +335,7 @@ fun ExpensesContent(
                                     text = stringResource(id = R.string.on_filters),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontWeight = FontWeight.Normal
+                                    fontWeight = FontWeight.Normal,
                                 )
                             },
                             trailingContent = {
@@ -279,12 +378,15 @@ fun ExpensesList(
     itemMetadata: Map<Int, Pair<Int, Int>>,
 ) {
     val listState = rememberLazyListState()
-    val currentExpenses by rememberUpdatedState(expenses)
-    var isFirstScroll by remember { mutableStateOf(true) }
+    val currentExpenses by rememberUpdatedState(newValue = expenses)
+    var isFirstScroll by remember { mutableStateOf(value = true) }
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .filter { it != null && it >= currentExpenses.size - 5 }
+            .filter { index ->
+                val threshold = currentExpenses.size - 5
+                (index != null) && (index >= threshold)
+            }
             .distinctUntilChanged()
             .collect {
                 onLoadMore()
@@ -314,7 +416,7 @@ fun ExpensesList(
     LazyColumn(
         state = listState,
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         itemsIndexed(
             items = expenses,
@@ -344,8 +446,9 @@ fun ExpensesList(
                         countInGroup = metadata.second,
                         onClick = { },
                         onLongClick = { onItemLongClick(expense, index) },
-                        onIconClick = { onCategoryClick(expense, index) }
-                    )
+                    ) {
+                        onCategoryClick(expense, index)
+                    }
                 }
             }
         }
@@ -366,7 +469,7 @@ fun ExpensesContentPreview() {
             month = 10,
             day = 28,
             category = FirestoreEnums.CATEGORIES.TOTAL.value,
-            id = "total_28_10_2023"
+            id = "total_28_10_2023",
         ),
         Expense(
             name = "Jolly",
@@ -442,7 +545,7 @@ fun ExpensesContentPreview() {
             onItemLongClick = { _, _ -> },
             onCategoryClick = { _, _ -> },
             getDateLabel = { _, _ -> "Oct 27, 2023" },
-            itemMetadata = emptyMap()
+            itemMetadata = emptyMap(),
         )
     }
 }
