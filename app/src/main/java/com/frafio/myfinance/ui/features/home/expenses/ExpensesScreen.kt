@@ -334,7 +334,7 @@ fun ExpensesContent(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        painter = painterResource(R.drawable.ic_bar_chart_4_bars),
+                                        painter = painterResource(R.drawable.ic_bar_chart_4_bars_filled),
                                         contentDescription = null,
                                     )
                                 }
@@ -477,7 +477,7 @@ fun ExpensesList(
 
 @Preview(showBackground = true)
 @Composable
-fun ExpensesContentPreview() {
+fun ExpensesPreview() {
     val sampleExpenses = listOf(
         Expense(
             name = FirestoreEnums.NAMES.TOTAL.value,

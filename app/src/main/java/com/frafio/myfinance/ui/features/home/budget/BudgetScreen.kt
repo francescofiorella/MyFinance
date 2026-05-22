@@ -355,7 +355,7 @@ fun IncomeList(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewBudgetContent() {
+fun BudgetPreview() {
     MyFinanceTheme {
         IncomeList(
             incomes = listOf(

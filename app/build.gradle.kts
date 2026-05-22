@@ -20,7 +20,7 @@ android {
         minSdk = 29
         targetSdk = 37
         versionCode = 4
-        versionName = "4.9.4"
+        versionName = "4.9.5"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -54,7 +54,6 @@ android {
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_17
-        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
 }
 
@@ -73,6 +72,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.fragment.ktx)
 
     // SplashScreen API
@@ -107,6 +107,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material3.window.size)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.google.fonts)

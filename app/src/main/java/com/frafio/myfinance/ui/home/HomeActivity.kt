@@ -2,70 +2,64 @@ package com.frafio.myfinance.ui.home
 
 import android.animation.ObjectAnimator
 import android.content.Intent
-import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.Window
 import android.view.animation.LinearInterpolator
-import androidx.activity.addCallback
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.animation.doOnEnd
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.AuthResult
+import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
-import com.frafio.myfinance.databinding.ActivityHomeBinding
-import com.frafio.myfinance.ui.BaseFragment
+import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.AuthActivity
-import com.frafio.myfinance.ui.home.budget.BudgetFragment
-import com.frafio.myfinance.ui.home.dashboard.DashboardFragment
-import com.frafio.myfinance.ui.home.expenses.ExpensesFragment
-import com.frafio.myfinance.ui.home.profile.ProfileFragment
-import com.frafio.myfinance.utils.instantHide
-import com.frafio.myfinance.utils.instantShow
-import com.frafio.myfinance.utils.setRoundDrawableFromUrl
-import com.frafio.myfinance.utils.snackBar
+import com.frafio.myfinance.ui.features.home.HomeScreen
+import com.frafio.myfinance.ui.home.budget.BudgetListener
+import com.frafio.myfinance.ui.home.budget.BudgetViewModel
+import com.frafio.myfinance.ui.home.dashboard.DashboardViewModel
+import com.frafio.myfinance.ui.home.expenses.ExpensesListener
+import com.frafio.myfinance.ui.home.expenses.ExpensesViewModel
+import com.frafio.myfinance.ui.home.profile.ProfileListener
+import com.frafio.myfinance.ui.home.profile.ProfileViewModel
+import com.frafio.myfinance.ui.theme.MyFinanceTheme
+import com.frafio.myfinance.utils.dateToExtendedString
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.navigation.NavigationBarView
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
+class HomeActivity : ComponentActivity(), HomeListener {
 
-class HomeActivity : AppCompatActivity(), HomeListener {
-
-    private lateinit var binding: ActivityHomeBinding
     private val viewModel by viewModels<HomeViewModel>()
-
-    private var dashboardFragment: DashboardFragment? = null
-    private var expensesFragment: ExpensesFragment? = null
-    private var budgetFragment: BudgetFragment? = null
-    private var profileFragment: ProfileFragment? = null
-    private var activeFragment: BaseFragment? = null
+    private val dashboardViewModel by viewModels<DashboardViewModel>()
+    private val expensesViewModel by viewModels<ExpensesViewModel>()
+    private val budgetViewModel by viewModels<BudgetViewModel>()
+    private val profileViewModel by viewModels<ProfileViewModel>()
 
     private var userRequest: Boolean = false
-    var isLayoutReady: Boolean = false
-
-    companion object {
-        private const val DASHBOARD_FRAGMENT_TAG = "dashboard_fragment_tag"
-        private const val EXPENSES_FRAGMENT_TAG = "expenses_fragment_tag"
-        private const val BUDGET_FRAGMENT_TAG = "budget_fragment_tag"
-        private const val PROFILE_FRAGMENT_TAG = "profile_fragment_tag"
-    }
+    private var isLayoutReady by mutableStateOf(false)
+    private var showProgress by mutableStateOf(false)
+    private val snackbarHostState = SnackbarHostState()
 
     private var addResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -75,38 +69,53 @@ class HomeActivity : AppCompatActivity(), HomeListener {
             val totalId = data.getStringExtra(AddActivity.ADD_RESULT_TOTAL_ID) ?: ""
             when (expenseRequest) {
                 AddActivity.REQUEST_EXPENSE_CODE -> {
-                    showFragment(R.id.expensesFragment)
-                    expensesFragment?.scrollToId(totalId)
+                    viewModel.navigateTo(HomeViewModel.Screen.EXPENSES)
+                    expensesViewModel.scrollToId(totalId)
                     showSnackBar(message)
                 }
 
                 AddActivity.REQUEST_INCOME_CODE -> {
-                    showFragment(R.id.budgetFragment)
-                    budgetFragment?.scrollToId(totalId)
+                    viewModel.navigateTo(HomeViewModel.Screen.BUDGET)
+                    budgetViewModel.scrollToId(totalId)
                     showSnackBar(message)
                 }
             }
         }
     }
 
+    private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data: Intent? = result.data
+            val editRequest = data?.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
+
+            if (editRequest == AddActivity.REQUEST_EXPENSE_CODE) {
+                showSnackBar(FinanceCode.EXPENSE_EDIT_SUCCESS.message)
+            } else if (editRequest == AddActivity.REQUEST_INCOME_CODE) {
+                showSnackBar(FinanceCode.INCOME_EDIT_SUCCESS.message)
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        
+        if (viewModel.isDynamicColorOn()) {
+            DynamicColors.applyToActivityIfAvailable(this)
+        }
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+
         super.onCreate(savedInstanceState)
 
+        enableEdgeToEdge()
+
         if (savedInstanceState == null) {
-            userRequest = intent.extras?.getBoolean(AuthActivity.INTENT_USER_REQUEST, false)
-                ?: false
-            if (userRequest) {
-                setTheme(R.style.Theme_MyFinance)
-            } else {
-                installSplashScreen().apply {
-                    setKeepOnScreenCondition {
-                        // keep if the layout is not ready
-                        !isLayoutReady
-                    }
+            userRequest = intent.extras?.getBoolean(AuthActivity.INTENT_USER_REQUEST, false) ?: false
+            if (!userRequest) {
+                splashScreen.apply {
+                    setKeepOnScreenCondition { !isLayoutReady }
                     setOnExitAnimationListener { splashScreenViewProvider ->
-                        supportFragmentManager.unregisterFragmentLifecycleCallbacks(
-                            fragmentCallback
-                        )
                         val fadeOut = ObjectAnimator.ofFloat(
                             splashScreenViewProvider.view,
                             View.ALPHA,
@@ -121,33 +130,90 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     }
                 }
             }
-        } else {
-            setTheme(R.style.Theme_MyFinance)
         }
 
-        if (viewModel.isDynamicColorOn()) {
-            DynamicColors.applyToActivityIfAvailable(this)
-        }
-
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         viewModel.listener = this
-        binding.viewModel = viewModel
+        expensesViewModel.listener = object : ExpensesListener {
+            override fun onCompleted(response: LiveData<FinanceResult>) {
+                response.observe(this@HomeActivity) { result ->
+                    if (result.code == FinanceCode.EXPENSE_ADD_SUCCESS.code) {
+                        showSnackBar(result.message)
+                    }
+                }
+            }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-                val systemBars = insets.getInsets(
-                    WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
-                )
-                val orientation = view.resources.configuration.orientation
-                // Apply padding
-                view.setPadding(
-                    systemBars.left,
-                    systemBars.top,
-                    systemBars.right,
-                    if (orientation == Configuration.ORIENTATION_LANDSCAPE) systemBars.bottom else 0
-                )
-                insets
+            override fun onDeleteCompleted(response: LiveData<FinanceResult>, expense: Expense) {
+                response.observe(this@HomeActivity) { result ->
+                    if (result.code == FinanceCode.EXPENSE_DELETE_SUCCESS.code) {
+                        showSnackBar(
+                            message = result.message,
+                            actionText = getString(R.string.cancel),
+                            actionFun = { expensesViewModel.addExpense(expense) }
+                        )
+                    } else {
+                        showSnackBar(result.message)
+                    }
+                }
+            }
+
+            override fun onDeleteCompleted(response: LiveData<FinanceResult>, label: String) {
+                response.observe(this@HomeActivity) { result ->
+                    if (result.code == FinanceCode.LABEL_DELETE_SUCCESS.code) {
+                        showSnackBar(
+                            message = result.message,
+                            actionText = getString(R.string.cancel),
+                            actionFun = { expensesViewModel.undoDeleteLabel() },
+                            dismissFun = { expensesViewModel.resetLastDeletedLabel() }
+                        )
+                    } else {
+                        showSnackBar(result.message)
+                    }
+                }
+            }
+        }
+        budgetViewModel.listener = object : BudgetListener {
+            override fun onCompleted(response: LiveData<FinanceResult>, previousBudget: Double?) {
+                response.observe(this@HomeActivity) { result ->
+                    when (result.code) {
+                        FinanceCode.BUDGET_UPDATE_SUCCESS.code -> {
+                            previousBudget?.let {
+                                showSnackBar(
+                                    message = result.message,
+                                    actionText = getString(R.string.cancel),
+                                    actionFun = { budgetViewModel.setMonthlyBudget(previousBudget) }
+                                )
+                            }
+                        }
+                        FinanceCode.INCOME_ADD_SUCCESS.code -> showSnackBar(result.message)
+                        else -> showSnackBar(result.message)
+                    }
+                }
+            }
+
+            override fun onDeleteCompleted(response: LiveData<FinanceResult>, income: Income) {
+                response.observe(this@HomeActivity) { result ->
+                    if (result.code == FinanceCode.INCOME_DELETE_SUCCESS.code) {
+                        showSnackBar(
+                            message = result.message,
+                            actionText = getString(R.string.cancel),
+                            actionFun = { budgetViewModel.addIncome(income) }
+                        )
+                    } else {
+                        showSnackBar(result.message)
+                    }
+                }
+            }
+        }
+        profileViewModel.listener = object : ProfileListener {
+            override fun onStarted() { showProgressIndicator() }
+            override fun onProfileUpdateComplete(response: LiveData<AuthResult>) {
+                response.observe(this@HomeActivity) { authResult ->
+                    hideProgressIndicator()
+                    showSnackBar(authResult.message)
+                    if (authResult.code == AuthCode.USER_DATA_UPDATED.code) {
+                        profileViewModel.updateLocalUser()
+                    }
+                }
             }
         }
 
@@ -160,228 +226,99 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 viewModel.updateLabels()
                 viewModel.updateLocalMonthlyBudget()
                 viewModel.updateLocalLabels()
-                initFragments()
+                profileViewModel.updateLocalUser()
                 intent.extras?.getString(AuthActivity.INTENT_USER_NAME).also { userName ->
                     showSnackBar("${getString(R.string.login_successful)} $userName")
                 }
+                isLayoutReady = true
             } else {
-                // import db data
                 viewModel.checkUser()
             }
-
-            binding.navDrawer?.setCheckedItem(R.id.dashboardFragment)
-        }
-
-        binding.navBar?.setOnItemSelectedListener(navBarListener)
-        binding.navDrawer?.setNavigationItemSelectedListener(navDrawerListener)
-
-        binding.propicImageView.setRoundDrawableFromUrl(viewModel.getProPic())
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        dashboardFragment = supportFragmentManager
-            .findFragmentByTag(DASHBOARD_FRAGMENT_TAG) as DashboardFragment?
-        expensesFragment = supportFragmentManager
-            .findFragmentByTag(EXPENSES_FRAGMENT_TAG) as ExpensesFragment?
-        budgetFragment = supportFragmentManager
-            .findFragmentByTag(BUDGET_FRAGMENT_TAG) as BudgetFragment?
-        profileFragment = supportFragmentManager
-            .findFragmentByTag(PROFILE_FRAGMENT_TAG) as ProfileFragment?
-
-        when (viewModel.fragmentStack.lastOrNull()) {
-            EXPENSES_FRAGMENT_TAG -> {
-                activeFragment = expensesFragment
-                showFragment(R.id.expensesFragment)
-            }
-
-            BUDGET_FRAGMENT_TAG -> {
-                activeFragment = budgetFragment
-                showFragment(R.id.budgetFragment)
-            }
-
-            PROFILE_FRAGMENT_TAG -> {
-                activeFragment = profileFragment
-                showFragment(R.id.profileFragment)
-            }
-
-            else -> {
-                // Either tag is DASHBOARD_FRAGMENT_TAG or set Dashboard as default
-                activeFragment = dashboardFragment
-                showFragment(R.id.dashboardFragment)
-            }
-        }
-    }
-
-    private val navBarListener = NavigationBarView.OnItemSelectedListener { item ->
-        activeFragment?.let { navigateTo(item.itemId) }
-        true
-    }
-
-    private val navDrawerListener = NavigationView.OnNavigationItemSelectedListener { item ->
-        activeFragment?.let { navigateTo(item.itemId) }
-        true
-    }
-
-    private fun navigateTo(itemId: Int) {
-        val currentId = if (binding.navBar != null) {
-            binding.navBar!!.selectedItemId
         } else {
-            binding.navDrawer!!.checkedItem?.itemId
-        }
-        if (currentId == itemId) {
-            activeFragment!!.scrollUp()
-            return
-        }
-
-        if (!onBackPressedDispatcher.hasEnabledCallbacks()
-            && !(viewModel.fragmentStack.size == 1 && itemId == R.id.dashboardFragment)) {
-            // add on back pressed callback
-            onBackPressedDispatcher.addCallback {
-                viewModel.fragmentStack.removeAt(viewModel.fragmentStack.size - 1)
-                when (viewModel.fragmentStack.lastOrNull()) {
-                    DASHBOARD_FRAGMENT_TAG -> {
-                        showFragment(R.id.dashboardFragment)
-                        // if last fragment, remove callback
-                        if (viewModel.fragmentStack.size == 1) {
-                            isEnabled = false
-                        }
-                    }
-                    EXPENSES_FRAGMENT_TAG -> showFragment(R.id.expensesFragment)
-                    BUDGET_FRAGMENT_TAG -> showFragment(R.id.budgetFragment)
-                    PROFILE_FRAGMENT_TAG -> showFragment(R.id.profileFragment)
-                    else -> { // Should not be reached
-                        isEnabled = false
-                        onBackPressedDispatcher.onBackPressed()
-                    }
-                }
-            }
-        }
-
-        val transaction = supportFragmentManager.beginTransaction()
-        when (itemId) {
-            R.id.dashboardFragment -> {
-                if (dashboardFragment == null) {
-                    dashboardFragment = DashboardFragment()
-                    transaction.add(
-                        R.id.home_fragmentContainerView,
-                        dashboardFragment!!,
-                        DASHBOARD_FRAGMENT_TAG
-                    )
-                }
-                binding.fragmentTitle.text = getString(R.string.dashboard)
-                binding.logoutBtn.instantHide()
-                binding.propicImageView.instantShow()
-
-                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(dashboardFragment!!).commit()
-                activeFragment = dashboardFragment
-
-                if (viewModel.fragmentStack.lastOrNull() != DASHBOARD_FRAGMENT_TAG)
-                    viewModel.fragmentStack.add(DASHBOARD_FRAGMENT_TAG)
-            }
-
-            R.id.expensesFragment -> {
-                if (expensesFragment == null) {
-                    expensesFragment = ExpensesFragment()
-                    transaction.add(
-                        R.id.home_fragmentContainerView,
-                        expensesFragment!!,
-                        EXPENSES_FRAGMENT_TAG
-                    )
-                }
-                binding.fragmentTitle.text = getString(R.string.expenses)
-                binding.logoutBtn.instantHide()
-                binding.propicImageView.instantShow()
-                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(expensesFragment!!).commit()
-                activeFragment = expensesFragment
-
-                if (viewModel.fragmentStack.lastOrNull() != EXPENSES_FRAGMENT_TAG)
-                    viewModel.fragmentStack.add(EXPENSES_FRAGMENT_TAG)
-            }
-
-            R.id.budgetFragment -> {
-                if (budgetFragment == null) {
-                    budgetFragment = BudgetFragment()
-                    transaction.add(
-                        R.id.home_fragmentContainerView,
-                        budgetFragment!!,
-                        BUDGET_FRAGMENT_TAG
-                    )
-                }
-                binding.fragmentTitle.text = getString(R.string.budget)
-                binding.logoutBtn.instantHide()
-                binding.propicImageView.instantShow()
-                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(budgetFragment!!).commit()
-                activeFragment = budgetFragment
-
-                if (viewModel.fragmentStack.lastOrNull() != BUDGET_FRAGMENT_TAG)
-                    viewModel.fragmentStack.add(BUDGET_FRAGMENT_TAG)
-            }
-
-            R.id.profileFragment -> {
-                if (profileFragment == null) {
-                    profileFragment = ProfileFragment()
-                    transaction.add(
-                        R.id.home_fragmentContainerView,
-                        profileFragment!!,
-                        PROFILE_FRAGMENT_TAG
-                    )
-                }
-                binding.fragmentTitle.text = getString(R.string.profile)
-                binding.logoutBtn.instantShow()
-                binding.propicImageView.instantHide()
-                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .hide(activeFragment!!).show(profileFragment!!).commit()
-                activeFragment = profileFragment
-
-                if (viewModel.fragmentStack.lastOrNull() != PROFILE_FRAGMENT_TAG)
-                    viewModel.fragmentStack.add(PROFILE_FRAGMENT_TAG)
-            }
-
-            else -> Unit // should not be possible
-        }
-    }
-
-    // called only one time, when the activity is loaded for the first time
-    private val fragmentCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
-            super.onFragmentResumed(fm, f)
             isLayoutReady = true
         }
+
+        setContent {
+            MyFinanceTheme {
+                val windowSizeClass = calculateWindowSizeClass(this)
+                HomeScreen(
+                    viewModel = viewModel,
+                    dashboardViewModel = dashboardViewModel,
+                    expensesViewModel = expensesViewModel,
+                    budgetViewModel = budgetViewModel,
+                    profileViewModel = profileViewModel,
+                    windowWidthSizeClass = windowSizeClass.widthSizeClass,
+                    showProgress = showProgress,
+                    snackbarHostState = snackbarHostState,
+                    onAddClick = { onAddButtonClick() },
+                    onLogoutClick = { viewModel.onLogoutButtonClick(View(this)) },
+                    onProPicClick = { viewModel.navigateTo(HomeViewModel.Screen.PROFILE) },
+                    onEditExpense = { expense, position ->
+                        Intent(this, AddActivity::class.java).also {
+                            it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
+                            it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_EXPENSE_CODE)
+                            it.putExtra(AddActivity.EXTRA_TRANSACTION, expense)
+                            it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                            editResultLauncher.launch(it)
+                        }
+                    },
+                    onEditIncome = { income, position ->
+                        Intent(this, AddActivity::class.java).also {
+                            it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
+                            it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_INCOME_CODE)
+                            it.putExtra(AddActivity.EXTRA_TRANSACTION, income)
+                            it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                            editResultLauncher.launch(it)
+                        }
+                    },
+                    onDynamicColorChanged = { isChecked ->
+                        profileViewModel.setDynamicColor(isChecked)
+                        showSnackBar(
+                            message = getString(R.string.restart_app_changes),
+                            actionText = getString(R.string.restart),
+                            actionFun = {
+                                val intent = packageManager.getLaunchIntentForPackage(packageName)
+                                val mainIntent = Intent.makeRestartActivityTask(intent!!.component)
+                                startActivity(mainIntent)
+                                Runtime.getRuntime().exit(0)
+                            }
+                        )
+                    },
+                    getDateLabel = { start, end -> getDateChipLabel(start, end) },
+                    onShowSnackBar = { message -> showSnackBar(message) }
+                )
+            }
+        }
     }
 
-    fun onAddButtonClick(view: View) {
-        ActivityOptionsCompat.makeClipRevealAnimation(
-            view, 0, 0, view.measuredWidth, view.measuredHeight
-        ).also { activityOptionsCompat ->
-            Intent(applicationContext, AddActivity::class.java).also {
-                it.putExtra(
-                    AddActivity.REQUEST_CODE_KEY,
-                    AddActivity.REQUEST_ADD_CODE
-                )
-                addResultLauncher.launch(it, activityOptionsCompat)
-            }
+    private fun onAddButtonClick() {
+        Intent(applicationContext, AddActivity::class.java).also {
+            it.putExtra(
+                AddActivity.REQUEST_CODE_KEY,
+                AddActivity.REQUEST_ADD_CODE
+            )
+            addResultLauncher.launch(it)
         }
     }
 
     fun showSnackBar(
         message: String,
         actionText: String? = null,
-        actionFun: () -> Unit = {}
-    ): Snackbar {
-        var view = when {
-            binding.homeAddBtn != null -> binding.homeAddBtn
-            else -> binding.homeAddExtBtn
+        actionFun: () -> Unit = {},
+        dismissFun: () -> Unit = {}
+    ) {
+        lifecycleScope.launch {
+            val result = snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = actionText,
+                duration = SnackbarDuration.Short
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                actionFun()
+            } else {
+                dismissFun()
+            }
         }
-
-        if (view?.isVisible == false) {
-            view = null
-        }
-
-        return snackBar(message, view, actionText, actionFun)
     }
 
     override fun onLogOutSuccess(response: LiveData<AuthResult>) {
@@ -403,18 +340,14 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                     viewModel.updateLabels()
                     viewModel.updateLocalMonthlyBudget()
                     viewModel.updateLocalLabels()
-                    initFragments()
+                    profileViewModel.updateLocalUser()
                     if (userRequest) {
                         hideProgressIndicator()
                         intent.extras?.getString(AuthActivity.INTENT_USER_NAME).also { userName ->
                             showSnackBar("${getString(R.string.login_successful)} $userName")
                         }
-                    } else {
-                        supportFragmentManager.registerFragmentLifecycleCallbacks(
-                            fragmentCallback,
-                            true
-                        )
                     }
+                    isLayoutReady = true
                 }
 
                 AuthCode.USER_NOT_LOGGED.code -> {
@@ -432,16 +365,9 @@ class HomeActivity : AppCompatActivity(), HomeListener {
                 FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS.code -> {
                     hideProgressIndicator()
                 }
-
-                FinanceCode.BUDGET_UPDATE_SUCCESS.code -> Unit
-
                 else -> Unit
             }
         }
-    }
-
-    fun onProPicClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        showFragment(R.id.profileFragment)
     }
 
     private fun goToLoginActivity() {
@@ -452,27 +378,30 @@ class HomeActivity : AppCompatActivity(), HomeListener {
     }
 
     fun showProgressIndicator() {
-        binding.homeProgressIndicator.show()
+        showProgress = true
     }
 
     fun hideProgressIndicator() {
-        binding.homeProgressIndicator.hide()
+        showProgress = false
     }
 
-    private fun initFragments() {
-        viewModel.fragmentStack.add(DASHBOARD_FRAGMENT_TAG)
-        dashboardFragment = DashboardFragment()
-        activeFragment = dashboardFragment
-        supportFragmentManager.beginTransaction()
-            .add(R.id.home_fragmentContainerView, dashboardFragment!!, DASHBOARD_FRAGMENT_TAG)
-            .commit()
-    }
-
-    private fun showFragment(fragmentId: Int) {
-        binding.navBar?.selectedItemId = fragmentId
-        binding.navDrawer?.let {
-            navigateTo(fragmentId)
-            it.setCheckedItem(fragmentId)
+    private fun getDateChipLabel(startDate: LocalDate, endDate: LocalDate): String {
+        return when (startDate.year) {
+            endDate.year -> {
+                if (startDate.monthValue == endDate.monthValue) {
+                    val startDayOfMonth =
+                        if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+                    "$startDayOfMonth - ${dateToExtendedString(endDate)}"
+                } else {
+                    val startDayOfMonth =
+                        if (startDate.dayOfMonth < 10) "0${startDate.dayOfMonth}" else startDate.dayOfMonth.toString()
+                    val startMonth =
+                        startDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                            .replaceFirstChar { it.uppercase() }
+                    "$startDayOfMonth $startMonth - ${dateToExtendedString(endDate)}"
+                }
+            }
+            else -> "${dateToExtendedString(startDate)} - ${dateToExtendedString(endDate)}"
         }
     }
 }

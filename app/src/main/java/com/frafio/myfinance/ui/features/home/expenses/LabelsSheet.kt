@@ -429,7 +429,7 @@ private fun LabelItem(
                                 onClick = { menuExpanded = true }
                             ) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.ic_more_vert),
+                                    painter = painterResource(id = R.drawable.ic_more_vert_filled),
                                     contentDescription = null
                                 )
                             }

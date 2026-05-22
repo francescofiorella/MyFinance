@@ -1,17 +1,13 @@
 package com.frafio.myfinance.ui.features.home.profile
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,8 +29,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -86,39 +82,23 @@ fun ProfileScreen(
         }
     }
 
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val isLandscape = maxWidth > maxHeight
-
-        if (isLandscape) {
-            ProfileContentLandscape(
-                user = user,
-                googleSignIn = viewModel.googleSignIn,
-                versionName = viewModel.versionName,
-                isDynamicColorAvailable = viewModel.isDynamicColorAvailable,
-                isDynamicColorChecked = isDynamicColorChecked,
-                scrollState = scrollState,
-                onUploadProPic = onUploadProPic,
-                onEditFullName = { showEditFullNameSheet = true },
-                onDynamicColorChanged = onDynamicColorChanged
-            )
-        } else {
-            ProfileContentPortrait(
-                user = user,
-                googleSignIn = viewModel.googleSignIn,
-                versionName = viewModel.versionName,
-                isDynamicColorAvailable = viewModel.isDynamicColorAvailable,
-                isDynamicColorChecked = isDynamicColorChecked,
-                scrollState = scrollState,
-                onUploadProPic = onUploadProPic,
-                onEditFullName = { showEditFullNameSheet = true },
-                onDynamicColorChanged = onDynamicColorChanged
-            )
-        }
-    }
+    ProfileContent(
+        modifier = modifier,
+        user = user,
+        googleSignIn = viewModel.googleSignIn,
+        versionName = viewModel.versionName,
+        isDynamicColorAvailable = viewModel.isDynamicColorAvailable,
+        isDynamicColorChecked = isDynamicColorChecked,
+        scrollState = scrollState,
+        onUploadProPic = onUploadProPic,
+        onEditFullName = { showEditFullNameSheet = true },
+        onDynamicColorChanged = onDynamicColorChanged
+    )
 }
 
 @Composable
-private fun ProfileContentPortrait(
+private fun ProfileContent(
+    modifier: Modifier = Modifier,
     user: User?,
     googleSignIn: Boolean,
     versionName: String,
@@ -130,7 +110,7 @@ private fun ProfileContentPortrait(
     onDynamicColorChanged: (Boolean) -> Unit
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -151,50 +131,6 @@ private fun ProfileContentPortrait(
             onEditFullName = onEditFullName,
             onDynamicColorChanged = onDynamicColorChanged
         )
-    }
-}
-
-@Composable
-private fun ProfileContentLandscape(
-    user: User?,
-    googleSignIn: Boolean,
-    versionName: String,
-    isDynamicColorAvailable: Boolean,
-    isDynamicColorChecked: Boolean,
-    scrollState: ScrollState,
-    onUploadProPic: () -> Unit,
-    onEditFullName: () -> Unit,
-    onDynamicColorChanged: (Boolean) -> Unit
-) {
-    Row(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .weight(0.4f)
-                .fillMaxHeight()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            ProfileHeader(user = user)
-        }
-
-        Column(
-            modifier = Modifier
-                .weight(0.6f)
-                .fillMaxHeight()
-                .verticalScroll(scrollState)
-        ) {
-            ProfileCards(
-                user = user,
-                googleSignIn = googleSignIn,
-                versionName = versionName,
-                isDynamicColorAvailable = isDynamicColorAvailable,
-                isDynamicColorChecked = isDynamicColorChecked,
-                onUploadProPic = onUploadProPic,
-                onEditFullName = onEditFullName,
-                onDynamicColorChanged = onDynamicColorChanged
-            )
-        }
     }
 }
 
@@ -308,9 +244,9 @@ private fun ProfileCards(
                 Icon(
                     painter = painterResource(
                         id = if (expanded)
-                            R.drawable.ic_keyboard_arrow_up
+                            R.drawable.ic_keyboard_arrow_up_filled
                         else
-                            R.drawable.ic_keyboard_arrow_down
+                            R.drawable.ic_keyboard_arrow_down_filled
                     ),
                     contentDescription = null,
                 )
@@ -618,11 +554,11 @@ private fun ProfileCards(
     Spacer(modifier = Modifier.height(88.dp))
 }
 
-@Preview(showBackground = true, name = "Portrait")
+@Preview(showBackground = true)
 @Composable
-fun ProfilePortraitPreview() {
+fun ProfilePreview() {
     MyFinanceTheme {
-        ProfileContentPortrait(
+        ProfileContent(
             user = User(
                 fullName = "John Doe",
                 email = "john.doe@example.com",
@@ -635,31 +571,6 @@ fun ProfilePortraitPreview() {
             versionName = "1.0.0",
             isDynamicColorAvailable = true,
             isDynamicColorChecked = false,
-            scrollState = rememberScrollState(),
-            onUploadProPic = {},
-            onEditFullName = {},
-            onDynamicColorChanged = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, widthDp = 800, heightDp = 400, name = "Landscape")
-@Composable
-fun ProfileLandscapePreview() {
-    MyFinanceTheme {
-        ProfileContentLandscape(
-            user = User(
-                fullName = "John Doe",
-                email = "john.doe@example.com",
-                photoUrl = null,
-                creationDay = 1,
-                creationMonth = 1,
-                creationYear = 2023
-            ),
-            googleSignIn = true,
-            versionName = "My Finance 1.0.0",
-            isDynamicColorAvailable = true,
-            isDynamicColorChecked = true,
             scrollState = rememberScrollState(),
             onUploadProPic = {},
             onEditFullName = {},
