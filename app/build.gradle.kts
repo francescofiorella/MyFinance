@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     id("kotlin-parcelize")
 }
 
@@ -20,7 +21,7 @@ android {
         minSdk = 29
         targetSdk = 37
         versionCode = 4
-        versionName = "4.9.5"
+        versionName = "4.9.6"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -111,4 +112,15 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.google.fonts)
+
+    // Navigation 3 and Adaptive
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.compose.material3.navigationSuite)
+    implementation(libs.androidx.compose.material3.adaptive)
+    implementation(libs.androidx.compose.material3.adaptive.layout)
+    implementation(libs.androidx.compose.material3.adaptive.navigation)
+    implementation(libs.androidx.compose.material3.adaptive.navigation3)
+    implementation(libs.androidx.lifecycle.viewModel.navigation3)
+    implementation(libs.kotlinx.serialization.json)
 }

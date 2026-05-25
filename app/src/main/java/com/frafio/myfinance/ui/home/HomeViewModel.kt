@@ -3,14 +3,15 @@ package com.frafio.myfinance.ui.home
 import android.app.Application
 import android.view.View
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.MyFinanceApplication
-import com.frafio.myfinance.R
 import com.frafio.myfinance.data.repository.IncomeRepository
 import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.data.repository.UserRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository(
@@ -24,40 +25,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     )
     var listener: HomeListener? = null
 
-    enum class Screen(val titleRes: Int) {
-        DASHBOARD(R.string.dashboard),
-        EXPENSES(R.string.expenses),
-        BUDGET(R.string.budget),
-        PROFILE(R.string.profile)
-    }
+    private val _navEvents = Channel<MyFinanceNavKey>(Channel.BUFFERED)
+    val navEvents = _navEvents.receiveAsFlow()
 
-    private val _currentScreen = MutableStateFlow(Screen.DASHBOARD)
-    val currentScreen: StateFlow<Screen> = _currentScreen.asStateFlow()
-
-    private val _navigationStack = MutableStateFlow(listOf(Screen.DASHBOARD))
-
-    fun navigateTo(screen: Screen) {
-        if (_currentScreen.value == screen) return
-        
-        val newStack = _navigationStack.value.toMutableList()
-        newStack.add(screen)
-        _navigationStack.value = newStack
-        _currentScreen.value = screen
-    }
-
-    fun navigateBack(): Boolean {
-        val currentStack = _navigationStack.value
-        if (currentStack.size > 1) {
-            val newStack = currentStack.dropLast(1)
-            _navigationStack.value = newStack
-            _currentScreen.value = newStack.last()
-            return true
-        }
-        return false
-    }
-
-    fun getNavigationStackSize(): Int {
-        return _navigationStack.value.size
+    fun navigateTo(key: MyFinanceNavKey) {
+        viewModelScope.launch { _navEvents.send(key) }
     }
 
     fun checkUser() {

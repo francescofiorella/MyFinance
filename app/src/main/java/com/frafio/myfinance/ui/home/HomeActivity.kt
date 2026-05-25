@@ -15,7 +15,6 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -33,6 +32,8 @@ import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.AuthActivity
 import com.frafio.myfinance.ui.features.home.HomeScreen
+import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
+import com.frafio.myfinance.ui.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.ui.home.budget.BudgetListener
 import com.frafio.myfinance.ui.home.budget.BudgetViewModel
 import com.frafio.myfinance.ui.home.dashboard.DashboardViewModel
@@ -69,13 +70,13 @@ class HomeActivity : ComponentActivity(), HomeListener {
             val totalId = data.getStringExtra(AddActivity.ADD_RESULT_TOTAL_ID) ?: ""
             when (expenseRequest) {
                 AddActivity.REQUEST_EXPENSE_CODE -> {
-                    viewModel.navigateTo(HomeViewModel.Screen.EXPENSES)
+                    viewModel.navigateTo(MyFinanceNavKey.Expenses)
                     expensesViewModel.scrollToId(totalId)
                     showSnackBar(message)
                 }
 
                 AddActivity.REQUEST_INCOME_CODE -> {
-                    viewModel.navigateTo(HomeViewModel.Screen.BUDGET)
+                    viewModel.navigateTo(MyFinanceNavKey.Budget)
                     budgetViewModel.scrollToId(totalId)
                     showSnackBar(message)
                 }
@@ -240,19 +241,19 @@ class HomeActivity : ComponentActivity(), HomeListener {
 
         setContent {
             MyFinanceTheme {
-                val windowSizeClass = calculateWindowSizeClass(this)
+                val appState = rememberMyFinanceAppState()
                 HomeScreen(
+                    appState = appState,
                     viewModel = viewModel,
                     dashboardViewModel = dashboardViewModel,
                     expensesViewModel = expensesViewModel,
                     budgetViewModel = budgetViewModel,
                     profileViewModel = profileViewModel,
-                    windowWidthSizeClass = windowSizeClass.widthSizeClass,
                     showProgress = showProgress,
                     snackbarHostState = snackbarHostState,
                     onAddClick = { onAddButtonClick() },
                     onLogoutClick = { viewModel.onLogoutButtonClick(View(this)) },
-                    onProPicClick = { viewModel.navigateTo(HomeViewModel.Screen.PROFILE) },
+                    onProPicClick = { viewModel.navigateTo(MyFinanceNavKey.Profile) },
                     onEditExpense = { expense, position ->
                         Intent(this, AddActivity::class.java).also {
                             it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
