@@ -55,10 +55,10 @@ import coil3.compose.AsyncImage
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.Income
-import com.frafio.myfinance.ui.features.home.budget.BudgetScreen
-import com.frafio.myfinance.ui.features.home.dashboard.DashboardScreen
-import com.frafio.myfinance.ui.features.home.expenses.ExpensesScreen
-import com.frafio.myfinance.ui.features.home.profile.ProfileScreen
+import com.frafio.myfinance.ui.features.home.budget.navigation.budgetEntry
+import com.frafio.myfinance.ui.features.home.dashboard.navigation.dashboardEntry
+import com.frafio.myfinance.ui.features.home.expenses.navigation.expensesEntry
+import com.frafio.myfinance.ui.features.home.profile.navigation.profileEntry
 import com.frafio.myfinance.ui.home.HomeViewModel
 import com.frafio.myfinance.ui.home.budget.BudgetViewModel
 import com.frafio.myfinance.ui.home.dashboard.DashboardViewModel
@@ -171,31 +171,23 @@ fun HomeScreen(
             onLogoutClick = onLogoutClick,
             onProPicClick = onProPicClick,
             screenContent = {
+                val comingSoonString = stringResource(id = R.string.coming_soon)
                 val entryProvider: (NavKey) -> NavEntry<NavKey> = entryProvider {
-                    entry<MyFinanceNavKey.Dashboard> {
-                        DashboardScreen(viewModel = dashboardViewModel)
-                    }
-                    entry<MyFinanceNavKey.Expenses> {
-                        ExpensesScreen(
-                            viewModel = expensesViewModel,
-                            onItemLongClick = onEditExpense,
-                            getDateLabel = getDateLabel
-                        )
-                    }
-                    entry<MyFinanceNavKey.Budget> {
-                        BudgetScreen(
-                            viewModel = budgetViewModel,
-                            onEditIncome = onEditIncome
-                        )
-                    }
-                    entry<MyFinanceNavKey.Profile> {
-                        val comingSoonString = stringResource(id = R.string.coming_soon)
-                        ProfileScreen(
-                            viewModel = profileViewModel,
-                            onUploadProPic = { onShowSnackBar(comingSoonString) },
-                            onDynamicColorChanged = onDynamicColorChanged
-                        )
-                    }
+                    dashboardEntry(viewModel = dashboardViewModel)
+                    expensesEntry(
+                        viewModel = expensesViewModel,
+                        onItemLongClick = onEditExpense,
+                        getDateLabel = getDateLabel
+                    )
+                    budgetEntry(
+                        viewModel = budgetViewModel,
+                        onEditIncome = onEditIncome
+                    )
+                    profileEntry(
+                        viewModel = profileViewModel,
+                        onUploadProPic = { onShowSnackBar(comingSoonString) },
+                        onDynamicColorChanged = onDynamicColorChanged
+                    )
                 }
 
                 NavDisplay(
@@ -203,7 +195,7 @@ fun HomeScreen(
                     transitionSpec = { fadeIn() togetherWith fadeOut() },
                     popTransitionSpec = { fadeIn() togetherWith fadeOut() },
                     predictivePopTransitionSpec = { fadeIn() togetherWith fadeOut() },
-                    onBack = { navigator.goBack() },
+                    onBack = { navigator.goBack() }
                 )
             }
         )
@@ -220,7 +212,7 @@ private fun MainScaffold(
     onAddClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onProPicClick: () -> Unit,
-    screenContent: @Composable () -> Unit
+    screenContent: @Composable () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -285,10 +277,11 @@ private fun MainScaffold(
                 }
             },
             floatingActionButton = {
-                if (currentTopLevelKey != MyFinanceNavKey.Profile) {
-                    FloatingActionButton(onClick = onAddClick) {
-                        Icon(painterResource(R.drawable.ic_add_filled), contentDescription = stringResource(id = R.string.add))
-                    }
+                FloatingActionButton(onClick = onAddClick) {
+                    Icon(
+                        painterResource(R.drawable.ic_add_filled),
+                        contentDescription = stringResource(id = R.string.add)
+                    )
                 }
             },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
