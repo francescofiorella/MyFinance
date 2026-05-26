@@ -44,7 +44,7 @@ fun ResetPasswordSheet(
     onSend: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var emailFieldValue by remember {
+    var emailFieldValue by remember(show) {
         mutableStateOf(
             TextFieldValue(
                 text = "",

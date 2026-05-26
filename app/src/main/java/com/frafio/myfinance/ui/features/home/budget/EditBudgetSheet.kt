@@ -46,7 +46,7 @@ fun EditBudgetSheet(
     modifier: Modifier = Modifier,
 ) {
     val initialText = if (budget == 0.0) "" else doubleToString(budget)
-    var budgetTextFieldValue by remember {
+    var budgetTextFieldValue by remember(show) {
         mutableStateOf(
             TextFieldValue(
                 text = initialText,

@@ -43,7 +43,7 @@ fun EditFullNameSheet(
     onEditFullName: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var nameTextFieldValue by remember {
+    var nameTextFieldValue by remember(show) {
         mutableStateOf(
             TextFieldValue(
                 text = fullName,

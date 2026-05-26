@@ -27,7 +27,7 @@ fun AdaptiveSheet(
     val scope = rememberCoroutineScope()
 
     // Local state to keep the sheet in composition during animation
-    var shouldRender by remember { mutableStateOf(value = false) }
+    var shouldRender by remember(show) { mutableStateOf(value = false) }
 
     LaunchedEffect(show) {
         if (show) {

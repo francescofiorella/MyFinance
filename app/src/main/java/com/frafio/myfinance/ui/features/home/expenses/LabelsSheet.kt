@@ -85,10 +85,10 @@ fun LabelsSheet(
     onEditLabel: (String, String) -> Unit,
 ) {
 
-    var labelFieldValue by remember { mutableStateOf(TextFieldValue(text = "")) }
-    var editingLabel by remember { mutableStateOf<String?>(null) }
-    var editLabelFieldValue by remember { mutableStateOf(TextFieldValue(text = "")) }
-    val focusRequester = remember { FocusRequester() }
+    var labelFieldValue by remember(show) { mutableStateOf(TextFieldValue(text = "")) }
+    var editingLabel by remember(show) { mutableStateOf<String?>(null) }
+    var editLabelFieldValue by remember(show) { mutableStateOf(TextFieldValue(text = "")) }
+    val focusRequester = remember(show) { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(editingLabel) {
