@@ -15,6 +15,7 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,21 +27,13 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.AuthResult
-import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
-import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.AuthActivity
 import com.frafio.myfinance.ui.features.home.HomeScreen
+import com.frafio.myfinance.ui.navigation.LocalSnackbarHostState
 import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
 import com.frafio.myfinance.ui.navigation.rememberMyFinanceAppState
-import com.frafio.myfinance.ui.home.budget.BudgetListener
-import com.frafio.myfinance.ui.home.budget.BudgetViewModel
-import com.frafio.myfinance.ui.home.dashboard.DashboardViewModel
-import com.frafio.myfinance.ui.home.expenses.ExpensesListener
-import com.frafio.myfinance.ui.home.expenses.ExpensesViewModel
-import com.frafio.myfinance.ui.home.profile.ProfileListener
-import com.frafio.myfinance.ui.home.profile.ProfileViewModel
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.dateToExtendedString
 import com.google.android.material.color.DynamicColors
@@ -52,10 +45,6 @@ import java.util.Locale
 class HomeActivity : ComponentActivity(), HomeListener {
 
     private val viewModel by viewModels<HomeViewModel>()
-    private val dashboardViewModel by viewModels<DashboardViewModel>()
-    private val expensesViewModel by viewModels<ExpensesViewModel>()
-    private val budgetViewModel by viewModels<BudgetViewModel>()
-    private val profileViewModel by viewModels<ProfileViewModel>()
 
     private var userRequest: Boolean = false
     private var isLayoutReady by mutableStateOf(false)
@@ -67,17 +56,16 @@ class HomeActivity : ComponentActivity(), HomeListener {
             val data = result.data!!
             val expenseRequest = data.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
             val message = data.getStringExtra(AddActivity.ADD_RESULT_MESSAGE) ?: ""
-            val totalId = data.getStringExtra(AddActivity.ADD_RESULT_TOTAL_ID) ?: ""
+            // totalId is used for scrolling, we might need a shared event for this now
+            // val totalId = data.getStringExtra(AddActivity.ADD_RESULT_TOTAL_ID) ?: ""
             when (expenseRequest) {
                 AddActivity.REQUEST_EXPENSE_CODE -> {
                     viewModel.navigateTo(MyFinanceNavKey.Expenses)
-                    expensesViewModel.scrollToId(totalId)
                     showSnackBar(message)
                 }
 
                 AddActivity.REQUEST_INCOME_CODE -> {
                     viewModel.navigateTo(MyFinanceNavKey.Budget)
-                    budgetViewModel.scrollToId(totalId)
                     showSnackBar(message)
                 }
             }
@@ -121,7 +109,7 @@ class HomeActivity : ComponentActivity(), HomeListener {
                             splashScreenViewProvider.view,
                             View.ALPHA,
                             1f,
-                            0f
+                            0f,
                         ).apply {
                             interpolator = LinearInterpolator()
                             duration = 200L
@@ -134,89 +122,7 @@ class HomeActivity : ComponentActivity(), HomeListener {
         }
 
         viewModel.listener = this
-        expensesViewModel.listener = object : ExpensesListener {
-            override fun onCompleted(response: LiveData<FinanceResult>) {
-                response.observe(this@HomeActivity) { result ->
-                    if (result.code == FinanceCode.EXPENSE_ADD_SUCCESS.code) {
-                        showSnackBar(result.message)
-                    }
-                }
-            }
-
-            override fun onDeleteCompleted(response: LiveData<FinanceResult>, expense: Expense) {
-                response.observe(this@HomeActivity) { result ->
-                    if (result.code == FinanceCode.EXPENSE_DELETE_SUCCESS.code) {
-                        showSnackBar(
-                            message = result.message,
-                            actionText = getString(R.string.cancel),
-                            actionFun = { expensesViewModel.addExpense(expense) }
-                        )
-                    } else {
-                        showSnackBar(result.message)
-                    }
-                }
-            }
-
-            override fun onDeleteCompleted(response: LiveData<FinanceResult>, label: String) {
-                response.observe(this@HomeActivity) { result ->
-                    if (result.code == FinanceCode.LABEL_DELETE_SUCCESS.code) {
-                        showSnackBar(
-                            message = result.message,
-                            actionText = getString(R.string.cancel),
-                            actionFun = { expensesViewModel.undoDeleteLabel() },
-                            dismissFun = { expensesViewModel.resetLastDeletedLabel() }
-                        )
-                    } else {
-                        showSnackBar(result.message)
-                    }
-                }
-            }
-        }
-        budgetViewModel.listener = object : BudgetListener {
-            override fun onCompleted(response: LiveData<FinanceResult>, previousBudget: Double?) {
-                response.observe(this@HomeActivity) { result ->
-                    when (result.code) {
-                        FinanceCode.BUDGET_UPDATE_SUCCESS.code -> {
-                            previousBudget?.let {
-                                showSnackBar(
-                                    message = result.message,
-                                    actionText = getString(R.string.cancel),
-                                    actionFun = { budgetViewModel.setMonthlyBudget(previousBudget) }
-                                )
-                            }
-                        }
-                        FinanceCode.INCOME_ADD_SUCCESS.code -> showSnackBar(result.message)
-                        else -> showSnackBar(result.message)
-                    }
-                }
-            }
-
-            override fun onDeleteCompleted(response: LiveData<FinanceResult>, income: Income) {
-                response.observe(this@HomeActivity) { result ->
-                    if (result.code == FinanceCode.INCOME_DELETE_SUCCESS.code) {
-                        showSnackBar(
-                            message = result.message,
-                            actionText = getString(R.string.cancel),
-                            actionFun = { budgetViewModel.addIncome(income) }
-                        )
-                    } else {
-                        showSnackBar(result.message)
-                    }
-                }
-            }
-        }
-        profileViewModel.listener = object : ProfileListener {
-            override fun onStarted() { showProgressIndicator() }
-            override fun onProfileUpdateComplete(response: LiveData<AuthResult>) {
-                response.observe(this@HomeActivity) { authResult ->
-                    hideProgressIndicator()
-                    showSnackBar(authResult.message)
-                    if (authResult.code == AuthCode.USER_DATA_UPDATED.code) {
-                        profileViewModel.updateLocalUser()
-                    }
-                }
-            }
-        }
+        // Feature ViewModels are now managed by Navigation 3 entries
 
         if (savedInstanceState == null) {
             if (userRequest) {
@@ -227,7 +133,7 @@ class HomeActivity : ComponentActivity(), HomeListener {
                 viewModel.updateLabels()
                 viewModel.updateLocalMonthlyBudget()
                 viewModel.updateLocalLabels()
-                profileViewModel.updateLocalUser()
+                viewModel.updateLocalUser()
                 intent.extras?.getString(AuthActivity.INTENT_USER_NAME).also { userName ->
                     showSnackBar("${getString(R.string.login_successful)} $userName")
                 }
@@ -242,15 +148,11 @@ class HomeActivity : ComponentActivity(), HomeListener {
         setContent {
             MyFinanceTheme {
                 val appState = rememberMyFinanceAppState()
+                CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
                 HomeScreen(
                     appState = appState,
                     viewModel = viewModel,
-                    dashboardViewModel = dashboardViewModel,
-                    expensesViewModel = expensesViewModel,
-                    budgetViewModel = budgetViewModel,
-                    profileViewModel = profileViewModel,
                     showProgress = showProgress,
-                    snackbarHostState = snackbarHostState,
                     onAddClick = { onAddButtonClick() },
                     onLogoutClick = { viewModel.onLogoutButtonClick(View(this)) },
                     onProPicClick = { viewModel.navigateTo(MyFinanceNavKey.Profile) },
@@ -273,7 +175,7 @@ class HomeActivity : ComponentActivity(), HomeListener {
                         }
                     },
                     onDynamicColorChanged = { isChecked ->
-                        profileViewModel.setDynamicColor(isChecked)
+                        viewModel.setDynamicColor(isChecked)
                         showSnackBar(
                             message = getString(R.string.restart_app_changes),
                             actionText = getString(R.string.restart),
@@ -285,9 +187,9 @@ class HomeActivity : ComponentActivity(), HomeListener {
                             }
                         )
                     },
-                    getDateLabel = { start, end -> getDateChipLabel(start, end) },
-                    onShowSnackBar = { message -> showSnackBar(message) }
+                    getDateLabel = { start, end -> getDateChipLabel(start, end) }
                 )
+                }
             }
         }
     }
@@ -341,7 +243,7 @@ class HomeActivity : ComponentActivity(), HomeListener {
                     viewModel.updateLabels()
                     viewModel.updateLocalMonthlyBudget()
                     viewModel.updateLocalLabels()
-                    profileViewModel.updateLocalUser()
+                    viewModel.updateLocalUser()
                     if (userRequest) {
                         hideProgressIndicator()
                         intent.extras?.getString(AuthActivity.INTENT_USER_NAME).also { userName ->

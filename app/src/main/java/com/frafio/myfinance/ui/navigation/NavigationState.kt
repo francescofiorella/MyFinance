@@ -68,7 +68,7 @@ fun NavigationState.toEntries(
     val decoratedEntries = subStacks.mapValues { (_, stack) ->
         val decorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator<NavKey>(),
-            rememberViewModelStoreNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator<NavKey>(),
         )
         rememberDecoratedNavEntries(
             backStack = stack,

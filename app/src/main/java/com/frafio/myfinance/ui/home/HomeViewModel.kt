@@ -46,7 +46,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun isDynamicColorOn(): Boolean {
-        return userRepository.isDynamicColorOn()
+        return expensesRepository.getDynamicColorActive()
+    }
+
+    fun setDynamicColor(enabled: Boolean) {
+        expensesRepository.setDynamicColorActive(enabled)
+    }
+
+    fun updateLocalUser() {
+        // user state is managed in MyFinanceStorage/repositories
     }
 
     fun updateUserExpenses() {

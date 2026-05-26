@@ -20,7 +20,6 @@ import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -47,6 +46,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -60,10 +60,7 @@ import com.frafio.myfinance.ui.features.home.dashboard.navigation.dashboardEntry
 import com.frafio.myfinance.ui.features.home.expenses.navigation.expensesEntry
 import com.frafio.myfinance.ui.features.home.profile.navigation.profileEntry
 import com.frafio.myfinance.ui.home.HomeViewModel
-import com.frafio.myfinance.ui.home.budget.BudgetViewModel
-import com.frafio.myfinance.ui.home.dashboard.DashboardViewModel
-import com.frafio.myfinance.ui.home.expenses.ExpensesViewModel
-import com.frafio.myfinance.ui.home.profile.ProfileViewModel
+import com.frafio.myfinance.ui.navigation.LocalSnackbarHostState
 import com.frafio.myfinance.ui.navigation.MyFinanceAppState
 import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
 import com.frafio.myfinance.ui.navigation.Navigator
@@ -76,13 +73,8 @@ import java.time.LocalDate
 fun HomeScreen(
     appState: MyFinanceAppState,
     viewModel: HomeViewModel,
-    dashboardViewModel: DashboardViewModel,
-    expensesViewModel: ExpensesViewModel,
-    budgetViewModel: BudgetViewModel,
-    profileViewModel: ProfileViewModel,
-    windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfoV2(),
     showProgress: Boolean,
-    snackbarHostState: SnackbarHostState,
+    windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfoV2(),
     onAddClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onProPicClick: () -> Unit,
@@ -90,7 +82,6 @@ fun HomeScreen(
     onEditIncome: (Income, Int) -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
-    onShowSnackBar: (String) -> Unit,
 ) {
     val navigator = remember { Navigator(appState.navigationState) }
     val currentTopLevelKey = appState.navigationState.currentTopLevelKey
@@ -116,16 +107,7 @@ fun HomeScreen(
                     selected = isSelected,
                     onClick = {
                         if (isSelected) {
-                            when (navKey) {
-                                MyFinanceNavKey.Dashboard -> dashboardViewModel.scrollToTop()
-                                MyFinanceNavKey.Expenses -> {
-                                    val today = LocalDate.now()
-                                    val todayId = "total_${today.dayOfMonth}_${today.monthValue}_${today.year}"
-                                    expensesViewModel.scrollToId(todayId)
-                                }
-                                MyFinanceNavKey.Budget -> budgetViewModel.scrollToId(null)
-                                MyFinanceNavKey.Profile -> profileViewModel.scrollToTop()
-                            }
+                            appState.onReselect(navKey)
                         } else {
                             navigator.navigate(navKey)
                         }
@@ -165,27 +147,31 @@ fun HomeScreen(
         MainScaffold(
             currentTopLevelKey = currentTopLevelKey as MyFinanceNavKey,
             proPic = proPic,
-            showProgress = showProgress,
-            snackbarHostState = snackbarHostState,
+            showProgress = showProgress || appState.showProgress,
             onAddClick = onAddClick,
             onLogoutClick = onLogoutClick,
             onProPicClick = onProPicClick,
             screenContent = {
                 val comingSoonString = stringResource(id = R.string.coming_soon)
+                val snackbarHostState = LocalSnackbarHostState.current
                 val entryProvider: (NavKey) -> NavEntry<NavKey> = entryProvider {
-                    dashboardEntry(viewModel = dashboardViewModel)
+                    dashboardEntry(appState)
                     expensesEntry(
-                        viewModel = expensesViewModel,
+                        appState = appState,
                         onItemLongClick = onEditExpense,
                         getDateLabel = getDateLabel
                     )
                     budgetEntry(
-                        viewModel = budgetViewModel,
+                        appState = appState,
                         onEditIncome = onEditIncome
                     )
                     profileEntry(
-                        viewModel = profileViewModel,
-                        onUploadProPic = { onShowSnackBar(comingSoonString) },
+                        appState = appState,
+                        onUploadProPic = {
+                            appState.coroutineScope.launch {
+                                snackbarHostState.showSnackbar(comingSoonString)
+                            }
+                        },
                         onDynamicColorChanged = onDynamicColorChanged
                     )
                 }
@@ -194,9 +180,10 @@ fun HomeScreen(
                     entries = appState.navigationState.toEntries(entryProvider),
                     transitionSpec = { fadeIn() togetherWith fadeOut() },
                     popTransitionSpec = { fadeIn() togetherWith fadeOut() },
-                    predictivePopTransitionSpec = { fadeIn() togetherWith fadeOut() },
-                    onBack = { navigator.goBack() }
-                )
+                    predictivePopTransitionSpec = { fadeIn() togetherWith fadeOut() }
+                ) {
+                    navigator.goBack()
+                }
             }
         )
     }
@@ -208,12 +195,12 @@ private fun MainScaffold(
     currentTopLevelKey: MyFinanceNavKey,
     proPic: String?,
     showProgress: Boolean,
-    snackbarHostState: SnackbarHostState,
     onAddClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onProPicClick: () -> Unit,
     screenContent: @Composable () -> Unit,
 ) {
+    val snackbarHostState = LocalSnackbarHostState.current
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
