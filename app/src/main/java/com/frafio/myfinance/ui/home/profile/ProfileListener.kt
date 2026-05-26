@@ -5,9 +5,11 @@ import com.frafio.myfinance.data.model.AuthResult
 
 interface ProfileListener {
 
-    fun onStarted()
+    fun onStarted(notify: Boolean = true)
 
-    fun onProfileUpdateComplete(response: LiveData<AuthResult>)
+    fun onFullNameUpdateComplete(response: LiveData<AuthResult>, previousFullName: String, notify: Boolean = true)
+
+    fun onProPicUpdateComplete(response: LiveData<AuthResult>)
 
     fun onDynamicColorChanged()
 }

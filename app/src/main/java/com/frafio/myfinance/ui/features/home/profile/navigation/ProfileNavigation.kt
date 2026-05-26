@@ -34,6 +34,8 @@ fun EntryProviderScope<NavKey>.profileEntry(
         val snackbarHostState = LocalSnackbarHostState.current
         val coroutineScope = rememberCoroutineScope()
 
+        val undoString = stringResource(id = R.string.undo)
+
         LaunchedEffect(appState.reselectEvent) {
             appState.reselectEvent.collect { key ->
                 if (key == MyFinanceNavKey.Profile) {
@@ -44,23 +46,44 @@ fun EntryProviderScope<NavKey>.profileEntry(
 
         DisposableEffect(viewModel) {
             viewModel.listener = object : ProfileListener {
-                override fun onStarted() {
+                override fun onStarted(notify: Boolean) {
                     appState.showProgress = true
                 }
 
-                override fun onProfileUpdateComplete(response: LiveData<AuthResult>) {
+                override fun onFullNameUpdateComplete(response: LiveData<AuthResult>, previousFullName: String, notify: Boolean) {
+                    response.observeForever { authResult ->
+                        appState.showProgress = false
+                        if (notify) {
+                            coroutineScope.launch {
+                                val actionResult = snackbarHostState.showSnackbar(
+                                    message = authResult.message,
+                                    actionLabel = undoString
+                                )
+                                if (actionResult == SnackbarResult.ActionPerformed) {
+                                    viewModel.editFullName(previousFullName, notify = false)
+                                }
+                            }
+                        }
+                        if (authResult.code == AuthCode.USER_FULL_NAME_UPDATED.code) {
+                            viewModel.updateLocalUser()
+                        }
+                    }
+                }
+
+                override fun onProPicUpdateComplete(response: LiveData<AuthResult>) {
                     response.observeForever { authResult ->
                         appState.showProgress = false
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(authResult.message)
                         }
-                        if (authResult.code == AuthCode.USER_DATA_UPDATED.code) {
+                        if (authResult.code == AuthCode.USER_PROPIC_UPDATED.code) {
                             viewModel.updateLocalUser()
                         }
                     }
                 }
 
                 override fun onDynamicColorChanged() {
+                    appState.showProgress = false
                     coroutineScope.launch {
                         val result = snackbarHostState.showSnackbar(
                             message = appRestartMessage,

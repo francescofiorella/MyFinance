@@ -22,8 +22,12 @@ class UserRepository @Inject constructor(private val authManager: AuthManager) {
         private val TAG = UserRepository::class.java.simpleName
     }
 
-    fun updateProfile(fullName: String?, propicUri: String?): LiveData<AuthResult> {
-        return authManager.updateUserProfile(fullName, propicUri)
+    fun updatePropic(propicUri: String): LiveData<AuthResult> {
+        return authManager.updatePropic(propicUri)
+    }
+
+    fun updateFullName(fullName: String): LiveData<AuthResult> {
+        return authManager.updateFullName(fullName)
     }
 
     fun userLogin(email: String, password: String): LiveData<AuthResult> {

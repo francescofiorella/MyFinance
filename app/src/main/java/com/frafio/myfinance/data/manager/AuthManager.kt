@@ -48,16 +48,11 @@ class AuthManager @Inject constructor(
     private val fUser: FirebaseUser?
         get() = fAuth.currentUser
 
-    fun updateUserProfile(fullName: String?, propicUri: String?): LiveData<AuthResult> {
+    fun updatePropic(propicUri: String): LiveData<AuthResult> {
         val response = MutableLiveData<AuthResult>()
         val profileUpdates = userProfileChangeRequest {
-            fullName?.let {
-                displayName = it
-            }
-            propicUri?.let {
-                if (it.isNotEmpty()) {
-                    photoUri = it.toUri()
-                }
+            if (propicUri.isNotEmpty()) {
+                photoUri = propicUri.toUri()
             }
         }
 
@@ -65,11 +60,31 @@ class AuthManager @Inject constructor(
             .addOnCompleteListener { task ->
                 response.value = if (task.isSuccessful) {
                     MyFinanceStorage.updateUser(fUser!!)
-                    AuthResult(AuthCode.USER_DATA_UPDATED)
+                    AuthResult(AuthCode.USER_PROPIC_UPDATED)
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.e(TAG, "Error! ${task.exception?.localizedMessage}")
-                    AuthResult(AuthCode.USER_DATA_NOT_UPDATED)
+                    AuthResult(AuthCode.USER_PROPIC_NOT_UPDATED)
+                }
+            }
+        return response
+    }
+
+    fun updateFullName(fullName: String): LiveData<AuthResult> {
+        val response = MutableLiveData<AuthResult>()
+        val profileUpdates = userProfileChangeRequest {
+            displayName = fullName
+        }
+
+        fUser!!.updateProfile(profileUpdates)
+            .addOnCompleteListener { task ->
+                response.value = if (task.isSuccessful) {
+                    MyFinanceStorage.updateUser(fUser!!)
+                    AuthResult(AuthCode.USER_FULL_NAME_UPDATED)
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.e(TAG, "Error! ${task.exception?.localizedMessage}")
+                    AuthResult(AuthCode.USER_FULL_NAME_NOT_UPDATED)
                 }
             }
         return response

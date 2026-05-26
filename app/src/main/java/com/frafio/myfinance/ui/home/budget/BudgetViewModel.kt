@@ -109,19 +109,22 @@ class BudgetViewModel @Inject constructor(
         setMonthlyBudget(0.0, true)
     }
 
-    fun setMonthlyBudget(budget: Double, getOldBudget: Boolean = false) {
+    fun setMonthlyBudget(budget: Double, getOldBudget: Boolean = false, notify: Boolean = true) {
+        listener?.onStarted(notify)
         val previousBudget = if (getOldBudget) monthlyBudget.value else null
         val response = expensesRepository.setMonthlyBudget(budget)
-        listener?.onCompleted(response, previousBudget)
+        listener?.onCompleted(response, previousBudget, notify)
     }
 
     fun deleteIncome(income: Income) {
+        listener?.onStarted()
         val response = incomeRepository.deleteIncome(income)
         listener?.onDeleteCompleted(response, income)
     }
 
-    fun addIncome(income: Income) {
+    fun addIncome(income: Income, notify: Boolean = true) {
+        listener?.onStarted(notify)
         val response = incomeRepository.addIncome(income)
-        listener?.onCompleted(response, null)
+        listener?.onCompleted(response, null, notify)
     }
 }

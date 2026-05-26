@@ -250,9 +250,9 @@ class ExpensesViewModel @Inject constructor(
         listener?.onCompleted(response)
     }
 
-    fun addExpense(expense: Expense) {
+    fun addExpense(expense: Expense, notify: Boolean = true) {
         val response = expensesRepository.addExpense(expense)
-        listener?.onCompleted(response)
+        listener?.onCompleted(response, notify)
     }
 
     private var lastDeletedLabel: String? = null

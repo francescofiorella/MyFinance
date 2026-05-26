@@ -37,14 +37,15 @@ class ProfileViewModel @Inject constructor(
     fun uploadPropic() {
         listener?.onStarted()
         val propicUri = ""
-        val response = userRepository.updateProfile(null, propicUri)
-        listener?.onProfileUpdateComplete(response)
+        val response = userRepository.updatePropic(propicUri)
+        listener?.onProPicUpdateComplete(response)
     }
 
-    fun editFullName(fullName: String) {
-        listener?.onStarted()
-        val response = userRepository.updateProfile(fullName, null)
-        listener?.onProfileUpdateComplete(response)
+    fun editFullName(fullName: String, notify: Boolean = true) {
+        listener?.onStarted(notify)
+        val previousFN = _user.value?.fullName ?: ""
+        val response = userRepository.updateFullName(fullName)
+        listener?.onFullNameUpdateComplete(response, previousFN, notify)
     }
 
     fun updateLocalUser() {

@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.features.home.budget.navigation
 
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,32 +42,48 @@ fun EntryProviderScope<NavKey>.budgetEntry(
 
         DisposableEffect(viewModel) {
             viewModel.listener = object : BudgetListener {
+                override fun onStarted(notify: Boolean) {
+                    appState.showProgress = true
+                }
+
                 override fun onCompleted(
                     response: LiveData<FinanceResult>,
-                    previousBudget: Double?
+                    previousBudget: Double?,
+                    notify: Boolean
                 ) {
+                    appState.showProgress = false
                     response.observeForever { result ->
                         when (result.code) {
                             FinanceCode.BUDGET_UPDATE_SUCCESS.code -> {
                                 previousBudget?.let {
-                                    coroutineScope.launch {
-                                        val actionResult = snackbarHostState.showSnackbar(
-                                            message = result.message,
-                                            actionLabel = undoString
-                                        )
-                                        if (actionResult == androidx.compose.material3.SnackbarResult.ActionPerformed) {
-                                            viewModel.setMonthlyBudget(previousBudget)
+                                    if (notify) {
+                                        coroutineScope.launch {
+                                            val actionResult = snackbarHostState.showSnackbar(
+                                                message = result.message,
+                                                actionLabel = undoString
+                                            )
+                                            if (actionResult == SnackbarResult.ActionPerformed) {
+                                                viewModel.setMonthlyBudget(
+                                                    previousBudget,
+                                                    notify = false
+                                                )
+                                            }
                                         }
                                     }
                                 } ?: run {
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(result.message)
+                                    if (notify) {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar(result.message)
+                                        }
                                     }
                                 }
                             }
+
                             else -> {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(result.message)
+                                if (notify) {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(result.message)
+                                    }
                                 }
                             }
                         }
@@ -77,6 +94,7 @@ fun EntryProviderScope<NavKey>.budgetEntry(
                     response: LiveData<FinanceResult>,
                     income: Income
                 ) {
+                    appState.showProgress = false
                     response.observeForever { result ->
                         if (result.code == FinanceCode.INCOME_DELETE_SUCCESS.code) {
                             coroutineScope.launch {
@@ -84,8 +102,8 @@ fun EntryProviderScope<NavKey>.budgetEntry(
                                     message = result.message,
                                     actionLabel = undoString
                                 )
-                                if (actionResult == androidx.compose.material3.SnackbarResult.ActionPerformed) {
-                                    viewModel.addIncome(income)
+                                if (actionResult == SnackbarResult.ActionPerformed) {
+                                    viewModel.addIncome(income, notify = false)
                                 }
                             }
                         } else {

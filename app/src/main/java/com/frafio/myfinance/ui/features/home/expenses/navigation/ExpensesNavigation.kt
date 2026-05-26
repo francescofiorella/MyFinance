@@ -46,11 +46,18 @@ fun EntryProviderScope<NavKey>.expensesEntry(
 
         DisposableEffect(viewModel) {
             viewModel.listener = object : ExpensesListener {
-                override fun onCompleted(response: LiveData<FinanceResult>) {
+                override fun onStarted(notify: Boolean) {
+                    appState.showProgress = true
+                }
+
+                override fun onCompleted(response: LiveData<FinanceResult>, notify: Boolean) {
+                    appState.showProgress = false
                     response.observeForever { result ->
                         if (result.code == FinanceCode.EXPENSE_ADD_SUCCESS.code) {
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(result.message)
+                            if (notify) {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(result.message)
+                                }
                             }
                         }
                     }
@@ -60,6 +67,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
                     response: LiveData<FinanceResult>,
                     expense: Expense
                 ) {
+                    appState.showProgress = false
                     response.observeForever { result ->
                         if (result.code == FinanceCode.EXPENSE_DELETE_SUCCESS.code) {
                             coroutineScope.launch {
@@ -68,7 +76,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
                                     actionLabel = undoString
                                 )
                                 if (actionResult == SnackbarResult.ActionPerformed) {
-                                    viewModel.addExpense(expense)
+                                    viewModel.addExpense(expense, notify = false)
                                 }
                             }
                         } else {
@@ -82,6 +90,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
                 override fun onDeleteCompleted(
                     response: LiveData<FinanceResult>
                 ) {
+                    appState.showProgress = false
                     response.observeForever { result ->
                         if (result.code == FinanceCode.LABEL_DELETE_SUCCESS.code) {
                             coroutineScope.launch {
