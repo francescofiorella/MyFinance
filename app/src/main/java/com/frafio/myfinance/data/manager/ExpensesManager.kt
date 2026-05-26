@@ -21,8 +21,14 @@ import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ExpensesManager(private val sharedPreferences: SharedPreferences) {
+@Singleton
+class ExpensesManager @Inject constructor(
+    private val sharedPreferences: SharedPreferences,
+    private val expensesLocalRepository: ExpensesLocalRepository
+) {
 
     companion object {
         private val TAG = ExpensesManager::class.java.simpleName
@@ -31,7 +37,6 @@ class ExpensesManager(private val sharedPreferences: SharedPreferences) {
 
     private val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
-    private val expensesLocalRepository = ExpensesLocalRepository()
 
     fun getMonthlyBudget(): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()

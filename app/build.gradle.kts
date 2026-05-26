@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.google.devtools.ksp)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
@@ -21,7 +22,7 @@ android {
         minSdk = 29
         targetSdk = 37
         versionCode = 4
-        versionName = "4.9.6"
+        versionName = "4.9.7"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -123,4 +124,9 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive.navigation3)
     implementation(libs.androidx.lifecycle.viewModel.navigation3)
     implementation(libs.kotlinx.serialization.json)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.lifecycle.viewmodel.compose)
 }

@@ -1,9 +1,7 @@
 package com.frafio.myfinance.ui.add
 
-import android.app.Application
 import android.view.View
-import androidx.lifecycle.AndroidViewModel
-import com.frafio.myfinance.MyFinanceApplication
+import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Income
@@ -13,15 +11,15 @@ import com.frafio.myfinance.data.repository.IncomeRepository
 import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.dateToUTCTimestamp
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
+import javax.inject.Inject
 
-class AddViewModel(application: Application) : AndroidViewModel(application) {
-    private val expensesRepository = ExpensesRepository(
-        (application as MyFinanceApplication).expensesManager
-    )
-    private val incomeRepository = IncomeRepository(
-        (application as MyFinanceApplication).incomesManager
-    )
+@HiltViewModel
+class AddViewModel @Inject constructor(
+    private val expensesRepository: ExpensesRepository,
+    private val incomeRepository: IncomeRepository
+) : ViewModel() {
 
     var listener: AddListener? = null
 

@@ -1,17 +1,16 @@
 package com.frafio.myfinance.ui.features.home.budget.navigation
 
-import androidx.navigation3.runtime.EntryProviderScope
-import androidx.navigation3.runtime.NavKey
-import android.app.Application
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.LiveData
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FinanceCode
+import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.ui.features.home.budget.BudgetScreen
 import com.frafio.myfinance.ui.home.budget.BudgetListener
@@ -26,14 +25,11 @@ fun EntryProviderScope<NavKey>.budgetEntry(
     onEditIncome: (Income, Int) -> Unit,
 ) {
     entry<MyFinanceNavKey.Budget> {
-        val context = LocalContext.current
-        val viewModel: BudgetViewModel = viewModel(
-            factory = ViewModelProvider.AndroidViewModelFactory.getInstance(context.applicationContext as Application)
-        )
+        val viewModel: BudgetViewModel = hiltViewModel()
         val snackbarHostState = LocalSnackbarHostState.current
         val coroutineScope = rememberCoroutineScope()
 
-        val undoString = stringResource( id = R.string.undo)
+        val undoString = stringResource(id = R.string.undo)
 
         LaunchedEffect(appState.reselectEvent) {
             appState.reselectEvent.collect { key ->
@@ -46,7 +42,7 @@ fun EntryProviderScope<NavKey>.budgetEntry(
         DisposableEffect(viewModel) {
             viewModel.listener = object : BudgetListener {
                 override fun onCompleted(
-                    response: androidx.lifecycle.LiveData<com.frafio.myfinance.data.model.FinanceResult>,
+                    response: LiveData<FinanceResult>,
                     previousBudget: Double?
                 ) {
                     response.observeForever { result ->
@@ -78,7 +74,7 @@ fun EntryProviderScope<NavKey>.budgetEntry(
                 }
 
                 override fun onDeleteCompleted(
-                    response: androidx.lifecycle.LiveData<com.frafio.myfinance.data.model.FinanceResult>,
+                    response: LiveData<FinanceResult>,
                     income: Income
                 ) {
                     response.observeForever { result ->

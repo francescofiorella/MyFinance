@@ -1,16 +1,18 @@
 package com.frafio.myfinance.ui.auth
 
-import android.app.Application
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
-import androidx.lifecycle.AndroidViewModel
-import com.frafio.myfinance.MyFinanceApplication
+import androidx.lifecycle.ViewModel
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.data.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class AuthViewModel(application: Application) : AndroidViewModel(application) {
-    private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val userRepository: UserRepository
+) : ViewModel() {
 
     var email: String? = null
     var password: String? = null

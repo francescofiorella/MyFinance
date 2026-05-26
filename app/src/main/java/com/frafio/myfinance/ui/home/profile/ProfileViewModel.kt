@@ -1,14 +1,13 @@
 package com.frafio.myfinance.ui.home.profile
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.BuildConfig
-import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.model.User
 import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.data.repository.UserRepository
 import com.google.android.material.color.DynamicColors
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -16,11 +15,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProfileViewModel(application: Application) : AndroidViewModel(application) {
-    private val userRepository = UserRepository((application as MyFinanceApplication).authManager)
-    private val expensesRepository =
-        ExpensesRepository((application as MyFinanceApplication).expensesManager)
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val expensesRepository: ExpensesRepository
+) : ViewModel() {
 
     private val _user = MutableStateFlow(userRepository.getUser())
     val user: StateFlow<User?> = _user.asStateFlow()
@@ -66,6 +67,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     fun setDynamicColor(active: Boolean) {
         expensesRepository.setDynamicColorActive(active)
         _isSwitchDynamicColorChecked.value = active
+        listener?.onDynamicColorChanged()
     }
 
     private fun getDynamicColorCheck(): Boolean {

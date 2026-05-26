@@ -32,8 +32,10 @@ import com.frafio.myfinance.utils.getCategoryIcon
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.chip.Chip
+import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 
+@AndroidEntryPoint
 class AddActivity : AppCompatActivity(), AddListener {
 
     companion object {

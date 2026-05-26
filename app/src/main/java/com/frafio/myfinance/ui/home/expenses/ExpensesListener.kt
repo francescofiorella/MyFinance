@@ -8,5 +8,5 @@ interface ExpensesListener {
     fun onCompleted(response: LiveData<FinanceResult>)
 
     fun onDeleteCompleted(response: LiveData<FinanceResult>, expense: Expense)
-    fun onDeleteCompleted(response: LiveData<FinanceResult>, label: String)
+    fun onDeleteCompleted(response: LiveData<FinanceResult>)
 }

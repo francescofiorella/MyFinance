@@ -1,10 +1,8 @@
 package com.frafio.myfinance.ui.home.budget
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.manager.IncomesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Income
@@ -13,6 +11,7 @@ import com.frafio.myfinance.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.utils.addTotalsToIncomes
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,15 +24,14 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BudgetViewModel(application: Application) : AndroidViewModel(application) {
-    private val expensesRepository = ExpensesRepository(
-        (application as MyFinanceApplication).expensesManager
-    )
-    private val incomeRepository = IncomeRepository(
-        (application as MyFinanceApplication).incomesManager
-    )
-    private val incomesLocalRepository = IncomesLocalRepository()
+@HiltViewModel
+class BudgetViewModel @Inject constructor(
+    private val expensesRepository: ExpensesRepository,
+    private val incomeRepository: IncomeRepository,
+    incomesLocalRepository: IncomesLocalRepository
+) : ViewModel() {
 
     var listener: BudgetListener? = null
 

@@ -5,8 +5,11 @@ import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.manager.ExpensesManager
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ExpensesRepository(private val expensesManager: ExpensesManager) {
+@Singleton
+class ExpensesRepository @Inject constructor(private val expensesManager: ExpensesManager) {
     fun updateExpensesList(): LiveData<FinanceResult> {
         return expensesManager.updateExpensesList()
     }

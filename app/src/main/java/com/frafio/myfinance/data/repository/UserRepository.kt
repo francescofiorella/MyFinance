@@ -12,8 +12,11 @@ import com.frafio.myfinance.data.model.User
 import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class UserRepository(private val authManager: AuthManager) {
+@Singleton
+class UserRepository @Inject constructor(private val authManager: AuthManager) {
 
     companion object {
         private val TAG = UserRepository::class.java.simpleName
@@ -39,7 +42,7 @@ class UserRepository(private val authManager: AuthManager) {
             result = authManager.firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
         } else {
             Log.w(TAG, "Credential is not of type Google ID!")
-            result = MutableLiveData<AuthResult>()
+            result = MutableLiveData()
             result.value = AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
         }
 
@@ -71,9 +74,5 @@ class UserRepository(private val authManager: AuthManager) {
 
     fun getProPic(): String? {
         return MyFinanceStorage.user?.photoUrl
-    }
-
-    fun isDynamicColorOn(): Boolean {
-        return authManager.isDynamicColorOn()
     }
 }

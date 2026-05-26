@@ -36,8 +36,10 @@ import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class AuthActivity : AppCompatActivity(), AuthListener {
 
     companion object {
@@ -136,7 +138,7 @@ class AuthActivity : AppCompatActivity(), AuthListener {
         }
     }
 
-    fun onResetButtonClick(view: View) {
+    fun onResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         showResetPasswordSheet = true
     }
 

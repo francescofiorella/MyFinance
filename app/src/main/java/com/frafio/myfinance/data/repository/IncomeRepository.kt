@@ -4,8 +4,11 @@ import androidx.lifecycle.LiveData
 import com.frafio.myfinance.data.manager.IncomesManager
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.model.FinanceResult
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class IncomeRepository(private val incomesManager: IncomesManager) {
+@Singleton
+class IncomeRepository @Inject constructor(private val incomesManager: IncomesManager) {
     fun updateIncomeList(): LiveData<FinanceResult> {
         return incomesManager.updateIncomeList()
     }

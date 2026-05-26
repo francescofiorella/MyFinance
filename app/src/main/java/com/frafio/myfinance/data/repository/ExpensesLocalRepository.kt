@@ -1,14 +1,18 @@
 package com.frafio.myfinance.data.repository
 
 import androidx.lifecycle.LiveData
-import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.storage.MyFinanceDatabase
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ExpensesLocalRepository {
+@Singleton
+class ExpensesLocalRepository @Inject constructor(
+    @dagger.hilt.android.qualifiers.ApplicationContext context: android.content.Context
+) {
     private val expenseDao =
-        MyFinanceDatabase.getDatabase(MyFinanceApplication.instance).expenseDao()
+        MyFinanceDatabase.getDatabase(context).expenseDao()
 
     fun getWithFilter(name: String, categories: List<Int>): LiveData<List<Expense>> =
         expenseDao.getWithFilter(name, categories)

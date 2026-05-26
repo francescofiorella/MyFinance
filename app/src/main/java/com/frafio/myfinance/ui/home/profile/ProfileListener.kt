@@ -8,4 +8,6 @@ interface ProfileListener {
     fun onStarted()
 
     fun onProfileUpdateComplete(response: LiveData<AuthResult>)
+
+    fun onDynamicColorChanged()
 }

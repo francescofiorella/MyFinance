@@ -1,28 +1,10 @@
 <resources>
     <dimen name="field_corner_radius">@dimen/card_corner_radius</dimen>
-
     <dimen name="dashboard_bottom_margin">80dp</dimen>
-    <dimen name="card_full_margin">20dp</dimen>
-    <dimen name="card_half_margin">10dp</dimen>
-    <dimen name="card_text_space">20dp</dimen>
-
     <dimen name="card_elevation">2dp</dimen>
     <dimen name="card_corner_radius">24dp</dimen>
-    <dimen name="drawer_corner_radius">24dp</dimen>
-
-    <dimen name="card_title_size">16sp</dimen>
-    <dimen name="card_price_size">26sp</dimen>
-
     <dimen name="title_size">24sp</dimen>
-    <dimen name="title_padding">5dp</dimen>
     <dimen name="title_margin_top">10dp</dimen>
-    <dimen name="title_margin_bottom">10dp</dimen>
-    <dimen name="title_distance_from_arrow">15dp</dimen>
-
     <dimen name="arrow_margin_start">15dp</dimen>
-
-    <dimen name="profile_picture_size">40dp</dimen>
-    <dimen name="profile_picture_margin_end">15dp</dimen>
-
     <dimen name="fab_margin">16dp</dimen>
 </resources>

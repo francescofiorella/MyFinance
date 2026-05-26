@@ -1,7 +1,6 @@
 package com.frafio.myfinance.ui.home.dashboard
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.data.model.BarChartEntry
@@ -10,6 +9,7 @@ import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.utils.dateToUTCTimestamp
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,40 +26,48 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
+import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DashboardViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
+    private val expensesLocalRepository: ExpensesLocalRepository,
+    private val incomesLocalRepository: IncomesLocalRepository
+) : ViewModel() {
 
     private val pieChartEntriesSize = 24
-
-    private val expensesLocalRepository = ExpensesLocalRepository()
-    private val incomesLocalRepository = IncomesLocalRepository()
     private val today = LocalDate.now()
 
     private val _monthShown = MutableStateFlow(true)
     val monthShown: StateFlow<Boolean> = _monthShown.asStateFlow()
 
-    private val _thisMonthSum = MutableStateFlow(0.0)
-    val thisMonthSum: StateFlow<Double> = _thisMonthSum.asStateFlow()
+    val isListEmpty: StateFlow<Boolean?> = expensesLocalRepository.getCount().asFlow()
+        .map { it == 0 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    private val _thisYearSum = MutableStateFlow(0.0)
-    val thisYearSum: StateFlow<Double> = _thisYearSum.asStateFlow()
-
-    private val _monthlyBudget = MyFinanceStorage.monthlyBudget.asFlow()
+    val thisMonthSum: StateFlow<Double> = expensesLocalRepository.getPriceSumFromMonth(today.year, today.monthValue).asFlow()
+        .map { it ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
-    val monthlyBudget: StateFlow<Double> = _monthlyBudget
 
-    private val _incomesSum = MutableStateFlow(0.0)
-    val incomesSum: StateFlow<Double> = _incomesSum.asStateFlow()
-
-    private val _expensesSum = MutableStateFlow(0.0)
-    val expensesSum: StateFlow<Double> = _expensesSum.asStateFlow()
+    val thisYearSum: StateFlow<Double> = expensesLocalRepository.getPriceSumFromYear(today.year).asFlow()
+        .map { it ?: 0.0 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
     private val _balanceYearShown = MutableStateFlow(today.year)
     val balanceYearShown: StateFlow<Int> = _balanceYearShown.asStateFlow()
 
-    private val _isListEmpty = MutableStateFlow<Boolean?>(null)
-    val isListEmpty: StateFlow<Boolean?> = _isListEmpty.asStateFlow()
+    val expensesSum: StateFlow<Double> = _balanceYearShown
+        .flatMapLatest { year -> expensesLocalRepository.getPriceSumFromYear(year).asFlow() }
+        .map { it ?: 0.0 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+
+    val incomesSum: StateFlow<Double> = _balanceYearShown
+        .flatMapLatest { year -> incomesLocalRepository.getPriceSumFromYear(year).asFlow() }
+        .map { it ?: 0.0 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+
+    val monthlyBudget: StateFlow<Double> = MyFinanceStorage.monthlyBudget.asFlow()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
     private val _monthlyShownInPieChart = MutableStateFlow(true)
     val monthlyShownInPieChart: StateFlow<Boolean> = _monthlyShownInPieChart.asStateFlow()
@@ -121,7 +129,7 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                 }
                 flowOf(values.reversed())
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList<BarChartEntry>())
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val pieChartExpenses: StateFlow<List<Expense>> = combine(_pieChartDate, _monthlyShownInPieChart) { date, isMonthly ->
         date to isMonthly
@@ -137,38 +145,6 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         .asFlow().flatMapLatest { 
             flowOf(it ?: 0.0)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
-
-    init {
-        viewModelScope.launch {
-            expensesLocalRepository.getCount().asFlow().collect {
-                _isListEmpty.value = it == 0
-            }
-        }
-        viewModelScope.launch {
-            expensesLocalRepository.getPriceSumFromMonth(today.year, today.monthValue).asFlow().collect {
-                _thisMonthSum.value = it ?: 0.0
-            }
-        }
-        viewModelScope.launch {
-            expensesLocalRepository.getPriceSumFromYear(today.year).asFlow().collect {
-                _thisYearSum.value = it ?: 0.0
-            }
-        }
-        viewModelScope.launch {
-            _balanceYearShown.flatMapLatest { year ->
-                expensesLocalRepository.getPriceSumFromYear(year).asFlow()
-            }.collect {
-                _expensesSum.value = it ?: 0.0
-            }
-        }
-        viewModelScope.launch {
-            _balanceYearShown.flatMapLatest { year ->
-                incomesLocalRepository.getPriceSumFromYear(year).asFlow()
-            }.collect {
-                _incomesSum.value = it ?: 0.0
-            }
-        }
-    }
 
     fun toggleMonthShown(monthShown: Boolean) {
         _monthShown.value = monthShown

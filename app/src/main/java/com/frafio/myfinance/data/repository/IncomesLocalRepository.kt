@@ -1,13 +1,17 @@
 package com.frafio.myfinance.data.repository
 
 import androidx.lifecycle.LiveData
-import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.storage.MyFinanceDatabase
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class IncomesLocalRepository {
+@Singleton
+class IncomesLocalRepository @Inject constructor(
+    @dagger.hilt.android.qualifiers.ApplicationContext context: android.content.Context
+) {
     private val incomeDao =
-        MyFinanceDatabase.getDatabase(MyFinanceApplication.instance).incomeDao()
+        MyFinanceDatabase.getDatabase(context).incomeDao()
 
     fun getAll(): LiveData<List<Income>> = incomeDao.getAll()
 

@@ -1,18 +1,18 @@
 package com.frafio.myfinance.ui.features.home.expenses.navigation
 
-import androidx.navigation3.runtime.EntryProviderScope
-import androidx.navigation3.runtime.NavKey
-import android.app.Application
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.LiveData
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Expense
+import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.ui.features.home.expenses.ExpensesScreen
 import com.frafio.myfinance.ui.home.expenses.ExpensesListener
 import com.frafio.myfinance.ui.home.expenses.ExpensesViewModel
@@ -28,14 +28,11 @@ fun EntryProviderScope<NavKey>.expensesEntry(
     getDateLabel: (LocalDate, LocalDate) -> String,
 ) {
     entry<MyFinanceNavKey.Expenses> {
-        val context = LocalContext.current
-        val viewModel: ExpensesViewModel = viewModel(
-            factory = ViewModelProvider.AndroidViewModelFactory.getInstance(context.applicationContext as Application)
-        )
+        val viewModel: ExpensesViewModel = hiltViewModel()
         val snackbarHostState = LocalSnackbarHostState.current
         val coroutineScope = rememberCoroutineScope()
 
-        val undoString = stringResource( id = R.string.undo)
+        val undoString = stringResource(id = R.string.undo)
 
         LaunchedEffect(appState.reselectEvent) {
             appState.reselectEvent.collect { key ->
@@ -49,7 +46,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
 
         DisposableEffect(viewModel) {
             viewModel.listener = object : ExpensesListener {
-                override fun onCompleted(response: androidx.lifecycle.LiveData<com.frafio.myfinance.data.model.FinanceResult>) {
+                override fun onCompleted(response: LiveData<FinanceResult>) {
                     response.observeForever { result ->
                         if (result.code == FinanceCode.EXPENSE_ADD_SUCCESS.code) {
                             coroutineScope.launch {
@@ -60,7 +57,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
                 }
 
                 override fun onDeleteCompleted(
-                    response: androidx.lifecycle.LiveData<com.frafio.myfinance.data.model.FinanceResult>,
+                    response: LiveData<FinanceResult>,
                     expense: Expense
                 ) {
                     response.observeForever { result ->
@@ -70,7 +67,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
                                     message = result.message,
                                     actionLabel = undoString
                                 )
-                                if (actionResult == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                                if (actionResult == SnackbarResult.ActionPerformed) {
                                     viewModel.addExpense(expense)
                                 }
                             }
@@ -83,8 +80,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
                 }
 
                 override fun onDeleteCompleted(
-                    response: androidx.lifecycle.LiveData<com.frafio.myfinance.data.model.FinanceResult>,
-                    label: String
+                    response: LiveData<FinanceResult>
                 ) {
                     response.observeForever { result ->
                         if (result.code == FinanceCode.LABEL_DELETE_SUCCESS.code) {
@@ -93,7 +89,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
                                     message = result.message,
                                     actionLabel = undoString
                                 )
-                                if (actionResult == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                                if (actionResult == SnackbarResult.ActionPerformed) {
                                     viewModel.undoDeleteLabel()
                                 } else {
                                     viewModel.resetLastDeletedLabel()

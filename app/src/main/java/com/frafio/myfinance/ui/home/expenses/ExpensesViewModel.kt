@@ -1,10 +1,8 @@
 package com.frafio.myfinance.ui.home.expenses
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import com.frafio.myfinance.MyFinanceApplication
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
@@ -15,6 +13,7 @@ import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.utils.addTotalsToExpenses
 import com.frafio.myfinance.utils.addTotalsToExpensesWithoutToday
 import com.frafio.myfinance.utils.dateToUTCTimestamp
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -32,12 +31,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import javax.inject.Inject
 
-class ExpensesViewModel(application: Application) : AndroidViewModel(application) {
-    private val expensesRepository = ExpensesRepository(
-        (application as MyFinanceApplication).expensesManager
-    )
-    private val expensesLocalRepository = ExpensesLocalRepository()
+@HiltViewModel
+class ExpensesViewModel @Inject constructor(
+    private val expensesRepository: ExpensesRepository,
+    private val expensesLocalRepository: ExpensesLocalRepository
+) : ViewModel() {
 
     var listener: ExpensesListener? = null
 
@@ -263,7 +263,7 @@ class ExpensesViewModel(application: Application) : AndroidViewModel(application
         if (currentLabels.remove(label)) {
             lastDeletedLabel = label
             val response = expensesRepository.setLabels(currentLabels, FinanceCode.LABEL_DELETE_SUCCESS)
-            listener?.onDeleteCompleted(response, label)
+            listener?.onDeleteCompleted(response)
 
             viewModelScope.launch(Dispatchers.IO) {
                 val allExpenses = expensesLocalRepository.getAllSync()

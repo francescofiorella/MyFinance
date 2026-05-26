@@ -13,8 +13,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class IncomesManager {
+@Singleton
+class IncomesManager @Inject constructor(
+    private val incomesLocalRepository: IncomesLocalRepository
+) {
 
     companion object {
         private val TAG = IncomesManager::class.java.simpleName
@@ -23,8 +28,6 @@ class IncomesManager {
 
     private val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
-
-    private val incomesLocalRepository = IncomesLocalRepository()
 
     fun updateIncomeList(): LiveData<FinanceResult> {
         val response = MutableLiveData<FinanceResult>()

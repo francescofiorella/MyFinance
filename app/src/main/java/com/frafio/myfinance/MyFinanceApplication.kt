@@ -12,7 +12,10 @@ import com.frafio.myfinance.data.manager.IncomesManager
 import com.frafio.myfinance.data.manager.ExpensesManager
 import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.google.android.material.color.DynamicColors
+import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
+@HiltAndroidApp
 class MyFinanceApplication : Application(), SingletonImageLoader.Factory {
 
     companion object {
@@ -23,10 +26,10 @@ class MyFinanceApplication : Application(), SingletonImageLoader.Factory {
         const val LABELS_KEY = "LABELS_KEY"
     }
 
-    lateinit var sharedPreferences: SharedPreferences
-    lateinit var authManager: AuthManager
-    lateinit var expensesManager: ExpensesManager
-    lateinit var incomesManager: IncomesManager
+    @Inject lateinit var sharedPreferences: SharedPreferences
+    @Inject lateinit var authManager: AuthManager
+    @Inject lateinit var expensesManager: ExpensesManager
+    @Inject lateinit var incomesManager: IncomesManager
 
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(context)
@@ -39,11 +42,6 @@ class MyFinanceApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        sharedPreferences = getSharedPreferences(PREFERENCES_KEY, MODE_PRIVATE)
-
-        authManager = AuthManager(sharedPreferences)
-        expensesManager = ExpensesManager(sharedPreferences)
-        incomesManager = IncomesManager()
 
         // if the user activated it, change the colors
         if (getSharedDynamicColor(sharedPreferences)) {
@@ -56,7 +54,7 @@ object Strings {
     fun get(@StringRes stringRes: Int, vararg formatArgs: Any = emptyArray()): String {
         return try {
             MyFinanceApplication.instance.getString(stringRes, *formatArgs)
-        } catch (_: UninitializedPropertyAccessException) {
+        } catch (_: Exception) {
             ""
         }
     }

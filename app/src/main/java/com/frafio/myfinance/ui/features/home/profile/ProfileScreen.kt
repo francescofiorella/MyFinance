@@ -54,10 +54,9 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel,
-    onUploadProPic: () -> Unit,
-    onDynamicColorChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel,
+    onUploadProPic: () -> Unit
 ) {
     val user by viewModel.user.collectAsState()
     val isDynamicColorChecked by viewModel.isSwitchDynamicColorChecked.collectAsState()
@@ -92,7 +91,7 @@ fun ProfileScreen(
         scrollState = scrollState,
         onUploadProPic = onUploadProPic,
         onEditFullName = { showEditFullNameSheet = true },
-        onDynamicColorChanged = onDynamicColorChanged
+        onDynamicColorChanged = { viewModel.setDynamicColor(it) }
     )
 }
 

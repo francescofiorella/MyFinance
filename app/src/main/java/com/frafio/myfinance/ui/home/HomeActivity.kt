@@ -37,11 +37,13 @@ import com.frafio.myfinance.ui.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.dateToExtendedString
 import com.google.android.material.color.DynamicColors
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
 
+@AndroidEntryPoint
 class HomeActivity : ComponentActivity(), HomeListener {
 
     private val viewModel by viewModels<HomeViewModel>()
@@ -88,7 +90,7 @@ class HomeActivity : ComponentActivity(), HomeListener {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-        
+
         if (viewModel.isDynamicColorOn()) {
             DynamicColors.applyToActivityIfAvailable(this)
         }
@@ -100,7 +102,8 @@ class HomeActivity : ComponentActivity(), HomeListener {
         enableEdgeToEdge()
 
         if (savedInstanceState == null) {
-            userRequest = intent.extras?.getBoolean(AuthActivity.INTENT_USER_REQUEST, false) ?: false
+            userRequest =
+                intent.extras?.getBoolean(AuthActivity.INTENT_USER_REQUEST, false) ?: false
             if (!userRequest) {
                 splashScreen.apply {
                     setKeepOnScreenCondition { !isLayoutReady }
@@ -133,7 +136,6 @@ class HomeActivity : ComponentActivity(), HomeListener {
                 viewModel.updateLabels()
                 viewModel.updateLocalMonthlyBudget()
                 viewModel.updateLocalLabels()
-                viewModel.updateLocalUser()
                 intent.extras?.getString(AuthActivity.INTENT_USER_NAME).also { userName ->
                     showSnackBar("${getString(R.string.login_successful)} $userName")
                 }
@@ -149,46 +151,51 @@ class HomeActivity : ComponentActivity(), HomeListener {
             MyFinanceTheme {
                 val appState = rememberMyFinanceAppState()
                 CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
-                HomeScreen(
-                    appState = appState,
-                    viewModel = viewModel,
-                    showProgress = showProgress,
-                    onAddClick = { onAddButtonClick() },
-                    onLogoutClick = { viewModel.onLogoutButtonClick(View(this)) },
-                    onProPicClick = { viewModel.navigateTo(MyFinanceNavKey.Profile) },
-                    onEditExpense = { expense, position ->
-                        Intent(this, AddActivity::class.java).also {
-                            it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
-                            it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_EXPENSE_CODE)
-                            it.putExtra(AddActivity.EXTRA_TRANSACTION, expense)
-                            it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                            editResultLauncher.launch(it)
-                        }
-                    },
-                    onEditIncome = { income, position ->
-                        Intent(this, AddActivity::class.java).also {
-                            it.putExtra(AddActivity.REQUEST_CODE_KEY, AddActivity.REQUEST_EDIT_CODE)
-                            it.putExtra(AddActivity.EXPENSE_REQUEST_KEY, AddActivity.REQUEST_INCOME_CODE)
-                            it.putExtra(AddActivity.EXTRA_TRANSACTION, income)
-                            it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                            editResultLauncher.launch(it)
-                        }
-                    },
-                    onDynamicColorChanged = { isChecked ->
-                        viewModel.setDynamicColor(isChecked)
-                        showSnackBar(
-                            message = getString(R.string.restart_app_changes),
-                            actionText = getString(R.string.restart),
-                            actionFun = {
-                                val intent = packageManager.getLaunchIntentForPackage(packageName)
-                                val mainIntent = Intent.makeRestartActivityTask(intent!!.component)
-                                startActivity(mainIntent)
-                                Runtime.getRuntime().exit(0)
+                    HomeScreen(
+                        appState = appState,
+                        viewModel = viewModel,
+                        showProgress = showProgress,
+                        onAddClick = { onAddButtonClick() },
+                        onLogoutClick = { viewModel.onLogoutButtonClick(View(this)) },
+                        onProPicClick = { viewModel.navigateTo(MyFinanceNavKey.Profile) },
+                        onEditExpense = { expense, position ->
+                            Intent(this, AddActivity::class.java).also {
+                                it.putExtra(
+                                    AddActivity.REQUEST_CODE_KEY,
+                                    AddActivity.REQUEST_EDIT_CODE
+                                )
+                                it.putExtra(
+                                    AddActivity.EXPENSE_REQUEST_KEY,
+                                    AddActivity.REQUEST_EXPENSE_CODE
+                                )
+                                it.putExtra(AddActivity.EXTRA_TRANSACTION, expense)
+                                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                                editResultLauncher.launch(it)
                             }
-                        )
-                    },
-                    getDateLabel = { start, end -> getDateChipLabel(start, end) }
-                )
+                        },
+                        onEditIncome = { income, position ->
+                            Intent(this, AddActivity::class.java).also {
+                                it.putExtra(
+                                    AddActivity.REQUEST_CODE_KEY,
+                                    AddActivity.REQUEST_EDIT_CODE
+                                )
+                                it.putExtra(
+                                    AddActivity.EXPENSE_REQUEST_KEY,
+                                    AddActivity.REQUEST_INCOME_CODE
+                                )
+                                it.putExtra(AddActivity.EXTRA_TRANSACTION, income)
+                                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                                editResultLauncher.launch(it)
+                            }
+                        },
+                        getDateLabel = { start, end -> getDateChipLabel(start, end) },
+                        restartApplication = {
+                            val intent = packageManager.getLaunchIntentForPackage(packageName)
+                            val mainIntent = Intent.makeRestartActivityTask(intent!!.component)
+                            startActivity(mainIntent)
+                            Runtime.getRuntime().exit(0)
+                        }
+                    )
                 }
             }
         }
@@ -243,7 +250,6 @@ class HomeActivity : ComponentActivity(), HomeListener {
                     viewModel.updateLabels()
                     viewModel.updateLocalMonthlyBudget()
                     viewModel.updateLocalLabels()
-                    viewModel.updateLocalUser()
                     if (userRequest) {
                         hideProgressIndicator()
                         intent.extras?.getString(AuthActivity.INTENT_USER_NAME).also { userName ->
@@ -268,6 +274,7 @@ class HomeActivity : ComponentActivity(), HomeListener {
                 FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS.code -> {
                     hideProgressIndicator()
                 }
+
                 else -> Unit
             }
         }
@@ -304,6 +311,7 @@ class HomeActivity : ComponentActivity(), HomeListener {
                     "$startDayOfMonth $startMonth - ${dateToExtendedString(endDate)}"
                 }
             }
+
             else -> "${dateToExtendedString(startDate)} - ${dateToExtendedString(endDate)}"
         }
     }

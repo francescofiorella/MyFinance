@@ -10,7 +10,6 @@ import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.storage.MyFinanceStorage
-import com.frafio.myfinance.utils.getSharedDynamicColor
 import com.frafio.myfinance.utils.setSharedMonthlyBudget
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -27,8 +26,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AuthManager(private val sharedPreferences: SharedPreferences) {
+@Singleton
+class AuthManager @Inject constructor(
+    private val sharedPreferences: SharedPreferences,
+    private val expensesLocalRepository: ExpensesLocalRepository,
+    private val incomesLocalRepository: IncomesLocalRepository
+) {
 
     companion object {
         private val TAG = AuthManager::class.java.simpleName
@@ -41,9 +47,6 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
     // FirebaseUser
     private val fUser: FirebaseUser?
         get() = fAuth.currentUser
-
-    private val expensesLocalRepository = ExpensesLocalRepository()
-    private val incomesLocalRepository = IncomesLocalRepository()
 
     fun updateUserProfile(fullName: String?, propicUri: String?): LiveData<AuthResult> {
         val response = MutableLiveData<AuthResult>()
@@ -237,9 +240,5 @@ class AuthManager(private val sharedPreferences: SharedPreferences) {
 
         response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
         return (response)
-    }
-
-    fun isDynamicColorOn(): Boolean {
-        return getSharedDynamicColor(sharedPreferences)
     }
 }

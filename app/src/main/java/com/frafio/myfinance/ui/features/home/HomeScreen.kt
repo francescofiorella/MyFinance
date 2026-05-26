@@ -80,8 +80,8 @@ fun HomeScreen(
     onProPicClick: () -> Unit,
     onEditExpense: (Expense, Int) -> Unit,
     onEditIncome: (Income, Int) -> Unit,
-    onDynamicColorChanged: (Boolean) -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
+    restartApplication: () -> Unit
 ) {
     val navigator = remember { Navigator(appState.navigationState) }
     val currentTopLevelKey = appState.navigationState.currentTopLevelKey
@@ -172,7 +172,7 @@ fun HomeScreen(
                                 snackbarHostState.showSnackbar(comingSoonString)
                             }
                         },
-                        onDynamicColorChanged = onDynamicColorChanged
+                        restartApplication = restartApplication
                     )
                 }
 
