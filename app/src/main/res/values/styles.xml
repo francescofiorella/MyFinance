@@ -39,12 +39,6 @@
         </item>
     </style>
 
-    <style name="Widget.MyFinance.TextInputLayout.OutlinedBox.ExposedDropdownMenu" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
-        <item name="materialThemeOverlay">
-            @style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
-        </item>
-    </style>
-
     <style name="ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox" parent="">
         <item name="editTextStyle">
             @style/Widget.Material3.TextInputEditText.OutlinedBox
@@ -93,19 +87,6 @@
     </style>
 
     <!-- TextAppearance style. -->
-    <style name="TextAppearance.MyFinance.Caption" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="fontFamily">@font/nunito</item>
-    </style>
-
-    <style name="TextAppearance.MyFinance.ToolbarTitle" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="fontFamily">@font/nunito_semibold</item>
-        <item name="android:textSize">@dimen/title_size</item>
-    </style>
-
-    <style name="ThemeOverlay.MyFinance.NavigationView" parent="ThemeOverlay.Material3.NavigationView">
-        <item name="colorControlHighlight">@android:color/transparent</item>
-    </style>
-
     <style name="TextAppearance.MyFinance.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
         <item name="fontFamily">@font/nunito</item>
         <item name="android:fontFamily">@font/nunito</item>

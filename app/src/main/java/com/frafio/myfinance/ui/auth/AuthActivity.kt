@@ -19,6 +19,7 @@ import androidx.core.widget.doOnTextChanged
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -116,10 +117,10 @@ class AuthActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiEvents.collect { event ->
                     when (event) {
-                        is AuthUiEvent.Loading -> onAuthStarted()
+                        AuthUiEvent.Loading -> onAuthStarted()
                         is AuthUiEvent.Success -> onAuthSuccess(event.authResult)
                         is AuthUiEvent.Error -> onAuthFailure(event.authResult)
-                        is AuthUiEvent.NavigateToHome -> goToHomeActivity()
+                        AuthUiEvent.NavigateToHome -> goToHomeActivity()
                     }
                 }
             }
@@ -200,6 +201,9 @@ class AuthActivity : AppCompatActivity() {
                 // Extract credential from the result returned by Credential Manager
                 viewModel.onGoogleRequest(result.credential)
             } catch (e: GetCredentialException) {
+                onAuthSuccess(AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE))
+                Log.e(TAG, "Couldn't retrieve user's credentials: ${e.localizedMessage}")
+            } catch (e: NoCredentialException) {
                 onAuthSuccess(AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE))
                 Log.e(TAG, "Couldn't retrieve user's credentials: ${e.localizedMessage}")
             }

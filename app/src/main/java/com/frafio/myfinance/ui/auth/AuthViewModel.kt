@@ -18,7 +18,7 @@ sealed class AuthUiEvent {
     object Loading : AuthUiEvent()
     data class Success(val authResult: AuthResult) : AuthUiEvent()
     data class Error(val authResult: AuthResult) : AuthUiEvent()
-    data class NavigateToHome(val userName: String) : AuthUiEvent()
+    object NavigateToHome : AuthUiEvent()
 }
 
 @HiltViewModel
@@ -63,7 +63,7 @@ class AuthViewModel @Inject constructor(
 
             val loginResult = userRepository.userLogin(email!!, password!!)
             if (loginResult.code == AuthCode.LOGIN_SUCCESS.code) {
-                _uiEvents.emit(AuthUiEvent.NavigateToHome(getUserName()))
+                _uiEvents.emit(AuthUiEvent.NavigateToHome)
             } else {
                 _uiEvents.emit(AuthUiEvent.Success(loginResult))
             }
@@ -83,7 +83,7 @@ class AuthViewModel @Inject constructor(
             _uiEvents.emit(AuthUiEvent.Loading)
             val googleResult = userRepository.userLogin(credential)
             if (googleResult.code == AuthCode.LOGIN_SUCCESS.code) {
-                _uiEvents.emit(AuthUiEvent.NavigateToHome(getUserName()))
+                _uiEvents.emit(AuthUiEvent.NavigateToHome)
             } else {
                 _uiEvents.emit(AuthUiEvent.Success(googleResult))
             }
@@ -126,14 +126,10 @@ class AuthViewModel @Inject constructor(
 
             val signupResult = userRepository.userSignup(fullName!!, email!!, password!!)
             if (signupResult.code == AuthCode.SIGNUP_SUCCESS.code) {
-                _uiEvents.emit(AuthUiEvent.NavigateToHome(getUserName()))
+                _uiEvents.emit(AuthUiEvent.NavigateToHome)
             } else {
                 _uiEvents.emit(AuthUiEvent.Success(signupResult))
             }
         }
-    }
-
-    fun getUserName(): String {
-        return userRepository.getUser()?.fullName ?: ""
     }
 }

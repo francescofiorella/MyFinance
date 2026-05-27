@@ -55,10 +55,6 @@
     <string name="profile_picture">Profile Picture</string>
 
     <string name="back_arrow" translatable="false">Back Arrow</string>
-    <string name="dashboard_empty" translatable="false">Dashboard Empty</string>
-    <string name="list_empty" translatable="false">List Empty</string>
-    <string name="version_icon" translatable="false">Version Icon</string>
-    <string name="dynamic_color_icon" translatable="false">Dynamic Color Icon</string>
 
     <string name="use_dynamic_color">Dynamic colors</string>
     <string name="restart_app_changes">Restart the app to apply the changes</string>
@@ -69,24 +65,16 @@
 
     <string name="currency" translatable="false">€</string>
 
-    <string name="change_content">Swap content</string>
-
     <string name="your_profile">Your profile</string>
     <string name="your_name">Your name</string>
     <string name="your_budget">Your budget</string>
     <string name="edit_profile">Edit your profile</string>
     <string name="edit_propic">Upload your profile picture</string>
     <string name="edit_full_name">Edit your full name</string>
-    <string name="expense_category_icon">Expense Category Icon</string>
     <string name="no_expenses">No expenses</string>
     <string name="no_incomes">No incomes</string>
     <string name="enter_your_budget">Enter your monthly budget</string>
 
-    <string name="zero_double" translatable="false">0.00</string>
-    <string name="zero_price" translatable="false">€ 0.00</string>
-    <string name="zero_perc" translatable="false">0%</string>
-
-    <string name="monthly_budget">Monthly budget</string>
     <string name="annual_budget">Annual budget</string>
     <string name="incomes">Incomes</string>
 
@@ -112,7 +100,6 @@
     <string name="search">Search</string>
     <string name="filter">Filter</string>
     <string name="date_range">Date range</string>
-    <string name="clear_text">Clear text</string>
     <string name="annual_balance">Annual balance</string>
 
     <string name="coming_soon" translatable="false">Coming soon!</string>
