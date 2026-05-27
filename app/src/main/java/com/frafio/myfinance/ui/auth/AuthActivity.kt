@@ -20,9 +20,9 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.AuthResult
@@ -40,12 +40,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class AuthActivity : AppCompatActivity(), AuthListener {
+class AuthActivity : AppCompatActivity() {
 
     companion object {
         private val TAG = AuthActivity::class.java.simpleName
         const val INTENT_USER_REQUEST: String = "com.frafio.myfinance.USER_REQUEST"
-        const val INTENT_USER_NAME: String = "com.frafio.myfinance.USER_NAME"
     }
 
     // binding
@@ -63,8 +62,6 @@ class AuthActivity : AppCompatActivity(), AuthListener {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_auth)
         binding.viewModel = viewModel
-
-        viewModel.authListener = this
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -114,6 +111,19 @@ class AuthActivity : AppCompatActivity(), AuthListener {
         }
 
         viewModel.credentialManager = CredentialManager.create(baseContext)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvents.collect { event ->
+                    when (event) {
+                        is AuthUiEvent.Loading -> onAuthStarted()
+                        is AuthUiEvent.Success -> onAuthSuccess(event.authResult)
+                        is AuthUiEvent.Error -> onAuthFailure(event.authResult)
+                        is AuthUiEvent.NavigateToHome -> goToHomeActivity()
+                    }
+                }
+            }
+        }
 
         binding.authComposeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -166,10 +176,6 @@ class AuthActivity : AppCompatActivity(), AuthListener {
     }
 
     fun onGoogleButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        binding.authProgressIndicator.show()
-
-        onAuthStarted()
-
         // Instantiate a Google sign-in request
         val googleIdOption = GetGoogleIdOption.Builder()
             // Your server's client ID
@@ -187,16 +193,14 @@ class AuthActivity : AppCompatActivity(), AuthListener {
             try {
                 // Launch Credential Manager UI
                 val result = viewModel.credentialManager!!.getCredential(
-                    context = baseContext,
+                    context = this@AuthActivity,
                     request = request
                 )
 
                 // Extract credential from the result returned by Credential Manager
                 viewModel.onGoogleRequest(result.credential)
             } catch (e: GetCredentialException) {
-                val result = MutableLiveData<AuthResult>()
-                result.value = AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
-                onAuthSuccess(result)
+                onAuthSuccess(AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE))
                 Log.e(TAG, "Couldn't retrieve user's credentials: ${e.localizedMessage}")
             }
         }
@@ -261,7 +265,7 @@ class AuthActivity : AppCompatActivity(), AuthListener {
         binding.authSwitchTextView.text = getString(R.string.login_signup)
     }
 
-    override fun onAuthStarted() {
+    private fun onAuthStarted() {
         binding.authProgressIndicator.show()
 
         binding.authFullNameInputLayout.isEnabled = false
@@ -276,51 +280,47 @@ class AuthActivity : AppCompatActivity(), AuthListener {
         clearErrors()
     }
 
-    override fun onAuthSuccess(response: LiveData<AuthResult>) {
-        response.observe(this) { authResult ->
-            if (authResult.code != AuthCode.LOGIN_SUCCESS.code || authResult.code != AuthCode.SIGNUP_SUCCESS.code) {
-                binding.authProgressIndicator.hide()
+    private fun onAuthSuccess(authResult: AuthResult) {
+        binding.authProgressIndicator.hide()
 
-                binding.authFullNameInputLayout.isEnabled = true
-                binding.authEmailInputLayout.isEnabled = true
-                binding.authPasswordInputLayout.isEnabled = true
-                binding.authConfirmPasswordInputLayout.isEnabled = true
-                binding.authButton.isEnabled = true
-                binding.authResetPassTextView.isEnabled = true
-                binding.googleButton.isEnabled = true
-                binding.authSwitchTextView.isEnabled = true
-            }
+        binding.authFullNameInputLayout.isEnabled = true
+        binding.authEmailInputLayout.isEnabled = true
+        binding.authPasswordInputLayout.isEnabled = true
+        binding.authConfirmPasswordInputLayout.isEnabled = true
+        binding.authButton.isEnabled = true
+        binding.authResetPassTextView.isEnabled = true
+        binding.googleButton.isEnabled = true
+        binding.authSwitchTextView.isEnabled = true
 
-            when (authResult.code) {
-                AuthCode.LOGIN_SUCCESS.code,
-                AuthCode.SIGNUP_SUCCESS.code ->
-                    goToHomeActivity()
+        when (authResult.code) {
+            AuthCode.LOGIN_SUCCESS.code,
+            AuthCode.SIGNUP_SUCCESS.code ->
+                goToHomeActivity()
 
-                AuthCode.INVALID_EMAIL.code,
-                AuthCode.USER_NOT_FOUND.code,
-                AuthCode.EMAIL_NOT_WELL_FORMED.code,
-                AuthCode.EMAIL_ALREADY_ASSOCIATED.code ->
-                    binding.authEmailInputLayout.error = authResult.message
+            AuthCode.INVALID_EMAIL.code,
+            AuthCode.USER_NOT_FOUND.code,
+            AuthCode.EMAIL_NOT_WELL_FORMED.code,
+            AuthCode.EMAIL_ALREADY_ASSOCIATED.code ->
+                binding.authEmailInputLayout.error = authResult.message
 
-                AuthCode.WRONG_PASSWORD.code ->
-                    binding.authPasswordInputLayout.error = authResult.message
+            AuthCode.WRONG_PASSWORD.code ->
+                binding.authPasswordInputLayout.error = authResult.message
 
-                AuthCode.WEAK_PASSWORD.code ->
-                    binding.authConfirmPasswordInputLayout.error = authResult.message
+            AuthCode.WEAK_PASSWORD.code ->
+                binding.authConfirmPasswordInputLayout.error = authResult.message
 
-                AuthCode.GOOGLE_LOGIN_FAILURE.code,
-                AuthCode.USER_DISABLED.code,
-                AuthCode.LOGIN_FAILURE.code,
-                AuthCode.SIGNUP_PROFILE_NOT_UPDATED.code,
-                AuthCode.SIGNUP_FAILURE.code ->
-                    snackBar(authResult.message, binding.authDivider)
+            AuthCode.GOOGLE_LOGIN_FAILURE.code,
+            AuthCode.USER_DISABLED.code,
+            AuthCode.LOGIN_FAILURE.code,
+            AuthCode.SIGNUP_PROFILE_NOT_UPDATED.code,
+            AuthCode.SIGNUP_FAILURE.code ->
+                snackBar(authResult.message, binding.authDivider)
 
-                else -> snackBar(authResult.message, binding.authDivider)
-            }
+            else -> snackBar(authResult.message, binding.authDivider)
         }
     }
 
-    override fun onAuthFailure(authResult: AuthResult) {
+    private fun onAuthFailure(authResult: AuthResult) {
         binding.authProgressIndicator.hide()
 
         binding.authFullNameInputLayout.isEnabled = true
@@ -352,14 +352,10 @@ class AuthActivity : AppCompatActivity(), AuthListener {
     }
 
     private fun goToHomeActivity() {
-        viewModel.getUserName().also { userName ->
-            Intent(applicationContext, HomeActivity::class.java).also {
-                it.putExtra(INTENT_USER_REQUEST, true)
-                it.putExtra(INTENT_USER_NAME, userName)
-                startActivity(it)
-                finish()
-            }
+        Intent(applicationContext, HomeActivity::class.java).also {
+            it.putExtra(INTENT_USER_REQUEST, true)
+            startActivity(it)
+            finish()
         }
-
     }
 }

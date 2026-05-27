@@ -1,6 +1,6 @@
 package com.frafio.myfinance.data.dao
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -17,49 +17,49 @@ interface ExpenseDao {
             "FROM expense " +
             "WHERE (name LIKE :name || '%' OR name LIKE '% ' || :name || '%') AND category IN (:categories) " +
             "ORDER BY year DESC, month DESC, day DESC, price DESC, category DESC")
-    fun getWithFilter(name: String, categories: List<Int>): LiveData<List<Expense>>
+    fun getWithFilter(name: String, categories: List<Int>): Flow<List<Expense>>
 
     @Query("SELECT * " +
             "FROM expense " +
             "WHERE (name LIKE :name || '%' OR name LIKE '% ' || :name || '%') AND category IN (:categories) AND timestamp>=:firstTimestamp AND timestamp<:lastTimestamp " +
             "ORDER BY year DESC, month DESC, day DESC, price DESC, category DESC")
-    fun getWithFilterDate(name: String, categories: List<Int>, firstTimestamp: Long, lastTimestamp: Long): LiveData<List<Expense>>
+    fun getWithFilterDate(name: String, categories: List<Int>, firstTimestamp: Long, lastTimestamp: Long): Flow<List<Expense>>
 
     @Query("SELECT COUNT(*) " +
             "FROM expense")
-    fun getCount(): LiveData<Int>
+    fun getCount(): Flow<Int>
 
     @Query("SELECT SUM(price) " +
             "FROM expense " +
             "WHERE year=:year AND month=:month AND day=:day")
-    fun getPriceSumOfDay(year: Int, month: Int, day: Int): LiveData<Double?>
+    fun getPriceSumOfDay(year: Int, month: Int, day: Int): Flow<Double?>
 
     @Query("SELECT SUM(price) " +
             "FROM expense " +
             "WHERE year=:year AND month=:month")
-    fun getPriceSumOfMonth(year: Int, month: Int): LiveData<Double?>
+    fun getPriceSumOfMonth(year: Int, month: Int): Flow<Double?>
 
     @Query("SELECT SUM(price) " +
             "FROM expense " +
             "WHERE year=:year")
-    fun getPriceSumOfYear(year: Int): LiveData<Double?>
+    fun getPriceSumOfYear(year: Int): Flow<Double?>
 
     @Query("SELECT SUM(price) as value, year, month " +
             "FROM expense " +
             "WHERE timestamp>=:firstTimestamp AND timestamp<:lastTimestamp " +
             "GROUP BY year, month " +
             "ORDER BY year DESC, month DESC")
-    fun getPriceSumAfterAndBefore(firstTimestamp: Long, lastTimestamp: Long): LiveData<List<BarChartEntry>>
+    fun getPriceSumAfterAndBefore(firstTimestamp: Long, lastTimestamp: Long): Flow<List<BarChartEntry>>
 
     @Query("SELECT * " +
             "FROM expense " +
             "WHERE year=:year AND month=:month")
-    fun getExpensesOfMonth(year: Int, month: Int): LiveData<List<Expense>>
+    fun getExpensesOfMonth(year: Int, month: Int): Flow<List<Expense>>
 
     @Query("SELECT * " +
             "FROM expense " +
             "WHERE year=:year")
-    fun getExpensesOfYear(year: Int): LiveData<List<Expense>>
+    fun getExpensesOfYear(year: Int): Flow<List<Expense>>
 
     @Query("SELECT * FROM expense")
     fun getAllSync(): List<Expense>

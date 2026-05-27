@@ -1,6 +1,6 @@
 package com.frafio.myfinance.data.dao
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -15,12 +15,12 @@ interface IncomeDao {
     @Query("SELECT * " +
             "FROM income " +
             "ORDER BY year DESC, month DESC, day DESC, price DESC")
-    fun getAll(): LiveData<List<Income>>
+    fun getAll(): Flow<List<Income>>
 
     @Query("SELECT SUM(price) " +
             "FROM income " +
             "WHERE year=:year")
-    fun getPriceSumOfYear(year: Int): LiveData<Double?>
+    fun getPriceSumOfYear(year: Int): Flow<Double?>
 
     @Insert
     fun insertIncome(income: Income)

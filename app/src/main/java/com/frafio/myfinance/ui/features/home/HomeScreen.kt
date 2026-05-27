@@ -30,6 +30,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.window.core.layout.WindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -59,6 +60,7 @@ import com.frafio.myfinance.ui.features.home.budget.navigation.budgetEntry
 import com.frafio.myfinance.ui.features.home.dashboard.navigation.dashboardEntry
 import com.frafio.myfinance.ui.features.home.expenses.navigation.expensesEntry
 import com.frafio.myfinance.ui.features.home.profile.navigation.profileEntry
+import com.frafio.myfinance.ui.home.HomeUiEvent
 import com.frafio.myfinance.ui.home.HomeViewModel
 import com.frafio.myfinance.ui.navigation.LocalSnackbarHostState
 import com.frafio.myfinance.ui.navigation.MyFinanceAppState
@@ -73,7 +75,6 @@ import java.time.LocalDate
 fun HomeScreen(
     appState: MyFinanceAppState,
     viewModel: HomeViewModel,
-    showProgress: Boolean,
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfoV2(),
     onAddClick: () -> Unit,
     onLogoutClick: () -> Unit,
@@ -93,9 +94,35 @@ fun HomeScreen(
         NavigationSuiteType.NavigationBar
     }
 
+    val loginSuccessString = stringResource(id = R.string.login_successful)
+
     LaunchedEffect(viewModel.navEvents) {
         viewModel.navEvents.collect { key ->
             navigator.navigate(key)
+        }
+    }
+
+    LaunchedEffect(viewModel.uiEvents) {
+        viewModel.uiEvents.collect { event ->
+            when (event) {
+                is HomeUiEvent.ShowSnackBar -> {
+                    appState.showSnackBar(
+                        event.message,
+                        event.actionText,
+                        event.actionFun,
+                        event.dismissFun
+                    )
+                }
+                HomeUiEvent.LoadingStarted -> {
+                    appState.showProgress = true
+                }
+                HomeUiEvent.LoadingFinished -> {
+                    appState.showProgress = false
+                }
+                HomeUiEvent.LoginSuccess -> {
+                    appState.showSnackBar("$loginSuccessString ${viewModel.getFullName()}")
+                }
+            }
         }
     }
 
@@ -144,48 +171,50 @@ fun HomeScreen(
         },
         layoutType = layoutType
     ) {
-        MainScaffold(
-            currentTopLevelKey = currentTopLevelKey as MyFinanceNavKey,
-            proPic = proPic,
-            showProgress = showProgress || appState.showProgress,
-            onAddClick = onAddClick,
-            onLogoutClick = onLogoutClick,
-            onProPicClick = onProPicClick,
-            screenContent = {
-                val comingSoonString = stringResource(id = R.string.coming_soon)
-                val snackbarHostState = LocalSnackbarHostState.current
-                val entryProvider: (NavKey) -> NavEntry<NavKey> = entryProvider {
-                    dashboardEntry(appState)
-                    expensesEntry(
-                        appState = appState,
-                        onItemLongClick = onEditExpense,
-                        getDateLabel = getDateLabel
-                    )
-                    budgetEntry(
-                        appState = appState,
-                        onEditIncome = onEditIncome
-                    )
-                    profileEntry(
-                        appState = appState,
-                        onUploadProPic = {
-                            appState.coroutineScope.launch {
-                                snackbarHostState.showSnackbar(comingSoonString)
-                            }
-                        },
-                        restartApplication = restartApplication
-                    )
-                }
+        CompositionLocalProvider(LocalSnackbarHostState provides appState.snackbarHostState) {
+            MainScaffold(
+                currentTopLevelKey = currentTopLevelKey as MyFinanceNavKey,
+                proPic = proPic,
+                showProgress = appState.showProgress,
+                onAddClick = onAddClick,
+                onLogoutClick = onLogoutClick,
+                onProPicClick = onProPicClick,
+                screenContent = {
+                    val comingSoonString = stringResource(id = R.string.coming_soon)
+                    val snackbarHostState = LocalSnackbarHostState.current
+                    val entryProvider: (NavKey) -> NavEntry<NavKey> = entryProvider {
+                        dashboardEntry(appState)
+                        expensesEntry(
+                            appState = appState,
+                            onItemLongClick = onEditExpense,
+                            getDateLabel = getDateLabel
+                        )
+                        budgetEntry(
+                            appState = appState,
+                            onEditIncome = onEditIncome
+                        )
+                        profileEntry(
+                            appState = appState,
+                            onUploadProPic = {
+                                appState.coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(comingSoonString)
+                                }
+                            },
+                            restartApplication = restartApplication
+                        )
+                    }
 
-                NavDisplay(
-                    entries = appState.navigationState.toEntries(entryProvider),
-                    transitionSpec = { fadeIn() togetherWith fadeOut() },
-                    popTransitionSpec = { fadeIn() togetherWith fadeOut() },
-                    predictivePopTransitionSpec = { fadeIn() togetherWith fadeOut() }
-                ) {
-                    navigator.goBack()
+                    NavDisplay(
+                        entries = appState.navigationState.toEntries(entryProvider),
+                        transitionSpec = { fadeIn() togetherWith fadeOut() },
+                        popTransitionSpec = { fadeIn() togetherWith fadeOut() },
+                        predictivePopTransitionSpec = { fadeIn() togetherWith fadeOut() }
+                    ) {
+                        navigator.goBack()
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }
 

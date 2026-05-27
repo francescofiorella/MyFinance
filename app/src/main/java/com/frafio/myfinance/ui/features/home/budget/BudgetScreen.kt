@@ -79,7 +79,7 @@ fun BudgetScreen(
                 showEditBudgetSheet = false
             }
         },
-        onEditBudget = { viewModel.setMonthlyBudget(it, getOldBudget = true) },
+        onEditBudget = { viewModel.setMonthlyBudget(it) },
     )
 
     EditTransactionSheet(

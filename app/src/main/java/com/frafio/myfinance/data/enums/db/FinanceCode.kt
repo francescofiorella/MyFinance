@@ -206,7 +206,7 @@ enum class FinanceCode(val code: Int, val message: String) {
     LABEL_DELETE_SUCCESS(
         42, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Label deleted!"
-            Languages.ITALIANO.value -> "Etichetta rimossa"
+            Languages.ITALIANO.value -> "Etichetta rimossa!"
             else -> "Label deleted!" // english
         }
     ),

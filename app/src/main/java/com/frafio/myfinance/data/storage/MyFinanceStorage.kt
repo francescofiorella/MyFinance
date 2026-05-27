@@ -1,9 +1,10 @@
 package com.frafio.myfinance.data.storage
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.model.User
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.util.Calendar
 
 object MyFinanceStorage {
@@ -11,20 +12,16 @@ object MyFinanceStorage {
     val user: User?
         get() = privateUser
 
-    private val _monthlyBudget = MutableLiveData<Double>()
-    val monthlyBudget: LiveData<Double>
-        get() = _monthlyBudget
+    private val _monthlyBudget = MutableStateFlow(0.0)
+    val monthlyBudget: StateFlow<Double> = _monthlyBudget.asStateFlow()
 
-    private val _labels = MutableLiveData<List<String>>()
-    val labels: LiveData<List<String>>
-        get() = _labels
+    private val _labels = MutableStateFlow<List<String>>(emptyList())
+    val labels: StateFlow<List<String>> = _labels.asStateFlow()
 
     fun updateUser(fUser: FirebaseUser) {
         var userPic = ""
-        fUser.providerId
         fUser.photoUrl?.let { uri ->
             userPic = uri.toString().replace("s96-c", "s400-c")
-
         }
         var provider = User.EMAIL_PROVIDER
         for (user in fUser.providerData) {

@@ -117,6 +117,12 @@
 
     <string name="coming_soon" translatable="false">Coming soon!</string>
 
+    <string name="budget_updated">Budget updated!</string>
+    <string name="income_deleted">Income deleted!</string>
+    <string name="full_name_updated">User full name updated!</string>
+    <string name="expense_deleted">Expense deleted!</string>
+    <string name="label_deleted">Label deleted!</string>
+
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>
         <item>@string/groceries</item>

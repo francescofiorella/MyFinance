@@ -3,6 +3,7 @@ package com.frafio.myfinance.ui.home.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.BuildConfig
+import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.User
 import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.data.repository.UserRepository
@@ -17,6 +18,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class ProfileUiEvent {
+    data class ShowSnackBar(
+        val message: String,
+        val actionText: String? = null,
+        val actionFun: () -> Unit = {},
+        val dismissFun: () -> Unit = {}
+    ) : ProfileUiEvent()
+    object LoadingStarted : ProfileUiEvent()
+    object LoadingFinished : ProfileUiEvent()
+    data class FullNameUpdated(val previousFullName: String) : ProfileUiEvent()
+    object DynamicColorChanged : ProfileUiEvent()
+}
+
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
@@ -29,23 +43,42 @@ class ProfileViewModel @Inject constructor(
     private val _scrollToTop = MutableSharedFlow<Unit>(replay = 0)
     val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()
 
+    private val _uiEvents = MutableSharedFlow<ProfileUiEvent>()
+    val uiEvents: SharedFlow<ProfileUiEvent> = _uiEvents.asSharedFlow()
+
     val googleSignIn: Boolean
         get() = _user.value?.provider == User.GOOGLE_PROVIDER
 
-    var listener: ProfileListener? = null
-
     fun uploadPropic() {
-        listener?.onStarted()
-        val propicUri = ""
-        val response = userRepository.updatePropic(propicUri)
-        listener?.onProPicUpdateComplete(response)
+        viewModelScope.launch {
+            _uiEvents.emit(ProfileUiEvent.LoadingStarted)
+            val propicUri = ""
+            val response = userRepository.updatePropic(propicUri)
+            if (response.code == AuthCode.USER_PROPIC_UPDATED.code) {
+                updateLocalUser()
+            }
+            _uiEvents.emit(ProfileUiEvent.ShowSnackBar(response.message))
+            _uiEvents.emit(ProfileUiEvent.LoadingFinished)
+        }
     }
 
     fun editFullName(fullName: String, notify: Boolean = true) {
-        listener?.onStarted(notify)
-        val previousFN = _user.value?.fullName ?: ""
-        val response = userRepository.updateFullName(fullName)
-        listener?.onFullNameUpdateComplete(response, previousFN, notify)
+        viewModelScope.launch {
+            _uiEvents.emit(ProfileUiEvent.LoadingStarted)
+            val previousFN = _user.value?.fullName ?: ""
+            val response = userRepository.updateFullName(fullName)
+            if (response.code == AuthCode.USER_FULL_NAME_UPDATED.code) {
+                updateLocalUser()
+                if (notify) {
+                    _uiEvents.emit(ProfileUiEvent.FullNameUpdated(previousFN))
+                }
+            } else {
+                if (notify) {
+                    _uiEvents.emit(ProfileUiEvent.ShowSnackBar(response.message))
+                }
+            }
+            _uiEvents.emit(ProfileUiEvent.LoadingFinished)
+        }
     }
 
     fun updateLocalUser() {
@@ -68,7 +101,9 @@ class ProfileViewModel @Inject constructor(
     fun setDynamicColor(active: Boolean) {
         expensesRepository.setDynamicColorActive(active)
         _isSwitchDynamicColorChecked.value = active
-        listener?.onDynamicColorChanged()
+        viewModelScope.launch {
+            _uiEvents.emit(ProfileUiEvent.DynamicColorChanged)
+        }
     }
 
     private fun getDynamicColorCheck(): Boolean {

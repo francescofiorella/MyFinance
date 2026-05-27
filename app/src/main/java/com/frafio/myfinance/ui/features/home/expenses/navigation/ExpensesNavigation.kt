@@ -1,25 +1,17 @@
 package com.frafio.myfinance.ui.features.home.expenses.navigation
 
-import androidx.compose.material3.SnackbarResult
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.LiveData
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Expense
-import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.ui.features.home.expenses.ExpensesScreen
-import com.frafio.myfinance.ui.home.expenses.ExpensesListener
+import com.frafio.myfinance.ui.home.expenses.ExpensesUiEvent
 import com.frafio.myfinance.ui.home.expenses.ExpensesViewModel
-import com.frafio.myfinance.ui.navigation.LocalSnackbarHostState
 import com.frafio.myfinance.ui.navigation.MyFinanceAppState
 import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 fun EntryProviderScope<NavKey>.expensesEntry(
@@ -29,9 +21,9 @@ fun EntryProviderScope<NavKey>.expensesEntry(
 ) {
     entry<MyFinanceNavKey.Expenses> {
         val viewModel: ExpensesViewModel = hiltViewModel()
-        val snackbarHostState = LocalSnackbarHostState.current
-        val coroutineScope = rememberCoroutineScope()
 
+        val expenseDeletedString = stringResource(id = R.string.expense_deleted)
+        val labelDeletedString = stringResource(id = R.string.label_deleted)
         val undoString = stringResource(id = R.string.undo)
 
         LaunchedEffect(appState.reselectEvent) {
@@ -44,75 +36,46 @@ fun EntryProviderScope<NavKey>.expensesEntry(
             }
         }
 
-        DisposableEffect(viewModel) {
-            viewModel.listener = object : ExpensesListener {
-                override fun onStarted(notify: Boolean) {
-                    appState.showProgress = true
-                }
-
-                override fun onCompleted(response: LiveData<FinanceResult>, notify: Boolean) {
-                    appState.showProgress = false
-                    response.observeForever { result ->
-                        if (result.code == FinanceCode.EXPENSE_ADD_SUCCESS.code) {
-                            if (notify) {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(result.message)
-                                }
-                            }
-                        }
+        LaunchedEffect(viewModel.uiEvents) {
+            viewModel.uiEvents.collect { event ->
+                when (event) {
+                    is ExpensesUiEvent.ShowSnackBar -> {
+                        appState.showSnackBar(
+                            event.message,
+                            event.actionText,
+                            event.actionFun,
+                            event.dismissFun
+                        )
                     }
-                }
 
-                override fun onDeleteCompleted(
-                    response: LiveData<FinanceResult>,
-                    expense: Expense
-                ) {
-                    appState.showProgress = false
-                    response.observeForever { result ->
-                        if (result.code == FinanceCode.EXPENSE_DELETE_SUCCESS.code) {
-                            coroutineScope.launch {
-                                val actionResult = snackbarHostState.showSnackbar(
-                                    message = result.message,
-                                    actionLabel = undoString
-                                )
-                                if (actionResult == SnackbarResult.ActionPerformed) {
-                                    viewModel.addExpense(expense, notify = false)
-                                }
-                            }
-                        } else {
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(result.message)
-                            }
-                        }
+                    ExpensesUiEvent.LoadingStarted -> {
+                        appState.showProgress = true
                     }
-                }
 
-                override fun onDeleteCompleted(
-                    response: LiveData<FinanceResult>
-                ) {
-                    appState.showProgress = false
-                    response.observeForever { result ->
-                        if (result.code == FinanceCode.LABEL_DELETE_SUCCESS.code) {
-                            coroutineScope.launch {
-                                val actionResult = snackbarHostState.showSnackbar(
-                                    message = result.message,
-                                    actionLabel = undoString
-                                )
-                                if (actionResult == SnackbarResult.ActionPerformed) {
-                                    viewModel.undoDeleteLabel()
-                                } else {
-                                    viewModel.resetLastDeletedLabel()
-                                }
+                    ExpensesUiEvent.LoadingFinished -> {
+                        appState.showProgress = false
+                    }
+
+                    is ExpensesUiEvent.ExpenseDeleted -> {
+                        appState.showSnackBar(
+                            expenseDeletedString,
+                            undoString,
+                            {
+                                viewModel.addExpense(event.expense, notify = false)
                             }
-                        } else {
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(result.message)
-                            }
-                        }
+                        )
+                    }
+
+                    ExpensesUiEvent.LabelDeleted -> {
+                        appState.showSnackBar(
+                            labelDeletedString,
+                            undoString,
+                            viewModel::undoDeleteLabel,
+                            viewModel::resetLastDeletedLabel
+                        )
                     }
                 }
             }
-            onDispose { viewModel.listener = null }
         }
 
         ExpensesScreen(

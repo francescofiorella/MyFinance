@@ -16,7 +16,9 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
@@ -33,10 +35,11 @@ import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @AndroidEntryPoint
-class AddActivity : AppCompatActivity(), AddListener {
+class AddActivity : AppCompatActivity() {
 
     companion object {
         const val REQUEST_ADD_CODE: Int = 1
@@ -63,7 +66,6 @@ class AddActivity : AppCompatActivity(), AddListener {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add)
         binding.viewModel = viewModel
-        viewModel.listener = this
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -120,6 +122,18 @@ class AddActivity : AppCompatActivity(), AddListener {
                             binding.priceET.setSelection(lastPartOfText.length)
                         else
                             binding.priceET.setSelection(selection)
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvents.collect { event ->
+                    when (event) {
+                        is AddUiEvent.Loading -> onAddStart()
+                        is AddUiEvent.Success -> onAddSuccess(event.result)
+                        is AddUiEvent.Error -> onAddFailure(event.result)
                     }
                 }
             }
@@ -285,7 +299,7 @@ class AddActivity : AppCompatActivity(), AddListener {
         onBackPressedDispatcher.onBackPressed()
     }
 
-    override fun onAddStart() {
+    private fun onAddStart() {
         binding.addProgressIndicator.show()
 
         binding.nameTIL.error = ""
@@ -295,64 +309,62 @@ class AddActivity : AppCompatActivity(), AddListener {
         binding.addAddButton.isEnabled = false
     }
 
-    override fun onAddSuccess(response: LiveData<FinanceResult>) {
-        response.observe(this) { result ->
-            if (result.code != FinanceCode.EXPENSE_ADD_SUCCESS.code) {
-                binding.addProgressIndicator.hide()
-                binding.addAddButton.isEnabled = true
+    private fun onAddSuccess(result: FinanceResult) {
+        if (result.code != FinanceCode.EXPENSE_ADD_SUCCESS.code) {
+            binding.addProgressIndicator.hide()
+            binding.addAddButton.isEnabled = true
+        }
+
+        when (result.code) {
+            FinanceCode.EXPENSE_ADD_SUCCESS.code -> {
+                // go back to the homepage
+                Intent().also {
+                    val totalId = evaluateExpenseTotalId(
+                        viewModel.day!!,
+                        viewModel.month!!,
+                        viewModel.year!!
+                    )
+                    it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_EXPENSE_CODE)
+                    it.putExtra(ADD_RESULT_MESSAGE, result.message)
+                    it.putExtra(ADD_RESULT_TOTAL_ID, totalId)
+                    setResult(RESULT_OK, it)
+                    finish()
+                }
             }
 
-            when (result.code) {
-                FinanceCode.EXPENSE_ADD_SUCCESS.code -> {
-                    // go back to the homepage
-                    Intent().also {
-                        val totalId = evaluateExpenseTotalId(
-                            viewModel.day!!,
-                            viewModel.month!!,
-                            viewModel.year!!
-                        )
-                        it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_EXPENSE_CODE)
-                        it.putExtra(ADD_RESULT_MESSAGE, result.message)
-                        it.putExtra(ADD_RESULT_TOTAL_ID, totalId)
-                        setResult(RESULT_OK, it)
-                        finish()
-                    }
+            FinanceCode.EXPENSE_EDIT_SUCCESS.code -> {
+                // go back to the homepage
+                Intent().also {
+                    it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_EXPENSE_CODE)
+                    setResult(RESULT_OK, it)
+                    finish()
                 }
-
-                FinanceCode.EXPENSE_EDIT_SUCCESS.code -> {
-                    // go back to the homepage
-                    Intent().also {
-                        it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_EXPENSE_CODE)
-                        setResult(RESULT_OK, it)
-                        finish()
-                    }
-                }
-
-                FinanceCode.INCOME_ADD_SUCCESS.code -> {
-                    Intent().also {
-                        it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_INCOME_CODE)
-                        it.putExtra(ADD_RESULT_MESSAGE, result.message)
-                        it.putExtra(ADD_RESULT_TOTAL_ID, viewModel.year.toString())
-                        setResult(RESULT_OK, it)
-                        finish()
-                    }
-                }
-
-                FinanceCode.INCOME_EDIT_SUCCESS.code -> {
-                    // go back to the homepage
-                    Intent().also {
-                        it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_INCOME_CODE)
-                        setResult(RESULT_OK, it)
-                        finish()
-                    }
-                }
-
-                else -> snackBar(result.message, binding.addAddButton)
             }
+
+            FinanceCode.INCOME_ADD_SUCCESS.code -> {
+                Intent().also {
+                    it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_INCOME_CODE)
+                    it.putExtra(ADD_RESULT_MESSAGE, result.message)
+                    it.putExtra(ADD_RESULT_TOTAL_ID, viewModel.year.toString())
+                    setResult(RESULT_OK, it)
+                    finish()
+                }
+            }
+
+            FinanceCode.INCOME_EDIT_SUCCESS.code -> {
+                // go back to the homepage
+                Intent().also {
+                    it.putExtra(EXPENSE_REQUEST_KEY, REQUEST_INCOME_CODE)
+                    setResult(RESULT_OK, it)
+                    finish()
+                }
+            }
+
+            else -> snackBar(result.message, binding.addAddButton)
         }
     }
 
-    override fun onAddFailure(financeResult: FinanceResult) {
+    private fun onAddFailure(financeResult: FinanceResult) {
         binding.addProgressIndicator.hide()
         binding.addAddButton.isEnabled = true
 

@@ -1,22 +1,16 @@
 package com.frafio.myfinance.ui.features.home.budget.navigation
 
-import androidx.compose.material3.SnackbarResult
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.LiveData
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.db.FinanceCode
-import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.ui.features.home.budget.BudgetScreen
-import com.frafio.myfinance.ui.home.budget.BudgetListener
+import com.frafio.myfinance.ui.home.budget.BudgetUiEvent
 import com.frafio.myfinance.ui.home.budget.BudgetViewModel
-import com.frafio.myfinance.ui.navigation.LocalSnackbarHostState
 import com.frafio.myfinance.ui.navigation.MyFinanceAppState
 import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
 import kotlinx.coroutines.launch
@@ -27,9 +21,10 @@ fun EntryProviderScope<NavKey>.budgetEntry(
 ) {
     entry<MyFinanceNavKey.Budget> {
         val viewModel: BudgetViewModel = hiltViewModel()
-        val snackbarHostState = LocalSnackbarHostState.current
         val coroutineScope = rememberCoroutineScope()
 
+        val budgetUpdatedString = stringResource(id = R.string.budget_updated)
+        val incomeDeletedString = stringResource(id = R.string.income_deleted)
         val undoString = stringResource(id = R.string.undo)
 
         LaunchedEffect(appState.reselectEvent) {
@@ -40,81 +35,56 @@ fun EntryProviderScope<NavKey>.budgetEntry(
             }
         }
 
-        DisposableEffect(viewModel) {
-            viewModel.listener = object : BudgetListener {
-                override fun onStarted(notify: Boolean) {
-                    appState.showProgress = true
-                }
-
-                override fun onCompleted(
-                    response: LiveData<FinanceResult>,
-                    previousBudget: Double?,
-                    notify: Boolean
-                ) {
-                    appState.showProgress = false
-                    response.observeForever { result ->
-                        when (result.code) {
-                            FinanceCode.BUDGET_UPDATE_SUCCESS.code -> {
-                                previousBudget?.let {
-                                    if (notify) {
-                                        coroutineScope.launch {
-                                            val actionResult = snackbarHostState.showSnackbar(
-                                                message = result.message,
-                                                actionLabel = undoString
-                                            )
-                                            if (actionResult == SnackbarResult.ActionPerformed) {
-                                                viewModel.setMonthlyBudget(
-                                                    previousBudget,
-                                                    notify = false
-                                                )
-                                            }
-                                        }
-                                    }
-                                } ?: run {
-                                    if (notify) {
-                                        coroutineScope.launch {
-                                            snackbarHostState.showSnackbar(result.message)
-                                        }
-                                    }
-                                }
-                            }
-
-                            else -> {
-                                if (notify) {
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(result.message)
-                                    }
-                                }
-                            }
+        LaunchedEffect(viewModel.uiEvents) {
+            viewModel.uiEvents.collect { event ->
+                when (event) {
+                    is BudgetUiEvent.ShowSnackBar -> {
+                        coroutineScope.launch {
+                            appState.showSnackBar(
+                                event.message,
+                                event.actionText,
+                                event.actionFun,
+                                event.dismissFun
+                            )
                         }
                     }
-                }
 
-                override fun onDeleteCompleted(
-                    response: LiveData<FinanceResult>,
-                    income: Income
-                ) {
-                    appState.showProgress = false
-                    response.observeForever { result ->
-                        if (result.code == FinanceCode.INCOME_DELETE_SUCCESS.code) {
-                            coroutineScope.launch {
-                                val actionResult = snackbarHostState.showSnackbar(
-                                    message = result.message,
-                                    actionLabel = undoString
-                                )
-                                if (actionResult == SnackbarResult.ActionPerformed) {
-                                    viewModel.addIncome(income, notify = false)
+                    BudgetUiEvent.LoadingStarted -> {
+                        appState.showProgress = true
+                    }
+
+                    BudgetUiEvent.LoadingFinished -> {
+                        appState.showProgress = false
+                    }
+
+                    is BudgetUiEvent.BudgetUpdated -> {
+                        coroutineScope.launch {
+                            appState.showSnackBar(
+                                budgetUpdatedString,
+                                undoString,
+                                {
+                                    viewModel.setMonthlyBudget(
+                                        event.previousBudget,
+                                        notify = false
+                                    )
                                 }
-                            }
-                        } else {
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(result.message)
-                            }
+                            )
+                        }
+                    }
+
+                    is BudgetUiEvent.IncomeDeleted -> {
+                        coroutineScope.launch {
+                            appState.showSnackBar(
+                                incomeDeletedString,
+                                undoString,
+                                {
+                                    viewModel.addIncome(event.income, notify = false)
+                                }
+                            )
                         }
                     }
                 }
             }
-            onDispose { viewModel.listener = null }
         }
 
         BudgetScreen(

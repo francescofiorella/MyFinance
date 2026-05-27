@@ -3,8 +3,6 @@ package com.frafio.myfinance.data.repository
 import android.util.Log
 import androidx.credentials.Credential
 import androidx.credentials.CustomCredential
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.manager.AuthManager
 import com.frafio.myfinance.data.model.AuthResult
@@ -22,54 +20,46 @@ class UserRepository @Inject constructor(private val authManager: AuthManager) {
         private val TAG = UserRepository::class.java.simpleName
     }
 
-    fun updatePropic(propicUri: String): LiveData<AuthResult> {
+    suspend fun updatePropic(propicUri: String): AuthResult {
         return authManager.updatePropic(propicUri)
     }
 
-    fun updateFullName(fullName: String): LiveData<AuthResult> {
+    suspend fun updateFullName(fullName: String): AuthResult {
         return authManager.updateFullName(fullName)
     }
 
-    fun userLogin(email: String, password: String): LiveData<AuthResult> {
+    suspend fun userLogin(email: String, password: String): AuthResult {
         return authManager.defaultLogin(email, password)
     }
 
-    fun userLogin(credential: Credential): LiveData<AuthResult> {
-        val result: LiveData<AuthResult>
-
+    suspend fun userLogin(credential: Credential): AuthResult {
         // Check if credential is of type Google ID
-        if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+        return if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
             // Create Google ID Token
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
 
             // Sign in to Firebase with using the token
-            result = authManager.firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
+            authManager.firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
         } else {
             Log.w(TAG, "Credential is not of type Google ID!")
-            result = MutableLiveData()
-            result.value = AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
+            AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
         }
-
-        return result
     }
 
-    fun resetPassword(email: String): LiveData<AuthResult> {
+    suspend fun resetPassword(email: String): AuthResult {
         return authManager.resetPassword(email)
     }
 
-    fun userSignup(fullName: String, email: String, password: String): LiveData<AuthResult> {
+    suspend fun userSignup(fullName: String, email: String, password: String): AuthResult {
         return authManager.signup(fullName, email, password)
     }
 
-    fun userLogout(): LiveData<AuthResult> {
+    suspend fun userLogout(): AuthResult {
         return authManager.logout()
     }
 
-    fun isUserLogged(): LiveData<AuthResult> {
-        val response = MutableLiveData<AuthResult>()
-
-        response.value = authManager.isUserLogged()
-        return response
+    fun isUserLogged(): AuthResult {
+        return authManager.isUserLogged()
     }
 
     fun getUser(): User? {

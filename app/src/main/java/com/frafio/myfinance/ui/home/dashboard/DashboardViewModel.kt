@@ -1,7 +1,6 @@
 package com.frafio.myfinance.ui.home.dashboard
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.data.model.Expense
@@ -41,15 +40,15 @@ class DashboardViewModel @Inject constructor(
     private val _monthShown = MutableStateFlow(true)
     val monthShown: StateFlow<Boolean> = _monthShown.asStateFlow()
 
-    val isListEmpty: StateFlow<Boolean?> = expensesLocalRepository.getCount().asFlow()
+    val isListEmpty: StateFlow<Boolean?> = expensesLocalRepository.getCount()
         .map { it == 0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    val thisMonthSum: StateFlow<Double> = expensesLocalRepository.getPriceSumFromMonth(today.year, today.monthValue).asFlow()
+    val thisMonthSum: StateFlow<Double> = expensesLocalRepository.getPriceSumFromMonth(today.year, today.monthValue)
         .map { it ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
-    val thisYearSum: StateFlow<Double> = expensesLocalRepository.getPriceSumFromYear(today.year).asFlow()
+    val thisYearSum: StateFlow<Double> = expensesLocalRepository.getPriceSumFromYear(today.year)
         .map { it ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
@@ -57,17 +56,16 @@ class DashboardViewModel @Inject constructor(
     val balanceYearShown: StateFlow<Int> = _balanceYearShown.asStateFlow()
 
     val expensesSum: StateFlow<Double> = _balanceYearShown
-        .flatMapLatest { year -> expensesLocalRepository.getPriceSumFromYear(year).asFlow() }
+        .flatMapLatest { year -> expensesLocalRepository.getPriceSumFromYear(year) }
         .map { it ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
     val incomesSum: StateFlow<Double> = _balanceYearShown
-        .flatMapLatest { year -> incomesLocalRepository.getPriceSumFromYear(year).asFlow() }
+        .flatMapLatest { year -> incomesLocalRepository.getPriceSumFromYear(year) }
         .map { it ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
-    val monthlyBudget: StateFlow<Double> = MyFinanceStorage.monthlyBudget.asFlow()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+    val monthlyBudget: StateFlow<Double> = MyFinanceStorage.monthlyBudget
 
     private val _monthlyShownInPieChart = MutableStateFlow(true)
     val monthlyShownInPieChart: StateFlow<Boolean> = _monthlyShownInPieChart.asStateFlow()
@@ -103,7 +101,7 @@ class DashboardViewModel @Inject constructor(
             val lastTimestamp = dateToUTCTimestamp(nextMonth.year, nextMonth.monthValue, nextMonth.dayOfMonth)
             val firstDate = nextMonth.minusMonths(pieChartEntriesSize.toLong())
             val firstTimestamp = dateToUTCTimestamp(firstDate.year, firstDate.monthValue, firstDate.dayOfMonth)
-            expensesLocalRepository.getPriceSumAfterAndBefore(firstTimestamp, lastTimestamp).asFlow().flatMapLatest { entries ->
+            expensesLocalRepository.getPriceSumAfterAndBefore(firstTimestamp, lastTimestamp).flatMapLatest { entries ->
                 val values = mutableListOf<BarChartEntry>()
                 var currentDate = date
                 var j = 0
@@ -135,14 +133,14 @@ class DashboardViewModel @Inject constructor(
         date to isMonthly
     }.flatMapLatest { (date, isMonthly) ->
         if (isMonthly) {
-            expensesLocalRepository.getExpensesOfMonth(date.year, date.monthValue).asFlow()
+            expensesLocalRepository.getExpensesOfMonth(date.year, date.monthValue)
         } else {
-            expensesLocalRepository.getExpensesOfYear(date.year).asFlow()
+            expensesLocalRepository.getExpensesOfYear(date.year)
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val todaySum: StateFlow<Double> = expensesLocalRepository.getPriceSumFromDay(today.year, today.monthValue, today.dayOfMonth)
-        .asFlow().flatMapLatest { 
+        .flatMapLatest {
             flowOf(it ?: 0.0)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 

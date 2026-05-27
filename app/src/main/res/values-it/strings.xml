@@ -80,6 +80,12 @@
 
     <string name="total">Totale</string>
 
+    <string name="budget_updated">Budget aggiornato!</string>
+    <string name="income_deleted">Entrata eliminata!</string>
+    <string name="full_name_updated">Nome utente aggiornato!</string>
+    <string name="expense_deleted">Spesa eliminata!</string>
+    <string name="label_deleted">Etichetta rimossa!</string>
+
     <string name="housing">Abitazione</string>
     <string name="groceries">Alimentari</string>
     <string name="personal_care">Cura personale</string>

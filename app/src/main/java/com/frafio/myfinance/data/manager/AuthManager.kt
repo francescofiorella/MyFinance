@@ -2,8 +2,6 @@ package com.frafio.myfinance.data.manager
 
 import android.content.SharedPreferences
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.auth.SignupException
 import com.frafio.myfinance.data.model.AuthResult
@@ -22,10 +20,10 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.userProfileChangeRequest
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.core.net.toUri
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -48,46 +46,36 @@ class AuthManager @Inject constructor(
     private val fUser: FirebaseUser?
         get() = fAuth.currentUser
 
-    fun updatePropic(propicUri: String): LiveData<AuthResult> {
-        val response = MutableLiveData<AuthResult>()
+    suspend fun updatePropic(propicUri: String): AuthResult = withContext(Dispatchers.IO) {
         val profileUpdates = userProfileChangeRequest {
             if (propicUri.isNotEmpty()) {
                 photoUri = propicUri.toUri()
             }
         }
 
-        fUser!!.updateProfile(profileUpdates)
-            .addOnCompleteListener { task ->
-                response.value = if (task.isSuccessful) {
-                    MyFinanceStorage.updateUser(fUser!!)
-                    AuthResult(AuthCode.USER_PROPIC_UPDATED)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.e(TAG, "Error! ${task.exception?.localizedMessage}")
-                    AuthResult(AuthCode.USER_PROPIC_NOT_UPDATED)
-                }
-            }
-        return response
+        return@withContext try {
+            fUser!!.updateProfile(profileUpdates).await()
+            MyFinanceStorage.updateUser(fUser!!)
+            AuthResult(AuthCode.USER_PROPIC_UPDATED)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error! ${e.localizedMessage}")
+            AuthResult(AuthCode.USER_PROPIC_NOT_UPDATED)
+        }
     }
 
-    fun updateFullName(fullName: String): LiveData<AuthResult> {
-        val response = MutableLiveData<AuthResult>()
+    suspend fun updateFullName(fullName: String): AuthResult = withContext(Dispatchers.IO) {
         val profileUpdates = userProfileChangeRequest {
             displayName = fullName
         }
 
-        fUser!!.updateProfile(profileUpdates)
-            .addOnCompleteListener { task ->
-                response.value = if (task.isSuccessful) {
-                    MyFinanceStorage.updateUser(fUser!!)
-                    AuthResult(AuthCode.USER_FULL_NAME_UPDATED)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.e(TAG, "Error! ${task.exception?.localizedMessage}")
-                    AuthResult(AuthCode.USER_FULL_NAME_NOT_UPDATED)
-                }
-            }
-        return response
+        return@withContext try {
+            fUser!!.updateProfile(profileUpdates).await()
+            MyFinanceStorage.updateUser(fUser!!)
+            AuthResult(AuthCode.USER_FULL_NAME_UPDATED)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error! ${e.localizedMessage}")
+            AuthResult(AuthCode.USER_FULL_NAME_NOT_UPDATED)
+        }
     }
 
     fun isUserLogged(): AuthResult {
@@ -101,159 +89,98 @@ class AuthManager @Inject constructor(
         }
     }
 
-    fun firebaseAuthWithGoogle(idToken: String): LiveData<AuthResult> {
-        val response = MutableLiveData<AuthResult>()
-
-        try {
+    suspend fun firebaseAuthWithGoogle(idToken: String): AuthResult = withContext(Dispatchers.IO) {
+        return@withContext try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
-            fAuth.signInWithCredential(credential)
-                .addOnCompleteListener { task ->
-                    response.value = if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "signInWithCredential:success")
-                        MyFinanceStorage.updateUser(task.result!!.user!!)
-                        AuthResult(AuthCode.LOGIN_SUCCESS)
-                    } else {
-                        // If sign in fails, display a message to the user
-                        Log.w(TAG, "signInWithCredential:failure", task.exception)
-                        AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
-                    }
-                }
+            val authResult = fAuth.signInWithCredential(credential).await()
+            Log.d(TAG, "signInWithCredential:success")
+            MyFinanceStorage.updateUser(authResult.user!!)
+            AuthResult(AuthCode.LOGIN_SUCCESS)
         } catch (e: ApiException) {
-            // Google Sign In failed, update UI appropriately
             Log.e(TAG, "Error! ${e.localizedMessage}")
-            response.value = AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
+            AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
+        } catch (e: Exception) {
+            Log.w(TAG, "signInWithCredential:failure", e)
+            AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
         }
-
-        return response
     }
 
-    fun defaultLogin(email: String, password: String): LiveData<AuthResult> {
-        val response = MutableLiveData<AuthResult>()
-
-        // authenticate the user
-        fAuth.signInWithEmailAndPassword(email, password)
-            .addOnSuccessListener { authResult ->
-                MyFinanceStorage.updateUser(authResult.user!!)
-                response.value = AuthResult(AuthCode.LOGIN_SUCCESS)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                when (e) {
-                    is FirebaseAuthInvalidCredentialsException -> {
-                        when (e.errorCode) {
-                            SignupException.EXCEPTION_INVALID_EMAIL.value -> response.value =
-                                AuthResult(
-                                    AuthCode.INVALID_EMAIL
-                                )
-
-                            SignupException.EXCEPTION_WRONG_PASSWORD.value -> response.value =
-                                AuthResult(
-                                    AuthCode.WRONG_PASSWORD
-                                )
-
-                            else -> response.value = AuthResult(AuthCode.LOGIN_FAILURE)
-                        }
+    suspend fun defaultLogin(email: String, password: String): AuthResult = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val authResult = fAuth.signInWithEmailAndPassword(email, password).await()
+            MyFinanceStorage.updateUser(authResult.user!!)
+            AuthResult(AuthCode.LOGIN_SUCCESS)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error! ${e.localizedMessage}")
+            when (e) {
+                is FirebaseAuthInvalidCredentialsException -> {
+                    when (e.errorCode) {
+                        SignupException.EXCEPTION_INVALID_EMAIL.value -> AuthResult(AuthCode.INVALID_EMAIL)
+                        SignupException.EXCEPTION_WRONG_PASSWORD.value -> AuthResult(AuthCode.WRONG_PASSWORD)
+                        else -> AuthResult(AuthCode.LOGIN_FAILURE)
                     }
-
-                    is FirebaseAuthInvalidUserException -> {
-                        when (e.errorCode) {
-                            SignupException.EXCEPTION_USER_NOT_FOUND.value -> response.value =
-                                AuthResult(
-                                    AuthCode.USER_NOT_FOUND
-                                )
-
-                            SignupException.EXCEPTION_USER_DISABLED.value -> response.value =
-                                AuthResult(
-                                    AuthCode.USER_DISABLED
-                                )
-
-                            else -> response.value = AuthResult(AuthCode.LOGIN_FAILURE)
-                        }
+                }
+                is FirebaseAuthInvalidUserException -> {
+                    when (e.errorCode) {
+                        SignupException.EXCEPTION_USER_NOT_FOUND.value -> AuthResult(AuthCode.USER_NOT_FOUND)
+                        SignupException.EXCEPTION_USER_DISABLED.value -> AuthResult(AuthCode.USER_DISABLED)
+                        else -> AuthResult(AuthCode.LOGIN_FAILURE)
                     }
-
-                    else -> response.value = AuthResult(AuthCode.LOGIN_FAILURE)
                 }
+                else -> AuthResult(AuthCode.LOGIN_FAILURE)
             }
-
-        return response
+        }
     }
 
-    fun resetPassword(email: String): LiveData<AuthResult> {
-        val response = MutableLiveData<AuthResult>()
-
-        fAuth.sendPasswordResetEmail(email)
-            .addOnSuccessListener {
-                response.value = AuthResult(AuthCode.EMAIL_SENT)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                if (e is FirebaseTooManyRequestsException) {
-                    response.value = AuthResult(AuthCode.EMAIL_NOT_SENT_TOO_MANY_REQUESTS)
-                } else {
-                    response.value = AuthResult(AuthCode.EMAIL_NOT_SENT)
-                }
+    suspend fun resetPassword(email: String): AuthResult = withContext(Dispatchers.IO) {
+        return@withContext try {
+            fAuth.sendPasswordResetEmail(email).await()
+            AuthResult(AuthCode.EMAIL_SENT)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error! ${e.localizedMessage}")
+            if (e is FirebaseTooManyRequestsException) {
+                AuthResult(AuthCode.EMAIL_NOT_SENT_TOO_MANY_REQUESTS)
+            } else {
+                AuthResult(AuthCode.EMAIL_NOT_SENT)
             }
-
-        return response
+        }
     }
 
-    fun signup(fullName: String, email: String, password: String): LiveData<AuthResult> {
-        val response = MutableLiveData<AuthResult>()
+    suspend fun signup(fullName: String, email: String, password: String): AuthResult = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val authResult = fAuth.createUserWithEmailAndPassword(email, password).await()
+            val fUser = authResult.user
 
-        fAuth.createUserWithEmailAndPassword(email, password)
-            .addOnSuccessListener { authResult ->
-                // verify the email
-                val fUser = authResult.user
+            fUser?.sendEmailVerification()?.await()
+            Log.d(TAG, AuthCode.EMAIL_SENT.message)
 
-                fUser?.sendEmailVerification()?.addOnSuccessListener {
-                    Log.d(TAG, AuthCode.EMAIL_SENT.message)
-                }?.addOnFailureListener { e ->
-                    Log.e(TAG, "Error! ${e.localizedMessage}")
-                }
+            val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(fullName).build()
+            fUser?.updateProfile(profileUpdates)?.await()
 
-                val profileUpdates =
-                    UserProfileChangeRequest.Builder().setDisplayName(fullName).build()
-
-                fUser?.updateProfile(profileUpdates)?.addOnSuccessListener {
-                    MyFinanceStorage.updateUser(authResult.user!!)
-                    response.value = AuthResult(AuthCode.SIGNUP_SUCCESS)
-                }?.addOnFailureListener { e ->
-                    Log.e(TAG, "Error! ${e.localizedMessage}")
-                    response.value = AuthResult(AuthCode.SIGNUP_PROFILE_NOT_UPDATED)
-                }
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                when (e) {
-                    is FirebaseAuthWeakPasswordException ->
-                        response.value = AuthResult(AuthCode.WEAK_PASSWORD)
-
-                    is FirebaseAuthInvalidCredentialsException ->
-                        response.value = AuthResult(AuthCode.EMAIL_NOT_WELL_FORMED)
-
-                    is FirebaseAuthUserCollisionException ->
-                        response.value = AuthResult(AuthCode.EMAIL_ALREADY_ASSOCIATED)
-
-                    else -> response.value = AuthResult(AuthCode.SIGNUP_FAILURE)
-                }
+            MyFinanceStorage.updateUser(authResult.user!!)
+            AuthResult(AuthCode.SIGNUP_SUCCESS)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error! ${e.localizedMessage}")
+            when (e) {
+                is FirebaseAuthWeakPasswordException -> AuthResult(AuthCode.WEAK_PASSWORD)
+                is FirebaseAuthInvalidCredentialsException -> AuthResult(AuthCode.EMAIL_NOT_WELL_FORMED)
+                is FirebaseAuthUserCollisionException -> AuthResult(AuthCode.EMAIL_ALREADY_ASSOCIATED)
+                else -> AuthResult(AuthCode.SIGNUP_FAILURE)
             }
-
-        return response
+        }
     }
 
-    fun logout(): LiveData<AuthResult> {
-        val response = MutableLiveData<AuthResult>()
-
+    suspend fun logout(): AuthResult = withContext(Dispatchers.IO) {
         fAuth.signOut()
 
-        CoroutineScope(Dispatchers.IO).launch {
-            expensesLocalRepository.deleteAll()
-            incomesLocalRepository.deleteAll()
-        }
+        expensesLocalRepository.deleteAll()
+        incomesLocalRepository.deleteAll()
+        
         setSharedMonthlyBudget(sharedPreferences, 0.0)
         MyFinanceStorage.resetBudget()
         MyFinanceStorage.resetLabels()
         MyFinanceStorage.resetUser()
 
-        response.value = AuthResult(AuthCode.LOGOUT_SUCCESS)
-        return (response)
+        return@withContext AuthResult(AuthCode.LOGOUT_SUCCESS)
     }
 }

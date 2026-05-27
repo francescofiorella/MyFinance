@@ -1,6 +1,8 @@
 package com.frafio.myfinance.ui.navigation
 
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -33,15 +35,19 @@ fun rememberMyFinanceAppState(
         topLevelKeys = TOP_LEVEL_NAV_KEYS
     )
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     NavigationTrackingSideEffect(navigationState)
 
     return remember(
         navigationState,
         coroutineScope,
+        snackbarHostState
     ) {
         MyFinanceAppState(
             navigationState = navigationState,
             coroutineScope = coroutineScope,
+            snackbarHostState = snackbarHostState
         )
     }
 }
@@ -50,6 +56,7 @@ fun rememberMyFinanceAppState(
 class MyFinanceAppState(
     val navigationState: NavigationState,
     val coroutineScope: CoroutineScope,
+    val snackbarHostState: SnackbarHostState
 ) {
     var showProgress by mutableStateOf(false)
 
@@ -59,6 +66,26 @@ class MyFinanceAppState(
     fun onReselect(key: NavKey) {
         coroutineScope.launch {
             _reselectEvent.emit(key)
+        }
+    }
+
+    fun showSnackBar(
+        message: String,
+        actionText: String? = null,
+        actionFun: () -> Unit = {},
+        dismissFun: () -> Unit = {}
+    ) {
+        coroutineScope.launch {
+            val result = snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = actionText,
+                duration = SnackbarDuration.Short
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                actionFun()
+            } else {
+                dismissFun()
+            }
         }
     }
 }

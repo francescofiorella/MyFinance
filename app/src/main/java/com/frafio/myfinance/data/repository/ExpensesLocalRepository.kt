@@ -1,6 +1,6 @@
 package com.frafio.myfinance.data.repository
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.storage.MyFinanceDatabase
@@ -14,33 +14,33 @@ class ExpensesLocalRepository @Inject constructor(
     private val expenseDao =
         MyFinanceDatabase.getDatabase(context).expenseDao()
 
-    fun getWithFilter(name: String, categories: List<Int>): LiveData<List<Expense>> =
+    fun getWithFilter(name: String, categories: List<Int>): Flow<List<Expense>> =
         expenseDao.getWithFilter(name, categories)
 
-    fun getWithFilterDate(name: String, categories: List<Int>, firstTimestamp: Long, lastTimestamp: Long): LiveData<List<Expense>> =
+    fun getWithFilterDate(name: String, categories: List<Int>, firstTimestamp: Long, lastTimestamp: Long): Flow<List<Expense>> =
         expenseDao.getWithFilterDate(name, categories, firstTimestamp, lastTimestamp)
 
-    fun getCount(): LiveData<Int> = expenseDao.getCount()
+    fun getCount(): Flow<Int> = expenseDao.getCount()
 
-    fun getPriceSumFromDay(year: Int, month: Int, day: Int): LiveData<Double?> =
+    fun getPriceSumFromDay(year: Int, month: Int, day: Int): Flow<Double?> =
         expenseDao.getPriceSumOfDay(year, month, day)
 
-    fun getPriceSumFromMonth(year: Int, month: Int): LiveData<Double?> =
+    fun getPriceSumFromMonth(year: Int, month: Int): Flow<Double?> =
         expenseDao.getPriceSumOfMonth(year, month)
 
-    fun getPriceSumFromYear(year: Int): LiveData<Double?> =
+    fun getPriceSumFromYear(year: Int): Flow<Double?> =
         expenseDao.getPriceSumOfYear(year)
 
     fun getPriceSumAfterAndBefore(
         firstTimestamp: Long,
         lastTimestamp: Long
-    ): LiveData<List<BarChartEntry>> =
+    ): Flow<List<BarChartEntry>> =
         expenseDao.getPriceSumAfterAndBefore(firstTimestamp, lastTimestamp)
 
-    fun getExpensesOfMonth(year: Int, month: Int): LiveData<List<Expense>> =
+    fun getExpensesOfMonth(year: Int, month: Int): Flow<List<Expense>> =
         expenseDao.getExpensesOfMonth(year, month)
 
-    fun getExpensesOfYear(year: Int): LiveData<List<Expense>> =
+    fun getExpensesOfYear(year: Int): Flow<List<Expense>> =
         expenseDao.getExpensesOfYear(year)
 
     fun getAllSync(): List<Expense> = expenseDao.getAllSync()

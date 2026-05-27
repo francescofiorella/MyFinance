@@ -3,11 +3,23 @@ package com.frafio.myfinance.ui.auth
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed class AuthUiEvent {
+    object Loading : AuthUiEvent()
+    data class Success(val authResult: AuthResult) : AuthUiEvent()
+    data class Error(val authResult: AuthResult) : AuthUiEvent()
+    data class NavigateToHome(val userName: String) : AuthUiEvent()
+}
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -20,88 +32,108 @@ class AuthViewModel @Inject constructor(
     var fullName: String? = null
     var passwordConfirm: String? = null
 
-    var authListener: AuthListener? = null
-
     var isSigningUp: Boolean = false
 
     var credentialManager: CredentialManager? = null
 
+    private val _uiEvents = MutableSharedFlow<AuthUiEvent>()
+    val uiEvents: SharedFlow<AuthUiEvent> = _uiEvents.asSharedFlow()
+
     fun onLoginButtonClick() {
-        authListener?.onAuthStarted()
+        viewModelScope.launch {
+            _uiEvents.emit(AuthUiEvent.Loading)
 
-        var hasError = false
-        if (email.isNullOrEmpty()) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_EMAIL))
-            hasError = true
+            var hasError = false
+            if (email.isNullOrEmpty()) {
+                _uiEvents.emit(AuthUiEvent.Error(AuthResult(AuthCode.EMPTY_EMAIL)))
+                hasError = true
+            }
+
+            if (password.isNullOrEmpty()) {
+                _uiEvents.emit(AuthUiEvent.Error(AuthResult(AuthCode.EMPTY_PASSWORD)))
+                hasError = true
+            }
+
+            if (!password.isNullOrEmpty() && password!!.length < 8) {
+                _uiEvents.emit(AuthUiEvent.Error(AuthResult(AuthCode.SHORT_PASSWORD)))
+                hasError = true
+            }
+
+            if (hasError) return@launch
+
+            val loginResult = userRepository.userLogin(email!!, password!!)
+            if (loginResult.code == AuthCode.LOGIN_SUCCESS.code) {
+                _uiEvents.emit(AuthUiEvent.NavigateToHome(getUserName()))
+            } else {
+                _uiEvents.emit(AuthUiEvent.Success(loginResult))
+            }
         }
-
-        if (password.isNullOrEmpty()) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_PASSWORD))
-            hasError = true
-        }
-
-        if (!password.isNullOrEmpty() && password!!.length < 8) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.SHORT_PASSWORD))
-            hasError = true
-        }
-
-        if (hasError) return
-
-        val loginResponse = userRepository.userLogin(email!!, password!!)
-        authListener?.onAuthSuccess(loginResponse)
     }
 
     fun resetPassword(email: String) {
-        authListener?.onAuthStarted()
-        val resetResponse = userRepository.resetPassword(email)
-        authListener?.onAuthSuccess(resetResponse)
+        viewModelScope.launch {
+            _uiEvents.emit(AuthUiEvent.Loading)
+            val resetResult = userRepository.resetPassword(email)
+            _uiEvents.emit(AuthUiEvent.Success(resetResult))
+        }
     }
 
     fun onGoogleRequest(credential: Credential) {
-        authListener?.onAuthStarted()
-
-        val googleResponse = userRepository.userLogin(credential)
-        authListener?.onAuthSuccess(googleResponse)
+        viewModelScope.launch {
+            _uiEvents.emit(AuthUiEvent.Loading)
+            val googleResult = userRepository.userLogin(credential)
+            if (googleResult.code == AuthCode.LOGIN_SUCCESS.code) {
+                _uiEvents.emit(AuthUiEvent.NavigateToHome(getUserName()))
+            } else {
+                _uiEvents.emit(AuthUiEvent.Success(googleResult))
+            }
+        }
     }
 
     fun onSignupButtonClick() {
-        authListener?.onAuthStarted()
+        viewModelScope.launch {
+            _uiEvents.emit(AuthUiEvent.Loading)
 
-        // check info
-        var hasError = false
-        if (fullName.isNullOrEmpty()) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_NAME))
-            hasError = true
+            // check info
+            var hasError = false
+            if (fullName.isNullOrEmpty()) {
+                _uiEvents.emit(AuthUiEvent.Error(AuthResult(AuthCode.EMPTY_NAME)))
+                hasError = true
+            }
+
+            if (email.isNullOrEmpty()) {
+                _uiEvents.emit(AuthUiEvent.Error(AuthResult(AuthCode.EMPTY_EMAIL)))
+                hasError = true
+            }
+
+            if (password.isNullOrEmpty()) {
+                _uiEvents.emit(AuthUiEvent.Error(AuthResult(AuthCode.EMPTY_PASSWORD)))
+                hasError = true
+            } else if (password!!.length < 8) {
+                _uiEvents.emit(AuthUiEvent.Error(AuthResult(AuthCode.SHORT_PASSWORD)))
+                hasError = true
+            }
+
+            if (passwordConfirm.isNullOrEmpty()) {
+                _uiEvents.emit(AuthUiEvent.Error(AuthResult(AuthCode.EMPTY_CONFIRM_PASSWORD)))
+                hasError = true
+            } else if (!password.isNullOrEmpty() && passwordConfirm != password) {
+                _uiEvents.emit(AuthUiEvent.Error(AuthResult(AuthCode.PASSWORD_NOT_MATCH)))
+                hasError = true
+            }
+
+            if (hasError) return@launch
+
+            val signupResult = userRepository.userSignup(fullName!!, email!!, password!!)
+            if (signupResult.code == AuthCode.SIGNUP_SUCCESS.code) {
+                _uiEvents.emit(AuthUiEvent.NavigateToHome(getUserName()))
+            } else {
+                _uiEvents.emit(AuthUiEvent.Success(signupResult))
+            }
         }
-
-        if (email.isNullOrEmpty()) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_EMAIL))
-            hasError = true
-        }
-
-        if (password.isNullOrEmpty()) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_PASSWORD))
-            hasError = true
-        } else if (password!!.length < 8) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.SHORT_PASSWORD))
-            hasError = true
-        }
-
-        if (passwordConfirm.isNullOrEmpty()) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.EMPTY_CONFIRM_PASSWORD))
-            hasError = true
-        } else if (!password.isNullOrEmpty() && passwordConfirm != password) {
-            authListener?.onAuthFailure(AuthResult(AuthCode.PASSWORD_NOT_MATCH))
-            hasError = true
-        }
-
-        if (hasError) return
-
-        val signupResponse = userRepository.userSignup(fullName!!, email!!, password!!)
-        authListener?.onAuthSuccess(signupResponse)
     }
 
     fun getUserName(): String {
-        return userRepository.getUser()!!.fullName!!
+        return userRepository.getUser()?.fullName ?: ""
     }
 }

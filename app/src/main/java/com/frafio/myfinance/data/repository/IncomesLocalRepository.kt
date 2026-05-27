@@ -1,6 +1,6 @@
 package com.frafio.myfinance.data.repository
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.storage.MyFinanceDatabase
 import javax.inject.Inject
@@ -13,9 +13,9 @@ class IncomesLocalRepository @Inject constructor(
     private val incomeDao =
         MyFinanceDatabase.getDatabase(context).incomeDao()
 
-    fun getAll(): LiveData<List<Income>> = incomeDao.getAll()
+    fun getAll(): Flow<List<Income>> = incomeDao.getAll()
 
-    fun getPriceSumFromYear(year: Int): LiveData<Double?> =
+    fun getPriceSumFromYear(year: Int): Flow<Double?> =
         incomeDao.getPriceSumOfYear(year)
 
     fun insertIncome(income: Income) = incomeDao.insertIncome(income)

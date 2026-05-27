@@ -1,20 +1,21 @@
 package com.frafio.myfinance.ui.home.budget
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.manager.IncomesManager.Companion.DEFAULT_LIMIT
 import com.frafio.myfinance.data.model.Income
+import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.data.repository.IncomeRepository
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
-import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.frafio.myfinance.utils.addTotalsToIncomes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -26,6 +27,20 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class BudgetUiEvent {
+
+    data class ShowSnackBar(
+        val message: String,
+        val actionText: String? = null,
+        val actionFun: () -> Unit = {},
+        val dismissFun: () -> Unit = {}
+    ) : BudgetUiEvent()
+    object LoadingStarted : BudgetUiEvent()
+    object LoadingFinished : BudgetUiEvent()
+    data class BudgetUpdated(val previousBudget: Double) : BudgetUiEvent()
+    data class IncomeDeleted(val income: Income) : BudgetUiEvent()
+}
+
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
     private val expensesRepository: ExpensesRepository,
@@ -33,21 +48,21 @@ class BudgetViewModel @Inject constructor(
     incomesLocalRepository: IncomesLocalRepository
 ) : ViewModel() {
 
-    var listener: BudgetListener? = null
-
     private val _limit = MutableStateFlow(DEFAULT_LIMIT)
 
     private val _scrollToId = MutableSharedFlow<String?>(replay = 1)
     val scrollToId = _scrollToId.asSharedFlow()
 
-    val monthlyBudget: StateFlow<Double> = MyFinanceStorage.monthlyBudget.asFlow()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+    private val _uiEvents = MutableSharedFlow<BudgetUiEvent>()
+    val uiEvents: SharedFlow<BudgetUiEvent> = _uiEvents.asSharedFlow()
+
+    val monthlyBudget: StateFlow<Double> = MyFinanceStorage.monthlyBudget
 
     val annualBudget: StateFlow<Double> = monthlyBudget
         .map { it * 12 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
-    val incomes: StateFlow<List<Income>> = incomesLocalRepository.getAll().asFlow()
+    val incomes: StateFlow<List<Income>> = incomesLocalRepository.getAll()
         .combine(_limit) { list, limit ->
             list.take(limit.toInt())
         }
@@ -106,25 +121,46 @@ class BudgetViewModel @Inject constructor(
     }
 
     fun deleteMonthlyBudget() {
-        setMonthlyBudget(0.0, true)
+        setMonthlyBudget(0.0)
     }
 
-    fun setMonthlyBudget(budget: Double, getOldBudget: Boolean = false, notify: Boolean = true) {
-        listener?.onStarted(notify)
-        val previousBudget = if (getOldBudget) monthlyBudget.value else null
-        val response = expensesRepository.setMonthlyBudget(budget)
-        listener?.onCompleted(response, previousBudget, notify)
+    fun setMonthlyBudget(budget: Double, notify: Boolean = true) {
+        viewModelScope.launch {
+            _uiEvents.emit(BudgetUiEvent.LoadingStarted)
+            val previousBudget = monthlyBudget.value
+            val response = expensesRepository.setMonthlyBudget(budget)
+            if (notify) {
+                if (response.code == FinanceCode.BUDGET_UPDATE_SUCCESS.code) {
+                    _uiEvents.emit(BudgetUiEvent.BudgetUpdated(previousBudget))
+                } else {
+                    _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+                }
+            }
+            _uiEvents.emit(BudgetUiEvent.LoadingFinished)
+        }
     }
 
     fun deleteIncome(income: Income) {
-        listener?.onStarted()
-        val response = incomeRepository.deleteIncome(income)
-        listener?.onDeleteCompleted(response, income)
+        viewModelScope.launch {
+            _uiEvents.emit(BudgetUiEvent.LoadingStarted)
+            val response = incomeRepository.deleteIncome(income)
+            if (response.code == FinanceCode.INCOME_DELETE_SUCCESS.code) {
+                _uiEvents.emit(BudgetUiEvent.IncomeDeleted(income))
+            } else {
+                _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+            }
+            _uiEvents.emit(BudgetUiEvent.LoadingFinished)
+        }
     }
 
     fun addIncome(income: Income, notify: Boolean = true) {
-        listener?.onStarted(notify)
-        val response = incomeRepository.addIncome(income)
-        listener?.onCompleted(response, null, notify)
+        viewModelScope.launch {
+            _uiEvents.emit(BudgetUiEvent.LoadingStarted)
+            val response = incomeRepository.addIncome(income)
+            if (notify) {
+                _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+            }
+            _uiEvents.emit(BudgetUiEvent.LoadingFinished)
+        }
     }
 }

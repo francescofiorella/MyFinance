@@ -1,6 +1,5 @@
 package com.frafio.myfinance.data.repository
 
-import androidx.lifecycle.LiveData
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.manager.ExpensesManager
 import com.frafio.myfinance.data.model.Expense
@@ -10,19 +9,19 @@ import javax.inject.Singleton
 
 @Singleton
 class ExpensesRepository @Inject constructor(private val expensesManager: ExpensesManager) {
-    fun updateExpensesList(): LiveData<FinanceResult> {
+    suspend fun updateExpensesList(): FinanceResult {
         return expensesManager.updateExpensesList()
     }
 
-    fun deleteExpense(expense: Expense): LiveData<FinanceResult> {
+    suspend fun deleteExpense(expense: Expense): FinanceResult {
         return expensesManager.deleteExpense(expense)
     }
 
-    fun addExpense(expense: Expense): LiveData<FinanceResult> {
+    suspend fun addExpense(expense: Expense): FinanceResult {
         return expensesManager.addExpenses(expense)
     }
 
-    fun editExpense(expense: Expense): LiveData<FinanceResult> {
+    suspend fun editExpense(expense: Expense): FinanceResult {
         return expensesManager.editExpense(expense)
     }
 
@@ -34,11 +33,11 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
         return expensesManager.getDynamicColorActive()
     }
 
-    fun getMonthlyBudget(): LiveData<FinanceResult> {
+    suspend fun getMonthlyBudget(): FinanceResult {
         return expensesManager.getMonthlyBudget()
     }
 
-    fun setMonthlyBudget(budget: Double): LiveData<FinanceResult> {
+    suspend fun setMonthlyBudget(budget: Double): FinanceResult {
         return expensesManager.setMonthlyBudget(budget)
     }
 
@@ -46,14 +45,14 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
         expensesManager.updateLocalMonthlyBudget()
     }
 
-    fun getLabels(): LiveData<FinanceResult> {
+    suspend fun getLabels(): FinanceResult {
         return expensesManager.getLabels()
     }
 
-    fun setLabels(
+    suspend fun setLabels(
         labels: List<String>,
         successCode: FinanceCode = FinanceCode.LABELS_UPDATE_SUCCESS
-    ): LiveData<FinanceResult> {
+    ): FinanceResult {
         return expensesManager.setLabels(labels, successCode)
     }
 

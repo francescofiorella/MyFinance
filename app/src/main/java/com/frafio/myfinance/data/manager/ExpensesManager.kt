@@ -2,8 +2,6 @@ package com.frafio.myfinance.data.manager
 
 import android.content.SharedPreferences
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Expense
@@ -18,9 +16,9 @@ import com.frafio.myfinance.utils.setSharedLabels
 import com.frafio.myfinance.utils.setSharedMonthlyBudget
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -38,188 +36,150 @@ class ExpensesManager @Inject constructor(
     private val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
 
-    fun getMonthlyBudget(): LiveData<FinanceResult> {
-        val response = MutableLiveData<FinanceResult>()
-        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(MyFinanceStorage.user!!.email!!).get()
-            .addOnSuccessListener {
-                val value = it.data?.get(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value).toString()
-                    .toDoubleOrNull() ?: 0.0
-                setLocalMonthlyBudget(value)
-                MyFinanceStorage.updateBudget(value)
-                response.value = FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
-            }
-            .addOnFailureListener {
-                response.value = FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
-            }
-        return response
+    suspend fun getMonthlyBudget(): FinanceResult = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val document = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(MyFinanceStorage.user!!.email!!).get().await()
+            val value = document.data?.get(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value).toString()
+                .toDoubleOrNull() ?: 0.0
+            setLocalMonthlyBudget(value)
+            MyFinanceStorage.updateBudget(value)
+            FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
+        } catch (_: Exception) {
+            FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
+        }
     }
 
-    fun setMonthlyBudget(budget: Double): LiveData<FinanceResult> {
-        val response = MutableLiveData<FinanceResult>()
-        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(MyFinanceStorage.user!!.email!!)
-            .set(
-                hashMapOf(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value to budget),
-                SetOptions.merge()
-            )
-            .addOnSuccessListener {
-                setLocalMonthlyBudget(budget)
-                MyFinanceStorage.updateBudget(budget)
-                response.value = FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
-            }
-            .addOnFailureListener {
-                response.value = FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
-            }
-        return response
+    suspend fun setMonthlyBudget(budget: Double): FinanceResult = withContext(Dispatchers.IO) {
+        return@withContext try {
+            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(MyFinanceStorage.user!!.email!!)
+                .set(
+                    hashMapOf(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value to budget),
+                    SetOptions.merge()
+                ).await()
+            setLocalMonthlyBudget(budget)
+            MyFinanceStorage.updateBudget(budget)
+            FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
+        } catch (_: Exception) {
+            FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
+        }
     }
 
-    fun getLabels(): LiveData<FinanceResult> {
-        val response = MutableLiveData<FinanceResult>()
-        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(MyFinanceStorage.user!!.email!!).get()
-            .addOnSuccessListener {
-                val value = it.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
-                val labels = (value?.filterIsInstance<String>() ?: emptyList()).sorted()
-                setLocalLabels(labels)
-                MyFinanceStorage.updateLabels(labels)
-                response.value = FinanceResult(FinanceCode.LABELS_UPDATE_SUCCESS)
-            }
-            .addOnFailureListener {
-                response.value = FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
-            }
-        return response
+    suspend fun getLabels(): FinanceResult = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val document = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(MyFinanceStorage.user!!.email!!).get().await()
+            val value = document.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
+            val labels = (value?.filterIsInstance<String>() ?: emptyList()).sorted()
+            setLocalLabels(labels)
+            MyFinanceStorage.updateLabels(labels)
+            FinanceResult(FinanceCode.LABELS_UPDATE_SUCCESS)
+        } catch (_: Exception) {
+            FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
+        }
     }
 
-    fun setLabels(
+    suspend fun setLabels(
         labels: List<String>,
         successCode: FinanceCode = FinanceCode.LABELS_UPDATE_SUCCESS
-    ): LiveData<FinanceResult> {
-        val response = MutableLiveData<FinanceResult>()
+    ): FinanceResult = withContext(Dispatchers.IO) {
         val sortedLabels = labels.sorted()
-        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(MyFinanceStorage.user!!.email!!)
-            .set(hashMapOf(FirestoreEnums.FIELDS.LABELS.value to sortedLabels), SetOptions.merge())
-            .addOnSuccessListener {
-                setLocalLabels(sortedLabels)
-                MyFinanceStorage.updateLabels(sortedLabels)
-                response.value = FinanceResult(successCode)
-            }
-            .addOnFailureListener {
-                response.value = FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
-            }
-        return response
+        return@withContext try {
+            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(MyFinanceStorage.user!!.email!!)
+                .set(hashMapOf(FirestoreEnums.FIELDS.LABELS.value to sortedLabels), SetOptions.merge())
+                .await()
+            setLocalLabels(sortedLabels)
+            MyFinanceStorage.updateLabels(sortedLabels)
+            FinanceResult(successCode)
+        } catch (_: Exception) {
+            FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
+        }
     }
 
-    fun updateExpensesList(): LiveData<FinanceResult> {
-        val response = MutableLiveData<FinanceResult>()
+    suspend fun updateExpensesList(): FinanceResult = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val documentSnapshot = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(MyFinanceStorage.user!!.email!!).get().await()
+            
+            val labelsValue = documentSnapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
+            val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()
+            setLocalLabels(labels)
+            MyFinanceStorage.updateLabels(labels)
 
-        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(MyFinanceStorage.user!!.email!!).get()
-            .addOnSuccessListener { documentSnapshot ->
-                val labelsValue =
-                    documentSnapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
-                val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()
-                setLocalLabels(labels)
-                MyFinanceStorage.updateLabels(labels)
+            val queryDocumentSnapshots = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(MyFinanceStorage.user!!.email!!)
+                .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
+                .get().await()
 
-                fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                    .document(MyFinanceStorage.user!!.email!!)
-                    .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
-                    .get().addOnSuccessListener { queryDocumentSnapshots ->
-                        val expenseList = mutableListOf<Expense>()
-                        queryDocumentSnapshots.forEach { document ->
-                            var expense = document.toObject(Expense::class.java)
-                            expense.id = document.id
-                            val newLabels = expense.labels.toMutableList()
-                            for (label in expense.labels) {
-                                if (!labels.contains(label)) {
-                                    newLabels.remove(label)
-                                }
-                            }
-                            if (newLabels.size != expense.labels.size) {
-                                val updatedExpense = expense.copy(labels = newLabels)
-                                editExpense(updatedExpense)
-                                expense = updatedExpense
-                            }
-
-                            expenseList.add(expense)
-                        }
-                        CoroutineScope(Dispatchers.IO).launch {
-                            expensesLocalRepository.updateTable(expenseList)
-                        }
-                        response.value = FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS)
-                    }.addOnFailureListener { e ->
-                        val error = "Error! ${e.localizedMessage}"
-                        Log.e(TAG, error)
-                        response.value = FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_FAILURE)
+            val expenseList = mutableListOf<Expense>()
+            queryDocumentSnapshots.forEach { document ->
+                var expense = document.toObject(Expense::class.java)
+                expense.id = document.id
+                val newLabels = expense.labels.toMutableList()
+                for (label in expense.labels) {
+                    if (!labels.contains(label)) {
+                        newLabels.remove(label)
                     }
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error fetching labels! ${e.localizedMessage}")
-                response.value = FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_FAILURE)
-            }
+                }
+                if (newLabels.size != expense.labels.size) {
+                    val updatedExpense = expense.copy(labels = newLabels)
+                    editExpense(updatedExpense)
+                    expense = updatedExpense
+                }
 
-        return response
+                expenseList.add(expense)
+            }
+            expensesLocalRepository.updateTable(expenseList)
+            FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error! ${e.localizedMessage}")
+            FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_FAILURE)
+        }
     }
 
-    fun addExpenses(expense: Expense): LiveData<FinanceResult> {
-        val response = MutableLiveData<FinanceResult>()
-
-        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(MyFinanceStorage.user!!.email!!)
-            .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
-            .add(expense).addOnSuccessListener {
-                expense.id = it.id
-                CoroutineScope(Dispatchers.IO).launch {
-                    expensesLocalRepository.insertExpense(expense)
-                }
-                response.value = FinanceResult(FinanceCode.EXPENSE_ADD_SUCCESS)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = FinanceResult(FinanceCode.EXPENSE_ADD_FAILURE)
-            }
-
-        return response
+    suspend fun addExpenses(expense: Expense): FinanceResult = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val documentReference = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(MyFinanceStorage.user!!.email!!)
+                .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
+                .add(expense).await()
+            expense.id = documentReference.id
+            expensesLocalRepository.insertExpense(expense)
+            FinanceResult(FinanceCode.EXPENSE_ADD_SUCCESS)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error! ${e.localizedMessage}")
+            FinanceResult(FinanceCode.EXPENSE_ADD_FAILURE)
+        }
     }
 
-    fun editExpense(expense: Expense): LiveData<FinanceResult> {
-        val response = MutableLiveData<FinanceResult>()
-
-        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(MyFinanceStorage.user!!.email!!)
-            .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
-            .document(expense.id).set(expense).addOnSuccessListener {
-                CoroutineScope(Dispatchers.IO).launch {
-                    expensesLocalRepository.updateExpense(expense)
-                }
-                response.value = FinanceResult(FinanceCode.EXPENSE_EDIT_SUCCESS)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-                response.value = FinanceResult(FinanceCode.EXPENSE_EDIT_FAILURE)
-            }
-
-
-        return response
+    suspend fun editExpense(expense: Expense): FinanceResult = withContext(Dispatchers.IO) {
+        return@withContext try {
+            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(MyFinanceStorage.user!!.email!!)
+                .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
+                .document(expense.id).set(expense).await()
+            expensesLocalRepository.updateExpense(expense)
+            FinanceResult(FinanceCode.EXPENSE_EDIT_SUCCESS)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error! ${e.localizedMessage}")
+            FinanceResult(FinanceCode.EXPENSE_EDIT_FAILURE)
+        }
     }
 
-    fun deleteExpense(expense: Expense): LiveData<FinanceResult> {
-        val response = MutableLiveData<FinanceResult>()
-        fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-            .document(MyFinanceStorage.user!!.email!!)
-            .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
-            .document(expense.id).delete()
-            .addOnSuccessListener {
-                CoroutineScope(Dispatchers.IO).launch {
-                    expensesLocalRepository.deleteExpense(expense)
-                }
-                response.value = FinanceResult(FinanceCode.EXPENSE_DELETE_SUCCESS)
-            }.addOnFailureListener { e ->
-                Log.e(TAG, "Error! ${e.localizedMessage}")
-
-                response.value = FinanceResult(FinanceCode.EXPENSE_DELETE_FAILURE)
-            }
-
-        return response
+    suspend fun deleteExpense(expense: Expense): FinanceResult = withContext(Dispatchers.IO) {
+        return@withContext try {
+            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(MyFinanceStorage.user!!.email!!)
+                .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
+                .document(expense.id).delete().await()
+            expensesLocalRepository.deleteExpense(expense)
+            FinanceResult(FinanceCode.EXPENSE_DELETE_SUCCESS)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error! ${e.localizedMessage}")
+            FinanceResult(FinanceCode.EXPENSE_DELETE_FAILURE)
+        }
     }
 
     fun setDynamicColorActive(active: Boolean) {

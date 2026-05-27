@@ -12,26 +12,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
-import com.frafio.myfinance.R
-import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.db.FinanceCode
-import com.frafio.myfinance.data.model.AuthResult
-import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.ui.add.AddActivity
 import com.frafio.myfinance.ui.auth.AuthActivity
 import com.frafio.myfinance.ui.features.home.HomeScreen
-import com.frafio.myfinance.ui.navigation.LocalSnackbarHostState
 import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
 import com.frafio.myfinance.ui.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
@@ -44,31 +34,27 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 @AndroidEntryPoint
-class HomeActivity : ComponentActivity(), HomeListener {
+class HomeActivity : ComponentActivity() {
 
     private val viewModel by viewModels<HomeViewModel>()
 
     private var userRequest: Boolean = false
     private var isLayoutReady by mutableStateOf(false)
-    private var showProgress by mutableStateOf(false)
-    private val snackbarHostState = SnackbarHostState()
 
     private var addResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data!!
             val expenseRequest = data.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
             val message = data.getStringExtra(AddActivity.ADD_RESULT_MESSAGE) ?: ""
-            // totalId is used for scrolling, we might need a shared event for this now
-            // val totalId = data.getStringExtra(AddActivity.ADD_RESULT_TOTAL_ID) ?: ""
             when (expenseRequest) {
                 AddActivity.REQUEST_EXPENSE_CODE -> {
                     viewModel.navigateTo(MyFinanceNavKey.Expenses)
-                    showSnackBar(message)
+                    viewModel.showSnackBar(message)
                 }
 
                 AddActivity.REQUEST_INCOME_CODE -> {
                     viewModel.navigateTo(MyFinanceNavKey.Budget)
-                    showSnackBar(message)
+                    viewModel.showSnackBar(message)
                 }
             }
         }
@@ -80,9 +66,9 @@ class HomeActivity : ComponentActivity(), HomeListener {
             val editRequest = data?.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
 
             if (editRequest == AddActivity.REQUEST_EXPENSE_CODE) {
-                showSnackBar(FinanceCode.EXPENSE_EDIT_SUCCESS.message)
+                viewModel.showSnackBar(FinanceCode.EXPENSE_EDIT_SUCCESS.message)
             } else if (editRequest == AddActivity.REQUEST_INCOME_CODE) {
-                showSnackBar(FinanceCode.INCOME_EDIT_SUCCESS.message)
+                viewModel.showSnackBar(FinanceCode.INCOME_EDIT_SUCCESS.message)
             }
         }
     }
@@ -91,15 +77,29 @@ class HomeActivity : ComponentActivity(), HomeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
 
-        if (viewModel.isDynamicColorOn()) {
-            DynamicColors.applyToActivityIfAvailable(this)
-        }
-
         requestWindowFeature(Window.FEATURE_NO_TITLE)
 
         super.onCreate(savedInstanceState)
 
+        if (viewModel.isDynamicColorOn()) {
+            DynamicColors.applyToActivityIfAvailable(this)
+        }
+
         enableEdgeToEdge()
+
+        lifecycleScope.launch {
+            viewModel.logicEvents.collect { event ->
+                when (event) {
+                    HomeLogicEvent.UserLocalDataLoaded -> {
+                        isLayoutReady = true
+                    }
+
+                    HomeLogicEvent.UserNotLogged, HomeLogicEvent.LogoutSuccess -> {
+                        goToLoginActivity()
+                    }
+                }
+            }
+        }
 
         if (savedInstanceState == null) {
             userRequest =
@@ -122,27 +122,8 @@ class HomeActivity : ComponentActivity(), HomeListener {
                     }
                 }
             }
-        }
 
-        viewModel.listener = this
-        // Feature ViewModels are now managed by Navigation 3 entries
-
-        if (savedInstanceState == null) {
-            if (userRequest) {
-                showProgressIndicator()
-                viewModel.updateUserExpenses()
-                viewModel.updateUserIncomes()
-                viewModel.updateMonthlyBudget()
-                viewModel.updateLabels()
-                viewModel.updateLocalMonthlyBudget()
-                viewModel.updateLocalLabels()
-                intent.extras?.getString(AuthActivity.INTENT_USER_NAME).also { userName ->
-                    showSnackBar("${getString(R.string.login_successful)} $userName")
-                }
-                isLayoutReady = true
-            } else {
-                viewModel.checkUser()
-            }
+            viewModel.checkUser(userRequest)
         } else {
             isLayoutReady = true
         }
@@ -150,53 +131,54 @@ class HomeActivity : ComponentActivity(), HomeListener {
         setContent {
             MyFinanceTheme {
                 val appState = rememberMyFinanceAppState()
-                CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
-                    HomeScreen(
-                        appState = appState,
-                        viewModel = viewModel,
-                        showProgress = showProgress,
-                        onAddClick = { onAddButtonClick() },
-                        onLogoutClick = { viewModel.onLogoutButtonClick(View(this)) },
-                        onProPicClick = { viewModel.navigateTo(MyFinanceNavKey.Profile) },
-                        onEditExpense = { expense, position ->
-                            Intent(this, AddActivity::class.java).also {
-                                it.putExtra(
-                                    AddActivity.REQUEST_CODE_KEY,
-                                    AddActivity.REQUEST_EDIT_CODE
-                                )
-                                it.putExtra(
-                                    AddActivity.EXPENSE_REQUEST_KEY,
-                                    AddActivity.REQUEST_EXPENSE_CODE
-                                )
-                                it.putExtra(AddActivity.EXTRA_TRANSACTION, expense)
-                                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                                editResultLauncher.launch(it)
-                            }
-                        },
-                        onEditIncome = { income, position ->
-                            Intent(this, AddActivity::class.java).also {
-                                it.putExtra(
-                                    AddActivity.REQUEST_CODE_KEY,
-                                    AddActivity.REQUEST_EDIT_CODE
-                                )
-                                it.putExtra(
-                                    AddActivity.EXPENSE_REQUEST_KEY,
-                                    AddActivity.REQUEST_INCOME_CODE
-                                )
-                                it.putExtra(AddActivity.EXTRA_TRANSACTION, income)
-                                it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                                editResultLauncher.launch(it)
-                            }
-                        },
-                        getDateLabel = { start, end -> getDateChipLabel(start, end) },
-                        restartApplication = {
-                            val intent = packageManager.getLaunchIntentForPackage(packageName)
-                            val mainIntent = Intent.makeRestartActivityTask(intent!!.component)
-                            startActivity(mainIntent)
-                            Runtime.getRuntime().exit(0)
+                // show progress bar as it is loading data
+                // this is connected to viewModel.checkUser(userRequest)
+                // the ui event might be lost as it is called before the composition
+                if (savedInstanceState == null) appState.showProgress = true
+                HomeScreen(
+                    appState = appState,
+                    viewModel = viewModel,
+                    onAddClick = { onAddButtonClick() },
+                    onLogoutClick = { viewModel.onLogoutButtonClick(View(this)) },
+                    onProPicClick = { viewModel.navigateTo(MyFinanceNavKey.Profile) },
+                    onEditExpense = { expense, position ->
+                        Intent(this, AddActivity::class.java).also {
+                            it.putExtra(
+                                AddActivity.REQUEST_CODE_KEY,
+                                AddActivity.REQUEST_EDIT_CODE
+                            )
+                            it.putExtra(
+                                AddActivity.EXPENSE_REQUEST_KEY,
+                                AddActivity.REQUEST_EXPENSE_CODE
+                            )
+                            it.putExtra(AddActivity.EXTRA_TRANSACTION, expense)
+                            it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                            editResultLauncher.launch(it)
                         }
-                    )
-                }
+                    },
+                    onEditIncome = { income, position ->
+                        Intent(this, AddActivity::class.java).also {
+                            it.putExtra(
+                                AddActivity.REQUEST_CODE_KEY,
+                                AddActivity.REQUEST_EDIT_CODE
+                            )
+                            it.putExtra(
+                                AddActivity.EXPENSE_REQUEST_KEY,
+                                AddActivity.REQUEST_INCOME_CODE
+                            )
+                            it.putExtra(AddActivity.EXTRA_TRANSACTION, income)
+                            it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
+                            editResultLauncher.launch(it)
+                        }
+                    },
+                    getDateLabel = { start, end -> getDateChipLabel(start, end) },
+                    restartApplication = {
+                        val intent = packageManager.getLaunchIntentForPackage(packageName)
+                        val mainIntent = Intent.makeRestartActivityTask(intent!!.component)
+                        startActivity(mainIntent)
+                        Runtime.getRuntime().exit(0)
+                    }
+                )
             }
         }
     }
@@ -211,88 +193,11 @@ class HomeActivity : ComponentActivity(), HomeListener {
         }
     }
 
-    fun showSnackBar(
-        message: String,
-        actionText: String? = null,
-        actionFun: () -> Unit = {},
-        dismissFun: () -> Unit = {}
-    ) {
-        lifecycleScope.launch {
-            val result = snackbarHostState.showSnackbar(
-                message = message,
-                actionLabel = actionText,
-                duration = SnackbarDuration.Short
-            )
-            if (result == SnackbarResult.ActionPerformed) {
-                actionFun()
-            } else {
-                dismissFun()
-            }
-        }
-    }
-
-    override fun onLogOutSuccess(response: LiveData<AuthResult>) {
-        response.observe(this) { authResult ->
-            if (authResult.code == AuthCode.LOGOUT_SUCCESS.code) {
-                goToLoginActivity()
-            }
-        }
-    }
-
-    override fun onSplashOperationComplete(response: LiveData<AuthResult>) {
-        response.observe(this) { authResult ->
-            when (authResult.code) {
-                AuthCode.USER_LOGGED.code -> {
-                    showProgressIndicator()
-                    viewModel.updateUserExpenses()
-                    viewModel.updateUserIncomes()
-                    viewModel.updateMonthlyBudget()
-                    viewModel.updateLabels()
-                    viewModel.updateLocalMonthlyBudget()
-                    viewModel.updateLocalLabels()
-                    if (userRequest) {
-                        hideProgressIndicator()
-                        intent.extras?.getString(AuthActivity.INTENT_USER_NAME).also { userName ->
-                            showSnackBar("${getString(R.string.login_successful)} $userName")
-                        }
-                    }
-                    isLayoutReady = true
-                }
-
-                AuthCode.USER_NOT_LOGGED.code -> {
-                    goToLoginActivity()
-                }
-
-                else -> Unit
-            }
-        }
-    }
-
-    override fun onUserDataUpdated(response: LiveData<FinanceResult>) {
-        response.observe(this) { result ->
-            when (result.code) {
-                FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS.code -> {
-                    hideProgressIndicator()
-                }
-
-                else -> Unit
-            }
-        }
-    }
-
     private fun goToLoginActivity() {
         Intent(applicationContext, AuthActivity::class.java).also {
             startActivity(it)
             finish()
         }
-    }
-
-    fun showProgressIndicator() {
-        showProgress = true
-    }
-
-    fun hideProgressIndicator() {
-        showProgress = false
     }
 
     private fun getDateChipLabel(startDate: LocalDate, endDate: LocalDate): String {
