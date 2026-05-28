@@ -57,8 +57,6 @@
     <string name="back_arrow" translatable="false">Back Arrow</string>
 
     <string name="use_dynamic_color">Dynamic colors</string>
-    <string name="restart_app_changes">Restart the app to apply the changes</string>
-    <string name="restart">Restart</string>
 
     <string name="sign_up_provider">Signed up with Google</string>
     <string name="signUpDate">Account created in %1$s</string>

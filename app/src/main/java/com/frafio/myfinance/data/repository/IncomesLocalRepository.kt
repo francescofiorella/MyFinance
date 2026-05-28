@@ -1,19 +1,19 @@
 package com.frafio.myfinance.data.repository
 
 import kotlinx.coroutines.flow.Flow
+import com.frafio.myfinance.data.dao.IncomeDao
 import com.frafio.myfinance.data.model.Income
-import com.frafio.myfinance.data.storage.MyFinanceDatabase
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class IncomesLocalRepository @Inject constructor(
-    @dagger.hilt.android.qualifiers.ApplicationContext context: android.content.Context
+    private val incomeDao: IncomeDao
 ) {
-    private val incomeDao =
-        MyFinanceDatabase.getDatabase(context).incomeDao()
 
     fun getAll(): Flow<List<Income>> = incomeDao.getAll()
+
+    fun getCount(): Flow<Int> = incomeDao.getCount()
 
     fun getPriceSumFromYear(year: Int): Flow<Double?> =
         incomeDao.getPriceSumOfYear(year)

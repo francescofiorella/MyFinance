@@ -25,12 +25,8 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
         return expensesManager.editExpense(expense)
     }
 
-    fun setDynamicColorActive(active: Boolean) {
+    suspend fun setDynamicColorActive(active: Boolean) {
         expensesManager.setDynamicColorActive(active)
-    }
-
-    fun getDynamicColorActive(): Boolean {
-        return expensesManager.getDynamicColorActive()
     }
 
     suspend fun getMonthlyBudget(): FinanceResult {
@@ -39,10 +35,6 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
 
     suspend fun setMonthlyBudget(budget: Double): FinanceResult {
         return expensesManager.setMonthlyBudget(budget)
-    }
-
-    fun updateLocalMonthlyBudget() {
-        expensesManager.updateLocalMonthlyBudget()
     }
 
     suspend fun getLabels(): FinanceResult {
@@ -54,9 +46,5 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
         successCode: FinanceCode = FinanceCode.LABELS_UPDATE_SUCCESS
     ): FinanceResult {
         return expensesManager.setLabels(labels, successCode)
-    }
-
-    fun updateLocalLabels() {
-        expensesManager.updateLocalLabels()
     }
 }

@@ -32,6 +32,7 @@ import androidx.window.core.layout.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +48,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -81,12 +83,17 @@ fun HomeScreen(
     onProPicClick: () -> Unit,
     onEditExpense: (Expense, Int) -> Unit,
     onEditIncome: (Income, Int) -> Unit,
-    getDateLabel: (LocalDate, LocalDate) -> String,
-    restartApplication: () -> Unit
+    getDateLabel: (LocalDate, LocalDate) -> String
 ) {
     val navigator = remember { Navigator(appState.navigationState) }
     val currentTopLevelKey = appState.navigationState.currentTopLevelKey
-    val proPic = viewModel.getProPic()
+    val user by viewModel.user.collectAsStateWithLifecycle()
+    val proPic = user?.photoUrl
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+
+    LaunchedEffect(isLoading) {
+        appState.showProgress = isLoading
+    }
     
     val layoutType = if (windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
         NavigationSuiteType.NavigationRail
@@ -112,12 +119,6 @@ fun HomeScreen(
                         event.actionFun,
                         event.dismissFun
                     )
-                }
-                HomeUiEvent.LoadingStarted -> {
-                    appState.showProgress = true
-                }
-                HomeUiEvent.LoadingFinished -> {
-                    appState.showProgress = false
                 }
                 HomeUiEvent.LoginSuccess -> {
                     appState.showSnackBar("$loginSuccessString ${viewModel.getFullName()}")
@@ -199,8 +200,7 @@ fun HomeScreen(
                                 appState.coroutineScope.launch {
                                     snackbarHostState.showSnackbar(comingSoonString)
                                 }
-                            },
-                            restartApplication = restartApplication
+                            }
                         )
                     }
 

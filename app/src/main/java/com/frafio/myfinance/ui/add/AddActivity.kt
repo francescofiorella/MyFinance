@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,6 +35,7 @@ import com.frafio.myfinance.utils.getCategoryIcon
 import com.frafio.myfinance.utils.hideSoftKeyboard
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.material.chip.Chip
+import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -66,6 +68,14 @@ class AddActivity : AppCompatActivity() {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add)
         binding.viewModel = viewModel
+
+        lifecycleScope.launch {
+            viewModel.userPreferences.collect { prefs ->
+                if (prefs?.dynamicColor == true) {
+                    DynamicColors.applyToActivityIfAvailable(this@AddActivity)
+                }
+            }
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -142,7 +152,9 @@ class AddActivity : AppCompatActivity() {
         binding.addComposeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                MyFinanceTheme {
+                val userPreferences by viewModel.userPreferences.collectAsStateWithLifecycle()
+                val useDynamicColor = userPreferences?.dynamicColor ?: false
+                MyFinanceTheme(dynamicColor = useDynamicColor) {
                     CategorySheet(
                         show = showCategorySheet,
                         onDismiss = {

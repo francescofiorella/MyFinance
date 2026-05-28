@@ -1,22 +1,16 @@
 package com.frafio.myfinance.data.manager
 
-import android.content.SharedPreferences
 import android.util.Log
 import com.frafio.myfinance.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
-import com.frafio.myfinance.data.storage.MyFinanceStorage
-import com.frafio.myfinance.utils.getSharedDynamicColor
-import com.frafio.myfinance.utils.getSharedLabels
-import com.frafio.myfinance.utils.getSharedMonthlyBudget
-import com.frafio.myfinance.utils.setSharedDynamicColor
-import com.frafio.myfinance.utils.setSharedLabels
-import com.frafio.myfinance.utils.setSharedMonthlyBudget
+import com.frafio.myfinance.data.repository.UserPreferencesRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -24,7 +18,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ExpensesManager @Inject constructor(
-    private val sharedPreferences: SharedPreferences,
+    private val userPreferencesRepository: UserPreferencesRepository,
     private val expensesLocalRepository: ExpensesLocalRepository
 ) {
 
@@ -36,14 +30,18 @@ class ExpensesManager @Inject constructor(
     private val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
 
+    private suspend fun getUserEmail(): String? {
+        return userPreferencesRepository.userPreferencesFlow.first().user?.email
+    }
+
     suspend fun getMonthlyBudget(): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
         return@withContext try {
             val document = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!).get().await()
+                .document(email).get().await()
             val value = document.data?.get(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value).toString()
                 .toDoubleOrNull() ?: 0.0
-            setLocalMonthlyBudget(value)
-            MyFinanceStorage.updateBudget(value)
+            userPreferencesRepository.updateMonthlyBudget(value)
             FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
         } catch (_: Exception) {
             FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
@@ -51,15 +49,15 @@ class ExpensesManager @Inject constructor(
     }
 
     suspend fun setMonthlyBudget(budget: Double): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
         return@withContext try {
             fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!)
+                .document(email)
                 .set(
                     hashMapOf(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value to budget),
                     SetOptions.merge()
                 ).await()
-            setLocalMonthlyBudget(budget)
-            MyFinanceStorage.updateBudget(budget)
+            userPreferencesRepository.updateMonthlyBudget(budget)
             FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
         } catch (_: Exception) {
             FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
@@ -67,13 +65,13 @@ class ExpensesManager @Inject constructor(
     }
 
     suspend fun getLabels(): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
         return@withContext try {
             val document = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!).get().await()
+                .document(email).get().await()
             val value = document.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
             val labels = (value?.filterIsInstance<String>() ?: emptyList()).sorted()
-            setLocalLabels(labels)
-            MyFinanceStorage.updateLabels(labels)
+            userPreferencesRepository.updateLabels(labels)
             FinanceResult(FinanceCode.LABELS_UPDATE_SUCCESS)
         } catch (_: Exception) {
             FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
@@ -84,14 +82,14 @@ class ExpensesManager @Inject constructor(
         labels: List<String>,
         successCode: FinanceCode = FinanceCode.LABELS_UPDATE_SUCCESS
     ): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
         val sortedLabels = labels.sorted()
         return@withContext try {
             fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!)
+                .document(email)
                 .set(hashMapOf(FirestoreEnums.FIELDS.LABELS.value to sortedLabels), SetOptions.merge())
                 .await()
-            setLocalLabels(sortedLabels)
-            MyFinanceStorage.updateLabels(sortedLabels)
+            userPreferencesRepository.updateLabels(sortedLabels)
             FinanceResult(successCode)
         } catch (_: Exception) {
             FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
@@ -99,17 +97,17 @@ class ExpensesManager @Inject constructor(
     }
 
     suspend fun updateExpensesList(): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_FAILURE)
         return@withContext try {
             val documentSnapshot = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!).get().await()
+                .document(email).get().await()
             
             val labelsValue = documentSnapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
             val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()
-            setLocalLabels(labels)
-            MyFinanceStorage.updateLabels(labels)
+            userPreferencesRepository.updateLabels(labels)
 
             val queryDocumentSnapshots = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!)
+                .document(email)
                 .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
                 .get().await()
 
@@ -140,9 +138,10 @@ class ExpensesManager @Inject constructor(
     }
 
     suspend fun addExpenses(expense: Expense): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.EXPENSE_ADD_FAILURE)
         return@withContext try {
             val documentReference = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!)
+                .document(email)
                 .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
                 .add(expense).await()
             expense.id = documentReference.id
@@ -155,9 +154,10 @@ class ExpensesManager @Inject constructor(
     }
 
     suspend fun editExpense(expense: Expense): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.EXPENSE_EDIT_FAILURE)
         return@withContext try {
             fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!)
+                .document(email)
                 .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
                 .document(expense.id).set(expense).await()
             expensesLocalRepository.updateExpense(expense)
@@ -169,9 +169,10 @@ class ExpensesManager @Inject constructor(
     }
 
     suspend fun deleteExpense(expense: Expense): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.EXPENSE_DELETE_FAILURE)
         return@withContext try {
             fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!)
+                .document(email)
                 .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
                 .document(expense.id).delete().await()
             expensesLocalRepository.deleteExpense(expense)
@@ -182,27 +183,7 @@ class ExpensesManager @Inject constructor(
         }
     }
 
-    fun setDynamicColorActive(active: Boolean) {
-        setSharedDynamicColor(sharedPreferences, active)
-    }
-
-    fun getDynamicColorActive(): Boolean {
-        return getSharedDynamicColor(sharedPreferences)
-    }
-
-    private fun setLocalMonthlyBudget(value: Double) {
-        setSharedMonthlyBudget(sharedPreferences, value)
-    }
-
-    fun updateLocalMonthlyBudget() {
-        MyFinanceStorage.updateBudget(getSharedMonthlyBudget(sharedPreferences))
-    }
-
-    private fun setLocalLabels(value: List<String>) {
-        setSharedLabels(sharedPreferences, value)
-    }
-
-    fun updateLocalLabels() {
-        MyFinanceStorage.updateLabels(getSharedLabels(sharedPreferences))
+    suspend fun setDynamicColorActive(active: Boolean) {
+        userPreferencesRepository.updateDynamicColor(active)
     }
 }

@@ -7,14 +7,18 @@ import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.manager.AuthManager
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.data.model.User
-import com.frafio.myfinance.data.storage.MyFinanceStorage
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UserRepository @Inject constructor(private val authManager: AuthManager) {
+class UserRepository @Inject constructor(
+    private val authManager: AuthManager,
+    userPreferencesRepository: UserPreferencesRepository
+) {
 
     companion object {
         private val TAG = UserRepository::class.java.simpleName
@@ -58,15 +62,9 @@ class UserRepository @Inject constructor(private val authManager: AuthManager) {
         return authManager.logout()
     }
 
-    fun isUserLogged(): AuthResult {
+    suspend fun isUserLogged(): AuthResult {
         return authManager.isUserLogged()
     }
 
-    fun getUser(): User? {
-        return MyFinanceStorage.user
-    }
-
-    fun getProPic(): String? {
-        return MyFinanceStorage.user?.photoUrl
-    }
+    val userData: Flow<User?> = userPreferencesRepository.userPreferencesFlow.map { it.user }
 }

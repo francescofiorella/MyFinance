@@ -9,7 +9,8 @@ import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.repository.ExpensesRepository
 import com.frafio.myfinance.data.repository.IncomeRepository
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
-import com.frafio.myfinance.data.storage.MyFinanceStorage
+import com.frafio.myfinance.data.repository.LoadingRepository
+import com.frafio.myfinance.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.utils.addTotalsToIncomes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,8 +36,6 @@ sealed class BudgetUiEvent {
         val actionFun: () -> Unit = {},
         val dismissFun: () -> Unit = {}
     ) : BudgetUiEvent()
-    object LoadingStarted : BudgetUiEvent()
-    object LoadingFinished : BudgetUiEvent()
     data class BudgetUpdated(val previousBudget: Double) : BudgetUiEvent()
     data class IncomeDeleted(val income: Income) : BudgetUiEvent()
 }
@@ -45,7 +44,9 @@ sealed class BudgetUiEvent {
 class BudgetViewModel @Inject constructor(
     private val expensesRepository: ExpensesRepository,
     private val incomeRepository: IncomeRepository,
-    incomesLocalRepository: IncomesLocalRepository
+    incomesLocalRepository: IncomesLocalRepository,
+    userPreferencesRepository: UserPreferencesRepository,
+    private val loadingRepository: LoadingRepository
 ) : ViewModel() {
 
     private val _limit = MutableStateFlow(DEFAULT_LIMIT)
@@ -56,7 +57,9 @@ class BudgetViewModel @Inject constructor(
     private val _uiEvents = MutableSharedFlow<BudgetUiEvent>()
     val uiEvents: SharedFlow<BudgetUiEvent> = _uiEvents.asSharedFlow()
 
-    val monthlyBudget: StateFlow<Double> = MyFinanceStorage.monthlyBudget
+    val monthlyBudget: StateFlow<Double> = userPreferencesRepository.userPreferencesFlow
+        .map { it.monthlyBudget }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
     val annualBudget: StateFlow<Double> = monthlyBudget
         .map { it * 12 }
@@ -126,41 +129,50 @@ class BudgetViewModel @Inject constructor(
 
     fun setMonthlyBudget(budget: Double, notify: Boolean = true) {
         viewModelScope.launch {
-            _uiEvents.emit(BudgetUiEvent.LoadingStarted)
-            val previousBudget = monthlyBudget.value
-            val response = expensesRepository.setMonthlyBudget(budget)
-            if (notify) {
-                if (response.code == FinanceCode.BUDGET_UPDATE_SUCCESS.code) {
-                    _uiEvents.emit(BudgetUiEvent.BudgetUpdated(previousBudget))
-                } else {
-                    _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+            try {
+                loadingRepository.startLoading()
+                val previousBudget = monthlyBudget.value
+                val response = expensesRepository.setMonthlyBudget(budget)
+                if (notify) {
+                    if (response.code == FinanceCode.BUDGET_UPDATE_SUCCESS.code) {
+                        _uiEvents.emit(BudgetUiEvent.BudgetUpdated(previousBudget))
+                    } else {
+                        _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+                    }
                 }
+            } finally {
+                loadingRepository.stopLoading()
             }
-            _uiEvents.emit(BudgetUiEvent.LoadingFinished)
         }
     }
 
     fun deleteIncome(income: Income) {
         viewModelScope.launch {
-            _uiEvents.emit(BudgetUiEvent.LoadingStarted)
-            val response = incomeRepository.deleteIncome(income)
-            if (response.code == FinanceCode.INCOME_DELETE_SUCCESS.code) {
-                _uiEvents.emit(BudgetUiEvent.IncomeDeleted(income))
-            } else {
-                _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+            try {
+                loadingRepository.startLoading()
+                val response = incomeRepository.deleteIncome(income)
+                if (response.code == FinanceCode.INCOME_DELETE_SUCCESS.code) {
+                    _uiEvents.emit(BudgetUiEvent.IncomeDeleted(income))
+                } else {
+                    _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+                }
+            } finally {
+                loadingRepository.stopLoading()
             }
-            _uiEvents.emit(BudgetUiEvent.LoadingFinished)
         }
     }
 
     fun addIncome(income: Income, notify: Boolean = true) {
         viewModelScope.launch {
-            _uiEvents.emit(BudgetUiEvent.LoadingStarted)
-            val response = incomeRepository.addIncome(income)
-            if (notify) {
-                _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+            try {
+                loadingRepository.startLoading()
+                val response = incomeRepository.addIncome(income)
+                if (notify) {
+                    _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+                }
+            } finally {
+                loadingRepository.stopLoading()
             }
-            _uiEvents.emit(BudgetUiEvent.LoadingFinished)
         }
     }
 }

@@ -48,14 +48,6 @@ fun EntryProviderScope<NavKey>.expensesEntry(
                         )
                     }
 
-                    ExpensesUiEvent.LoadingStarted -> {
-                        appState.showProgress = true
-                    }
-
-                    ExpensesUiEvent.LoadingFinished -> {
-                        appState.showProgress = false
-                    }
-
                     is ExpensesUiEvent.ExpenseDeleted -> {
                         appState.showSnackBar(
                             expenseDeletedString,

@@ -8,6 +8,7 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -37,6 +38,7 @@ import com.frafio.myfinance.utils.instantHide
 import com.frafio.myfinance.utils.instantShow
 import com.frafio.myfinance.utils.snackBar
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -114,6 +116,14 @@ class AuthActivity : AppCompatActivity() {
         viewModel.credentialManager = CredentialManager.create(baseContext)
 
         lifecycleScope.launch {
+            viewModel.userPreferences.collect { prefs ->
+                if (prefs?.dynamicColor == true) {
+                    DynamicColors.applyToActivityIfAvailable(this@AuthActivity)
+                }
+            }
+        }
+
+        lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiEvents.collect { event ->
                     when (event) {
@@ -129,7 +139,9 @@ class AuthActivity : AppCompatActivity() {
         binding.authComposeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                MyFinanceTheme {
+                val userPreferences by viewModel.userPreferences.collectAsStateWithLifecycle()
+                val useDynamicColor = userPreferences?.dynamicColor ?: false
+                MyFinanceTheme(dynamicColor = useDynamicColor) {
                     ResetPasswordSheet(
                         show = showResetPasswordSheet,
                         onDismiss = {
@@ -177,6 +189,7 @@ class AuthActivity : AppCompatActivity() {
     }
 
     fun onGoogleButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        onAuthStarted()
         // Instantiate a Google sign-in request
         val googleIdOption = GetGoogleIdOption.Builder()
             // Your server's client ID

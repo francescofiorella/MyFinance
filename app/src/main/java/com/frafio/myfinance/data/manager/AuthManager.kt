@@ -1,14 +1,13 @@
 package com.frafio.myfinance.data.manager
 
-import android.content.SharedPreferences
 import android.util.Log
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.enums.auth.SignupException
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
-import com.frafio.myfinance.data.storage.MyFinanceStorage
-import com.frafio.myfinance.utils.setSharedMonthlyBudget
+import com.frafio.myfinance.data.repository.UserPreferencesRepository
+import com.frafio.myfinance.data.mapper.toUser
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
@@ -29,7 +28,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthManager @Inject constructor(
-    private val sharedPreferences: SharedPreferences,
+    private val userPreferencesRepository: UserPreferencesRepository,
     private val expensesLocalRepository: ExpensesLocalRepository,
     private val incomesLocalRepository: IncomesLocalRepository
 ) {
@@ -55,7 +54,7 @@ class AuthManager @Inject constructor(
 
         return@withContext try {
             fUser!!.updateProfile(profileUpdates).await()
-            MyFinanceStorage.updateUser(fUser!!)
+            userPreferencesRepository.updateUser(fUser!!.toUser())
             AuthResult(AuthCode.USER_PROPIC_UPDATED)
         } catch (e: Exception) {
             Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -70,7 +69,7 @@ class AuthManager @Inject constructor(
 
         return@withContext try {
             fUser!!.updateProfile(profileUpdates).await()
-            MyFinanceStorage.updateUser(fUser!!)
+            userPreferencesRepository.updateUser(fUser!!.toUser())
             AuthResult(AuthCode.USER_FULL_NAME_UPDATED)
         } catch (e: Exception) {
             Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -78,14 +77,13 @@ class AuthManager @Inject constructor(
         }
     }
 
-    fun isUserLogged(): AuthResult {
-        fUser.also {
-            return if (it != null) {
-                MyFinanceStorage.updateUser(it)
-                AuthResult(AuthCode.USER_LOGGED)
-            } else {
-                AuthResult(AuthCode.USER_NOT_LOGGED)
-            }
+    suspend fun isUserLogged(): AuthResult = withContext(Dispatchers.IO) {
+        val user = fUser
+        return@withContext if (user != null) {
+            userPreferencesRepository.updateUser(user.toUser())
+            AuthResult(AuthCode.USER_LOGGED)
+        } else {
+            AuthResult(AuthCode.USER_NOT_LOGGED)
         }
     }
 
@@ -94,7 +92,7 @@ class AuthManager @Inject constructor(
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             val authResult = fAuth.signInWithCredential(credential).await()
             Log.d(TAG, "signInWithCredential:success")
-            MyFinanceStorage.updateUser(authResult.user!!)
+            userPreferencesRepository.updateUser(authResult.user!!.toUser())
             AuthResult(AuthCode.LOGIN_SUCCESS)
         } catch (e: ApiException) {
             Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -108,7 +106,7 @@ class AuthManager @Inject constructor(
     suspend fun defaultLogin(email: String, password: String): AuthResult = withContext(Dispatchers.IO) {
         return@withContext try {
             val authResult = fAuth.signInWithEmailAndPassword(email, password).await()
-            MyFinanceStorage.updateUser(authResult.user!!)
+            userPreferencesRepository.updateUser(authResult.user!!.toUser())
             AuthResult(AuthCode.LOGIN_SUCCESS)
         } catch (e: Exception) {
             Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -157,7 +155,7 @@ class AuthManager @Inject constructor(
             val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(fullName).build()
             fUser?.updateProfile(profileUpdates)?.await()
 
-            MyFinanceStorage.updateUser(authResult.user!!)
+            userPreferencesRepository.updateUser(authResult.user!!.toUser())
             AuthResult(AuthCode.SIGNUP_SUCCESS)
         } catch (e: Exception) {
             Log.e(TAG, "Error! ${e.localizedMessage}")
@@ -176,10 +174,9 @@ class AuthManager @Inject constructor(
         expensesLocalRepository.deleteAll()
         incomesLocalRepository.deleteAll()
         
-        setSharedMonthlyBudget(sharedPreferences, 0.0)
-        MyFinanceStorage.resetBudget()
-        MyFinanceStorage.resetLabels()
-        MyFinanceStorage.resetUser()
+        userPreferencesRepository.updateMonthlyBudget(0.0)
+        userPreferencesRepository.updateLabels(emptyList())
+        userPreferencesRepository.clearUserData()
 
         return@withContext AuthResult(AuthCode.LOGOUT_SUCCESS)
     }

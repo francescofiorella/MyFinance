@@ -17,6 +17,9 @@ interface IncomeDao {
             "ORDER BY year DESC, month DESC, day DESC, price DESC")
     fun getAll(): Flow<List<Income>>
 
+    @Query("SELECT COUNT(*) FROM income")
+    fun getCount(): Flow<Int>
+
     @Query("SELECT SUM(price) " +
             "FROM income " +
             "WHERE year=:year")

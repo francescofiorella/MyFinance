@@ -6,15 +6,19 @@ import com.frafio.myfinance.BuildConfig
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.User
 import com.frafio.myfinance.data.repository.ExpensesRepository
+import com.frafio.myfinance.data.repository.LoadingRepository
 import com.frafio.myfinance.data.repository.UserRepository
+import com.frafio.myfinance.data.repository.UserPreferencesData
+import com.frafio.myfinance.data.repository.UserPreferencesRepository
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,20 +29,19 @@ sealed class ProfileUiEvent {
         val actionFun: () -> Unit = {},
         val dismissFun: () -> Unit = {}
     ) : ProfileUiEvent()
-    object LoadingStarted : ProfileUiEvent()
-    object LoadingFinished : ProfileUiEvent()
     data class FullNameUpdated(val previousFullName: String) : ProfileUiEvent()
-    object DynamicColorChanged : ProfileUiEvent()
 }
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val expensesRepository: ExpensesRepository
+    private val expensesRepository: ExpensesRepository,
+    userPreferencesRepository: UserPreferencesRepository,
+    private val loadingRepository: LoadingRepository
 ) : ViewModel() {
 
-    private val _user = MutableStateFlow(userRepository.getUser())
-    val user: StateFlow<User?> = _user.asStateFlow()
+    val user: StateFlow<User?> = userRepository.userData
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     private val _scrollToTop = MutableSharedFlow<Unit>(replay = 0)
     val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()
@@ -46,43 +49,45 @@ class ProfileViewModel @Inject constructor(
     private val _uiEvents = MutableSharedFlow<ProfileUiEvent>()
     val uiEvents: SharedFlow<ProfileUiEvent> = _uiEvents.asSharedFlow()
 
-    val googleSignIn: Boolean
-        get() = _user.value?.provider == User.GOOGLE_PROVIDER
+    val userPreferences: StateFlow<UserPreferencesData?> = userPreferencesRepository.userPreferencesFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val isSwitchDynamicColorChecked: StateFlow<Boolean> = userPreferences
+        .map { it?.dynamicColor ?: false }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     fun uploadPropic() {
         viewModelScope.launch {
-            _uiEvents.emit(ProfileUiEvent.LoadingStarted)
-            val propicUri = ""
-            val response = userRepository.updatePropic(propicUri)
-            if (response.code == AuthCode.USER_PROPIC_UPDATED.code) {
-                updateLocalUser()
+            try {
+                loadingRepository.startLoading()
+                val propicUri = ""
+                val response = userRepository.updatePropic(propicUri)
+                _uiEvents.emit(ProfileUiEvent.ShowSnackBar(response.message))
+            } finally {
+                loadingRepository.stopLoading()
             }
-            _uiEvents.emit(ProfileUiEvent.ShowSnackBar(response.message))
-            _uiEvents.emit(ProfileUiEvent.LoadingFinished)
         }
     }
 
     fun editFullName(fullName: String, notify: Boolean = true) {
         viewModelScope.launch {
-            _uiEvents.emit(ProfileUiEvent.LoadingStarted)
-            val previousFN = _user.value?.fullName ?: ""
-            val response = userRepository.updateFullName(fullName)
-            if (response.code == AuthCode.USER_FULL_NAME_UPDATED.code) {
-                updateLocalUser()
-                if (notify) {
-                    _uiEvents.emit(ProfileUiEvent.FullNameUpdated(previousFN))
+            try {
+                loadingRepository.startLoading()
+                val previousFN = user.value?.fullName ?: ""
+                val response = userRepository.updateFullName(fullName)
+                if (response.code == AuthCode.USER_FULL_NAME_UPDATED.code) {
+                    if (notify) {
+                        _uiEvents.emit(ProfileUiEvent.FullNameUpdated(previousFN))
+                    }
+                } else {
+                    if (notify) {
+                        _uiEvents.emit(ProfileUiEvent.ShowSnackBar(response.message))
+                    }
                 }
-            } else {
-                if (notify) {
-                    _uiEvents.emit(ProfileUiEvent.ShowSnackBar(response.message))
-                }
+            } finally {
+                loadingRepository.stopLoading()
             }
-            _uiEvents.emit(ProfileUiEvent.LoadingFinished)
         }
-    }
-
-    fun updateLocalUser() {
-        _user.value = userRepository.getUser()
     }
 
     fun scrollToTop() {
@@ -94,19 +99,10 @@ class ProfileViewModel @Inject constructor(
     val versionName: String = "MyFinance ${BuildConfig.VERSION_NAME}"
 
     val isDynamicColorAvailable: Boolean = DynamicColors.isDynamicColorAvailable()
-    
-    private val _isSwitchDynamicColorChecked = MutableStateFlow(getDynamicColorCheck())
-    val isSwitchDynamicColorChecked: StateFlow<Boolean> = _isSwitchDynamicColorChecked.asStateFlow()
 
     fun setDynamicColor(active: Boolean) {
-        expensesRepository.setDynamicColorActive(active)
-        _isSwitchDynamicColorChecked.value = active
         viewModelScope.launch {
-            _uiEvents.emit(ProfileUiEvent.DynamicColorChanged)
+            expensesRepository.setDynamicColorActive(active)
         }
-    }
-
-    private fun getDynamicColorCheck(): Boolean {
-        return expensesRepository.getDynamicColorActive()
     }
 }

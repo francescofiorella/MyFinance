@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,7 +26,7 @@ fun DashboardScreen(
     viewModel: DashboardViewModel,
     modifier: Modifier = Modifier
 ) {
-    val isListEmpty by viewModel.isListEmpty.collectAsState()
+    val isListEmpty by viewModel.isListEmpty.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     LaunchedEffect(viewModel.scrollToTop) {
@@ -57,20 +58,20 @@ fun DashboardContent(
     viewModel: DashboardViewModel,
     scrollState: ScrollState
 ) {
-    val monthShown by viewModel.monthShown.collectAsState()
-    val thisMonthSum by viewModel.thisMonthSum.collectAsState()
-    val thisYearSum by viewModel.thisYearSum.collectAsState()
-    val monthlyBudget by viewModel.monthlyBudget.collectAsState()
-    val todaySum by viewModel.todaySum.collectAsState()
-    val balanceYear by viewModel.balanceYearShown.collectAsState()
-    val incomesSum by viewModel.incomesSum.collectAsState()
-    val expensesSum by viewModel.expensesSum.collectAsState()
-    val barChartData by viewModel.barChartData.collectAsState()
-    val isNextBarDateEnabled by viewModel.isNextBarChartDateEnabled.collectAsState()
-    val pieExpenses by viewModel.pieChartExpenses.collectAsState()
-    val pieDate by viewModel.pieChartDate.collectAsState()
-    val monthlyShownInPie by viewModel.monthlyShownInPieChart.collectAsState()
-    val isNextPieDateEnabled by viewModel.isNextPieChartDateEnabled.collectAsState()
+    val monthShown by viewModel.monthShown.collectAsStateWithLifecycle()
+    val thisMonthSum by viewModel.thisMonthSum.collectAsStateWithLifecycle()
+    val thisYearSum by viewModel.thisYearSum.collectAsStateWithLifecycle()
+    val monthlyBudget by viewModel.monthlyBudget.collectAsStateWithLifecycle()
+    val todaySum by viewModel.todaySum.collectAsStateWithLifecycle()
+    val balanceYear by viewModel.balanceYearShown.collectAsStateWithLifecycle()
+    val incomesSum by viewModel.incomesSum.collectAsStateWithLifecycle()
+    val expensesSum by viewModel.expensesSum.collectAsStateWithLifecycle()
+    val barChartData by viewModel.barChartData.collectAsStateWithLifecycle()
+    val isNextBarDateEnabled by viewModel.isNextBarChartDateEnabled.collectAsStateWithLifecycle()
+    val pieExpenses by viewModel.pieChartExpenses.collectAsStateWithLifecycle()
+    val pieDate by viewModel.pieChartDate.collectAsStateWithLifecycle()
+    val monthlyShownInPie by viewModel.monthlyShownInPieChart.collectAsStateWithLifecycle()
+    val isNextPieDateEnabled by viewModel.isNextPieChartDateEnabled.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier

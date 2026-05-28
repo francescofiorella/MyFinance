@@ -24,9 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,8 +58,17 @@ fun ProfileScreen(
     viewModel: ProfileViewModel,
     onUploadProPic: () -> Unit
 ) {
-    val user by viewModel.user.collectAsState()
-    val isDynamicColorChecked by viewModel.isSwitchDynamicColorChecked.collectAsState()
+    val userState by viewModel.user.collectAsStateWithLifecycle()
+
+    // Preserve user data during logout transition to avoid "flashing"
+    var lastUser by remember { mutableStateOf<User?>(null) }
+    if (userState != null) {
+        lastUser = userState
+    }
+    val user = userState ?: lastUser
+    val googleSignIn = user?.provider == User.GOOGLE_PROVIDER
+
+    val isDynamicColorChecked by viewModel.isSwitchDynamicColorChecked.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     var showEditFullNameSheet by remember { mutableStateOf(false) }
@@ -84,7 +93,7 @@ fun ProfileScreen(
     ProfileContent(
         modifier = modifier,
         user = user,
-        googleSignIn = viewModel.googleSignIn,
+        googleSignIn = googleSignIn,
         versionName = viewModel.versionName,
         isDynamicColorAvailable = viewModel.isDynamicColorAvailable,
         isDynamicColorChecked = isDynamicColorChecked,

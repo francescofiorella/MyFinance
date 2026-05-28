@@ -55,13 +55,9 @@
     <string name="profile_picture">Immagine di profilo</string>
 
     <string name="use_dynamic_color">Colori dinamici</string>
-    <string name="restart_app_changes">Riavvia l\'app per applicare le modifiche</string>
-    <string name="restart">Riavvia</string>
 
     <string name="sign_up_provider">Registrato con Google</string>
     <string name="signUpDate">Account creato il %1$s</string>
-
-    <string name="change_content">Scambia contenuto</string>
 
     <string name="your_profile">Il tuo profilo</string>
     <string name="your_name">Il tuo nome</string>
@@ -69,12 +65,10 @@
     <string name="edit_profile">Modifica il tuo profilo</string>
     <string name="edit_propic">Carica la tua foto profilo</string>
     <string name="edit_full_name">Modifica il tuo nome</string>
-    <string name="expense_category_icon">Icona di categoria spesa</string>
     <string name="no_expenses">Nessuna spesa</string>
     <string name="no_incomes">Nessuna entrata</string>
     <string name="enter_your_budget">Inserisci il tuo budget mensile</string>
 
-    <string name="monthly_budget">Budget mensile</string>
     <string name="annual_budget">Budget annuale</string>
     <string name="incomes">Entrate</string>
 
@@ -106,6 +100,5 @@
     <string name="search">Cerca</string>
     <string name="filter">Filtro</string>
     <string name="date_range">Intervallo di date</string>
-    <string name="clear_text">Pulisci testo</string>
     <string name="annual_balance">Bilancio annuale</string>
 </resources>

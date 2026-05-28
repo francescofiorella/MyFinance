@@ -26,9 +26,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,15 +71,15 @@ fun ExpensesScreen(
     getDateLabel: (LocalDate, LocalDate) -> String,
     modifier: Modifier = Modifier,
 ) {
-    val expenses by viewModel.expenses.collectAsState()
-    val totalFilteredExpenses by viewModel.totalFilteredExpenses.collectAsState()
-    val isExpensesEmpty by viewModel.isExpensesEmpty.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val selectedCategories by viewModel.selectedCategories.collectAsState()
-    val selectedLabels by viewModel.selectedLabels.collectAsState()
-    val dateRange by viewModel.dateRange.collectAsState()
-    val itemMetadata by viewModel.itemMetadata.collectAsState()
-    val labels by viewModel.labels.collectAsState()
+    val expenses by viewModel.expenses.collectAsStateWithLifecycle()
+    val totalFilteredExpenses by viewModel.totalFilteredExpenses.collectAsStateWithLifecycle()
+    val isExpensesEmpty by viewModel.isExpensesEmpty.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val selectedCategories by viewModel.selectedCategories.collectAsStateWithLifecycle()
+    val selectedLabels by viewModel.selectedLabels.collectAsStateWithLifecycle()
+    val dateRange by viewModel.dateRange.collectAsStateWithLifecycle()
+    val itemMetadata by viewModel.itemMetadata.collectAsStateWithLifecycle()
+    val labels by viewModel.labels.collectAsStateWithLifecycle()
 
     var showFilterSheet by remember { mutableStateOf(value = false) }
     var showCategorySheet by remember { mutableStateOf(value = false) }
@@ -200,8 +200,23 @@ fun ExpensesScreen(
             } else {
                 if (checked) {
                     viewModel.addLabelToExpense(labelsTargetExpense!!, label)
+                    // update target label
+                    if (!labelsTargetExpense!!.labels.contains(label)) {
+                        val labels = labelsTargetExpense!!.labels.toMutableList()
+                        labels.add(label)
+                        labelsTargetExpense = labelsTargetExpense!!.copy(
+                            labels = labels
+                        )
+                    }
                 } else {
                     viewModel.removeLabelFromExpense(labelsTargetExpense!!, label)
+                    // update target label
+                    val labels = labelsTargetExpense!!.labels.toMutableList()
+                    if (labels.remove(label)) {
+                        labelsTargetExpense = labelsTargetExpense!!.copy(
+                            labels = labels
+                        )
+                    }
                 }
             }
         },

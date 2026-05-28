@@ -49,14 +49,6 @@ fun EntryProviderScope<NavKey>.budgetEntry(
                         }
                     }
 
-                    BudgetUiEvent.LoadingStarted -> {
-                        appState.showProgress = true
-                    }
-
-                    BudgetUiEvent.LoadingFinished -> {
-                        appState.showProgress = false
-                    }
-
                     is BudgetUiEvent.BudgetUpdated -> {
                         coroutineScope.launch {
                             appState.showSnackBar(

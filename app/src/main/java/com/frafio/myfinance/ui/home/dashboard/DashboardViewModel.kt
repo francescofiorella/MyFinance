@@ -6,7 +6,7 @@ import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
-import com.frafio.myfinance.data.storage.MyFinanceStorage
+import com.frafio.myfinance.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.utils.dateToUTCTimestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,7 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val expensesLocalRepository: ExpensesLocalRepository,
-    private val incomesLocalRepository: IncomesLocalRepository
+    private val incomesLocalRepository: IncomesLocalRepository,
+    userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val pieChartEntriesSize = 24
@@ -65,7 +66,9 @@ class DashboardViewModel @Inject constructor(
         .map { it ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
-    val monthlyBudget: StateFlow<Double> = MyFinanceStorage.monthlyBudget
+    val monthlyBudget: StateFlow<Double> = userPreferencesRepository.userPreferencesFlow
+        .map { it.monthlyBudget }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
     private val _monthlyShownInPieChart = MutableStateFlow(true)
     val monthlyShownInPieChart: StateFlow<Boolean> = _monthlyShownInPieChart.asStateFlow()

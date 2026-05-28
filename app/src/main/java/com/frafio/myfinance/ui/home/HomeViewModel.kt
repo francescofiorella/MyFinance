@@ -4,16 +4,28 @@ import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.data.enums.auth.AuthCode
+import com.frafio.myfinance.data.model.User
 import com.frafio.myfinance.data.repository.IncomeRepository
+import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.repository.ExpensesRepository
+import com.frafio.myfinance.data.repository.IncomesLocalRepository
+import com.frafio.myfinance.data.repository.LoadingRepository
+import com.frafio.myfinance.data.repository.UserPreferencesData
 import com.frafio.myfinance.data.repository.UserRepository
+import com.frafio.myfinance.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,19 +43,38 @@ sealed class HomeUiEvent {
         val dismissFun: () -> Unit = {}
     ) : HomeUiEvent()
     object LoginSuccess : HomeUiEvent()
-    object LoadingStarted : HomeUiEvent()
-    object LoadingFinished : HomeUiEvent()
 }
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val expensesRepository: ExpensesRepository,
-    private val incomeRepository: IncomeRepository
+    private val incomeRepository: IncomeRepository,
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val expensesLocalRepository: ExpensesLocalRepository,
+    private val incomesLocalRepository: IncomesLocalRepository,
+    private val loadingRepository: LoadingRepository
 ) : ViewModel() {
 
+    val isLoading: StateFlow<Boolean> = loadingRepository.isLoading
+
+    val userPreferences: StateFlow<UserPreferencesData?> = userPreferencesRepository.userPreferencesFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    val user: StateFlow<User?> = userPreferences
+        .map { it?.user }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
     private val _navEvents = Channel<MyFinanceNavKey>(Channel.BUFFERED)
-    val navEvents = _navEvents.receiveAsFlow()
+    val navEvents: Flow<MyFinanceNavKey> = _navEvents.receiveAsFlow()
 
     private val _uiEvents = MutableSharedFlow<HomeUiEvent>()
     val uiEvents: SharedFlow<HomeUiEvent> = _uiEvents.asSharedFlow()
@@ -73,39 +104,51 @@ class HomeViewModel @Inject constructor(
 
     fun checkUser(userRequest: Boolean) {
         viewModelScope.launch {
-            _uiEvents.emit(HomeUiEvent.LoadingStarted)
-            val authResult = userRepository.isUserLogged()
-            when (authResult.code) {
-                AuthCode.USER_LOGGED.code -> {
-                    updateUserData()
-                    if (userRequest) {
-                        _uiEvents.emit(HomeUiEvent.LoginSuccess)
+            try {
+                loadingRepository.startLoading()
+                val authResult = userRepository.isUserLogged()
+                when (authResult.code) {
+                    AuthCode.USER_LOGGED.code -> {
+                        updateUserData()
+                        if (userRequest) {
+                            _uiEvents.emit(HomeUiEvent.LoginSuccess)
+                        }
+                    }
+
+                    AuthCode.USER_NOT_LOGGED.code -> {
+                        _logicEvents.emit(HomeLogicEvent.UserNotLogged)
                     }
                 }
-                AuthCode.USER_NOT_LOGGED.code -> {
-                    _logicEvents.emit(HomeLogicEvent.UserNotLogged)
-                }
+            } finally {
+                loadingRepository.stopLoading()
             }
-            _uiEvents.emit(HomeUiEvent.LoadingFinished)
         }
     }
 
     private suspend fun updateUserData() {
-        expensesRepository.updateLocalMonthlyBudget()
-        expensesRepository.updateLocalLabels()
+        // Wait for first local emissions to ensure screen can be populated
+        userPreferencesRepository.userPreferencesFlow.first()
+        expensesLocalRepository.getCount().first()
+        incomesLocalRepository.getCount().first()
+
         _logicEvents.emit(HomeLogicEvent.UserLocalDataLoaded)
-        expensesRepository.updateExpensesList()
-        incomeRepository.updateIncomeList()
-        expensesRepository.getMonthlyBudget()
-        expensesRepository.getLabels()
+
+        // Remote sync in background
+        viewModelScope.launch {
+            try {
+                loadingRepository.startLoading()
+                expensesRepository.updateExpensesList()
+                incomeRepository.updateIncomeList()
+                expensesRepository.getMonthlyBudget()
+                expensesRepository.getLabels()
+            } finally {
+                loadingRepository.stopLoading()
+            }
+        }
     }
 
     fun getFullName(): String {
-        return userRepository.getUser()?.fullName ?: ""
-    }
-
-    fun getProPic(): String? {
-        return userRepository.getProPic()
+        return user.value?.fullName ?: ""
     }
 
     fun onLogoutButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -115,9 +158,5 @@ class HomeViewModel @Inject constructor(
                 _logicEvents.emit(HomeLogicEvent.LogoutSuccess)
             }
         }
-    }
-
-    fun isDynamicColorOn(): Boolean {
-        return expensesRepository.getDynamicColorActive()
     }
 }

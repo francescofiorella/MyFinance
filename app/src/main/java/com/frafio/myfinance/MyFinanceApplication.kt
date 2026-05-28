@@ -1,7 +1,6 @@
 package com.frafio.myfinance
 
 import android.app.Application
-import android.content.SharedPreferences
 import androidx.annotation.StringRes
 import coil3.ImageLoader
 import coil3.PlatformContext
@@ -10,9 +9,11 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.frafio.myfinance.data.manager.AuthManager
 import com.frafio.myfinance.data.manager.IncomesManager
 import com.frafio.myfinance.data.manager.ExpensesManager
-import com.frafio.myfinance.utils.getSharedDynamicColor
+import com.frafio.myfinance.data.repository.UserPreferencesRepository
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -26,7 +27,7 @@ class MyFinanceApplication : Application(), SingletonImageLoader.Factory {
         const val LABELS_KEY = "LABELS_KEY"
     }
 
-    @Inject lateinit var sharedPreferences: SharedPreferences
+    @Inject lateinit var userPreferencesRepository: UserPreferencesRepository
     @Inject lateinit var authManager: AuthManager
     @Inject lateinit var expensesManager: ExpensesManager
     @Inject lateinit var incomesManager: IncomesManager
@@ -44,7 +45,10 @@ class MyFinanceApplication : Application(), SingletonImageLoader.Factory {
         instance = this
 
         // if the user activated it, change the colors
-        if (getSharedDynamicColor(sharedPreferences)) {
+        val useDynamicColor = runBlocking {
+            userPreferencesRepository.userPreferencesFlow.first().dynamicColor
+        }
+        if (useDynamicColor) {
             DynamicColors.applyToActivitiesIfAvailable(this)
         }
     }

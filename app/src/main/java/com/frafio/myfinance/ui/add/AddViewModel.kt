@@ -10,12 +10,17 @@ import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.repository.IncomeRepository
 import com.frafio.myfinance.data.repository.ExpensesRepository
+import com.frafio.myfinance.data.repository.UserPreferencesData
+import com.frafio.myfinance.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.utils.dateToExtendedString
 import com.frafio.myfinance.utils.dateToUTCTimestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -29,8 +34,16 @@ sealed class AddUiEvent {
 @HiltViewModel
 class AddViewModel @Inject constructor(
     private val expensesRepository: ExpensesRepository,
-    private val incomeRepository: IncomeRepository
+    private val incomeRepository: IncomeRepository,
+    userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
+
+    val userPreferences: StateFlow<UserPreferencesData?> = userPreferencesRepository.userPreferencesFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     var name: String? = null
     var priceString: String? = null

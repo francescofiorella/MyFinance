@@ -7,10 +7,15 @@ import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.data.repository.UserRepository
+import com.frafio.myfinance.data.repository.UserPreferencesData
+import com.frafio.myfinance.data.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,8 +28,16 @@ sealed class AuthUiEvent {
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
+
+    val userPreferences: StateFlow<UserPreferencesData?> = userPreferencesRepository.userPreferencesFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     var email: String? = null
     var password: String? = null
@@ -80,7 +93,6 @@ class AuthViewModel @Inject constructor(
 
     fun onGoogleRequest(credential: Credential) {
         viewModelScope.launch {
-            _uiEvents.emit(AuthUiEvent.Loading)
             val googleResult = userRepository.userLogin(credential)
             if (googleResult.code == AuthCode.LOGIN_SUCCESS.code) {
                 _uiEvents.emit(AuthUiEvent.NavigateToHome)

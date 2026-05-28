@@ -1,18 +1,16 @@
 package com.frafio.myfinance.data.repository
 
 import kotlinx.coroutines.flow.Flow
+import com.frafio.myfinance.data.dao.ExpenseDao
 import com.frafio.myfinance.data.model.BarChartEntry
 import com.frafio.myfinance.data.model.Expense
-import com.frafio.myfinance.data.storage.MyFinanceDatabase
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ExpensesLocalRepository @Inject constructor(
-    @dagger.hilt.android.qualifiers.ApplicationContext context: android.content.Context
+    private val expenseDao: ExpenseDao
 ) {
-    private val expenseDao =
-        MyFinanceDatabase.getDatabase(context).expenseDao()
 
     fun getWithFilter(name: String, categories: List<Int>): Flow<List<Expense>> =
         expenseDao.getWithFilter(name, categories)

@@ -6,9 +6,10 @@ import com.frafio.myfinance.data.enums.db.FinanceCode
 import com.frafio.myfinance.data.model.Income
 import com.frafio.myfinance.data.model.FinanceResult
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
-import com.frafio.myfinance.data.storage.MyFinanceStorage
+import com.frafio.myfinance.data.repository.UserPreferencesRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -16,6 +17,7 @@ import javax.inject.Singleton
 
 @Singleton
 class IncomesManager @Inject constructor(
+    private val userPreferencesRepository: UserPreferencesRepository,
     private val incomesLocalRepository: IncomesLocalRepository
 ) {
 
@@ -27,10 +29,15 @@ class IncomesManager @Inject constructor(
     private val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
 
+    private suspend fun getUserEmail(): String? {
+        return userPreferencesRepository.userPreferencesFlow.first().user?.email
+    }
+
     suspend fun updateIncomeList(): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.INCOME_LIST_UPDATE_FAILURE)
         return@withContext try {
             val queryDocumentSnapshots = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!)
+                .document(email)
                 .collection(FirestoreEnums.FIELDS.INCOMES.value)
                 .get().await()
             val incomeList = mutableListOf<Income>()
@@ -49,9 +56,10 @@ class IncomesManager @Inject constructor(
     }
 
     suspend fun addIncome(income: Income): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.INCOME_ADD_FAILURE)
         return@withContext try {
             val documentReference = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!)
+                .document(email)
                 .collection(FirestoreEnums.FIELDS.INCOMES.value)
                 .add(income).await()
             income.id = documentReference.id
@@ -64,9 +72,10 @@ class IncomesManager @Inject constructor(
     }
 
     suspend fun editIncome(income: Income): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.INCOME_EDIT_FAILURE)
         return@withContext try {
             fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!)
+                .document(email)
                 .collection(FirestoreEnums.FIELDS.INCOMES.value)
                 .document(income.id).set(income).await()
             incomesLocalRepository.updateIncome(income)
@@ -78,9 +87,10 @@ class IncomesManager @Inject constructor(
     }
 
     suspend fun deleteIncome(income: Income): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.INCOME_DELETE_FAILURE)
         return@withContext try {
             fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(MyFinanceStorage.user!!.email!!)
+                .document(email)
                 .collection(FirestoreEnums.FIELDS.INCOMES.value)
                 .document(income.id).delete().await()
             incomesLocalRepository.deleteIncome(income)

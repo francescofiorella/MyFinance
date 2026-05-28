@@ -12,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -81,10 +82,6 @@ class HomeActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        if (viewModel.isDynamicColorOn()) {
-            DynamicColors.applyToActivityIfAvailable(this)
-        }
-
         enableEdgeToEdge()
 
         lifecycleScope.launch {
@@ -101,12 +98,23 @@ class HomeActivity : ComponentActivity() {
             }
         }
 
+        lifecycleScope.launch {
+            viewModel.userPreferences.collect { prefs ->
+                if (prefs != null) {
+                    // Re-apply if dynamic color changed
+                    if (prefs.dynamicColor) {
+                        DynamicColors.applyToActivityIfAvailable(this@HomeActivity)
+                    }
+                }
+            }
+        }
+
         if (savedInstanceState == null) {
             userRequest =
                 intent.extras?.getBoolean(AuthActivity.INTENT_USER_REQUEST, false) ?: false
             if (!userRequest) {
                 splashScreen.apply {
-                    setKeepOnScreenCondition { !isLayoutReady }
+                    setKeepOnScreenCondition { !isLayoutReady || viewModel.userPreferences.value == null }
                     setOnExitAnimationListener { splashScreenViewProvider ->
                         val fadeOut = ObjectAnimator.ofFloat(
                             splashScreenViewProvider.view,
@@ -129,12 +137,11 @@ class HomeActivity : ComponentActivity() {
         }
 
         setContent {
-            MyFinanceTheme {
+            val userPreferences by viewModel.userPreferences.collectAsStateWithLifecycle()
+            val useDynamicColor = userPreferences?.dynamicColor ?: false
+
+            MyFinanceTheme(dynamicColor = useDynamicColor) {
                 val appState = rememberMyFinanceAppState()
-                // show progress bar as it is loading data
-                // this is connected to viewModel.checkUser(userRequest)
-                // the ui event might be lost as it is called before the composition
-                if (savedInstanceState == null) appState.showProgress = true
                 HomeScreen(
                     appState = appState,
                     viewModel = viewModel,
@@ -171,13 +178,7 @@ class HomeActivity : ComponentActivity() {
                             editResultLauncher.launch(it)
                         }
                     },
-                    getDateLabel = { start, end -> getDateChipLabel(start, end) },
-                    restartApplication = {
-                        val intent = packageManager.getLaunchIntentForPackage(packageName)
-                        val mainIntent = Intent.makeRestartActivityTask(intent!!.component)
-                        startActivity(mainIntent)
-                        Runtime.getRuntime().exit(0)
-                    }
+                    getDateLabel = { start, end -> getDateChipLabel(start, end) }
                 )
             }
         }

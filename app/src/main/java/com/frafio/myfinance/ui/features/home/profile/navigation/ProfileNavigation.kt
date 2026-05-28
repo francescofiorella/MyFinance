@@ -16,8 +16,7 @@ import kotlinx.coroutines.launch
 
 fun EntryProviderScope<NavKey>.profileEntry(
     appState: MyFinanceAppState,
-    onUploadProPic: () -> Unit,
-    restartApplication: () -> Unit
+    onUploadProPic: () -> Unit
 ) {
     entry<MyFinanceNavKey.Profile> {
         val viewModel: ProfileViewModel = hiltViewModel()
@@ -25,8 +24,6 @@ fun EntryProviderScope<NavKey>.profileEntry(
 
         val fnUpdatedString = stringResource(id = R.string.full_name_updated)
         val undoString = stringResource(id = R.string.undo)
-        val appRestartMessage = stringResource(id = R.string.restart_app_changes)
-        val appRestartActionText = stringResource(id = R.string.restart)
 
         LaunchedEffect(appState.reselectEvent) {
             appState.reselectEvent.collect { key ->
@@ -50,14 +47,6 @@ fun EntryProviderScope<NavKey>.profileEntry(
                         }
                     }
 
-                    ProfileUiEvent.LoadingStarted -> {
-                        appState.showProgress = true
-                    }
-
-                    ProfileUiEvent.LoadingFinished -> {
-                        appState.showProgress = false
-                    }
-
                     is ProfileUiEvent.FullNameUpdated -> {
                         coroutineScope.launch {
                             appState.showSnackBar(
@@ -66,15 +55,6 @@ fun EntryProviderScope<NavKey>.profileEntry(
                                 {
                                     viewModel.editFullName(event.previousFullName, notify = false)
                                 }
-                            )
-                        }
-                    }
-                    ProfileUiEvent.DynamicColorChanged -> {
-                        coroutineScope.launch {
-                            appState.showSnackBar(
-                                appRestartMessage,
-                                appRestartActionText,
-                                restartApplication
                             )
                         }
                     }

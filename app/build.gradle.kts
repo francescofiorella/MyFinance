@@ -22,7 +22,7 @@ android {
         minSdk = 29
         targetSdk = 37
         versionCode = 4
-        versionName = "4.9.8"
+        versionName = "4.9.9"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -64,7 +64,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.lifecycle.extensions)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.animation.core)
     testImplementation(libs.junit)
@@ -72,6 +71,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.fragment.ktx)
@@ -91,7 +91,6 @@ dependencies {
     implementation(libs.play.services.auth)
 
     // Graphic library
-    implementation(libs.glide)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
@@ -128,4 +127,5 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.datastore.preferences)
 }

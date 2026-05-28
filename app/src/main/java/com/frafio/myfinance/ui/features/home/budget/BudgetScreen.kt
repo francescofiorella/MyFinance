@@ -22,9 +22,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,11 +61,11 @@ fun BudgetScreen(
     onEditIncome: (Income, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val incomes by viewModel.incomes.collectAsState()
-    val isIncomesEmpty by viewModel.isIncomesEmpty.collectAsState()
-    val itemMetadata by viewModel.itemMetadata.collectAsState()
-    val monthlyBudget by viewModel.monthlyBudget.collectAsState()
-    val annualBudget by viewModel.annualBudget.collectAsState()
+    val incomes by viewModel.incomes.collectAsStateWithLifecycle()
+    val isIncomesEmpty by viewModel.isIncomesEmpty.collectAsStateWithLifecycle()
+    val itemMetadata by viewModel.itemMetadata.collectAsStateWithLifecycle()
+    val monthlyBudget by viewModel.monthlyBudget.collectAsStateWithLifecycle()
+    val annualBudget by viewModel.annualBudget.collectAsStateWithLifecycle()
 
     var showEditBudgetSheet by remember { mutableStateOf(value = false) }
     var showEditIncomeSheet by remember { mutableStateOf(value = false) }
