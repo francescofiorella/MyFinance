@@ -43,6 +43,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -138,34 +139,36 @@ fun LabelsSheet(
                     )
                 }
                 labels.forEachIndexed { index, label ->
-                    LabelItem(
-                        label = label,
-                        initialSelected = expense?.labels?.contains(label) ?: selectedLabels.contains(label),
-                        isEditing = editingLabel == label,
-                        editLabelValue = editLabelFieldValue,
-                        onEditLabelValueChange = { editLabelFieldValue = it },
-                        onLabelCheckedChanged = onLabelCheckedChanged,
-                        onEditClick = {
-                            editLabelFieldValue = TextFieldValue(
-                                text = label,
-                                selection = TextRange(label.length)
-                            )
-                            editingLabel = label
-                        },
-                        onDeleteClick = { onDeleteLabel(label) },
-                        onConfirmEdit = {
-                            onEditLabel(label, editLabelFieldValue.text.trim())
-                            editingLabel = null
-                        },
-                        onCancelEdit = {
-                            editingLabel = null
-                            editLabelFieldValue = TextFieldValue(text = "")
-                        },
-                        focusRequester = focusRequester,
-                        showEditOptions = showEditLabel,
-                        index = index,
-                        count = labels.size
-                    )
+                    key(label) {
+                        LabelItem(
+                            label = label,
+                            initialSelected = expense?.labels?.contains(label) ?: selectedLabels.contains(label),
+                            isEditing = editingLabel == label,
+                            editLabelValue = editLabelFieldValue,
+                            onEditLabelValueChange = { editLabelFieldValue = it },
+                            onLabelCheckedChanged = onLabelCheckedChanged,
+                            onEditClick = {
+                                editLabelFieldValue = TextFieldValue(
+                                    text = label,
+                                    selection = TextRange(label.length)
+                                )
+                                editingLabel = label
+                            },
+                            onDeleteClick = { onDeleteLabel(label) },
+                            onConfirmEdit = {
+                                onEditLabel(label, editLabelFieldValue.text.trim())
+                                editingLabel = null
+                            },
+                            onCancelEdit = {
+                                editingLabel = null
+                                editLabelFieldValue = TextFieldValue(text = "")
+                            },
+                            focusRequester = focusRequester,
+                            showEditOptions = showEditLabel,
+                            index = index,
+                            count = labels.size
+                        )
+                    }
                 }
             }
         }
@@ -272,7 +275,7 @@ private fun LabelItem(
     count: Int,
     modifier: Modifier = Modifier
 ) {
-    var checked by remember(initialSelected) {
+    var checked by remember(label, initialSelected) {
         mutableStateOf(initialSelected)
     }
 

@@ -80,14 +80,12 @@ fun ExpensesScreen(
     val dateRange by viewModel.dateRange.collectAsStateWithLifecycle()
     val itemMetadata by viewModel.itemMetadata.collectAsStateWithLifecycle()
     val labels by viewModel.labels.collectAsStateWithLifecycle()
+    val editingExpense by viewModel.editingExpense.collectAsStateWithLifecycle()
 
     var showFilterSheet by remember { mutableStateOf(value = false) }
     var showCategorySheet by remember { mutableStateOf(value = false) }
-    var categoryTargetExpense by remember { mutableStateOf<Expense?>(value = null) }
     var showEditSheet by remember { mutableStateOf(value = false) }
-    var editTargetExpense by remember { mutableStateOf<Expense?>(value = null) }
     var showLabelsSheet by remember { mutableStateOf(value = false) }
-    var labelsTargetExpense by remember { mutableStateOf<Expense?>(value = null) }
     var showNewLabelInLabels by remember { mutableStateOf(value = true) }
     var showDatePickerRange by remember { mutableStateOf(value = false) }
 
@@ -102,11 +100,11 @@ fun ExpensesScreen(
         labelEnabled = labels.isNotEmpty(),
         dateRangeEnabled = dateRange == null,
         onSelectCategory = {
-            categoryTargetExpense = null
+            viewModel.setEditingExpense(null)
             showCategorySheet = true
         },
         onSelectLabel = {
-            labelsTargetExpense = null
+            viewModel.setEditingExpense(null)
             showNewLabelInLabels = false
             showLabelsSheet = true
         },
@@ -136,13 +134,13 @@ fun ExpensesScreen(
                 showCategorySheet = false
             }
         },
-        expense = categoryTargetExpense,
-        disabledCategories = if (categoryTargetExpense == null) selectedCategories else emptyList(),
+        expense = editingExpense,
+        disabledCategories = if (editingExpense == null) selectedCategories else emptyList(),
         onCategorySelected = { categoryId ->
-            if (categoryTargetExpense == null) {
+            if (editingExpense == null) {
                 viewModel.onCategoryFilterChanged(categoryId)
             } else {
-                viewModel.updateCategory(categoryTargetExpense!!, categoryId)
+                viewModel.updateCategory(editingExpense!!, categoryId)
             }
             if (showCategorySheet) {
                 showCategorySheet = false
@@ -152,14 +150,13 @@ fun ExpensesScreen(
 
     EditTransactionSheet(
         show = showEditSheet,
-        transaction = editTargetExpense ?: Expense(),
+        transaction = editingExpense ?: Expense(),
         onDismiss = {
             if (showEditSheet) {
                 showEditSheet = false
             }
         },
         onLabels = {
-            labelsTargetExpense = editTargetExpense
             showNewLabelInLabels = true
             showLabelsSheet = true
             if (showEditSheet) {
@@ -167,7 +164,7 @@ fun ExpensesScreen(
             }
         },
         onEdit = {
-            editTargetExpense?.let {
+            editingExpense?.let {
                 onItemLongClick(it, expenses.indexOf(it))
             }
             if (showEditSheet) {
@@ -175,7 +172,7 @@ fun ExpensesScreen(
             }
         },
         onDelete = {
-            editTargetExpense?.let { viewModel.deleteExpense(it) }
+            editingExpense?.let { viewModel.deleteExpense(it) }
             if (showEditSheet) {
                 showEditSheet = false
             }
@@ -189,34 +186,19 @@ fun ExpensesScreen(
                 showLabelsSheet = false
             }
         },
-        expense = labelsTargetExpense,
+        expense = editingExpense,
         labels = labels,
         selectedLabels = selectedLabels,
         showEditLabel = showNewLabelInLabels,
         onNewLabel = viewModel::addLabel,
         onLabelCheckedChanged = { label, checked ->
-            if (labelsTargetExpense == null) {
+            if (editingExpense == null) {
                 viewModel.onLabelFilterChanged(label, checked)
             } else {
                 if (checked) {
-                    viewModel.addLabelToExpense(labelsTargetExpense!!, label)
-                    // update target label
-                    if (!labelsTargetExpense!!.labels.contains(label)) {
-                        val labels = labelsTargetExpense!!.labels.toMutableList()
-                        labels.add(label)
-                        labelsTargetExpense = labelsTargetExpense!!.copy(
-                            labels = labels
-                        )
-                    }
+                    viewModel.addLabelToExpense(editingExpense!!, label)
                 } else {
-                    viewModel.removeLabelFromExpense(labelsTargetExpense!!, label)
-                    // update target label
-                    val labels = labelsTargetExpense!!.labels.toMutableList()
-                    if (labels.remove(label)) {
-                        labelsTargetExpense = labelsTargetExpense!!.copy(
-                            labels = labels
-                        )
-                    }
+                    viewModel.removeLabelFromExpense(editingExpense!!, label)
                 }
             }
         },
@@ -241,11 +223,11 @@ fun ExpensesScreen(
         onLoadMore = { viewModel.loadMore() },
         onFilterClick = { showFilterSheet = true },
         onItemLongClick = { expense, _ ->
-            editTargetExpense = expense
+            viewModel.setEditingExpense(expense)
             showEditSheet = true
         },
         onCategoryClick = { expense, _ ->
-            categoryTargetExpense = expense
+            viewModel.setEditingExpense(expense)
             showCategorySheet = true
         },
         getDateLabel = getDateLabel,

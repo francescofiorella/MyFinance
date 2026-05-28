@@ -70,6 +70,9 @@ class ExpensesViewModel @Inject constructor(
     private val _scrollToId = MutableSharedFlow<String?>(replay = 1)
     val scrollToId = _scrollToId.asSharedFlow()
 
+    private val _editingExpense = MutableStateFlow<Expense?>(null)
+    val editingExpense = _editingExpense.asStateFlow()
+
     private val _uiEvents = MutableSharedFlow<ExpensesUiEvent>()
     val uiEvents: SharedFlow<ExpensesUiEvent> = _uiEvents.asSharedFlow()
 
@@ -219,6 +222,10 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
+    fun setEditingExpense(expense: Expense?) {
+        _editingExpense.value = expense
+    }
+
     fun deleteExpense(expense: Expense) {
         viewModelScope.launch {
             try {
@@ -246,6 +253,10 @@ class ExpensesViewModel @Inject constructor(
                 val response = expensesRepository.editExpense(updated)
                 if (response.code == FinanceCode.EXPENSE_EDIT_FAILURE.code) {
                     _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
+                } else {
+                    if (_editingExpense.value?.id == expense.id) {
+                        _editingExpense.value = updated
+                    }
                 }
             } finally {
                 loadingRepository.stopLoading()
@@ -283,6 +294,10 @@ class ExpensesViewModel @Inject constructor(
                 val response = expensesRepository.editExpense(updated)
                 if (response.code == FinanceCode.EXPENSE_EDIT_FAILURE.code) {
                     _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
+                } else {
+                    if (_editingExpense.value?.id == expense.id) {
+                        _editingExpense.value = updated
+                    }
                 }
             } finally {
                 loadingRepository.stopLoading()
@@ -303,6 +318,10 @@ class ExpensesViewModel @Inject constructor(
                 val response = expensesRepository.editExpense(updated)
                 if (response.code == FinanceCode.EXPENSE_EDIT_FAILURE.code) {
                     _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
+                } else {
+                    if (_editingExpense.value?.id == expense.id) {
+                        _editingExpense.value = updated
+                    }
                 }
             } finally {
                 loadingRepository.stopLoading()
@@ -436,6 +455,9 @@ class ExpensesViewModel @Inject constructor(
                                     labels = updatedLabels
                                 )
                                 expensesRepository.editExpense(updatedExpense)
+                                if (_editingExpense.value?.id == expense.id) {
+                                    _editingExpense.value = updatedExpense
+                                }
                             }
                         }
                     }
