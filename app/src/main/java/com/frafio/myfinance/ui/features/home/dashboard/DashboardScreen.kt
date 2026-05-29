@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
@@ -77,7 +78,8 @@ fun DashboardContent(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(bottom = 88.dp) // dashboard_bottom_margin
+            .padding(bottom = 88.dp), // dashboard_bottom_margin
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         BudgetIndicatorCard(
             monthShown = monthShown,
@@ -202,7 +204,8 @@ fun DashboardContent(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(bottom = 88.dp)
+            .padding(bottom = 88.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         BudgetIndicatorCard(
             monthShown = monthShown,
