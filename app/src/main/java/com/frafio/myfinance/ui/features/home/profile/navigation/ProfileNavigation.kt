@@ -7,6 +7,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.frafio.myfinance.R
+import com.frafio.myfinance.data.model.User
 import com.frafio.myfinance.ui.features.home.profile.ProfileScreen
 import com.frafio.myfinance.ui.home.profile.ProfileUiEvent
 import com.frafio.myfinance.ui.home.profile.ProfileViewModel
@@ -16,6 +17,8 @@ import kotlinx.coroutines.launch
 
 fun EntryProviderScope<NavKey>.profileEntry(
     appState: MyFinanceAppState,
+    initialUser: User? = null,
+    profilePicture: android.graphics.Bitmap? = null,
     onUploadProPic: () -> Unit
 ) {
     entry<MyFinanceNavKey.Profile> {
@@ -64,6 +67,8 @@ fun EntryProviderScope<NavKey>.profileEntry(
 
         ProfileScreen(
             viewModel = viewModel,
+            initialUser = initialUser,
+            initialProfilePicture = profilePicture,
             onUploadProPic = onUploadProPic
         )
     }

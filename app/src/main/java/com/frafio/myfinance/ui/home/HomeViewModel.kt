@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.home
 
+import android.graphics.Bitmap
 import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -53,10 +54,14 @@ class HomeViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val expensesLocalRepository: ExpensesLocalRepository,
     private val incomesLocalRepository: IncomesLocalRepository,
-    private val loadingRepository: LoadingRepository
+    private val loadingRepository: LoadingRepository,
+    profileImageStorage: com.frafio.myfinance.data.storage.ProfileImageStorage
 ) : ViewModel() {
 
     val isLoading: StateFlow<Boolean> = loadingRepository.isLoading
+
+    val profilePicture: StateFlow<Bitmap?> = userRepository.profilePicture
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), profileImageStorage.loadBitmapSync())
 
     val userPreferences: StateFlow<UserPreferencesData?> = userPreferencesRepository.userPreferencesFlow
         .stateIn(
@@ -127,7 +132,7 @@ class HomeViewModel @Inject constructor(
 
     private suspend fun updateUserData() {
         // Wait for first local emissions to ensure screen can be populated
-        userPreferencesRepository.userPreferencesFlow.first()
+        val userPrefs = userPreferencesRepository.userPreferencesFlow.first()
         expensesLocalRepository.getCount().first()
         incomesLocalRepository.getCount().first()
 
@@ -137,6 +142,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 loadingRepository.startLoading()
+                userRepository.syncProfilePicture(userPrefs.user?.photoUrl)
                 expensesRepository.updateExpensesList()
                 incomeRepository.updateIncomeList()
                 expensesRepository.getMonthlyBudget()

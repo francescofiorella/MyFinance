@@ -7,6 +7,7 @@ import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.data.repository.UserPreferencesRepository
+import com.frafio.myfinance.data.storage.ProfileImageStorage
 import com.frafio.myfinance.data.mapper.toUser
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -30,7 +31,8 @@ import javax.inject.Singleton
 class AuthManager @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val expensesLocalRepository: ExpensesLocalRepository,
-    private val incomesLocalRepository: IncomesLocalRepository
+    private val incomesLocalRepository: IncomesLocalRepository,
+    private val profileImageStorage: ProfileImageStorage
 ) {
 
     companion object {
@@ -173,6 +175,7 @@ class AuthManager @Inject constructor(
 
         expensesLocalRepository.deleteAll()
         incomesLocalRepository.deleteAll()
+        profileImageStorage.deleteImage()
         
         userPreferencesRepository.updateMonthlyBudget(0.0)
         userPreferencesRepository.updateLabels(emptyList())

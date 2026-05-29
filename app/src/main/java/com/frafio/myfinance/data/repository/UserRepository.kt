@@ -1,5 +1,6 @@
 package com.frafio.myfinance.data.repository
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.credentials.Credential
 import androidx.credentials.CustomCredential
@@ -7,18 +8,33 @@ import com.frafio.myfinance.data.enums.auth.AuthCode
 import com.frafio.myfinance.data.manager.AuthManager
 import com.frafio.myfinance.data.model.AuthResult
 import com.frafio.myfinance.data.model.User
+import com.frafio.myfinance.data.storage.ProfileImageStorage
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class UserRepository @Inject constructor(
     private val authManager: AuthManager,
-    userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val profileImageStorage: ProfileImageStorage,
+    private val okHttpClient: OkHttpClient
 ) {
+
+    private var _lastUser: User? = null
+    private val _profilePicture = kotlinx.coroutines.flow.MutableStateFlow<Bitmap?>(profileImageStorage.loadBitmapSync())
+    val profilePicture: Flow<Bitmap?> = _profilePicture.asStateFlow()
 
     companion object {
         private val TAG = UserRepository::class.java.simpleName
@@ -59,12 +75,51 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun userLogout(): AuthResult {
-        return authManager.logout()
+        val result = authManager.logout()
+        if (result.code == AuthCode.LOGOUT_SUCCESS.code) {
+            _profilePicture.value = null
+            _lastUser = null
+        }
+        return result
     }
 
     suspend fun isUserLogged(): AuthResult {
         return authManager.isUserLogged()
     }
 
-    val userData: Flow<User?> = userPreferencesRepository.userPreferencesFlow.map { it.user }
+    suspend fun syncProfilePicture(photoUrl: String?) = withContext(Dispatchers.IO) {
+        if (photoUrl.isNullOrEmpty()) return@withContext
+
+        val user = userPreferencesRepository.userPreferencesFlow.first().user
+        if (user?.photoUrl == photoUrl && !user.localPhotoPath.isNullOrEmpty()) {
+            return@withContext
+        }
+
+        try {
+            val request = Request.Builder().url(photoUrl).build()
+            val response = okHttpClient.newCall(request).execute()
+            if (response.isSuccessful) {
+                val inputStream = response.body?.byteStream()
+                if (inputStream != null) {
+                    val localPath = profileImageStorage.saveImage(inputStream)
+                    if (localPath != null && user != null) {
+                        userPreferencesRepository.updateUser(user.copy(localPhotoPath = localPath))
+                        _profilePicture.value = profileImageStorage.loadBitmap()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error syncing profile picture: ${e.localizedMessage}")
+        }
+    }
+
+    val userData: Flow<User?> = userPreferencesRepository.userPreferencesFlow
+        .map { it.user }
+        .onEach { _lastUser = it }
+
+    fun getCurrentUser(): User? {
+        return _lastUser ?: runBlocking {
+            userPreferencesRepository.userPreferencesFlow.first().user
+        }
+    }
 }

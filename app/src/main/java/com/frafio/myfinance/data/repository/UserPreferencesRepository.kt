@@ -29,6 +29,7 @@ class UserPreferencesRepository @Inject constructor(
         val USER_FULL_NAME = stringPreferencesKey("user_full_name")
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_PHOTO_URL = stringPreferencesKey("user_photo_url")
+        val USER_LOCAL_PHOTO_PATH = stringPreferencesKey("user_local_photo_path")
         val USER_PROVIDER = intPreferencesKey("user_provider")
         val USER_CREATION_YEAR = intPreferencesKey("user_creation_year")
         val USER_CREATION_MONTH = intPreferencesKey("user_creation_month")
@@ -54,6 +55,7 @@ class UserPreferencesRepository @Inject constructor(
                     fullName = preferences[PreferencesKeys.USER_FULL_NAME],
                     email = email,
                     photoUrl = preferences[PreferencesKeys.USER_PHOTO_URL],
+                    localPhotoPath = preferences[PreferencesKeys.USER_LOCAL_PHOTO_PATH],
                     provider = preferences[PreferencesKeys.USER_PROVIDER],
                     creationYear = preferences[PreferencesKeys.USER_CREATION_YEAR],
                     creationMonth = preferences[PreferencesKeys.USER_CREATION_MONTH],
@@ -87,6 +89,7 @@ class UserPreferencesRepository @Inject constructor(
             preferences[PreferencesKeys.USER_FULL_NAME] = user.fullName ?: ""
             preferences[PreferencesKeys.USER_EMAIL] = user.email ?: ""
             preferences[PreferencesKeys.USER_PHOTO_URL] = user.photoUrl ?: ""
+            preferences[PreferencesKeys.USER_LOCAL_PHOTO_PATH] = user.localPhotoPath ?: ""
             preferences[PreferencesKeys.USER_PROVIDER] = user.provider ?: User.EMAIL_PROVIDER
             preferences[PreferencesKeys.USER_CREATION_YEAR] = user.creationYear ?: 0
             preferences[PreferencesKeys.USER_CREATION_MONTH] = user.creationMonth ?: 0
@@ -99,6 +102,7 @@ class UserPreferencesRepository @Inject constructor(
             preferences.remove(PreferencesKeys.USER_FULL_NAME)
             preferences.remove(PreferencesKeys.USER_EMAIL)
             preferences.remove(PreferencesKeys.USER_PHOTO_URL)
+            preferences.remove(PreferencesKeys.USER_LOCAL_PHOTO_PATH)
             preferences.remove(PreferencesKeys.USER_PROVIDER)
             preferences.remove(PreferencesKeys.USER_CREATION_YEAR)
             preferences.remove(PreferencesKeys.USER_CREATION_MONTH)

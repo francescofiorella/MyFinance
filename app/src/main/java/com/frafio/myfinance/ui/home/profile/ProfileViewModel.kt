@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.home.profile
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.BuildConfig
@@ -37,11 +38,15 @@ class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val expensesRepository: ExpensesRepository,
     userPreferencesRepository: UserPreferencesRepository,
-    private val loadingRepository: LoadingRepository
+    private val loadingRepository: LoadingRepository,
+    profileImageStorage: com.frafio.myfinance.data.storage.ProfileImageStorage
 ) : ViewModel() {
 
     val user: StateFlow<User?> = userRepository.userData
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userRepository.getCurrentUser())
+
+    val profilePicture: StateFlow<Bitmap?> = userRepository.profilePicture
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), profileImageStorage.loadBitmapSync())
 
     private val _scrollToTop = MutableSharedFlow<Unit>(replay = 0)
     val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()

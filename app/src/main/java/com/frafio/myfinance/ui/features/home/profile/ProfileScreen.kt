@@ -1,8 +1,10 @@
 package com.frafio.myfinance.ui.features.home.profile
 
+import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -35,17 +37,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.model.User
 import com.frafio.myfinance.ui.home.profile.ProfileViewModel
@@ -56,16 +56,25 @@ import kotlinx.coroutines.flow.collectLatest
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel,
+    initialUser: User? = null,
+    initialProfilePicture: Bitmap? = null,
     onUploadProPic: () -> Unit
 ) {
     val userState by viewModel.user.collectAsStateWithLifecycle()
+    val profilePictureState by viewModel.profilePicture.collectAsStateWithLifecycle()
 
     // Preserve user data during logout transition to avoid "flashing"
-    var lastUser by remember { mutableStateOf<User?>(null) }
+    var lastUser by remember { mutableStateOf(initialUser) }
     if (userState != null) {
         lastUser = userState
     }
     val user = userState ?: lastUser
+
+    var lastProfilePicture by remember { mutableStateOf(initialProfilePicture) }
+    if (profilePictureState != null) {
+        lastProfilePicture = profilePictureState
+    }
+    val profilePicture = profilePictureState ?: lastProfilePicture
     val googleSignIn = user?.provider == User.GOOGLE_PROVIDER
 
     val isDynamicColorChecked by viewModel.isSwitchDynamicColorChecked.collectAsStateWithLifecycle()
@@ -93,6 +102,7 @@ fun ProfileScreen(
     ProfileContent(
         modifier = modifier,
         user = user,
+        profilePicture = profilePicture,
         googleSignIn = googleSignIn,
         versionName = viewModel.versionName,
         isDynamicColorAvailable = viewModel.isDynamicColorAvailable,
@@ -108,6 +118,7 @@ fun ProfileScreen(
 private fun ProfileContent(
     modifier: Modifier = Modifier,
     user: User?,
+    profilePicture: Bitmap?,
     googleSignIn: Boolean,
     versionName: String,
     isDynamicColorAvailable: Boolean,
@@ -125,7 +136,7 @@ private fun ProfileContent(
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        ProfileHeader(user = user)
+        ProfileHeader(user = user, profilePicture = profilePicture)
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -143,15 +154,17 @@ private fun ProfileContent(
 }
 
 @Composable
-private fun ProfileHeader(user: User?) {
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(user?.photoUrl)
-            .crossfade(false)
-            .build(),
+private fun ProfileHeader(user: User?, profilePicture: Bitmap?) {
+    val painter = remember(profilePicture) {
+        if (profilePicture != null) {
+            BitmapPainter(profilePicture.asImageBitmap())
+        } else {
+            null
+        }
+    } ?: painterResource(id = R.drawable.ic_user)
+    Image(
+        painter = painter,
         contentDescription = stringResource(id = R.string.profile_picture),
-        placeholder = painterResource(id = R.drawable.ic_user),
-        error = painterResource(id = R.drawable.ic_user),
         modifier = Modifier
             .size(120.dp)
             .clip(CircleShape),
@@ -575,6 +588,7 @@ fun ProfilePreview() {
                 creationMonth = 1,
                 creationYear = 2023
             ),
+            profilePicture = null,
             googleSignIn = true,
             versionName = "1.0.0",
             isDynamicColorAvailable = true,

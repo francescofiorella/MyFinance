@@ -24,5 +24,5 @@ fun FirebaseUser.toUser(): User {
         month = calendar.get(Calendar.MONTH) + 1
         year = calendar.get(Calendar.YEAR)
     }
-    return User(this.displayName, this.email, userPic, provider, year, month, day)
+    return User(this.displayName, this.email, userPic, null, provider, year, month, day)
 }

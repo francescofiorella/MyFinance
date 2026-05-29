@@ -1,8 +1,10 @@
 package com.frafio.myfinance.ui.features.home
 
+import android.graphics.Bitmap
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,7 +30,6 @@ import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
-import androidx.window.core.layout.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -38,7 +39,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -49,12 +52,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import coil3.compose.AsyncImage
+import androidx.window.core.layout.WindowSizeClass
 import com.frafio.myfinance.R
 import com.frafio.myfinance.data.model.Expense
 import com.frafio.myfinance.data.model.Income
@@ -70,6 +72,7 @@ import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
 import com.frafio.myfinance.ui.navigation.Navigator
 import com.frafio.myfinance.ui.navigation.TOP_LEVEL_NAV_KEYS
 import com.frafio.myfinance.ui.navigation.toEntries
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
@@ -88,18 +91,19 @@ fun HomeScreen(
     val navigator = remember { Navigator(appState.navigationState) }
     val currentTopLevelKey = appState.navigationState.currentTopLevelKey
     val user by viewModel.user.collectAsStateWithLifecycle()
-    val proPic = user?.photoUrl
+    val profilePicture by viewModel.profilePicture.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(isLoading) {
         appState.showProgress = isLoading
     }
-    
-    val layoutType = if (windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
-        NavigationSuiteType.NavigationRail
-    } else {
-        NavigationSuiteType.NavigationBar
-    }
+
+    val layoutType =
+        if (windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
+            NavigationSuiteType.NavigationRail
+        } else {
+            NavigationSuiteType.NavigationBar
+        }
 
     val loginSuccessString = stringResource(id = R.string.login_successful)
 
@@ -120,6 +124,7 @@ fun HomeScreen(
                         event.dismissFun
                     )
                 }
+
                 HomeUiEvent.LoginSuccess -> {
                     appState.showSnackBar("$loginSuccessString ${viewModel.getFullName()}")
                 }
@@ -175,7 +180,7 @@ fun HomeScreen(
         CompositionLocalProvider(LocalSnackbarHostState provides appState.snackbarHostState) {
             MainScaffold(
                 currentTopLevelKey = currentTopLevelKey as MyFinanceNavKey,
-                proPic = proPic,
+                profilePicture = profilePicture,
                 showProgress = appState.showProgress,
                 onAddClick = onAddClick,
                 onLogoutClick = onLogoutClick,
@@ -196,6 +201,8 @@ fun HomeScreen(
                         )
                         profileEntry(
                             appState = appState,
+                            initialUser = user,
+                            profilePicture = profilePicture,
                             onUploadProPic = {
                                 appState.coroutineScope.launch {
                                     snackbarHostState.showSnackbar(comingSoonString)
@@ -222,7 +229,7 @@ fun HomeScreen(
 @Composable
 private fun MainScaffold(
     currentTopLevelKey: MyFinanceNavKey,
-    proPic: String?,
+    profilePicture: Bitmap?,
     showProgress: Boolean,
     onAddClick: () -> Unit,
     onLogoutClick: () -> Unit,
@@ -230,6 +237,7 @@ private fun MainScaffold(
     screenContent: @Composable () -> Unit,
 ) {
     val snackbarHostState = LocalSnackbarHostState.current
+
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
@@ -273,15 +281,20 @@ private fun MainScaffold(
                                 }
                             } else {
                                 IconButton(onClick = onProPicClick) {
-                                    AsyncImage(
-                                        model = proPic ?: R.drawable.ic_user,
+                                    val painter = remember(profilePicture) {
+                                        if (profilePicture != null) {
+                                            BitmapPainter(profilePicture.asImageBitmap())
+                                        } else {
+                                            null
+                                        }
+                                    } ?: painterResource(id = R.drawable.ic_user)
+                                    Image(
+                                        painter = painter,
                                         contentDescription = stringResource(id = R.string.profile_picture),
                                         modifier = Modifier
                                             .size(40.dp)
                                             .clip(CircleShape),
-                                        contentScale = ContentScale.Crop,
-                                        error = painterResource(id = R.drawable.ic_user),
-                                        placeholder = painterResource(id = R.drawable.ic_user)
+                                        contentScale = ContentScale.Crop
                                     )
                                 }
                             }
