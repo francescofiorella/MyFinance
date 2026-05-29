@@ -72,9 +72,7 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.fragment.ktx)
 
     // SplashScreen API
     implementation(libs.androidx.core.splashscreen)
@@ -88,7 +86,6 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
-    implementation(libs.play.services.auth)
 
     // Graphic library
     implementation(libs.coil.compose)
@@ -109,7 +106,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material3.window.size)
-    implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.google.fonts)
 
     // Navigation 3 and Adaptive
