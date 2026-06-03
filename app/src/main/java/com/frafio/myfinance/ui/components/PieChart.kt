@@ -1,5 +1,6 @@
 package com.frafio.myfinance.ui.components
 
+import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -65,18 +66,30 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+object PieChartDefaults {
+    val Radius: Dp = 80.dp
+    val ArcWidth: Dp = 14.dp
+    val OffsetBetweenArcs: Dp = 4.dp
+    val IconSize: Dp = 32.dp
+    val SelectedIconSize: Dp = 36.dp
+    val IconPadding: Dp = 6.dp
+    val AnimationEasing: Easing = LinearOutSlowInEasing
+    const val ChartAnimationDuration: Int = 1000
+    const val ArcSelectionAnimationDuration: Int = 100
+}
+
 @Composable
 fun PieChart(
     modifier: Modifier = Modifier,
     entries: List<Double>,
-    radius: Dp = 80.dp,
-    arcWidth: Dp = 14.dp,
-    offsetBetweenArcs: Dp = 4.dp,
-    iconSize: Dp = 32.dp,
-    selectedIconSize: Dp = 36.dp,
-    iconPadding: Dp = 6.dp,
     animate: Boolean = true,
-    animDuration: Int = 1000
+    radius: Dp = PieChartDefaults.Radius,
+    arcWidth: Dp = PieChartDefaults.ArcWidth,
+    offsetBetweenArcs: Dp = PieChartDefaults.OffsetBetweenArcs,
+    iconSize: Dp = PieChartDefaults.IconSize,
+    selectedIconSize: Dp = PieChartDefaults.SelectedIconSize,
+    iconPadding: Dp = PieChartDefaults.IconPadding,
+    animDuration: Int = PieChartDefaults.ChartAnimationDuration
 ) {
     val density = LocalDensity.current
     val chartEntryOffset = remember(offsetBetweenArcs, arcWidth, radius, density) {
@@ -113,7 +126,7 @@ fun PieChart(
     val animatedValues = floatValues.mapIndexed { index, value ->
         animateFloatAsState(
             targetValue = value,
-            animationSpec = tween(if (animate) animDuration else 0, easing = LinearOutSlowInEasing),
+            animationSpec = tween(if (animate) animDuration else 0, easing = PieChartDefaults.AnimationEasing),
             label = "arc_$index"
         )
     }
@@ -122,7 +135,7 @@ fun PieChart(
         val itemOffset = if (value > 0f && floatValues.count { it > 0f } > 1) chartEntryOffset else 0f
         animateFloatAsState(
             targetValue = itemOffset,
-            animationSpec = tween(if (animate) animDuration else 0, easing = LinearOutSlowInEasing),
+            animationSpec = tween(if (animate) animDuration else 0, easing = PieChartDefaults.AnimationEasing),
             label = "offset_$index"
         )
     }
@@ -130,7 +143,7 @@ fun PieChart(
     val animatedAlphas = floatValues.mapIndexed { index, value ->
         animateFloatAsState(
             targetValue = if (value > 0f) 1f else 0f,
-            animationSpec = tween(if (animate) animDuration else 0, easing = LinearOutSlowInEasing),
+            animationSpec = tween(if (animate) animDuration else 0, easing = PieChartDefaults.AnimationEasing),
             label = "alpha_$index"
         )
     }
@@ -138,14 +151,14 @@ fun PieChart(
     val selectionFactors = entries.indices.map { index ->
         animateFloatAsState(
             targetValue = if (selectedArcIndex == index || pressedArcIndex == index) 1f else 0f,
-            animationSpec = tween(100, easing = LinearOutSlowInEasing),
+            animationSpec = tween(PieChartDefaults.ArcSelectionAnimationDuration, easing = PieChartDefaults.AnimationEasing),
             label = "selection_factor_$index"
         )
     }
 
     val emptyCircleAlpha by animateFloatAsState(
         targetValue = if (entries.sum() == 0.0) 1f else 0f,
-        animationSpec = tween(if (animate) animDuration else 0, easing = LinearOutSlowInEasing),
+        animationSpec = tween(if (animate) animDuration else 0, easing = PieChartDefaults.AnimationEasing),
         label = "empty_alpha"
     )
 
