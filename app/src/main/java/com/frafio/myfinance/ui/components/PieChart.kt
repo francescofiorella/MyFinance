@@ -75,7 +75,7 @@ fun PieChart(
         }
     }
     var selectedArc by remember(data) { mutableIntStateOf(-1) }
-    var pressedArc by remember { mutableIntStateOf(-1) }
+    var pressedArc by remember(data) { mutableIntStateOf(-1) }
 
     val isDark = isSystemInDarkTheme()
 
