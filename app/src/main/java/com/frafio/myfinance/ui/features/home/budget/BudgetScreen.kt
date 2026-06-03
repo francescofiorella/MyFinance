@@ -107,7 +107,7 @@ fun BudgetScreen(
         },
     )
 
-    IncomeList(
+    BudgetContent(
         incomes = incomes,
         isIncomesEmpty = isIncomesEmpty,
         itemMetadata = itemMetadata,
@@ -127,7 +127,7 @@ fun BudgetScreen(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun IncomeList(
+fun BudgetContent(
     incomes: List<Income>,
     isIncomesEmpty: Boolean,
     monthlyBudget: Double,
@@ -191,125 +191,21 @@ fun IncomeList(
         modifier = modifier.fillMaxSize()
     ) {
         item {
-            // Monthly Budget Card
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 64.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.currency) + " "
-                            + doubleToPrice(monthlyBudget).replace(
-                        stringResource(R.string.currency),
-                        ""
-                    ).trim(),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.displaySmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.annual_budget) + " ",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = doubleToPrice(annualBudget),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                val editInteractionSource = remember { MutableInteractionSource() }
-                val deleteInteractionSource = remember { MutableInteractionSource() }
-                ButtonGroup(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    overflowIndicator = { menuState ->
-                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
-                    }
-                ) {
-                    customItem(
-                        {
-                            FilledIconButton(
-                                modifier = Modifier
-                                    .size(IconButtonDefaults.smallContainerSize())
-                                    .animateWidth(editInteractionSource),
-                                onClick = onEditBudgetClick,
-                                shapes = IconButtonDefaults.shapes(
-                                    shape = IconButtonDefaults.smallSquareShape,
-                                ),
-                                interactionSource = editInteractionSource
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_edit_filled),
-                                    contentDescription = null,
-                                )
-                            }
-                        },
-                        {}
-                    )
-                    customItem(
-                        {
-                            FilledIconButton(
-                                modifier = Modifier
-                                    .size(IconButtonDefaults.smallContainerSize())
-                                    .animateWidth(deleteInteractionSource),
-                                onClick = onDeleteBudget,
-                                enabled = monthlyBudget != 0.0,
-                                shapes = IconButtonDefaults.shapes(
-                                    shape = IconButtonDefaults.smallSquareShape,
-                                ),
-                                interactionSource = deleteInteractionSource
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_delete_filled),
-                                    contentDescription = null
-                                )
-                            }
-                        },
-                        {}
-                    )
-                }
-            }
+            BudgetOverview(
+                monthlyBudget = monthlyBudget,
+                annualBudget = annualBudget,
+                onEditBudgetClick = onEditBudgetClick,
+                onDeleteBudget = onDeleteBudget
+            )
         }
 
         item {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 64.dp),
-                text = stringResource(R.string.incomes),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            SectionHeader(title = stringResource(R.string.incomes))
         }
 
         if (isIncomesEmpty) {
             item {
-                Box(
-                    modifier = Modifier
-                        .fillParentMaxSize()
-                        .padding(top = 64.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(R.string.warning_budget),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                IncomeEmptyState(modifier = Modifier.fillParentMaxSize())
             }
         } else {
             itemsIndexed(
@@ -323,30 +219,178 @@ fun IncomeList(
                     }
                 }
             ) { index, income ->
-                when (income.category) {
-                    FirestoreEnums.CATEGORIES.TOTAL.value -> {
-                        TotalItem(transaction = income)
-                    }
-
-                    FirestoreEnums.CATEGORIES.JOLLY.value -> {
-                        EmptyListItem(messageRes = R.string.no_incomes)
-                    }
-
-                    else -> {
-                        val metadata = itemMetadata[index] ?: Pair(0, 1)
-                        TransactionListItem(
-                            transaction = income,
-                            indexInGroup = metadata.first,
-                            countInGroup = metadata.second,
-                            onClick = { },
-                            onLongClick = { onItemLongClick(income, index) }
-                        )
-                    }
-                }
+                val metadata = itemMetadata[index] ?: Pair(0, 1)
+                IncomeItem(
+                    income = income,
+                    indexInGroup = metadata.first,
+                    countInGroup = metadata.second,
+                    onLongClick = { onItemLongClick(income, index) }
+                )
             }
             item {
                 Spacer(modifier = Modifier.height(88.dp)) // Floating Action Button space
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun BudgetOverview(
+    monthlyBudget: Double,
+    annualBudget: Double,
+    onEditBudgetClick: () -> Unit,
+    onDeleteBudget: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .padding(top = 64.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.currency) + " "
+                    + doubleToPrice(monthlyBudget).replace(
+                stringResource(R.string.currency),
+                ""
+            ).trim(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.displaySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = stringResource(R.string.annual_budget) + " ",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = doubleToPrice(annualBudget),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val editInteractionSource = remember { MutableInteractionSource() }
+        val deleteInteractionSource = remember { MutableInteractionSource() }
+        ButtonGroup(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            overflowIndicator = { menuState ->
+                ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+            }
+        ) {
+            customItem(
+                {
+                    FilledIconButton(
+                        modifier = Modifier
+                            .size(IconButtonDefaults.smallContainerSize())
+                            .animateWidth(editInteractionSource),
+                        onClick = onEditBudgetClick,
+                        shapes = IconButtonDefaults.shapes(
+                            shape = IconButtonDefaults.smallSquareShape,
+                        ),
+                        interactionSource = editInteractionSource
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_edit_filled),
+                            contentDescription = null,
+                        )
+                    }
+                },
+                {}
+            )
+            customItem(
+                {
+                    FilledIconButton(
+                        modifier = Modifier
+                            .size(IconButtonDefaults.smallContainerSize())
+                            .animateWidth(deleteInteractionSource),
+                        onClick = onDeleteBudget,
+                        enabled = monthlyBudget != 0.0,
+                        shapes = IconButtonDefaults.shapes(
+                            shape = IconButtonDefaults.smallSquareShape,
+                        ),
+                        interactionSource = deleteInteractionSource
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_delete_filled),
+                            contentDescription = null
+                        )
+                    }
+                },
+                {}
+            )
+        }
+    }
+}
+
+@Composable
+private fun SectionHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .padding(top = 64.dp),
+        text = title,
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+}
+
+@Composable
+private fun IncomeEmptyState(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier.padding(top = 64.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.warning_budget),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun IncomeItem(
+    income: Income,
+    indexInGroup: Int,
+    countInGroup: Int,
+    onLongClick: () -> Unit,
+) {
+    when (income.category) {
+        FirestoreEnums.CATEGORIES.TOTAL.value -> {
+            TotalItem(transaction = income)
+        }
+
+        FirestoreEnums.CATEGORIES.JOLLY.value -> {
+            EmptyListItem(messageRes = R.string.no_incomes)
+        }
+
+        else -> {
+            TransactionListItem(
+                transaction = income,
+                indexInGroup = indexInGroup,
+                countInGroup = countInGroup,
+                onClick = { },
+                onLongClick = onLongClick
+            )
         }
     }
 }
@@ -356,7 +400,7 @@ fun IncomeList(
 @Composable
 fun BudgetPreview() {
     MyFinanceTheme {
-        IncomeList(
+        BudgetContent(
             incomes = listOf(
                 Income(
                     id = "2024",

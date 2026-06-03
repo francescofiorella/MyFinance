@@ -207,7 +207,7 @@ fun ExpensesByCategoryCard(
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 PieChart(
-                    data = values,
+                    entries = values,
                     animate = true
                 )
             }
