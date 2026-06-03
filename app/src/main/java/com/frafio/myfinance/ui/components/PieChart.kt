@@ -75,6 +75,7 @@ fun PieChart(
         }
     }
     var selectedArc by remember(data) { mutableIntStateOf(-1) }
+    var pressedArc by remember { mutableIntStateOf(-1) }
 
     val isDark = isSystemInDarkTheme()
 
@@ -134,6 +135,17 @@ fun PieChart(
         )
     }
 
+    val selectionFactors = data.indices.map { index ->
+        animateFloatAsState(
+            targetValue = if (selectedArc == index || pressedArc == index) 1f else 0f,
+            animationSpec = tween(
+                durationMillis = 50,
+                easing = LinearOutSlowInEasing
+            ),
+            label = "selection_factor_$index"
+        )
+    }
+
     val emptyCircleAlpha by animateFloatAsState(
         targetValue = if (data.sum() == 0.0) 1f else 0f,
         animationSpec = tween(
@@ -154,33 +166,46 @@ fun PieChart(
             modifier = Modifier
                 .size(radius * 2f)
                 .pointerInput(data) {
-                    detectTapGestures { tapOffset ->
-                        val centerX = size.width / 2f
-                        val centerY = size.height / 2f
-                        val dx = tapOffset.x - centerX
-                        val dy = tapOffset.y - centerY
-                        val distance = sqrt((dx * dx + dy * dy).toDouble())
+                    detectTapGestures(
+                        onPress = { tapOffset ->
+                            val centerX = size.width / 2f
+                            val centerY = size.height / 2f
+                            val dx = tapOffset.x - centerX
+                            val dy = tapOffset.y - centerY
+                            val distance = sqrt((dx * dx + dy * dy).toDouble())
 
-                        if (distance <= (radius + barWidth * 2).toPx() &&
-                            distance >= (radius - barWidth * 2).toPx()
-                        ) {
-                            var touchAngle = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
-                            while (touchAngle < -90f) touchAngle += 360f
+                            if (distance <= (radius + barWidth * 2).toPx() &&
+                                distance >= (radius - barWidth * 2).toPx()
+                            ) {
+                                var touchAngle = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
+                                while (touchAngle < -90f) touchAngle += 360f
 
-                            var currentStartAngle = -90f
-                            floatValues.forEachIndexed { index, value ->
-                                if (value > 0f) {
-                                    val endAngle = currentStartAngle + value
-                                    if (touchAngle in (currentStartAngle - targetOffset / 2)..(endAngle + targetOffset / 2)) {
-                                        selectedArc = index
+                                var currentStartAngle = -90f
+                                var foundIndex = -1
+                                floatValues.forEachIndexed { index, value ->
+                                    if (value > 0f) {
+                                        val endAngle = currentStartAngle + value
+                                        if (touchAngle in (currentStartAngle - targetOffset / 2)..(endAngle + targetOffset / 2)) {
+                                            foundIndex = index
+                                        }
+                                        currentStartAngle = endAngle + targetOffset
                                     }
-                                    currentStartAngle = endAngle + targetOffset
+                                }
+
+                                if (foundIndex != -1) {
+                                    pressedArc = foundIndex
+                                    val released = tryAwaitRelease()
+                                    if (released) {
+                                        selectedArc = if (selectedArc == foundIndex) -1 else foundIndex
+                                    }
+                                    pressedArc = -1
                                 }
                             }
                         }
-                    }
+                    )
                 }
-        ) {
+        )
+{
             // Draw background gray circle for empty state with fade animation
             if (emptyCircleAlpha > 0.001f) {
                 drawArc(
@@ -197,50 +222,48 @@ fun PieChart(
                 val sweepAngle = animatedValueState.value
                 val animatedOffset = animatedOffsets[index].value
                 val alpha = animatedAlphas[index].value
-                if (alpha > 0.001f && sweepAngle > 0.001f) {
-                    val strokeSize: Float
-                    val actualIconSize: Dp
-                    if (selectedArc == index) {
-                        strokeSize = barWidth.toPx() * 1.2f
-                        actualIconSize = selectedIconSize
-                    } else {
-                        strokeSize = barWidth.toPx()
-                        actualIconSize = iconSize
-                    }
+                val selectionFactor = selectionFactors[index].value
 
+                if (alpha > 0.001f && sweepAngle > 0.001f) {
+                    val strokeSizePx = barWidth.toPx() * (1f + 0.2f * selectionFactor)
+                    val actualIconSizePx = iconSize.toPx() + (selectedIconSize.toPx() - iconSize.toPx()) * selectionFactor
+                    
+                    val currentRadiusPx = radius.toPx() + (barWidth.toPx() * 0.15f * selectionFactor)
+                    
                     drawArc(
                         color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark).copy(alpha = alpha),
                         startAngle = currentStartAngle,
                         sweepAngle = sweepAngle,
                         useCenter = false,
-                        size = Size(radius.toPx() * 2f, radius.toPx() * 2f),
-                        style = Stroke(width = strokeSize, cap = StrokeCap.Round),
+                        topLeft = Offset(center.x - currentRadiusPx, center.y - currentRadiusPx),
+                        size = Size(currentRadiusPx * 2f, currentRadiusPx * 2f),
+                        style = Stroke(width = strokeSizePx, cap = StrokeCap.Round),
                     )
 
                     val angleInRadians = ((currentStartAngle + sweepAngle / 2) * PI / 180).toFloat()
-                    val iconRadius = radius.toPx() + strokeSize / 2 + iconPadding.toPx() + actualIconSize.toPx() / 2
+                    val iconRadius = currentRadiusPx + strokeSizePx / 2 + iconPadding.toPx() + actualIconSizePx / 2
                     val topLeft = Offset(
-                        x = center.x + iconRadius * cos(angleInRadians) - actualIconSize.toPx() / 2,
-                        y = center.y + iconRadius * sin(angleInRadians) - actualIconSize.toPx() / 2
+                        x = center.x + iconRadius * cos(angleInRadians) - actualIconSizePx / 2,
+                        y = center.y + iconRadius * sin(angleInRadians) - actualIconSizePx / 2
                     )
 
-                    val paddingSize = 6.dp
-                    val innerIconSize = actualIconSize - paddingSize * 2
+                    val paddingSizePx = 6.dp.toPx()
+                    val innerIconSizePx = actualIconSizePx - paddingSizePx * 2
 
                     drawRoundRect(
                         color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark).copy(alpha = alpha),
-                        size = Size(actualIconSize.toPx(), actualIconSize.toPx()),
+                        size = Size(actualIconSizePx, actualIconSizePx),
                         cornerRadius = CornerRadius(160.dp.toPx()),
                         topLeft = topLeft
                     )
 
                     translate(
-                        left = topLeft.x + paddingSize.toPx(),
-                        top = topLeft.y + paddingSize.toPx()
+                        left = topLeft.x + paddingSizePx,
+                        top = topLeft.y + paddingSizePx
                     ) {
                         with(painters[index]) {
                             draw(
-                                size = Size(innerIconSize.toPx(), innerIconSize.toPx()),
+                                size = Size(innerIconSizePx, innerIconSizePx),
                                 colorFilter = ColorFilter.tint(getCategoryOnContainerColor(index, default = surfaceColor, isDark = isDark)),
                                 alpha = alpha
                             )
