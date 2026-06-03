@@ -171,7 +171,7 @@ fun PieChart(
     ) {
         // Empty State Background
         if (emptyCircleAlpha > 0.001f) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
+            Canvas(modifier = Modifier.size(radius * 2f)) {
                 drawArc(
                     color = surfaceVariant.copy(alpha = emptyCircleAlpha),
                     startAngle = 0f,

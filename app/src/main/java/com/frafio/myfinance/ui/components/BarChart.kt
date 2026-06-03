@@ -50,17 +50,23 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
+object BarChartDefaults {
+    val BarWidth: Dp = 40.dp
+    val BarPadding: Dp = 3.dp
+    val BarMaxHeight: Dp = 160.dp
+}
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BarChart(
     modifier: Modifier = Modifier,
     entries: List<BarChartEntry>,
     referenceValue: Double? = null,
-    barWidth: Dp = 40.dp,
-    barPadding: Dp = 3.dp,
-    barMaxHeight: Dp = 160.dp,
     onBarClick: (Int) -> Unit = {},
-    resetIndicatorHook: Boolean = false
+    resetIndicatorHook: Boolean = false,
+    barWidth: Dp = BarChartDefaults.BarWidth,
+    barPadding: Dp = BarChartDefaults.BarPadding,
+    barMaxHeight: Dp = BarChartDefaults.BarMaxHeight
 ) {
     BoxWithConstraints(modifier = modifier) {
         val maxWidth = maxWidth
