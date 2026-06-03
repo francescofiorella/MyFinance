@@ -50,24 +50,29 @@ import com.frafio.myfinance.utils.getCategoryTextColor
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
-import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.sqrt
 
 @Composable
 fun PieChart(
     data: List<Double>,
-    radiusOuter: Dp = 80.dp,
-    chartBarOffset: Dp = 1.dp,
-    chartBarWidth: Dp = 12.dp,
-    unselectedIconSize: Dp = 32.dp,
+    radius: Dp = 80.dp,
+    barWidth: Dp = 14.dp,
+    offsetBetweenBars: Dp = 4.dp,
+    iconSize: Dp = 32.dp,
     selectedIconSize: Dp = 36.dp,
-    iconDistance: Dp = 16.dp,
+    iconPadding: Dp = 6.dp,
     animate: Boolean = true,
     animDuration: Int = 1000
 ) {
-    val chartEntryOffset = with(LocalDensity.current) {
-        chartBarOffset.toPx().roundToInt() + (chartBarWidth.toPx().roundToInt() / 4)
+    val density = LocalDensity.current
+    val chartEntryOffset = remember(offsetBetweenBars, barWidth, radius, density) {
+        with(density) {
+            val radiusPx = radius.toPx()
+            if (radiusPx > 0) {
+                ((offsetBetweenBars.toPx() + barWidth.toPx()) / radiusPx) * (180f / PI.toFloat())
+            } else 0f
+        }
     }
     var selectedArc by remember(data) { mutableIntStateOf(-1) }
 
@@ -82,10 +87,10 @@ fun PieChart(
     val totalText = stringResource(R.string.total)
     val totalPriceText = doubleToPriceWithoutDecimals(data.sum())
 
-    val floatValues = remember(data) {
+    val floatValues = remember(data, chartEntryOffset) {
         val values = mutableListOf<Float>()
         val count = data.count { v -> v > 0.0 }
-        val offset = if (count <= 1) 0 else chartEntryOffset
+        val offset = if (count <= 1) 0f else chartEntryOffset
         val totalOffset = offset * count
         val sum = data.sum()
         data.forEach { value ->
@@ -107,7 +112,7 @@ fun PieChart(
     }
 
     val animatedOffsets = floatValues.mapIndexed { index, value ->
-        val itemOffset = if (value > 0f && floatValues.count { it > 0f } > 1) chartEntryOffset.toFloat() else 0f
+        val itemOffset = if (value > 0f && floatValues.count { it > 0f } > 1) chartEntryOffset else 0f
         animateFloatAsState(
             targetValue = itemOffset,
             animationSpec = tween(
@@ -138,15 +143,16 @@ fun PieChart(
         label = "empty_alpha"
     )
 
-    val targetOffset = if (data.count { v -> v > 0.0 } <= 1) 0 else chartEntryOffset
+    val targetOffset = if (data.count { v -> v > 0.0 } <= 1) 0f else chartEntryOffset
+    val chartPadding = selectedIconSize + iconPadding + (barWidth * 0.6f) + 4.dp
 
     Box(
-        modifier = Modifier.padding(unselectedIconSize + iconDistance),
+        modifier = Modifier.padding(chartPadding),
         contentAlignment = Alignment.Center
     ) {
         Canvas(
             modifier = Modifier
-                .size(radiusOuter * 2f)
+                .size(radius * 2f)
                 .pointerInput(data) {
                     detectTapGestures { tapOffset ->
                         val centerX = size.width / 2f
@@ -155,8 +161,8 @@ fun PieChart(
                         val dy = tapOffset.y - centerY
                         val distance = sqrt((dx * dx + dy * dy).toDouble())
 
-                        if (distance <= (radiusOuter + chartBarWidth).toPx() &&
-                            distance >= (radiusOuter - chartBarWidth * 2).toPx()
+                        if (distance <= (radius + barWidth * 2).toPx() &&
+                            distance >= (radius - barWidth * 2).toPx()
                         ) {
                             var touchAngle = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
                             while (touchAngle < -90f) touchAngle += 360f
@@ -182,7 +188,7 @@ fun PieChart(
                     startAngle = 0f,
                     sweepAngle = 360f,
                     useCenter = false,
-                    style = Stroke(chartBarWidth.toPx())
+                    style = Stroke(barWidth.toPx())
                 )
             }
 
@@ -193,13 +199,13 @@ fun PieChart(
                 val alpha = animatedAlphas[index].value
                 if (alpha > 0.001f && sweepAngle > 0.001f) {
                     val strokeSize: Float
-                    val iconSize: Dp
+                    val actualIconSize: Dp
                     if (selectedArc == index) {
-                        strokeSize = chartBarWidth.toPx() * 1.2f
-                        iconSize = selectedIconSize
+                        strokeSize = barWidth.toPx() * 1.2f
+                        actualIconSize = selectedIconSize
                     } else {
-                        strokeSize = chartBarWidth.toPx()
-                        iconSize = unselectedIconSize
+                        strokeSize = barWidth.toPx()
+                        actualIconSize = iconSize
                     }
 
                     drawArc(
@@ -207,23 +213,23 @@ fun PieChart(
                         startAngle = currentStartAngle,
                         sweepAngle = sweepAngle,
                         useCenter = false,
-                        size = Size(radiusOuter.toPx() * 2f, radiusOuter.toPx() * 2f),
+                        size = Size(radius.toPx() * 2f, radius.toPx() * 2f),
                         style = Stroke(width = strokeSize, cap = StrokeCap.Round),
                     )
 
                     val angleInRadians = ((currentStartAngle + sweepAngle / 2) * PI / 180).toFloat()
-                    val iconRadius = radiusOuter.toPx() + strokeSize + iconDistance.toPx()
+                    val iconRadius = radius.toPx() + strokeSize / 2 + iconPadding.toPx() + actualIconSize.toPx() / 2
                     val topLeft = Offset(
-                        x = center.x + iconRadius * cos(angleInRadians) - iconSize.toPx() / 2,
-                        y = center.y + iconRadius * sin(angleInRadians) - iconSize.toPx() / 2
+                        x = center.x + iconRadius * cos(angleInRadians) - actualIconSize.toPx() / 2,
+                        y = center.y + iconRadius * sin(angleInRadians) - actualIconSize.toPx() / 2
                     )
 
                     val paddingSize = 6.dp
-                    val innerIconSize = iconSize - paddingSize * 2
+                    val innerIconSize = actualIconSize - paddingSize * 2
 
                     drawRoundRect(
                         color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark).copy(alpha = alpha),
-                        size = Size(iconSize.toPx(), iconSize.toPx()),
+                        size = Size(actualIconSize.toPx(), actualIconSize.toPx()),
                         cornerRadius = CornerRadius(160.dp.toPx()),
                         topLeft = topLeft
                     )
