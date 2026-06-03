@@ -33,7 +33,7 @@ class UserRepository @Inject constructor(
 ) {
 
     private var _lastUser: User? = null
-    private val _profilePicture = kotlinx.coroutines.flow.MutableStateFlow<Bitmap?>(profileImageStorage.loadBitmapSync())
+    private val _profilePicture = kotlinx.coroutines.flow.MutableStateFlow(profileImageStorage.loadBitmapSync())
     val profilePicture: Flow<Bitmap?> = _profilePicture.asStateFlow()
 
     companion object {

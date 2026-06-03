@@ -1,7 +1,6 @@
 package com.frafio.myfinance.ui.home
 
 import android.graphics.Bitmap
-import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.data.enums.auth.AuthCode
@@ -16,6 +15,7 @@ import com.frafio.myfinance.data.repository.UserRepository
 import com.frafio.myfinance.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.ui.navigation.HomeTabKey
 import androidx.navigation3.runtime.NavKey
+import com.frafio.myfinance.data.storage.ProfileImageStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -57,7 +57,7 @@ class HomeViewModel @Inject constructor(
     private val expensesLocalRepository: ExpensesLocalRepository,
     private val incomesLocalRepository: IncomesLocalRepository,
     private val loadingRepository: LoadingRepository,
-    profileImageStorage: com.frafio.myfinance.data.storage.ProfileImageStorage
+    profileImageStorage: ProfileImageStorage
 ) : ViewModel() {
 
     val profilePicture: StateFlow<Bitmap?> = userRepository.profilePicture
@@ -168,7 +168,7 @@ class HomeViewModel @Inject constructor(
         return user.value?.fullName ?: ""
     }
 
-    fun onLogoutButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun onLogoutButtonClick() {
         viewModelScope.launch {
             val logoutResult = userRepository.userLogout()
             if (logoutResult.code == AuthCode.LOGOUT_SUCCESS.code) {

@@ -411,8 +411,7 @@ fun ExpensesList(
         scrollToIdFlow.collect { id ->
             if (id != null) {
                 snapshotFlow { currentExpenses }
-                    .filter { list -> list.any { it.id.startsWith(id) } }
-                    .first()
+                    .first { list -> list.any { it.id.startsWith(id) } }
                     .let { list ->
                         val index = list.indexOfFirst { it.id.startsWith(id) }
                         if (index != -1) {

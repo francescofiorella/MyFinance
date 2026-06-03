@@ -39,7 +39,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -77,7 +76,6 @@ fun HomeScreen(
     onNavigateToRoot: (RootKey) -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String
 ) {
-    val context = LocalContext.current
     val navigator = remember { Navigator(appState.navigationState) }
     val currentTab = appState.navigationState.currentTopLevelKey as HomeTabKey
 
@@ -141,7 +139,7 @@ fun HomeScreen(
                 )
             )
         },
-        onLogoutClick = { homeViewModel.onLogoutButtonClick(android.view.View(context)) },
+        onLogoutClick = { homeViewModel.onLogoutButtonClick() },
         onProPicClick = { navigator.navigate(HomeTabKey.Profile) },
         screenContent = {
             val homeEntries = appState.navigationState.toEntries(

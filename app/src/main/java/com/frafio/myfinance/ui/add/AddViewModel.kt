@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.data.enums.db.FinanceCode
@@ -31,7 +30,6 @@ import java.time.LocalDate
 sealed class AddUiEvent {
     data class Success(
         val result: FinanceResult,
-        val id: String,
         val isExpense: Boolean,
         val day: Int,
         val month: Int,
@@ -46,7 +44,6 @@ class AddViewModel @AssistedInject constructor(
     private val incomeRepository: IncomeRepository,
     private val loadingRepository: LoadingRepository,
     @Assisted private val initialNavKey: RootKey.AddEditTransaction,
-    @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     @AssistedFactory
@@ -177,7 +174,7 @@ class AddViewModel @AssistedInject constructor(
                             )
                             expensesRepository.addExpense(expense).also {
                                 if (it.code == FinanceCode.EXPENSE_ADD_SUCCESS.code) {
-                                    _uiEvents.emit(AddUiEvent.Success(it, expense.id, true, day, month, year))
+                                    _uiEvents.emit(AddUiEvent.Success(it, true, day, month, year))
                                 } else {
                                     _uiEvents.emit(AddUiEvent.Error(it))
                                 }
@@ -195,7 +192,7 @@ class AddViewModel @AssistedInject constructor(
                             )
                             incomeRepository.addIncome(income).also {
                                 if (it.code == FinanceCode.INCOME_ADD_SUCCESS.code) {
-                                    _uiEvents.emit(AddUiEvent.Success(it, income.id, false, day, month, year))
+                                    _uiEvents.emit(AddUiEvent.Success(it, false, day, month, year))
                                 } else {
                                     _uiEvents.emit(AddUiEvent.Error(it))
                                 }
@@ -218,7 +215,7 @@ class AddViewModel @AssistedInject constructor(
                             )
                             expensesRepository.editExpense(expense).also {
                                 if (it.code == FinanceCode.EXPENSE_EDIT_SUCCESS.code) {
-                                    _uiEvents.emit(AddUiEvent.Success(it, expense.id, true, day, month, year))
+                                    _uiEvents.emit(AddUiEvent.Success(it, true, day, month, year))
                                 } else {
                                     _uiEvents.emit(AddUiEvent.Error(it))
                                 }
@@ -237,7 +234,7 @@ class AddViewModel @AssistedInject constructor(
                             )
                             incomeRepository.editIncome(income).also {
                                 if (it.code == FinanceCode.INCOME_EDIT_SUCCESS.code) {
-                                    _uiEvents.emit(AddUiEvent.Success(it, income.id, false, day, month, year))
+                                    _uiEvents.emit(AddUiEvent.Success(it, false, day, month, year))
                                 } else {
                                     _uiEvents.emit(AddUiEvent.Error(it))
                                 }
