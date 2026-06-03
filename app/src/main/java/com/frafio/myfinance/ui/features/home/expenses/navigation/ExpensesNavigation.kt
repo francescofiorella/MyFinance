@@ -11,15 +11,18 @@ import com.frafio.myfinance.ui.features.home.expenses.ExpensesScreen
 import com.frafio.myfinance.ui.home.expenses.ExpensesUiEvent
 import com.frafio.myfinance.ui.home.expenses.ExpensesViewModel
 import com.frafio.myfinance.ui.navigation.MyFinanceAppState
-import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
+import com.frafio.myfinance.ui.navigation.HomeTabKey
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 fun EntryProviderScope<NavKey>.expensesEntry(
     appState: MyFinanceAppState,
+    parentScrollEvents: Flow<Pair<String, Boolean>?>,
+    resetParentScrollEvents: () -> Unit,
     onItemLongClick: (Expense, Int) -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
 ) {
-    entry<MyFinanceNavKey.Expenses> {
+    entry<HomeTabKey.Expenses> {
         val viewModel: ExpensesViewModel = hiltViewModel()
 
         val expenseDeletedString = stringResource(id = R.string.expense_deleted)
@@ -28,10 +31,22 @@ fun EntryProviderScope<NavKey>.expensesEntry(
 
         LaunchedEffect(appState.reselectEvent) {
             appState.reselectEvent.collect { key ->
-                if (key == MyFinanceNavKey.Expenses) {
+                if (key == HomeTabKey.Expenses) {
                     val today = LocalDate.now()
                     val todayId = "total_${today.dayOfMonth}_${today.monthValue}_${today.year}"
                     viewModel.scrollToId(todayId)
+                }
+            }
+        }
+
+        LaunchedEffect(parentScrollEvents) {
+            parentScrollEvents.collect { event ->
+                if (event != null) {
+                    val (id, isExpense) = event
+                    if (isExpense) {
+                        viewModel.scrollToId(id)
+                        resetParentScrollEvents()
+                    }
                 }
             }
         }

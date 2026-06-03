@@ -11,12 +11,14 @@ import com.frafio.myfinance.utils.doubleToPriceWithoutDecimals
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
 @Parcelize
 @Immutable
 @IgnoreExtraProperties
 @Entity
+@Serializable
 data class Expense(
     override val name: String? = null,
     override val price: Double? = null,

@@ -26,17 +26,17 @@ class Navigator(val state: NavigationState) {
      * Go back to the previous navigation key.
      */
     fun goBack() {
-        if (state.currentKey == state.startKey) {
-            // Use callback or similar to close app if needed, 
-            // but usually this is handled by BackHandler in UI
-            return
-        }
-        
         when (state.currentKey) {
+            state.startKey -> {
+                // Cannot go back from start key in this sub-stack-based navigator
+                // This might be handled by the parent layer
+            }
             state.currentTopLevelKey -> {
                 // We're at the base of the current sub stack, go back to the previous top level
                 // stack.
-                state.topLevelStack.removeLastOrNull()
+                if (state.topLevelStack.size > 1) {
+                    state.topLevelStack.removeLastOrNull()
+                }
             }
             else -> state.currentSubStack.removeLastOrNull()
         }

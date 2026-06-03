@@ -162,7 +162,7 @@ fun IncomeList(
         scrollToIdFlow.collect { id ->
             if (id != null) {
                 snapshotFlow { currentIncomes }
-                    .filter { it.isNotEmpty() }
+                    .filter { list -> list.any { it.id.startsWith(id) } }
                     .first()
                     .let { list ->
                         val index = list.indexOfFirst { it.id.startsWith(id) }

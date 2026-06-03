@@ -9,21 +9,46 @@ import android.view.animation.LinearInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.frafio.myfinance.data.enums.db.FinanceCode
-import com.frafio.myfinance.ui.add.AddActivity
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberDecoratedNavEntries
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
+import com.frafio.myfinance.data.repository.LoadingRepository
 import com.frafio.myfinance.ui.auth.AuthActivity
+import com.frafio.myfinance.ui.features.add.navigation.addEntry
 import com.frafio.myfinance.ui.features.home.HomeScreen
-import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
+import com.frafio.myfinance.ui.navigation.LocalSnackbarHostState
+import com.frafio.myfinance.ui.navigation.RootKey
 import com.frafio.myfinance.ui.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.ui.theme.MyFinanceTheme
 import com.frafio.myfinance.utils.dateToExtendedString
@@ -33,46 +58,18 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeActivity : ComponentActivity() {
 
     private val viewModel by viewModels<HomeViewModel>()
 
+    @Inject
+    lateinit var loadingRepository: LoadingRepository
+
     private var userRequest: Boolean = false
     private var isLayoutReady by mutableStateOf(false)
-
-    private var addResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val data = result.data!!
-            val expenseRequest = data.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
-            val message = data.getStringExtra(AddActivity.ADD_RESULT_MESSAGE) ?: ""
-            when (expenseRequest) {
-                AddActivity.REQUEST_EXPENSE_CODE -> {
-                    viewModel.navigateTo(MyFinanceNavKey.Expenses)
-                    viewModel.showSnackBar(message)
-                }
-
-                AddActivity.REQUEST_INCOME_CODE -> {
-                    viewModel.navigateTo(MyFinanceNavKey.Budget)
-                    viewModel.showSnackBar(message)
-                }
-            }
-        }
-    }
-
-    private var editResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val data: Intent? = result.data
-            val editRequest = data?.getIntExtra(AddActivity.EXPENSE_REQUEST_KEY, -1)
-
-            if (editRequest == AddActivity.REQUEST_EXPENSE_CODE) {
-                viewModel.showSnackBar(FinanceCode.EXPENSE_EDIT_SUCCESS.message)
-            } else if (editRequest == AddActivity.REQUEST_INCOME_CODE) {
-                viewModel.showSnackBar(FinanceCode.INCOME_EDIT_SUCCESS.message)
-            }
-        }
-    }
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -139,58 +136,81 @@ class HomeActivity : ComponentActivity() {
         setContent {
             val userPreferences by viewModel.userPreferences.collectAsStateWithLifecycle()
             val useDynamicColor = userPreferences?.dynamicColor ?: false
+            val isLoading by loadingRepository.isLoading.collectAsStateWithLifecycle()
 
             MyFinanceTheme(dynamicColor = useDynamicColor) {
                 val appState = rememberMyFinanceAppState()
-                HomeScreen(
-                    appState = appState,
-                    viewModel = viewModel,
-                    onAddClick = { onAddButtonClick() },
-                    onLogoutClick = { viewModel.onLogoutButtonClick(View(this)) },
-                    onProPicClick = { viewModel.navigateTo(MyFinanceNavKey.Profile) },
-                    onEditExpense = { expense, position ->
-                        Intent(this, AddActivity::class.java).also {
-                            it.putExtra(
-                                AddActivity.REQUEST_CODE_KEY,
-                                AddActivity.REQUEST_EDIT_CODE
-                            )
-                            it.putExtra(
-                                AddActivity.EXPENSE_REQUEST_KEY,
-                                AddActivity.REQUEST_EXPENSE_CODE
-                            )
-                            it.putExtra(AddActivity.EXTRA_TRANSACTION, expense)
-                            it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                            editResultLauncher.launch(it)
-                        }
-                    },
-                    onEditIncome = { income, position ->
-                        Intent(this, AddActivity::class.java).also {
-                            it.putExtra(
-                                AddActivity.REQUEST_CODE_KEY,
-                                AddActivity.REQUEST_EDIT_CODE
-                            )
-                            it.putExtra(
-                                AddActivity.EXPENSE_REQUEST_KEY,
-                                AddActivity.REQUEST_INCOME_CODE
-                            )
-                            it.putExtra(AddActivity.EXTRA_TRANSACTION, income)
-                            it.putExtra(AddActivity.EXPENSE_POSITION_KEY, position)
-                            editResultLauncher.launch(it)
-                        }
-                    },
-                    getDateLabel = { start, end -> getDateChipLabel(start, end) }
-                )
-            }
-        }
-    }
+                val rootBackStack = rememberNavBackStack(RootKey.Home)
 
-    private fun onAddButtonClick() {
-        Intent(applicationContext, AddActivity::class.java).also {
-            it.putExtra(
-                AddActivity.REQUEST_CODE_KEY,
-                AddActivity.REQUEST_ADD_CODE
-            )
-            addResultLauncher.launch(it)
+                LaunchedEffect(isLoading) {
+                    appState.showProgress = isLoading
+                }
+
+                val decorators = listOf(
+                    rememberSaveableStateHolderNavEntryDecorator<NavKey>(),
+                    rememberViewModelStoreNavEntryDecorator()
+                )
+                val rootEntries = rememberDecoratedNavEntries(
+                    backStack = rootBackStack,
+                    entryDecorators = decorators,
+                    entryProvider = entryProvider {
+                        entry<RootKey.Home> {
+                            HomeScreen(
+                                appState = appState,
+                                homeViewModel = viewModel,
+                                onNavigateToRoot = { rootKey ->
+                                    rootBackStack.add(rootKey)
+                                },
+                                getDateLabel = { start, end -> getDateChipLabel(start, end) }
+                            )
+                        }
+                        addEntry(
+                            appState = appState,
+                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
+                            onSaveSuccess = { isExpense, day, month, year ->
+                                viewModel.onTransactionCommitted(isExpense, day, month, year)
+                                rootBackStack.removeAt(rootBackStack.size - 1)
+                            }
+                        )
+                    }
+                )
+
+                CompositionLocalProvider(LocalSnackbarHostState provides appState.snackbarHostState) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        NavDisplay(
+                            entries = rootEntries,
+                            transitionSpec = { slideInHorizontally(initialOffsetX = { (it * 0.1).toInt() }) + fadeIn() togetherWith
+                                    slideOutHorizontally(targetOffsetX = { -(it * 0.1).toInt() }) + fadeOut() },
+                            popTransitionSpec = { slideInHorizontally(initialOffsetX = { -(it * 0.1).toInt() }) + fadeIn() togetherWith
+                                    slideOutHorizontally(targetOffsetX = { (it * 0.1).toInt() }) + fadeOut() },
+                            predictivePopTransitionSpec = { slideInHorizontally(initialOffsetX = { -(it * 0.1).toInt() }) + fadeIn() togetherWith
+                                    slideOutHorizontally(targetOffsetX = { (it * 0.1).toInt() }) + fadeOut() },
+                            onBack = { rootBackStack.removeAt(rootBackStack.size - 1) }
+                        )
+
+                        if (appState.showProgress) {
+                            val density = LocalDensity.current
+                            val amplitude = with(density) { 3.dp.toPx() }
+                            val stroke = Stroke(
+                                width = with(density) { 4.dp.toPx() },
+                                cap = StrokeCap.Round,
+                            )
+                            val waveLength = 40.dp
+                            LinearWavyProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .statusBarsPadding()
+                                    .align(Alignment.TopCenter),
+                                stroke = stroke,
+                                trackStroke = stroke,
+                                amplitude = amplitude,
+                                wavelength = waveLength,
+                                waveSpeed = waveLength
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 

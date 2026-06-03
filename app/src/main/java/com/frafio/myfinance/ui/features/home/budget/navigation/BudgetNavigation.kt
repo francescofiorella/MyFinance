@@ -12,14 +12,17 @@ import com.frafio.myfinance.ui.features.home.budget.BudgetScreen
 import com.frafio.myfinance.ui.home.budget.BudgetUiEvent
 import com.frafio.myfinance.ui.home.budget.BudgetViewModel
 import com.frafio.myfinance.ui.navigation.MyFinanceAppState
-import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
+import com.frafio.myfinance.ui.navigation.HomeTabKey
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 fun EntryProviderScope<NavKey>.budgetEntry(
     appState: MyFinanceAppState,
+    parentScrollEvents: Flow<Pair<String, Boolean>?>,
+    resetParentScrollEvents: () -> Unit,
     onEditIncome: (Income, Int) -> Unit,
 ) {
-    entry<MyFinanceNavKey.Budget> {
+    entry<HomeTabKey.Budget> {
         val viewModel: BudgetViewModel = hiltViewModel()
         val coroutineScope = rememberCoroutineScope()
 
@@ -29,8 +32,20 @@ fun EntryProviderScope<NavKey>.budgetEntry(
 
         LaunchedEffect(appState.reselectEvent) {
             appState.reselectEvent.collect { key ->
-                if (key == MyFinanceNavKey.Budget) {
+                if (key == HomeTabKey.Budget) {
                     viewModel.scrollToId(null)
+                }
+            }
+        }
+
+        LaunchedEffect(parentScrollEvents) {
+            parentScrollEvents.collect { event ->
+                if (event != null) {
+                    val (id, isExpense) = event
+                    if (!isExpense) {
+                        viewModel.scrollToId(id)
+                        resetParentScrollEvents()
+                    }
                 }
             }
         }

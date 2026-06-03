@@ -411,16 +411,17 @@ fun ExpensesList(
         scrollToIdFlow.collect { id ->
             if (id != null) {
                 snapshotFlow { currentExpenses }
-                    .filter { it.isNotEmpty() }
+                    .filter { list -> list.any { it.id.startsWith(id) } }
                     .first()
                     .let { list ->
                         val index = list.indexOfFirst { it.id.startsWith(id) }
-                        val finalIndex = if (index != -1) index else 0
-                        if (isFirstScroll) {
-                            listState.scrollToItem(finalIndex)
-                            isFirstScroll = false
-                        } else {
-                            listState.animateScrollToItem(finalIndex)
+                        if (index != -1) {
+                            if (isFirstScroll) {
+                                listState.scrollToItem(index)
+                                isFirstScroll = false
+                            } else {
+                                listState.animateScrollToItem(index)
+                            }
                         }
                     }
             }

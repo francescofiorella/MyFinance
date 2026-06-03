@@ -12,7 +12,7 @@ import com.frafio.myfinance.ui.features.home.profile.ProfileScreen
 import com.frafio.myfinance.ui.home.profile.ProfileUiEvent
 import com.frafio.myfinance.ui.home.profile.ProfileViewModel
 import com.frafio.myfinance.ui.navigation.MyFinanceAppState
-import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
+import com.frafio.myfinance.ui.navigation.HomeTabKey
 import kotlinx.coroutines.launch
 
 fun EntryProviderScope<NavKey>.profileEntry(
@@ -21,7 +21,7 @@ fun EntryProviderScope<NavKey>.profileEntry(
     profilePicture: android.graphics.Bitmap? = null,
     onUploadProPic: () -> Unit
 ) {
-    entry<MyFinanceNavKey.Profile> {
+    entry<HomeTabKey.Profile> {
         val viewModel: ProfileViewModel = hiltViewModel()
         val coroutineScope = rememberCoroutineScope()
 
@@ -30,7 +30,7 @@ fun EntryProviderScope<NavKey>.profileEntry(
 
         LaunchedEffect(appState.reselectEvent) {
             appState.reselectEvent.collect { key ->
-                if (key == MyFinanceNavKey.Profile) {
+                if (key == HomeTabKey.Profile) {
                     viewModel.scrollToTop()
                 }
             }

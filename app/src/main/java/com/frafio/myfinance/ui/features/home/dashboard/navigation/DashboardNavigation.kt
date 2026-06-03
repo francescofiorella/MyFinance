@@ -7,15 +7,15 @@ import androidx.navigation3.runtime.NavKey
 import com.frafio.myfinance.ui.features.home.dashboard.DashboardScreen
 import com.frafio.myfinance.ui.home.dashboard.DashboardViewModel
 import com.frafio.myfinance.ui.navigation.MyFinanceAppState
-import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
+import com.frafio.myfinance.ui.navigation.HomeTabKey
 
 fun EntryProviderScope<NavKey>.dashboardEntry(appState: MyFinanceAppState) {
-    entry<MyFinanceNavKey.Dashboard> {
+    entry<HomeTabKey.Dashboard> {
         val viewModel: DashboardViewModel = hiltViewModel()
 
         LaunchedEffect(appState.reselectEvent) {
             appState.reselectEvent.collect { key ->
-                if (key == MyFinanceNavKey.Dashboard) {
+                if (key == HomeTabKey.Dashboard) {
                     viewModel.scrollToTop()
                 }
             }

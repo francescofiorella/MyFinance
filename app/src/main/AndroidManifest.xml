@@ -17,11 +17,6 @@
         android:usesCleartextTraffic="false"
         tools:targetApi="33">
         <activity
-            android:name=".ui.add.AddActivity"
-            android:enableOnBackInvokedCallback="false"
-            android:exported="false"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
             android:name=".ui.auth.AuthActivity"
             android:enableOnBackInvokedCallback="true"
             android:exported="false"

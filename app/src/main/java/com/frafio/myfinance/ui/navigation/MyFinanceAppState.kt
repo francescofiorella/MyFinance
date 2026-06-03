@@ -4,7 +4,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -19,44 +18,39 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-val TOP_LEVEL_NAV_KEYS: Set<NavKey> = setOf(
-    MyFinanceNavKey.Dashboard,
-    MyFinanceNavKey.Expenses,
-    MyFinanceNavKey.Budget,
-    MyFinanceNavKey.Profile
-)
-
 @Composable
 fun rememberMyFinanceAppState(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ): MyFinanceAppState {
+    val snackbarHostState = remember { SnackbarHostState() }
     val navigationState = rememberNavigationState(
-        startKey = MyFinanceNavKey.Dashboard,
-        topLevelKeys = TOP_LEVEL_NAV_KEYS
+        startKey = HomeTabKey.Dashboard,
+        topLevelKeys = setOf(
+            HomeTabKey.Dashboard,
+            HomeTabKey.Expenses,
+            HomeTabKey.Budget,
+            HomeTabKey.Profile
+        )
     )
 
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    NavigationTrackingSideEffect(navigationState)
-
     return remember(
-        navigationState,
         coroutineScope,
-        snackbarHostState
+        snackbarHostState,
+        navigationState
     ) {
         MyFinanceAppState(
-            navigationState = navigationState,
             coroutineScope = coroutineScope,
-            snackbarHostState = snackbarHostState
+            snackbarHostState = snackbarHostState,
+            navigationState = navigationState
         )
     }
 }
 
 @Stable
 class MyFinanceAppState(
-    val navigationState: NavigationState,
     val coroutineScope: CoroutineScope,
-    val snackbarHostState: SnackbarHostState
+    val snackbarHostState: SnackbarHostState,
+    val navigationState: NavigationState
 ) {
     var showProgress by mutableStateOf(false)
 
@@ -87,17 +81,6 @@ class MyFinanceAppState(
                 dismissFun()
             }
         }
-    }
-}
-
-/**
- * Stores information about navigation events for analytics or performance monitoring.
- */
-@Composable
-private fun NavigationTrackingSideEffect(navigationState: NavigationState) {
-    LaunchedEffect(navigationState.currentKey) {
-        // Track navigation events here (e.g. Firebase Analytics, JankStats)
-        // Log.d("Navigation", "Navigated to: ${navigationState.currentKey}")
     }
 }
 

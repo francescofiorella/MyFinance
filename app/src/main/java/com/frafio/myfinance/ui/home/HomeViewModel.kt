@@ -14,9 +14,11 @@ import com.frafio.myfinance.data.repository.LoadingRepository
 import com.frafio.myfinance.data.repository.UserPreferencesData
 import com.frafio.myfinance.data.repository.UserRepository
 import com.frafio.myfinance.data.repository.UserPreferencesRepository
-import com.frafio.myfinance.ui.navigation.MyFinanceNavKey
+import com.frafio.myfinance.ui.navigation.HomeTabKey
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -58,8 +60,6 @@ class HomeViewModel @Inject constructor(
     profileImageStorage: com.frafio.myfinance.data.storage.ProfileImageStorage
 ) : ViewModel() {
 
-    val isLoading: StateFlow<Boolean> = loadingRepository.isLoading
-
     val profilePicture: StateFlow<Bitmap?> = userRepository.profilePicture
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), profileImageStorage.loadBitmapSync())
 
@@ -78,8 +78,14 @@ class HomeViewModel @Inject constructor(
             initialValue = null
         )
 
-    private val _navEvents = Channel<MyFinanceNavKey>(Channel.BUFFERED)
-    val navEvents: Flow<MyFinanceNavKey> = _navEvents.receiveAsFlow()
+    private val _navEvents = Channel<NavKey>(Channel.BUFFERED)
+    val navEvents: Flow<NavKey> = _navEvents.receiveAsFlow()
+
+    private val _scrollEvents = MutableSharedFlow<Pair<String, Boolean>?>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val scrollEvents: Flow<Pair<String, Boolean>?> = _scrollEvents.asSharedFlow()
 
     private val _uiEvents = MutableSharedFlow<HomeUiEvent>()
     val uiEvents: SharedFlow<HomeUiEvent> = _uiEvents.asSharedFlow()
@@ -87,23 +93,28 @@ class HomeViewModel @Inject constructor(
     private val _logicEvents = MutableSharedFlow<HomeLogicEvent>()
     val logicEvents: SharedFlow<HomeLogicEvent> = _logicEvents.asSharedFlow()
 
-    fun navigateTo(key: MyFinanceNavKey) {
+    fun navigateTo(key: NavKey) {
         viewModelScope.launch { _navEvents.send(key) }
     }
 
-    fun showSnackBar(
-        message: String,
-        actionText: String? = null,
-        actionFun: () -> Unit = {},
-        dismissFun: () -> Unit = {}
-    ) {
+    fun onTransactionCommitted(isExpense: Boolean, day: Int, month: Int, year: Int) {
         viewModelScope.launch {
-            _uiEvents.emit(HomeUiEvent.ShowSnackBar(
-                message,
-                actionText,
-                actionFun,
-                dismissFun
-            ))
+            val targetTab = if (isExpense) HomeTabKey.Expenses else HomeTabKey.Budget
+            navigateTo(targetTab)
+
+            val scrollId = if (isExpense) {
+                "total_${day}_${month}_${year}"
+            } else {
+                year.toString()
+            }
+
+            _scrollEvents.emit(scrollId to isExpense)
+        }
+    }
+
+    fun resetScrollEvent() {
+        viewModelScope.launch {
+            _scrollEvents.emit(null)
         }
     }
 

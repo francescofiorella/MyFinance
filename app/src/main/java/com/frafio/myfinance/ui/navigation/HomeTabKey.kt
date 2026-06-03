@@ -4,16 +4,16 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface MyFinanceNavKey : NavKey {
+sealed interface HomeTabKey : NavKey {
     @Serializable
-    data object Dashboard : MyFinanceNavKey
+    data object Dashboard : HomeTabKey
 
     @Serializable
-    data object Expenses : MyFinanceNavKey
+    data object Expenses : HomeTabKey
 
     @Serializable
-    data object Budget : MyFinanceNavKey
+    data object Budget : HomeTabKey
 
     @Serializable
-    data object Profile : MyFinanceNavKey
+    data object Profile : HomeTabKey
 }
