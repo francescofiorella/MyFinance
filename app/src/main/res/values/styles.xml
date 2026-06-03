@@ -48,26 +48,6 @@
         </item>
     </style>
 
-    <style name="Widget.MyFinance.TextInputLayout.TransparentBox" parent="Widget.MyFinance.TextInputLayout.OutlinedBox">
-        <item name="materialThemeOverlay">
-            @style/ThemeOverlay.MyFinance.TextInputLayout.TransparentBox
-        </item>
-        <item name="hintEnabled">false</item>
-        <item name="boxBackgroundMode">none</item>
-    </style>
-
-    <style name="ThemeOverlay.MyFinance.TextInputLayout.TransparentBox" parent="">
-        <item name="editTextStyle">
-            @style/Widget.MyFinance.TextInputEditText.TransparentBox
-        </item>
-    </style>
-
-    <style name="Widget.MyFinance.TextInputEditText.TransparentBox" parent="Widget.Material3.TextInputEditText.OutlinedBox">
-        <item name="android:paddingVertical">6dp</item>
-        <item name="fontFamily">@font/nunito</item>
-        <item name="android:textColorHint">?attr/colorOnSurfaceVariant</item>
-    </style>
-
     <!--Material DatePicker style. -->
     <style name="ThemeOverlay.MyFinance.DatePicker" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="android:fontFamily">@font/nunito</item>
@@ -84,15 +64,5 @@
 
     <style name="ShapeAppearance.MyFinance.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
         <item name="cornerSize">@dimen/card_corner_radius</item>
-    </style>
-
-    <!-- TextAppearance style. -->
-    <style name="TextAppearance.MyFinance.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
-        <item name="fontFamily">@font/nunito</item>
-        <item name="android:fontFamily">@font/nunito</item>
-    </style>
-
-    <style name="Widget.MyFinance.Chip.Filter" parent="Widget.Material3.Chip.Filter">
-        <item name="android:textAppearance">@style/TextAppearance.MyFinance.BodyMedium</item>
     </style>
 </resources>

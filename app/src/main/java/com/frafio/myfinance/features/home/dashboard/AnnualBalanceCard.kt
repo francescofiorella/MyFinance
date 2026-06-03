@@ -1,0 +1,298 @@
+package com.frafio.myfinance.features.home.dashboard
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialShapes
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.toShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.frafio.myfinance.R
+import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.core.utils.doubleToPrice
+import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
+import java.time.LocalDate
+import kotlin.math.abs
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3AdaptiveApi::class,
+    ExperimentalMaterial3Api::class
+)
+@Composable
+fun AnnualBalanceCard(
+    balanceYear: Int,
+    incomesSum: Double,
+    expensesSum: Double,
+    onPreviousYear: () -> Unit,
+    onNextYear: () -> Unit,
+    onToday: () -> Unit
+) {
+    val balance = incomesSum - expensesSum
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 16.dp),
+        shape = ListItemDefaults.shapes().selectedShape,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        )
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.annual_balance),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = balanceYear.toString(),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+
+                val previousInteractionSource = remember { MutableInteractionSource() }
+                val nextInteractionSource = remember { MutableInteractionSource() }
+                val todayInteractionSource = remember { MutableInteractionSource() }
+                ButtonGroup(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    overflowIndicator = { menuState ->
+                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+                    }
+                ) {
+                    customItem(
+                        {
+                            FilledTonalIconButton(
+                                modifier = Modifier
+                                    .size(IconButtonDefaults.smallContainerSize())
+                                    .animateWidth(previousInteractionSource),
+                                onClick = onPreviousYear,
+                                shapes = IconButtonDefaults.shapes(
+                                    shape = IconButtonDefaults.smallSquareShape,
+                                ),
+                                interactionSource = previousInteractionSource
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_keyboard_arrow_left_filled),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        {}
+                    )
+                    customItem(
+                        {
+                            FilledTonalIconButton(
+                                modifier = Modifier
+                                    .size(IconButtonDefaults.smallContainerSize())
+                                    .animateWidth(nextInteractionSource),
+                                onClick = onNextYear,
+                                enabled = balanceYear < LocalDate.now().year,
+                                shapes = IconButtonDefaults.shapes(
+                                    shape = IconButtonDefaults.smallSquareShape,
+                                ),
+                                interactionSource = nextInteractionSource
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_keyboard_arrow_right_filled),
+                                    contentDescription = null
+                                )
+                            }
+                        },
+                        {}
+                    )
+                    customItem(
+                        {
+                            FilledTonalIconButton(
+                                modifier = Modifier
+                                    .width(52.dp)
+                                    .animateWidth(todayInteractionSource),
+                                onClick = onToday,
+                                shapes = IconButtonDefaults.shapes(),
+                                interactionSource = todayInteractionSource
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_today_filled),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        {}
+                    )
+                }
+            }
+
+            Text(
+                text = doubleToPrice(abs(balance)),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = if (balance < 0.0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .widthIn(max = BottomSheetDefaults.SheetMaxWidth - 48.dp) // remove padding 24dp each side
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .size(40.dp)
+                            .clip(MaterialShapes.Pill.toShape())
+                            .background(
+                                if (isSystemInDarkTheme())
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.primaryContainer
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_downward_filled),
+                            contentDescription = null,
+                            tint = if (isSystemInDarkTheme())
+                                MaterialTheme.colorScheme.onPrimary
+                            else
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+                Column(
+                    Modifier.weight(2f),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = stringResource(R.string.incomes),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = if (incomesSum < 1000)
+                            doubleToPrice(incomesSum)
+                        else
+                            doubleToPriceWithoutDecimals(incomesSum),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Normal,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                }
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .size(40.dp)
+                            .clip(MaterialShapes.Pill.toShape())
+                            .background(
+                                if (isSystemInDarkTheme())
+                                    MaterialTheme.colorScheme.error
+                                else
+                                    MaterialTheme.colorScheme.errorContainer
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_upward_filled),
+                            contentDescription = null,
+                            tint = if (isSystemInDarkTheme())
+                                MaterialTheme.colorScheme.onError
+                            else
+                                MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    }
+                }
+                Column(
+                    Modifier.weight(2f),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = stringResource(R.string.expenses),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = if (expensesSum < 1000)
+                            doubleToPrice(expensesSum)
+                        else
+                            doubleToPriceWithoutDecimals(expensesSum),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Normal,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AnnualBalanceCardPreview() {
+    MyFinanceTheme {
+        AnnualBalanceCard(
+            balanceYear = 2024,
+            incomesSum = 2000.0,
+            expensesSum = 1500.0,
+            onPreviousYear = {},
+            onNextYear = {},
+            onToday = {}
+        )
+    }
+}

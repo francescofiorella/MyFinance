@@ -1,0 +1,238 @@
+package com.frafio.myfinance.core.data.enums.auth
+
+import com.frafio.myfinance.core.data.enums.db.Languages
+import com.frafio.myfinance.core.utils.getCurrentLanguage
+
+enum class AuthCode(val code: Int, val message: String) {
+    LOGIN_SUCCESS(
+        1, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Login successful!"
+            Languages.ITALIANO.value -> "Accesso avvenuto con successo!"
+            else -> "Login successful!" // english
+        }
+    ),
+
+    GOOGLE_LOGIN_FAILURE(
+        2, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Google login failed!"
+            Languages.ITALIANO.value -> "Accesso con Google fallito!"
+            else -> "Google login failed!" // english
+        }
+    ),
+
+    LOGIN_FAILURE(
+        3, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Login failed!"
+            Languages.ITALIANO.value -> "Accesso fallito!"
+            else -> "Login failed!" // english
+        }
+    ),
+
+    INVALID_EMAIL(
+        4, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "The entered email is not valid"
+            Languages.ITALIANO.value -> "L'email inserita non è valida"
+            else -> "The entered email is not valid" // english
+        }
+    ),
+
+    WRONG_PASSWORD(
+        5, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "The entered password is incorrect"
+            Languages.ITALIANO.value -> "La password inserita non è corretta"
+            else -> "The entered password is incorrect" // english
+        }
+    ),
+
+    USER_NOT_FOUND(
+        6, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "The entered email does not have an associated account"
+            Languages.ITALIANO.value -> "L'email inserita non ha un account associato"
+            else -> "The entered email does not have an associated account" // english
+        }
+    ),
+
+    USER_DISABLED(
+        7, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Your account has been disabled!"
+            Languages.ITALIANO.value -> "Il tuo account è stato disabilitato!"
+            else -> "Your account has been disabled!" // english
+        }
+    ),
+
+    SIGNUP_SUCCESS(
+        10, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Signup successful!"
+            Languages.ITALIANO.value -> "Registrazione avvenuta con successo!"
+            else -> "Signup successful!" // english
+        }
+    ),
+
+    WEAK_PASSWORD(
+        11, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "The entered password is not secure"
+            Languages.ITALIANO.value -> "La password inserita non è sicura"
+            else -> "The entered password is not secure" // english
+        }
+    ),
+
+    EMAIL_NOT_WELL_FORMED(
+        12, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "The entered email is not well formed"
+            Languages.ITALIANO.value -> "L'email inserita non è ben formata"
+            else -> "The entered email is not well formed" // english
+        }
+    ),
+
+    EMAIL_ALREADY_ASSOCIATED(
+        13, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "The entered email already has an associated account"
+            Languages.ITALIANO.value -> "L'email inserita ha già un account associato"
+            else -> "The entered email already has an associated account" // english
+        }
+    ),
+
+    SIGNUP_PROFILE_NOT_UPDATED(
+        14, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Signup failed! Please contact the administrator"
+            Languages.ITALIANO.value -> "Registrazione non avvenuta correttamente! Per favore contatta l'amministratore"
+            else -> "Signup failed! Please contact the administrator" // english
+        }
+    ),
+
+    SIGNUP_FAILURE(
+        15, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Signup failed!"
+            Languages.ITALIANO.value -> "Registrazione fallita!"
+            else -> "Signup failed!" // english
+        }
+    ),
+
+    EMPTY_EMAIL(
+        20, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Enter your email"
+            Languages.ITALIANO.value -> "Inserisci la tua email"
+            else -> "Enter your email" // english
+        }
+    ),
+
+    EMPTY_PASSWORD(
+        21, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Enter your password"
+            Languages.ITALIANO.value -> "Inserisci la tua password"
+            else -> "Enter your password" // english
+        }
+    ),
+
+    SHORT_PASSWORD(
+        22, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "The password must be at least 8 characters long!"
+            Languages.ITALIANO.value -> "La password deve essere lunga almeno 8 caratteri!"
+            else -> "The password must be at least 8 characters long!" // english
+        }
+    ),
+
+    EMPTY_NAME(
+        23, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Enter your full name"
+            Languages.ITALIANO.value -> "Inserisci il tuo nome e cognome"
+            else -> "Enter your full name" // english
+        }
+    ),
+
+    EMPTY_CONFIRM_PASSWORD(
+        24, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Confirm your password"
+            Languages.ITALIANO.value -> "Conferma la tua password"
+            else -> "Confirm your password" // english
+        }
+    ),
+
+    PASSWORD_NOT_MATCH(
+        25, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "The entered passwords do not match!"
+            Languages.ITALIANO.value -> "Le password inserite non corrispondono!"
+            else -> "The entered passwords do not match!" // english
+        }
+    ),
+
+    EMAIL_SENT(
+        30, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Email sent. Check your email box!"
+            Languages.ITALIANO.value -> "Email inviata. Controlla la tua casella di posta!"
+            else -> "Email sent. Check your email box!" // english
+        }
+    ),
+
+    EMAIL_NOT_SENT_TOO_MANY_REQUESTS(
+        31, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Email not sent! Too many requests have been made"
+            Languages.ITALIANO.value -> "Email non inviata! Sono state effettuate troppe richieste"
+            else -> "Email not sent! Too many requests have been made" // english
+        }
+    ),
+
+    EMAIL_NOT_SENT(
+        32, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Error! Email not sent"
+            Languages.ITALIANO.value -> "Errore! Email non inviata"
+            else -> "Error! Email not sent" // english
+        }
+    ),
+
+    LOGOUT_SUCCESS(
+        40, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "User logged out!"
+            Languages.ITALIANO.value -> "Utente disconnesso!"
+            else -> "User logged out!" // english
+        }
+    ),
+
+    USER_LOGGED(
+        100, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "User logged!"
+            Languages.ITALIANO.value -> "Utente connesso!"
+            else -> "User logged!" // english
+        }
+    ),
+
+    USER_NOT_LOGGED(
+        101, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "User not logged!"
+            Languages.ITALIANO.value -> "Utente non connesso!"
+            else -> "User not logged!" // english
+        }
+    ),
+
+    USER_FULL_NAME_UPDATED(
+        102, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "User full name updated!"
+            Languages.ITALIANO.value -> "Nome utente aggiornato!"
+            else -> "User full name updated!" // english
+        }
+    ),
+
+    USER_FULL_NAME_NOT_UPDATED(
+        103, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "User full name not updated!"
+            Languages.ITALIANO.value -> "Aggiornamento nome utente non riuscito!"
+            else -> "User full name not updated!" // english
+        }
+    ),
+
+    USER_PROPIC_UPDATED(
+        104, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "User profile picture updated!"
+            Languages.ITALIANO.value -> "Foto profilo utente aggiornata!"
+            else -> "User profile picture updated!" // english
+        }
+    ),
+
+    USER_PROPIC_NOT_UPDATED(
+        105, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "User profile picture not updated!"
+            Languages.ITALIANO.value -> "Aggiornamento foto profilo utente non riuscito!"
+            else -> "User profile picture not updated!" // english
+        }
+    )
+}

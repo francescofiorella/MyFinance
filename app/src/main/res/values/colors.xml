@@ -29,12 +29,9 @@
     <color name="md_theme_onSurface">#191c20</color>
     <color name="md_theme_onSurfaceVariant">#43474e</color>
     <color name="md_theme_outline">#73777f</color>
-    <color name="md_theme_outlineVariant">#c3c6cf</color>
     <color name="md_theme_inverseSurface">#2e3035</color>
     <color name="md_theme_inverseOnSurface">#eff0f7</color>
     <color name="md_theme_inversePrimary">#a4c9fe</color>
-    <color name="md_theme_scrim">#000000</color>
-    <color name="md_theme_shadow">#000000</color>
 
     <color name="launcher_icon_bg">#3D5576</color>
 </resources>

@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.auth.AuthActivity">
+    tools:context=".app.AuthActivity">
 
     <data>
 
         <variable
             name="viewModel"
-            type="com.frafio.myfinance.ui.auth.AuthViewModel" />
+            type="com.frafio.myfinance.features.auth.AuthViewModel" />
 
     </data>
 

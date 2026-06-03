@@ -1,0 +1,8 @@
+package com.frafio.myfinance.core.data.enums.auth
+
+enum class SignupException(val value: String) {
+    EXCEPTION_INVALID_EMAIL("ERROR_INVALID_EMAIL"),
+    EXCEPTION_WRONG_PASSWORD("ERROR_WRONG_PASSWORD"),
+    EXCEPTION_USER_NOT_FOUND("ERROR_USER_NOT_FOUND"),
+    EXCEPTION_USER_DISABLED("ERROR_USER_DISABLED")
+}
