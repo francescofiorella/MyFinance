@@ -22,7 +22,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TonalToggleButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -62,6 +65,8 @@ fun ExpensesByCategoryCard(
     val formatter = remember(monthlyShown) {
         DateTimeFormatter.ofPattern(if (monthlyShown) "MMMM uuuu" else "uuuu")
     }
+
+    var resetPieChart by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -143,7 +148,10 @@ fun ExpensesByCategoryCard(
                                 modifier = Modifier
                                     .width(52.dp)
                                     .animateWidth(todayInteractionSource),
-                                onClick = onToday,
+                                onClick = {
+                                    onToday()
+                                    resetPieChart = !resetPieChart
+                                },
                                 shapes = IconButtonDefaults.shapes(),
                                 interactionSource = todayInteractionSource
                             ) {
@@ -208,7 +216,8 @@ fun ExpensesByCategoryCard(
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 PieChart(
                     entries = values,
-                    animate = true
+                    animate = true,
+                    resetSelectionHook = resetPieChart
                 )
             }
 

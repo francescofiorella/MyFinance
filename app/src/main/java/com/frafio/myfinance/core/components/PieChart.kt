@@ -83,6 +83,7 @@ fun PieChart(
     modifier: Modifier = Modifier,
     entries: List<Double>,
     animate: Boolean = true,
+    resetSelectionHook: Boolean = false,
     radius: Dp = PieChartDefaults.Radius,
     arcWidth: Dp = PieChartDefaults.ArcWidth,
     offsetBetweenArcs: Dp = PieChartDefaults.OffsetBetweenArcs,
@@ -101,8 +102,8 @@ fun PieChart(
         }
     }
 
-    var selectedArcIndex by remember(entries) { mutableIntStateOf(-1) }
-    var pressedArcIndex by remember(entries) { mutableIntStateOf(-1) }
+    var selectedArcIndex by remember(entries, resetSelectionHook) { mutableIntStateOf(-1) }
+    var pressedArcIndex by remember(entries, resetSelectionHook) { mutableIntStateOf(-1) }
 
     val interactionSources = remember(entries.size) { List(entries.size) { MutableInteractionSource() } }
     val isDark = isSystemInDarkTheme()
@@ -156,6 +157,14 @@ fun PieChart(
         )
     }
 
+    val iconSelectionFactors = entries.indices.map { index ->
+        animateFloatAsState(
+            targetValue = if (selectedArcIndex == index) 1f else 0f,
+            animationSpec = tween(PieChartDefaults.ArcSelectionAnimationDuration, easing = PieChartDefaults.AnimationEasing),
+            label = "icon_selection_factor_$index"
+        )
+    }
+
     val emptyCircleAlpha by animateFloatAsState(
         targetValue = if (entries.sum() == 0.0) 1f else 0f,
         animationSpec = tween(if (animate) animDuration else 0, easing = PieChartDefaults.AnimationEasing),
@@ -198,6 +207,7 @@ fun PieChart(
                 },
                 alphaState = animatedAlphas[index],
                 selectionFactorState = selectionFactors[index],
+                iconSelectionFactorState = iconSelectionFactors[index],
                 radiusPx = radiusPx,
                 arcWidthPx = arcWidthPx,
                 iconSize = iconSize,
@@ -254,6 +264,7 @@ private fun PieChartArc(
     startAngleProvider: () -> Float,
     alphaState: State<Float>,
     selectionFactorState: State<Float>,
+    iconSelectionFactorState: State<Float>,
     radiusPx: Float,
     arcWidthPx: Float,
     iconSize: Dp,
@@ -333,9 +344,10 @@ private fun PieChartArc(
 
                     val start = startAngleProvider()
                     val factor = selectionFactorState.value
+                    val iconFactor = iconSelectionFactorState.value
                     val strokePx = arcWidthPx * (1f + 0.2f * factor)
                     val radPx = radiusPx + (arcWidthPx * 0.15f * factor)
-                    val actualIconSizePx = with(density) { (iconSize + (selectedIconSize - iconSize) * factor).toPx() }
+                    val actualIconSizePx = with(density) { (iconSize + (selectedIconSize - iconSize) * iconFactor).toPx() }
                     val iconRadiusPx = radPx + strokePx / 2 + with(density) { iconPadding.toPx() } + actualIconSizePx / 2
 
                     val angleInRadians = ((start + sweep / 2) * PI / 180).toFloat()
@@ -343,7 +355,7 @@ private fun PieChartArc(
                     translationY = iconRadiusPx * sin(angleInRadians)
                     alpha = alphaValue
                 }
-                .size(lerp(iconSize, selectedIconSize, selectionFactorState.value))
+                .size(lerp(iconSize, selectedIconSize, iconSelectionFactorState.value))
                 .align(Alignment.Center)
                 .background(color, shape = CircleShape)
                 .padding(6.dp)
