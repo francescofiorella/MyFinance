@@ -161,17 +161,15 @@ fun BudgetContent(
         scrollToIdFlow.collect { id ->
             if (id != null) {
                 snapshotFlow { currentIncomes }
-                    .first { list -> list.any { it.id.startsWith(id) } }
+                    .first { list -> list.any { it.id.startsWith(id) } || list.isNotEmpty() }
                     .let { list ->
                         val index = list.indexOfFirst { it.id.startsWith(id) }
-                        if (index != -1) {
-                            val finalIndex = index + headerCount
-                            if (isFirstScroll) {
-                                listState.scrollToItem(finalIndex)
-                                isFirstScroll = false
-                            } else {
-                                listState.animateScrollToItem(finalIndex)
-                            }
+                        val finalIndex = if (index != -1) index + headerCount else 0
+                        if (isFirstScroll) {
+                            listState.scrollToItem(finalIndex)
+                            isFirstScroll = false
+                        } else {
+                            listState.animateScrollToItem(finalIndex)
                         }
                     }
             } else {

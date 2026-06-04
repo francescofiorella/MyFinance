@@ -170,7 +170,7 @@ fun AnnualBalanceCard(
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = if (balance < 0.0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                color = if (balance < 0.0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(16.dp))

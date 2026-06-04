@@ -216,7 +216,7 @@ class ExpensesViewModel @Inject constructor(
         _limit.value += (DEFAULT_LIMIT)
     }
 
-    fun scrollToId(id: String) {
+    fun scrollToId(id: String?) {
         viewModelScope.launch {
             _scrollToId.emit(id)
         }
