@@ -19,9 +19,6 @@
         android:windowSoftInputMode="adjustResize"
         tools:targetApi="37">
         <activity
-            android:name=".app.AuthActivity"
-            android:exported="false" />
-        <activity
             android:name=".app.HomeActivity"
             android:exported="true"
             android:theme="@style/Theme.MyFinance.SplashScreen">

@@ -22,8 +22,11 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -43,7 +46,7 @@ class AddViewModel @AssistedInject constructor(
     private val expensesRepository: ExpensesRepository,
     private val incomeRepository: IncomeRepository,
     private val loadingRepository: LoadingRepository,
-    @Assisted private val initialNavKey: RootKey.AddEditTransaction,
+    @Assisted private val initialNavKey: RootKey.AddEditTransaction
 ) : ViewModel() {
 
     @AssistedFactory
@@ -87,9 +90,17 @@ class AddViewModel @AssistedInject constructor(
     private val _uiEvents = MutableSharedFlow<AddUiEvent>()
     val uiEvents: SharedFlow<AddUiEvent> = _uiEvents.asSharedFlow()
 
+    private val _isAdding: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isAdding: StateFlow<Boolean> = _isAdding.asStateFlow()
+
+    fun updateAddingState(isAdding: Boolean) {
+        _isAdding.value = isAdding
+    }
+
     fun onAddButtonClick() {
         viewModelScope.launch {
             try {
+                updateAddingState(true)
                 loadingRepository.startLoading()
 
                 // check info
@@ -122,6 +133,7 @@ class AddViewModel @AssistedInject constructor(
                 }
 
                 if (hasError) {
+                    updateAddingState(false)
                     return@launch
                 }
 

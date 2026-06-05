@@ -1,68 +1,7 @@
 <resources>
-    <!-- SplashScreen themes. -->
     <style name="Theme.MyFinance.SplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/launcher_icon_bg</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_myfinance</item>
         <item name="postSplashScreenTheme">@style/Theme.MyFinance</item>
-    </style>
-
-    <!--Dialog style. -->
-    <style name="ThemeOverlay.MyFinance.AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="materialAlertDialogTitleTextStyle">
-            @style/TextAppearance.MyFinance.AlertDialog.Title
-        </item>
-        <item name="materialAlertDialogBodyTextStyle">
-            @style/TextAppearance.MyFinance.AlertDialog.Body
-        </item>
-        <item name="buttonBarNeutralButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
-        <item name="buttonBarNegativeButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
-        <item name="buttonBarPositiveButtonStyle">@style/Widget.MyFinance.AlertDialog.Button</item>
-        <item name="fontFamily">@font/nunito</item>
-    </style>
-
-    <style name="TextAppearance.MyFinance.AlertDialog.Title" parent="MaterialAlertDialog.Material3.Title.Text">
-        <item name="fontFamily">@font/nunito_semibold</item>
-    </style>
-
-    <style name="TextAppearance.MyFinance.AlertDialog.Body" parent="MaterialAlertDialog.Material3.Body.Text">
-        <item name="fontFamily">@font/nunito</item>
-    </style>
-
-    <style name="Widget.MyFinance.AlertDialog.Button" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="fontFamily">@font/nunito_semibold</item>
-    </style>
-
-    <!--Material Fields style.-->
-    <style name="Widget.MyFinance.TextInputLayout.OutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-        <item name="materialThemeOverlay">
-            @style/ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox
-        </item>
-    </style>
-
-    <style name="ThemeOverlay.MyFinance.TextInputLayout.OutlinedBox" parent="">
-        <item name="editTextStyle">
-            @style/Widget.Material3.TextInputEditText.OutlinedBox
-        </item>
-        <item name="autoCompleteTextViewStyle">
-            @style/Widget.Material3.AutoCompleteTextView.OutlinedBox
-        </item>
-    </style>
-
-    <!--Material DatePicker style. -->
-    <style name="ThemeOverlay.MyFinance.DatePicker" parent="ThemeOverlay.Material3.MaterialCalendar">
-        <item name="android:fontFamily">@font/nunito</item>
-        <item name="buttonBarPositiveButtonStyle">@style/Widget.MyFinance.DatePicker.Button</item>
-        <item name="buttonBarNegativeButtonStyle">@style/Widget.MyFinance.DatePicker.Button</item>
-        <item name="shapeAppearanceMediumComponent">
-            @style/ShapeAppearance.MyFinance.MediumComponent
-        </item>
-    </style>
-
-    <style name="Widget.MyFinance.DatePicker.Button" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="fontFamily">@font/nunito_bold</item>
-    </style>
-
-    <style name="ShapeAppearance.MyFinance.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
-        <item name="cornerSize">@dimen/card_corner_radius</item>
     </style>
 </resources>

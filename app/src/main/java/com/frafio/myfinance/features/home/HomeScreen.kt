@@ -1,4 +1,4 @@
-package com.frafio.myfinance.features.home
+﻿package com.frafio.myfinance.features.home
 
 import android.graphics.Bitmap
 import androidx.compose.animation.fadeIn
@@ -366,7 +366,7 @@ private fun MainScaffold(
                                         } else {
                                             null
                                         }
-                                    } ?: painterResource(id = R.drawable.ic_user)
+                                    } ?: painterResource(id = R.drawable.image_user)
                                     Image(
                                         painter = painter,
                                         contentDescription = stringResource(id = R.string.profile_picture),

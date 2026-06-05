@@ -1,4 +1,4 @@
-package com.frafio.myfinance.features.add.navigation
+﻿package com.frafio.myfinance.features.add.navigation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -30,6 +30,7 @@ fun EntryProviderScope<NavKey>.addEntry(
                         onSaveSuccess(event.isExpense, event.day, event.month, event.year)
                     }
                     is AddUiEvent.Error -> {
+                        viewModel.updateAddingState(true)
                         appState.showSnackBar(event.result.message)
                     }
                 }

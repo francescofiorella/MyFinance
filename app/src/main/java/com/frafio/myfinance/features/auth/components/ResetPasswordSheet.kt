@@ -1,4 +1,4 @@
-package com.frafio.myfinance.features.auth
+package com.frafio.myfinance.features.auth.components
 
 import android.util.Patterns
 import androidx.compose.foundation.background

@@ -22,7 +22,7 @@ android {
         minSdk = 29
         targetSdk = 37
         versionCode = 4
-        versionName = "4.10.3"
+        versionName = "4.10.4"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -47,7 +47,6 @@ android {
     }
 
     buildFeatures {
-        dataBinding = true
         buildConfig = true
         compose = true
     }
@@ -63,7 +62,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.animation.core)
     testImplementation(libs.junit)
@@ -72,7 +71,6 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.activity.compose)
 
     // SplashScreen API
     implementation(libs.androidx.core.splashscreen)

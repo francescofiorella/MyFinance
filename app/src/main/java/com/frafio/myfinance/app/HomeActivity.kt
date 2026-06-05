@@ -1,7 +1,6 @@
-package com.frafio.myfinance.app
+﻿package com.frafio.myfinance.app
 
 import android.animation.ObjectAnimator
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.Window
@@ -50,6 +49,7 @@ import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.dateToExtendedString
 import com.frafio.myfinance.features.add.navigation.addEntry
+import com.frafio.myfinance.features.auth.navigation.authEntry
 import com.frafio.myfinance.features.home.HomeScreen
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.AndroidEntryPoint
@@ -67,7 +67,6 @@ class HomeActivity : ComponentActivity() {
     @Inject
     lateinit var loadingRepository: LoadingRepository
 
-    private var userRequest: Boolean = false
     private var isLayoutReady by mutableStateOf(false)
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -82,14 +81,8 @@ class HomeActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             viewModel.logicEvents.collect { event ->
-                when (event) {
-                    HomeLogicEvent.UserLocalDataLoaded -> {
-                        isLayoutReady = true
-                    }
-
-                    HomeLogicEvent.UserNotLogged, HomeLogicEvent.LogoutSuccess -> {
-                        goToLoginActivity()
-                    }
+                if (event == HomeLogicEvent.UserLocalDataLoaded || event == HomeLogicEvent.UserNotLogged) {
+                    isLayoutReady = true
                 }
             }
         }
@@ -106,28 +99,24 @@ class HomeActivity : ComponentActivity() {
         }
 
         if (savedInstanceState == null) {
-            userRequest =
-                intent.extras?.getBoolean(AuthActivity.INTENT_USER_REQUEST, false) ?: false
-            if (!userRequest) {
-                splashScreen.apply {
-                    setKeepOnScreenCondition { !isLayoutReady || viewModel.userPreferences.value == null }
-                    setOnExitAnimationListener { splashScreenViewProvider ->
-                        val fadeOut = ObjectAnimator.ofFloat(
-                            splashScreenViewProvider.view,
-                            View.ALPHA,
-                            1f,
-                            0f,
-                        ).apply {
-                            interpolator = LinearInterpolator()
-                            duration = 200L
-                        }
-                        fadeOut.doOnEnd { splashScreenViewProvider.remove() }
-                        fadeOut.start()
+            splashScreen.apply {
+                setKeepOnScreenCondition { !isLayoutReady }
+                setOnExitAnimationListener { splashScreenViewProvider ->
+                    val fadeOut = ObjectAnimator.ofFloat(
+                        splashScreenViewProvider.view,
+                        View.ALPHA,
+                        1f,
+                        0f,
+                    ).apply {
+                        interpolator = LinearInterpolator()
+                        duration = 200L
                     }
+                    fadeOut.doOnEnd { splashScreenViewProvider.remove() }
+                    fadeOut.start()
                 }
             }
 
-            viewModel.checkUser(userRequest)
+            viewModel.checkUser(notify = false)
         } else {
             isLayoutReady = true
         }
@@ -139,10 +128,29 @@ class HomeActivity : ComponentActivity() {
 
             MyFinanceTheme(dynamicColor = useDynamicColor) {
                 val appState = rememberMyFinanceAppState()
-                val rootBackStack = rememberNavBackStack(RootKey.Home)
+                val rootBackStack = rememberNavBackStack(if (viewModel.userRepository.isUserLoggedIn()) RootKey.Home else RootKey.Auth)
 
                 LaunchedEffect(isLoading) {
                     appState.showProgress = isLoading
+                }
+
+                LaunchedEffect(Unit) {
+                    viewModel.logicEvents.collect { event ->
+                        when (event) {
+                            HomeLogicEvent.UserLocalDataLoaded -> {
+                                isLayoutReady = true
+                            }
+                            HomeLogicEvent.UserNotLogged -> {
+                                isLayoutReady = true
+                                rootBackStack.clear()
+                                rootBackStack.add(RootKey.Auth)
+                            }
+                            HomeLogicEvent.LogoutSuccess -> {
+                                rootBackStack.clear()
+                                rootBackStack.add(RootKey.Auth)
+                            }
+                        }
+                    }
                 }
 
                 val decorators = listOf(
@@ -153,6 +161,15 @@ class HomeActivity : ComponentActivity() {
                     backStack = rootBackStack,
                     entryDecorators = decorators,
                     entryProvider = entryProvider {
+                        authEntry(
+                            appState = appState,
+                            onAuthSuccess = {
+                                appState.navigationState.reset()
+                                viewModel.checkUser(notify = true)
+                                rootBackStack.clear()
+                                rootBackStack.add(RootKey.Home)
+                            }
+                        )
                         entry<RootKey.Home> {
                             HomeScreen(
                                 appState = appState,
@@ -219,12 +236,6 @@ class HomeActivity : ComponentActivity() {
         }
     }
 
-    private fun goToLoginActivity() {
-        Intent(applicationContext, AuthActivity::class.java).also {
-            startActivity(it)
-            finish()
-        }
-    }
 
     private fun getDateChipLabel(startDate: LocalDate, endDate: LocalDate): String {
         return when (startDate.year) {

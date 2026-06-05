@@ -41,12 +41,5 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
-
-        <!--Custom widgets theme. -->
-        <item name="materialCalendarTheme">@style/ThemeOverlay.MyFinance.DatePicker</item>
-        <item name="materialCalendarFullscreenTheme">@style/ThemeOverlay.MyFinance.DatePicker</item>
-        <item name="textInputStyle">@style/Widget.MyFinance.TextInputLayout.OutlinedBox</item>
-        <item name="materialCardViewStyle">?attr/materialCardViewOutlinedStyle</item>
-        <item name="materialAlertDialogTheme">@style/ThemeOverlay.MyFinance.AlertDialog</item>
     </style>
 </resources>

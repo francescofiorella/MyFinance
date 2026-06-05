@@ -1,6 +1,0 @@
-<resources>
-    <dimen name="field_corner_radius">@dimen/card_corner_radius</dimen>
-    <dimen name="card_elevation">2dp</dimen>
-    <dimen name="card_corner_radius">24dp</dimen>
-    <dimen name="arrow_margin_start">15dp</dimen>
-</resources>

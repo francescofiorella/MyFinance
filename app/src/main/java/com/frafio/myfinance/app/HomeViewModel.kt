@@ -50,7 +50,7 @@ sealed class HomeUiEvent {
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    val userRepository: UserRepository,
     private val expensesRepository: ExpensesRepository,
     private val incomeRepository: IncomeRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
@@ -90,7 +90,7 @@ class HomeViewModel @Inject constructor(
     private val _uiEvents = MutableSharedFlow<HomeUiEvent>()
     val uiEvents: SharedFlow<HomeUiEvent> = _uiEvents.asSharedFlow()
 
-    private val _logicEvents = MutableSharedFlow<HomeLogicEvent>()
+    private val _logicEvents = MutableSharedFlow<HomeLogicEvent>(replay = 1)
     val logicEvents: SharedFlow<HomeLogicEvent> = _logicEvents.asSharedFlow()
 
     fun navigateTo(key: NavKey) {
@@ -118,7 +118,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun checkUser(userRequest: Boolean) {
+    fun checkUser(notify: Boolean) {
         viewModelScope.launch {
             try {
                 loadingRepository.startLoading()
@@ -126,7 +126,7 @@ class HomeViewModel @Inject constructor(
                 when (authResult.code) {
                     AuthCode.USER_LOGGED.code -> {
                         updateUserData()
-                        if (userRequest) {
+                        if (notify) {
                             _uiEvents.emit(HomeUiEvent.LoginSuccess)
                         }
                     }

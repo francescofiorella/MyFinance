@@ -122,4 +122,8 @@ class UserRepository @Inject constructor(
             userPreferencesRepository.userPreferencesFlow.first().user
         }
     }
+
+    fun isUserLoggedIn(): Boolean {
+        return authManager.isUserLoggedIn()
+    }
 }

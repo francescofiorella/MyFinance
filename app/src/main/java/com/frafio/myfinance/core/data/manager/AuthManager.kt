@@ -89,6 +89,10 @@ class AuthManager @Inject constructor(
         }
     }
 
+    fun isUserLoggedIn(): Boolean {
+        return fUser != null
+    }
+
     suspend fun firebaseAuthWithGoogle(idToken: String): AuthResult = withContext(Dispatchers.IO) {
         return@withContext try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
@@ -176,7 +180,7 @@ class AuthManager @Inject constructor(
         expensesLocalRepository.deleteAll()
         incomesLocalRepository.deleteAll()
         profileImageStorage.deleteImage()
-        
+
         userPreferencesRepository.updateMonthlyBudget(0.0)
         userPreferencesRepository.updateLabels(emptyList())
         userPreferencesRepository.clearUserData()

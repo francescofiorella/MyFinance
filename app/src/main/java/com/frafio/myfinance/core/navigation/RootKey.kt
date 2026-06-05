@@ -7,6 +7,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface RootKey : NavKey {
     @Serializable
+    data object Auth : RootKey
+
+    @Serializable
     data object Home : RootKey
 
     @Serializable

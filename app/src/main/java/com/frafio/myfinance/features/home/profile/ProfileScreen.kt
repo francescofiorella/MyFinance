@@ -160,7 +160,7 @@ private fun ProfileHeader(user: User?, profilePicture: Bitmap?) {
         } else {
             null
         }
-    } ?: painterResource(id = R.drawable.ic_user)
+    } ?: painterResource(id = R.drawable.image_user)
     Image(
         painter = painter,
         contentDescription = stringResource(id = R.string.profile_picture),

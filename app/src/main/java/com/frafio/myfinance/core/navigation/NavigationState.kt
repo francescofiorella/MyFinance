@@ -48,6 +48,15 @@ class NavigationState(
 ) {
     val currentTopLevelKey: NavKey by derivedStateOf { topLevelStack.last() }
 
+    fun reset() {
+        subStacks.forEach { (key, stack) ->
+            stack.clear()
+            stack.add(key)
+        }
+        topLevelStack.clear()
+        topLevelStack.add(startKey)
+    }
+
     val topLevelKeys
         get() = subStacks.keys
 
