@@ -20,6 +20,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,10 +34,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class HomeLogicEvent {
-    object UserLocalDataLoaded : HomeLogicEvent()
-    object UserNotLogged : HomeLogicEvent()
-    object LogoutSuccess : HomeLogicEvent()
+sealed class MainEvent {
+    object UserNotLogged : MainEvent()
+    object LogoutSuccess : MainEvent()
 }
 
 sealed class HomeUiEvent {
@@ -46,6 +47,11 @@ sealed class HomeUiEvent {
         val dismissFun: () -> Unit = {}
     ) : HomeUiEvent()
     object LoginSuccess : HomeUiEvent()
+}
+
+sealed interface HomeUiState {
+    data object Loading : HomeUiState
+    data object Complete : HomeUiState
 }
 
 @HiltViewModel
@@ -59,6 +65,9 @@ class HomeViewModel @Inject constructor(
     private val loadingRepository: LoadingRepository,
     profileImageStorage: ProfileImageStorage
 ) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     val profilePicture: StateFlow<Bitmap?> = userRepository.profilePicture
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), profileImageStorage.loadBitmapSync())
@@ -90,8 +99,8 @@ class HomeViewModel @Inject constructor(
     private val _uiEvents = MutableSharedFlow<HomeUiEvent>()
     val uiEvents: SharedFlow<HomeUiEvent> = _uiEvents.asSharedFlow()
 
-    private val _logicEvents = MutableSharedFlow<HomeLogicEvent>(replay = 1)
-    val logicEvents: SharedFlow<HomeLogicEvent> = _logicEvents.asSharedFlow()
+    private val _mainEvents = MutableSharedFlow<MainEvent>(replay = 1)
+    val mainEvents: SharedFlow<MainEvent> = _mainEvents.asSharedFlow()
 
     fun navigateTo(key: NavKey) {
         viewModelScope.launch { _navEvents.send(key) }
@@ -132,7 +141,8 @@ class HomeViewModel @Inject constructor(
                     }
 
                     AuthCode.USER_NOT_LOGGED.code -> {
-                        _logicEvents.emit(HomeLogicEvent.UserNotLogged)
+                        _uiState.value = HomeUiState.Complete
+                        _mainEvents.emit(MainEvent.UserNotLogged)
                     }
                 }
             } finally {
@@ -147,7 +157,7 @@ class HomeViewModel @Inject constructor(
         expensesLocalRepository.getCount().first()
         incomesLocalRepository.getCount().first()
 
-        _logicEvents.emit(HomeLogicEvent.UserLocalDataLoaded)
+        _uiState.value = HomeUiState.Complete
 
         // Remote sync in background
         viewModelScope.launch {
@@ -172,7 +182,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val logoutResult = userRepository.userLogout()
             if (logoutResult.code == AuthCode.LOGOUT_SUCCESS.code) {
-                _logicEvents.emit(HomeLogicEvent.LogoutSuccess)
+                _mainEvents.emit(MainEvent.LogoutSuccess)
             }
         }
     }

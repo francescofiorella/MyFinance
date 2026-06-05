@@ -1,10 +1,6 @@
 ﻿package com.frafio.myfinance.app
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
-import android.view.View
-import android.view.Window
-import android.view.animation.LinearInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -19,22 +15,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.LinearWavyProgressIndicator
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -51,74 +42,34 @@ import com.frafio.myfinance.core.utils.dateToExtendedString
 import com.frafio.myfinance.features.add.navigation.addEntry
 import com.frafio.myfinance.features.auth.navigation.authEntry
 import com.frafio.myfinance.features.home.HomeScreen
-import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
 
     private val viewModel by viewModels<HomeViewModel>()
 
     @Inject
     lateinit var loadingRepository: LoadingRepository
 
-    private var isLayoutReady by mutableStateOf(false)
-
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
 
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
 
-        lifecycleScope.launch {
-            viewModel.logicEvents.collect { event ->
-                if (event == HomeLogicEvent.UserLocalDataLoaded || event == HomeLogicEvent.UserNotLogged) {
-                    isLayoutReady = true
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            viewModel.userPreferences.collect { prefs ->
-                if (prefs != null) {
-                    // Re-apply if dynamic color changed
-                    if (prefs.dynamicColor) {
-                        DynamicColors.applyToActivityIfAvailable(this@HomeActivity)
-                    }
-                }
-            }
+        // Keep the splash screen on-screen until the UI state is loaded.
+        splashScreen.setKeepOnScreenCondition {
+            viewModel.uiState.value is HomeUiState.Loading
         }
 
         if (savedInstanceState == null) {
-            splashScreen.apply {
-                setKeepOnScreenCondition { !isLayoutReady }
-                setOnExitAnimationListener { splashScreenViewProvider ->
-                    val fadeOut = ObjectAnimator.ofFloat(
-                        splashScreenViewProvider.view,
-                        View.ALPHA,
-                        1f,
-                        0f,
-                    ).apply {
-                        interpolator = LinearInterpolator()
-                        duration = 200L
-                    }
-                    fadeOut.doOnEnd { splashScreenViewProvider.remove() }
-                    fadeOut.start()
-                }
-            }
-
             viewModel.checkUser(notify = false)
-        } else {
-            isLayoutReady = true
         }
 
         setContent {
@@ -135,17 +86,14 @@ class HomeActivity : ComponentActivity() {
                 }
 
                 LaunchedEffect(Unit) {
-                    viewModel.logicEvents.collect { event ->
+                    viewModel.mainEvents.collect { event ->
                         when (event) {
-                            HomeLogicEvent.UserLocalDataLoaded -> {
-                                isLayoutReady = true
-                            }
-                            HomeLogicEvent.UserNotLogged -> {
-                                isLayoutReady = true
+                            MainEvent.UserNotLogged -> {
                                 rootBackStack.clear()
                                 rootBackStack.add(RootKey.Auth)
                             }
-                            HomeLogicEvent.LogoutSuccess -> {
+
+                            MainEvent.LogoutSuccess -> {
                                 rootBackStack.clear()
                                 rootBackStack.add(RootKey.Auth)
                             }

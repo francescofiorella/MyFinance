@@ -12,7 +12,6 @@ import com.frafio.myfinance.core.data.repository.UserRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesData
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.ProfileImageStorage
-import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -104,7 +103,7 @@ class ProfileViewModel @Inject constructor(
 
     val versionName: String = "MyFinance ${BuildConfig.VERSION_NAME}"
 
-    val isDynamicColorAvailable: Boolean = DynamicColors.isDynamicColorAvailable()
+    val isDynamicColorAvailable: Boolean = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
 
     fun setDynamicColor(active: Boolean) {
         viewModelScope.launch {

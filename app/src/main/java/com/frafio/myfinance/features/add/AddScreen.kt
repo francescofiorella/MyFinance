@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
@@ -21,6 +22,7 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
@@ -36,11 +38,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -171,6 +175,7 @@ fun AddScreen(
     priceError: String? = null,
     categoryError: String? = null
 ) {
+    val focusManager = LocalFocusManager.current
     val categories = stringArrayResource(id = R.array.categories)
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -254,6 +259,18 @@ fun AddScreen(
                             .padding(start = 44.dp, end = 8.dp),
                         enabled = !isAdding,
                         textStyle = MaterialTheme.typography.headlineMedium,
+                        trailingIcon = {
+                            if (nameError != null) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_error_filled),
+                                    contentDescription = null
+                                )
+                            } else if (name.isNotEmpty() && !isAdding) {
+                                IconButton(onClick = { onNameChange("") }) {
+                                    Icon(painter = painterResource(id = R.drawable.ic_cancel_filled), contentDescription = "Clear")
+                                }
+                            }
+                        },
                         isError = nameError != null,
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
@@ -267,8 +284,10 @@ fun AddScreen(
                         ),
                         keyboardOptions = KeyboardOptions(
                             capitalization = KeyboardCapitalization.Sentences,
-                            autoCorrectEnabled = false
+                            autoCorrectEnabled = false,
+                            imeAction = ImeAction.Next
                         ),
+                        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                         singleLine = true
                     )
                     if (nameError != null) {
@@ -342,6 +361,18 @@ fun AddScreen(
                         textStyle = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = 18.sp
                         ),
+                        trailingIcon = {
+                            if (priceError != null) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_error_filled),
+                                    contentDescription = null
+                                )
+                            } else if (priceString.isNotEmpty() && !isAdding) {
+                                IconButton(onClick = { onPriceChange("") }) {
+                                    Icon(painter = painterResource(id = R.drawable.ic_cancel_filled), contentDescription = "Clear")
+                                }
+                            }
+                        },
                         isError = priceError != null,
                         leadingIcon = {
                             val currency = stringResource(id = R.string.currency)
@@ -366,7 +397,14 @@ fun AddScreen(
                             disabledIndicatorColor = Color.Transparent,
                             errorIndicatorColor = Color.Transparent
                         ),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Decimal,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(onDone = {
+                            focusManager.clearFocus()
+                            if (!isAdding) onSaveClick()
+                        }),
                         singleLine = true
                     )
                     if (priceError != null) {

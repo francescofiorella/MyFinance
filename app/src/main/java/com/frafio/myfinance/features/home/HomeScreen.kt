@@ -41,8 +41,6 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -328,7 +326,6 @@ private fun MainScaffold(
                             Column {
                                 Text(
                                     text = stringResource(id = R.string.app_name),
-                                    fontFamily = FontFamily(Font(R.font.nunito_bold)),
                                     fontSize = 24.sp,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
@@ -342,7 +339,6 @@ private fun MainScaffold(
                                             HomeTabKey.Profile -> R.string.profile
                                         }
                                     ),
-                                    fontFamily = FontFamily(Font(R.font.nunito)),
                                     fontSize = 16.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     maxLines = 1,

@@ -10,10 +10,7 @@ import com.frafio.myfinance.core.data.manager.AuthManager
 import com.frafio.myfinance.core.data.manager.ExpensesManager
 import com.frafio.myfinance.core.data.manager.IncomesManager
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
-import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -39,14 +36,6 @@ class MyFinanceApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         instance = this
-
-        // if the user activated it, change the colors
-        val useDynamicColor = runBlocking {
-            userPreferencesRepository.userPreferencesFlow.first().dynamicColor
-        }
-        if (useDynamicColor) {
-            DynamicColors.applyToActivitiesIfAvailable(this)
-        }
     }
 }
 

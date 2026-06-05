@@ -1,7 +1,6 @@
 [versions]
 activityKtx = "1.13.0"
 agp = "9.2.1"
-appcompat = "1.7.1"
 composeBom = "2026.05.01"
 coreKtx = "1.19.0"
 coreSplashscreen = "1.2.0"
@@ -17,7 +16,6 @@ kotlin = "2.3.21"
 kotlinx = "1.11.0"
 ksp = "2.3.6"
 lifecycleKtx = "2.10.0"
-material = "1.14.0"
 material3 = "1.5.0-alpha21"
 material3WindowSizeClass = "1.4.0"
 roomRuntime = "2.8.4"
@@ -32,7 +30,6 @@ datastore = "1.2.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityKtx" }
-androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
@@ -62,8 +59,6 @@ junit = { module = "junit:junit", version.ref = "junit" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx" }
-material = { module = "com.google.android.material:material", version.ref = "material" }
-androidx-compose-animation-core = { group = "androidx.compose.animation", name = "animation-core", version.ref = "ui" }
 androidx-compose-material3-navigationSuite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }
 androidx-compose-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive", version.ref = "androidxComposeMaterial3Adaptive" }
 androidx-compose-material3-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "androidxComposeMaterial3Adaptive" }
