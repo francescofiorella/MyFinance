@@ -191,78 +191,77 @@ private fun AuthContent(
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(padding),
         ) {
             val topPadding = maxHeight * 0.2f
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(topPadding))
+
+                Text(
+                    text = stringResource(id = R.string.app_name),
+                    style = MaterialTheme.typography.displayMediumEmphasized,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AuthForm(
+                    isSigningUp = uiState.isSigningUp,
+                    isLoading = isLoading,
+                    email = uiState.email,
+                    onEmailChange = onEmailChange,
+                    password = uiState.password,
+                    onPasswordChange = onPasswordChange,
+                    fullName = uiState.fullName,
+                    onFullNameChange = onFullNameChange,
+                    confirmPassword = uiState.confirmPassword,
+                    onConfirmPasswordChange = onConfirmPasswordChange,
+                    emailError = uiState.emailError,
+                    passwordError = uiState.passwordError,
+                    fullNameError = uiState.fullNameError,
+                    confirmPasswordError = uiState.confirmPasswordError,
+                    onAuthClick = onAuthClick
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = onAuthClick,
+                    enabled = !isLoading
                 ) {
-                    Spacer(modifier = Modifier.height(topPadding))
-
-                    Text(
-                        text = stringResource(id = R.string.app_name),
-                        style = MaterialTheme.typography.displayMediumEmphasized,
-                        color = MaterialTheme.colorScheme.primary
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_login_filled),
+                        contentDescription = null,
+                        modifier = Modifier.size(ButtonDefaults.IconSize)
                     )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    AuthForm(
-                        isSigningUp = uiState.isSigningUp,
-                        isLoading = isLoading,
-                        email = uiState.email,
-                        onEmailChange = onEmailChange,
-                        password = uiState.password,
-                        onPasswordChange = onPasswordChange,
-                        fullName = uiState.fullName,
-                        onFullNameChange = onFullNameChange,
-                        confirmPassword = uiState.confirmPassword,
-                        onConfirmPasswordChange = onConfirmPasswordChange,
-                        emailError = uiState.emailError,
-                        passwordError = uiState.passwordError,
-                        fullNameError = uiState.fullNameError,
-                        confirmPasswordError = uiState.confirmPasswordError,
-                        onAuthClick = onAuthClick
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        onClick = onAuthClick,
-                        enabled = !isLoading
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_login_filled),
-                            contentDescription = null,
-                            modifier = Modifier.size(ButtonDefaults.IconSize)
-                        )
-                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                        Text(text = stringResource(id = if (uiState.isSigningUp) R.string.signup else R.string.login))
-                    }
-
-                    TextButton(
-                        onClick = onForgotPasswordClick,
-                        enabled = !uiState.isSigningUp && !isLoading
-                    ) {
-                        Text(
-                            text = stringResource(
-                                id = if (uiState.isSigningUp) R.string.auth_or else R.string.forgotten_password
-                            ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    GoogleSignInButton(
-                        onClick = onGoogleClick,
-                        enabled = !isLoading
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                    Text(text = stringResource(id = if (uiState.isSigningUp) R.string.signup else R.string.login))
                 }
+
+                TextButton(
+                    onClick = onForgotPasswordClick,
+                    enabled = !uiState.isSigningUp && !isLoading
+                ) {
+                    Text(
+                        text = stringResource(
+                            id = if (uiState.isSigningUp) R.string.auth_or else R.string.forgotten_password
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                GoogleSignInButton(
+                    onClick = onGoogleClick,
+                    enabled = !isLoading
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             AnimatedVisibility(

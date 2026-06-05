@@ -8,8 +8,11 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,11 +27,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import com.frafio.myfinance.R
-
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthForm(
     isSigningUp: Boolean,
@@ -51,7 +54,8 @@ fun AuthForm(
     val focusManager = LocalFocusManager.current
 
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .widthIn(max = BottomSheetDefaults.SheetMaxWidth),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AnimatedVisibility(
