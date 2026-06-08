@@ -40,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -118,7 +117,7 @@ fun BarChart(
                     text = if (selectedIndex == -1)
                         "" else doubleToPrice(entries[selectedIndex].value),
                     color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.headlineLarge,
+                    style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -126,8 +125,7 @@ fun BarChart(
                     modifier = Modifier.padding(bottom = 5.dp),
                     text = extendedLabel,
                     color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Normal
+                    style = MaterialTheme.typography.labelSmall
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -227,9 +225,8 @@ fun BarChart(
                     val extendedLabel = shortLabel + "/" + "%02d".format(entry.year).takeLast(2)
                     Text(
                         text = if (isSelected) extendedLabel else shortLabel,
-                        fontSize = 11.sp,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                         color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .weight(1f)

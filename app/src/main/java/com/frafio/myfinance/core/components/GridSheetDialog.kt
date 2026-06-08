@@ -21,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.MenuItem
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -97,8 +96,7 @@ private fun GridItem(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(id = item.textRes),
-                style = MaterialTheme.typography.bodyMedium,
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

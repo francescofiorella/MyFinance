@@ -41,23 +41,22 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass
 import com.frafio.myfinance.R
-import com.frafio.myfinance.features.add.AddViewModel
-import com.frafio.myfinance.core.components.SwipeableSnackbarHost
-import com.frafio.myfinance.features.home.budget.navigation.budgetEntry
-import com.frafio.myfinance.features.home.dashboard.navigation.dashboardEntry
-import com.frafio.myfinance.features.home.expenses.navigation.expensesEntry
-import com.frafio.myfinance.features.home.profile.navigation.profileEntry
 import com.frafio.myfinance.app.HomeUiEvent
 import com.frafio.myfinance.app.HomeViewModel
+import com.frafio.myfinance.features.add.AddViewModel
+import com.frafio.myfinance.core.components.SwipeableSnackbarHost
+import com.frafio.myfinance.features.budget.navigation.budgetEntry
+import com.frafio.myfinance.features.dashboard.navigation.dashboardEntry
+import com.frafio.myfinance.features.expenses.navigation.expensesEntry
+import com.frafio.myfinance.features.profile.navigation.profileEntry
 import com.frafio.myfinance.core.navigation.HomeTabKey
 import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.navigation.RootKey
@@ -326,9 +325,8 @@ private fun MainScaffold(
                             Column {
                                 Text(
                                     text = stringResource(id = R.string.app_name),
-                                    fontSize = 24.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = stringResource(
@@ -339,10 +337,8 @@ private fun MainScaffold(
                                             HomeTabKey.Profile -> R.string.profile
                                         }
                                     ),
-                                    fontSize = 16.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         },

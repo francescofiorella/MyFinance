@@ -205,7 +205,7 @@ private fun AuthContent(
 
                 Text(
                     text = stringResource(id = R.string.app_name),
-                    style = MaterialTheme.typography.displayMediumEmphasized,
+                    style = MaterialTheme.typography.displayLargeEmphasized,
                     color = MaterialTheme.colorScheme.primary
                 )
 

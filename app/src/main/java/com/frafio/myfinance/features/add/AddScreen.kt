@@ -49,7 +49,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppDatePickerDialog
@@ -59,7 +58,7 @@ import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.getCategoryIcon
-import com.frafio.myfinance.features.home.expenses.CategorySheet
+import com.frafio.myfinance.features.expenses.components.CategorySheet
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -349,18 +348,14 @@ fun AddScreen(
                         placeholder = {
                             Text(
                                 text = stringResource(id = R.string.amount),
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontSize = 18.sp
-                                )
+                                style = MaterialTheme.typography.bodyLarge
                             )
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 8.dp, vertical = 4.dp),
                         enabled = !isAdding,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 18.sp
-                        ),
+                        textStyle = MaterialTheme.typography.bodyLarge,
                         trailingIcon = {
                             if (priceError != null) {
                                 Icon(
@@ -441,17 +436,13 @@ fun AddScreen(
                         placeholder = {
                             Text(
                                 text = stringResource(id = R.string.date),
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontSize = 18.sp
-                                )
+                                style = MaterialTheme.typography.bodyLarge
                             )
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 8.dp, vertical = 4.dp),
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 18.sp
-                        ),
+                        textStyle = MaterialTheme.typography.bodyLarge,
                         enabled = false,
                         leadingIcon = {
                             Icon(
@@ -507,17 +498,13 @@ fun AddScreen(
                             placeholder = {
                                 Text(
                                     text = stringResource(id = R.string.category),
-                                    style = MaterialTheme.typography.bodyLarge.copy(
-                                        fontSize = 18.sp
-                                    )
+                                    style = MaterialTheme.typography.bodyLarge
                                 )
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 8.dp, vertical = 4.dp),
-                            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                                fontSize = 18.sp
-                            ),
+                            textStyle = MaterialTheme.typography.bodyLarge,
                             isError = categoryError != null,
                             enabled = false,
                             leadingIcon = {

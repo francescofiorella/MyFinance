@@ -67,7 +67,6 @@ fun TotalItem(
                 transaction.getDateString(extended = true)
             },
             style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -75,7 +74,6 @@ fun TotalItem(
             Text(
                 text = transaction.getPriceString(true),
                 style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -161,8 +159,7 @@ fun TransactionListItem(
                 ) {
                     Text(
                         text = transaction.name ?: "",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Normal
+                        style = MaterialTheme.typography.bodyLarge
                     )
                     val supportingText = if (transaction is Income) {
                         transaction.getDateString(extended = false)
@@ -181,8 +178,7 @@ fun TransactionListItem(
                         .padding(start = 12.dp),
                     text = transaction.getPriceString(true),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.Normal
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         },
@@ -248,7 +244,6 @@ fun EmptyListItem(
             Text(
                 text = stringResource(messageRes),
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },

@@ -27,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
@@ -58,8 +57,7 @@ fun EmptyView(
             Spacer(modifier = Modifier.width(32.dp))
             Text(
                 text = stringResource(messageRes),
-                style = MaterialTheme.typography.bodyMedium,
-                fontSize = 21.sp,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Start,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -82,8 +80,7 @@ fun EmptyView(
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = stringResource(messageRes),
-                style = MaterialTheme.typography.bodyMedium,
-                fontSize = 21.sp,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface,

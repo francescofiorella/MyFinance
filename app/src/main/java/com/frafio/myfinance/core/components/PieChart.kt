@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
-import androidx.compose.ui.unit.sp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
@@ -239,16 +238,14 @@ fun PieChart(
             Text(
                 text = title,
                 color = getCategoryTextColor(selectedArcIndex, MaterialTheme.colorScheme.onSurface, isDark = isDark),
-                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
             Text(
                 text = doubleToPriceWithoutDecimals(valueText),
                 color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 18.sp,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
         }
