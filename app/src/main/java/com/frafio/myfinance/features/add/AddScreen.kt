@@ -193,12 +193,12 @@ fun AddScreen(
                             if (!isAdding) onSaveClick()
                         },
                         containerColor = if (!isAdding) {
-                            ButtonDefaults.filledTonalButtonColors().containerColor
+                            MaterialTheme.colorScheme.primaryContainer
                         } else {
                             ButtonDefaults.filledTonalButtonColors().disabledContainerColor
                         },
                         contentColor = if (!isAdding) {
-                            ButtonDefaults.filledTonalButtonColors().contentColor
+                            MaterialTheme.colorScheme.onPrimaryContainer
                         } else {
                             ButtonDefaults.filledTonalButtonColors().disabledContentColor
                         },

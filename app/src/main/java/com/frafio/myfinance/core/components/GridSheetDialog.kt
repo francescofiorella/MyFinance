@@ -96,7 +96,7 @@ private fun GridItem(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(id = item.textRes),
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
