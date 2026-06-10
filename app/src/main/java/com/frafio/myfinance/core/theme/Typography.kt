@@ -14,7 +14,7 @@ val GoogleSansFlexFamily = FontFamily(
             FontVariation.grade(0),
             FontVariation.slant(0f),
             FontVariation.width(100f),
-            FontVariation.Setting(name = "ROND", value = 100f)
+            FontVariation.Setting(name = "ROND", value = 0f)
         )
     )
 )

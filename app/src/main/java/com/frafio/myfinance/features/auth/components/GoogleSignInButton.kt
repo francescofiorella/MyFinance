@@ -35,7 +35,10 @@ fun GoogleSignInButton(
             painter = painterResource(id = R.drawable.ic_google),
             contentDescription = null,
             modifier = Modifier.size(24.dp),
-            tint = Color.Unspecified
+            tint = if (enabled)
+                Color.Unspecified
+            else
+                ButtonDefaults.buttonColors().disabledContentColor
         )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         Text(

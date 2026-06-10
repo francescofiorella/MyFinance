@@ -245,7 +245,7 @@ fun PieChart(
             Text(
                 text = doubleToPriceWithoutDecimals(valueText),
                 color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
         }
