@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,13 +34,29 @@ import com.frafio.myfinance.core.theme.MyFinanceTheme
 @Composable
 fun EmptyView(
     modifier: Modifier = Modifier,
-    imageResLight: Int,
-    imageResDark: Int,
+    imageResLight: Int?,
+    imageResDark: Int?,
     messageRes: Int
 ) {
     val isDarkTheme = isSystemInDarkTheme()
-    val imageRes = if (isDarkTheme) imageResDark else imageResLight
     val configuration = LocalConfiguration.current
+
+    if (imageResLight == null || imageResDark == null) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(messageRes),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        return
+    }
+
+    val imageRes = if (isDarkTheme) imageResDark else imageResLight
 
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
         Row(
@@ -109,6 +126,19 @@ fun EmptyViewLandscapePreview() {
         EmptyView(
             imageResLight = R.drawable.image_audit_pana,
             imageResDark = R.drawable.image_shared_goals_amico,
+            messageRes = R.string.warning_home
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun EmptyViewNoImagePreview() {
+    MyFinanceTheme {
+        EmptyView(
+            imageResLight = null,
+            imageResDark = null,
             messageRes = R.string.warning_home
         )
     }

@@ -3,6 +3,7 @@ package com.frafio.myfinance.features.budget
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -33,17 +36,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.components.EditTransactionSheet
 import com.frafio.myfinance.core.components.EmptyListItem
+import com.frafio.myfinance.core.components.EmptyView
 import com.frafio.myfinance.core.components.TotalItem
 import com.frafio.myfinance.core.components.TransactionListItem
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -184,28 +190,71 @@ fun BudgetContent(
         }
     }
 
-    LazyColumn(
-        state = listState,
-        modifier = modifier.fillMaxSize()
-    ) {
-        item {
-            BudgetOverview(
-                monthlyBudget = monthlyBudget,
-                annualBudget = annualBudget,
-                onEditBudgetClick = onEditBudgetClick,
-                onDeleteBudget = onDeleteBudget
-            )
-        }
+    if (isIncomesEmpty) {
+        BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+            val minHeight = maxHeight
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Layout(
+                    content = {
+                        Column {
+                            BudgetOverview(
+                                monthlyBudget = monthlyBudget,
+                                annualBudget = annualBudget,
+                                onEditBudgetClick = onEditBudgetClick,
+                                onDeleteBudget = onDeleteBudget
+                            )
+                            SectionHeader(title = stringResource(R.string.incomes))
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 64.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            EmptyView(
+                                imageResLight = null,
+                                imageResDark = null,
+                                messageRes = R.string.warning_budget
+                            )
+                        }
+                    }
+                ) { measurables, constraints ->
+                    val topPlaceable = measurables[0].measure(constraints.copy(minHeight = 0))
+                    val remainingHeight = (minHeight.roundToPx() - topPlaceable.height).coerceAtLeast(0)
 
-        item {
-            SectionHeader(title = stringResource(R.string.incomes))
-        }
+                    val emptyPlaceable = measurables[1].measure(
+                        constraints.copy(minHeight = remainingHeight, maxHeight = Constraints.Infinity)
+                    )
 
-        if (isIncomesEmpty) {
-            item {
-                IncomeEmptyState(modifier = Modifier.fillParentMaxSize())
+                    layout(constraints.maxWidth, topPlaceable.height + emptyPlaceable.height) {
+                        topPlaceable.placeRelative(0, 0)
+                        emptyPlaceable.placeRelative(0, topPlaceable.height)
+                    }
+                }
             }
-        } else {
+        }
+    } else {
+        LazyColumn(
+            state = listState,
+            modifier = modifier.fillMaxSize()
+        ) {
+            item {
+                BudgetOverview(
+                    monthlyBudget = monthlyBudget,
+                    annualBudget = annualBudget,
+                    onEditBudgetClick = onEditBudgetClick,
+                    onDeleteBudget = onDeleteBudget
+                )
+            }
+
+            item {
+                SectionHeader(title = stringResource(R.string.incomes))
+            }
+
             itemsIndexed(
                 items = incomes,
                 key = { _, income -> income.id },
@@ -349,22 +398,6 @@ private fun SectionHeader(
 }
 
 @Composable
-private fun IncomeEmptyState(
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier.padding(top = 64.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = stringResource(R.string.warning_budget),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-@Composable
 private fun IncomeItem(
     income: Income,
     indexInGroup: Int,
@@ -432,6 +465,28 @@ fun BudgetPreview() {
             ),
             monthlyBudget = 1200.0,
             annualBudget = 14400.0,
+            scrollToIdFlow = emptyFlow(),
+            onLoadMore = {},
+            onItemLongClick = { _, _ -> },
+            onEditBudgetClick = {},
+            onDeleteBudget = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BudgetEmptyPreview() {
+    MyFinanceTheme {
+        BudgetContent(
+            incomes = listOf(),
+            isIncomesEmpty = true,
+            itemMetadata = mapOf(
+                1 to Pair(0, 2),
+                2 to Pair(1, 2)
+            ),
+            monthlyBudget = 0.0,
+            annualBudget = 0.0,
             scrollToIdFlow = emptyFlow(),
             onLoadMore = {},
             onItemLongClick = { _, _ -> },
