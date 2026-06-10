@@ -27,6 +27,12 @@ import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
+data class AnnualBalanceData(
+    val year: Int,
+    val incomes: Double,
+    val expenses: Double
+)
+
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
@@ -54,17 +60,19 @@ class DashboardViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
     private val _balanceYearShown = MutableStateFlow(today.year)
-    val balanceYearShown: StateFlow<Int> = _balanceYearShown.asStateFlow()
-
-    val expensesSum: StateFlow<Double> = _balanceYearShown
-        .flatMapLatest { year -> expensesLocalRepository.getPriceSumFromYear(year) }
-        .map { it ?: 0.0 }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
-
-    val incomesSum: StateFlow<Double> = _balanceYearShown
-        .flatMapLatest { year -> incomesLocalRepository.getPriceSumFromYear(year) }
-        .map { it ?: 0.0 }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+    val annualBalanceData: StateFlow<AnnualBalanceData> = _balanceYearShown
+        .flatMapLatest { year ->
+            combine(
+                incomesLocalRepository.getPriceSumFromYear(year),
+                expensesLocalRepository.getPriceSumFromYear(year)
+            ) { incomes, expenses ->
+                AnnualBalanceData(year, incomes ?: 0.0, expenses ?: 0.0)
+            }
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            AnnualBalanceData(today.year, 0.0, 0.0)
+        )
 
     val monthlyBudget: StateFlow<Double> = userPreferencesRepository.userPreferencesFlow
         .map { it.monthlyBudget }

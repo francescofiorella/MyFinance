@@ -52,8 +52,7 @@ fun DashboardScreen(
                 DashboardContent(viewModel, scrollState)
             }
 
-            null -> { /* Loading or Initial state */
-            }
+            null -> { /* Loading or Initial state */ }
         }
     }
 }
@@ -68,9 +67,7 @@ fun DashboardContent(
     val thisYearSum by viewModel.thisYearSum.collectAsStateWithLifecycle()
     val monthlyBudget by viewModel.monthlyBudget.collectAsStateWithLifecycle()
     val todaySum by viewModel.todaySum.collectAsStateWithLifecycle()
-    val balanceYear by viewModel.balanceYearShown.collectAsStateWithLifecycle()
-    val incomesSum by viewModel.incomesSum.collectAsStateWithLifecycle()
-    val expensesSum by viewModel.expensesSum.collectAsStateWithLifecycle()
+    val annualBalanceData by viewModel.annualBalanceData.collectAsStateWithLifecycle()
     val barChartData by viewModel.barChartData.collectAsStateWithLifecycle()
     val isNextBarDateEnabled by viewModel.isNextBarChartDateEnabled.collectAsStateWithLifecycle()
     val pieExpenses by viewModel.pieChartExpenses.collectAsStateWithLifecycle()
@@ -107,9 +104,9 @@ fun DashboardContent(
             isNextDateEnabled = isNextBarDateEnabled
         )
         AnnualBalanceCard(
-            balanceYear = balanceYear,
-            incomesSum = incomesSum,
-            expensesSum = expensesSum,
+            balanceYear = annualBalanceData.year,
+            incomesSum = annualBalanceData.incomes,
+            expensesSum = annualBalanceData.expenses,
             onPreviousYear = { viewModel.previousBalanceYear() },
             onNextYear = { viewModel.nextBalanceYear() },
             onToday = { viewModel.todayBalanceYear() }

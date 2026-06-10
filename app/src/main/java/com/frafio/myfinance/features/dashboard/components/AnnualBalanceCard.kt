@@ -72,7 +72,10 @@ fun AnnualBalanceCard(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
         )
     ) {
-        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
+        Column(
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -184,7 +187,7 @@ fun AnnualBalanceCard(
                 Row(
                     horizontalArrangement = Arrangement.End,
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(2f)
                 ) {
                     Box(
                         modifier = Modifier
@@ -210,7 +213,7 @@ fun AnnualBalanceCard(
                     }
                 }
                 Column(
-                    Modifier.weight(2f),
+                    Modifier.weight(3f),
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
@@ -231,7 +234,7 @@ fun AnnualBalanceCard(
                 Row(
                     horizontalArrangement = Arrangement.End,
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(2f)
                 ) {
                     Box(
                         modifier = Modifier
@@ -257,7 +260,7 @@ fun AnnualBalanceCard(
                     }
                 }
                 Column(
-                    Modifier.weight(2f),
+                    Modifier.weight(3f),
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
