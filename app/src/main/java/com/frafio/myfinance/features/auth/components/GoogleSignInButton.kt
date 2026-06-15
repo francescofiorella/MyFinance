@@ -29,6 +29,7 @@ fun GoogleSignInButton(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
+        shapes = ButtonDefaults.shapes(),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
     ) {
         Icon(

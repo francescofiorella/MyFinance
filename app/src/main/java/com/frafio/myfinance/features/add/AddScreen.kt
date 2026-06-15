@@ -231,6 +231,7 @@ fun AddScreen(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
+                    shapes = IconButtonDefaults.shapes(),
                     modifier = Modifier
                         .padding(start = 16.dp)
                 ) {

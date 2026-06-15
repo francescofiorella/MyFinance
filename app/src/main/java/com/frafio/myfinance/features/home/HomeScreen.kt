@@ -10,12 +10,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,7 +34,6 @@ import com.frafio.myfinance.core.navigation.Navigator
 import com.frafio.myfinance.core.navigation.toEntries
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
@@ -344,14 +342,20 @@ private fun MainScaffold(
                         },
                         actions = {
                             if (currentTab == HomeTabKey.Profile) {
-                                FilledTonalIconButton(onClick = onLogoutClick) {
+                                FilledTonalIconButton(
+                                    onClick = onLogoutClick,
+                                    shapes = IconButtonDefaults.shapes()
+                                ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_logout_filled),
                                         contentDescription = "Logout"
                                     )
                                 }
                             } else {
-                                IconButton(onClick = onProPicClick) {
+                                FilledTonalIconButton(
+                                    onClick = onProPicClick,
+                                    shapes = IconButtonDefaults.shapes(),
+                                ) {
                                     val painter = remember(profilePicture) {
                                         if (profilePicture != null) {
                                             BitmapPainter(profilePicture.asImageBitmap())
@@ -363,8 +367,7 @@ private fun MainScaffold(
                                         painter = painter,
                                         contentDescription = stringResource(id = R.string.profile_picture),
                                         modifier = Modifier
-                                            .size(40.dp)
-                                            .clip(CircleShape),
+                                            .size(40.dp),
                                         contentScale = ContentScale.Crop
                                     )
                                 }

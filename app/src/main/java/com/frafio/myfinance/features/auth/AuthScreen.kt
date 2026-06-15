@@ -233,7 +233,8 @@ private fun AuthContent(
 
                 Button(
                     onClick = onAuthClick,
-                    enabled = !isLoading
+                    enabled = !isLoading,
+                    shapes = ButtonDefaults.shapes()
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_login_filled),
@@ -278,6 +279,7 @@ private fun AuthContent(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
+                    shapes = IconButtonDefaults.shapes(),
                     enabled = !isLoading
                 ) {
                     Icon(
