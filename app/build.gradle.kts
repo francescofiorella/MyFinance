@@ -22,7 +22,7 @@ android {
         minSdk = 29
         targetSdk = 37
         versionCode = 4
-        versionName = "4.11.3"
+        versionName = "4.11.4"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -97,6 +97,7 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    ksp(libs.metadata.jvm)
     implementation(libs.hilt.lifecycle.viewmodel.compose)
 
     // Room

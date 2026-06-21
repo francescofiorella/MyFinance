@@ -341,21 +341,19 @@ private fun MainScaffold(
                             }
                         },
                         actions = {
-                            if (currentTab == HomeTabKey.Profile) {
-                                FilledTonalIconButton(
-                                    onClick = onLogoutClick,
-                                    shapes = IconButtonDefaults.shapes()
-                                ) {
+                            FilledTonalIconButton(
+                                onClick = if (currentTab == HomeTabKey.Profile)
+                                    onLogoutClick
+                                else
+                                    onProPicClick,
+                                shapes = IconButtonDefaults.shapes()
+                            ) {
+                                if (currentTab == HomeTabKey.Profile) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_logout_filled),
                                         contentDescription = "Logout"
                                     )
-                                }
-                            } else {
-                                FilledTonalIconButton(
-                                    onClick = onProPicClick,
-                                    shapes = IconButtonDefaults.shapes(),
-                                ) {
+                                } else {
                                     val painter = remember(profilePicture) {
                                         if (profilePicture != null) {
                                             BitmapPainter(profilePicture.asImageBitmap())

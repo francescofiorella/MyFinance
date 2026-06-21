@@ -1,31 +1,32 @@
 [versions]
 activityKtx = "1.13.0"
 agp = "9.2.1"
-composeBom = "2026.05.01"
+composeBom = "2026.06.00"
 coreKtx = "1.19.0"
 coreSplashscreen = "1.2.0"
 credentials = "1.6.0"
 espressoCore = "3.7.0"
-firebaseBom = "34.14.1"
+firebaseBom = "34.15.0"
 firebaseCrashlytics = "3.0.7"
-googleServices = "4.4.4"
+googleServices = "4.5.0"
 googleIdentity = "1.2.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
-kotlin = "2.3.21"
+kotlin = "2.4.0"
 kotlinx = "1.11.0"
 ksp = "2.3.6"
-lifecycleKtx = "2.10.0"
-material3 = "1.5.0-alpha21"
+lifecycleKtx = "2.11.0"
+material3 = "1.5.0-alpha22"
 material3WindowSizeClass = "1.4.0"
 roomRuntime = "2.8.4"
-ui = "1.11.2"
-coil = "3.4.0"
+ui = "1.11.3"
+coil = "3.5.0"
 hilt = "2.59.2"
+kotlinMetadataJvm = "2.4.0"
 hiltLifecycleCompose = "1.3.0"
 androidxComposeMaterial3Adaptive = "1.2.0"
-androidxComposeMaterial3AdaptiveNavigation3 = "1.3.0-beta02"
-androidxNavigation3 = "1.1.2"
+androidxComposeMaterial3AdaptiveNavigation3 = "1.3.0-rc01"
+androidxNavigation3 = "1.1.3"
 datastore = "1.2.1"
 
 [libraries]
@@ -68,6 +69,7 @@ androidx-navigation3-ui = { group = "androidx.navigation3", name = "navigation3-
 androidx-lifecycle-viewModel-navigation3 = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version.ref = "lifecycleKtx" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+metadata-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-metadata-jvm", version.ref = "kotlinMetadataJvm" }
 
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }

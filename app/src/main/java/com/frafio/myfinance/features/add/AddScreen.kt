@@ -517,6 +517,14 @@ fun AddScreen(
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
+                            trailingIcon = {
+                                if (categoryError != null) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_error_filled),
+                                        contentDescription = null
+                                    )
+                                }
+                            },
                             colors = if (isAdding) {
                                 TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
@@ -535,7 +543,8 @@ fun AddScreen(
                                     errorContainerColor = Color.Transparent,
                                     errorIndicatorColor = Color.Transparent,
                                     disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    disabledTrailingIconColor = MaterialTheme.colorScheme.error
                                 )
                             }
                         )
