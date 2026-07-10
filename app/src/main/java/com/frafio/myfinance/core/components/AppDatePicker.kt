@@ -50,7 +50,7 @@ fun AppDatePickerDialog(
                     },
                     enabled = confirmEnabled.value
                 ) {
-                    Text(stringResource(id = R.string.ok))
+                    Text(stringResource(id = android.R.string.ok))
                 }
             },
             dismissButton = {
@@ -112,7 +112,7 @@ fun AppDateRangePickerDialog(
                     },
                     enabled = confirmEnabled.value
                 ) {
-                    Text(stringResource(id = R.string.ok))
+                    Text(stringResource(id = android.R.string.ok))
                 }
             },
             dismissButton = {
