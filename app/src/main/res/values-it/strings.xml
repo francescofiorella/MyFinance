@@ -14,11 +14,12 @@
     <string name="send">Invia</string>
     <string name="remove">Rimuovi</string>
     <string name="undo">Annulla</string>
-    <string name="ok">Ok</string>
 
     <string name="login_successful">Hai effettuato l\'accesso come</string>
 
     <string name="name">Nome</string>
+    <string name="expense_name">Nome spesa</string>
+    <string name="income_name">Nome entrata</string>
     <string name="amount">Importo</string>
     <string name="date">Data</string>
     <string name="category">Categoria</string>

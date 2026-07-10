@@ -14,11 +14,12 @@
     <string name="send">Send</string>
     <string name="remove">Remove</string>
     <string name="undo">Undo</string>
-    <string name="ok">Ok</string>
 
     <string name="login_successful">You are logged in as</string>
 
     <string name="name">Name</string>
+    <string name="expense_name">Expense name</string>
+    <string name="income_name">Income name</string>
     <string name="amount">Amount</string>
     <string name="date">Date</string>
     <string name="category">Category</string>

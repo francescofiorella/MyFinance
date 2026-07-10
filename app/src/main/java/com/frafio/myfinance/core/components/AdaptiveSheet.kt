@@ -1,5 +1,6 @@
 package com.frafio.myfinance.core.components
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -49,6 +50,7 @@ fun AdaptiveSheet(
             sheetState = sheetState,
             dragHandle = null,
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
             content = {
                 content()
             },

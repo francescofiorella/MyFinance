@@ -123,7 +123,7 @@ fun ExpensesCard(
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .clip(MaterialShapes.Sunny.toShape())
+                        .clip(MaterialShapes.Cookie12Sided.toShape())
                         .background(MaterialTheme.colorScheme.secondaryContainer),
                     contentAlignment = Alignment.Center
                 ) {

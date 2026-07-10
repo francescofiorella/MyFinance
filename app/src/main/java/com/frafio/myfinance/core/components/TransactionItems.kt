@@ -206,7 +206,7 @@ fun TransactionListItem(
                             Text(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 text = label,
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                             )
                         }

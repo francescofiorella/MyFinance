@@ -14,6 +14,7 @@ import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.repository.ExpensesRepository
 import com.frafio.myfinance.core.data.repository.IncomeRepository
 import com.frafio.myfinance.core.data.repository.LoadingRepository
+import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.utils.dateToExtendedString
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
@@ -24,9 +25,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -46,6 +50,7 @@ class AddViewModel @AssistedInject constructor(
     private val expensesRepository: ExpensesRepository,
     private val incomeRepository: IncomeRepository,
     private val loadingRepository: LoadingRepository,
+    userPreferencesRepository: UserPreferencesRepository,
     @Assisted private val initialNavKey: RootKey.AddEditTransaction
 ) : ViewModel() {
 
@@ -71,8 +76,69 @@ class AddViewModel @AssistedInject constructor(
     )
     var category by mutableIntStateOf(initialNavKey.transaction?.category ?: -1)
 
-    // TODO add labels in AddActivity
     var labels by mutableStateOf(initialNavKey.transaction?.labels ?: emptyList())
+
+    val allLabels: StateFlow<List<String>> = userPreferencesRepository.userPreferencesFlow
+        .map { it.labels }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun onLabelCheckedChanged(label: String, checked: Boolean) {
+        if (checked) {
+            if (!labels.contains(label)) labels = labels + label
+        } else {
+            labels = labels - label
+        }
+    }
+
+    fun addLabel(label: String) {
+        viewModelScope.launch {
+            try {
+                loadingRepository.startLoading()
+                val currentAllLabels = allLabels.value
+                if (currentAllLabels.contains(label)) return@launch
+                expensesRepository.setLabels(currentAllLabels + label)
+            } finally {
+                loadingRepository.stopLoading()
+            }
+        }
+    }
+
+    fun deleteLabel(label: String) {
+        viewModelScope.launch {
+            try {
+                loadingRepository.startLoading()
+                val currentAllLabels = allLabels.value.toMutableList()
+                if (currentAllLabels.remove(label)) {
+                    expensesRepository.setLabels(currentAllLabels, FinanceCode.LABEL_DELETE_SUCCESS)
+                    // Also remove from selected labels
+                    labels = labels - label
+                }
+            } finally {
+                loadingRepository.stopLoading()
+            }
+        }
+    }
+
+    fun editLabel(oldName: String, newName: String) {
+        viewModelScope.launch {
+            try {
+                loadingRepository.startLoading()
+                val currentAllLabels = allLabels.value.toMutableList()
+                val index = currentAllLabels.indexOf(oldName)
+                if (index != -1) {
+                    currentAllLabels[index] = newName
+                    expensesRepository.setLabels(currentAllLabels, FinanceCode.LABEL_UPDATE_SUCCESS)
+
+                    // Update current selected labels if it contained the old name
+                    if (labels.contains(oldName)) {
+                        labels = labels.map { if (it == oldName) newName else it }
+                    }
+                }
+            } finally {
+                loadingRepository.stopLoading()
+            }
+        }
+    }
 
     val dateString: String?
         get() = dateToExtendedString(day, month, year)
@@ -86,6 +152,12 @@ class AddViewModel @AssistedInject constructor(
     var nameError by mutableStateOf<String?>(null)
     var priceError by mutableStateOf<String?>(null)
     var categoryError by mutableStateOf<String?>(null)
+
+    fun resetErrors() {
+        nameError = null
+        priceError = null
+        categoryError = null
+    }
 
     private val _uiEvents = MutableSharedFlow<AddUiEvent>()
     val uiEvents: SharedFlow<AddUiEvent> = _uiEvents.asSharedFlow()
@@ -127,6 +199,7 @@ class AddViewModel @AssistedInject constructor(
 
                 if (navKey.expenseCode == REQUEST_INCOME_CODE) {
                     category = FirestoreEnums.CATEGORIES.INCOME.value
+                    labels = emptyList()
                 } else if (category == -1) {
                     categoryError = FinanceCode.EMPTY_CATEGORY.message
                     hasError = true

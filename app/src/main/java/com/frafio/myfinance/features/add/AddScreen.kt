@@ -1,6 +1,14 @@
 ﻿package com.frafio.myfinance.features.add
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,36 +16,46 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuGroup
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -59,6 +77,7 @@ import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.getCategoryIcon
 import com.frafio.myfinance.features.expenses.components.CategorySheet
+import com.frafio.myfinance.features.expenses.components.LabelsSheet
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,9 +90,11 @@ fun AddScreen(
     val focusManager = LocalFocusManager.current
 
     val isAdding by viewModel.isAdding.collectAsStateWithLifecycle()
+    val allLabels by viewModel.allLabels.collectAsStateWithLifecycle()
 
     var showCategorySheet by rememberSaveable { mutableStateOf(false) }
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
+    var showLabelsSheet by rememberSaveable { mutableStateOf(false) }
 
     AddScreen(
         appState = appState,
@@ -98,10 +119,17 @@ fun AddScreen(
             focusManager.clearFocus()
             showCategorySheet = true
         },
+        labels = viewModel.labels,
+        onLabelClick = {
+            focusManager.clearFocus()
+            showLabelsSheet = true
+        },
+        onLabelCheckedChanged = viewModel::onLabelCheckedChanged,
         navKey = viewModel.navKey,
         onNavKeyChange = {
             focusManager.clearFocus()
             viewModel.navKey = it
+            viewModel.resetErrors()
         },
         onSaveClick = {
             focusManager.clearFocus()
@@ -129,6 +157,21 @@ fun AddScreen(
         }
     )
 
+    LabelsSheet(
+        show = showLabelsSheet,
+        onDismiss = {
+            if (showLabelsSheet) {
+                showLabelsSheet = false
+            }
+        },
+        labels = allLabels,
+        selectedLabels = viewModel.labels,
+        onNewLabel = viewModel::addLabel,
+        onLabelCheckedChanged = viewModel::onLabelCheckedChanged,
+        onDeleteLabel = viewModel::deleteLabel,
+        onEditLabel = viewModel::editLabel
+    )
+
     AppDatePickerDialog(
         show = showDatePicker,
         onDismiss = {
@@ -152,7 +195,7 @@ fun AddScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AddScreen(
     appState: MyFinanceAppState,
@@ -165,11 +208,13 @@ fun AddScreen(
     onDateClick: () -> Unit,
     category: Int,
     onCategoryClick: () -> Unit,
+    labels: List<String>,
+    onLabelClick: () -> Unit,
+    onLabelCheckedChanged: (String, Boolean) -> Unit,
     navKey: RootKey.AddEditTransaction,
     onNavKeyChange: (RootKey.AddEditTransaction) -> Unit,
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit,
-    showCategoryField: Boolean = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
     nameError: String? = null,
     priceError: String? = null,
     categoryError: String? = null
@@ -177,356 +222,388 @@ fun AddScreen(
     val focusManager = LocalFocusManager.current
     val categories = stringArrayResource(id = R.array.categories)
 
+    var lastNonNullNameError by remember { mutableStateOf("") }
+    if (nameError != null) {
+        lastNonNullNameError = nameError
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             containerColor = MaterialTheme.colorScheme.surface,
             snackbarHost = {
                 SwipeableSnackbarHost(hostState = appState.snackbarHostState)
-            },
-            floatingActionButton = {
-                CompositionLocalProvider(
-                    LocalRippleConfiguration provides
-                            if (isAdding) null else LocalRippleConfiguration.current
-                ) {
-                    ExtendedFloatingActionButton(
-                        onClick = {
-                            if (!isAdding) onSaveClick()
-                        },
-                        containerColor = if (!isAdding) {
-                            MaterialTheme.colorScheme.primaryContainer
-                        } else {
-                            ButtonDefaults.filledTonalButtonColors().disabledContainerColor
-                        },
-                        contentColor = if (!isAdding) {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        } else {
-                            ButtonDefaults.filledTonalButtonColors().disabledContentColor
-                        },
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_check_filled),
-                                contentDescription = null
-                            )
-                        },
-                        text = {
-                            Text(
-                                text = stringResource(id = R.string.save)
-                            )
-                        }
-                    )
-                }
             }
         ) { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
             ) {
-                Spacer(modifier = Modifier.height(10.dp))
-
-                FilledTonalIconButton(
-                    onClick = onBackClick,
-                    colors = IconButtonDefaults.filledTonalIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    shapes = IconButtonDefaults.shapes(),
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_close_filled),
-                        contentDescription = stringResource(id = R.string.back_arrow),
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // Name Field (Large)
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    TextField(
-                        value = name,
-                        onValueChange = onNameChange,
-                        placeholder = {
-                            Text(
-                                text = stringResource(id = R.string.name),
-                                style = MaterialTheme.typography.headlineMedium
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 44.dp, end = 8.dp),
-                        enabled = !isAdding,
-                        textStyle = MaterialTheme.typography.headlineMedium,
-                        trailingIcon = {
-                            if (nameError != null) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_error_filled),
-                                    contentDescription = null
-                                )
-                            } else if (name.isNotEmpty() && !isAdding) {
-                                IconButton(onClick = { onNameChange("") }) {
-                                    Icon(painter = painterResource(id = R.drawable.ic_cancel_filled), contentDescription = "Clear")
-                                }
-                            }
-                        },
-                        isError = nameError != null,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
-                            errorContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent,
-                            errorIndicatorColor = Color.Transparent
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Sentences,
-                            autoCorrectEnabled = false,
-                            imeAction = ImeAction.Next
-                        ),
-                        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
-                        singleLine = true
-                    )
-                    if (nameError != null) {
-                        Text(
-                            text = nameError,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier
-                                .align(Alignment.BottomStart)
-                                .padding(start = 60.dp)
-                        )
-                    }
-                }
-
-                // Type Selection (Chips)
                 Row(
                     modifier = Modifier
-                        .padding(start = 60.dp)
-                        .offset(y = (-8).dp)
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp, horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    FilterChip(
-                        selected = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
-                        onClick = { onNavKeyChange(navKey.copy(expenseCode = AddViewModel.REQUEST_EXPENSE_CODE)) },
-                        label = {
-                            Text(
-                                text = stringResource(id = R.string.expense)
-                            )
-                        },
-                        enabled = navKey.requestCode == AddViewModel.REQUEST_ADD_CODE && !isAdding
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    FilterChip(
-                        selected = navKey.expenseCode == AddViewModel.REQUEST_INCOME_CODE,
-                        onClick = { onNavKeyChange(navKey.copy(expenseCode = AddViewModel.REQUEST_INCOME_CODE)) },
-                        label = {
-                            Text(
-                                text = stringResource(id = R.string.income)
-                            )
-                        },
-                        enabled = navKey.requestCode == AddViewModel.REQUEST_ADD_CODE && !isAdding
-                    )
-                }
+                    IconButton(
+                        onClick = onBackClick,
+                        colors = IconButtonDefaults.iconButtonVibrantColors()
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_close_filled),
+                            contentDescription = stringResource(id = R.string.back_arrow),
+                        )
+                    }
 
-                HorizontalDivider(
-                    modifier = Modifier.padding(top = 4.dp),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
-
-                // Amount Field
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    TextField(
-                        value = priceString,
-                        onValueChange = { text ->
-                            if (text.isEmpty() || text.toDoubleOrNull() != null || text == ".") {
-                                onPriceChange(text)
-                            }
-                        },
-                        placeholder = {
+                    var expanded by rememberSaveable { mutableStateOf(false) }
+                    Box {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = if (navKey.requestCode == AddViewModel.REQUEST_ADD_CODE && !isAdding)
+                                Modifier
+                                    .clip(CircleShape)
+                                    .clickable { expanded = !expanded }
+                                    .padding(start = 16.dp, end = 4.dp)
+                            else
+                                Modifier
+                        ) {
                             Text(
-                                text = stringResource(id = R.string.amount),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        enabled = !isAdding,
-                        textStyle = MaterialTheme.typography.bodyLarge,
-                        trailingIcon = {
-                            if (priceError != null) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_error_filled),
-                                    contentDescription = null
-                                )
-                            } else if (priceString.isNotEmpty() && !isAdding) {
-                                IconButton(onClick = { onPriceChange("") }) {
-                                    Icon(painter = painterResource(id = R.drawable.ic_cancel_filled), contentDescription = "Clear")
-                                }
-                            }
-                        },
-                        isError = priceError != null,
-                        leadingIcon = {
-                            val currency = stringResource(id = R.string.currency)
-                            Icon(
-                                painter = painterResource(
-                                    id = when (currency) {
-                                        "$" -> R.drawable.ic_attach_money_filled
-                                        "€" -> R.drawable.ic_euro_filled
-                                        else -> R.drawable.ic_euro_filled
+                                text = stringResource(
+                                    id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) {
+                                        R.string.expense
+                                    } else {
+                                        R.string.income
                                     }
                                 ),
-                                contentDescription = null
+                                style = MaterialTheme.typography.titleLarge,
                             )
-                        },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
-                            errorContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent,
-                            errorIndicatorColor = Color.Transparent
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Decimal,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(onDone = {
-                            focusManager.clearFocus()
-                            if (!isAdding) onSaveClick()
-                        }),
-                        singleLine = true
-                    )
-                    if (priceError != null) {
-                        Text(
-                            text = priceError,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier
-                                .align(Alignment.BottomStart)
-                                .padding(start = 56.dp)
+                            if (navKey.requestCode == AddViewModel.REQUEST_ADD_CODE && !isAdding) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(start = 4.dp)
+                                        .width(32.dp)
+                                        .height(40.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (expanded)
+                                                MaterialTheme.colorScheme.surfaceContainer
+                                            else
+                                                MaterialTheme.colorScheme.surface
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(
+                                            id = if (expanded)
+                                                R.drawable.ic_keyboard_arrow_up_filled
+                                            else
+                                                R.drawable.ic_keyboard_arrow_down_filled
+                                        ),
+                                        contentDescription = null,
+                                    )
+                                }
+                            }
+                        }
+                        // Type Selection
+                        DropdownMenuPopup(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuGroup(
+                                shapes = MenuDefaults.groupShapes(),
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                            ) {
+                                DropdownMenuItem(
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_vertical_align_top_outline),
+                                            contentDescription = null
+                                        )
+                                    },
+                                    text = {
+                                        Text(
+                                            text = stringResource(id = R.string.expense),
+                                            style = MaterialTheme.typography.titleMedium
+                                        )
+                                    },
+                                    trailingIcon = {
+                                        Spacer(
+                                            modifier = Modifier.width(
+                                                24.dp
+                                            )
+                                        )
+                                    },
+                                    onClick = {
+                                        onNavKeyChange(navKey.copy(expenseCode = AddViewModel.REQUEST_EXPENSE_CODE))
+                                        expanded = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_vertical_align_bottom_outline),
+                                            contentDescription = null
+                                        )
+                                    },
+                                    text = {
+                                        Text(
+                                            stringResource(id = R.string.income),
+                                            style = MaterialTheme.typography.titleMedium
+                                        )
+                                    },
+                                    trailingIcon = {
+                                        Spacer(
+                                            modifier = Modifier.width(
+                                                24.dp
+                                            )
+                                        )
+                                    },
+                                    onClick = {
+                                        onNavKeyChange(navKey.copy(expenseCode = AddViewModel.REQUEST_INCOME_CODE))
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    FilledIconButton(
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .width(52.dp),
+                        onClick = onSaveClick,
+                        enabled = !isAdding,
+                        shapes = IconButtonDefaults.shapes()
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_check_filled),
+                            contentDescription = null,
                         )
                     }
                 }
 
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
-
-                // Date Field
-                Box(
-                    modifier = if (!isAdding) {
-                        Modifier
-                            .fillMaxWidth()
-                            .clickable { onDateClick() }
-                    } else {
-                        Modifier
-                            .fillMaxWidth()
-                    }
+                Column(
+                    modifier = Modifier
+                        .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
+                        .align(Alignment.CenterHorizontally)
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    TextField(
-                        value = dateString,
-                        onValueChange = {},
-                        placeholder = {
-                            Text(
-                                text = stringResource(id = R.string.date),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        },
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        textStyle = MaterialTheme.typography.bodyLarge,
-                        enabled = false,
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_today_filled),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        },
-                        colors = if (isAdding) {
-                            TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                disabledContainerColor = Color.Transparent,
-                                errorContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                disabledIndicatorColor = Color.Transparent,
-                                errorIndicatorColor = Color.Transparent
-                            )
-                        } else {
-                            TextFieldDefaults.colors(
-                                disabledContainerColor = Color.Transparent,
-                                disabledIndicatorColor = Color.Transparent,
-                                errorContainerColor = Color.Transparent,
-                                errorIndicatorColor = Color.Transparent,
-                                disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    )
-                }
-
-                // Category Field
-                if (showCategoryField) {
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant
-                    )
-
-                    Box(
-                        modifier = if (!isAdding) {
-                            Modifier
-                                .fillMaxWidth()
-                                .clickable { onCategoryClick() }
-                        } else {
-                            Modifier
-                                .fillMaxWidth()
-                        }
+                            .padding(horizontal = 40.dp)
+                            .padding(top = 48.dp, bottom = 64.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        TextField(
-                            value = if (category != -1) categories.getOrElse(category) { "" } else "",
-                            onValueChange = {},
-                            placeholder = {
-                                Text(
-                                    text = stringResource(id = R.string.category),
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp, vertical = 4.dp),
-                            textStyle = MaterialTheme.typography.bodyLarge,
-                            isError = categoryError != null,
-                            enabled = false,
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(
-                                        id = if (category != -1) getCategoryIcon(category) else R.drawable.ic_grid_3x3_filled
-                                    ),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            },
-                            trailingIcon = {
-                                if (categoryError != null) {
+                        // Name Field (Large)
+                            TextField(
+                                value = name,
+                                onValueChange = onNameChange,
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(
+                                            id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE)
+                                                R.string.expense_name
+                                            else
+                                                R.string.income_name
+                                        ),
+                                        style = MaterialTheme.typography.headlineSmall
+                                    )
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                enabled = !isAdding,
+                                textStyle = MaterialTheme.typography.headlineSmall,
+                                trailingIcon = {
+                                    if (nameError != null) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_error_filled),
+                                            contentDescription = null
+                                        )
+                                    } else if (name.isNotEmpty() && !isAdding) {
+                                        IconButton(onClick = { onNameChange("") }) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.ic_cancel_filled),
+                                                contentDescription = "Clear"
+                                            )
+                                        }
+                                    }
+                                },
+                                isError = nameError != null,
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    disabledContainerColor = Color.Transparent,
+                                    errorContainerColor = Color.Transparent
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    capitalization = KeyboardCapitalization.Sentences,
+                                    autoCorrectEnabled = false,
+                                    imeAction = ImeAction.Next
+                                ),
+                                keyboardActions = KeyboardActions(onNext = {
+                                    focusManager.moveFocus(
+                                        FocusDirection.Down
+                                    )
+                                }),
+                                singleLine = true
+                            )
+                        AnimatedVisibility(
+                            visible = nameError != null,
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically()
+                        ) {
+                            Text(
+                                text = lastNonNullNameError,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp)
+                            )
+                        }
+
+                        // Labels Selection
+                        AnimatedVisibility(
+                            visible = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                                    .horizontalScroll(rememberScrollState()),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                labels.forEach { label ->
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(AssistChipDefaults.shape)
+                                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                                            .clickable {
+                                                onLabelCheckedChanged(
+                                                    label,
+                                                    false
+                                                )
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(
+                                                horizontal = 8.dp,
+                                                vertical = 4.dp
+                                            ),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Text(
+                                                text = label,
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                            )
+                                            Icon(
+                                                modifier = Modifier.size(16.dp),
+                                                painter = painterResource(id = R.drawable.ic_close_filled),
+                                                contentDescription = "Remove Label",
+                                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .clip(AssistChipDefaults.shape)
+                                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                                        .clickable { onLabelClick() },
+                                    contentAlignment = Alignment.Center
+                                ) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.ic_error_filled),
-                                        contentDescription = null
+                                        modifier = Modifier
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            .size(AssistChipDefaults.IconSize),
+                                        painter = painterResource(id = R.drawable.ic_add_filled),
+                                        contentDescription = "Add Label",
+                                        tint = MaterialTheme.colorScheme.onSecondaryContainer
                                     )
                                 }
-                            },
-                            colors = if (isAdding) {
-                                TextFieldDefaults.colors(
+                            }
+                        }
+                    }
+
+                    // Amount Field
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 8.dp),
+                        shape = ListItemDefaults.shapes().selectedShape,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        )
+                    ) {
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            TextField(
+                                value = priceString,
+                                onValueChange = { text ->
+                                    if (text.isEmpty() || text.toDoubleOrNull() != null || text == ".") {
+                                        onPriceChange(text)
+                                    }
+                                },
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(id = R.string.amount),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                enabled = !isAdding,
+                                textStyle = MaterialTheme.typography.bodyLarge,
+                                trailingIcon = {
+                                    if (priceError != null) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_error_filled),
+                                            contentDescription = null
+                                        )
+                                    } else if (priceString.isNotEmpty() && !isAdding) {
+                                        IconButton(onClick = { onPriceChange("") }) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.ic_cancel_filled),
+                                                contentDescription = "Clear"
+                                            )
+                                        }
+                                    }
+                                },
+                                isError = priceError != null,
+                                leadingIcon = {
+                                    val currency = stringResource(id = R.string.currency)
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(all = 8.dp)
+                                            .size(48.dp)
+                                            .clip(MaterialShapes.Cookie12Sided.toShape())
+                                            .background(MaterialTheme.colorScheme.secondaryContainer),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(
+                                                id = when (currency) {
+                                                    "$" -> R.drawable.ic_attach_money_filled
+                                                    "€" -> R.drawable.ic_euro_filled
+                                                    else -> R.drawable.ic_euro_filled
+                                                }
+                                            ),
+                                            contentDescription = null
+                                        )
+                                    }
+                                },
+                                colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedContainerColor = Color.Transparent,
                                     disabledContainerColor = Color.Transparent,
@@ -535,33 +612,216 @@ fun AddScreen(
                                     unfocusedIndicatorColor = Color.Transparent,
                                     disabledIndicatorColor = Color.Transparent,
                                     errorIndicatorColor = Color.Transparent
-                                )
-                            } else {
-                                TextFieldDefaults.colors(
-                                    disabledContainerColor = Color.Transparent,
-                                    disabledIndicatorColor = Color.Transparent,
-                                    errorContainerColor = Color.Transparent,
-                                    errorIndicatorColor = Color.Transparent,
-                                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    disabledTrailingIconColor = MaterialTheme.colorScheme.error
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Decimal,
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    focusManager.clearFocus()
+                                    if (!isAdding) onSaveClick()
+                                }),
+                                singleLine = true
+                            )
+                            if (priceError != null) {
+                                Text(
+                                    text = priceError,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier
+                                        .align(Alignment.BottomStart)
+                                        .padding(start = 76.dp)
                                 )
                             }
+                        }
+                    }
+
+                    // Date Field
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 8.dp),
+                        shape = ListItemDefaults.shapes().selectedShape,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         )
-                        if (categoryError != null) {
-                            Text(
-                                text = categoryError,
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall,
+                    ) {
+                        Box(
+                            modifier = if (!isAdding) {
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onDateClick() }
+                            } else {
+                                Modifier
+                                    .fillMaxWidth()
+                            }
+                        ) {
+                            TextField(
+                                value = dateString,
+                                onValueChange = {},
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(id = R.string.date),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                },
                                 modifier = Modifier
-                                    .align(Alignment.BottomStart)
-                                    .padding(start = 56.dp)
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                textStyle = MaterialTheme.typography.bodyLarge,
+                                enabled = false,
+                                leadingIcon = {
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(all = 8.dp)
+                                            .size(48.dp)
+                                            .clip(MaterialShapes.Pill.toShape())
+                                            .background(MaterialTheme.colorScheme.secondaryContainer),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_today_filled),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                },
+                                colors = if (isAdding) {
+                                    TextFieldDefaults.colors(
+                                        focusedContainerColor = Color.Transparent,
+                                        unfocusedContainerColor = Color.Transparent,
+                                        disabledContainerColor = Color.Transparent,
+                                        errorContainerColor = Color.Transparent,
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent,
+                                        disabledIndicatorColor = Color.Transparent,
+                                        errorIndicatorColor = Color.Transparent
+                                    )
+                                } else {
+                                    TextFieldDefaults.colors(
+                                        disabledContainerColor = Color.Transparent,
+                                        disabledIndicatorColor = Color.Transparent,
+                                        errorContainerColor = Color.Transparent,
+                                        errorIndicatorColor = Color.Transparent,
+                                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                },
+                                singleLine = true
                             )
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(80.dp)) // dashboard_bottom_margin
+                    // Category Field
+                    AnimatedVisibility(
+                        visible = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .padding(bottom = 8.dp),
+                            shape = ListItemDefaults.shapes().selectedShape,
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            )
+                        ) {
+                            Box(
+                                modifier = if (!isAdding) {
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .clickable { onCategoryClick() }
+                                } else {
+                                    Modifier
+                                        .fillMaxWidth()
+                                }
+                            ) {
+                                TextField(
+                                    value = if (category != -1) categories.getOrElse(category) { "" } else "",
+                                    onValueChange = {},
+                                    placeholder = {
+                                        Text(
+                                            text = stringResource(id = R.string.category),
+                                            style = MaterialTheme.typography.bodyLarge
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                                    textStyle = MaterialTheme.typography.bodyLarge,
+                                    isError = categoryError != null,
+                                    enabled = false,
+                                    leadingIcon = {
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(all = 8.dp)
+                                                .size(48.dp)
+                                                .clip(MaterialShapes.Sunny.toShape())
+                                                .background(MaterialTheme.colorScheme.secondaryContainer),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(
+                                                    id = if (category != -1) getCategoryIcon(
+                                                        category
+                                                    ) else R.drawable.ic_grid_3x3_filled
+                                                ),
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    },
+                                    trailingIcon = {
+                                        if (categoryError != null) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.ic_error_filled),
+                                                contentDescription = null
+                                            )
+                                        }
+                                    },
+                                    colors = if (isAdding) {
+                                        TextFieldDefaults.colors(
+                                            focusedContainerColor = Color.Transparent,
+                                            unfocusedContainerColor = Color.Transparent,
+                                            disabledContainerColor = Color.Transparent,
+                                            errorContainerColor = Color.Transparent,
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent,
+                                            disabledIndicatorColor = Color.Transparent,
+                                            errorIndicatorColor = Color.Transparent
+                                        )
+                                    } else {
+                                        TextFieldDefaults.colors(
+                                            disabledContainerColor = Color.Transparent,
+                                            disabledIndicatorColor = Color.Transparent,
+                                            errorContainerColor = Color.Transparent,
+                                            errorIndicatorColor = Color.Transparent,
+                                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                            disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            disabledTrailingIconColor = MaterialTheme.colorScheme.error
+                                        )
+                                    },
+                                    singleLine = true
+                                )
+                                if (categoryError != null) {
+                                    Text(
+                                        text = categoryError,
+                                        color = MaterialTheme.colorScheme.error,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier
+                                            .align(Alignment.BottomStart)
+                                            .padding(start = 76.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
     }
@@ -583,6 +843,9 @@ fun AddScreenPreview() {
             onDateClick = {},
             category = 1,
             onCategoryClick = {},
+            labels = listOf("Dinner", "Cheat Meal"),
+            onLabelClick = {},
+            onLabelCheckedChanged = { _, _ -> },
             navKey = RootKey.AddEditTransaction(
                 requestCode = AddViewModel.REQUEST_ADD_CODE,
                 expenseCode = AddViewModel.REQUEST_EXPENSE_CODE
@@ -596,3 +859,4 @@ fun AddScreenPreview() {
         )
     }
 }
+

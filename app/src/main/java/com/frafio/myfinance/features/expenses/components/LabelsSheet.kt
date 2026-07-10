@@ -426,62 +426,64 @@ private fun LabelItem(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (showEditOptions) {
                             var menuExpanded by remember { mutableStateOf(false) }
-                            IconButton(
-                                onClick = { menuExpanded = true }
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_more_vert_filled),
-                                    contentDescription = null
-                                )
-                            }
-                            DropdownMenuPopup(
-                                expanded = menuExpanded,
-                                onDismissRequest = { menuExpanded = false }
-                            ) {
-                                DropdownMenuGroup(
-                                    shapes = MenuDefaults.groupShapes(),
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                            Box {
+                                IconButton(
+                                    onClick = { menuExpanded = true }
                                 ) {
-                                    DropdownMenuItem(
-                                        leadingIcon = {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.ic_edit_outline),
-                                                contentDescription = null
-                                            )
-                                        },
-                                        text = { Text(text = stringResource(id = R.string.edit)) },
-                                        trailingIcon = {
-                                            Spacer(
-                                                modifier = Modifier.width(
-                                                    40.dp
-                                                )
-                                            )
-                                        },
-                                        onClick = {
-                                            onEditClick()
-                                            menuExpanded = false
-                                        }
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_more_vert_filled),
+                                        contentDescription = null
                                     )
-                                    DropdownMenuItem(
-                                        leadingIcon = {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.ic_delete_outline),
-                                                contentDescription = null
-                                            )
-                                        },
-                                        text = { Text(text = stringResource(id = R.string.delete)) },
-                                        trailingIcon = {
-                                            Spacer(
-                                                modifier = Modifier.width(
-                                                    40.dp
+                                }
+                                DropdownMenuPopup(
+                                    expanded = menuExpanded,
+                                    onDismissRequest = { menuExpanded = false }
+                                ) {
+                                    DropdownMenuGroup(
+                                        shapes = MenuDefaults.groupShapes(),
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                                    ) {
+                                        DropdownMenuItem(
+                                            leadingIcon = {
+                                                Icon(
+                                                    painter = painterResource(id = R.drawable.ic_edit_outline),
+                                                    contentDescription = null
                                                 )
-                                            )
-                                        },
-                                        onClick = {
-                                            onDeleteClick()
-                                            menuExpanded = false
-                                        }
-                                    )
+                                            },
+                                            text = { Text(text = stringResource(id = R.string.edit)) },
+                                            trailingIcon = {
+                                                Spacer(
+                                                    modifier = Modifier.width(
+                                                        24.dp
+                                                    )
+                                                )
+                                            },
+                                            onClick = {
+                                                onEditClick()
+                                                menuExpanded = false
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            leadingIcon = {
+                                                Icon(
+                                                    painter = painterResource(id = R.drawable.ic_delete_outline),
+                                                    contentDescription = null
+                                                )
+                                            },
+                                            text = { Text(text = stringResource(id = R.string.delete)) },
+                                            trailingIcon = {
+                                                Spacer(
+                                                    modifier = Modifier.width(
+                                                        24.dp
+                                                    )
+                                                )
+                                            },
+                                            onClick = {
+                                                onDeleteClick()
+                                                menuExpanded = false
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
