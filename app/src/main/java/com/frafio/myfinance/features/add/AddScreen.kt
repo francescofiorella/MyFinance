@@ -8,6 +8,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,17 +22,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenuGroup
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
@@ -41,9 +39,9 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.toShape
@@ -55,6 +53,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
@@ -227,8 +226,11 @@ fun AddScreen(
         lastNonNullNameError = nameError
     }
 
+    var isTypeSelectionVisible by remember { mutableStateOf(false) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
+            modifier = Modifier.blur(if (isTypeSelectionVisible) 16.dp else 0.dp),
             containerColor = MaterialTheme.colorScheme.surface,
             snackbarHost = {
                 SwipeableSnackbarHost(hostState = appState.snackbarHostState)
@@ -256,18 +258,22 @@ fun AddScreen(
                         )
                     }
 
-                    var expanded by rememberSaveable { mutableStateOf(false) }
-                    Box {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = if (navKey.requestCode == AddViewModel.REQUEST_ADD_CODE && !isAdding)
-                                Modifier
-                                    .clip(CircleShape)
-                                    .clickable { expanded = !expanded }
-                                    .padding(start = 16.dp, end = 4.dp)
-                            else
-                                Modifier
-                        ) {
+                    TextButton(
+                        onClick = {
+                            focusManager.clearFocus()
+                            isTypeSelectionVisible = true
+                        },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = TextFieldDefaults.colors().focusedTextColor,
+                            disabledContentColor = if (isAdding) {
+                                TextFieldDefaults.colors().disabledTextColor
+                            } else {
+                                TextFieldDefaults.colors().focusedTextColor
+                            }
+                        ),
+                        enabled = navKey.requestCode == AddViewModel.REQUEST_ADD_CODE && !isAdding
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = stringResource(
                                     id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) {
@@ -278,91 +284,12 @@ fun AddScreen(
                                 ),
                                 style = MaterialTheme.typography.titleLarge,
                             )
-                            if (navKey.requestCode == AddViewModel.REQUEST_ADD_CODE && !isAdding) {
-                                Box(
+                            if (navKey.requestCode == AddViewModel.REQUEST_ADD_CODE) {
+                                Icon(
                                     modifier = Modifier
-                                        .padding(start = 4.dp)
-                                        .width(32.dp)
-                                        .height(40.dp)
-                                        .clip(CircleShape)
-                                        .background(
-                                            if (expanded)
-                                                MaterialTheme.colorScheme.surfaceContainer
-                                            else
-                                                MaterialTheme.colorScheme.surface
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        painter = painterResource(
-                                            id = if (expanded)
-                                                R.drawable.ic_keyboard_arrow_up_filled
-                                            else
-                                                R.drawable.ic_keyboard_arrow_down_filled
-                                        ),
-                                        contentDescription = null,
-                                    )
-                                }
-                            }
-                        }
-                        // Type Selection
-                        DropdownMenuPopup(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            DropdownMenuGroup(
-                                shapes = MenuDefaults.groupShapes(),
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer
-                            ) {
-                                DropdownMenuItem(
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_vertical_align_top_outline),
-                                            contentDescription = null
-                                        )
-                                    },
-                                    text = {
-                                        Text(
-                                            text = stringResource(id = R.string.expense),
-                                            style = MaterialTheme.typography.titleMedium
-                                        )
-                                    },
-                                    trailingIcon = {
-                                        Spacer(
-                                            modifier = Modifier.width(
-                                                24.dp
-                                            )
-                                        )
-                                    },
-                                    onClick = {
-                                        onNavKeyChange(navKey.copy(expenseCode = AddViewModel.REQUEST_EXPENSE_CODE))
-                                        expanded = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_vertical_align_bottom_outline),
-                                            contentDescription = null
-                                        )
-                                    },
-                                    text = {
-                                        Text(
-                                            stringResource(id = R.string.income),
-                                            style = MaterialTheme.typography.titleMedium
-                                        )
-                                    },
-                                    trailingIcon = {
-                                        Spacer(
-                                            modifier = Modifier.width(
-                                                24.dp
-                                            )
-                                        )
-                                    },
-                                    onClick = {
-                                        onNavKeyChange(navKey.copy(expenseCode = AddViewModel.REQUEST_INCOME_CODE))
-                                        expanded = false
-                                    }
+                                        .padding(start = 4.dp),
+                                    painter = painterResource(id = R.drawable.ic_keyboard_arrow_down_filled),
+                                    contentDescription = null,
                                 )
                             }
                         }
@@ -397,59 +324,59 @@ fun AddScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         // Name Field (Large)
-                            TextField(
-                                value = name,
-                                onValueChange = onNameChange,
-                                placeholder = {
-                                    Text(
-                                        text = stringResource(
-                                            id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE)
-                                                R.string.expense_name
-                                            else
-                                                R.string.income_name
-                                        ),
-                                        style = MaterialTheme.typography.headlineSmall
+                        TextField(
+                            value = name,
+                            onValueChange = onNameChange,
+                            placeholder = {
+                                Text(
+                                    text = stringResource(
+                                        id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE)
+                                            R.string.expense_name
+                                        else
+                                            R.string.income_name
+                                    ),
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            enabled = !isAdding,
+                            textStyle = MaterialTheme.typography.headlineSmall,
+                            trailingIcon = {
+                                if (nameError != null) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_error_filled),
+                                        contentDescription = null
                                     )
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                enabled = !isAdding,
-                                textStyle = MaterialTheme.typography.headlineSmall,
-                                trailingIcon = {
-                                    if (nameError != null) {
+                                } else if (name.isNotEmpty() && !isAdding) {
+                                    IconButton(onClick = { onNameChange("") }) {
                                         Icon(
-                                            painter = painterResource(id = R.drawable.ic_error_filled),
-                                            contentDescription = null
+                                            painter = painterResource(id = R.drawable.ic_cancel_filled),
+                                            contentDescription = "Clear"
                                         )
-                                    } else if (name.isNotEmpty() && !isAdding) {
-                                        IconButton(onClick = { onNameChange("") }) {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.ic_cancel_filled),
-                                                contentDescription = "Clear"
-                                            )
-                                        }
                                     }
-                                },
-                                isError = nameError != null,
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    disabledContainerColor = Color.Transparent,
-                                    errorContainerColor = Color.Transparent
-                                ),
-                                keyboardOptions = KeyboardOptions(
-                                    capitalization = KeyboardCapitalization.Sentences,
-                                    autoCorrectEnabled = false,
-                                    imeAction = ImeAction.Next
-                                ),
-                                keyboardActions = KeyboardActions(onNext = {
-                                    focusManager.moveFocus(
-                                        FocusDirection.Down
-                                    )
-                                }),
-                                singleLine = true
-                            )
+                                }
+                            },
+                            isError = nameError != null,
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent,
+                                errorContainerColor = Color.Transparent
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Sentences,
+                                autoCorrectEnabled = false,
+                                imeAction = ImeAction.Next
+                            ),
+                            keyboardActions = KeyboardActions(onNext = {
+                                focusManager.moveFocus(
+                                    FocusDirection.Down
+                                )
+                            }),
+                            singleLine = true
+                        )
                         AnimatedVisibility(
                             visible = nameError != null,
                             enter = fadeIn() + expandVertically(),
@@ -821,6 +748,55 @@ fun AddScreen(
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+
+        // Type Selection
+        AnimatedVisibility(
+            visible = isTypeSelectionVisible,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { isTypeSelectionVisible = false },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                TextButton(
+                    onClick = {
+                        focusManager.clearFocus()
+                        onNavKeyChange(navKey.copy(expenseCode = AddViewModel.REQUEST_EXPENSE_CODE))
+                        isTypeSelectionVisible = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = TextFieldDefaults.colors().focusedTextColor
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.expense),
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                }
+                TextButton(
+                    onClick = {
+                        focusManager.clearFocus()
+                        onNavKeyChange(navKey.copy(expenseCode = AddViewModel.REQUEST_INCOME_CODE))
+                        isTypeSelectionVisible = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = TextFieldDefaults.colors().focusedTextColor
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.income),
+                        style = MaterialTheme.typography.headlineMedium
+                    )
                 }
             }
         }
