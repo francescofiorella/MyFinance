@@ -1,6 +1,7 @@
 ﻿package com.frafio.myfinance.features.add
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -33,6 +34,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -40,6 +42,7 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -228,6 +231,10 @@ fun AddScreen(
 
     var isTypeSelectionVisible by remember { mutableStateOf(false) }
 
+    val colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+    )
+
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.blur(if (isTypeSelectionVisible) 16.dp else 0.dp),
@@ -248,9 +255,13 @@ fun AddScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(
+                    FilledTonalIconButton(
                         onClick = onBackClick,
-                        colors = IconButtonDefaults.iconButtonVibrantColors()
+                        colors = IconButtonDefaults.filledTonalIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        shapes = IconButtonDefaults.shapes(),
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_close_filled),
@@ -315,400 +326,331 @@ fun AddScreen(
                         .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
                         .align(Alignment.CenterHorizontally)
                         .verticalScroll(rememberScrollState())
+                        .animateContentSize()
                 ) {
-                    Column(
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 40.dp)
-                            .padding(top = 48.dp, bottom = 64.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 16.dp)
+                            .animateContentSize(),
+                        shape = ListItemDefaults.shapes().selectedShape,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        )
                     ) {
-                        // Name Field (Large)
-                        TextField(
-                            value = name,
-                            onValueChange = onNameChange,
-                            placeholder = {
-                                Text(
-                                    text = stringResource(
-                                        id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE)
-                                            R.string.expense_name
-                                        else
-                                            R.string.income_name
-                                    ),
-                                    style = MaterialTheme.typography.headlineSmall
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(start = 16.dp)
+                                    .padding(vertical = 16.dp)
+                                    .size(64.dp)
+                                    .clip(MaterialShapes.Cookie12Sided.toShape())
+                                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_edit_filled),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            enabled = !isAdding,
-                            textStyle = MaterialTheme.typography.headlineSmall,
-                            trailingIcon = {
-                                if (nameError != null) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_error_filled),
-                                        contentDescription = null
+                            }
+
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                // Name Field (Large)
+                                Box(modifier = Modifier.fillMaxWidth()) {
+                                    TextField(
+                                        value = name,
+                                        onValueChange = onNameChange,
+                                        placeholder = {
+                                            Text(
+                                                text = stringResource(
+                                                    id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE)
+                                                        R.string.expense_name
+                                                    else
+                                                        R.string.income_name
+                                                ),
+                                                style = MaterialTheme.typography.headlineSmall
+                                            )
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(end = 16.dp),
+                                        enabled = !isAdding,
+                                        textStyle = MaterialTheme.typography.headlineSmall,
+                                        trailingIcon = {
+                                            if (nameError != null) {
+                                                Icon(
+                                                    painter = painterResource(id = R.drawable.ic_error_filled),
+                                                    contentDescription = null
+                                                )
+                                            } else if (name.isNotEmpty() && !isAdding) {
+                                                IconButton(onClick = { onNameChange("") }) {
+                                                    Icon(
+                                                        painter = painterResource(id = R.drawable.ic_cancel_filled),
+                                                        contentDescription = "Clear"
+                                                    )
+                                                }
+                                            }
+                                        },
+                                        isError = nameError != null,
+                                        colors = TextFieldDefaults.colors(
+                                            focusedContainerColor = Color.Transparent,
+                                            unfocusedContainerColor = Color.Transparent,
+                                            disabledContainerColor = Color.Transparent,
+                                            errorContainerColor = Color.Transparent,
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent,
+                                            disabledIndicatorColor = Color.Transparent,
+                                            errorIndicatorColor = Color.Transparent
+                                        ),
+                                        keyboardOptions = KeyboardOptions(
+                                            capitalization = KeyboardCapitalization.Sentences,
+                                            autoCorrectEnabled = false,
+                                            imeAction = ImeAction.Next
+                                        ),
+                                        keyboardActions = KeyboardActions(onNext = {
+                                            focusManager.moveFocus(
+                                                FocusDirection.Down
+                                            )
+                                        }),
+                                        singleLine = true
                                     )
-                                } else if (name.isNotEmpty() && !isAdding) {
-                                    IconButton(onClick = { onNameChange("") }) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_cancel_filled),
-                                            contentDescription = "Clear"
+                                    if (nameError != null) {
+                                        Text(
+                                            text = lastNonNullNameError,
+                                            color = MaterialTheme.colorScheme.error,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier
+                                                .align(Alignment.BottomStart)
+                                                .padding(start = 16.dp)
                                         )
                                     }
                                 }
-                            },
-                            isError = nameError != null,
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                disabledContainerColor = Color.Transparent,
-                                errorContainerColor = Color.Transparent
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Sentences,
-                                autoCorrectEnabled = false,
-                                imeAction = ImeAction.Next
-                            ),
-                            keyboardActions = KeyboardActions(onNext = {
-                                focusManager.moveFocus(
-                                    FocusDirection.Down
-                                )
-                            }),
-                            singleLine = true
-                        )
-                        AnimatedVisibility(
-                            visible = nameError != null,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
-                        ) {
-                            Text(
-                                text = lastNonNullNameError,
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 16.dp)
-                            )
-                        }
 
-                        // Labels Selection
-                        AnimatedVisibility(
-                            visible = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
-                                    .horizontalScroll(rememberScrollState()),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                labels.forEach { label ->
-                                    Box(
+                                // Labels Selection
+                                AnimatedVisibility(
+                                    visible = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
+                                    enter = fadeIn() + expandVertically(),
+                                    exit = fadeOut() + shrinkVertically()
+                                ) {
+                                    Row(
                                         modifier = Modifier
-                                            .clip(AssistChipDefaults.shape)
-                                            .background(MaterialTheme.colorScheme.secondaryContainer)
-                                            .clickable {
-                                                onLabelCheckedChanged(
-                                                    label,
-                                                    false
-                                                )
-                                            },
-                                        contentAlignment = Alignment.Center
+                                            .fillMaxWidth()
+                                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                                            .horizontalScroll(rememberScrollState()),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
-                                        Row(
-                                            modifier = Modifier.padding(
-                                                horizontal = 8.dp,
-                                                vertical = 4.dp
-                                            ),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        labels.forEach { label ->
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(AssistChipDefaults.shape)
+                                                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                                                    .clickable {
+                                                        onLabelCheckedChanged(
+                                                            label,
+                                                            false
+                                                        )
+                                                    },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.padding(
+                                                        horizontal = 8.dp,
+                                                        vertical = 4.dp
+                                                    ),
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                                ) {
+                                                    Text(
+                                                        text = label,
+                                                        style = MaterialTheme.typography.labelSmall,
+                                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                                    )
+                                                    Icon(
+                                                        modifier = Modifier.size(16.dp),
+                                                        painter = painterResource(id = R.drawable.ic_close_filled),
+                                                        contentDescription = "Remove Label",
+                                                        tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(AssistChipDefaults.shape)
+                                                .background(MaterialTheme.colorScheme.secondaryContainer)
+                                                .clickable { onLabelClick() },
+                                            contentAlignment = Alignment.Center
                                         ) {
-                                            Text(
-                                                text = label,
-                                                style = MaterialTheme.typography.labelSmall,
-                                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                            )
                                             Icon(
-                                                modifier = Modifier.size(16.dp),
-                                                painter = painterResource(id = R.drawable.ic_close_filled),
-                                                contentDescription = "Remove Label",
+                                                modifier = Modifier
+                                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                                    .size(AssistChipDefaults.IconSize),
+                                                painter = painterResource(id = R.drawable.ic_add_filled),
+                                                contentDescription = "Add Label",
                                                 tint = MaterialTheme.colorScheme.onSecondaryContainer
                                             )
                                         }
                                     }
                                 }
-
+                            }
+                        }
+                    }
+                    // Amount Field
+                    SegmentedListItem(
+                        onClick = { },
+                        shapes = ListItemDefaults.segmentedShapes(
+                            index = 0,
+                            count = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) 3 else 2,
+                            defaultShapes = ListItemDefaults.shapes()
+                        ),
+                        colors = colors,
+                        content = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                val currency = stringResource(id = R.string.currency)
                                 Box(
                                     modifier = Modifier
-                                        .clip(AssistChipDefaults.shape)
-                                        .background(MaterialTheme.colorScheme.secondaryContainer)
-                                        .clickable { onLabelClick() },
+                                        .padding(vertical = 6.dp)
+                                        .size(48.dp)
+                                        .clip(MaterialShapes.Cookie7Sided.toShape())
+                                        .background(MaterialTheme.colorScheme.secondaryContainer),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        modifier = Modifier
-                                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                                            .size(AssistChipDefaults.IconSize),
-                                        painter = painterResource(id = R.drawable.ic_add_filled),
-                                        contentDescription = "Add Label",
-                                        tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                        painter = painterResource(
+                                            id = when (currency) {
+                                                "$" -> R.drawable.ic_attach_money_filled
+                                                "€" -> R.drawable.ic_euro_filled
+                                                else -> R.drawable.ic_euro_filled
+                                            }
+                                        ),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
+                                Box(modifier = Modifier.fillMaxWidth()) {
+                                    TextField(
+                                        value = priceString,
+                                        onValueChange = { text ->
+                                            if (text.isEmpty() || text.toDoubleOrNull() != null || text == ".") {
+                                                onPriceChange(text)
+                                            }
+                                        },
+                                        placeholder = {
+                                            Text(
+                                                text = stringResource(id = R.string.amount),
+                                                style = MaterialTheme.typography.bodyLarge
+                                            )
+                                        },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        enabled = !isAdding,
+                                        textStyle = MaterialTheme.typography.bodyLarge,
+                                        trailingIcon = {
+                                            if (priceError != null) {
+                                                Icon(
+                                                    painter = painterResource(id = R.drawable.ic_error_filled),
+                                                    contentDescription = null
+                                                )
+                                            } else if (priceString.isNotEmpty() && !isAdding) {
+                                                IconButton(onClick = { onPriceChange("") }) {
+                                                    Icon(
+                                                        painter = painterResource(id = R.drawable.ic_cancel_filled),
+                                                        contentDescription = "Clear"
+                                                    )
+                                                }
+                                            }
+                                        },
+                                        isError = priceError != null,
+                                        colors = TextFieldDefaults.colors(
+                                            focusedContainerColor = Color.Transparent,
+                                            unfocusedContainerColor = Color.Transparent,
+                                            disabledContainerColor = Color.Transparent,
+                                            errorContainerColor = Color.Transparent,
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent,
+                                            disabledIndicatorColor = Color.Transparent,
+                                            errorIndicatorColor = Color.Transparent
+                                        ),
+                                        keyboardOptions = KeyboardOptions(
+                                            keyboardType = KeyboardType.Decimal,
+                                            imeAction = ImeAction.Done
+                                        ),
+                                        keyboardActions = KeyboardActions(onDone = {
+                                            focusManager.clearFocus()
+                                            if (!isAdding) onSaveClick()
+                                        }),
+                                        singleLine = true
+                                    )
+                                    if (priceError != null) {
+                                        Text(
+                                            text = priceError,
+                                            color = MaterialTheme.colorScheme.error,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier
+                                                .align(Alignment.BottomStart)
+                                                .padding(start = 16.dp)
+                                        )
+                                    }
+                                }
                             }
-                        }
-                    }
-
-                    // Amount Field
-                    Card(
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
-                            .padding(bottom = 8.dp),
-                        shape = ListItemDefaults.shapes().selectedShape,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        )
-                    ) {
-                        Box(modifier = Modifier.fillMaxWidth()) {
-                            TextField(
-                                value = priceString,
-                                onValueChange = { text ->
-                                    if (text.isEmpty() || text.toDoubleOrNull() != null || text == ".") {
-                                        onPriceChange(text)
-                                    }
-                                },
-                                placeholder = {
-                                    Text(
-                                        text = stringResource(id = R.string.amount),
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                                enabled = !isAdding,
-                                textStyle = MaterialTheme.typography.bodyLarge,
-                                trailingIcon = {
-                                    if (priceError != null) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_error_filled),
-                                            contentDescription = null
-                                        )
-                                    } else if (priceString.isNotEmpty() && !isAdding) {
-                                        IconButton(onClick = { onPriceChange("") }) {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.ic_cancel_filled),
-                                                contentDescription = "Clear"
-                                            )
-                                        }
-                                    }
-                                },
-                                isError = priceError != null,
-                                leadingIcon = {
-                                    val currency = stringResource(id = R.string.currency)
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(all = 8.dp)
-                                            .size(48.dp)
-                                            .clip(MaterialShapes.Cookie12Sided.toShape())
-                                            .background(MaterialTheme.colorScheme.secondaryContainer),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(
-                                                id = when (currency) {
-                                                    "$" -> R.drawable.ic_attach_money_filled
-                                                    "€" -> R.drawable.ic_euro_filled
-                                                    else -> R.drawable.ic_euro_filled
-                                                }
-                                            ),
-                                            contentDescription = null
-                                        )
-                                    }
-                                },
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    disabledContainerColor = Color.Transparent,
-                                    errorContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    disabledIndicatorColor = Color.Transparent,
-                                    errorIndicatorColor = Color.Transparent
-                                ),
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Decimal,
-                                    imeAction = ImeAction.Done
-                                ),
-                                keyboardActions = KeyboardActions(onDone = {
-                                    focusManager.clearFocus()
-                                    if (!isAdding) onSaveClick()
-                                }),
-                                singleLine = true
-                            )
-                            if (priceError != null) {
-                                Text(
-                                    text = priceError,
-                                    color = MaterialTheme.colorScheme.error,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier
-                                        .align(Alignment.BottomStart)
-                                        .padding(start = 76.dp)
-                                )
-                            }
-                        }
-                    }
+                            .padding(bottom = 2.dp)
+                    )
 
                     // Date Field
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = 8.dp),
-                        shape = ListItemDefaults.shapes().selectedShape,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        )
-                    ) {
-                        Box(
-                            modifier = if (!isAdding) {
-                                Modifier
-                                    .fillMaxWidth()
-                                    .clickable { onDateClick() }
-                            } else {
-                                Modifier
-                                    .fillMaxWidth()
-                            }
-                        ) {
-                            TextField(
-                                value = dateString,
-                                onValueChange = {},
-                                placeholder = {
-                                    Text(
-                                        text = stringResource(id = R.string.date),
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                                textStyle = MaterialTheme.typography.bodyLarge,
-                                enabled = false,
-                                leadingIcon = {
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(all = 8.dp)
-                                            .size(48.dp)
-                                            .clip(MaterialShapes.Pill.toShape())
-                                            .background(MaterialTheme.colorScheme.secondaryContainer),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_today_filled),
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                },
-                                colors = if (isAdding) {
-                                    TextFieldDefaults.colors(
-                                        focusedContainerColor = Color.Transparent,
-                                        unfocusedContainerColor = Color.Transparent,
-                                        disabledContainerColor = Color.Transparent,
-                                        errorContainerColor = Color.Transparent,
-                                        focusedIndicatorColor = Color.Transparent,
-                                        unfocusedIndicatorColor = Color.Transparent,
-                                        disabledIndicatorColor = Color.Transparent,
-                                        errorIndicatorColor = Color.Transparent
-                                    )
-                                } else {
-                                    TextFieldDefaults.colors(
-                                        disabledContainerColor = Color.Transparent,
-                                        disabledIndicatorColor = Color.Transparent,
-                                        errorContainerColor = Color.Transparent,
-                                        errorIndicatorColor = Color.Transparent,
-                                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                },
-                                singleLine = true
-                            )
-                        }
-                    }
-
-                    // Category Field
-                    AnimatedVisibility(
-                        visible = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
-                        enter = fadeIn() + expandVertically(),
-                        exit = fadeOut() + shrinkVertically()
-                    ) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .padding(bottom = 8.dp),
-                            shape = ListItemDefaults.shapes().selectedShape,
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            )
-                        ) {
-                            Box(
-                                modifier = if (!isAdding) {
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .clickable { onCategoryClick() }
-                                } else {
-                                    Modifier
-                                        .fillMaxWidth()
-                                }
+                    SegmentedListItem(
+                        onClick = if (!isAdding) onDateClick else {
+                            { }
+                        },
+                        shapes = ListItemDefaults.segmentedShapes(
+                            index = 1,
+                            count = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) 3 else 2,
+                            defaultShapes = ListItemDefaults.shapes()
+                        ),
+                        colors = colors,
+                        content = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(vertical = 6.dp)
+                                        .size(48.dp)
+                                        .clip(MaterialShapes.Pill.toShape())
+                                        .background(MaterialTheme.colorScheme.secondaryContainer),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_today_filled),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                                 TextField(
-                                    value = if (category != -1) categories.getOrElse(category) { "" } else "",
+                                    value = dateString,
                                     onValueChange = {},
                                     placeholder = {
                                         Text(
-                                            text = stringResource(id = R.string.category),
+                                            text = stringResource(id = R.string.date),
                                             style = MaterialTheme.typography.bodyLarge
                                         )
                                     },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                                    modifier = Modifier.fillMaxWidth(),
                                     textStyle = MaterialTheme.typography.bodyLarge,
-                                    isError = categoryError != null,
                                     enabled = false,
-                                    leadingIcon = {
-                                        Box(
-                                            modifier = Modifier
-                                                .padding(all = 8.dp)
-                                                .size(48.dp)
-                                                .clip(MaterialShapes.Sunny.toShape())
-                                                .background(MaterialTheme.colorScheme.secondaryContainer),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(
-                                                    id = if (category != -1) getCategoryIcon(
-                                                        category
-                                                    ) else R.drawable.ic_grid_3x3_filled
-                                                ),
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-                                    },
-                                    trailingIcon = {
-                                        if (categoryError != null) {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.ic_error_filled),
-                                                contentDescription = null
-                                            )
-                                        }
-                                    },
                                     colors = if (isAdding) {
                                         TextFieldDefaults.colors(
                                             focusedContainerColor = Color.Transparent,
@@ -727,27 +669,126 @@ fun AddScreen(
                                             errorContainerColor = Color.Transparent,
                                             errorIndicatorColor = Color.Transparent,
                                             disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                            disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            disabledTrailingIconColor = MaterialTheme.colorScheme.error
+                                            disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     },
                                     singleLine = true
                                 )
-                                if (categoryError != null) {
-                                    Text(
-                                        text = categoryError,
-                                        color = MaterialTheme.colorScheme.error,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier
-                                            .align(Alignment.BottomStart)
-                                            .padding(start = 76.dp)
-                                    )
-                                }
                             }
-                        }
-                    }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 2.dp)
+                    )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    // Category Field
+                    AnimatedVisibility(
+                        visible = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        SegmentedListItem(
+                            onClick = if (!isAdding) onCategoryClick else {
+                                { }
+                            },
+                            shapes = ListItemDefaults.segmentedShapes(
+                                index = 2,
+                                count = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) 3 else 2,
+                                defaultShapes = ListItemDefaults.shapes()
+                            ),
+                            colors = colors,
+                            content = {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(vertical = 6.dp)
+                                            .size(48.dp)
+                                            .clip(MaterialShapes.Sunny.toShape())
+                                            .background(MaterialTheme.colorScheme.secondaryContainer),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(
+                                                id = if (category != -1) getCategoryIcon(
+                                                    category
+                                                ) else R.drawable.ic_grid_3x3_filled
+                                            ),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    Box(modifier = Modifier.fillMaxWidth()) {
+                                        TextField(
+                                            value = if (category != -1) categories.getOrElse(
+                                                category
+                                            ) { "" } else "",
+                                            onValueChange = {},
+                                            placeholder = {
+                                                Text(
+                                                    text = stringResource(id = R.string.category),
+                                                    style = MaterialTheme.typography.bodyLarge
+                                                )
+                                            },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            textStyle = MaterialTheme.typography.bodyLarge,
+                                            isError = categoryError != null,
+                                            enabled = false,
+                                            trailingIcon = {
+                                                if (categoryError != null) {
+                                                    Icon(
+                                                        painter = painterResource(id = R.drawable.ic_error_filled),
+                                                        contentDescription = null
+                                                    )
+                                                }
+                                            },
+                                            colors = if (isAdding) {
+                                                TextFieldDefaults.colors(
+                                                    focusedContainerColor = Color.Transparent,
+                                                    unfocusedContainerColor = Color.Transparent,
+                                                    disabledContainerColor = Color.Transparent,
+                                                    errorContainerColor = Color.Transparent,
+                                                    focusedIndicatorColor = Color.Transparent,
+                                                    unfocusedIndicatorColor = Color.Transparent,
+                                                    disabledIndicatorColor = Color.Transparent,
+                                                    errorIndicatorColor = Color.Transparent
+                                                )
+                                            } else {
+                                                TextFieldDefaults.colors(
+                                                    disabledContainerColor = Color.Transparent,
+                                                    disabledIndicatorColor = Color.Transparent,
+                                                    errorContainerColor = Color.Transparent,
+                                                    errorIndicatorColor = Color.Transparent,
+                                                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                                    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    disabledTrailingIconColor = MaterialTheme.colorScheme.error
+                                                )
+                                            },
+                                            singleLine = true
+                                        )
+                                        if (categoryError != null) {
+                                            Text(
+                                                text = categoryError,
+                                                color = MaterialTheme.colorScheme.error,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                modifier = Modifier
+                                                    .align(Alignment.BottomStart)
+                                                    .padding(start = 16.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .padding(bottom = 2.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(14.dp)) // plus 2.dp from card
                 }
             }
         }
@@ -829,9 +870,9 @@ fun AddScreenPreview() {
             onNavKeyChange = {},
             onSaveClick = {},
             onBackClick = {},
-            nameError = null,
-            priceError = null,
-            categoryError = null
+            nameError = "Error message",
+            priceError = "Error message",
+            categoryError = "Error message"
         )
     }
 }

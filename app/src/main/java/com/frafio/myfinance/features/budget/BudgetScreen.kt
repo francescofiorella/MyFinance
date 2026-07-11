@@ -275,7 +275,7 @@ fun BudgetContent(
                 )
             }
             item {
-                Spacer(modifier = Modifier.height(88.dp)) // Floating Action Button space
+                Spacer(modifier = Modifier.height(112.dp)) // Floating Action Button space
             }
         }
     }

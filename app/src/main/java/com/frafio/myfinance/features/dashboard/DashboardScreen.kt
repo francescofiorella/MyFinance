@@ -78,8 +78,7 @@ fun DashboardContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(bottom = 88.dp), // dashboard_bottom_margin
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         BudgetIndicatorCard(
@@ -121,6 +120,7 @@ fun DashboardContent(
             onToday = { viewModel.todayPieChartDate() },
             isNextDateEnabled = isNextPieDateEnabled
         )
+        Spacer(modifier = Modifier.height(112.dp)) // Floating Action Button space
     }
 }
 

@@ -562,7 +562,7 @@ private fun ProfileCards(
             .padding(horizontal = 16.dp)
     )
 
-    Spacer(modifier = Modifier.height(88.dp))
+    Spacer(modifier = Modifier.height(112.dp)) // Floating Action Button space
 }
 
 @Preview(showBackground = true)
