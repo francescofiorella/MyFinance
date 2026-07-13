@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,10 +45,6 @@ fun BudgetIndicatorCard(
     monthlyBudget: Double,
     onToggleMonthShown: (Boolean) -> Unit
 ) {
-    val title = if (monthlyBudget > 0.0)
-        stringResource(R.string.expenses_budget)
-    else
-        stringResource(R.string.this_month)
     val amount = if (monthShown) thisMonthSum else thisYearSum
     val totalBudget = if (monthShown) monthlyBudget else monthlyBudget * 12
 
@@ -67,7 +64,8 @@ fun BudgetIndicatorCard(
                 text = doubleToPrice(amount),
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = if (monthlyBudget > 0.0) TextAlign.Start else TextAlign.Center
             )
 
             if (monthlyBudget > 0.0) {
@@ -106,7 +104,7 @@ fun BudgetIndicatorCard(
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = title,
+                        text = stringResource(R.string.expenses_budget),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -166,6 +164,14 @@ fun BudgetIndicatorCard(
                         {}
                     )
                 }
+            } else {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.this_month),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -184,6 +190,25 @@ fun BudgetIndicatorCardPreview() {
                 thisMonthSum = 450.0,
                 thisYearSum = 5400.0,
                 monthlyBudget = 1000.0,
+                onToggleMonthShown = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun NoBudgetIndicatorCardPreview() {
+    MyFinanceTheme {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            BudgetIndicatorCard(
+                monthShown = true,
+                thisMonthSum = 450.0,
+                thisYearSum = 5400.0,
+                monthlyBudget = 0.0,
                 onToggleMonthShown = {}
             )
         }
