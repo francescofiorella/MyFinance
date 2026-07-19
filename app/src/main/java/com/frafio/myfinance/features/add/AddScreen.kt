@@ -1,5 +1,6 @@
 ﻿package com.frafio.myfinance.features.add
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
@@ -235,6 +236,10 @@ fun AddScreen(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     )
 
+    BackHandler(enabled = isTypeSelectionVisible) {
+        isTypeSelectionVisible = false
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.blur(if (isTypeSelectionVisible) 16.dp else 0.dp),
@@ -256,7 +261,13 @@ fun AddScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     FilledTonalIconButton(
-                        onClick = onBackClick,
+                        onClick = {
+                            if (isTypeSelectionVisible) {
+                                isTypeSelectionVisible = false
+                            } else {
+                                onBackClick()
+                            }
+                        },
                         colors = IconButtonDefaults.filledTonalIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.surfaceContainer,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant

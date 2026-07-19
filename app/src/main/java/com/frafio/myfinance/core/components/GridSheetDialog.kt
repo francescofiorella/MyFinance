@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -74,13 +75,16 @@ private fun GridItem(
     onDismiss: () -> Unit
 ) {
     Surface(
-        modifier = modifier.alpha(if (item.enabled) 1f else 0.38f),
+        modifier = modifier
+            .padding(4.dp)
+            .alpha(if (item.enabled) 1f else 0.38f),
         onClick = {
             item.onClick()
             onDismiss()
         },
         enabled = item.enabled,
-        color = MaterialTheme.colorScheme.surfaceContainerLow
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = RoundedCornerShape(12.dp)
     ) {
         Column(
             modifier = Modifier
