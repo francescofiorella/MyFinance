@@ -1,5 +1,6 @@
 ﻿package com.frafio.myfinance.features.add
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -813,6 +814,11 @@ fun AddScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(
+                        MaterialTheme.colorScheme.scrim.copy(
+                            alpha = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) 0.7f else 0.1f
+                        )
+                    )
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
