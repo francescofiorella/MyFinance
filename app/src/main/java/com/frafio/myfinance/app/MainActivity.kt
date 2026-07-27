@@ -44,6 +44,7 @@ import com.frafio.myfinance.core.utils.dateToExtendedString
 import com.frafio.myfinance.features.add.navigation.addEntry
 import com.frafio.myfinance.features.auth.navigation.authEntry
 import com.frafio.myfinance.features.home.HomeScreen
+import com.frafio.myfinance.features.labels.navigation.labelsEntry
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -137,6 +138,10 @@ class MainActivity : ComponentActivity() {
                                 viewModel.onTransactionCommitted(isExpense, day, month, year)
                                 rootBackStack.removeAt(rootBackStack.size - 1)
                             }
+                        )
+                        labelsEntry(
+                            appState = appState,
+                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
                         )
                     }
                 )

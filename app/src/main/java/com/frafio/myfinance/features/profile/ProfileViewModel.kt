@@ -79,8 +79,10 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 loadingRepository.startLoading()
+                val trimmedFullName = fullName.trim()
+                if (trimmedFullName.isEmpty()) return@launch
                 val previousFN = user.value?.fullName ?: ""
-                val response = userRepository.updateFullName(fullName)
+                val response = userRepository.updateFullName(trimmedFullName)
                 if (response.code == AuthCode.USER_FULL_NAME_UPDATED.code) {
                     if (notify) {
                         _uiEvents.emit(ProfileUiEvent.FullNameUpdated(previousFN))

@@ -190,8 +190,6 @@ fun ExpensesScreen(
         expense = editingExpense,
         labels = labels,
         selectedLabels = selectedLabels,
-        showEditLabel = showNewLabelInLabels,
-        onNewLabel = viewModel::addLabel,
         onLabelCheckedChanged = { label, checked ->
             if (editingExpense == null) {
                 viewModel.onLabelFilterChanged(label, checked)
@@ -202,9 +200,7 @@ fun ExpensesScreen(
                     viewModel.removeLabelFromExpense(editingExpense!!, label)
                 }
             }
-        },
-        onDeleteLabel = viewModel::deleteLabel,
-        onEditLabel = viewModel::editLabel,
+        }
     )
 
     ExpensesContent(

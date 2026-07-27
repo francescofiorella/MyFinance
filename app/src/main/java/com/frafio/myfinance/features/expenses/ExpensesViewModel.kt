@@ -42,7 +42,6 @@ sealed class ExpensesUiEvent {
         val dismissFun: () -> Unit = {}
     ) : ExpensesUiEvent()
     data class ExpenseDeleted(val expense: Expense) : ExpensesUiEvent()
-    object LabelDeleted : ExpensesUiEvent()
 }
 
 @HiltViewModel
@@ -91,7 +90,7 @@ class ExpensesViewModel @Inject constructor(
         _selectedLabels,
         _dateRange
     ) { query, categories, labels, dateRange ->
-        FilterParams(query, categories, labels, dateRange)
+        FilterParams(query.trim(), categories, labels, dateRange)
     }.flatMapLatest { params ->
         val effectiveCategories = params.categories.ifEmpty {
             listOf(
@@ -264,29 +263,14 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
-    fun addLabel(label: String) {
-        viewModelScope.launch {
-            try {
-                loadingRepository.startLoading()
-                val currentLabels = labels.value
-                if (currentLabels.contains(label)) return@launch
-                val response = expensesRepository.setLabels(currentLabels + label)
-                if (response.code == FinanceCode.LABELS_UPDATE_FAILURE.code) {
-                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
-                }
-            } finally {
-                loadingRepository.stopLoading()
-            }
-        }
-    }
-
     fun addLabelToExpense(expense: Expense, label: String) {
         viewModelScope.launch {
             try {
                 loadingRepository.startLoading()
-                if (expense.labels.contains(label)) return@launch
+                val trimmedLabel = label.trim()
+                if (trimmedLabel.isEmpty() || expense.labels.contains(trimmedLabel)) return@launch
                 val labels = expense.labels.toMutableList()
-                labels.add(label)
+                labels.add(trimmedLabel)
                 val updated = expense.copy(
                     timestamp = dateToUTCTimestamp(expense.year!!, expense.month!!, expense.day!!),
                     labels = labels
@@ -336,131 +320,6 @@ class ExpensesViewModel @Inject constructor(
                 val response = expensesRepository.addExpense(expense)
                 if (notify) {
                     _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
-                }
-            } finally {
-                loadingRepository.stopLoading()
-            }
-        }
-    }
-
-    private var lastDeletedLabel: String? = null
-    private var expensesWithDeletedLabel: List<Expense> = emptyList()
-
-    fun deleteLabel(label: String) {
-        viewModelScope.launch {
-            try {
-                loadingRepository.startLoading()
-                val currentLabels = labels.value.toMutableList()
-                if (currentLabels.remove(label)) {
-                    lastDeletedLabel = label
-                    val response = expensesRepository.setLabels(
-                        currentLabels,
-                        FinanceCode.LABEL_DELETE_SUCCESS
-                    )
-                    if (response.code == FinanceCode.LABELS_UPDATE_FAILURE.code) {
-                        _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
-                        return@launch
-                    }
-                    _uiEvents.emit(ExpensesUiEvent.LabelDeleted)
-
-                    viewModelScope.launch(Dispatchers.IO) {
-                        val allExpenses = expensesLocalRepository.getAllSync()
-                        expensesWithDeletedLabel = allExpenses.filter { it.labels.contains(label) }
-
-                        expensesWithDeletedLabel.forEach { expense ->
-                            val updatedLabels = expense.labels.toMutableList()
-                            updatedLabels.remove(label)
-                            val updatedExpense = expense.copy(
-                                timestamp = dateToUTCTimestamp(
-                                    expense.year!!,
-                                    expense.month!!,
-                                    expense.day!!
-                                ),
-                                labels = updatedLabels
-                            )
-                            expensesRepository.editExpense(updatedExpense)
-                        }
-                    }
-                }
-            } finally {
-                loadingRepository.stopLoading()
-            }
-        }
-    }
-
-    fun undoDeleteLabel() {
-        viewModelScope.launch {
-            try {
-                loadingRepository.startLoading()
-                val label = lastDeletedLabel ?: return@launch
-                val currentLabels = labels.value.toMutableList()
-                if (!currentLabels.contains(label)) {
-                    currentLabels.add(label)
-                    val response = expensesRepository.setLabels(currentLabels)
-                    if (response.code == FinanceCode.LABELS_UPDATE_FAILURE.code) {
-                        _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
-                        return@launch
-                    }
-
-                    viewModelScope.launch(Dispatchers.IO) {
-                        expensesWithDeletedLabel.forEach { expense ->
-                            expensesRepository.editExpense(expense)
-                        }
-                        resetLastDeletedLabel()
-                    }
-                }
-            } finally {
-                loadingRepository.stopLoading()
-            }
-        }
-    }
-
-    fun resetLastDeletedLabel() {
-        lastDeletedLabel = null
-        expensesWithDeletedLabel = emptyList()
-    }
-
-    fun editLabel(oldName: String, newName: String) {
-        viewModelScope.launch {
-            try {
-                loadingRepository.startLoading()
-                val currentLabels = labels.value.toMutableList()
-                val index = currentLabels.indexOf(oldName)
-                if (index != -1) {
-                    currentLabels[index] = newName
-                    val response = expensesRepository.setLabels(
-                        currentLabels,
-                        FinanceCode.LABEL_UPDATE_SUCCESS
-                    )
-                    if (response.code == FinanceCode.LABELS_UPDATE_FAILURE.code) {
-                        _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
-                        return@launch
-                    }
-
-                    viewModelScope.launch(Dispatchers.IO) {
-                        val allExpenses = expensesLocalRepository.getAllSync()
-                        val expensesToUpdate = allExpenses.filter { it.labels.contains(oldName) }
-
-                        expensesToUpdate.forEach { expense ->
-                            val updatedLabels = expense.labels.toMutableList()
-                            val labelIndex = updatedLabels.indexOf(oldName)
-                            if (labelIndex != -1) {
-                                updatedLabels[labelIndex] = newName
-                                val updatedExpense = expense.copy(
-                                    timestamp = dateToUTCTimestamp(
-                                        expense.year!!,
-                                        expense.month!!,
-                                        expense.day!!
-                                    ),
-                                    labels = updatedLabels
-                                )
-                                expensesRepository.editExpense(updatedExpense)
-                                if (_editingExpense.value?.id == expense.id) {
-                                    _editingExpense.value = updatedExpense
-                                }
-                            }
-                        }
-                    }
                 }
             } finally {
                 loadingRepository.stopLoading()

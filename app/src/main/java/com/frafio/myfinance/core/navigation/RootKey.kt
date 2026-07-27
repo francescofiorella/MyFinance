@@ -13,6 +13,9 @@ sealed interface RootKey : NavKey {
     data object Home : RootKey
 
     @Serializable
+    data object Labels : RootKey
+
+    @Serializable
     data class AddEditTransaction(
         val requestCode: Int,
         val expenseCode: Int,

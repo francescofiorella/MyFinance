@@ -20,7 +20,8 @@ fun EntryProviderScope<NavKey>.profileEntry(
     appState: MyFinanceAppState,
     initialUser: User? = null,
     profilePicture: Bitmap? = null,
-    onUploadProPic: () -> Unit
+    onUploadProPic: () -> Unit,
+    onManageLabels: () -> Unit
 ) {
     entry<HomeTabKey.Profile> {
         val viewModel: ProfileViewModel = hiltViewModel()
@@ -70,7 +71,8 @@ fun EntryProviderScope<NavKey>.profileEntry(
             viewModel = viewModel,
             initialUser = initialUser,
             initialProfilePicture = profilePicture,
-            onUploadProPic = onUploadProPic
+            onUploadProPic = onUploadProPic,
+            onManageLabels = onManageLabels
         )
     }
 }

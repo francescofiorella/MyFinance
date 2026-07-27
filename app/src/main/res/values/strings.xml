@@ -14,10 +14,10 @@
     <string name="send">Send</string>
     <string name="remove">Remove</string>
     <string name="undo">Undo</string>
+    <string name="close">Close</string>
 
     <string name="login_successful">You are logged in as</string>
 
-    <string name="name">Name</string>
     <string name="expense_name">Expense name</string>
     <string name="income_name">Income name</string>
     <string name="amount">Amount</string>
@@ -71,6 +71,7 @@
     <string name="edit_profile">Edit your profile</string>
     <string name="edit_propic">Upload your profile picture</string>
     <string name="edit_full_name">Edit your full name</string>
+    <string name="manage_labels">Manage labels</string>
     <string name="no_expenses">No expenses</string>
     <string name="no_incomes">No incomes</string>
     <string name="enter_your_budget">Enter your monthly budget</string>
@@ -108,7 +109,6 @@
     <string name="income_deleted">Income deleted!</string>
     <string name="full_name_updated">User full name updated!</string>
     <string name="expense_deleted">Expense deleted!</string>
-    <string name="label_deleted">Label deleted!</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>

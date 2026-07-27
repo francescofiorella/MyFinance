@@ -6,3 +6,8 @@ data class FinanceResult(private val result: FinanceCode, private val customMess
     val code: Int = result.code
     val message: String = customMessage ?: result.message
 }
+
+data class DeleteLabelResult(
+    val financeResult: FinanceResult,
+    val affectedExpenses: List<Expense> = emptyList()
+)

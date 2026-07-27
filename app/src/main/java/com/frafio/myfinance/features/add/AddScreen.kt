@@ -170,10 +170,7 @@ fun AddScreen(
         },
         labels = allLabels,
         selectedLabels = viewModel.labels,
-        onNewLabel = viewModel::addLabel,
-        onLabelCheckedChanged = viewModel::onLabelCheckedChanged,
-        onDeleteLabel = viewModel::deleteLabel,
-        onEditLabel = viewModel::editLabel
+        onLabelCheckedChanged = viewModel::onLabelCheckedChanged
     )
 
     AppDatePickerDialog(
@@ -311,7 +308,12 @@ fun AddScreen(
                                 Icon(
                                     modifier = Modifier
                                         .padding(start = 4.dp),
-                                    painter = painterResource(id = R.drawable.ic_keyboard_arrow_down_filled),
+                                    painter = painterResource(
+                                        id = if (isTypeSelectionVisible)
+                                            R.drawable.ic_keyboard_arrow_up_filled
+                                        else
+                                            R.drawable.ic_keyboard_arrow_down_filled
+                                    ),
                                     contentDescription = null,
                                 )
                             }
@@ -328,7 +330,7 @@ fun AddScreen(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_check_filled),
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.save),
                         )
                     }
                 }
@@ -516,7 +518,6 @@ fun AddScreen(
                     }
                     // Amount Field
                     SegmentedListItem(
-                        onClick = { },
                         shapes = ListItemDefaults.segmentedShapes(
                             index = 0,
                             count = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) 3 else 2,

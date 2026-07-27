@@ -14,10 +14,10 @@
     <string name="send">Invia</string>
     <string name="remove">Rimuovi</string>
     <string name="undo">Annulla</string>
+    <string name="close">Chiudi</string>
 
     <string name="login_successful">Hai effettuato l\'accesso come</string>
 
-    <string name="name">Nome</string>
     <string name="expense_name">Nome spesa</string>
     <string name="income_name">Nome entrata</string>
     <string name="amount">Importo</string>
@@ -67,6 +67,7 @@
     <string name="edit_profile">Modifica il tuo profilo</string>
     <string name="edit_propic">Carica la tua foto profilo</string>
     <string name="edit_full_name">Modifica il tuo nome</string>
+    <string name="manage_labels">Gestisci etichette</string>
     <string name="no_expenses">Nessuna spesa</string>
     <string name="no_incomes">Nessuna entrata</string>
     <string name="enter_your_budget">Inserisci il tuo budget mensile</string>
@@ -80,7 +81,6 @@
     <string name="income_deleted">Entrata eliminata!</string>
     <string name="full_name_updated">Nome utente aggiornato!</string>
     <string name="expense_deleted">Spesa eliminata!</string>
-    <string name="label_deleted">Etichetta rimossa!</string>
 
     <string name="housing">Abitazione</string>
     <string name="groceries">Alimentari</string>

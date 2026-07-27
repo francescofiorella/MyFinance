@@ -43,6 +43,12 @@ sealed class AddUiEvent {
         val year: Int
     ) : AddUiEvent()
     data class Error(val result: FinanceResult) : AddUiEvent()
+    data class ShowSnackBar(
+        val message: String,
+        val actionText: String? = null,
+        val actionFun: () -> Unit = {},
+        val dismissFun: () -> Unit = {}
+    ) : AddUiEvent()
 }
 
 @HiltViewModel(assistedFactory = AddViewModel.Factory::class)
@@ -90,56 +96,6 @@ class AddViewModel @AssistedInject constructor(
         }
     }
 
-    fun addLabel(label: String) {
-        viewModelScope.launch {
-            try {
-                loadingRepository.startLoading()
-                val currentAllLabels = allLabels.value
-                if (currentAllLabels.contains(label)) return@launch
-                expensesRepository.setLabels(currentAllLabels + label)
-            } finally {
-                loadingRepository.stopLoading()
-            }
-        }
-    }
-
-    fun deleteLabel(label: String) {
-        viewModelScope.launch {
-            try {
-                loadingRepository.startLoading()
-                val currentAllLabels = allLabels.value.toMutableList()
-                if (currentAllLabels.remove(label)) {
-                    expensesRepository.setLabels(currentAllLabels, FinanceCode.LABEL_DELETE_SUCCESS)
-                    // Also remove from selected labels
-                    labels = labels - label
-                }
-            } finally {
-                loadingRepository.stopLoading()
-            }
-        }
-    }
-
-    fun editLabel(oldName: String, newName: String) {
-        viewModelScope.launch {
-            try {
-                loadingRepository.startLoading()
-                val currentAllLabels = allLabels.value.toMutableList()
-                val index = currentAllLabels.indexOf(oldName)
-                if (index != -1) {
-                    currentAllLabels[index] = newName
-                    expensesRepository.setLabels(currentAllLabels, FinanceCode.LABEL_UPDATE_SUCCESS)
-
-                    // Update current selected labels if it contained the old name
-                    if (labels.contains(oldName)) {
-                        labels = labels.map { if (it == oldName) newName else it }
-                    }
-                }
-            } finally {
-                loadingRepository.stopLoading()
-            }
-        }
-    }
-
     val dateString: String?
         get() = dateToExtendedString(day, month, year)
 
@@ -174,6 +130,9 @@ class AddViewModel @AssistedInject constructor(
             try {
                 updateAddingState(true)
                 loadingRepository.startLoading()
+
+                name = name.trim()
+                priceString = priceString.trim()
 
                 // check info
                 var hasError = false

@@ -72,6 +72,7 @@ class AuthViewModel @Inject constructor(
 
     fun onLoginButtonClick() {
         viewModelScope.launch {
+            _uiState.update { it.copy(email = it.email.trim()) }
             if (!validateLogin()) return@launch
             loadingRepository.startLoading()
 
@@ -90,7 +91,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             loadingRepository.startLoading()
             
-            val result = userRepository.resetPassword(email)
+            val result = userRepository.resetPassword(email.trim())
             
             loadingRepository.stopLoading()
 
@@ -118,6 +119,7 @@ class AuthViewModel @Inject constructor(
 
     fun onSignupButtonClick() {
         viewModelScope.launch {
+            _uiState.update { it.copy(fullName = it.fullName.trim(), email = it.email.trim()) }
             if (!validateSignup()) return@launch
             loadingRepository.startLoading()
 

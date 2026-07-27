@@ -2,6 +2,7 @@ package com.frafio.myfinance.core.data.repository
 
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
 import com.frafio.myfinance.core.data.manager.ExpensesManager
+import com.frafio.myfinance.core.data.model.DeleteLabelResult
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
 import javax.inject.Inject
@@ -9,6 +10,9 @@ import javax.inject.Singleton
 
 @Singleton
 class ExpensesRepository @Inject constructor(private val expensesManager: ExpensesManager) {
+    private var lastDeletedLabel: String? = null
+    private var lastAffectedExpenses: List<Expense> = emptyList()
+
     suspend fun updateExpensesList(): FinanceResult {
         return expensesManager.updateExpensesList()
     }
@@ -41,10 +45,34 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
         return expensesManager.getLabels()
     }
 
-    suspend fun setLabels(
-        labels: List<String>,
-        successCode: FinanceCode = FinanceCode.LABELS_UPDATE_SUCCESS
-    ): FinanceResult {
-        return expensesManager.setLabels(labels, successCode)
+    suspend fun addLabel(label: String): FinanceResult {
+        return expensesManager.addLabel(label)
+    }
+
+    suspend fun deleteLabel(label: String): DeleteLabelResult {
+        val result = expensesManager.deleteLabel(label)
+        if (result.financeResult.code == FinanceCode.LABEL_DELETE_SUCCESS.code) {
+            lastDeletedLabel = label
+            lastAffectedExpenses = result.affectedExpenses
+        }
+        return result
+    }
+
+    suspend fun editLabel(oldName: String, newName: String): FinanceResult {
+        return expensesManager.editLabel(oldName, newName)
+    }
+
+    suspend fun undoDeleteLabel(): FinanceResult {
+        val label = lastDeletedLabel ?: return FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
+        val result = expensesManager.undoDeleteLabel(label, lastAffectedExpenses)
+        if (result.code == FinanceCode.LABELS_UPDATE_SUCCESS.code) {
+            resetLastDeletedLabel()
+        }
+        return result
+    }
+
+    fun resetLastDeletedLabel() {
+        lastDeletedLabel = null
+        lastAffectedExpenses = emptyList()
     }
 }

@@ -177,7 +177,8 @@ fun HomeScreen(
                         profilePicture = profilePicture,
                         onUploadProPic = {
                             appState.showSnackBar(comingSoonString)
-                        }
+                        },
+                        onManageLabels = { onNavigateToRoot(RootKey.Labels) }
                     )
                 }
             )

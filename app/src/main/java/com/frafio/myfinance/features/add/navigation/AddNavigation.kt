@@ -33,6 +33,14 @@ fun EntryProviderScope<NavKey>.addEntry(
                         viewModel.updateAddingState(true)
                         appState.showSnackBar(event.result.message)
                     }
+                    is AddUiEvent.ShowSnackBar -> {
+                        appState.showSnackBar(
+                            event.message,
+                            event.actionText,
+                            event.actionFun,
+                            event.dismissFun
+                        )
+                    }
                 }
             }
         }

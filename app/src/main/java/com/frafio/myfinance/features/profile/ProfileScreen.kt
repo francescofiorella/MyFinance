@@ -58,7 +58,8 @@ fun ProfileScreen(
     viewModel: ProfileViewModel,
     initialUser: User? = null,
     initialProfilePicture: Bitmap? = null,
-    onUploadProPic: () -> Unit
+    onUploadProPic: () -> Unit,
+    onManageLabels: () -> Unit
 ) {
     val userState by viewModel.user.collectAsStateWithLifecycle()
     val profilePictureState by viewModel.profilePicture.collectAsStateWithLifecycle()
@@ -110,7 +111,8 @@ fun ProfileScreen(
         scrollState = scrollState,
         onUploadProPic = onUploadProPic,
         onEditFullName = { showEditFullNameSheet = true },
-        onDynamicColorChanged = { viewModel.setDynamicColor(it) }
+        onDynamicColorChanged = { viewModel.setDynamicColor(it) },
+        onManageLabels = onManageLabels
     )
 }
 
@@ -126,7 +128,8 @@ private fun ProfileContent(
     scrollState: ScrollState,
     onUploadProPic: () -> Unit,
     onEditFullName: () -> Unit,
-    onDynamicColorChanged: (Boolean) -> Unit
+    onDynamicColorChanged: (Boolean) -> Unit,
+    onManageLabels: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -148,7 +151,8 @@ private fun ProfileContent(
             isDynamicColorChecked = isDynamicColorChecked,
             onUploadProPic = onUploadProPic,
             onEditFullName = onEditFullName,
-            onDynamicColorChanged = onDynamicColorChanged
+            onDynamicColorChanged = onDynamicColorChanged,
+            onManageLabels = onManageLabels
         )
     }
 }
@@ -198,7 +202,8 @@ private fun ProfileCards(
     isDynamicColorChecked: Boolean,
     onUploadProPic: () -> Unit,
     onEditFullName: () -> Unit,
-    onDynamicColorChanged: (Boolean) -> Unit
+    onDynamicColorChanged: (Boolean) -> Unit,
+    onManageLabels: () -> Unit
 ) {
     val colors = ListItemDefaults.colors(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
@@ -477,13 +482,64 @@ private fun ProfileCards(
         color = MaterialTheme.colorScheme.onSurface
     )
 
+    val myFinanceItemCount = (if (isDynamicColorAvailable) 1 else 0) + 2
+
+    SegmentedListItem(
+        onClick = onManageLabels,
+        colors = colors,
+        shapes = ListItemDefaults.segmentedShapes(
+            index = 0,
+            count = myFinanceItemCount,
+            defaultShapes = ListItemDefaults.shapes()
+        ),
+        leadingContent = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_sell_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+        },
+        content = {
+            Text(
+                text = stringResource(id = R.string.manage_labels),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        trailingContent = {
+            Box(
+                modifier = Modifier
+                    .width(32.dp)
+                    .height(40.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
+                    contentDescription = null,
+                )
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 2.dp),
+    )
+
     if (isDynamicColorAvailable) {
         SegmentedListItem(
             onClick = {},
             colors = colors,
             shapes = ListItemDefaults.segmentedShapes(
-                index = 0,
-                count = 2,
+                index = 1,
+                count = myFinanceItemCount,
                 defaultShapes = ListItemDefaults.shapes()
             ),
             leadingContent = {
@@ -524,17 +580,11 @@ private fun ProfileCards(
     SegmentedListItem(
         onClick = {},
         colors = colors,
-        shapes = if (isDynamicColorAvailable) {
-            ListItemDefaults.segmentedShapes(
-                index = 1,
-                count = 2,
-                defaultShapes = ListItemDefaults.shapes()
-            )
-        } else {
-            ListItemDefaults.shapes(
-                shape = ListItemDefaults.shapes().selectedShape
-            )
-        },
+        shapes = ListItemDefaults.segmentedShapes(
+            index = if (isDynamicColorAvailable) 2 else 1,
+            count = myFinanceItemCount,
+            defaultShapes = ListItemDefaults.shapes()
+        ),
         leadingContent = {
             Box(
                 modifier = Modifier
@@ -586,7 +636,8 @@ fun ProfilePreview() {
             scrollState = rememberScrollState(),
             onUploadProPic = {},
             onEditFullName = {},
-            onDynamicColorChanged = {}
+            onDynamicColorChanged = {},
+            onManageLabels = {}
         )
     }
 }

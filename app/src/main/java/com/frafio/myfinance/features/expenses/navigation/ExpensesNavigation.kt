@@ -26,7 +26,6 @@ fun EntryProviderScope<NavKey>.expensesEntry(
         val viewModel: ExpensesViewModel = hiltViewModel()
 
         val expenseDeletedString = stringResource(id = R.string.expense_deleted)
-        val labelDeletedString = stringResource(id = R.string.label_deleted)
         val undoString = stringResource(id = R.string.undo)
 
         LaunchedEffect(appState.reselectEvent) {
@@ -70,15 +69,6 @@ fun EntryProviderScope<NavKey>.expensesEntry(
                             {
                                 viewModel.addExpense(event.expense, notify = false)
                             }
-                        )
-                    }
-
-                    ExpensesUiEvent.LabelDeleted -> {
-                        appState.showSnackBar(
-                            labelDeletedString,
-                            undoString,
-                            viewModel::undoDeleteLabel,
-                            viewModel::resetLastDeletedLabel
                         )
                     }
                 }
