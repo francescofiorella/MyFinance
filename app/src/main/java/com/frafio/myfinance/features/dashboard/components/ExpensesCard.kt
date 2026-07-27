@@ -50,7 +50,6 @@ fun ExpensesCard(
 
     Column {
         SegmentedListItem(
-            onClick = { },
             shapes = ListItemDefaults.segmentedShapes(
                 index = 0,
                 count = 2,
@@ -112,7 +111,6 @@ fun ExpensesCard(
         val amount = if (monthShown) thisYearSum else thisMonthSum
 
         SegmentedListItem(
-            onClick = { },
             shapes = ListItemDefaults.segmentedShapes(
                 index = 1,
                 count = 2,
