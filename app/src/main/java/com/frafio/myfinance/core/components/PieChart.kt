@@ -1,5 +1,6 @@
 package com.frafio.myfinance.core.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -57,8 +58,6 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.core.utils.getCategoryContainerColor
-import com.frafio.myfinance.core.utils.getCategoryIcon
-import com.frafio.myfinance.core.utils.getCategoryName
 import com.frafio.myfinance.core.utils.getCategoryOnContainerColor
 import com.frafio.myfinance.core.utils.getCategoryTextColor
 import kotlin.math.PI
@@ -77,10 +76,16 @@ object PieChartDefaults {
     const val ArcSelectionAnimationDuration: Int = 100
 }
 
+data class PieChartItem(
+    val value: Double,
+    val label: String,
+    @DrawableRes val icon: Int
+)
+
 @Composable
 fun PieChart(
     modifier: Modifier = Modifier,
-    entries: List<Double>,
+    items: List<PieChartItem>,
     animate: Boolean = true,
     resetSelectionHook: Boolean = false,
     radius: Dp = PieChartDefaults.Radius,
@@ -101,10 +106,10 @@ fun PieChart(
         }
     }
 
-    var selectedArcIndex by remember(entries, resetSelectionHook) { mutableIntStateOf(-1) }
-    var pressedArcIndex by remember(entries, resetSelectionHook) { mutableIntStateOf(-1) }
+    var selectedArcIndex by remember(items, resetSelectionHook) { mutableIntStateOf(-1) }
+    var pressedArcIndex by remember(items, resetSelectionHook) { mutableIntStateOf(-1) }
 
-    val interactionSources = remember(entries.size) { List(entries.size) { MutableInteractionSource() } }
+    val interactionSources = remember(items.size) { List(items.size) { MutableInteractionSource() } }
     val isDark = isSystemInDarkTheme()
 
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -113,13 +118,13 @@ fun PieChart(
     val arcWidthPx = with(density) { arcWidth.toPx() }
     val radiusPx = with(density) { radius.toPx() }
 
-    val floatValues = remember(entries, chartEntryOffset) {
-        val count = entries.count { it > 0.0 }
+    val floatValues = remember(items, chartEntryOffset) {
+        val count = items.count { it.value > 0.0 }
         val offset = if (count <= 1) 0f else chartEntryOffset
         val totalOffset = offset * count
-        val sum = entries.sum()
-        entries.map { value ->
-            if (sum > 0) (360f - totalOffset) * value.toFloat() / sum.toFloat() else 0f
+        val sum = items.sumOf { it.value }
+        items.map { item ->
+            if (sum > 0) (360f - totalOffset) * item.value.toFloat() / sum.toFloat() else 0f
         }
     }
 
@@ -148,7 +153,7 @@ fun PieChart(
         )
     }
 
-    val selectionFactors = entries.indices.map { index ->
+    val selectionFactors = items.indices.map { index ->
         animateFloatAsState(
             targetValue = if (selectedArcIndex == index || pressedArcIndex == index) 1f else 0f,
             animationSpec = tween(PieChartDefaults.ArcSelectionAnimationDuration, easing = PieChartDefaults.AnimationEasing),
@@ -156,7 +161,7 @@ fun PieChart(
         )
     }
 
-    val iconSelectionFactors = entries.indices.map { index ->
+    val iconSelectionFactors = items.indices.map { index ->
         animateFloatAsState(
             targetValue = if (selectedArcIndex == index) 1f else 0f,
             animationSpec = tween(PieChartDefaults.ArcSelectionAnimationDuration, easing = PieChartDefaults.AnimationEasing),
@@ -165,7 +170,7 @@ fun PieChart(
     }
 
     val emptyCircleAlpha by animateFloatAsState(
-        targetValue = if (entries.sum() == 0.0) 1f else 0f,
+        targetValue = if (items.sumOf { it.value } == 0.0) 1f else 0f,
         animationSpec = tween(if (animate) animDuration else 0, easing = PieChartDefaults.AnimationEasing),
         label = "empty_alpha"
     )
@@ -191,35 +196,37 @@ fun PieChart(
         }
 
         // Arcs
-        entries.indices.forEach { index ->
-            PieChartArc(
-                color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark),
-                iconPainter = painterResource(getCategoryIcon(index)),
-                iconOnColor = getCategoryOnContainerColor(index, default = MaterialTheme.colorScheme.surface, isDark = isDark),
-                sweepState = animatedValues[index],
-                startAngleProvider = {
-                    var start = -90f
-                    for (i in 0 until index) {
-                        start += animatedValues[i].value + animatedOffsets[i].value
-                    }
-                    start
-                },
-                alphaState = animatedAlphas[index],
-                selectionFactorState = selectionFactors[index],
-                iconSelectionFactorState = iconSelectionFactors[index],
-                radiusPx = radiusPx,
-                arcWidthPx = arcWidthPx,
-                iconSize = iconSize,
-                selectedIconSize = selectedIconSize,
-                iconPadding = iconPadding,
-                interactionSource = interactionSources[index],
-                onPress = { pressedArcIndex = index },
-                onRelease = {
-                    selectedArcIndex = index
-                    pressedArcIndex = -1
-                },
-                onCancel = { pressedArcIndex = -1 }
-            )
+        items.indices.forEach { index ->
+            if (floatValues[index] > 0f || animatedValues[index].value > 0.01f) {
+                PieChartArc(
+                    color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark),
+                    iconPainter = painterResource(items[index].icon),
+                    iconOnColor = getCategoryOnContainerColor(index, default = MaterialTheme.colorScheme.surface, isDark = isDark),
+                    sweepState = animatedValues[index],
+                    startAngleProvider = {
+                        var start = -90f
+                        for (i in 0 until index) {
+                            start += animatedValues[i].value + animatedOffsets[i].value
+                        }
+                        start
+                    },
+                    alphaState = animatedAlphas[index],
+                    selectionFactorState = selectionFactors[index],
+                    iconSelectionFactorState = iconSelectionFactors[index],
+                    radiusPx = radiusPx,
+                    arcWidthPx = arcWidthPx,
+                    iconSize = iconSize,
+                    selectedIconSize = selectedIconSize,
+                    iconPadding = iconPadding,
+                    interactionSource = interactionSources[index],
+                    onPress = { pressedArcIndex = index },
+                    onRelease = {
+                        selectedArcIndex = index
+                        pressedArcIndex = -1
+                    },
+                    onCancel = { pressedArcIndex = -1 }
+                )
+            }
         }
 
         // Center Content
@@ -232,8 +239,8 @@ fun PieChart(
                 onClick = { selectedArcIndex = -1 }
             )
         ) {
-            val title = if (selectedArcIndex != -1) stringResource(getCategoryName(selectedArcIndex)) else stringResource(R.string.total)
-            val valueText = if (selectedArcIndex != -1) entries[selectedArcIndex] else entries.sum()
+            val title = if (selectedArcIndex != -1) items[selectedArcIndex].label else stringResource(R.string.total)
+            val valueText = if (selectedArcIndex != -1) items[selectedArcIndex].value else items.sumOf { it.value }
 
             Text(
                 text = title,
@@ -373,8 +380,9 @@ private class ArcShape(
     private val radiusPx: Float
 ) : Shape {
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
-        if (sweepAngle <= 0f) return Outline.Generic(Path())
         val path = Path()
+        if (sweepAngle <= 0f) return Outline.Generic(path)
+
         val center = Offset(size.width / 2f, size.height / 2f)
         val outerRadius = radiusPx + strokeWidthPx / 2f
         val innerRadius = radiusPx - strokeWidthPx / 2f
@@ -382,7 +390,10 @@ private class ArcShape(
         val outerRect = Rect(center.x - outerRadius, center.y - outerRadius, center.x + outerRadius, center.y + outerRadius)
         val innerRect = Rect(center.x - innerRadius, center.y - innerRadius, center.x + innerRadius, center.y + innerRadius)
 
-        val endAngle = startAngle + sweepAngle
+        // Use a slightly less than 360 value to avoid path closing issues with rounded caps
+        val effectiveSweep = sweepAngle.coerceIn(0f, 359.99f)
+
+        val endAngle = startAngle + effectiveSweep
         val startAngleRad = Math.toRadians(startAngle.toDouble())
         val endAngleRad = Math.toRadians(endAngle.toDouble())
 
@@ -398,9 +409,9 @@ private class ArcShape(
         val startCapRect = Rect(startCapCenter.x - capRadius, startCapCenter.y - capRadius, startCapCenter.x + capRadius, startCapCenter.y + capRadius)
         val endCapRect = Rect(endCapCenter.x - capRadius, endCapCenter.y - capRadius, endCapCenter.x + capRadius, endCapCenter.y + capRadius)
 
-        path.arcTo(outerRect, startAngle, sweepAngle, true)
+        path.arcTo(outerRect, startAngle, effectiveSweep, true)
         path.arcTo(endCapRect, endAngle, 180f, false)
-        path.arcTo(innerRect, endAngle, -sweepAngle, false)
+        path.arcTo(innerRect, endAngle, -effectiveSweep, false)
         path.arcTo(startCapRect, startAngle + 180f, 180f, false)
         path.close()
 
@@ -412,8 +423,26 @@ private class ArcShape(
 @Composable
 fun PieChartPreview() {
     MyFinanceTheme {
+        val items = listOf(
+            PieChartItem(1.0, "Housing", R.drawable.ic_home_filled),
+            PieChartItem(1.0, "Groceries", R.drawable.ic_shopping_cart_filled),
+            PieChartItem(1.0, "Personal Care", R.drawable.ic_self_care_filled)
+        )
+        PieChart(items = items)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PieChartSingleEntryPreview() {
+    MyFinanceTheme {
+        val items = listOf(
+            PieChartItem(100.0, "Total", R.drawable.ic_home_filled),
+            PieChartItem(0.0, "Other", R.drawable.ic_grid_3x3_filled)
+        )
         PieChart(
-            entries = listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+            items = items,
+            animate = false
         )
     }
 }

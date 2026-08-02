@@ -15,12 +15,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FilledTonalToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TonalToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +36,9 @@ import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.components.PieChart
+import com.frafio.myfinance.core.components.PieChartItem
+import com.frafio.myfinance.core.utils.getCategoryIcon
+import com.frafio.myfinance.core.utils.getCategoryName
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -175,47 +178,55 @@ fun ExpensesByCategoryCard(
             ) {
                 customItem(
                     {
-                        TonalToggleButton(
-                            shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                        FilledTonalToggleButton(
                             checked = monthlyShown,
                             onCheckedChange = {
                                 onSwitchData(true)
-                            }
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.monthly),
-                                maxLines = 1,
-                                softWrap = false,
-                                overflow = TextOverflow.Visible
-                            )
-                        }
+                            },
+                            shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                            content = {
+                                Text(
+                                    text = stringResource(id = R.string.monthly),
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Visible
+                                )
+                            })
                     },
                     {}
                 )
                 customItem(
                     {
-                        TonalToggleButton(
-                            shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                        FilledTonalToggleButton(
                             checked = !monthlyShown,
                             onCheckedChange = {
                                 onSwitchData(false)
+                            },
+                            shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                            content = {
+                                Text(
+                                    text = stringResource(id = R.string.annual),
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Visible
+                                )
                             }
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.annual),
-                                maxLines = 1,
-                                softWrap = false,
-                                overflow = TextOverflow.Visible
-                            )
-                        }
+                        )
                     },
                     {}
                 )
             }
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                val chartItems = values.mapIndexed { index, value ->
+                    PieChartItem(
+                        value = value,
+                        label = stringResource(getCategoryName(index)),
+                        icon = getCategoryIcon(index)
+                    )
+                }
                 PieChart(
-                    entries = values,
+                    items = chartItems,
                     animate = true,
                     resetSelectionHook = resetPieChart
                 )
