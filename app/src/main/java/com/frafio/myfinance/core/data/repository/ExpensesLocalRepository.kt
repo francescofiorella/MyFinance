@@ -43,13 +43,5 @@ class ExpensesLocalRepository @Inject constructor(
 
     fun getAllSync(): List<Expense> = expenseDao.getAllSync()
 
-    fun insertExpense(expense: Expense) = expenseDao.insertExpense(expense)
-
-    fun updateExpense(expense: Expense) = expenseDao.updateExpense(expense)
-
     fun deleteAll() = expenseDao.deleteAll()
-
-    fun deleteExpense(expense: Expense) = expenseDao.deleteExpense(expense)
-
-    fun updateTable(expenses: List<Expense>) = expenseDao.updateTable(*expenses.toTypedArray())
 }

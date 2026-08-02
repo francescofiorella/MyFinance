@@ -12,7 +12,7 @@ import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.Expense
 
 @Dao
-interface ExpenseDao {
+interface ExpenseDao : BaseDao<Expense> {
     @Query("SELECT * " +
             "FROM expense " +
             "WHERE (name LIKE :name || '%' OR name LIKE '% ' || :name || '%') AND category IN (:categories) " +
@@ -62,19 +62,22 @@ interface ExpenseDao {
     fun getExpensesOfYear(year: Int): Flow<List<Expense>>
 
     @Query("SELECT * FROM expense")
-    fun getAllSync(): List<Expense>
-
-    @Insert
-    fun insertExpense(expense: Expense)
+    override fun getAllSync(): List<Expense>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg expenses: Expense)
+    override fun upsert(item: Expense)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    override fun insertAll(vararg items: Expense)
 
     @Update
     fun updateExpense(expense: Expense)
 
     @Delete
     fun deleteExpense(expense: Expense)
+
+    @Query("DELETE FROM expense WHERE id = :id")
+    override fun deleteById(id: String)
 
     @Query("DELETE FROM expense")
     fun deleteAll()

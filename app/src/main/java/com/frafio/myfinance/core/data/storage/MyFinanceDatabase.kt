@@ -15,10 +15,11 @@ import com.frafio.myfinance.core.data.model.Expense
  * DB Versions:
  * 1 - Initial version
  * 2 - "labels" attribute added to Expense and Income
+ * 3 - "updatedAt", "isDeleted", and "deleteAt" added to Expense and Income
  */
 @Database(
     entities = [Expense::class, Income::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -38,7 +39,6 @@ abstract class MyFinanceDatabase : RoomDatabase() {
                     "myFinanceLocal"
                 )
                     .fallbackToDestructiveMigration(true)
-                    .createFromAsset("database/myFinanceDatabase.db")
                     .build()
                 INSTANCE = i
                 INSTANCE

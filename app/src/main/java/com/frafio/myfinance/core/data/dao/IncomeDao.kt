@@ -11,7 +11,7 @@ import androidx.room.Update
 import com.frafio.myfinance.core.data.model.Income
 
 @Dao
-interface IncomeDao {
+interface IncomeDao : BaseDao<Income> {
     @Query("SELECT * " +
             "FROM income " +
             "ORDER BY year DESC, month DESC, day DESC, price DESC")
@@ -25,17 +25,23 @@ interface IncomeDao {
             "WHERE year=:year")
     fun getPriceSumOfYear(year: Int): Flow<Double?>
 
-    @Insert
-    fun insertIncome(income: Income)
+    @Query("SELECT * FROM income")
+    override fun getAllSync(): List<Income>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg incomes: Income)
+    override fun upsert(item: Income)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    override fun insertAll(vararg items: Income)
 
     @Update
     fun updateIncome(income: Income)
 
     @Delete
     fun deleteIncome(income: Income)
+
+    @Query("DELETE FROM income WHERE id = :id")
+    override fun deleteById(id: String)
 
     @Query("DELETE FROM income")
     fun deleteAll()

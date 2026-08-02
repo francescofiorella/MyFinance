@@ -16,7 +16,10 @@ object FirestoreEnums {
         PRICE("price"),
         CATEGORY("category"),
         LABELS("labels"),
-        ID("id")
+        ID("id"),
+        UPDATED_AT("updatedAt"),
+        IS_DELETED("isDeleted"),
+        DELETE_AT("deleteAt")
     }
 
     enum class NAMES(val value: String, val valueEn: String, val valueIt: String) {

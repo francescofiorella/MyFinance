@@ -18,13 +18,5 @@ class IncomesLocalRepository @Inject constructor(
     fun getPriceSumFromYear(year: Int): Flow<Double?> =
         incomeDao.getPriceSumOfYear(year)
 
-    fun insertIncome(income: Income) = incomeDao.insertIncome(income)
-
-    fun updateIncome(income: Income) = incomeDao.updateIncome(income)
-
     fun deleteAll() = incomeDao.deleteAll()
-
-    fun deleteIncome(income: Income) = incomeDao.deleteIncome(income)
-
-    fun updateTable(incomes: List<Income>) = incomeDao.updateTable(*incomes.toTypedArray())
 }

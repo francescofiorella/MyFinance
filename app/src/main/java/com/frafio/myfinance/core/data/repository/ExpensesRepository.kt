@@ -1,7 +1,7 @@
 package com.frafio.myfinance.core.data.repository
 
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
-import com.frafio.myfinance.core.data.manager.ExpensesManager
+import com.frafio.myfinance.core.data.manager.ExpensesSyncManager
 import com.frafio.myfinance.core.data.model.DeleteLabelResult
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
@@ -9,24 +9,24 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ExpensesRepository @Inject constructor(private val expensesManager: ExpensesManager) {
+class ExpensesRepository @Inject constructor(private val expensesManager: ExpensesSyncManager) {
     private var lastDeletedLabel: String? = null
     private var lastAffectedExpenses: List<Expense> = emptyList()
 
     suspend fun updateExpensesList(): FinanceResult {
-        return expensesManager.updateExpensesList()
+        return expensesManager.updateList()
     }
 
     suspend fun deleteExpense(expense: Expense): FinanceResult {
-        return expensesManager.deleteExpense(expense)
+        return expensesManager.delete(expense)
     }
 
     suspend fun addExpense(expense: Expense): FinanceResult {
-        return expensesManager.addExpenses(expense)
+        return expensesManager.add(expense)
     }
 
     suspend fun editExpense(expense: Expense): FinanceResult {
-        return expensesManager.editExpense(expense)
+        return expensesManager.edit(expense)
     }
 
     suspend fun setDynamicColorActive(active: Boolean) {

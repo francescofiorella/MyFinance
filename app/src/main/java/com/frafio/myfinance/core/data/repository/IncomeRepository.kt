@@ -1,26 +1,26 @@
 package com.frafio.myfinance.core.data.repository
 
-import com.frafio.myfinance.core.data.manager.IncomesManager
+import com.frafio.myfinance.core.data.manager.IncomesSyncManager
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.model.FinanceResult
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class IncomeRepository @Inject constructor(private val incomesManager: IncomesManager) {
+class IncomeRepository @Inject constructor(private val incomesManager: IncomesSyncManager) {
     suspend fun updateIncomeList(): FinanceResult {
-        return incomesManager.updateIncomeList()
+        return incomesManager.updateList()
     }
 
     suspend fun addIncome(income: Income): FinanceResult {
-        return incomesManager.addIncome(income)
+        return incomesManager.add(income)
     }
 
     suspend fun editIncome(income: Income): FinanceResult {
-        return incomesManager.editIncome(income)
+        return incomesManager.edit(income)
     }
 
     suspend fun deleteIncome(income: Income): FinanceResult {
-        return incomesManager.deleteIncome(income)
+        return incomesManager.delete(income)
     }
 }

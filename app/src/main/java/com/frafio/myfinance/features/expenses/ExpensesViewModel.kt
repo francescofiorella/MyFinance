@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
-import com.frafio.myfinance.core.data.manager.ExpensesManager.Companion.DEFAULT_LIMIT
+import com.frafio.myfinance.core.data.manager.BaseSyncManager.Companion.DEFAULT_LIMIT_EXPENSES
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.ExpensesRepository
@@ -64,7 +64,7 @@ class ExpensesViewModel @Inject constructor(
     private val _dateRange = MutableStateFlow<Pair<LocalDate, LocalDate>?>(null)
     val dateRange = _dateRange.asStateFlow()
 
-    private val _limit = MutableStateFlow(DEFAULT_LIMIT)
+    private val _limit = MutableStateFlow(DEFAULT_LIMIT_EXPENSES)
 
     private val _scrollToId = MutableSharedFlow<String?>(replay = 1)
     val scrollToId = _scrollToId.asSharedFlow()
@@ -212,7 +212,7 @@ class ExpensesViewModel @Inject constructor(
     }
 
     fun loadMore() {
-        _limit.value += (DEFAULT_LIMIT)
+        _limit.value += DEFAULT_LIMIT_EXPENSES
     }
 
     fun scrollToId(id: String?) {

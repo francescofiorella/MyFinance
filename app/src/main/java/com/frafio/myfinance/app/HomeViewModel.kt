@@ -164,9 +164,9 @@ class HomeViewModel @Inject constructor(
             try {
                 loadingRepository.startLoading()
                 userRepository.syncProfilePicture(userPrefs.user?.photoUrl)
+                expensesRepository.getMonthlyBudget()
                 expensesRepository.updateExpensesList()
                 incomeRepository.updateIncomeList()
-                expensesRepository.getMonthlyBudget()
                 expensesRepository.getLabels()
             } finally {
                 loadingRepository.stopLoading()

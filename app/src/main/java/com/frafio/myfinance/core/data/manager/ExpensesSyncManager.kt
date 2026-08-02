@@ -1,6 +1,6 @@
 package com.frafio.myfinance.core.data.manager
 
-import android.util.Log
+import com.frafio.myfinance.core.data.dao.ExpenseDao
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.DeleteLabelResult
@@ -8,8 +8,8 @@ import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
+import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -19,21 +19,39 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ExpensesManager @Inject constructor(
+class ExpensesSyncManager @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val expensesLocalRepository: ExpensesLocalRepository
-) {
+    private val expensesLocalRepository: ExpensesLocalRepository,
+    database: MyFinanceDatabase,
+    expenseDao: ExpenseDao
+) : BaseSyncManager<Expense>(userPreferencesRepository, database, Expense::class.java) {
 
-    companion object {
-        private val TAG = ExpensesManager::class.java.simpleName
-        const val DEFAULT_LIMIT: Long = 50
-    }
+    override val collectionName: String = FirestoreEnums.FIELDS.PAYMENTS.value
+    override val baseDao = expenseDao
+    override val listUpdateSuccessCode = FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS
+    override val listUpdateFailureCode = FinanceCode.EXPENSE_LIST_UPDATE_FAILURE
+    override val addSuccessCode = FinanceCode.EXPENSE_ADD_SUCCESS
+    override val addFailureCode = FinanceCode.EXPENSE_ADD_FAILURE
+    override val editSuccessCode = FinanceCode.EXPENSE_EDIT_SUCCESS
+    override val editFailureCode = FinanceCode.EXPENSE_EDIT_FAILURE
+    override val deleteSuccessCode = FinanceCode.EXPENSE_DELETE_SUCCESS
+    override val deleteFailureCode = FinanceCode.EXPENSE_DELETE_FAILURE
 
-    private val fStore: FirebaseFirestore
-        get() = FirebaseFirestore.getInstance()
+    override suspend fun getLastSync(userPrefs: com.frafio.myfinance.core.data.repository.UserPreferencesData): Long = userPrefs.lastExpensesSync
+    override suspend fun updateLastSync(timestamp: Long) = userPreferencesRepository.updateLastExpensesSync(timestamp)
 
-    private suspend fun getUserEmail(): String? {
-        return userPreferencesRepository.userPreferencesFlow.first().user?.email
+    override fun onPreUpsert(item: Expense, labels: List<String>): Expense {
+        val newLabels = item.labels.toMutableList()
+        var changed = false
+        for (label in item.labels) {
+            if (!labels.contains(label)) {
+                newLabels.remove(label)
+                changed = true
+            }
+        }
+        return if (changed) {
+            item.copy(labels = newLabels, updatedAt = System.currentTimeMillis())
+        } else item
     }
 
     suspend fun getMonthlyBudget(): FinanceResult = withContext(Dispatchers.IO) {
@@ -129,7 +147,7 @@ class ExpensesManager @Inject constructor(
                 ),
                 labels = updatedLabels
             )
-            editExpense(updatedExpense)
+            edit(updatedExpense)
         }
 
         DeleteLabelResult(result, affectedExpenses)
@@ -144,7 +162,7 @@ class ExpensesManager @Inject constructor(
         }
 
         affectedExpenses.forEach { expense ->
-            editExpense(expense)
+            edit(expense)
         }
         FinanceResult(FinanceCode.LABELS_UPDATE_SUCCESS)
     }
@@ -171,96 +189,9 @@ class ExpensesManager @Inject constructor(
                 ),
                 labels = updatedLabels
             )
-            editExpense(updatedExpense)
+            edit(updatedExpense)
         }
         result
-    }
-
-    suspend fun updateExpensesList(): FinanceResult = withContext(Dispatchers.IO) {
-        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_FAILURE)
-        return@withContext try {
-            val documentSnapshot = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email).get().await()
-            
-            val labelsValue = documentSnapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
-            val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()
-            userPreferencesRepository.updateLabels(labels)
-
-            val queryDocumentSnapshots = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
-                .get().await()
-
-            val expenseList = mutableListOf<Expense>()
-            queryDocumentSnapshots.forEach { document ->
-                var expense = document.toObject(Expense::class.java)
-                expense.id = document.id
-                val newLabels = expense.labels.toMutableList()
-                for (label in expense.labels) {
-                    if (!labels.contains(label)) {
-                        newLabels.remove(label)
-                    }
-                }
-                if (newLabels.size != expense.labels.size) {
-                    val updatedExpense = expense.copy(labels = newLabels)
-                    editExpense(updatedExpense)
-                    expense = updatedExpense
-                }
-
-                expenseList.add(expense)
-            }
-            expensesLocalRepository.updateTable(expenseList)
-            FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_SUCCESS)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error! ${e.localizedMessage}")
-            FinanceResult(FinanceCode.EXPENSE_LIST_UPDATE_FAILURE)
-        }
-    }
-
-    suspend fun addExpenses(expense: Expense): FinanceResult = withContext(Dispatchers.IO) {
-        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.EXPENSE_ADD_FAILURE)
-        return@withContext try {
-            val documentReference = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
-                .add(expense).await()
-            expense.id = documentReference.id
-            expensesLocalRepository.insertExpense(expense)
-            FinanceResult(FinanceCode.EXPENSE_ADD_SUCCESS)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error! ${e.localizedMessage}")
-            FinanceResult(FinanceCode.EXPENSE_ADD_FAILURE)
-        }
-    }
-
-    suspend fun editExpense(expense: Expense): FinanceResult = withContext(Dispatchers.IO) {
-        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.EXPENSE_EDIT_FAILURE)
-        return@withContext try {
-            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
-                .document(expense.id).set(expense).await()
-            expensesLocalRepository.updateExpense(expense)
-            FinanceResult(FinanceCode.EXPENSE_EDIT_SUCCESS)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error! ${e.localizedMessage}")
-            FinanceResult(FinanceCode.EXPENSE_EDIT_FAILURE)
-        }
-    }
-
-    suspend fun deleteExpense(expense: Expense): FinanceResult = withContext(Dispatchers.IO) {
-        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.EXPENSE_DELETE_FAILURE)
-        return@withContext try {
-            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .collection(FirestoreEnums.FIELDS.PAYMENTS.value)
-                .document(expense.id).delete().await()
-            expensesLocalRepository.deleteExpense(expense)
-            FinanceResult(FinanceCode.EXPENSE_DELETE_SUCCESS)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error! ${e.localizedMessage}")
-            FinanceResult(FinanceCode.EXPENSE_DELETE_FAILURE)
-        }
     }
 
     suspend fun setDynamicColorActive(active: Boolean) {

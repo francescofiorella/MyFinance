@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.frafio.myfinance.core.data.model.User
@@ -33,6 +34,8 @@ class UserPreferencesRepository @Inject constructor(
         val USER_CREATION_YEAR = intPreferencesKey("user_creation_year")
         val USER_CREATION_MONTH = intPreferencesKey("user_creation_month")
         val USER_CREATION_DAY = intPreferencesKey("user_creation_day")
+        val LAST_EXPENSES_SYNC = longPreferencesKey("last_expenses_sync")
+        val LAST_INCOMES_SYNC = longPreferencesKey("last_incomes_sync")
     }
 
     val userPreferencesFlow: Flow<UserPreferencesData> = dataStore.data
@@ -47,6 +50,8 @@ class UserPreferencesRepository @Inject constructor(
             val dynamicColor = preferences[PreferencesKeys.DYNAMIC_COLOR] ?: true
             val monthlyBudget = preferences[PreferencesKeys.MONTHLY_BUDGET]?.toDouble() ?: 0.0
             val labels = preferences[PreferencesKeys.LABELS]?.toList()?.sorted() ?: emptyList()
+            val lastExpensesSync = preferences[PreferencesKeys.LAST_EXPENSES_SYNC] ?: 0L
+            val lastIncomesSync = preferences[PreferencesKeys.LAST_INCOMES_SYNC] ?: 0L
 
             val email = preferences[PreferencesKeys.USER_EMAIL]
             val user = if (email != null) {
@@ -62,7 +67,7 @@ class UserPreferencesRepository @Inject constructor(
                 )
             } else null
 
-            UserPreferencesData(dynamicColor, monthlyBudget, labels, user)
+            UserPreferencesData(dynamicColor, monthlyBudget, labels, user, lastExpensesSync, lastIncomesSync)
         }
 
     suspend fun updateDynamicColor(activate: Boolean) {
@@ -80,6 +85,18 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun updateLabels(labels: List<String>) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.LABELS] = labels.toSet()
+        }
+    }
+
+    suspend fun updateLastExpensesSync(timestamp: Long) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LAST_EXPENSES_SYNC] = timestamp
+        }
+    }
+
+    suspend fun updateLastIncomesSync(timestamp: Long) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LAST_INCOMES_SYNC] = timestamp
         }
     }
 
@@ -114,5 +131,7 @@ data class UserPreferencesData(
     val dynamicColor: Boolean,
     val monthlyBudget: Double,
     val labels: List<String>,
-    val user: User?
+    val user: User?,
+    val lastExpensesSync: Long = 0L,
+    val lastIncomesSync: Long = 0L
 )
