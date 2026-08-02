@@ -12,9 +12,12 @@ import com.frafio.myfinance.core.data.model.Transaction
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.Calendar
@@ -49,54 +52,6 @@ abstract class BaseSyncManager<T : Transaction>(
 
     protected suspend fun getUserEmail(): String? {
         return userPreferencesRepository.userPreferencesFlow.first().user?.email
-    }
-
-    suspend fun updateList(): FinanceResult = withContext(Dispatchers.IO) {
-        val userPrefs = userPreferencesRepository.userPreferencesFlow.first()
-        val email = userPrefs.user?.email ?: return@withContext FinanceResult(listUpdateFailureCode)
-        val labels = userPrefs.labels
-        val lastSync = getLastSync(userPrefs)
-
-        return@withContext try {
-            val queryDocumentSnapshots = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .collection(collectionName)
-                .whereGreaterThan(FirestoreEnums.FIELDS.UPDATED_AT.value, lastSync)
-                .orderBy(FirestoreEnums.FIELDS.UPDATED_AT.value, Query.Direction.ASCENDING)
-                .get().await()
-
-            var maxUpdatedAt = lastSync
-            database.withTransaction {
-                queryDocumentSnapshots.forEach { document ->
-                    val item = document.toObject(clazz)
-                    // Set ID manually
-                    when (item) {
-                        is Expense -> item.id = document.id
-                        is Income -> item.id = document.id
-                    }
-
-                    if (item.updatedAt != null && item.updatedAt!! > maxUpdatedAt) {
-                        maxUpdatedAt = item.updatedAt!!
-                    }
-
-                    if (item.isDeleted == true) {
-                        baseDao.deleteById(item.id)
-                    } else {
-                        val finalItem = onPreUpsert(item, labels)
-                        baseDao.upsert(finalItem)
-                    }
-                }
-            }
-
-            if (maxUpdatedAt > lastSync) {
-                updateLastSync(maxUpdatedAt)
-            }
-
-            FinanceResult(listUpdateSuccessCode)
-        } catch (e: Exception) {
-            Log.e("BaseSyncManager", "Error updating list for $collectionName: ${e.localizedMessage}")
-            FinanceResult(listUpdateFailureCode)
-        }
     }
 
     suspend fun add(item: T): FinanceResult = withContext(Dispatchers.IO) {
@@ -176,5 +131,73 @@ abstract class BaseSyncManager<T : Transaction>(
             is Income -> item.copy(updatedAt = updatedAt, isDeleted = isDeleted, deleteAt = deleteAt) as T
             else -> item
         }
+    }
+
+    private var snapshotListener: ListenerRegistration? = null
+
+    fun startSnapshotListener(scope: CoroutineScope) {
+        if (snapshotListener != null) return
+
+        scope.launch(Dispatchers.IO) {
+            val userPrefs = userPreferencesRepository.userPreferencesFlow.first()
+            val email = userPrefs.user?.email ?: return@launch
+            val labels = userPrefs.labels
+            var currentLastSync = getLastSync(userPrefs)
+
+            Log.d("BaseSyncManager", "Starting listener for $collectionName. lastSync: $currentLastSync, user: $email")
+
+            snapshotListener = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(email)
+                .collection(collectionName)
+                .whereGreaterThan(FirestoreEnums.FIELDS.UPDATED_AT.value, currentLastSync)
+                .orderBy(FirestoreEnums.FIELDS.UPDATED_AT.value, Query.Direction.ASCENDING)
+                .addSnapshotListener { snapshots, error ->
+                    if (error != null) {
+                        Log.e("BaseSyncManager", "Listen failed for $collectionName: ${error.localizedMessage}")
+                        return@addSnapshotListener
+                    }
+
+                    if (snapshots != null) {
+                        if (!snapshots.isEmpty) {
+                            scope.launch(Dispatchers.IO) {
+                                var maxUpdatedAt = currentLastSync
+                                try {
+                                    database.withTransaction {
+                                        snapshots.documentChanges.forEach { dc ->
+                                            val item = dc.document.toObject(clazz)
+                                            when (item) {
+                                                is Expense -> item.id = dc.document.id
+                                                is Income -> item.id = dc.document.id
+                                            }
+
+                                            if (item.updatedAt != null && item.updatedAt!! > maxUpdatedAt) {
+                                                maxUpdatedAt = item.updatedAt!!
+                                            }
+
+                                            if (item.isDeleted == true) {
+                                                baseDao.deleteById(item.id)
+                                            } else {
+                                                val finalItem = onPreUpsert(item, labels)
+                                                baseDao.upsert(finalItem)
+                                            }
+                                        }
+                                    }
+                                    if (maxUpdatedAt > currentLastSync) {
+                                        currentLastSync = maxUpdatedAt
+                                        updateLastSync(maxUpdatedAt)
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("BaseSyncManager", "Critical error in snapshot processor for $collectionName", e)
+                                }
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
+    fun stopSnapshotListener() {
+        snapshotListener?.remove()
+        snapshotListener = null
     }
 }

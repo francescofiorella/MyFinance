@@ -85,7 +85,7 @@ fun EntryProviderScope<NavKey>.budgetEntry(
                                 incomeDeletedString,
                                 undoString,
                                 {
-                                    viewModel.addIncome(event.income, notify = false)
+                                    viewModel.undoDeleteIncome(event.income)
                                 }
                             )
                         }

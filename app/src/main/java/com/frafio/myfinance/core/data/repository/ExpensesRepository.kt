@@ -5,6 +5,7 @@ import com.frafio.myfinance.core.data.manager.ExpensesSyncManager
 import com.frafio.myfinance.core.data.model.DeleteLabelResult
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,10 +13,6 @@ import javax.inject.Singleton
 class ExpensesRepository @Inject constructor(private val expensesManager: ExpensesSyncManager) {
     private var lastDeletedLabel: String? = null
     private var lastAffectedExpenses: List<Expense> = emptyList()
-
-    suspend fun updateExpensesList(): FinanceResult {
-        return expensesManager.updateList()
-    }
 
     suspend fun deleteExpense(expense: Expense): FinanceResult {
         return expensesManager.delete(expense)
@@ -74,5 +71,13 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
     fun resetLastDeletedLabel() {
         lastDeletedLabel = null
         lastAffectedExpenses = emptyList()
+    }
+
+    fun startSnapshotListener(scope: CoroutineScope) {
+        expensesManager.startSnapshotListener(scope)
+    }
+
+    fun stopSnapshotListener() {
+        expensesManager.stopSnapshotListener()
     }
 }

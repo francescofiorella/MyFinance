@@ -165,8 +165,11 @@ class HomeViewModel @Inject constructor(
                 loadingRepository.startLoading()
                 userRepository.syncProfilePicture(userPrefs.user?.photoUrl)
                 expensesRepository.getMonthlyBudget()
-                expensesRepository.updateExpensesList()
-                incomeRepository.updateIncomeList()
+                
+                // Start snapshot listeners (this also handles initial delta sync)
+                expensesRepository.startSnapshotListener(viewModelScope)
+                incomeRepository.startSnapshotListener(viewModelScope)
+                
                 expensesRepository.getLabels()
             } finally {
                 loadingRepository.stopLoading()
@@ -185,5 +188,10 @@ class HomeViewModel @Inject constructor(
                 _mainEvents.emit(MainEvent.LogoutSuccess)
             }
         }
+    }
+
+    override fun onCleared() {
+        expensesRepository.stopSnapshotListener()
+        incomeRepository.stopSnapshotListener()
     }
 }

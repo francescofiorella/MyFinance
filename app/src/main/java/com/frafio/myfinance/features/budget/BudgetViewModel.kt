@@ -162,14 +162,12 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
-    fun addIncome(income: Income, notify: Boolean = true) {
+    fun undoDeleteIncome(income: Income) {
         viewModelScope.launch {
             try {
                 loadingRepository.startLoading()
-                val response = incomeRepository.addIncome(income)
-                if (notify) {
-                    _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
-                }
+                val response = incomeRepository.editIncome(income)
+                _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
             } finally {
                 loadingRepository.stopLoading()
             }

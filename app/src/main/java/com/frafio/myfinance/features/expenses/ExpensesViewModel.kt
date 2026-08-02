@@ -313,14 +313,12 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
-    fun addExpense(expense: Expense, notify: Boolean = true) {
+    fun undoDeleteExpense(expense: Expense) {
         viewModelScope.launch {
             try {
                 loadingRepository.startLoading()
-                val response = expensesRepository.addExpense(expense)
-                if (notify) {
-                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
-                }
+                val response = expensesRepository.editExpense(expense)
+                _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
             } finally {
                 loadingRepository.stopLoading()
             }

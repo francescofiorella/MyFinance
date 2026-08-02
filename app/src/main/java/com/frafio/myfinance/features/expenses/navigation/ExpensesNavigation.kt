@@ -67,7 +67,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
                             expenseDeletedString,
                             undoString,
                             {
-                                viewModel.addExpense(event.expense, notify = false)
+                                viewModel.undoDeleteExpense(event.expense)
                             }
                         )
                     }
