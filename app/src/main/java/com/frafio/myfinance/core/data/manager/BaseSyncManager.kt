@@ -196,7 +196,7 @@ abstract class BaseSyncManager<T : Transaction>(
         }
     }
 
-    fun stopSnapshotListener() {
+    open fun stopSnapshotListener() {
         snapshotListener?.remove()
         snapshotListener = null
     }

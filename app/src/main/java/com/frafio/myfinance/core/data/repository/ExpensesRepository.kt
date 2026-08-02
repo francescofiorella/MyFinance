@@ -30,16 +30,8 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
         expensesManager.setDynamicColorActive(active)
     }
 
-    suspend fun getMonthlyBudget(): FinanceResult {
-        return expensesManager.getMonthlyBudget()
-    }
-
     suspend fun setMonthlyBudget(budget: Double): FinanceResult {
         return expensesManager.setMonthlyBudget(budget)
-    }
-
-    suspend fun getLabels(): FinanceResult {
-        return expensesManager.getLabels()
     }
 
     suspend fun addLabel(label: String): FinanceResult {
@@ -75,6 +67,10 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
 
     fun startSnapshotListener(scope: CoroutineScope) {
         expensesManager.startSnapshotListener(scope)
+    }
+
+    fun startRootSnapshotListener(scope: CoroutineScope) {
+        expensesManager.startRootSnapshotListener(scope)
     }
 
     fun stopSnapshotListener() {

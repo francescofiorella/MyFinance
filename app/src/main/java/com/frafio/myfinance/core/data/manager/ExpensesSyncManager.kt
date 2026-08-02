@@ -10,9 +10,12 @@ import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -54,20 +57,6 @@ class ExpensesSyncManager @Inject constructor(
         } else item
     }
 
-    suspend fun getMonthlyBudget(): FinanceResult = withContext(Dispatchers.IO) {
-        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
-        return@withContext try {
-            val document = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email).get().await()
-            val value = document.data?.get(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value).toString()
-                .toDoubleOrNull() ?: 0.0
-            userPreferencesRepository.updateMonthlyBudget(value)
-            FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
-        } catch (_: Exception) {
-            FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
-        }
-    }
-
     suspend fun setMonthlyBudget(budget: Double): FinanceResult = withContext(Dispatchers.IO) {
         val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
         return@withContext try {
@@ -81,20 +70,6 @@ class ExpensesSyncManager @Inject constructor(
             FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
         } catch (_: Exception) {
             FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
-        }
-    }
-
-    suspend fun getLabels(): FinanceResult = withContext(Dispatchers.IO) {
-        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
-        return@withContext try {
-            val document = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email).get().await()
-            val value = document.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
-            val labels = (value?.filterIsInstance<String>() ?: emptyList()).sorted()
-            userPreferencesRepository.updateLabels(labels)
-            FinanceResult(FinanceCode.LABELS_UPDATE_SUCCESS)
-        } catch (_: Exception) {
-            FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
         }
     }
 
@@ -196,5 +171,39 @@ class ExpensesSyncManager @Inject constructor(
 
     suspend fun setDynamicColorActive(active: Boolean) {
         userPreferencesRepository.updateDynamicColor(active)
+    }
+
+    private var rootListener: ListenerRegistration? = null
+
+    fun startRootSnapshotListener(scope: CoroutineScope) {
+        if (rootListener != null) return
+
+        scope.launch(Dispatchers.IO) {
+            val email = getUserEmail() ?: return@launch
+            rootListener = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(email)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null && snapshot.exists()) {
+                        scope.launch(Dispatchers.IO) {
+                            val budget = snapshot.data?.get(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value)
+                                .toString().toDoubleOrNull() ?: 0.0
+                            userPreferencesRepository.updateMonthlyBudget(budget)
+
+                            val labelsValue = snapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
+                            val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()
+                            userPreferencesRepository.updateLabels(labels)
+                        }
+                    }
+                }
+        }
+    }
+
+    override fun stopSnapshotListener() {
+        super.stopSnapshotListener()
+        rootListener?.remove()
+        rootListener = null
     }
 }

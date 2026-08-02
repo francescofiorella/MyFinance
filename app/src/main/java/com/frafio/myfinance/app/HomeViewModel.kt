@@ -164,13 +164,12 @@ class HomeViewModel @Inject constructor(
             try {
                 loadingRepository.startLoading()
                 userRepository.syncProfilePicture(userPrefs.user?.photoUrl)
-                expensesRepository.getMonthlyBudget()
                 
                 // Start snapshot listeners (this also handles initial delta sync)
+                expensesRepository.startRootSnapshotListener(viewModelScope)
                 expensesRepository.startSnapshotListener(viewModelScope)
                 incomeRepository.startSnapshotListener(viewModelScope)
-                
-                expensesRepository.getLabels()
+
             } finally {
                 loadingRepository.stopLoading()
             }
