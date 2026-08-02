@@ -3,6 +3,7 @@ package com.frafio.myfinance.core.data.repository
 import com.frafio.myfinance.core.data.manager.IncomesSyncManager
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.model.FinanceResult
+import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -21,8 +22,8 @@ class IncomeRepository @Inject constructor(private val incomesManager: IncomesSy
         return incomesManager.delete(income)
     }
 
-    fun startSnapshotListener(scope: CoroutineScope) {
-        incomesManager.startSnapshotListener(scope)
+    fun startSnapshotListener(scope: CoroutineScope, onError: ((FirebaseFirestoreException) -> Unit)? = null) {
+        incomesManager.startSnapshotListener(scope, onError)
     }
 
     fun stopSnapshotListener() {

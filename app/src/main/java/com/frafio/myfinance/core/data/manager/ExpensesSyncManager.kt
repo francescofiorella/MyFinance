@@ -10,6 +10,7 @@ import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.CoroutineScope
@@ -175,7 +176,7 @@ class ExpensesSyncManager @Inject constructor(
 
     private var rootListener: ListenerRegistration? = null
 
-    fun startRootSnapshotListener(scope: CoroutineScope) {
+    fun startRootSnapshotListener(scope: CoroutineScope, onError: ((FirebaseFirestoreException) -> Unit)? = null) {
         if (rootListener != null) return
 
         scope.launch(Dispatchers.IO) {
@@ -184,6 +185,9 @@ class ExpensesSyncManager @Inject constructor(
                 .document(email)
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
+                        if (error.code == FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED) {
+                            onError?.invoke(error)
+                        }
                         return@addSnapshotListener
                     }
                     if (snapshot != null && snapshot.exists()) {

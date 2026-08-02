@@ -5,6 +5,7 @@ import com.frafio.myfinance.core.data.manager.ExpensesSyncManager
 import com.frafio.myfinance.core.data.model.DeleteLabelResult
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
+import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -65,12 +66,12 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
         lastAffectedExpenses = emptyList()
     }
 
-    fun startSnapshotListener(scope: CoroutineScope) {
-        expensesManager.startSnapshotListener(scope)
+    fun startSnapshotListener(scope: CoroutineScope, onError: ((FirebaseFirestoreException) -> Unit)? = null) {
+        expensesManager.startSnapshotListener(scope, onError)
     }
 
-    fun startRootSnapshotListener(scope: CoroutineScope) {
-        expensesManager.startRootSnapshotListener(scope)
+    fun startRootSnapshotListener(scope: CoroutineScope, onError: ((FirebaseFirestoreException) -> Unit)? = null) {
+        expensesManager.startRootSnapshotListener(scope, onError)
     }
 
     fun stopSnapshotListener() {

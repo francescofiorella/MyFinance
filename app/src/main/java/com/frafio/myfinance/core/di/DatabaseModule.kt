@@ -3,6 +3,7 @@ package com.frafio.myfinance.core.di
 import android.content.Context
 import com.frafio.myfinance.core.data.dao.ExpenseDao
 import com.frafio.myfinance.core.data.dao.IncomeDao
+import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
 import dagger.Module
 import dagger.Provides
@@ -17,8 +18,11 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): MyFinanceDatabase {
-        return MyFinanceDatabase.getDatabase(context)
+    fun provideDatabase(
+        @ApplicationContext context: Context,
+        userPreferencesRepository: UserPreferencesRepository
+    ): MyFinanceDatabase {
+        return MyFinanceDatabase.getDatabase(context, userPreferencesRepository)
     }
 
     @Provides

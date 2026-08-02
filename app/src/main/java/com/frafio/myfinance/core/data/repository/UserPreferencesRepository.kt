@@ -100,6 +100,13 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun resetSyncTimestamps() {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LAST_EXPENSES_SYNC] = 0L
+            preferences[PreferencesKeys.LAST_INCOMES_SYNC] = 0L
+        }
+    }
+
     suspend fun updateUser(user: User) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.USER_FULL_NAME] = user.fullName ?: ""

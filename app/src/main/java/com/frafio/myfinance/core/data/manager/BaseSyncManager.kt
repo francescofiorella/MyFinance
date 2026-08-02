@@ -12,6 +12,7 @@ import com.frafio.myfinance.core.data.model.Transaction
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CoroutineScope
@@ -135,7 +136,7 @@ abstract class BaseSyncManager<T : Transaction>(
 
     private var snapshotListener: ListenerRegistration? = null
 
-    fun startSnapshotListener(scope: CoroutineScope) {
+    fun startSnapshotListener(scope: CoroutineScope, onError: ((FirebaseFirestoreException) -> Unit)? = null) {
         if (snapshotListener != null) return
 
         scope.launch(Dispatchers.IO) {
@@ -154,6 +155,9 @@ abstract class BaseSyncManager<T : Transaction>(
                 .addSnapshotListener { snapshots, error ->
                     if (error != null) {
                         Log.e("BaseSyncManager", "Listen failed for $collectionName: ${error.localizedMessage}")
+                        if (error.code == FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED) {
+                            onError?.invoke(error)
+                        }
                         return@addSnapshotListener
                     }
 

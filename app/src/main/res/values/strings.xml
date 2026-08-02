@@ -109,6 +109,7 @@
     <string name="income_deleted">Income deleted!</string>
     <string name="full_name_updated">User full name updated!</string>
     <string name="expense_deleted">Expense deleted!</string>
+    <string name="firestore_quota_exceeded">Firestore quota exceeded. Syncing is disabled.</string>
 
     <string-array name="categories" translatable="false">
         <item>@string/housing</item>

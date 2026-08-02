@@ -16,6 +16,7 @@ import com.frafio.myfinance.core.data.repository.UserPreferencesData
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.repository.UserRepository
 import com.frafio.myfinance.core.data.storage.ProfileImageStorage
+import com.google.firebase.firestore.FirebaseFirestoreException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -47,6 +48,7 @@ sealed class HomeUiEvent {
         val dismissFun: () -> Unit = {}
     ) : HomeUiEvent()
     object LoginSuccess : HomeUiEvent()
+    object FirestoreQuotaExceeded : HomeUiEvent()
 }
 
 sealed interface HomeUiState {
@@ -165,10 +167,16 @@ class HomeViewModel @Inject constructor(
                 loadingRepository.startLoading()
                 userRepository.syncProfilePicture(userPrefs.user?.photoUrl)
                 
+                val onSyncError: (FirebaseFirestoreException) -> Unit = {
+                    viewModelScope.launch {
+                        _uiEvents.emit(HomeUiEvent.FirestoreQuotaExceeded)
+                    }
+                }
+
                 // Start snapshot listeners (this also handles initial delta sync)
-                expensesRepository.startRootSnapshotListener(viewModelScope)
-                expensesRepository.startSnapshotListener(viewModelScope)
-                incomeRepository.startSnapshotListener(viewModelScope)
+                expensesRepository.startRootSnapshotListener(viewModelScope, onSyncError)
+                expensesRepository.startSnapshotListener(viewModelScope, onSyncError)
+                incomeRepository.startSnapshotListener(viewModelScope, onSyncError)
 
             } finally {
                 loadingRepository.stopLoading()

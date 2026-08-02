@@ -81,6 +81,7 @@
     <string name="income_deleted">Entrata eliminata!</string>
     <string name="full_name_updated">Nome utente aggiornato!</string>
     <string name="expense_deleted">Spesa eliminata!</string>
+    <string name="firestore_quota_exceeded">Quota Firestore superata. La sincronizzazione è disabilitata.</string>
 
     <string name="housing">Abitazione</string>
     <string name="groceries">Alimentari</string>

@@ -183,6 +183,7 @@ class AuthManager @Inject constructor(
 
         userPreferencesRepository.updateMonthlyBudget(0.0)
         userPreferencesRepository.updateLabels(emptyList())
+        userPreferencesRepository.resetSyncTimestamps()
         userPreferencesRepository.clearUserData()
 
         return@withContext AuthResult(AuthCode.LOGOUT_SUCCESS)

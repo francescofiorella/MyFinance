@@ -5,11 +5,16 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.frafio.myfinance.core.data.converters.Converters
 import com.frafio.myfinance.core.data.dao.IncomeDao
 import com.frafio.myfinance.core.data.dao.ExpenseDao
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * DB Versions:
@@ -31,7 +36,10 @@ abstract class MyFinanceDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: MyFinanceDatabase? = null
 
-        fun getDatabase(context: Context): MyFinanceDatabase =
+        fun getDatabase(
+            context: Context,
+            userPreferencesRepository: UserPreferencesRepository? = null
+        ): MyFinanceDatabase =
             (INSTANCE ?: synchronized(this) {
                 val i = INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
@@ -39,6 +47,16 @@ abstract class MyFinanceDatabase : RoomDatabase() {
                     "myFinanceLocal"
                 )
                     .fallbackToDestructiveMigration(true)
+                    .addCallback(object : Callback() {
+                        override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
+                            super.onDestructiveMigration(db)
+                            userPreferencesRepository?.let { repo ->
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    repo.resetSyncTimestamps()
+                                }
+                            }
+                        }
+                    })
                     .build()
                 INSTANCE = i
                 INSTANCE
