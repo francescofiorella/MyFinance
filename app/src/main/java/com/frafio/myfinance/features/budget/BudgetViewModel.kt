@@ -59,11 +59,11 @@ class BudgetViewModel @Inject constructor(
 
     val monthlyBudget: StateFlow<Double> = userPreferencesRepository.userPreferencesFlow
         .map { it.monthlyBudget }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value.monthlyBudget)
 
     val annualBudget: StateFlow<Double> = monthlyBudget
         .map { it * 12 }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value.monthlyBudget * 12)
 
     val incomes: StateFlow<List<Income>> = incomesLocalRepository.getAll()
         .combine(_limit) { list, limit ->
@@ -76,9 +76,17 @@ class BudgetViewModel @Inject constructor(
         .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val isIncomesEmpty: StateFlow<Boolean> = incomes
-        .map { it.isEmpty() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    val isIncomesEmpty: StateFlow<Boolean?> = combine(
+        incomesLocalRepository.getCount(),
+        loadingRepository.isFirstSync
+    ) { count, isFirstSync ->
+        val isEmpty = count == 0
+        if (isFirstSync && isEmpty) null else isEmpty
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = if (loadingRepository.isFirstSync.value) null else false
+    )
 
     val itemMetadata: StateFlow<Map<Int, Pair<Int, Int>>> = incomes
         .map { list ->

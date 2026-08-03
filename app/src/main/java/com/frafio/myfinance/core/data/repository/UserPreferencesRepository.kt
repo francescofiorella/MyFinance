@@ -11,9 +11,14 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.frafio.myfinance.core.data.model.User
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,6 +27,8 @@ import javax.inject.Singleton
 class UserPreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
     private object PreferencesKeys {
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
         val MONTHLY_BUDGET = floatPreferencesKey("monthly_budget")
@@ -38,7 +45,7 @@ class UserPreferencesRepository @Inject constructor(
         val LAST_INCOMES_SYNC = longPreferencesKey("last_incomes_sync")
     }
 
-    val userPreferencesFlow: Flow<UserPreferencesData> = dataStore.data
+    val userPreferencesFlow: StateFlow<UserPreferencesData> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
                 emit(emptyPreferences())
@@ -69,6 +76,16 @@ class UserPreferencesRepository @Inject constructor(
 
             UserPreferencesData(dynamicColor, monthlyBudget, labels, user, lastExpensesSync, lastIncomesSync)
         }
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.Eagerly,
+            initialValue = UserPreferencesData(
+                dynamicColor = true,
+                monthlyBudget = 0.0,
+                labels = emptyList(),
+                user = null
+            )
+        )
 
     suspend fun updateDynamicColor(activate: Boolean) {
         dataStore.edit { preferences ->

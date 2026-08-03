@@ -86,7 +86,7 @@ class AddViewModel @AssistedInject constructor(
 
     val allLabels: StateFlow<List<String>> = userPreferencesRepository.userPreferencesFlow
         .map { it.labels }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value.labels)
 
     fun onLabelCheckedChanged(label: String, checked: Boolean) {
         if (checked) {

@@ -23,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -135,7 +136,7 @@ fun BudgetScreen(
 @Composable
 fun BudgetContent(
     incomes: List<Income>,
-    isIncomesEmpty: Boolean,
+    isIncomesEmpty: Boolean?,
     monthlyBudget: Double,
     annualBudget: Double,
     onEditBudgetClick: () -> Unit,
@@ -190,92 +191,109 @@ fun BudgetContent(
         }
     }
 
-    if (isIncomesEmpty) {
-        BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-            val minHeight = maxHeight
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Layout(
-                    content = {
-                        Column {
-                            BudgetOverview(
-                                monthlyBudget = monthlyBudget,
-                                annualBudget = annualBudget,
-                                onEditBudgetClick = onEditBudgetClick,
-                                onDeleteBudget = onDeleteBudget
-                            )
-                            SectionHeader(title = stringResource(R.string.incomes))
+    when (isIncomesEmpty) {
+        true -> {
+            BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+                val minHeight = maxHeight
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Layout(
+                        content = {
+                            Column {
+                                BudgetOverview(
+                                    monthlyBudget = monthlyBudget,
+                                    annualBudget = annualBudget,
+                                    onEditBudgetClick = onEditBudgetClick,
+                                    onDeleteBudget = onDeleteBudget
+                                )
+                                SectionHeader(title = stringResource(R.string.incomes))
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 64.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                EmptyView(
+                                    imageResLight = null,
+                                    imageResDark = null,
+                                    messageRes = R.string.warning_budget
+                                )
+                            }
                         }
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 64.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            EmptyView(
-                                imageResLight = null,
-                                imageResDark = null,
-                                messageRes = R.string.warning_budget
+                    ) { measurables, constraints ->
+                        val topPlaceable = measurables[0].measure(constraints.copy(minHeight = 0))
+                        val remainingHeight =
+                            (minHeight.roundToPx() - topPlaceable.height).coerceAtLeast(0)
+
+                        val emptyPlaceable = measurables[1].measure(
+                            constraints.copy(
+                                minHeight = remainingHeight,
+                                maxHeight = Constraints.Infinity
                             )
+                        )
+
+                        layout(constraints.maxWidth, topPlaceable.height + emptyPlaceable.height) {
+                            topPlaceable.placeRelative(0, 0)
+                            emptyPlaceable.placeRelative(0, topPlaceable.height)
                         }
-                    }
-                ) { measurables, constraints ->
-                    val topPlaceable = measurables[0].measure(constraints.copy(minHeight = 0))
-                    val remainingHeight = (minHeight.roundToPx() - topPlaceable.height).coerceAtLeast(0)
-
-                    val emptyPlaceable = measurables[1].measure(
-                        constraints.copy(minHeight = remainingHeight, maxHeight = Constraints.Infinity)
-                    )
-
-                    layout(constraints.maxWidth, topPlaceable.height + emptyPlaceable.height) {
-                        topPlaceable.placeRelative(0, 0)
-                        emptyPlaceable.placeRelative(0, topPlaceable.height)
                     }
                 }
             }
         }
-    } else {
-        LazyColumn(
-            state = listState,
-            modifier = modifier.fillMaxSize()
-        ) {
-            item {
-                BudgetOverview(
-                    monthlyBudget = monthlyBudget,
-                    annualBudget = annualBudget,
-                    onEditBudgetClick = onEditBudgetClick,
-                    onDeleteBudget = onDeleteBudget
-                )
-            }
 
-            item {
-                SectionHeader(title = stringResource(R.string.incomes))
-            }
-
-            itemsIndexed(
-                items = incomes,
-                key = { _, income -> income.id },
-                contentType = { _, income ->
-                    when (income.category) {
-                        FirestoreEnums.CATEGORIES.TOTAL.value -> "total"
-                        FirestoreEnums.CATEGORIES.JOLLY.value -> "jolly"
-                        else -> "income"
-                    }
+        false -> {
+            LazyColumn(
+                state = listState,
+                modifier = modifier.fillMaxSize()
+            ) {
+                item {
+                    BudgetOverview(
+                        monthlyBudget = monthlyBudget,
+                        annualBudget = annualBudget,
+                        onEditBudgetClick = onEditBudgetClick,
+                        onDeleteBudget = onDeleteBudget
+                    )
                 }
-            ) { index, income ->
-                val metadata = itemMetadata[index] ?: Pair(0, 1)
-                IncomeItem(
-                    income = income,
-                    indexInGroup = metadata.first,
-                    countInGroup = metadata.second,
-                    onLongClick = { onItemLongClick(income, index) }
-                )
+
+                item {
+                    SectionHeader(title = stringResource(R.string.incomes))
+                }
+
+                itemsIndexed(
+                    items = incomes,
+                    key = { _, income -> income.id },
+                    contentType = { _, income ->
+                        when (income.category) {
+                            FirestoreEnums.CATEGORIES.TOTAL.value -> "total"
+                            FirestoreEnums.CATEGORIES.JOLLY.value -> "jolly"
+                            else -> "income"
+                        }
+                    }
+                ) { index, income ->
+                    val metadata = itemMetadata[index] ?: Pair(0, 1)
+                    IncomeItem(
+                        income = income,
+                        indexInGroup = metadata.first,
+                        countInGroup = metadata.second,
+                        onLongClick = { onItemLongClick(income, index) }
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(112.dp)) // Floating Action Button space
+                }
             }
-            item {
-                Spacer(modifier = Modifier.height(112.dp)) // Floating Action Button space
+        }
+
+        null -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingIndicator()
             }
         }
     }

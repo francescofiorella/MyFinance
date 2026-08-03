@@ -12,7 +12,18 @@ class LoadingRepository @Inject constructor() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _isFirstSync = MutableStateFlow(true)
+    val isFirstSync: StateFlow<Boolean> = _isFirstSync.asStateFlow()
+
     private val loadingCount = AtomicInteger(0)
+
+    fun startFirstSync() {
+        _isFirstSync.value = true
+    }
+
+    fun stopFirstSync() {
+        _isFirstSync.value = false
+    }
 
     fun startLoading() {
         loadingCount.incrementAndGet()

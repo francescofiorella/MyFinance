@@ -26,10 +26,11 @@ import com.frafio.myfinance.features.dashboard.components.ExpensesCard
 import com.frafio.myfinance.features.dashboard.components.MonthlyExpensesChartCard
 import kotlin.collections.listOf
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val isListEmpty by viewModel.isListEmpty.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
@@ -52,7 +53,14 @@ fun DashboardScreen(
                 DashboardContent(viewModel, scrollState)
             }
 
-            null -> { /* Loading or Initial state */ }
+            null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LoadingIndicator()
+                }
+            }
         }
     }
 }
@@ -86,7 +94,7 @@ fun DashboardContent(
             thisMonthSum = thisMonthSum,
             thisYearSum = thisYearSum,
             monthlyBudget = monthlyBudget,
-            onToggleMonthShown = { viewModel.toggleMonthShown(it) }
+            onToggleMonthShown = viewModel::toggleMonthShown
         )
         ExpensesCard(
             todaySum = todaySum,

@@ -39,7 +39,7 @@ class LabelsViewModel @Inject constructor(
 
     val allLabels: StateFlow<List<String>> = userPreferencesRepository.userPreferencesFlow
         .map { it.labels }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value.labels)
 
     private val _uiEvents = MutableSharedFlow<LabelsUiEvent>()
     val uiEvents: SharedFlow<LabelsUiEvent> = _uiEvents

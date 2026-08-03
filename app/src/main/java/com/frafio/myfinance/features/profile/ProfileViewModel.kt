@@ -56,7 +56,7 @@ class ProfileViewModel @Inject constructor(
     val uiEvents: SharedFlow<ProfileUiEvent> = _uiEvents.asSharedFlow()
 
     val userPreferences: StateFlow<UserPreferencesData?> = userPreferencesRepository.userPreferencesFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value)
 
     val isSwitchDynamicColorChecked: StateFlow<Boolean> = userPreferences
         .map { it?.dynamicColor ?: false }

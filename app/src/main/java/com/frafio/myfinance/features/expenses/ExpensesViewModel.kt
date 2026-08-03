@@ -77,11 +77,19 @@ class ExpensesViewModel @Inject constructor(
 
     val labels: StateFlow<List<String>> = userPreferencesRepository.userPreferencesFlow
         .map { it.labels }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value.labels)
 
-    val isExpensesEmpty: StateFlow<Boolean?> = expensesLocalRepository.getCount()
-        .map { it == 0 }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+    val isExpensesEmpty: StateFlow<Boolean?> = combine(
+        expensesLocalRepository.getCount(),
+        loadingRepository.isFirstSync
+    ) { count, isFirstSync ->
+        val isEmpty = count == 0
+        if (isFirstSync && isEmpty) null else isEmpty
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = if (loadingRepository.isFirstSync.value) null else false
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val allFilteredExpenses: Flow<List<Expense>> = combine(

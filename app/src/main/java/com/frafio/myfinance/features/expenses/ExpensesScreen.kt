@@ -21,6 +21,7 @@ import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
@@ -255,122 +256,137 @@ fun ExpensesContent(
     getDateLabel: (LocalDate, LocalDate) -> String,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        if (isExpensesEmpty == true) {
-            EmptyView(
-                imageResLight = R.drawable.image_audit_pana,
-                imageResDark = R.drawable.image_shared_goals_amico,
-                messageRes = R.string.warning_home
-            )
-        } else {
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = onSearchQueryChanged,
-                onFilterClick = onFilterClick,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+    Box(modifier = modifier.fillMaxSize()) {
+        when (isExpensesEmpty) {
+            true -> {
+                EmptyView(
+                    imageResLight = R.drawable.image_audit_pana,
+                    imageResDark = R.drawable.image_shared_goals_amico,
+                    messageRes = R.string.warning_home
+                )
+            }
 
-            AnimatedVisibility(
-                visible = (selectedCategories.isNotEmpty()) || (selectedLabels.isNotEmpty()) || (dateRange != null),
-                enter = expandVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
-                exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
-            ) {
-                Column {
-                    var checked by remember { mutableStateOf(value = false) }
-                    val colors = ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+            false -> {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    SearchBar(
+                        query = searchQuery,
+                        onQueryChange = onSearchQueryChanged,
+                        onFilterClick = onFilterClick,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        FilterChipBar(
-                            modifier = Modifier
-                                .padding(end = 8.dp)
-                                .weight(1f),
-                            categories = selectedCategories,
-                            labels = selectedLabels,
-                            dateFilter = dateRange,
-                            getDateLabel = getDateLabel,
-                            onCategoryRemoved = onCategoryFilterChanged,
-                            onLabelRemoved = { onLabelFilterChanged(it, false) },
-                        ) {
-                            onDateFilterChanged(null)
-                        }
-                        FilledTonalIconToggleButton(
-                            checked = checked,
-                            onCheckedChange = { checked = it },
-                            shapes = IconButtonDefaults.toggleableShapes()
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_query_stats_filled),
-                                contentDescription = null
-                            )
-                        }
-                    }
+
                     AnimatedVisibility(
-                        visible = checked,
+                        visible = (selectedCategories.isNotEmpty()) || (selectedLabels.isNotEmpty()) || (dateRange != null),
                         enter = expandVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
                         exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
                     ) {
-                        SegmentedListItem(
-                            onClick = { },
-                            shapes = ListItemDefaults.shapes(
-                                shape = ListItemDefaults.shapes().selectedShape
-                            ),
-                            colors = colors,
-                            leadingContent = {
-                                Box(
+                        Column {
+                            var checked by remember { mutableStateOf(value = false) }
+                            val colors = ListItemDefaults.colors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                            )
+                            Row(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                FilterChipBar(
                                     modifier = Modifier
-                                        .size(40.dp)
-                                        .clip(MaterialShapes.Pill.toShape())
-                                        .background(MaterialTheme.colorScheme.secondaryContainer),
-                                    contentAlignment = Alignment.Center
+                                        .padding(end = 8.dp)
+                                        .weight(1f),
+                                    categories = selectedCategories,
+                                    labels = selectedLabels,
+                                    dateFilter = dateRange,
+                                    getDateLabel = getDateLabel,
+                                    onCategoryRemoved = onCategoryFilterChanged,
+                                    onLabelRemoved = { onLabelFilterChanged(it, false) },
+                                ) {
+                                    onDateFilterChanged(null)
+                                }
+                                FilledTonalIconToggleButton(
+                                    checked = checked,
+                                    onCheckedChange = { checked = it },
+                                    shapes = IconButtonDefaults.toggleableShapes()
                                 ) {
                                     Icon(
-                                        painter = painterResource(R.drawable.ic_bar_chart_4_bars_filled),
-                                        contentDescription = null,
+                                        painter = painterResource(id = R.drawable.ic_query_stats_filled),
+                                        contentDescription = null
                                     )
                                 }
-                            },
-                            content = {
-                                Text(
-                                    text = stringResource(id = R.string.total_expenses),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurface
+                            }
+                            AnimatedVisibility(
+                                visible = checked,
+                                enter = expandVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
+                                exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
+                            ) {
+                                SegmentedListItem(
+                                    onClick = { },
+                                    shapes = ListItemDefaults.shapes(
+                                        shape = ListItemDefaults.shapes().selectedShape
+                                    ),
+                                    colors = colors,
+                                    leadingContent = {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(40.dp)
+                                                .clip(MaterialShapes.Pill.toShape())
+                                                .background(MaterialTheme.colorScheme.secondaryContainer),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.ic_bar_chart_4_bars_filled),
+                                                contentDescription = null,
+                                            )
+                                        }
+                                    },
+                                    content = {
+                                        Text(
+                                            text = stringResource(id = R.string.total_expenses),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    },
+                                    supportingContent = {
+                                        Text(
+                                            text = stringResource(id = R.string.on_filters),
+                                            style = MaterialTheme.typography.labelMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    },
+                                    trailingContent = {
+                                        Text(
+                                            modifier = Modifier.padding(end = 8.dp),
+                                            text = doubleToPrice(totalFilteredExpenses),
+                                            style = MaterialTheme.typography.titleLarge,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 8.dp)
                                 )
-                            },
-                            supportingContent = {
-                                Text(
-                                    text = stringResource(id = R.string.on_filters),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            },
-                            trailingContent = {
-                                Text(
-                                    modifier = Modifier.padding(end = 8.dp),
-                                    text = doubleToPrice(totalFilteredExpenses),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
+                            }
+                        }
                     }
+
+                    ExpensesList(
+                        expenses = expenses,
+                        onItemLongClick = onItemLongClick,
+                        onCategoryClick = onCategoryClick,
+                        onLoadMore = onLoadMore,
+                        scrollToIdFlow = scrollToIdFlow,
+                        itemMetadata = itemMetadata
+                    )
                 }
             }
 
-            ExpensesList(
-                expenses = expenses,
-                onItemLongClick = onItemLongClick,
-                onCategoryClick = onCategoryClick,
-                onLoadMore = onLoadMore,
-                scrollToIdFlow = scrollToIdFlow,
-                itemMetadata = itemMetadata
-            )
+            null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LoadingIndicator()
+                }
+            }
         }
     }
 }

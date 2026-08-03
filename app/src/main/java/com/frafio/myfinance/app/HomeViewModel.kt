@@ -80,7 +80,7 @@ class HomeViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
+            initialValue = userPreferencesRepository.userPreferencesFlow.value
         )
 
     val user: StateFlow<User?> = userPreferences
@@ -88,7 +88,7 @@ class HomeViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
+            initialValue = userPreferencesRepository.userPreferencesFlow.value.user
         )
 
     private val _navEvents = Channel<NavKey>(Channel.BUFFERED)
@@ -135,6 +135,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 loadingRepository.startLoading()
+                loadingRepository.startFirstSync()
                 val authResult = userRepository.isUserLogged()
                 when (authResult.code) {
                     AuthCode.USER_LOGGED.code -> {
@@ -150,6 +151,8 @@ class HomeViewModel @Inject constructor(
             } catch (_: Exception) {
                 _uiState.value = HomeUiState.Complete
                 loadingRepository.stopLoading()
+            } finally {
+                loadingRepository.stopFirstSync()
             }
         }
     }
@@ -189,7 +192,7 @@ class HomeViewModel @Inject constructor(
         expensesRepository.startSnapshotListener(viewModelScope, expensesSync, onSyncError)
         incomeRepository.startSnapshotListener(viewModelScope, incomesSync, onSyncError)
 
-        // Wait for initial sync (No timeout as requested)
+        // Wait for initial sync
         rootSync.await()
         expensesSync.await()
         incomesSync.await()

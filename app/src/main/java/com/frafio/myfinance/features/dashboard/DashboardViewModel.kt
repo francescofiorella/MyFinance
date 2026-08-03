@@ -6,6 +6,7 @@ import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.IncomesLocalRepository
+import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +39,8 @@ data class AnnualBalanceData(
 class DashboardViewModel @Inject constructor(
     private val expensesLocalRepository: ExpensesLocalRepository,
     private val incomesLocalRepository: IncomesLocalRepository,
-    userPreferencesRepository: UserPreferencesRepository
+    userPreferencesRepository: UserPreferencesRepository,
+    loadingRepository: LoadingRepository
 ) : ViewModel() {
 
     private val pieChartEntriesSize = 24
@@ -47,9 +49,18 @@ class DashboardViewModel @Inject constructor(
     private val _monthShown = MutableStateFlow(true)
     val monthShown: StateFlow<Boolean> = _monthShown.asStateFlow()
 
-    val isListEmpty: StateFlow<Boolean?> = expensesLocalRepository.getCount()
-        .map { it == 0 }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+    val isListEmpty: StateFlow<Boolean?> = combine(
+        expensesLocalRepository.getCount(),
+        incomesLocalRepository.getCount(),
+        loadingRepository.isFirstSync
+    ) { expensesCount, incomesCount, isFirstSync ->
+        val isEmpty = expensesCount == 0 && incomesCount == 0
+        if (isFirstSync && isEmpty) null else isEmpty
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = if (loadingRepository.isFirstSync.value) null else false
+    )
 
     val thisMonthSum: StateFlow<Double> = expensesLocalRepository.getPriceSumFromMonth(today.year, today.monthValue)
         .map { it ?: 0.0 }
@@ -76,7 +87,7 @@ class DashboardViewModel @Inject constructor(
 
     val monthlyBudget: StateFlow<Double> = userPreferencesRepository.userPreferencesFlow
         .map { it.monthlyBudget }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value.monthlyBudget)
 
     private val _monthlyShownInPieChart = MutableStateFlow(true)
     val monthlyShownInPieChart: StateFlow<Boolean> = _monthlyShownInPieChart.asStateFlow()
