@@ -140,18 +140,20 @@ class HomeViewModel @Inject constructor(
                 when (authResult.code) {
                     AuthCode.USER_LOGGED.code -> {
                         updateUserData(notify)
+                        loadingRepository.stopLoading()
+                        loadingRepository.stopFirstSync()
                     }
 
                     AuthCode.USER_NOT_LOGGED.code -> {
                         _uiState.value = HomeUiState.Complete
                         _mainEvents.emit(MainEvent.UserNotLogged)
                         loadingRepository.stopLoading()
+                        loadingRepository.stopFirstSync()
                     }
                 }
             } catch (_: Exception) {
                 _uiState.value = HomeUiState.Complete
                 loadingRepository.stopLoading()
-            } finally {
                 loadingRepository.stopFirstSync()
             }
         }
@@ -196,8 +198,6 @@ class HomeViewModel @Inject constructor(
         rootSync.await()
         expensesSync.await()
         incomesSync.await()
-
-        loadingRepository.stopLoading()
     }
 
     fun getFullName(): String {
