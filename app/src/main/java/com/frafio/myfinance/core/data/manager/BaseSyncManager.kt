@@ -9,12 +9,14 @@ import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.model.Transaction
+import com.frafio.myfinance.core.data.repository.UserPreferencesData
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -31,6 +33,7 @@ abstract class BaseSyncManager<T : Transaction>(
     companion object {
         const val DEFAULT_LIMIT_EXPENSES: Long = 50
         const val DEFAULT_LIMIT_INCOMES: Long = 100
+        const val SYNC_THRESHOLD_MS = 29L * 24L * 60L * 60L * 1000L // 29 days in ms
     }
     protected val fStore: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
@@ -46,7 +49,7 @@ abstract class BaseSyncManager<T : Transaction>(
     protected abstract val deleteSuccessCode: FinanceCode
     protected abstract val deleteFailureCode: FinanceCode
 
-    protected abstract suspend fun getLastSync(userPrefs: com.frafio.myfinance.core.data.repository.UserPreferencesData): Long
+    protected abstract suspend fun getLastSync(userPrefs: UserPreferencesData): Long
     protected abstract suspend fun updateLastSync(timestamp: Long)
     
     protected open fun onPreUpsert(item: T, labels: List<String>): T = item
@@ -136,14 +139,84 @@ abstract class BaseSyncManager<T : Transaction>(
 
     private var snapshotListener: ListenerRegistration? = null
 
-    fun startSnapshotListener(scope: CoroutineScope, onError: ((FirebaseFirestoreException) -> Unit)? = null) {
-        if (snapshotListener != null) return
+    private suspend fun performFullSync(email: String): Long? = withContext(Dispatchers.IO) {
+        try {
+            val snapshots = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(email)
+                .collection(collectionName)
+                .get()
+                .await()
+
+            val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels
+            val remoteItems = snapshots.documents.mapNotNull { doc ->
+                val item = doc.toObject(clazz)
+                when (item) {
+                    is Expense -> item.id = doc.id
+                    is Income -> item.id = doc.id
+                }
+                item
+            }
+
+            val remoteIds = remoteItems.map { it.id }.toSet()
+            val localItems = baseDao.getAllSync()
+            val localIds = localItems.map { it.id }.toSet()
+
+            database.withTransaction {
+                // Upsert remote items (if not deleted)
+                remoteItems.forEach { item ->
+                    if (item.isDeleted == true) {
+                        baseDao.deleteById(item.id)
+                    } else {
+                        val finalItem = onPreUpsert(item, currentLabels)
+                        baseDao.upsert(finalItem)
+                    }
+                }
+
+                // Delete local items that are not in remote
+                localIds.forEach { id ->
+                    if (!remoteIds.contains(id)) {
+                        baseDao.deleteById(id)
+                    }
+                }
+            }
+
+            val maxUpdatedAt = remoteItems.mapNotNull { it.updatedAt }.maxOrNull() ?: System.currentTimeMillis()
+            updateLastSync(maxUpdatedAt)
+            return@withContext maxUpdatedAt
+        } catch (e: Exception) {
+            Log.e("BaseSyncManager", "Error during full sync for $collectionName: ${e.localizedMessage}")
+            return@withContext null
+        }
+    }
+
+    fun startSnapshotListener(
+        scope: CoroutineScope,
+        onInitialSync: CompletableDeferred<Unit>? = null,
+        onError: ((FirebaseFirestoreException) -> Unit)? = null
+    ) {
+        if (snapshotListener != null) {
+            onInitialSync?.complete(Unit)
+            return
+        }
 
         scope.launch(Dispatchers.IO) {
             val userPrefs = userPreferencesRepository.userPreferencesFlow.first()
-            val email = userPrefs.user?.email ?: return@launch
-            val labels = userPrefs.labels
+            val email = userPrefs.user?.email ?: run {
+                onInitialSync?.complete(Unit)
+                return@launch
+            }
             var currentLastSync = getLastSync(userPrefs)
+            val currentTime = System.currentTimeMillis()
+
+            if (currentLastSync != 0L && currentTime - currentLastSync >= SYNC_THRESHOLD_MS) {
+                Log.d("BaseSyncManager", "Performing full sync for $collectionName (last sync was > 29 days ago)")
+                val newLastSync = performFullSync(email)
+                if (newLastSync != null) {
+                    currentLastSync = newLastSync
+                }
+            }
+
+            var isFirstSnapshot = true
 
             Log.d("BaseSyncManager", "Starting listener for $collectionName. lastSync: $currentLastSync, user: $email")
 
@@ -155,16 +228,16 @@ abstract class BaseSyncManager<T : Transaction>(
                 .addSnapshotListener { snapshots, error ->
                     if (error != null) {
                         Log.e("BaseSyncManager", "Listen failed for $collectionName: ${error.localizedMessage}")
-                        if (error.code == FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED) {
-                            onError?.invoke(error)
-                        }
+                        onInitialSync?.complete(Unit)
+                        onError?.invoke(error)
                         return@addSnapshotListener
                     }
 
                     if (snapshots != null) {
-                        if (!snapshots.isEmpty) {
-                            scope.launch(Dispatchers.IO) {
+                        scope.launch(Dispatchers.IO) {
+                            if (!snapshots.isEmpty) {
                                 var maxUpdatedAt = currentLastSync
+                                val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels
                                 try {
                                     database.withTransaction {
                                         snapshots.documentChanges.forEach { dc ->
@@ -181,7 +254,7 @@ abstract class BaseSyncManager<T : Transaction>(
                                             if (item.isDeleted == true) {
                                                 baseDao.deleteById(item.id)
                                             } else {
-                                                val finalItem = onPreUpsert(item, labels)
+                                                val finalItem = onPreUpsert(item, currentLabels)
                                                 baseDao.upsert(finalItem)
                                             }
                                         }
@@ -194,7 +267,15 @@ abstract class BaseSyncManager<T : Transaction>(
                                     Log.e("BaseSyncManager", "Critical error in snapshot processor for $collectionName", e)
                                 }
                             }
+
+                            if (isFirstSnapshot) {
+                                isFirstSnapshot = false
+                                onInitialSync?.complete(Unit)
+                            }
                         }
+                    } else if (isFirstSnapshot) {
+                        isFirstSnapshot = false
+                        onInitialSync?.complete(Unit)
                     }
                 }
         }

@@ -13,6 +13,7 @@ import com.frafio.myfinance.core.utils.dateToUTCTimestamp
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -45,6 +46,7 @@ class ExpensesSyncManager @Inject constructor(
     override suspend fun updateLastSync(timestamp: Long) = userPreferencesRepository.updateLastExpensesSync(timestamp)
 
     override fun onPreUpsert(item: Expense, labels: List<String>): Expense {
+        if (labels.isEmpty() && item.labels.isNotEmpty()) return item
         val newLabels = item.labels.toMutableList()
         var changed = false
         for (label in item.labels) {
@@ -176,18 +178,28 @@ class ExpensesSyncManager @Inject constructor(
 
     private var rootListener: ListenerRegistration? = null
 
-    fun startRootSnapshotListener(scope: CoroutineScope, onError: ((FirebaseFirestoreException) -> Unit)? = null) {
-        if (rootListener != null) return
+    fun startRootSnapshotListener(
+        scope: CoroutineScope,
+        onInitialSync: CompletableDeferred<Unit>? = null,
+        onError: ((FirebaseFirestoreException) -> Unit)? = null
+    ) {
+        if (rootListener != null) {
+            onInitialSync?.complete(Unit)
+            return
+        }
 
         scope.launch(Dispatchers.IO) {
-            val email = getUserEmail() ?: return@launch
+            val email = getUserEmail() ?: run {
+                onInitialSync?.complete(Unit)
+                return@launch
+            }
+            var isFirstSnapshot = true
             rootListener = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
                 .document(email)
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
-                        if (error.code == FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED) {
-                            onError?.invoke(error)
-                        }
+                        onInitialSync?.complete(Unit)
+                        onError?.invoke(error)
                         return@addSnapshotListener
                     }
                     if (snapshot != null && snapshot.exists()) {
@@ -199,7 +211,15 @@ class ExpensesSyncManager @Inject constructor(
                             val labelsValue = snapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
                             val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()
                             userPreferencesRepository.updateLabels(labels)
+
+                            if (isFirstSnapshot) {
+                                isFirstSnapshot = false
+                                onInitialSync?.complete(Unit)
+                            }
                         }
+                    } else if (isFirstSnapshot) {
+                        isFirstSnapshot = false
+                        onInitialSync?.complete(Unit)
                     }
                 }
         }

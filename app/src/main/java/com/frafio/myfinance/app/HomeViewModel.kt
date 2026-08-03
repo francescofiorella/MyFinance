@@ -18,6 +18,7 @@ import com.frafio.myfinance.core.data.repository.UserRepository
 import com.frafio.myfinance.core.data.storage.ProfileImageStorage
 import com.google.firebase.firestore.FirebaseFirestoreException
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import javax.inject.Inject
 
 sealed class MainEvent {
@@ -136,52 +138,63 @@ class HomeViewModel @Inject constructor(
                 val authResult = userRepository.isUserLogged()
                 when (authResult.code) {
                     AuthCode.USER_LOGGED.code -> {
-                        updateUserData()
-                        if (notify) {
-                            _uiEvents.emit(HomeUiEvent.LoginSuccess)
-                        }
+                        updateUserData(notify)
                     }
 
                     AuthCode.USER_NOT_LOGGED.code -> {
                         _uiState.value = HomeUiState.Complete
                         _mainEvents.emit(MainEvent.UserNotLogged)
+                        loadingRepository.stopLoading()
                     }
                 }
-            } finally {
+            } catch (_: Exception) {
+                _uiState.value = HomeUiState.Complete
                 loadingRepository.stopLoading()
             }
         }
     }
 
-    private suspend fun updateUserData() {
+    private suspend fun updateUserData(notify: Boolean) {
         // Wait for first local emissions to ensure screen can be populated
         val userPrefs = userPreferencesRepository.userPreferencesFlow.first()
         expensesLocalRepository.getCount().first()
         incomesLocalRepository.getCount().first()
 
+        // Dismiss splash screen
         _uiState.value = HomeUiState.Complete
+        
+        // Ensure HomeScreen is composed and collecting before emitting
+        if (notify) {
+            yield()
+            _uiEvents.emit(HomeUiEvent.LoginSuccess)
+        }
 
-        // Remote sync in background
-        viewModelScope.launch {
-            try {
-                loadingRepository.startLoading()
-                userRepository.syncProfilePicture(userPrefs.user?.photoUrl)
-                
-                val onSyncError: (FirebaseFirestoreException) -> Unit = {
-                    viewModelScope.launch {
-                        _uiEvents.emit(HomeUiEvent.FirestoreQuotaExceeded)
-                    }
+        // Remote sync
+        val expensesSync = CompletableDeferred<Unit>()
+        val incomesSync = CompletableDeferred<Unit>()
+        val rootSync = CompletableDeferred<Unit>()
+        
+        val onSyncError: (FirebaseFirestoreException) -> Unit = { error ->
+            viewModelScope.launch {
+                if (error.code == FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED) {
+                    _uiEvents.emit(HomeUiEvent.FirestoreQuotaExceeded)
                 }
-
-                // Start snapshot listeners (this also handles initial delta sync)
-                expensesRepository.startRootSnapshotListener(viewModelScope, onSyncError)
-                expensesRepository.startSnapshotListener(viewModelScope, onSyncError)
-                incomeRepository.startSnapshotListener(viewModelScope, onSyncError)
-
-            } finally {
-                loadingRepository.stopLoading()
             }
         }
+
+        userRepository.syncProfilePicture(userPrefs.user?.photoUrl)
+        
+        // Start snapshot listeners
+        expensesRepository.startRootSnapshotListener(viewModelScope, rootSync, onSyncError)
+        expensesRepository.startSnapshotListener(viewModelScope, expensesSync, onSyncError)
+        incomeRepository.startSnapshotListener(viewModelScope, incomesSync, onSyncError)
+
+        // Wait for initial sync (No timeout as requested)
+        rootSync.await()
+        expensesSync.await()
+        incomesSync.await()
+
+        loadingRepository.stopLoading()
     }
 
     fun getFullName(): String {
@@ -192,6 +205,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val logoutResult = userRepository.userLogout()
             if (logoutResult.code == AuthCode.LOGOUT_SUCCESS.code) {
+                expensesRepository.stopSnapshotListener()
+                incomeRepository.stopSnapshotListener()
                 _mainEvents.emit(MainEvent.LogoutSuccess)
             }
         }
