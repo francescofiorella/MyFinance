@@ -46,7 +46,7 @@ fun GridSheetDialog(
         endContent = endContent,
         modifier = modifier
     ) {
-        Column(modifier = Modifier.padding(top = 8.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 20.dp)) {
             items.chunked(rowSize).forEach { rowItems ->
                 Row(modifier = Modifier.fillMaxWidth()) {
                     rowItems.forEach { item ->
@@ -83,8 +83,8 @@ private fun GridItem(
             onDismiss()
         },
         enabled = item.enabled,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-        shape = RoundedCornerShape(12.dp)
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
@@ -95,14 +95,14 @@ private fun GridItem(
             Icon(
                 painter = painterResource(id = item.iconRes),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurface
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(id = item.textRes),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -117,7 +117,7 @@ fun GridSheetPreview() {
             title = stringResource(id = R.string.category),
             label = stringResource(id = R.string.select),
             onDismiss = {},
-            rowSize = 2,
+            rowSize = 3,
             items = listOf(
                 MenuItem(
                     iconRes = R.drawable.ic_home_filled,
@@ -126,7 +126,13 @@ fun GridSheetPreview() {
                 ) {},
                 MenuItem(
                     iconRes = R.drawable.ic_shopping_cart_filled,
-                    textRes = R.string.groceries
+                    textRes = R.string.groceries,
+                    enabled = true
+                ) {},
+                MenuItem(
+                    iconRes = R.drawable.ic_self_care_filled,
+                    textRes = R.string.personal_care,
+                    enabled = true
                 ) {}
             ),
             modifier = Modifier

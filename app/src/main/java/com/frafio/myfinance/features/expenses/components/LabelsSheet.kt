@@ -114,7 +114,7 @@ fun LabelItem(
                 checked = it
             },
             colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
             ),
             shapes = if (count > 1) {
                 ListItemDefaults.segmentedShapes(
