@@ -7,6 +7,7 @@ import com.frafio.myfinance.core.data.model.DeleteLabelResult
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
+import com.frafio.myfinance.core.data.repository.UserPreferencesData
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
@@ -42,8 +43,10 @@ class ExpensesSyncManager @Inject constructor(
     override val deleteSuccessCode = FinanceCode.EXPENSE_DELETE_SUCCESS
     override val deleteFailureCode = FinanceCode.EXPENSE_DELETE_FAILURE
 
-    override suspend fun getLastSync(userPrefs: com.frafio.myfinance.core.data.repository.UserPreferencesData): Long = userPrefs.lastExpensesSync
+    override suspend fun getLastSync(userPrefs: UserPreferencesData): Long = userPrefs.lastExpensesSync
     override suspend fun updateLastSync(timestamp: Long) = userPreferencesRepository.updateLastExpensesSync(timestamp)
+    override suspend fun getLastAppSync(userPrefs: UserPreferencesData): Long = userPrefs.lastExpensesAppSync
+    override suspend fun updateLastAppSync(timestamp: Long) = userPreferencesRepository.updateLastExpensesAppSync(timestamp)
 
     override fun onPreUpsert(item: Expense, labels: List<String>): Expense {
         if (labels.isEmpty() && item.labels.isNotEmpty()) return item

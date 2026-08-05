@@ -91,12 +91,7 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     viewModel.mainEvents.collect { event ->
                         when (event) {
-                            MainEvent.UserNotLogged -> {
-                                rootBackStack.clear()
-                                rootBackStack.add(RootKey.Auth)
-                            }
-
-                            MainEvent.LogoutSuccess -> {
+                            MainEvent.UserNotLogged, MainEvent.LogoutSuccess -> {
                                 rootBackStack.clear()
                                 rootBackStack.add(RootKey.Auth)
                             }

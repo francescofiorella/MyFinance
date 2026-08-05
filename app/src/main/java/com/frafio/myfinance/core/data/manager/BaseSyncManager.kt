@@ -51,6 +51,8 @@ abstract class BaseSyncManager<T : Transaction>(
 
     protected abstract suspend fun getLastSync(userPrefs: UserPreferencesData): Long
     protected abstract suspend fun updateLastSync(timestamp: Long)
+    protected abstract suspend fun getLastAppSync(userPrefs: UserPreferencesData): Long
+    protected abstract suspend fun updateLastAppSync(timestamp: Long)
     
     protected open fun onPreUpsert(item: T, labels: List<String>): T = item
 
@@ -182,6 +184,7 @@ abstract class BaseSyncManager<T : Transaction>(
 
             val maxUpdatedAt = remoteItems.mapNotNull { it.updatedAt }.maxOrNull() ?: System.currentTimeMillis()
             updateLastSync(maxUpdatedAt)
+            updateLastAppSync(System.currentTimeMillis())
             return@withContext maxUpdatedAt
         } catch (e: Exception) {
             Log.e("BaseSyncManager", "Error during full sync for $collectionName: ${e.localizedMessage}")
@@ -206,9 +209,10 @@ abstract class BaseSyncManager<T : Transaction>(
                 return@launch
             }
             var currentLastSync = getLastSync(userPrefs)
+            val currentLastAppSync = getLastAppSync(userPrefs)
             val currentTime = System.currentTimeMillis()
 
-            if (currentLastSync != 0L && currentTime - currentLastSync >= SYNC_THRESHOLD_MS) {
+            if (currentLastAppSync != 0L && currentTime - currentLastAppSync >= SYNC_THRESHOLD_MS) {
                 Log.d("BaseSyncManager", "Performing full sync for $collectionName (last sync was > 29 days ago)")
                 val newLastSync = performFullSync(email)
                 if (newLastSync != null) {
@@ -236,6 +240,7 @@ abstract class BaseSyncManager<T : Transaction>(
                     if (snapshots != null) {
                         scope.launch(Dispatchers.IO) {
                             if (!snapshots.isEmpty) {
+                                updateLastAppSync(System.currentTimeMillis())
                                 var maxUpdatedAt = currentLastSync
                                 val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels
                                 try {

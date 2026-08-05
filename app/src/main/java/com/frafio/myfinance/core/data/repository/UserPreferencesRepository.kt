@@ -43,6 +43,8 @@ class UserPreferencesRepository @Inject constructor(
         val USER_CREATION_DAY = intPreferencesKey("user_creation_day")
         val LAST_EXPENSES_SYNC = longPreferencesKey("last_expenses_sync")
         val LAST_INCOMES_SYNC = longPreferencesKey("last_incomes_sync")
+        val LAST_EXPENSES_APP_SYNC = longPreferencesKey("last_expenses_app_sync")
+        val LAST_INCOMES_APP_SYNC = longPreferencesKey("last_incomes_app_sync")
     }
 
     val userPreferencesFlow: StateFlow<UserPreferencesData> = dataStore.data
@@ -59,6 +61,8 @@ class UserPreferencesRepository @Inject constructor(
             val labels = preferences[PreferencesKeys.LABELS]?.toList()?.sorted() ?: emptyList()
             val lastExpensesSync = preferences[PreferencesKeys.LAST_EXPENSES_SYNC] ?: 0L
             val lastIncomesSync = preferences[PreferencesKeys.LAST_INCOMES_SYNC] ?: 0L
+            val lastExpensesAppSync = preferences[PreferencesKeys.LAST_EXPENSES_APP_SYNC] ?: 0L
+            val lastIncomesAppSync = preferences[PreferencesKeys.LAST_INCOMES_APP_SYNC] ?: 0L
 
             val email = preferences[PreferencesKeys.USER_EMAIL]
             val user = if (email != null) {
@@ -74,7 +78,16 @@ class UserPreferencesRepository @Inject constructor(
                 )
             } else null
 
-            UserPreferencesData(dynamicColor, monthlyBudget, labels, user, lastExpensesSync, lastIncomesSync)
+            UserPreferencesData(
+                dynamicColor,
+                monthlyBudget,
+                labels,
+                user,
+                lastExpensesSync,
+                lastIncomesSync,
+                lastExpensesAppSync,
+                lastIncomesAppSync
+            )
         }
         .stateIn(
             scope = scope,
@@ -117,10 +130,24 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun updateLastExpensesAppSync(timestamp: Long) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LAST_EXPENSES_APP_SYNC] = timestamp
+        }
+    }
+
+    suspend fun updateLastIncomesAppSync(timestamp: Long) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LAST_INCOMES_APP_SYNC] = timestamp
+        }
+    }
+
     suspend fun resetSyncTimestamps() {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.LAST_EXPENSES_SYNC] = 0L
             preferences[PreferencesKeys.LAST_INCOMES_SYNC] = 0L
+            preferences[PreferencesKeys.LAST_EXPENSES_APP_SYNC] = 0L
+            preferences[PreferencesKeys.LAST_INCOMES_APP_SYNC] = 0L
         }
     }
 
@@ -157,5 +184,7 @@ data class UserPreferencesData(
     val labels: List<String>,
     val user: User?,
     val lastExpensesSync: Long = 0L,
-    val lastIncomesSync: Long = 0L
+    val lastIncomesSync: Long = 0L,
+    val lastExpensesAppSync: Long = 0L,
+    val lastIncomesAppSync: Long = 0L
 )

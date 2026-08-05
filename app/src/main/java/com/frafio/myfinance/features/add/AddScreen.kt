@@ -196,7 +196,7 @@ fun AddScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
     appState: MyFinanceAppState,
@@ -220,19 +220,7 @@ fun AddScreen(
     priceError: String? = null,
     categoryError: String? = null
 ) {
-    val focusManager = LocalFocusManager.current
-    val categories = stringArrayResource(id = R.array.categories)
-
-    var lastNonNullNameError by remember { mutableStateOf("") }
-    if (nameError != null) {
-        lastNonNullNameError = nameError
-    }
-
     var isTypeSelectionVisible by remember { mutableStateOf(false) }
-
-    val colors = ListItemDefaults.colors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer
-    )
 
     BackHandler(enabled = isTypeSelectionVisible) {
         isTypeSelectionVisible = false
@@ -251,89 +239,14 @@ fun AddScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp, horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    FilledTonalIconButton(
-                        onClick = {
-                            if (isTypeSelectionVisible) {
-                                isTypeSelectionVisible = false
-                            } else {
-                                onBackClick()
-                            }
-                        },
-                        colors = IconButtonDefaults.filledTonalIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        shapes = IconButtonDefaults.shapes(),
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_close_filled),
-                            contentDescription = stringResource(id = R.string.back_arrow),
-                        )
-                    }
-
-                    TextButton(
-                        onClick = {
-                            focusManager.clearFocus()
-                            isTypeSelectionVisible = true
-                        },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = TextFieldDefaults.colors().focusedTextColor,
-                            disabledContentColor = if (isAdding) {
-                                TextFieldDefaults.colors().disabledTextColor
-                            } else {
-                                TextFieldDefaults.colors().focusedTextColor
-                            }
-                        ),
-                        enabled = navKey.requestCode == AddViewModel.REQUEST_ADD_CODE && !isAdding
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = stringResource(
-                                    id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) {
-                                        R.string.expense
-                                    } else {
-                                        R.string.income
-                                    }
-                                ),
-                                style = MaterialTheme.typography.titleLarge,
-                            )
-                            if (navKey.requestCode == AddViewModel.REQUEST_ADD_CODE) {
-                                Icon(
-                                    modifier = Modifier
-                                        .padding(start = 4.dp),
-                                    painter = painterResource(
-                                        id = if (isTypeSelectionVisible)
-                                            R.drawable.ic_keyboard_arrow_up_filled
-                                        else
-                                            R.drawable.ic_keyboard_arrow_down_filled
-                                    ),
-                                    contentDescription = null,
-                                )
-                            }
-                        }
-                    }
-
-                    FilledIconButton(
-                        modifier = Modifier
-                            .padding(end = 4.dp)
-                            .width(52.dp),
-                        onClick = onSaveClick,
-                        enabled = !isAdding,
-                        shapes = IconButtonDefaults.shapes()
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_check_filled),
-                            contentDescription = stringResource(R.string.save),
-                        )
-                    }
-                }
+                AddTopBar(
+                    navKey = navKey,
+                    isAdding = isAdding,
+                    isTypeSelectionVisible = isTypeSelectionVisible,
+                    onBackClick = onBackClick,
+                    onToggleTypeSelection = { isTypeSelectionVisible = it },
+                    onSaveClick = onSaveClick
+                )
 
                 Column(
                     modifier = Modifier
@@ -342,521 +255,744 @@ fun AddScreen(
                         .verticalScroll(rememberScrollState())
                         .animateContentSize()
                 ) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = 16.dp)
-                            .animateContentSize(),
-                        shape = ListItemDefaults.shapes().selectedShape,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(start = 16.dp)
-                                    .padding(vertical = 16.dp)
-                                    .size(64.dp)
-                                    .clip(MaterialShapes.Cookie12Sided.toShape())
-                                    .background(MaterialTheme.colorScheme.secondaryContainer),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_edit_filled),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                // Name Field (Large)
-                                Box(modifier = Modifier.fillMaxWidth()) {
-                                    TextField(
-                                        value = name,
-                                        onValueChange = onNameChange,
-                                        placeholder = {
-                                            Text(
-                                                text = stringResource(
-                                                    id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE)
-                                                        R.string.expense_name
-                                                    else
-                                                        R.string.income_name
-                                                ),
-                                                style = MaterialTheme.typography.headlineSmall
-                                            )
-                                        },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(end = 16.dp),
-                                        enabled = !isAdding,
-                                        textStyle = MaterialTheme.typography.headlineSmall,
-                                        trailingIcon = {
-                                            if (nameError != null) {
-                                                Icon(
-                                                    painter = painterResource(id = R.drawable.ic_error_filled),
-                                                    contentDescription = null
-                                                )
-                                            } else if (name.isNotEmpty() && !isAdding) {
-                                                IconButton(onClick = { onNameChange("") }) {
-                                                    Icon(
-                                                        painter = painterResource(id = R.drawable.ic_cancel_filled),
-                                                        contentDescription = "Clear"
-                                                    )
-                                                }
-                                            }
-                                        },
-                                        isError = nameError != null,
-                                        colors = TextFieldDefaults.colors(
-                                            focusedContainerColor = Color.Transparent,
-                                            unfocusedContainerColor = Color.Transparent,
-                                            disabledContainerColor = Color.Transparent,
-                                            errorContainerColor = Color.Transparent,
-                                            focusedIndicatorColor = Color.Transparent,
-                                            unfocusedIndicatorColor = Color.Transparent,
-                                            disabledIndicatorColor = Color.Transparent,
-                                            errorIndicatorColor = Color.Transparent
-                                        ),
-                                        keyboardOptions = KeyboardOptions(
-                                            capitalization = KeyboardCapitalization.Sentences,
-                                            autoCorrectEnabled = false,
-                                            imeAction = ImeAction.Next
-                                        ),
-                                        keyboardActions = KeyboardActions(onNext = {
-                                            focusManager.moveFocus(
-                                                FocusDirection.Down
-                                            )
-                                        }),
-                                        singleLine = true
-                                    )
-                                    if (nameError != null) {
-                                        Text(
-                                            text = lastNonNullNameError,
-                                            color = MaterialTheme.colorScheme.error,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier
-                                                .align(Alignment.BottomStart)
-                                                .padding(start = 16.dp)
-                                        )
-                                    }
-                                }
-
-                                // Labels Selection
-                                AnimatedVisibility(
-                                    visible = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
-                                    enter = fadeIn() + expandVertically(),
-                                    exit = fadeOut() + shrinkVertically()
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                                            .horizontalScroll(rememberScrollState()),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        labels.forEach { label ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(AssistChipDefaults.shape)
-                                                    .background(MaterialTheme.colorScheme.secondaryContainer)
-                                                    .clickable {
-                                                        onLabelCheckedChanged(
-                                                            label,
-                                                            false
-                                                        )
-                                                    },
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Row(
-                                                    modifier = Modifier.padding(
-                                                        horizontal = 8.dp,
-                                                        vertical = 4.dp
-                                                    ),
-                                                    verticalAlignment = Alignment.CenterVertically,
-                                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                                ) {
-                                                    Text(
-                                                        text = label,
-                                                        style = MaterialTheme.typography.labelSmall,
-                                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                                    )
-                                                    Icon(
-                                                        modifier = Modifier.size(16.dp),
-                                                        painter = painterResource(id = R.drawable.ic_close_filled),
-                                                        contentDescription = "Remove Label",
-                                                        tint = MaterialTheme.colorScheme.onSecondaryContainer
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(AssistChipDefaults.shape)
-                                                .background(MaterialTheme.colorScheme.secondaryContainer)
-                                                .clickable { onLabelClick() },
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                modifier = Modifier
-                                                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                                                    .size(AssistChipDefaults.IconSize),
-                                                painter = painterResource(id = R.drawable.ic_add_filled),
-                                                contentDescription = "Add Label",
-                                                tint = MaterialTheme.colorScheme.onSecondaryContainer
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    // Amount Field
-                    SegmentedListItem(
-                        shapes = ListItemDefaults.segmentedShapes(
-                            index = 0,
-                            count = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) 3 else 2,
-                            defaultShapes = ListItemDefaults.shapes()
-                        ),
-                        colors = colors,
-                        content = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                val currency = stringResource(id = R.string.currency)
-                                Box(
-                                    modifier = Modifier
-                                        .padding(vertical = 6.dp)
-                                        .size(48.dp)
-                                        .clip(MaterialShapes.Cookie7Sided.toShape())
-                                        .background(MaterialTheme.colorScheme.secondaryContainer),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        painter = painterResource(
-                                            id = when (currency) {
-                                                "$" -> R.drawable.ic_attach_money_filled
-                                                "€" -> R.drawable.ic_euro_filled
-                                                else -> R.drawable.ic_euro_filled
-                                            }
-                                        ),
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Box(modifier = Modifier.fillMaxWidth()) {
-                                    TextField(
-                                        value = priceString,
-                                        onValueChange = { text ->
-                                            if (text.isEmpty() || text.toDoubleOrNull() != null || text == ".") {
-                                                onPriceChange(text)
-                                            }
-                                        },
-                                        placeholder = {
-                                            Text(
-                                                text = stringResource(id = R.string.amount),
-                                                style = MaterialTheme.typography.bodyLarge
-                                            )
-                                        },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        enabled = !isAdding,
-                                        textStyle = MaterialTheme.typography.bodyLarge,
-                                        trailingIcon = {
-                                            if (priceError != null) {
-                                                Icon(
-                                                    painter = painterResource(id = R.drawable.ic_error_filled),
-                                                    contentDescription = null
-                                                )
-                                            } else if (priceString.isNotEmpty() && !isAdding) {
-                                                IconButton(onClick = { onPriceChange("") }) {
-                                                    Icon(
-                                                        painter = painterResource(id = R.drawable.ic_cancel_filled),
-                                                        contentDescription = "Clear"
-                                                    )
-                                                }
-                                            }
-                                        },
-                                        isError = priceError != null,
-                                        colors = TextFieldDefaults.colors(
-                                            focusedContainerColor = Color.Transparent,
-                                            unfocusedContainerColor = Color.Transparent,
-                                            disabledContainerColor = Color.Transparent,
-                                            errorContainerColor = Color.Transparent,
-                                            focusedIndicatorColor = Color.Transparent,
-                                            unfocusedIndicatorColor = Color.Transparent,
-                                            disabledIndicatorColor = Color.Transparent,
-                                            errorIndicatorColor = Color.Transparent
-                                        ),
-                                        keyboardOptions = KeyboardOptions(
-                                            keyboardType = KeyboardType.Decimal,
-                                            imeAction = ImeAction.Done
-                                        ),
-                                        keyboardActions = KeyboardActions(onDone = {
-                                            focusManager.clearFocus()
-                                            if (!isAdding) onSaveClick()
-                                        }),
-                                        singleLine = true
-                                    )
-                                    if (priceError != null) {
-                                        Text(
-                                            text = priceError,
-                                            color = MaterialTheme.colorScheme.error,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier
-                                                .align(Alignment.BottomStart)
-                                                .padding(start = 16.dp)
-                                        )
-                                    }
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = 2.dp)
+                    NameAndLabelsCard(
+                        name = name,
+                        onNameChange = onNameChange,
+                        nameError = nameError,
+                        isAdding = isAdding,
+                        navKey = navKey,
+                        labels = labels,
+                        onLabelClick = onLabelClick,
+                        onLabelCheckedChanged = onLabelCheckedChanged
                     )
 
-                    // Date Field
-                    SegmentedListItem(
-                        onClick = if (!isAdding) onDateClick else {
-                            { }
-                        },
-                        shapes = ListItemDefaults.segmentedShapes(
-                            index = 1,
-                            count = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) 3 else 2,
-                            defaultShapes = ListItemDefaults.shapes()
-                        ),
-                        colors = colors,
-                        content = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .padding(vertical = 6.dp)
-                                        .size(48.dp)
-                                        .clip(MaterialShapes.Pill.toShape())
-                                        .background(MaterialTheme.colorScheme.secondaryContainer),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_today_filled),
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                TextField(
-                                    value = dateString,
-                                    onValueChange = {},
-                                    placeholder = {
-                                        Text(
-                                            text = stringResource(id = R.string.date),
-                                            style = MaterialTheme.typography.bodyLarge
-                                        )
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textStyle = MaterialTheme.typography.bodyLarge,
-                                    enabled = false,
-                                    colors = if (isAdding) {
-                                        TextFieldDefaults.colors(
-                                            focusedContainerColor = Color.Transparent,
-                                            unfocusedContainerColor = Color.Transparent,
-                                            disabledContainerColor = Color.Transparent,
-                                            errorContainerColor = Color.Transparent,
-                                            focusedIndicatorColor = Color.Transparent,
-                                            unfocusedIndicatorColor = Color.Transparent,
-                                            disabledIndicatorColor = Color.Transparent,
-                                            errorIndicatorColor = Color.Transparent
-                                        )
-                                    } else {
-                                        TextFieldDefaults.colors(
-                                            disabledContainerColor = Color.Transparent,
-                                            disabledIndicatorColor = Color.Transparent,
-                                            errorContainerColor = Color.Transparent,
-                                            errorIndicatorColor = Color.Transparent,
-                                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                            disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    },
-                                    singleLine = true
-                                )
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = 2.dp)
+                    TransactionForm(
+                        priceString = priceString,
+                        onPriceChange = onPriceChange,
+                        priceError = priceError,
+                        dateString = dateString,
+                        onDateClick = onDateClick,
+                        category = category,
+                        onCategoryClick = onCategoryClick,
+                        categoryError = categoryError,
+                        isAdding = isAdding,
+                        navKey = navKey,
+                        onSaveClick = onSaveClick
                     )
 
-                    // Category Field
-                    AnimatedVisibility(
-                        visible = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
-                        enter = fadeIn() + expandVertically(),
-                        exit = fadeOut() + shrinkVertically()
-                    ) {
-                        SegmentedListItem(
-                            onClick = if (!isAdding) onCategoryClick else {
-                                { }
-                            },
-                            shapes = ListItemDefaults.segmentedShapes(
-                                index = 2,
-                                count = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) 3 else 2,
-                                defaultShapes = ListItemDefaults.shapes()
-                            ),
-                            colors = colors,
-                            content = {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(vertical = 6.dp)
-                                            .size(48.dp)
-                                            .clip(MaterialShapes.Sunny.toShape())
-                                            .background(MaterialTheme.colorScheme.secondaryContainer),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(
-                                                id = if (category != -1) getCategoryIcon(
-                                                    category
-                                                ) else R.drawable.ic_grid_3x3_filled
-                                            ),
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                    Box(modifier = Modifier.fillMaxWidth()) {
-                                        TextField(
-                                            value = if (category != -1) categories.getOrElse(
-                                                category
-                                            ) { "" } else "",
-                                            onValueChange = {},
-                                            placeholder = {
-                                                Text(
-                                                    text = stringResource(id = R.string.category),
-                                                    style = MaterialTheme.typography.bodyLarge
-                                                )
-                                            },
-                                            modifier = Modifier.fillMaxWidth(),
-                                            textStyle = MaterialTheme.typography.bodyLarge,
-                                            isError = categoryError != null,
-                                            enabled = false,
-                                            trailingIcon = {
-                                                if (categoryError != null) {
-                                                    Icon(
-                                                        painter = painterResource(id = R.drawable.ic_error_filled),
-                                                        contentDescription = null
-                                                    )
-                                                }
-                                            },
-                                            colors = if (isAdding) {
-                                                TextFieldDefaults.colors(
-                                                    focusedContainerColor = Color.Transparent,
-                                                    unfocusedContainerColor = Color.Transparent,
-                                                    disabledContainerColor = Color.Transparent,
-                                                    errorContainerColor = Color.Transparent,
-                                                    focusedIndicatorColor = Color.Transparent,
-                                                    unfocusedIndicatorColor = Color.Transparent,
-                                                    disabledIndicatorColor = Color.Transparent,
-                                                    errorIndicatorColor = Color.Transparent
-                                                )
-                                            } else {
-                                                TextFieldDefaults.colors(
-                                                    disabledContainerColor = Color.Transparent,
-                                                    disabledIndicatorColor = Color.Transparent,
-                                                    errorContainerColor = Color.Transparent,
-                                                    errorIndicatorColor = Color.Transparent,
-                                                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                                    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    disabledTrailingIconColor = MaterialTheme.colorScheme.error
-                                                )
-                                            },
-                                            singleLine = true
-                                        )
-                                        if (categoryError != null) {
-                                            Text(
-                                                text = categoryError,
-                                                color = MaterialTheme.colorScheme.error,
-                                                style = MaterialTheme.typography.bodySmall,
-                                                modifier = Modifier
-                                                    .align(Alignment.BottomStart)
-                                                    .padding(start = 16.dp)
-                                            )
-                                        }
-                                    }
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .padding(bottom = 2.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(14.dp)) // plus 2.dp from card
+                    Spacer(modifier = Modifier.height(14.dp))
                 }
             }
         }
 
-        // Type Selection
-        AnimatedVisibility(
-            visible = isTypeSelectionVisible,
-            enter = fadeIn(),
-            exit = fadeOut()
+        TransactionTypeOverlay(
+            isVisible = isTypeSelectionVisible,
+            onDismiss = { isTypeSelectionVisible = false },
+            onTypeSelected = { type ->
+                onNavKeyChange(navKey.copy(expenseCode = type))
+                isTypeSelectionVisible = false
+            }
+        )
+    }
+}
+
+@Composable
+fun AddTopBar(
+    navKey: RootKey.AddEditTransaction,
+    isAdding: Boolean,
+    isTypeSelectionVisible: Boolean,
+    onBackClick: () -> Unit,
+    onToggleTypeSelection: (Boolean) -> Unit,
+    onSaveClick: () -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp, horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FilledTonalIconButton(
+            onClick = {
+                if (isTypeSelectionVisible) {
+                    onToggleTypeSelection(false)
+                } else {
+                    onBackClick()
+                }
+            },
+            colors = IconButtonDefaults.filledTonalIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
+            shapes = IconButtonDefaults.shapes(),
         ) {
-            Column(
+            Icon(
+                painter = painterResource(id = R.drawable.ic_close_filled),
+                contentDescription = stringResource(id = R.string.back_arrow),
+            )
+        }
+
+        TextButton(
+            onClick = {
+                focusManager.clearFocus()
+                onToggleTypeSelection(true)
+            },
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = TextFieldDefaults.colors().focusedTextColor,
+                disabledContentColor = if (isAdding) {
+                    TextFieldDefaults.colors().disabledTextColor
+                } else {
+                    TextFieldDefaults.colors().focusedTextColor
+                }
+            ),
+            enabled = navKey.requestCode == AddViewModel.REQUEST_ADD_CODE && !isAdding
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(
+                        id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) {
+                            R.string.expense
+                        } else {
+                            R.string.income
+                        }
+                    ),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                if (navKey.requestCode == AddViewModel.REQUEST_ADD_CODE) {
+                    Icon(
+                        modifier = Modifier
+                            .padding(start = 4.dp),
+                        painter = painterResource(
+                            id = if (isTypeSelectionVisible)
+                                R.drawable.ic_keyboard_arrow_up_filled
+                            else
+                                R.drawable.ic_keyboard_arrow_down_filled
+                        ),
+                        contentDescription = null,
+                    )
+                }
+            }
+        }
+
+        FilledIconButton(
+            modifier = Modifier
+                .padding(end = 4.dp)
+                .width(52.dp),
+            onClick = onSaveClick,
+            enabled = !isAdding,
+            shapes = IconButtonDefaults.shapes()
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_check_filled),
+                contentDescription = stringResource(R.string.save),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun NameAndLabelsCard(
+    name: String,
+    onNameChange: (String) -> Unit,
+    nameError: String?,
+    isAdding: Boolean,
+    navKey: RootKey.AddEditTransaction,
+    labels: List<String>,
+    onLabelClick: () -> Unit,
+    onLabelCheckedChanged: (String, Boolean) -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+    var lastNonNullNameError by remember { mutableStateOf("") }
+    if (nameError != null) {
+        lastNonNullNameError = nameError
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 16.dp)
+            .animateContentSize(),
+        shape = ListItemDefaults.shapes().selectedShape,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        )
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        MaterialTheme.colorScheme.scrim.copy(
-                            alpha = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) 0.7f else 0.1f
-                        )
-                    )
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { isTypeSelectionVisible = false },
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                    .padding(start = 16.dp)
+                    .padding(vertical = 16.dp)
+                    .size(64.dp)
+                    .clip(MaterialShapes.Cookie12Sided.toShape())
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center
             ) {
-                TextButton(
-                    onClick = {
-                        focusManager.clearFocus()
-                        onNavKeyChange(navKey.copy(expenseCode = AddViewModel.REQUEST_EXPENSE_CODE))
-                        isTypeSelectionVisible = false
-                    },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = TextFieldDefaults.colors().focusedTextColor
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_edit_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    TextField(
+                        value = name,
+                        onValueChange = onNameChange,
+                        placeholder = {
+                            Text(
+                                text = stringResource(
+                                    id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE)
+                                        R.string.expense_name
+                                    else
+                                        R.string.income_name
+                                ),
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 16.dp),
+                        enabled = !isAdding,
+                        textStyle = MaterialTheme.typography.headlineSmall,
+                        trailingIcon = {
+                            if (nameError != null) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_error_filled),
+                                    contentDescription = null
+                                )
+                            } else if (name.isNotEmpty() && !isAdding) {
+                                IconButton(onClick = { onNameChange("") }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_cancel_filled),
+                                        contentDescription = "Clear"
+                                    )
+                                }
+                            }
+                        },
+                        isError = nameError != null,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                            errorContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            errorIndicatorColor = Color.Transparent
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            autoCorrectEnabled = false,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(onNext = {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }),
+                        singleLine = true
                     )
-                ) {
-                    Text(
-                        text = stringResource(R.string.expense),
-                        style = MaterialTheme.typography.headlineMedium
-                    )
+                    if (nameError != null) {
+                        Text(
+                            text = lastNonNullNameError,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(start = 16.dp)
+                        )
+                    }
                 }
-                TextButton(
-                    onClick = {
-                        focusManager.clearFocus()
-                        onNavKeyChange(navKey.copy(expenseCode = AddViewModel.REQUEST_INCOME_CODE))
-                        isTypeSelectionVisible = false
-                    },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = TextFieldDefaults.colors().focusedTextColor
-                    )
+
+                AnimatedVisibility(
+                    visible = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
                 ) {
-                    Text(
-                        text = stringResource(R.string.income),
-                        style = MaterialTheme.typography.headlineMedium
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                            .horizontalScroll(rememberScrollState()),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        labels.forEach { label ->
+                            LabelChip(
+                                label = label,
+                                onClick = { onLabelCheckedChanged(label, false) }
+                            )
+                        }
+
+                        AddLabelChip(onClick = onLabelClick)
+                    }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun LabelChip(
+    label: String,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clip(AssistChipDefaults.shape)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
+            Icon(
+                modifier = Modifier.size(16.dp),
+                painter = painterResource(id = R.drawable.ic_close_filled),
+                contentDescription = "Remove Label",
+                tint = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+        }
+    }
+}
+
+@Composable
+fun AddLabelChip(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .clip(AssistChipDefaults.shape)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            modifier = Modifier
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .size(AssistChipDefaults.IconSize),
+            painter = painterResource(id = R.drawable.ic_add_filled),
+            contentDescription = "Add Label",
+            tint = MaterialTheme.colorScheme.onSecondaryContainer
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun TransactionForm(
+    priceString: String,
+    onPriceChange: (String) -> Unit,
+    priceError: String?,
+    dateString: String,
+    onDateClick: () -> Unit,
+    category: Int,
+    onCategoryClick: () -> Unit,
+    categoryError: String?,
+    isAdding: Boolean,
+    navKey: RootKey.AddEditTransaction,
+    onSaveClick: () -> Unit
+) {
+    val colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+    val categories = stringArrayResource(id = R.array.categories)
+
+    Column {
+        // Amount Field
+        SegmentedListItem(
+            shapes = ListItemDefaults.segmentedShapes(
+                index = 0,
+                count = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) 3 else 2,
+                defaultShapes = ListItemDefaults.shapes()
+            ),
+            colors = colors,
+            content = {
+                AmountField(
+                    priceString = priceString,
+                    onPriceChange = onPriceChange,
+                    priceError = priceError,
+                    isAdding = isAdding,
+                    onSaveClick = onSaveClick
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 2.dp)
+        )
+
+        // Date Field
+        SegmentedListItem(
+            onClick = if (!isAdding) onDateClick else { {} },
+            shapes = ListItemDefaults.segmentedShapes(
+                index = 1,
+                count = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) 3 else 2,
+                defaultShapes = ListItemDefaults.shapes()
+            ),
+            colors = colors,
+            content = {
+                DateField(
+                    dateString = dateString,
+                    isAdding = isAdding
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 2.dp)
+        )
+
+        // Category Field
+        AnimatedVisibility(
+            visible = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            SegmentedListItem(
+                onClick = if (!isAdding) onCategoryClick else { {} },
+                shapes = ListItemDefaults.segmentedShapes(
+                    index = 2,
+                    count = 3,
+                    defaultShapes = ListItemDefaults.shapes()
+                ),
+                colors = colors,
+                content = {
+                    CategoryField(
+                        category = category,
+                        categoryError = categoryError,
+                        categories = categories,
+                        isAdding = isAdding
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 2.dp)
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun AmountField(
+    priceString: String,
+    onPriceChange: (String) -> Unit,
+    priceError: String?,
+    isAdding: Boolean,
+    onSaveClick: () -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+    val currency = stringResource(id = R.string.currency)
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(vertical = 6.dp)
+                .size(48.dp)
+                .clip(MaterialShapes.Cookie7Sided.toShape())
+                .background(MaterialTheme.colorScheme.secondaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = when (currency) {
+                        "$" -> R.drawable.ic_attach_money_filled
+                        "€" -> R.drawable.ic_euro_filled
+                        else -> R.drawable.ic_euro_filled
+                    }
+                ),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Box(modifier = Modifier.fillMaxWidth()) {
+            TextField(
+                value = priceString,
+                onValueChange = { text ->
+                    if (text.isEmpty() || text.toDoubleOrNull() != null || text == ".") {
+                        onPriceChange(text)
+                    }
+                },
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.amount),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isAdding,
+                textStyle = MaterialTheme.typography.bodyLarge,
+                trailingIcon = {
+                    if (priceError != null) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_error_filled),
+                            contentDescription = null
+                        )
+                    } else if (priceString.isNotEmpty() && !isAdding) {
+                        IconButton(onClick = { onPriceChange("") }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_cancel_filled),
+                                contentDescription = "Clear"
+                            )
+                        }
+                    }
+                },
+                isError = priceError != null,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent
+                ),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    focusManager.clearFocus()
+                    if (!isAdding) onSaveClick()
+                }),
+                singleLine = true
+            )
+            if (priceError != null) {
+                Text(
+                    text = priceError,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 16.dp)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun DateField(
+    dateString: String,
+    isAdding: Boolean
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(vertical = 6.dp)
+                .size(48.dp)
+                .clip(MaterialShapes.Pill.toShape())
+                .background(MaterialTheme.colorScheme.secondaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_today_filled),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        TextField(
+            value = dateString,
+            onValueChange = {},
+            placeholder = {
+                Text(
+                    text = stringResource(id = R.string.date),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = MaterialTheme.typography.bodyLarge,
+            enabled = false,
+            colors = if (isAdding) {
+                TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent
+                )
+            } else {
+                TextFieldDefaults.colors(
+                    disabledContainerColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent,
+                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            singleLine = true
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun CategoryField(
+    category: Int,
+    categoryError: String?,
+    categories: Array<String>,
+    isAdding: Boolean
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(vertical = 6.dp)
+                .size(48.dp)
+                .clip(MaterialShapes.Sunny.toShape())
+                .background(MaterialTheme.colorScheme.secondaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (category != -1) getCategoryIcon(category)
+                    else R.drawable.ic_grid_3x3_filled
+                ),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Box(modifier = Modifier.fillMaxWidth()) {
+            TextField(
+                value = if (category != -1) categories.getOrElse(category) { "" } else "",
+                onValueChange = {},
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.category),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = MaterialTheme.typography.bodyLarge,
+                isError = categoryError != null,
+                enabled = false,
+                trailingIcon = {
+                    if (categoryError != null) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_error_filled),
+                            contentDescription = null
+                        )
+                    }
+                },
+                colors = if (isAdding) {
+                    TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        errorContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent
+                    )
+                } else {
+                    TextFieldDefaults.colors(
+                        disabledContainerColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        errorContainerColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
+                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledTrailingIconColor = MaterialTheme.colorScheme.error
+                    )
+                },
+                singleLine = true
+            )
+            if (categoryError != null) {
+                Text(
+                    text = categoryError,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TransactionTypeOverlay(
+    isVisible: Boolean,
+    onDismiss: () -> Unit,
+    onTypeSelected: (Int) -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    MaterialTheme.colorScheme.scrim.copy(
+                        alpha = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) 0.7f else 0.1f
+                    )
+                )
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onDismiss() },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            TextButton(
+                onClick = {
+                    focusManager.clearFocus()
+                    onTypeSelected(AddViewModel.REQUEST_EXPENSE_CODE)
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = TextFieldDefaults.colors().focusedTextColor
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.expense),
+                    style = MaterialTheme.typography.headlineMedium
+                    )
+            }
+            TextButton(
+                onClick = {
+                    focusManager.clearFocus()
+                    onTypeSelected(AddViewModel.REQUEST_INCOME_CODE)
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = TextFieldDefaults.colors().focusedTextColor
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.income),
+                    style = MaterialTheme.typography.headlineMedium
+                )
             }
         }
     }
@@ -894,4 +1030,3 @@ fun AddScreenPreview() {
         )
     }
 }
-

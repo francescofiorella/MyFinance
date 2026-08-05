@@ -29,4 +29,6 @@ class IncomesSyncManager @Inject constructor(
 
     override suspend fun getLastSync(userPrefs: com.frafio.myfinance.core.data.repository.UserPreferencesData): Long = userPrefs.lastIncomesSync
     override suspend fun updateLastSync(timestamp: Long) = userPreferencesRepository.updateLastIncomesSync(timestamp)
+    override suspend fun getLastAppSync(userPrefs: com.frafio.myfinance.core.data.repository.UserPreferencesData): Long = userPrefs.lastIncomesAppSync
+    override suspend fun updateLastAppSync(timestamp: Long) = userPreferencesRepository.updateLastIncomesAppSync(timestamp)
 }
