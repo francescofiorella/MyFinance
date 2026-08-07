@@ -1,12 +1,8 @@
 package com.frafio.myfinance.features.expenses.components
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -72,21 +68,19 @@ fun LabelsSheet(
             labelFirst = labelFirst,
             endContent = endContent
         ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                LazyColumn {
-                    itemsIndexed(
-                        items = labels,
-                        key = { _, label -> label }
-                    ) { index, label ->
-                        LabelItem(
-                            label = label,
-                            initialSelected = expense?.labels?.contains(label)
-                                ?: selectedLabels.contains(label),
-                            onLabelCheckedChanged = onLabelCheckedChanged,
-                            index = index,
-                            count = labels.size
-                        )
-                    }
+            LazyColumn {
+                itemsIndexed(
+                    items = labels,
+                    key = { _, label -> label }
+                ) { index, label ->
+                    LabelItem(
+                        label = label,
+                        initialSelected = expense?.labels?.contains(label)
+                            ?: selectedLabels.contains(label),
+                        onLabelCheckedChanged = onLabelCheckedChanged,
+                        index = index,
+                        count = labels.size
+                    )
                 }
             }
         }
@@ -107,78 +101,67 @@ fun LabelItem(
         mutableStateOf(initialSelected)
     }
 
-    AnimatedVisibility(
-        visible = true,
-        enter = expandVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
-        exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
-    ) {
-        SegmentedListItem(
-            checked = checked,
-            onCheckedChange = {
-                onLabelCheckedChanged(label, it)
-                checked = it
-            },
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-            ),
-            shapes = if (count > 1) {
-                ListItemDefaults.segmentedShapes(
-                    index = index,
-                    count = count
-                )
-            } else {
-                ListItemDefaults.shapes(
-                    shape = ListItemDefaults.shapes().selectedShape
-                )
-            },
-            leadingContent = {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (checked)
-                                MaterialTheme.colorScheme.primary
-                            else
-                                MaterialTheme.colorScheme.secondaryContainer
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_sell_outline),
-                        contentDescription = null,
-                        tint = if (checked)
-                            MaterialTheme.colorScheme.onPrimary
+    SegmentedListItem(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = if (index == count - 1) 0.dp else 2.dp),
+        checked = checked,
+        onCheckedChange = {
+            onLabelCheckedChanged(label, it)
+            checked = it
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        ),
+        shapes = if (count > 1) {
+            ListItemDefaults.segmentedShapes(
+                index = index,
+                count = count
+            )
+        } else {
+            ListItemDefaults.shapes(
+                shape = ListItemDefaults.shapes().selectedShape
+            )
+        },
+        leadingContent = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (checked)
+                            MaterialTheme.colorScheme.primary
                         else
-                            MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }
-            },
-            content = {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            },
-            trailingContent = {
-                Checkbox(
-                    modifier = Modifier.padding(8.dp),
-                    checked = checked,
-                    onCheckedChange = null
-                )
-            },
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(
-                    bottom = if (index == count - 1)
-                        0.dp
+                            MaterialTheme.colorScheme.secondaryContainer
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_sell_outline),
+                    contentDescription = null,
+                    tint = if (checked)
+                        MaterialTheme.colorScheme.onPrimary
                     else
-                        2.dp
-                ),
-        )
-    }
+                        MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+        },
+        content = {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        trailingContent = {
+            Checkbox(
+                modifier = Modifier.padding(8.dp),
+                checked = checked,
+                onCheckedChange = null
+            )
+        }
+    )
 }
 
 @Preview(showBackground = true)
@@ -186,10 +169,10 @@ fun LabelItem(
 fun LabelsSheetPreview() {
     MyFinanceTheme {
         LabelsSheet(
-            show = true,
-            onDismiss = {},
             modifier = Modifier
                 .background(color = MaterialTheme.colorScheme.surfaceContainerLow),
+            show = true,
+            onDismiss = {},
             labels = listOf(
                 "Travel",
                 "Dinner"
