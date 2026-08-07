@@ -43,6 +43,19 @@ import com.frafio.myfinance.core.theme.yellowOnContainerDark
 import com.frafio.myfinance.core.theme.yellowOnContainerLight
 import java.time.LocalDate
 
+fun getCurrencyIcon(currencyCode: String): Int {
+    return when (currencyCode) {
+        "EUR" -> R.drawable.ic_euro_filled
+        "FRF" -> R.drawable.ic_currency_franc_filled
+        "TRY" -> R.drawable.ic_currency_lira_filled
+        "GBP", "FKP", "GIP", "SHP", "SSP" -> R.drawable.ic_currency_pound_filled
+        "RUB" -> R.drawable.ic_currency_ruble_filled
+        "JPY" -> R.drawable.ic_currency_yen_filled
+        "CNY" -> R.drawable.ic_currency_yuan_filled
+        else -> R.drawable.ic_attach_money_filled
+    }
+}
+
 fun getCategoryIcon(categoryId: Int?): Int {
     return when (categoryId) {
         FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_home_filled

@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,9 +28,10 @@ fun AdaptiveSheet(
     content: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val isPreview = LocalInspectionMode.current
 
     // Local state to keep the sheet in composition during animation
-    var shouldRender by remember(show) { mutableStateOf(value = false) }
+    var shouldRender by remember { mutableStateOf(show) }
 
     LaunchedEffect(show) {
         if (show) {
@@ -45,7 +47,11 @@ fun AdaptiveSheet(
         }
     }
 
-    if (shouldRender) {
+    if (isPreview) {
+        if (show) {
+            content()
+        }
+    } else if (shouldRender) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,

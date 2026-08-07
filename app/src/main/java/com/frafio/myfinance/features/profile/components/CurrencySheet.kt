@@ -26,6 +26,7 @@ import com.frafio.myfinance.core.components.GridSheetDialog
 import com.frafio.myfinance.core.data.model.MenuItem
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.capitalizeWords
+import com.frafio.myfinance.core.utils.getCurrencyIcon
 import com.frafio.myfinance.core.utils.getLocaleFromCurrency
 import java.util.Currency
 import java.util.Locale
@@ -60,7 +61,7 @@ fun CurrencySheet(
         Pair("RUB", Locale.forLanguageTag("ru-RU")),
         Pair("AUD", Locale.forLanguageTag("en-AU")),
         Pair("CAD", Locale.CANADA),
-        Pair("INR", Locale.forLanguageTag("en-IN"))
+        Pair("TRY", Locale.forLanguageTag("tr-TR"))
     )
 
     val initialCurrenciesCodes = remember { currencies.map { it.first }.toSet() }
@@ -79,11 +80,15 @@ fun CurrencySheet(
     val displayItems = remember(showAll) {
         if (showAll) {
             val otherCurrenciesMenuItems = Currency.getAvailableCurrencies()
-                .filter { it.currencyCode !in initialCurrenciesCodes }
+                .filter { it.currencyCode !in initialCurrenciesCodes && it.currencyCode != "XXX" }
                 .sortedBy { it.currencyCode }
                 .map { currency ->
+                    val symbol = when (currency.currencyCode) {
+                        "FRF" -> "₣"
+                        else -> currency.getSymbol(getLocaleFromCurrency(currency.currencyCode))
+                    }
                     MenuItem(
-                        symbol = currency.getSymbol(getLocaleFromCurrency(currency.currencyCode)),
+                        symbol = symbol,
                         text = currency.displayName.capitalizeWords(),
                         onClick = { onCurrencySelected(currency.currencyCode) }
                     )
@@ -101,11 +106,7 @@ fun CurrencySheet(
     ) {
         GridSheetDialog(
             modifier = modifier,
-            icon = when (currencyCode) {
-                "EUR" -> R.drawable.ic_euro_filled
-                "USD" -> R.drawable.ic_attach_money_filled
-                else -> R.drawable.ic_attach_money_filled
-            },
+            icon = getCurrencyIcon(currencyCode),
             title = stringResource(id = R.string.currency),
             label = stringResource(id = R.string.select),
             rowSize = 3,

@@ -154,11 +154,11 @@ fun String.capitalizeWords(): String = lowercase().split(" ").joinToString(" ") 
 fun getLocaleFromCurrency(currencyCode: String): Locale {
     val countryCode = currencyCode.take(2)
 
-    if (currencyCode.equals("EUR", ignoreCase = true)) {
-        return Locale.GERMANY // Default European locale for EUR
+    return when (currencyCode) {
+        "EUR" -> Locale.GERMANY
+        "FRF" -> Locale.FRANCE
+        else -> Locale.getAvailableLocales().firstOrNull { locale ->
+            locale.country.equals(countryCode, ignoreCase = true)
+        } ?: Locale.US
     }
-
-    return Locale.getAvailableLocales().firstOrNull { locale ->
-        locale.country.equals(countryCode, ignoreCase = true)
-    } ?: Locale.US // Fallback to country-only locale
 }

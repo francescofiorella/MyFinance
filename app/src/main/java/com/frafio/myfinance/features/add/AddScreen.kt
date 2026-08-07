@@ -80,6 +80,7 @@ import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.getCategoryIcon
+import com.frafio.myfinance.core.utils.getCurrencyIcon
 import com.frafio.myfinance.features.expenses.components.CategorySheet
 import com.frafio.myfinance.features.expenses.components.LabelsSheet
 import java.time.LocalDate
@@ -715,13 +716,7 @@ fun AmountField(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                painter = painterResource(
-                    id = when (currencyCode) {
-                        "EUR" -> R.drawable.ic_euro_filled
-                        "USD" -> R.drawable.ic_attach_money_filled
-                        else -> R.drawable.ic_attach_money_filled
-                    }
-                ),
+                painter = painterResource(id = getCurrencyIcon(currencyCode)),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )

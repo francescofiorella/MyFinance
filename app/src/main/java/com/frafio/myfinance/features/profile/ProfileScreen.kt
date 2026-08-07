@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.User
 import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.core.utils.getCurrencyIcon
 import com.frafio.myfinance.features.profile.components.CurrencySheet
 import com.frafio.myfinance.features.profile.components.EditFullNameSheet
 import kotlinx.coroutines.flow.collectLatest
@@ -573,11 +574,7 @@ private fun ProfileCards(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = when (currencyCode) {
-                        "EUR" -> R.drawable.ic_euro_filled
-                        "USD" -> R.drawable.ic_attach_money_filled
-                        else -> R.drawable.ic_attach_money_filled
-                    }),
+                    painter = painterResource(id = getCurrencyIcon(currencyCode)),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
