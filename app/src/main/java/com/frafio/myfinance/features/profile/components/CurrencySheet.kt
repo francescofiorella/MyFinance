@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,8 +40,6 @@ fun CurrencySheet(
 ) {
     var showAll by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
-
-    val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
 
     LaunchedEffect(show) {
         if (!show) {
@@ -101,8 +97,7 @@ fun CurrencySheet(
 
     AdaptiveSheet(
         show = show,
-        onDismiss = onDismiss,
-        sheetState = sheetState
+        onDismiss = onDismiss
     ) {
         GridSheetDialog(
             modifier = modifier,
