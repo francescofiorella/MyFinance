@@ -6,6 +6,7 @@ object FirestoreEnums {
     enum class FIELDS(val value: String) {
         PURCHASES("purchases"),
         MONTHLY_BUDGET("monthly_budget"),
+        CURRENCY_CODE("currencyCode"),
         PAYMENTS("payments"),
         INCOMES("incomes"),
         NAME("name"),

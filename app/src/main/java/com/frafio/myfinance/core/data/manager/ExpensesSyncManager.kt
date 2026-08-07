@@ -79,6 +79,22 @@ class ExpensesSyncManager @Inject constructor(
         }
     }
 
+    suspend fun setCurrencyCode(currencyCode: String): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
+        return@withContext try {
+            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(email)
+                .set(
+                    hashMapOf(FirestoreEnums.FIELDS.CURRENCY_CODE.value to currencyCode),
+                    SetOptions.merge()
+                ).await()
+            userPreferencesRepository.updateCurrencyCode(currencyCode)
+            FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
+        } catch (_: Exception) {
+            FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
+        }
+    }
+
     suspend fun setLabels(
         labels: List<String>,
         successCode: FinanceCode = FinanceCode.LABELS_UPDATE_SUCCESS
@@ -210,6 +226,9 @@ class ExpensesSyncManager @Inject constructor(
                             val budget = snapshot.data?.get(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value)
                                 .toString().toDoubleOrNull() ?: 0.0
                             userPreferencesRepository.updateMonthlyBudget(budget)
+
+                            val currencyCode = snapshot.data?.get(FirestoreEnums.FIELDS.CURRENCY_CODE.value) as? String ?: "EUR"
+                            userPreferencesRepository.updateCurrencyCode(currencyCode)
 
                             val labelsValue = snapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
                             val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()

@@ -1,7 +1,8 @@
 package com.frafio.myfinance.core.utils
 
-import com.frafio.myfinance.R
-import com.frafio.myfinance.app.Strings
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import java.sql.Timestamp
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -11,8 +12,11 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.TextStyle
+import java.util.Currency
 import java.util.Locale
 import kotlin.math.round
+
+var activeCurrencyCode by mutableStateOf("EUR")
 
 fun doubleToString(double: Double): String {
     val locale = Locale.UK
@@ -33,11 +37,15 @@ fun doubleToStringWithoutDecimals(double: Double): String {
 }
 
 fun doubleToPrice(double: Double): String {
-    return "${Strings.get(R.string.currency)} ${doubleToString(double)}" // € edited to $
+    val currency = Currency.getInstance(activeCurrencyCode)
+    val symbol = currency.getSymbol(getLocaleFromCurrency(activeCurrencyCode))
+    return "$symbol ${doubleToString(double)}"
 }
 
 fun doubleToPriceWithoutDecimals(double: Double): String {
-    return "${Strings.get(R.string.currency)} ${doubleToStringWithoutDecimals(double)}" // € edited to $
+    val currency = Currency.getInstance(activeCurrencyCode)
+    val symbol = currency.getSymbol(getLocaleFromCurrency(activeCurrencyCode))
+    return "$symbol ${doubleToStringWithoutDecimals(double)}"
 }
 
 fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?): String? {
@@ -91,7 +99,8 @@ fun dateToExtendedString(date: LocalDate?): String? {
     var formattedDate: String? = null
     date?.let {
         val locale = Locale.getDefault()
-        val dayString = if (date.dayOfMonth < 10) "0${date.dayOfMonth}" else date.dayOfMonth.toString()
+        val dayString =
+            if (date.dayOfMonth < 10) "0${date.dayOfMonth}" else date.dayOfMonth.toString()
         val monthString = date.month.getDisplayName(TextStyle.SHORT, locale)
             .replaceFirstChar { it.uppercase() }
         formattedDate = "$dayString $monthString ${date.year}"
@@ -99,6 +108,7 @@ fun dateToExtendedString(date: LocalDate?): String? {
 
     return formattedDate
 }
+
 @Suppress("UNUSED")
 fun timeToString(hour: Int?, minute: Int?): String? {
     var formattedTime: String? = null
@@ -135,4 +145,20 @@ fun dateToUTCTimestamp(year: Int, month: Int, day: Int): Long {
 fun dateToUTCTimestamp(date: LocalDate): Long {
     val instant = date.atStartOfDay().toInstant(ZoneOffset.UTC)
     return Timestamp.from(instant).time
+}
+
+fun String.capitalizeWords(): String = lowercase().split(" ").joinToString(" ") { word ->
+    word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+}
+
+fun getLocaleFromCurrency(currencyCode: String): Locale {
+    val countryCode = currencyCode.take(2)
+
+    if (currencyCode.equals("EUR", ignoreCase = true)) {
+        return Locale.GERMANY // Default European locale for EUR
+    }
+
+    return Locale.getAvailableLocales().firstOrNull { locale ->
+        locale.country.equals(countryCode, ignoreCase = true)
+    } ?: Locale.US // Fallback to country-only locale
 }

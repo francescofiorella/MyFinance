@@ -40,6 +40,7 @@ import com.frafio.myfinance.core.navigation.LocalSnackbarHostState
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.core.utils.activeCurrencyCode
 import com.frafio.myfinance.core.utils.dateToExtendedString
 import com.frafio.myfinance.features.add.navigation.addEntry
 import com.frafio.myfinance.features.auth.navigation.authEntry
@@ -79,6 +80,12 @@ class MainActivity : ComponentActivity() {
             val userPreferences by viewModel.userPreferences.collectAsStateWithLifecycle()
             val useDynamicColor = userPreferences?.dynamicColor ?: false
             val isLoading by loadingRepository.isLoading.collectAsStateWithLifecycle()
+
+            LaunchedEffect(userPreferences?.currencyCode) {
+                userPreferences?.currencyCode?.let {
+                    activeCurrencyCode = it
+                }
+            }
 
             MyFinanceTheme(dynamicColor = useDynamicColor) {
                 val appState = rememberMyFinanceAppState()

@@ -113,4 +113,15 @@ class ProfileViewModel @Inject constructor(
             expensesRepository.setDynamicColorActive(active)
         }
     }
+
+    fun setCurrencyCode(currencyCode: String) {
+        viewModelScope.launch {
+            try {
+                loadingRepository.startLoading()
+                expensesRepository.setCurrencyCode(currencyCode)
+            } finally {
+                loadingRepository.stopLoading()
+            }
+        }
+    }
 }

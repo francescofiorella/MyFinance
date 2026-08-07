@@ -2,6 +2,7 @@ package com.frafio.myfinance.features.expenses.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,6 +17,7 @@ import com.frafio.myfinance.core.components.GridSheetDialog
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.getCategoryIcon
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategorySheet(
     show: Boolean,

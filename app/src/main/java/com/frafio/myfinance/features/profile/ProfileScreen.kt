@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.User
 import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.features.profile.components.CurrencySheet
 import com.frafio.myfinance.features.profile.components.EditFullNameSheet
 import kotlinx.coroutines.flow.collectLatest
 
@@ -78,10 +79,14 @@ fun ProfileScreen(
     val profilePicture = profilePictureState ?: lastProfilePicture
     val googleSignIn = user?.provider == User.GOOGLE_PROVIDER
 
+    val userPreferences by viewModel.userPreferences.collectAsStateWithLifecycle()
     val isDynamicColorChecked by viewModel.isSwitchDynamicColorChecked.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
+    val currencyCode = userPreferences?.currencyCode ?: "EUR"
+
     var showEditFullNameSheet by remember { mutableStateOf(false) }
+    var showCurrencySheet by remember { mutableStateOf(false) }
 
     EditFullNameSheet(
         show = showEditFullNameSheet,
@@ -92,6 +97,16 @@ fun ProfileScreen(
             }
         },
         onEditFullName = { viewModel.editFullName(it) }
+    )
+
+    CurrencySheet(
+        show = showCurrencySheet,
+        onDismiss = { showCurrencySheet = false },
+        onCurrencySelected = {
+            viewModel.setCurrencyCode(it)
+            showCurrencySheet = false
+        },
+        currencyCode = currencyCode
     )
 
     LaunchedEffect(viewModel.scrollToTop) {
@@ -112,7 +127,9 @@ fun ProfileScreen(
         onUploadProPic = onUploadProPic,
         onEditFullName = { showEditFullNameSheet = true },
         onDynamicColorChanged = { viewModel.setDynamicColor(it) },
-        onManageLabels = onManageLabels
+        onManageLabels = onManageLabels,
+        onSelectCurrency = { showCurrencySheet = true },
+        currencyCode = currencyCode
     )
 }
 
@@ -129,7 +146,9 @@ private fun ProfileContent(
     onUploadProPic: () -> Unit,
     onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
-    onManageLabels: () -> Unit
+    onManageLabels: () -> Unit,
+    onSelectCurrency: () -> Unit,
+    currencyCode: String
 ) {
     Column(
         modifier = modifier
@@ -152,7 +171,9 @@ private fun ProfileContent(
             onUploadProPic = onUploadProPic,
             onEditFullName = onEditFullName,
             onDynamicColorChanged = onDynamicColorChanged,
-            onManageLabels = onManageLabels
+            onManageLabels = onManageLabels,
+            onSelectCurrency = onSelectCurrency,
+            currencyCode = currencyCode
         )
     }
 }
@@ -203,7 +224,9 @@ private fun ProfileCards(
     onUploadProPic: () -> Unit,
     onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
-    onManageLabels: () -> Unit
+    onManageLabels: () -> Unit,
+    onSelectCurrency: () -> Unit,
+    currencyCode: String
 ) {
     val colors = ListItemDefaults.colors(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
@@ -482,7 +505,7 @@ private fun ProfileCards(
         color = MaterialTheme.colorScheme.onSurface
     )
 
-    val myFinanceItemCount = (if (isDynamicColorAvailable) 1 else 0) + 2
+    val myFinanceItemCount = (if (isDynamicColorAvailable) 1 else 0) + 3
 
     SegmentedListItem(
         onClick = onManageLabels,
@@ -533,12 +556,65 @@ private fun ProfileCards(
             .padding(bottom = 2.dp),
     )
 
+    SegmentedListItem(
+        onClick = onSelectCurrency,
+        colors = colors,
+        shapes = ListItemDefaults.segmentedShapes(
+            index = 1,
+            count = myFinanceItemCount,
+            defaultShapes = ListItemDefaults.shapes()
+        ),
+        leadingContent = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = when (currencyCode) {
+                        "EUR" -> R.drawable.ic_euro_filled
+                        "USD" -> R.drawable.ic_attach_money_filled
+                        else -> R.drawable.ic_attach_money_filled
+                    }),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+        },
+        content = {
+            Text(
+                text = stringResource(id = R.string.change_currency),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        trailingContent = {
+            Box(
+                modifier = Modifier
+                    .width(32.dp)
+                    .height(40.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
+                    contentDescription = null,
+                )
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 2.dp),
+    )
+
     if (isDynamicColorAvailable) {
         SegmentedListItem(
             onClick = {},
             colors = colors,
             shapes = ListItemDefaults.segmentedShapes(
-                index = 1,
+                index = 2,
                 count = myFinanceItemCount,
                 defaultShapes = ListItemDefaults.shapes()
             ),
@@ -581,7 +657,7 @@ private fun ProfileCards(
         onClick = {},
         colors = colors,
         shapes = ListItemDefaults.segmentedShapes(
-            index = if (isDynamicColorAvailable) 2 else 1,
+            index = if (isDynamicColorAvailable) 3 else 2,
             count = myFinanceItemCount,
             defaultShapes = ListItemDefaults.shapes()
         ),
@@ -630,14 +706,16 @@ fun ProfilePreview() {
             ),
             profilePicture = null,
             googleSignIn = true,
-            versionName = "1.0.0",
+            versionName = "MyFinance 1.0.0",
             isDynamicColorAvailable = true,
             isDynamicColorChecked = false,
             scrollState = rememberScrollState(),
             onUploadProPic = {},
             onEditFullName = {},
             onDynamicColorChanged = {},
-            onManageLabels = {}
+            onManageLabels = {},
+            onSelectCurrency = {},
+            currencyCode = "EUR"
         )
     }
 }

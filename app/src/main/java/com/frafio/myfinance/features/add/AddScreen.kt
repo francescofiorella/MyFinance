@@ -95,6 +95,7 @@ fun AddScreen(
 
     val isAdding by viewModel.isAdding.collectAsStateWithLifecycle()
     val allLabels by viewModel.allLabels.collectAsStateWithLifecycle()
+    val currencyCode by viewModel.currencyCode.collectAsStateWithLifecycle()
 
     var showCategorySheet by rememberSaveable { mutableStateOf(false) }
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
@@ -142,7 +143,8 @@ fun AddScreen(
         onBackClick = onBackClick,
         nameError = viewModel.nameError,
         priceError = viewModel.priceError,
-        categoryError = viewModel.categoryError
+        categoryError = viewModel.categoryError,
+        currencyCode = currencyCode
     )
 
     CategorySheet(
@@ -218,7 +220,8 @@ fun AddScreen(
     onBackClick: () -> Unit,
     nameError: String? = null,
     priceError: String? = null,
-    categoryError: String? = null
+    categoryError: String? = null,
+    currencyCode: String = "EUR"
 ) {
     var isTypeSelectionVisible by remember { mutableStateOf(false) }
 
@@ -277,7 +280,8 @@ fun AddScreen(
                         categoryError = categoryError,
                         isAdding = isAdding,
                         navKey = navKey,
-                        onSaveClick = onSaveClick
+                        onSaveClick = onSaveClick,
+                        currencyCode = currencyCode
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -603,7 +607,8 @@ fun TransactionForm(
     categoryError: String?,
     isAdding: Boolean,
     navKey: RootKey.AddEditTransaction,
-    onSaveClick: () -> Unit
+    onSaveClick: () -> Unit,
+    currencyCode: String
 ) {
     val colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     val categories = stringArrayResource(id = R.array.categories)
@@ -623,7 +628,8 @@ fun TransactionForm(
                     onPriceChange = onPriceChange,
                     priceError = priceError,
                     isAdding = isAdding,
-                    onSaveClick = onSaveClick
+                    onSaveClick = onSaveClick,
+                    currencyCode = currencyCode
                 )
             },
             modifier = Modifier
@@ -691,10 +697,10 @@ fun AmountField(
     onPriceChange: (String) -> Unit,
     priceError: String?,
     isAdding: Boolean,
-    onSaveClick: () -> Unit
+    onSaveClick: () -> Unit,
+    currencyCode: String
 ) {
     val focusManager = LocalFocusManager.current
-    val currency = stringResource(id = R.string.currency)
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -710,10 +716,10 @@ fun AmountField(
         ) {
             Icon(
                 painter = painterResource(
-                    id = when (currency) {
-                        "$" -> R.drawable.ic_attach_money_filled
-                        "€" -> R.drawable.ic_euro_filled
-                        else -> R.drawable.ic_euro_filled
+                    id = when (currencyCode) {
+                        "EUR" -> R.drawable.ic_euro_filled
+                        "USD" -> R.drawable.ic_attach_money_filled
+                        else -> R.drawable.ic_attach_money_filled
                     }
                 ),
                 contentDescription = null,

@@ -1,6 +1,7 @@
 package com.frafio.myfinance.core.components
 
 import androidx.compose.foundation.background
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -12,6 +13,7 @@ import com.frafio.myfinance.core.data.model.Transaction
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.getCategoryIcon
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTransactionSheet(
     show: Boolean,

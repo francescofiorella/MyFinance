@@ -19,6 +19,19 @@ val GoogleSansFlexFamily = FontFamily(
     )
 )
 
+val GoogleSansFlexRoundFamily = FontFamily(
+    Font(
+        resId = R.font.google_sans_flex,
+        variationSettings = FontVariation.Settings(
+            FontVariation.weight(400),
+            FontVariation.grade(0),
+            FontVariation.slant(0f),
+            FontVariation.width(100f),
+            FontVariation.Setting(name = "ROND", value = 100f)
+        )
+    )
+)
+
 val GoogleSansFlexEmphasizedFamily = FontFamily(
     Font(
         resId = R.font.google_sans_flex,

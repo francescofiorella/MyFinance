@@ -32,6 +32,7 @@ class UserPreferencesRepository @Inject constructor(
     private object PreferencesKeys {
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
         val MONTHLY_BUDGET = floatPreferencesKey("monthly_budget")
+        val CURRENCY_CODE = stringPreferencesKey("currencyCode")
         val LABELS = stringSetPreferencesKey("labels")
         val USER_FULL_NAME = stringPreferencesKey("user_full_name")
         val USER_EMAIL = stringPreferencesKey("user_email")
@@ -58,6 +59,7 @@ class UserPreferencesRepository @Inject constructor(
         .map { preferences ->
             val dynamicColor = preferences[PreferencesKeys.DYNAMIC_COLOR] ?: true
             val monthlyBudget = preferences[PreferencesKeys.MONTHLY_BUDGET]?.toDouble() ?: 0.0
+            val currencyCode = preferences[PreferencesKeys.CURRENCY_CODE] ?: "EUR"
             val labels = preferences[PreferencesKeys.LABELS]?.toList()?.sorted() ?: emptyList()
             val lastExpensesSync = preferences[PreferencesKeys.LAST_EXPENSES_SYNC] ?: 0L
             val lastIncomesSync = preferences[PreferencesKeys.LAST_INCOMES_SYNC] ?: 0L
@@ -81,6 +83,7 @@ class UserPreferencesRepository @Inject constructor(
             UserPreferencesData(
                 dynamicColor,
                 monthlyBudget,
+                currencyCode,
                 labels,
                 user,
                 lastExpensesSync,
@@ -95,6 +98,7 @@ class UserPreferencesRepository @Inject constructor(
             initialValue = UserPreferencesData(
                 dynamicColor = true,
                 monthlyBudget = 0.0,
+                currencyCode = "EUR",
                 labels = emptyList(),
                 user = null
             )
@@ -109,6 +113,12 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun updateMonthlyBudget(budget: Double) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.MONTHLY_BUDGET] = budget.toFloat()
+        }
+    }
+
+    suspend fun updateCurrencyCode(currencyCode: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.CURRENCY_CODE] = currencyCode
         }
     }
 
@@ -181,6 +191,7 @@ class UserPreferencesRepository @Inject constructor(
 data class UserPreferencesData(
     val dynamicColor: Boolean,
     val monthlyBudget: Double,
+    val currencyCode: String,
     val labels: List<String>,
     val user: User?,
     val lastExpensesSync: Long = 0L,

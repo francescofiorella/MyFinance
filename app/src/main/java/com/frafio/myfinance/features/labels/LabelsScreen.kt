@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -112,82 +113,81 @@ fun LabelsContent(
         snackbarHost = snackbarHost,
         containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp, horizontal = 16.dp),
-                    contentAlignment = Alignment.Center
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp, horizontal = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                FilledTonalIconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    shapes = IconButtonDefaults.shapes(),
                 ) {
-                    FilledTonalIconButton(
-                        onClick = onBackClick,
-                        modifier = Modifier.align(Alignment.CenterStart),
-                        colors = IconButtonDefaults.filledTonalIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        shapes = IconButtonDefaults.shapes(),
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
-                            contentDescription = stringResource(id = R.string.back_arrow),
-                        )
-                    }
-
-                    Text(
-                        text = stringResource(id = R.string.labels),
-                        style = MaterialTheme.typography.titleLarge,
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
+                        contentDescription = stringResource(id = R.string.back_arrow),
                     )
                 }
-            }
-            item {
-                NewLabelItem(
-                    value = labelFieldValue,
-                    onValueChange = { labelFieldValue = it },
-                    isValid = isLabelValid,
-                    onConfirm = {
-                        onAddLabel(labelFieldValue.text.trim())
-                        labelFieldValue = TextFieldValue("")
-                        focusManager.clearFocus()
-                    },
-                    modifier = Modifier.padding(top = 16.dp)
+
+                Text(
+                    text = stringResource(id = R.string.labels),
+                    style = MaterialTheme.typography.titleLarge,
                 )
             }
 
-            itemsIndexed(
-                items = allLabels,
-                key = { _, label -> label }
-            ) { index, label ->
-                LabelItem(
-                    label = label,
-                    isEditing = editingLabel == label,
-                    editLabelValue = editLabelFieldValue,
-                    onEditLabelValueChange = { editLabelFieldValue = it },
-                    onEditClick = {
-                        editLabelFieldValue = TextFieldValue(
-                            text = label,
-                            selection = TextRange(label.length)
-                        )
-                        editingLabel = label
-                    },
-                    onDeleteClick = { onDeleteLabel(label) },
-                    onConfirmEdit = {
-                        onEditLabel(label, editLabelFieldValue.text.trim())
-                        editingLabel = null
-                    },
-                    onCancelEdit = {
-                        editingLabel = null
-                        editLabelFieldValue = TextFieldValue(text = "")
-                    },
-                    focusRequester = focusRequester,
-                    index = index,
-                    count = allLabels.size
-                )
+            NewLabelItem(
+                value = labelFieldValue,
+                onValueChange = { labelFieldValue = it },
+                isValid = isLabelValid,
+                onConfirm = {
+                    onAddLabel(labelFieldValue.text.trim())
+                    labelFieldValue = TextFieldValue("")
+                    focusManager.clearFocus()
+                },
+                modifier = Modifier.padding(top = 16.dp)
+            )
+
+            LazyColumn {
+                itemsIndexed(
+                    items = allLabels,
+                    key = { _, label -> label }
+                ) { index, label ->
+                    LabelItem(
+                        label = label,
+                        isEditing = editingLabel == label,
+                        editLabelValue = editLabelFieldValue,
+                        onEditLabelValueChange = { editLabelFieldValue = it },
+                        onEditClick = {
+                            editLabelFieldValue = TextFieldValue(
+                                text = label,
+                                selection = TextRange(label.length)
+                            )
+                            editingLabel = label
+                        },
+                        onDeleteClick = { onDeleteLabel(label) },
+                        onConfirmEdit = {
+                            onEditLabel(label, editLabelFieldValue.text.trim())
+                            editingLabel = null
+                        },
+                        onCancelEdit = {
+                            editingLabel = null
+                            editLabelFieldValue = TextFieldValue(text = "")
+                        },
+                        focusRequester = focusRequester,
+                        index = index,
+                        count = allLabels.size
+                    )
+                }
             }
         }
     }

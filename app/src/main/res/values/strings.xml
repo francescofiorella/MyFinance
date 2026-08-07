@@ -63,7 +63,9 @@
     <string name="sign_up_provider">Signed up with Google</string>
     <string name="signUpDate">Account created in %1$s</string>
 
-    <string name="currency" translatable="false">€</string>
+    <string name="change_currency">Change currency</string>
+    <string name="currency">Currency</string>
+    <string name="show_all_currencies">Show all currencies</string>
 
     <string name="your_profile">Your profile</string>
     <string name="your_name">Your name</string>

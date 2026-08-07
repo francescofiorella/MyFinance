@@ -36,6 +36,10 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
         return expensesManager.setMonthlyBudget(budget)
     }
 
+    suspend fun setCurrencyCode(currencyCode: String): FinanceResult {
+        return expensesManager.setCurrencyCode(currencyCode)
+    }
+
     suspend fun addLabel(label: String): FinanceResult {
         return expensesManager.addLabel(label)
     }

@@ -316,11 +316,7 @@ private fun BudgetOverview(
             .padding(top = 48.dp, bottom = 64.dp)
     ) {
         Text(
-            text = stringResource(R.string.currency) + " "
-                    + doubleToPrice(monthlyBudget).replace(
-                stringResource(R.string.currency),
-                ""
-            ).trim(),
+            text = doubleToPrice(monthlyBudget),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.onSurface,

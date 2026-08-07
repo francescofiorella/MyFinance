@@ -94,6 +94,10 @@
     <string name="miscellaneous">Varie</string>
 
     <string name="select">Seleziona</string>
+    <string name="change_currency">Cambia valuta</string>
+    <string name="currency">Valuta</string>
+    <string name="show_all_currencies">Mostra tutte le valute</string>
+
     <string name="expense">Spesa</string>
     <string name="income">Entrata</string>
     <string name="save">Salva</string>

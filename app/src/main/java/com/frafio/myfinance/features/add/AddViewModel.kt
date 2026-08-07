@@ -88,6 +88,10 @@ class AddViewModel @AssistedInject constructor(
         .map { it.labels }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value.labels)
 
+    val currencyCode: StateFlow<String> = userPreferencesRepository.userPreferencesFlow
+        .map { it.currencyCode }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value.currencyCode)
+
     fun onLabelCheckedChanged(label: String, checked: Boolean) {
         if (checked) {
             if (!labels.contains(label)) labels = labels + label
