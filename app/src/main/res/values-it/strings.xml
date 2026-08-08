@@ -46,7 +46,8 @@
     <string name="password">Password</string>
 
     <string name="warning_home">Aggiungi la tua prima spesa!</string>
-    <string name="warning_budget">Nessuna entrata da mostrare</string>
+    <string name="warning_budget">Aggiungi la tua prima entrata!</string>
+    <string name="warning_labels">Aggiungi la tua prima etichetta!</string>
 
     <string name="expenses_today">Spese oggi</string>
     <string name="expenses_budget">Spesa su budget</string>

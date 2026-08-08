@@ -1,6 +1,8 @@
 package com.frafio.myfinance.core.components
 
 import android.content.res.Configuration
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,76 +35,90 @@ import com.frafio.myfinance.core.theme.MyFinanceTheme
 @Composable
 fun EmptyView(
     modifier: Modifier = Modifier,
-    imageResLight: Int?,
-    imageResDark: Int?,
-    messageRes: Int
+    @DrawableRes image: Int? = null,
+    @DrawableRes imageDark: Int? = null,
+    @StringRes message: Int,
+    contentAlignment: Alignment = Alignment.Center
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val configuration = LocalConfiguration.current
 
-    if (imageResLight == null || imageResDark == null) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
+    Box(
+        modifier = modifier,
+        contentAlignment = contentAlignment
+    ) {
+        if (image == null && !isDarkTheme || image == null && imageDark == null) {
             Text(
-                text = stringResource(messageRes),
+                text = stringResource(message),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
             )
+            return
         }
-        return
+
+        val imageRes = if (isDarkTheme && imageDark != null) imageDark else image!!
+
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(imageRes),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth(0.3f)
+                        .aspectRatio(1f)
+                )
+                Spacer(modifier = Modifier.width(32.dp))
+                Text(
+                    text = stringResource(message),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Start,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.widthIn(max = 400.dp)
+                )
+            }
+        } else {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(imageRes),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth(0.6f)
+                        .aspectRatio(1f)
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = stringResource(message),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(horizontal = 32.dp)
+                )
+            }
+        }
     }
+}
 
-    val imageRes = if (isDarkTheme) imageResDark else imageResLight
-
-    if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        Row(
-            modifier = modifier.fillMaxSize().padding(horizontal = 32.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Image(
-                painter = painterResource(imageRes),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxHeight(0.7f)
-                    .aspectRatio(1f)
-            )
-            Spacer(modifier = Modifier.width(32.dp))
-            Text(
-                text = stringResource(messageRes),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Start,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.widthIn(max = 400.dp)
-            )
-        }
-    } else {
-        Column(
-            modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(imageRes),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .aspectRatio(1f)
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(
-                text = stringResource(messageRes),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(horizontal = 32.dp)
-            )
-        }
+@Preview(showBackground = true)
+@Composable
+fun EmptyViewNoImagePreview() {
+    MyFinanceTheme {
+        EmptyView(
+            modifier = Modifier.fillMaxSize(),
+            image = null,
+            imageDark = null,
+            message = R.string.warning_home,
+            contentAlignment = Alignment.Center
+        )
     }
 }
 
@@ -112,9 +127,11 @@ fun EmptyView(
 fun EmptyViewPreview() {
     MyFinanceTheme {
         EmptyView(
-            imageResLight = R.drawable.image_audit_pana,
-            imageResDark = R.drawable.image_shared_goals_amico,
-            messageRes = R.string.warning_home
+            modifier = Modifier.fillMaxSize(),
+            image = R.drawable.image_consulting_cuate,
+            imageDark = R.drawable.image_investment_data_cuate,
+            message = R.string.warning_home,
+            contentAlignment = Alignment.Center
         )
     }
 }
@@ -124,22 +141,11 @@ fun EmptyViewPreview() {
 fun EmptyViewLandscapePreview() {
     MyFinanceTheme {
         EmptyView(
-            imageResLight = R.drawable.image_audit_pana,
-            imageResDark = R.drawable.image_shared_goals_amico,
-            messageRes = R.string.warning_home
-        )
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun EmptyViewNoImagePreview() {
-    MyFinanceTheme {
-        EmptyView(
-            imageResLight = null,
-            imageResDark = null,
-            messageRes = R.string.warning_home
+            modifier = Modifier.fillMaxSize(),
+            image = R.drawable.image_consulting_cuate,
+            imageDark = R.drawable.image_investment_data_cuate,
+            message = R.string.warning_home,
+            contentAlignment = Alignment.Center
         )
     }
 }

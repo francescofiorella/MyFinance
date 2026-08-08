@@ -44,9 +44,10 @@ fun DashboardScreen(
     Box(modifier = modifier.fillMaxSize()) {
         when (isListEmpty) {
             true -> EmptyView(
-                imageResLight = R.drawable.image_audit_amico,
-                imageResDark = R.drawable.image_late_at_night_amico,
-                messageRes = R.string.warning_home
+                modifier = Modifier.fillMaxSize(),
+                image = R.drawable.image_investment_data_cuate,
+                imageDark = R.drawable.image_investment_data_cuate,
+                message = R.string.warning_home
             )
 
             false -> {
@@ -181,7 +182,7 @@ fun DashboardPreview() {
 }
 
 @Composable
-fun DashboardContent(
+private fun DashboardContent(
     monthShown: Boolean,
     thisMonthSum: Double,
     thisYearSum: Double,

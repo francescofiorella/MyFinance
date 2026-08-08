@@ -3,7 +3,6 @@ package com.frafio.myfinance.features.budget
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,8 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -26,7 +23,6 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,22 +33,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
-import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.components.EditTransactionSheet
 import com.frafio.myfinance.core.components.EmptyListItem
 import com.frafio.myfinance.core.components.EmptyView
 import com.frafio.myfinance.core.components.TotalItem
 import com.frafio.myfinance.core.components.TransactionListItem
+import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
+import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.features.budget.components.EditBudgetSheet
@@ -191,78 +186,41 @@ fun BudgetContent(
         }
     }
 
-    when (isIncomesEmpty) {
-        true -> {
-            BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-                val minHeight = maxHeight
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Layout(
-                        content = {
-                            Column {
-                                BudgetOverview(
-                                    monthlyBudget = monthlyBudget,
-                                    annualBudget = annualBudget,
-                                    onEditBudgetClick = onEditBudgetClick,
-                                    onDeleteBudget = onDeleteBudget
-                                )
-                                SectionHeader(title = stringResource(R.string.incomes))
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 64.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                EmptyView(
-                                    imageResLight = null,
-                                    imageResDark = null,
-                                    messageRes = R.string.warning_budget
-                                )
-                            }
-                        }
-                    ) { measurables, constraints ->
-                        val topPlaceable = measurables[0].measure(constraints.copy(minHeight = 0))
-                        val remainingHeight =
-                            (minHeight.roundToPx() - topPlaceable.height).coerceAtLeast(0)
-
-                        val emptyPlaceable = measurables[1].measure(
-                            constraints.copy(
-                                minHeight = remainingHeight,
-                                maxHeight = Constraints.Infinity
-                            )
-                        )
-
-                        layout(constraints.maxWidth, topPlaceable.height + emptyPlaceable.height) {
-                            topPlaceable.placeRelative(0, 0)
-                            emptyPlaceable.placeRelative(0, topPlaceable.height)
-                        }
-                    }
-                }
-            }
+    if (isIncomesEmpty == null) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingIndicator()
         }
+    } else {
+        LazyColumn(
+            state = listState,
+            modifier = modifier.fillMaxSize()
+        ) {
+            item {
+                BudgetOverview(
+                    monthlyBudget = monthlyBudget,
+                    annualBudget = annualBudget,
+                    onEditBudgetClick = onEditBudgetClick,
+                    onDeleteBudget = onDeleteBudget
+                )
+            }
 
-        false -> {
-            LazyColumn(
-                state = listState,
-                modifier = modifier.fillMaxSize()
-            ) {
+            item {
+                SectionHeader(title = stringResource(R.string.incomes))
+            }
+
+            if (isIncomesEmpty) {
                 item {
-                    BudgetOverview(
-                        monthlyBudget = monthlyBudget,
-                        annualBudget = annualBudget,
-                        onEditBudgetClick = onEditBudgetClick,
-                        onDeleteBudget = onDeleteBudget
+                    EmptyView(
+                        modifier = Modifier.fillMaxWidth(),
+                        image = R.drawable.image_savings_cuate,
+                        message = R.string.warning_budget,
+                        contentAlignment = Alignment.TopCenter
                     )
                 }
-
-                item {
-                    SectionHeader(title = stringResource(R.string.incomes))
-                }
-
+            } else {
                 itemsIndexed(
                     items = incomes,
                     key = { _, income -> income.id },
@@ -285,15 +243,6 @@ fun BudgetContent(
                 item {
                     Spacer(modifier = Modifier.height(112.dp)) // Floating Action Button space
                 }
-            }
-        }
-
-        null -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                LoadingIndicator()
             }
         }
     }

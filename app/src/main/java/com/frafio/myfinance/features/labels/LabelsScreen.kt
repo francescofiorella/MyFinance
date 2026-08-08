@@ -59,6 +59,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.EmptyView
 import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -98,6 +99,8 @@ fun LabelsContent(
     var editingLabel by remember { mutableStateOf<String?>(null) }
     var editLabelFieldValue by remember { mutableStateOf(TextFieldValue(text = "")) }
     val focusRequester = remember { FocusRequester() }
+
+    val isLabelsEmpty = allLabels.isEmpty()
 
     LaunchedEffect(editingLabel) {
         if (editingLabel != null) {
@@ -158,37 +161,45 @@ fun LabelsContent(
                 modifier = Modifier.padding(top = 16.dp)
             )
 
-            LazyColumn {
-                itemsIndexed(
-                    items = allLabels,
-                    key = { _, label -> label }
-                ) { index, label ->
-                    LabelItem(
-                        label = label,
-                        allLabels = allLabels,
-                        isEditing = editingLabel == label,
-                        editLabelValue = editLabelFieldValue,
-                        onEditLabelValueChange = { editLabelFieldValue = it },
-                        onEditClick = {
-                            editLabelFieldValue = TextFieldValue(
-                                text = label,
-                                selection = TextRange(label.length)
-                            )
-                            editingLabel = label
-                        },
-                        onDeleteClick = { onDeleteLabel(label) },
-                        onConfirmEdit = {
-                            onEditLabel(label, editLabelFieldValue.text.trim())
-                            editingLabel = null
-                        },
-                        onCancelEdit = {
-                            editingLabel = null
-                            editLabelFieldValue = TextFieldValue(text = "")
-                        },
-                        focusRequester = focusRequester,
-                        index = index,
-                        count = allLabels.size
-                    )
+            if (isLabelsEmpty) {
+                EmptyView(
+                    modifier = Modifier.fillMaxSize(),
+                    image = R.drawable.image_file_searching_rafiki,
+                    message = R.string.warning_labels
+                )
+            } else {
+                LazyColumn {
+                    itemsIndexed(
+                        items = allLabels,
+                        key = { _, label -> label }
+                    ) { index, label ->
+                        LabelItem(
+                            label = label,
+                            allLabels = allLabels,
+                            isEditing = editingLabel == label,
+                            editLabelValue = editLabelFieldValue,
+                            onEditLabelValueChange = { editLabelFieldValue = it },
+                            onEditClick = {
+                                editLabelFieldValue = TextFieldValue(
+                                    text = label,
+                                    selection = TextRange(label.length)
+                                )
+                                editingLabel = label
+                            },
+                            onDeleteClick = { onDeleteLabel(label) },
+                            onConfirmEdit = {
+                                onEditLabel(label, editLabelFieldValue.text.trim())
+                                editingLabel = null
+                            },
+                            onCancelEdit = {
+                                editingLabel = null
+                                editLabelFieldValue = TextFieldValue(text = "")
+                            },
+                            focusRequester = focusRequester,
+                            index = index,
+                            count = allLabels.size
+                        )
+                    }
                 }
             }
         }
@@ -490,6 +501,21 @@ fun LabelsPreview() {
     MyFinanceTheme {
         LabelsContent(
             allLabels = listOf("Food", "Transport", "Rent", "Health", "Entertainment"),
+            onBackClick = {},
+            onAddLabel = {},
+            onDeleteLabel = {},
+            onEditLabel = { _, _ -> },
+            snackbarHost = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EmptyLabelsPreview() {
+    MyFinanceTheme {
+        LabelsContent(
+            allLabels = listOf(),
             onBackClick = {},
             onAddLabel = {},
             onDeleteLabel = {},

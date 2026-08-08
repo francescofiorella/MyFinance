@@ -260,9 +260,9 @@ fun ExpensesContent(
         when (isExpensesEmpty) {
             true -> {
                 EmptyView(
-                    imageResLight = R.drawable.image_audit_pana,
-                    imageResDark = R.drawable.image_shared_goals_amico,
-                    messageRes = R.string.warning_home
+                    modifier = Modifier.fillMaxSize(),
+                    image = R.drawable.image_consulting_cuate,
+                    message = R.string.warning_home
                 )
             }
 

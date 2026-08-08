@@ -187,7 +187,7 @@ private fun ProfileHeader(user: User?, profilePicture: Bitmap?) {
         } else {
             null
         }
-    } ?: painterResource(id = R.drawable.image_user)
+    } ?: painterResource(id = R.drawable.image_profile_interface_cuate)
     Image(
         painter = painter,
         contentDescription = stringResource(id = R.string.profile_picture),
