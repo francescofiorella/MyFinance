@@ -105,8 +105,9 @@ fun LabelsContent(
         }
     }
 
-    val isLabelValid =
-        labelFieldValue.text.isNotEmpty() && !allLabels.contains(labelFieldValue.text)
+    val isLabelValid = labelFieldValue.text.isNotEmpty() && allLabels.none {
+        it.equals(labelFieldValue.text, ignoreCase = true)
+    }
 
     Scaffold(
         modifier = modifier,
@@ -164,6 +165,7 @@ fun LabelsContent(
                 ) { index, label ->
                     LabelItem(
                         label = label,
+                        allLabels = allLabels,
                         isEditing = editingLabel == label,
                         editLabelValue = editLabelFieldValue,
                         onEditLabelValueChange = { editLabelFieldValue = it },
@@ -289,6 +291,7 @@ fun NewLabelItem(
 fun LabelItem(
     modifier: Modifier = Modifier,
     label: String,
+    allLabels: List<String>,
     isEditing: Boolean,
     editLabelValue: TextFieldValue,
     onEditLabelValueChange: (TextFieldValue) -> Unit,
@@ -427,12 +430,19 @@ fun LabelItem(
                 )
                 customItem(
                     {
+                        val isLabelValid = editLabelValue.text.isNotEmpty() && allLabels.none { existing ->
+                            if (existing == label) {
+                                existing == editLabelValue.text
+                            } else {
+                                existing.equals(editLabelValue.text, ignoreCase = true)
+                            }
+                        }
                         FilledIconButton(
                             modifier = Modifier
                                 .size(IconButtonDefaults.smallContainerSize())
                                 .animateWidth(secondInteractionSource),
                             onClick = if (isEditing) onConfirmEdit else onDeleteClick,
-                            enabled = !isEditing || (editLabelValue.text.isNotEmpty() && editLabelValue.text != label),
+                            enabled = !isEditing || isLabelValid,
                             shapes = IconButtonDefaults.shapes(
                                 shape = IconButtonDefaults.smallSquareShape,
                             ),
