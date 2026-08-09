@@ -62,19 +62,6 @@ class ProfileViewModel @Inject constructor(
         .map { it?.dynamicColor ?: false }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    fun uploadPropic() {
-        viewModelScope.launch {
-            try {
-                loadingRepository.startLoading()
-                val propicUri = ""
-                val response = userRepository.updatePropic(propicUri)
-                _uiEvents.emit(ProfileUiEvent.ShowSnackBar(response.message))
-            } finally {
-                loadingRepository.stopLoading()
-            }
-        }
-    }
-
     fun editFullName(fullName: String, notify: Boolean = true) {
         viewModelScope.launch {
             try {

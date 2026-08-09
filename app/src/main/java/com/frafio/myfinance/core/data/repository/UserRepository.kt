@@ -40,10 +40,6 @@ class UserRepository @Inject constructor(
         private val TAG = UserRepository::class.java.simpleName
     }
 
-    suspend fun updatePropic(propicUri: String): AuthResult {
-        return authManager.updatePropic(propicUri)
-    }
-
     suspend fun updateFullName(fullName: String): AuthResult {
         return authManager.updateFullName(fullName)
     }

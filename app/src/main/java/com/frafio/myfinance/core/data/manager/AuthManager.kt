@@ -14,7 +14,6 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.userProfileChangeRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import androidx.core.net.toUri
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
 import com.frafio.myfinance.core.data.enums.auth.SignupException
 import com.frafio.myfinance.core.data.mapper.toUser
@@ -46,23 +45,6 @@ class AuthManager @Inject constructor(
     // FirebaseUser
     private val fUser: FirebaseUser?
         get() = fAuth.currentUser
-
-    suspend fun updatePropic(propicUri: String): AuthResult = withContext(Dispatchers.IO) {
-        val profileUpdates = userProfileChangeRequest {
-            if (propicUri.isNotEmpty()) {
-                photoUri = propicUri.toUri()
-            }
-        }
-
-        return@withContext try {
-            fUser!!.updateProfile(profileUpdates).await()
-            userPreferencesRepository.updateUser(fUser!!.toUser())
-            AuthResult(AuthCode.USER_PROPIC_UPDATED)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error! ${e.localizedMessage}")
-            AuthResult(AuthCode.USER_PROPIC_NOT_UPDATED)
-        }
-    }
 
     suspend fun updateFullName(fullName: String): AuthResult = withContext(Dispatchers.IO) {
         val profileUpdates = userProfileChangeRequest {

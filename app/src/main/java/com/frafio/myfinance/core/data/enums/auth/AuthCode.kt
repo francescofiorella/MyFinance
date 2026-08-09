@@ -210,21 +210,5 @@ enum class AuthCode(val code: Int, val message: String) {
             Languages.ITALIANO.value -> "Aggiornamento nome utente non riuscito!"
             else -> "User full name not updated!" // english
         }
-    ),
-
-    USER_PROPIC_UPDATED(
-        104, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "User profile picture updated!"
-            Languages.ITALIANO.value -> "Foto profilo utente aggiornata!"
-            else -> "User profile picture updated!" // english
-        }
-    ),
-
-    USER_PROPIC_NOT_UPDATED(
-        105, when (getCurrentLanguage()) {
-            Languages.ENGLISH.value -> "User profile picture not updated!"
-            Languages.ITALIANO.value -> "Aggiornamento foto profilo utente non riuscito!"
-            else -> "User profile picture not updated!" // english
-        }
     )
 }

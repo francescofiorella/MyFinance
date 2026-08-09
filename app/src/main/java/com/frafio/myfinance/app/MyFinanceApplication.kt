@@ -1,7 +1,6 @@
 package com.frafio.myfinance.app
 
 import android.app.Application
-import androidx.annotation.StringRes
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
@@ -30,15 +29,5 @@ class MyFinanceApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         instance = this
-    }
-}
-
-object Strings {
-    fun get(@StringRes stringRes: Int, vararg formatArgs: Any = emptyArray()): String {
-        return try {
-            MyFinanceApplication.instance.getString(stringRes, *formatArgs)
-        } catch (_: Exception) {
-            ""
-        }
     }
 }
