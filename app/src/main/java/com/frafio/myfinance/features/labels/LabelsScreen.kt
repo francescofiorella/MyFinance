@@ -108,8 +108,8 @@ fun LabelsContent(
         }
     }
 
-    val isLabelValid = labelFieldValue.text.isNotEmpty() && allLabels.none {
-        it.equals(labelFieldValue.text, ignoreCase = true)
+    val isLabelValid = labelFieldValue.text.trim().isNotEmpty() && allLabels.none {
+        it.equals(labelFieldValue.text.trim(), ignoreCase = true)
     }
 
     Scaffold(
@@ -275,18 +275,18 @@ fun NewLabelItem(
                         )
                     }
                     Spacer(modifier = Modifier.width(14.dp))
-                }
-                FilledIconButton(
-                    onClick = onConfirm,
-                    enabled = isValid,
-                    shapes = IconButtonDefaults.shapes(
-                        shape = IconButtonDefaults.smallSquareShape,
-                    )
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_check_filled),
-                        contentDescription = stringResource(id = R.string.confirm)
-                    )
+                    FilledIconButton(
+                        onClick = onConfirm,
+                        enabled = isValid,
+                        shapes = IconButtonDefaults.shapes(
+                            shape = IconButtonDefaults.smallSquareShape,
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_check_filled),
+                            contentDescription = stringResource(id = R.string.confirm)
+                        )
+                    }
                 }
             }
         },
@@ -314,6 +314,13 @@ fun LabelItem(
     index: Int,
     count: Int
 ) {
+    val isLabelValid = editLabelValue.text.trim().isNotEmpty() && allLabels.none { existing ->
+        if (existing == label) {
+            existing == editLabelValue.text.trim()
+        } else {
+            existing.equals(editLabelValue.text.trim(), ignoreCase = true)
+        }
+    }
     SegmentedListItem(
         colors = if (isEditing)
             ListItemDefaults.colors(
@@ -384,7 +391,7 @@ fun LabelItem(
                         keyboardType = KeyboardType.Text
                     ),
                     keyboardActions = KeyboardActions(onDone = {
-                        if (editLabelValue.text.isNotEmpty() && editLabelValue.text != label) {
+                        if (isLabelValid) {
                             onConfirmEdit()
                         }
                     })
@@ -441,13 +448,6 @@ fun LabelItem(
                 )
                 customItem(
                     {
-                        val isLabelValid = editLabelValue.text.isNotEmpty() && allLabels.none { existing ->
-                            if (existing == label) {
-                                existing == editLabelValue.text
-                            } else {
-                                existing.equals(editLabelValue.text, ignoreCase = true)
-                            }
-                        }
                         FilledIconButton(
                             modifier = Modifier
                                 .size(IconButtonDefaults.smallContainerSize())

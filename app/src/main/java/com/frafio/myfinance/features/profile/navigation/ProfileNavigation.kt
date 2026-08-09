@@ -20,7 +20,6 @@ fun EntryProviderScope<NavKey>.profileEntry(
     appState: MyFinanceAppState,
     initialUser: User? = null,
     profilePicture: Bitmap? = null,
-    onUploadProPic: () -> Unit,
     onManageLabels: () -> Unit
 ) {
     entry<HomeTabKey.Profile> {
@@ -71,7 +70,6 @@ fun EntryProviderScope<NavKey>.profileEntry(
             viewModel = viewModel,
             initialUser = initialUser,
             initialProfilePicture = profilePicture,
-            onUploadProPic = onUploadProPic,
             onManageLabels = onManageLabels
         )
     }

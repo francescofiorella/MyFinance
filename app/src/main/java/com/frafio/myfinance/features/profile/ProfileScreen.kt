@@ -47,11 +47,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.User
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.getCurrencyIcon
 import com.frafio.myfinance.features.profile.components.CurrencySheet
 import com.frafio.myfinance.features.profile.components.EditFullNameSheet
+import com.frafio.myfinance.features.profile.components.SelectProPicSheet
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -60,7 +62,6 @@ fun ProfileScreen(
     viewModel: ProfileViewModel,
     initialUser: User? = null,
     initialProfilePicture: Bitmap? = null,
-    onUploadProPic: () -> Unit,
     onManageLabels: () -> Unit
 ) {
     val userState by viewModel.user.collectAsStateWithLifecycle()
@@ -87,6 +88,7 @@ fun ProfileScreen(
     val currencyCode = userPreferences?.currencyCode ?: "EUR"
 
     var showEditFullNameSheet by remember { mutableStateOf(false) }
+    var showSelectProPicSheet by remember { mutableStateOf(false) }
     var showCurrencySheet by remember { mutableStateOf(false) }
 
     EditFullNameSheet(
@@ -98,6 +100,21 @@ fun ProfileScreen(
             }
         },
         onEditFullName = { viewModel.editFullName(it) }
+    )
+
+    SelectProPicSheet(
+        show = showSelectProPicSheet,
+        googlePhotoUrl = user?.photoUrl,
+        currentProPic = userPreferences?.proPicChoice,
+        onDismiss = {
+            if (showSelectProPicSheet) {
+                showSelectProPicSheet = false
+            }
+        },
+        onSelectPhoto = {
+            viewModel.setProPicChoice(it)
+            showSelectProPicSheet = false
+        }
     )
 
     CurrencySheet(
@@ -120,12 +137,13 @@ fun ProfileScreen(
         modifier = modifier,
         user = user,
         profilePicture = profilePicture,
+        proPicChoice = userPreferences?.proPicChoice,
         googleSignIn = googleSignIn,
         versionName = viewModel.versionName,
         isDynamicColorAvailable = viewModel.isDynamicColorAvailable,
         isDynamicColorChecked = isDynamicColorChecked,
         scrollState = scrollState,
-        onUploadProPic = onUploadProPic,
+        onSelectProPic = { showSelectProPicSheet = true },
         onEditFullName = { showEditFullNameSheet = true },
         onDynamicColorChanged = { viewModel.setDynamicColor(it) },
         onManageLabels = onManageLabels,
@@ -139,12 +157,13 @@ private fun ProfileContent(
     modifier: Modifier = Modifier,
     user: User?,
     profilePicture: Bitmap?,
+    proPicChoice: String?,
     googleSignIn: Boolean,
     versionName: String,
     isDynamicColorAvailable: Boolean,
     isDynamicColorChecked: Boolean,
     scrollState: ScrollState,
-    onUploadProPic: () -> Unit,
+    onSelectProPic: () -> Unit,
     onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
     onManageLabels: () -> Unit,
@@ -159,7 +178,7 @@ private fun ProfileContent(
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        ProfileHeader(user = user, profilePicture = profilePicture)
+        ProfileHeader(user = user, profilePicture = profilePicture, proPicChoice = proPicChoice)
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -169,7 +188,7 @@ private fun ProfileContent(
             versionName = versionName,
             isDynamicColorAvailable = isDynamicColorAvailable,
             isDynamicColorChecked = isDynamicColorChecked,
-            onUploadProPic = onUploadProPic,
+            onSelectProPic = onSelectProPic,
             onEditFullName = onEditFullName,
             onDynamicColorChanged = onDynamicColorChanged,
             onManageLabels = onManageLabels,
@@ -180,14 +199,19 @@ private fun ProfileContent(
 }
 
 @Composable
-private fun ProfileHeader(user: User?, profilePicture: Bitmap?) {
-    val painter = remember(profilePicture) {
-        if (profilePicture != null) {
-            BitmapPainter(profilePicture.asImageBitmap())
-        } else {
-            null
+private fun ProfileHeader(user: User?, profilePicture: Bitmap?, proPicChoice: String?) {
+    val painter = when (proPicChoice) {
+        FirestoreEnums.PRO_PIC_TYPES.DEFAULT_MAN.value -> painterResource(id = R.drawable.image_profile_interface_cuate)
+        FirestoreEnums.PRO_PIC_TYPES.DEFAULT_WOMAN.value -> painterResource(id = R.drawable.image_profile_interface_pana)
+        FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value -> {
+            if (profilePicture != null) {
+                BitmapPainter(profilePicture.asImageBitmap())
+            } else {
+                painterResource(id = R.drawable.image_profile_interface_cuate)
+            }
         }
-    } ?: painterResource(id = R.drawable.image_profile_interface_cuate)
+        else -> painterResource(id = R.drawable.image_profile_interface_cuate)
+    }
     Image(
         painter = painter,
         contentDescription = stringResource(id = R.string.profile_picture),
@@ -222,7 +246,7 @@ private fun ProfileCards(
     versionName: String,
     isDynamicColorAvailable: Boolean,
     isDynamicColorChecked: Boolean,
-    onUploadProPic: () -> Unit,
+    onSelectProPic: () -> Unit,
     onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
     onManageLabels: () -> Unit,
@@ -311,7 +335,7 @@ private fun ProfileCards(
     ) {
         Column {
             SegmentedListItem(
-                onClick = onUploadProPic,
+                onClick = onSelectProPic,
                 colors = colors,
                 shapes = ListItemDefaults.segmentedShapes(
                     index = 1,
@@ -327,7 +351,7 @@ private fun ProfileCards(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_upload_filled),
+                            painter = painterResource(id = R.drawable.ic_face_filled),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
@@ -702,12 +726,13 @@ fun ProfilePreview() {
                 creationYear = 2023
             ),
             profilePicture = null,
+            proPicChoice = null,
             googleSignIn = true,
             versionName = "MyFinance 1.0.0",
             isDynamicColorAvailable = true,
             isDynamicColorChecked = false,
             scrollState = rememberScrollState(),
-            onUploadProPic = {},
+            onSelectProPic = {},
             onEditFullName = {},
             onDynamicColorChanged = {},
             onManageLabels = {},

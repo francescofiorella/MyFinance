@@ -65,8 +65,9 @@
     <string name="your_profile">Il tuo profilo</string>
     <string name="your_name">Il tuo nome</string>
     <string name="your_budget">Il tuo budget</string>
+    <string name="your_propic">La tua foto profilo</string>
     <string name="edit_profile">Modifica il tuo profilo</string>
-    <string name="edit_propic">Carica la tua foto profilo</string>
+    <string name="edit_propic">Seleziona la tua foto profilo</string>
     <string name="edit_full_name">Modifica il tuo nome</string>
     <string name="manage_labels">Gestisci etichette</string>
     <string name="no_expenses">Nessuna spesa</string>

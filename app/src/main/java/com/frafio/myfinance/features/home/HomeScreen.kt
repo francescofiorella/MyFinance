@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.navigation.Navigator
 import com.frafio.myfinance.core.navigation.toEntries
 import androidx.compose.ui.Alignment
@@ -76,6 +77,7 @@ fun HomeScreen(
 
     val user by homeViewModel.user.collectAsStateWithLifecycle()
     val profilePicture by homeViewModel.profilePicture.collectAsStateWithLifecycle()
+    val userPreferences by homeViewModel.userPreferences.collectAsStateWithLifecycle()
 
     val loginSuccessString = stringResource(id = R.string.login_successful)
     val quotaExceededString = stringResource(id = R.string.firestore_quota_exceeded)
@@ -117,12 +119,11 @@ fun HomeScreen(
         }
     }
 
-    val comingSoonString = stringResource(id = R.string.coming_soon)
-
     HomeScreenContent(
         appState = appState,
         currentTab = currentTab,
         profilePicture = profilePicture,
+        proPicChoice = userPreferences?.proPicChoice,
         windowAdaptiveInfo = windowAdaptiveInfo,
         onTabClick = { navKey ->
             if (currentTab == navKey) {
@@ -180,9 +181,6 @@ fun HomeScreen(
                         appState = appState,
                         initialUser = user,
                         profilePicture = profilePicture,
-                        onUploadProPic = {
-                            appState.showSnackBar(comingSoonString)
-                        },
                         onManageLabels = { onNavigateToRoot(RootKey.Labels) }
                     )
                 }
@@ -205,6 +203,7 @@ private fun HomeScreenContent(
     appState: MyFinanceAppState,
     currentTab: HomeTabKey,
     profilePicture: Bitmap?,
+    proPicChoice: String?,
     windowAdaptiveInfo: WindowAdaptiveInfo,
     onTabClick: (HomeTabKey) -> Unit,
     onAddClick: () -> Unit,
@@ -270,6 +269,7 @@ private fun HomeScreenContent(
                 appState = appState,
                 currentTab = currentTab,
                 profilePicture = profilePicture,
+                proPicChoice = proPicChoice,
                 onAddClick = onAddClick,
                 onLogoutClick = onLogoutClick,
                 onProPicClick = onProPicClick,
@@ -289,6 +289,7 @@ fun HomeScreenPreview() {
             appState = appState,
             currentTab = HomeTabKey.Dashboard,
             profilePicture = null,
+            proPicChoice = null,
             windowAdaptiveInfo = currentWindowAdaptiveInfoV2(),
             onTabClick = {},
             onAddClick = {},
@@ -312,6 +313,7 @@ private fun MainScaffold(
     appState: MyFinanceAppState,
     currentTab: HomeTabKey,
     profilePicture: Bitmap?,
+    proPicChoice: String?,
     onAddClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onProPicClick: () -> Unit,
@@ -360,13 +362,18 @@ private fun MainScaffold(
                                         contentDescription = "Logout"
                                     )
                                 } else {
-                                    val painter = remember(profilePicture) {
-                                        if (profilePicture != null) {
-                                            BitmapPainter(profilePicture.asImageBitmap())
-                                        } else {
-                                            null
+                                    val painter = when (proPicChoice) {
+                                        FirestoreEnums.PRO_PIC_TYPES.DEFAULT_MAN.value -> painterResource(id = R.drawable.image_profile_interface_cuate)
+                                        FirestoreEnums.PRO_PIC_TYPES.DEFAULT_WOMAN.value -> painterResource(id = R.drawable.image_profile_interface_pana)
+                                        FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value -> {
+                                            if (profilePicture != null) {
+                                                BitmapPainter(profilePicture.asImageBitmap())
+                                            } else {
+                                                painterResource(id = R.drawable.image_profile_interface_cuate)
+                                            }
                                         }
-                                    } ?: painterResource(id = R.drawable.image_profile_interface_cuate)
+                                        else -> painterResource(id = R.drawable.image_profile_interface_cuate)
+                                    }
                                     Image(
                                         painter = painter,
                                         contentDescription = stringResource(id = R.string.profile_picture),

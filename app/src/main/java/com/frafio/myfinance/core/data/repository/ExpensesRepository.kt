@@ -40,6 +40,10 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
         return expensesManager.setCurrencyCode(currencyCode)
     }
 
+    suspend fun setProPicChoice(choice: String): FinanceResult {
+        return expensesManager.setProPicChoice(choice)
+    }
+
     suspend fun addLabel(label: String): FinanceResult {
         return expensesManager.addLabel(label)
     }

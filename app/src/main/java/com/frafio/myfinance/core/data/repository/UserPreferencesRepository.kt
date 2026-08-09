@@ -46,6 +46,7 @@ class UserPreferencesRepository @Inject constructor(
         val LAST_INCOMES_SYNC = longPreferencesKey("last_incomes_sync")
         val LAST_EXPENSES_APP_SYNC = longPreferencesKey("last_expenses_app_sync")
         val LAST_INCOMES_APP_SYNC = longPreferencesKey("last_incomes_app_sync")
+        val PRO_PIC_CHOICE = stringPreferencesKey("pro_pic_choice")
     }
 
     val userPreferencesFlow: StateFlow<UserPreferencesData> = dataStore.data
@@ -65,6 +66,7 @@ class UserPreferencesRepository @Inject constructor(
             val lastIncomesSync = preferences[PreferencesKeys.LAST_INCOMES_SYNC] ?: 0L
             val lastExpensesAppSync = preferences[PreferencesKeys.LAST_EXPENSES_APP_SYNC] ?: 0L
             val lastIncomesAppSync = preferences[PreferencesKeys.LAST_INCOMES_APP_SYNC] ?: 0L
+            val proPicChoice = preferences[PreferencesKeys.PRO_PIC_CHOICE]
 
             val email = preferences[PreferencesKeys.USER_EMAIL]
             val user = if (email != null) {
@@ -89,7 +91,8 @@ class UserPreferencesRepository @Inject constructor(
                 lastExpensesSync,
                 lastIncomesSync,
                 lastExpensesAppSync,
-                lastIncomesAppSync
+                lastIncomesAppSync,
+                proPicChoice
             )
         }
         .stateIn(
@@ -100,9 +103,16 @@ class UserPreferencesRepository @Inject constructor(
                 monthlyBudget = 0.0,
                 currencyCode = "EUR",
                 labels = emptyList(),
-                user = null
+                user = null,
+                proPicChoice = null
             )
         )
+
+    suspend fun updateProPicChoice(choice: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.PRO_PIC_CHOICE] = choice
+        }
+    }
 
     suspend fun updateDynamicColor(activate: Boolean) {
         dataStore.edit { preferences ->
@@ -197,5 +207,6 @@ data class UserPreferencesData(
     val lastExpensesSync: Long = 0L,
     val lastIncomesSync: Long = 0L,
     val lastExpensesAppSync: Long = 0L,
-    val lastIncomesAppSync: Long = 0L
+    val lastIncomesAppSync: Long = 0L,
+    val proPicChoice: String? = null
 )

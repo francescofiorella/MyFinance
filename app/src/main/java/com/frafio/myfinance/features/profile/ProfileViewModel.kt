@@ -124,4 +124,15 @@ class ProfileViewModel @Inject constructor(
             }
         }
     }
+
+    fun setProPicChoice(choice: String) {
+        viewModelScope.launch {
+            try {
+                loadingRepository.startLoading()
+                expensesRepository.setProPicChoice(choice)
+            } finally {
+                loadingRepository.stopLoading()
+            }
+        }
+    }
 }

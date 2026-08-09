@@ -95,6 +95,22 @@ class ExpensesSyncManager @Inject constructor(
         }
     }
 
+    suspend fun setProPicChoice(choice: String): FinanceResult = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
+        return@withContext try {
+            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(email)
+                .set(
+                    hashMapOf(FirestoreEnums.FIELDS.PRO_PIC_CHOICE.value to choice),
+                    SetOptions.merge()
+                ).await()
+            userPreferencesRepository.updateProPicChoice(choice)
+            FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
+        } catch (_: Exception) {
+            FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
+        }
+    }
+
     suspend fun setLabels(
         labels: List<String>,
         successCode: FinanceCode = FinanceCode.LABELS_UPDATE_SUCCESS
@@ -233,6 +249,11 @@ class ExpensesSyncManager @Inject constructor(
                             val labelsValue = snapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
                             val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()
                             userPreferencesRepository.updateLabels(labels)
+
+                            val proPicChoice = snapshot.data?.get(FirestoreEnums.FIELDS.PRO_PIC_CHOICE.value) as? String
+                            if (proPicChoice != null) {
+                                userPreferencesRepository.updateProPicChoice(proPicChoice)
+                            }
 
                             if (isFirstSnapshot) {
                                 isFirstSnapshot = false

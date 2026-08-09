@@ -71,8 +71,9 @@
     <string name="your_profile">Your profile</string>
     <string name="your_name">Your name</string>
     <string name="your_budget">Your budget</string>
+    <string name="your_propic">Your profile picture</string>
     <string name="edit_profile">Edit your profile</string>
-    <string name="edit_propic">Upload your profile picture</string>
+    <string name="edit_propic">Select your profile picture</string>
     <string name="edit_full_name">Edit your full name</string>
     <string name="manage_labels">Manage labels</string>
     <string name="no_expenses">No expenses</string>
@@ -105,8 +106,6 @@
     <string name="filter">Filter</string>
     <string name="date_range">Date range</string>
     <string name="annual_balance">Annual balance</string>
-
-    <string name="coming_soon" translatable="false">Coming soon!</string>
 
     <string name="budget_updated">Budget updated!</string>
     <string name="income_deleted">Income deleted!</string>

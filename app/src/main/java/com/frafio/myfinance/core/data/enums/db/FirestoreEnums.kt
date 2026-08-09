@@ -20,7 +20,14 @@ object FirestoreEnums {
         ID("id"),
         UPDATED_AT("updatedAt"),
         IS_DELETED("isDeleted"),
-        DELETE_AT("deleteAt")
+        DELETE_AT("deleteAt"),
+        PRO_PIC_CHOICE("proPicChoice")
+    }
+
+    enum class PRO_PIC_TYPES(val value: String) {
+        DEFAULT_MAN("default_man"),
+        DEFAULT_WOMAN("default_woman"),
+        GOOGLE("google")
     }
 
     enum class NAMES(val value: String, val valueEn: String, val valueIt: String) {
