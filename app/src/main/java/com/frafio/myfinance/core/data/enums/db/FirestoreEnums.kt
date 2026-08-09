@@ -25,8 +25,11 @@ object FirestoreEnums {
     }
 
     enum class PRO_PIC_TYPES(val value: String) {
-        DEFAULT_MAN("default_man"),
-        DEFAULT_WOMAN("default_woman"),
+        AVATAR_1("avatar_1"),
+        AVATAR_2("avatar_2"),
+        AVATAR_3("avatar_3"),
+        AVATAR_4("avatar_4"),
+        AVATAR_5("avatar_5"),
         GOOGLE("google")
     }
 

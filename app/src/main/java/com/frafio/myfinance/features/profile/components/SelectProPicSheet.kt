@@ -10,14 +10,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -59,26 +55,6 @@ fun SelectProPicSheet(
                 val iconSize = 32.dp
 
                 Spacer(modifier = Modifier.width(16.dp))
-                
-                ImageSelectorButton(
-                    modifier = Modifier.size(imageSize),
-                    drawable = R.drawable.image_profile_interface_cuate,
-                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.DEFAULT_MAN.value) },
-                    contentDescription = stringResource(id = R.string.profile_picture),
-                    containerSize = imageSize,
-                    contentSize = iconSize,
-                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.DEFAULT_MAN.value
-                )
-
-                ImageSelectorButton(
-                    modifier = Modifier.size(imageSize),
-                    drawable = R.drawable.image_profile_interface_pana,
-                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.DEFAULT_WOMAN.value) },
-                    contentDescription = stringResource(id = R.string.profile_picture),
-                    containerSize = imageSize,
-                    contentSize = iconSize,
-                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.DEFAULT_WOMAN.value
-                )
 
                 if (googlePhotoUrl != null) {
                     ImageSelectorButton(
@@ -91,18 +67,56 @@ fun SelectProPicSheet(
                         isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value
                     )
                 }
-
-                FilledTonalIconButton(
+                
+                ImageSelectorButton(
                     modifier = Modifier.size(imageSize),
-                    onClick = {},
-                    shapes = IconButtonDefaults.shapes()
-                ) {
-                    Icon(
-                        modifier = Modifier.size(iconSize),
-                        painter = painterResource(id = R.drawable.ic_add_filled),
-                        contentDescription = null
-                    )
-                }
+                    drawable = R.drawable.image_profile_interface_cuate,
+                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.AVATAR_1.value) },
+                    contentDescription = stringResource(id = R.string.profile_picture),
+                    containerSize = imageSize,
+                    contentSize = iconSize,
+                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.AVATAR_1.value
+                )
+
+                ImageSelectorButton(
+                    modifier = Modifier.size(imageSize),
+                    drawable = R.drawable.image_profile_interface_pana,
+                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.AVATAR_2.value) },
+                    contentDescription = stringResource(id = R.string.profile_picture),
+                    containerSize = imageSize,
+                    contentSize = iconSize,
+                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.AVATAR_2.value
+                )
+
+                ImageSelectorButton(
+                    modifier = Modifier.size(imageSize),
+                    drawable = R.drawable.image_balloon_seller_amico,
+                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.AVATAR_3.value) },
+                    contentDescription = stringResource(id = R.string.profile_picture),
+                    containerSize = imageSize,
+                    contentSize = iconSize,
+                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.AVATAR_3.value
+                )
+
+                ImageSelectorButton(
+                    modifier = Modifier.size(imageSize),
+                    drawable = R.drawable.image_edit_photo_pana,
+                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.AVATAR_4.value) },
+                    contentDescription = stringResource(id = R.string.profile_picture),
+                    containerSize = imageSize,
+                    contentSize = iconSize,
+                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.AVATAR_4.value
+                )
+
+                ImageSelectorButton(
+                    modifier = Modifier.size(imageSize),
+                    drawable = R.drawable.image_people_creating_robot_rafiki,
+                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.AVATAR_5.value) },
+                    contentDescription = stringResource(id = R.string.profile_picture),
+                    containerSize = imageSize,
+                    contentSize = iconSize,
+                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.AVATAR_5.value
+                )
 
                 Spacer(modifier = Modifier.width(16.dp))
             }
@@ -117,7 +131,7 @@ fun SelectProPicSheetPreview() {
         SelectProPicSheet(
             show = true,
             googlePhotoUrl = null,
-            currentProPic = FirestoreEnums.PRO_PIC_TYPES.DEFAULT_MAN.value,
+            currentProPic = FirestoreEnums.PRO_PIC_TYPES.AVATAR_1.value,
             onDismiss = {},
             onSelectPhoto = {},
             modifier = Modifier

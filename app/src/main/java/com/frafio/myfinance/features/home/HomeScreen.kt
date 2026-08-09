@@ -363,8 +363,11 @@ private fun MainScaffold(
                                     )
                                 } else {
                                     val painter = when (proPicChoice) {
-                                        FirestoreEnums.PRO_PIC_TYPES.DEFAULT_MAN.value -> painterResource(id = R.drawable.image_profile_interface_cuate)
-                                        FirestoreEnums.PRO_PIC_TYPES.DEFAULT_WOMAN.value -> painterResource(id = R.drawable.image_profile_interface_pana)
+                                        FirestoreEnums.PRO_PIC_TYPES.AVATAR_1.value -> painterResource(id = R.drawable.image_profile_interface_cuate)
+                                        FirestoreEnums.PRO_PIC_TYPES.AVATAR_2.value -> painterResource(id = R.drawable.image_profile_interface_pana)
+                                        FirestoreEnums.PRO_PIC_TYPES.AVATAR_3.value -> painterResource(id = R.drawable.image_balloon_seller_amico)
+                                        FirestoreEnums.PRO_PIC_TYPES.AVATAR_4.value -> painterResource(id = R.drawable.image_edit_photo_pana)
+                                        FirestoreEnums.PRO_PIC_TYPES.AVATAR_5.value -> painterResource(id = R.drawable.image_people_creating_robot_rafiki)
                                         FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value -> {
                                             if (profilePicture != null) {
                                                 BitmapPainter(profilePicture.asImageBitmap())
