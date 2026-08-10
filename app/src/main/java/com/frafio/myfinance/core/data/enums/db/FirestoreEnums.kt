@@ -30,6 +30,8 @@ object FirestoreEnums {
         AVATAR_3("avatar_3"),
         AVATAR_4("avatar_4"),
         AVATAR_5("avatar_5"),
+        AVATAR_6("avatar_6"),
+        AVATAR_7("avatar_7"),
         GOOGLE("google")
     }
 

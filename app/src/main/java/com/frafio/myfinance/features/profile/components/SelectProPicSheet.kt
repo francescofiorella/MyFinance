@@ -23,6 +23,7 @@ import com.frafio.myfinance.core.components.ImageSelectorButton
 import com.frafio.myfinance.core.components.SheetDialog
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.core.components.avatarOptions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,56 +68,18 @@ fun SelectProPicSheet(
                         isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value
                     )
                 }
-                
-                ImageSelectorButton(
-                    modifier = Modifier.size(imageSize),
-                    drawable = R.drawable.image_profile_interface_cuate,
-                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.AVATAR_1.value) },
-                    contentDescription = stringResource(id = R.string.profile_picture),
-                    containerSize = imageSize,
-                    contentSize = iconSize,
-                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.AVATAR_1.value
-                )
 
-                ImageSelectorButton(
-                    modifier = Modifier.size(imageSize),
-                    drawable = R.drawable.image_profile_interface_pana,
-                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.AVATAR_2.value) },
-                    contentDescription = stringResource(id = R.string.profile_picture),
-                    containerSize = imageSize,
-                    contentSize = iconSize,
-                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.AVATAR_2.value
-                )
-
-                ImageSelectorButton(
-                    modifier = Modifier.size(imageSize),
-                    drawable = R.drawable.image_balloon_seller_amico,
-                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.AVATAR_3.value) },
-                    contentDescription = stringResource(id = R.string.profile_picture),
-                    containerSize = imageSize,
-                    contentSize = iconSize,
-                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.AVATAR_3.value
-                )
-
-                ImageSelectorButton(
-                    modifier = Modifier.size(imageSize),
-                    drawable = R.drawable.image_edit_photo_pana,
-                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.AVATAR_4.value) },
-                    contentDescription = stringResource(id = R.string.profile_picture),
-                    containerSize = imageSize,
-                    contentSize = iconSize,
-                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.AVATAR_4.value
-                )
-
-                ImageSelectorButton(
-                    modifier = Modifier.size(imageSize),
-                    drawable = R.drawable.image_people_creating_robot_rafiki,
-                    onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.AVATAR_5.value) },
-                    contentDescription = stringResource(id = R.string.profile_picture),
-                    containerSize = imageSize,
-                    contentSize = iconSize,
-                    isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.AVATAR_5.value
-                )
+                avatarOptions.forEach { option ->
+                    ImageSelectorButton(
+                        modifier = Modifier.size(imageSize),
+                        drawable = option.drawableRes,
+                        onClick = { onSelectPhoto(option.id) },
+                        contentDescription = stringResource(id = R.string.profile_picture),
+                        containerSize = imageSize,
+                        contentSize = iconSize,
+                        isSelected = currentProPic == option.id
+                    )
+                }
 
                 Spacer(modifier = Modifier.width(16.dp))
             }

@@ -37,8 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,8 +45,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.User
+import com.frafio.myfinance.core.components.rememberProfilePicturePainter
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.getCurrencyIcon
 import com.frafio.myfinance.features.profile.components.CurrencySheet
@@ -200,21 +198,7 @@ private fun ProfileContent(
 
 @Composable
 private fun ProfileHeader(user: User?, profilePicture: Bitmap?, proPicChoice: String?) {
-    val painter = when (proPicChoice) {
-        FirestoreEnums.PRO_PIC_TYPES.AVATAR_1.value -> painterResource(id = R.drawable.image_profile_interface_cuate)
-        FirestoreEnums.PRO_PIC_TYPES.AVATAR_2.value -> painterResource(id = R.drawable.image_profile_interface_pana)
-        FirestoreEnums.PRO_PIC_TYPES.AVATAR_3.value -> painterResource(id = R.drawable.image_balloon_seller_amico)
-        FirestoreEnums.PRO_PIC_TYPES.AVATAR_4.value -> painterResource(id = R.drawable.image_edit_photo_pana)
-        FirestoreEnums.PRO_PIC_TYPES.AVATAR_5.value -> painterResource(id = R.drawable.image_people_creating_robot_rafiki)
-        FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value -> {
-            if (profilePicture != null) {
-                BitmapPainter(profilePicture.asImageBitmap())
-            } else {
-                painterResource(id = R.drawable.image_profile_interface_cuate)
-            }
-        }
-        else -> painterResource(id = R.drawable.image_profile_interface_cuate)
-    }
+    val painter = rememberProfilePicturePainter(proPicChoice, profilePicture)
     Image(
         painter = painter,
         contentDescription = stringResource(id = R.string.profile_picture),
