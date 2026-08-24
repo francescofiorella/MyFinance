@@ -12,6 +12,7 @@ import com.frafio.myfinance.core.data.model.Transaction
 import com.frafio.myfinance.core.data.repository.UserPreferencesData
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
@@ -27,7 +28,7 @@ import java.util.Calendar
 
 abstract class BaseSyncManager<T : Transaction>(
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val database: MyFinanceDatabase,
+    protected val database: MyFinanceDatabase,
     private val clazz: Class<T>
 ) {
     companion object {
@@ -127,6 +128,37 @@ abstract class BaseSyncManager<T : Transaction>(
         } catch (e: Exception) {
             Log.e("BaseSyncManager", "Error deleting item from $collectionName: ${e.localizedMessage}")
             FinanceResult(deleteFailureCode)
+        }
+    }
+
+    protected suspend fun updateArrayField(
+        id: String,
+        fieldName: String,
+        value: Any,
+        isAddition: Boolean
+    ): Long? = withContext(Dispatchers.IO) {
+        val email = getUserEmail() ?: return@withContext null
+        val updatedAt = System.currentTimeMillis()
+        
+        return@withContext try {
+            val operation = if (isAddition) {
+                FieldValue.arrayUnion(value)
+            } else {
+                FieldValue.arrayRemove(value)
+            }
+            
+            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
+                .document(email)
+                .collection(collectionName)
+                .document(id)
+                .update(
+                    fieldName, operation,
+                    FirestoreEnums.FIELDS.UPDATED_AT.value, updatedAt
+                ).await()
+            updatedAt
+        } catch (e: Exception) {
+            Log.e("BaseSyncManager", "Error updating array field $fieldName in $collectionName: ${e.localizedMessage}")
+            null
         }
     }
 

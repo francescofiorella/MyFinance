@@ -12,5 +12,7 @@ interface BaseDao<T> {
 
     fun deleteById(id: String)
 
+    suspend fun getById(id: String): T?
+
     fun getAllSync(): List<T>
 }

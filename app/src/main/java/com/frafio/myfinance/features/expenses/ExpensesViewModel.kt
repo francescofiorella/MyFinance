@@ -277,18 +277,15 @@ class ExpensesViewModel @Inject constructor(
                 loadingRepository.startLoading()
                 val trimmedLabel = label.trim()
                 if (trimmedLabel.isEmpty() || expense.labels.contains(trimmedLabel)) return@launch
-                val labels = expense.labels.toMutableList()
-                labels.add(trimmedLabel)
-                val updated = expense.copy(
-                    timestamp = dateToUTCTimestamp(expense.year!!, expense.month!!, expense.day!!),
-                    labels = labels
-                )
-                val response = expensesRepository.editExpense(updated)
+                val response = expensesRepository.updateExpenseLabels(expense.id, trimmedLabel, true)
                 if (response.code == FinanceCode.EXPENSE_EDIT_FAILURE.code) {
                     _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
                 } else {
                     if (_editingExpense.value?.id == expense.id) {
-                        _editingExpense.value = updated
+                        val latestExpense = expensesLocalRepository.getById(expense.id)
+                        if (latestExpense != null) {
+                            _editingExpense.value = latestExpense
+                        }
                     }
                 }
             } finally {
@@ -301,18 +298,15 @@ class ExpensesViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 loadingRepository.startLoading()
-                val labels = expense.labels.toMutableList()
-                if (!labels.remove(label)) return@launch
-                val updated = expense.copy(
-                    timestamp = dateToUTCTimestamp(expense.year!!, expense.month!!, expense.day!!),
-                    labels = labels
-                )
-                val response = expensesRepository.editExpense(updated)
+                val response = expensesRepository.updateExpenseLabels(expense.id, label, false)
                 if (response.code == FinanceCode.EXPENSE_EDIT_FAILURE.code) {
                     _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
                 } else {
                     if (_editingExpense.value?.id == expense.id) {
-                        _editingExpense.value = updated
+                        val latestExpense = expensesLocalRepository.getById(expense.id)
+                        if (latestExpense != null) {
+                            _editingExpense.value = latestExpense
+                        }
                     }
                 }
             } finally {

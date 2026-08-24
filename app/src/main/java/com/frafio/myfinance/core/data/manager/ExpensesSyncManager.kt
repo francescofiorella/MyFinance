@@ -1,6 +1,7 @@
 package com.frafio.myfinance.core.data.manager
 
 import com.frafio.myfinance.core.data.dao.ExpenseDao
+import androidx.room.withTransaction
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.DeleteLabelResult
@@ -135,6 +136,38 @@ class ExpensesSyncManager @Inject constructor(
         val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels
         if (currentLabels.contains(trimmedLabel)) return@withContext FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
         setLabels(currentLabels + trimmedLabel, FinanceCode.LABEL_ADD_SUCCESS)
+    }
+
+    suspend fun updateExpenseLabels(
+        expenseId: String,
+        label: String,
+        isAddition: Boolean
+    ): FinanceResult = withContext(Dispatchers.IO) {
+        val updatedAt = updateArrayField(
+            expenseId,
+            FirestoreEnums.FIELDS.LABELS.value,
+            label,
+            isAddition
+        ) ?: return@withContext FinanceResult(editFailureCode)
+
+        return@withContext try {
+            database.withTransaction {
+                val expense = baseDao.getById(expenseId)
+                if (expense != null) {
+                    val updatedLabels = expense.labels.toMutableList()
+                    if (isAddition) {
+                        if (!updatedLabels.contains(label)) updatedLabels.add(label)
+                    } else {
+                        updatedLabels.remove(label)
+                    }
+                    baseDao.upsert(expense.copy(labels = updatedLabels, updatedAt = updatedAt))
+                }
+            }
+            FinanceResult(editSuccessCode)
+        } catch (e: Exception) {
+            android.util.Log.e("ExpensesSyncManager", "Error updating local labels: ${e.localizedMessage}")
+            FinanceResult(editFailureCode)
+        }
     }
 
     suspend fun deleteLabel(label: String): DeleteLabelResult = withContext(Dispatchers.IO) {

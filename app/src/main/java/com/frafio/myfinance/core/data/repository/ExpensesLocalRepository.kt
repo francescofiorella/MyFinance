@@ -43,5 +43,7 @@ class ExpensesLocalRepository @Inject constructor(
 
     fun getAllSync(): List<Expense> = expenseDao.getAllSync()
 
+    suspend fun getById(id: String): Expense? = expenseDao.getById(id)
+
     fun deleteAll() = expenseDao.deleteAll()
 }

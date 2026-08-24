@@ -25,6 +25,9 @@ interface IncomeDao : BaseDao<Income> {
             "WHERE year=:year")
     fun getPriceSumOfYear(year: Int): Flow<Double?>
 
+    @Query("SELECT * FROM income WHERE id = :id")
+    override suspend fun getById(id: String): Income?
+
     @Query("SELECT * FROM income")
     override fun getAllSync(): List<Income>
 

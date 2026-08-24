@@ -61,6 +61,9 @@ interface ExpenseDao : BaseDao<Expense> {
             "WHERE year=:year")
     fun getExpensesOfYear(year: Int): Flow<List<Expense>>
 
+    @Query("SELECT * FROM expense WHERE id = :id")
+    override suspend fun getById(id: String): Expense?
+
     @Query("SELECT * FROM expense")
     override fun getAllSync(): List<Expense>
 

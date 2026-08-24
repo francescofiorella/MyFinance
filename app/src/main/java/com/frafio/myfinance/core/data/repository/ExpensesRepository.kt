@@ -44,6 +44,10 @@ class ExpensesRepository @Inject constructor(private val expensesManager: Expens
         return expensesManager.setProPicChoice(choice)
     }
 
+    suspend fun updateExpenseLabels(expenseId: String, label: String, isAddition: Boolean): FinanceResult {
+        return expensesManager.updateExpenseLabels(expenseId, label, isAddition)
+    }
+
     suspend fun addLabel(label: String): FinanceResult {
         return expensesManager.addLabel(label)
     }
