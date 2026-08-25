@@ -42,14 +42,15 @@ import com.frafio.myfinance.core.theme.MyFinanceTheme
 @Composable
 fun ResetPasswordSheet(
     show: Boolean,
+    initialEmail: String,
     onDismiss: () -> Unit,
     onSend: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var emailFieldValue by remember(show) {
+    var emailFieldValue by remember(show, initialEmail) {
         mutableStateOf(
             TextFieldValue(
-                text = "",
+                text = initialEmail,
             )
         )
     }
@@ -132,6 +133,7 @@ fun ResetPasswordSheetPreview() {
     MyFinanceTheme {
         ResetPasswordSheet(
             show = true,
+            initialEmail = "test@example.com",
             onDismiss = {},
             onSend = {},
             modifier = Modifier

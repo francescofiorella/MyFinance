@@ -21,6 +21,7 @@ fun EntryProviderScope<NavKey>.authEntry(
             viewModel.uiEvents.collect { event ->
                 when (event) {
                     AuthUiEvent.Success -> onAuthSuccess()
+                    is AuthUiEvent.Message -> appState.showSnackBar(event.message)
                     is AuthUiEvent.Error -> appState.showSnackBar(event.message)
                 }
             }

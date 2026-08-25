@@ -48,12 +48,12 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
 import com.frafio.myfinance.core.data.model.AuthResult
 import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
-import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.features.auth.components.AuthForm
 import com.frafio.myfinance.features.auth.components.GoogleSignInButton
 import com.frafio.myfinance.features.auth.components.ResetPasswordSheet
@@ -111,6 +111,7 @@ fun AuthScreen(
 
     ResetPasswordSheet(
         show = uiState.showResetPasswordSheet,
+        initialEmail = uiState.email,
         onDismiss = { viewModel.setShowResetPasswordSheet(false) },
         onSend = { email ->
             viewModel.resetPassword(email)

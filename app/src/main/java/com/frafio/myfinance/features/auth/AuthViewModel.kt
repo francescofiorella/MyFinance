@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 sealed class AuthUiEvent {
     object Success : AuthUiEvent()
-
+    data class Message(val message: String) : AuthUiEvent()
     data class Error(val message: String) : AuthUiEvent()
 }
 
@@ -96,7 +96,7 @@ class AuthViewModel @Inject constructor(
             loadingRepository.stopLoading()
 
             if (result.code == AuthCode.EMAIL_SENT.code) {
-                _uiEvents.emit(AuthUiEvent.Success)
+                _uiEvents.emit(AuthUiEvent.Message(result.message))
             } else {
                 _uiEvents.emit(AuthUiEvent.Error(result.message))
             }
