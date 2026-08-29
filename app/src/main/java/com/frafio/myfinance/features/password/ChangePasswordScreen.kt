@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.TextObfuscationMode
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,9 +30,9 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SecureTextField
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
@@ -53,8 +55,6 @@ import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -78,9 +78,9 @@ fun ChangePasswordScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val hasPassword = user?.hasPassword ?: false
 
-    var currentPassword by remember { mutableStateOf("") }
-    var newPassword by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
+    val currentPasswordState = rememberTextFieldState()
+    val newPasswordState = rememberTextFieldState()
+    val confirmPasswordState = rememberTextFieldState()
 
     var currentPasswordVisible by remember { mutableStateOf(false) }
     var newPasswordVisible by remember { mutableStateOf(false) }
@@ -91,6 +91,19 @@ fun ChangePasswordScreen(
     var confirmPasswordError by remember { mutableStateOf<String?>(null) }
     var remoteCurrentPasswordError by remember { mutableStateOf<String?>(null) }
 
+    LaunchedEffect(currentPasswordState.text) {
+        currentPasswordError = null
+        remoteCurrentPasswordError = null
+    }
+
+    LaunchedEffect(newPasswordState.text) {
+        newPasswordError = null
+    }
+
+    LaunchedEffect(confirmPasswordState.text) {
+        confirmPasswordError = null
+    }
+
     LaunchedEffect(viewModel.uiEvents) {
         viewModel.uiEvents.collectLatest { event ->
             when (event) {
@@ -98,9 +111,11 @@ fun ChangePasswordScreen(
                     onBackClick()
                     appState.showSnackBar(event.message)
                 }
+
                 is ChangePasswordUiEvent.InvalidCurrentPassword -> {
                     remoteCurrentPasswordError = event.message
                 }
+
                 is ChangePasswordUiEvent.ShowSnackBar -> {
                     appState.showSnackBar(event.message)
                 }
@@ -112,30 +127,20 @@ fun ChangePasswordScreen(
         appState = appState,
         hasPassword = hasPassword,
         isLoading = isLoading,
-        currentPassword = currentPassword,
-        onCurrentPasswordChange = {
-            currentPassword = it
-            currentPasswordError = null
-            remoteCurrentPasswordError = null
-        },
+        currentPasswordState = currentPasswordState,
         currentPasswordVisible = currentPasswordVisible,
         onCurrentPasswordVisibleChange = { currentPasswordVisible = it },
-        newPassword = newPassword,
-        onNewPasswordChange = {
-            newPassword = it
-            newPasswordError = null
-        },
+        newPasswordState = newPasswordState,
         newPasswordVisible = newPasswordVisible,
         onNewPasswordVisibleChange = { newPasswordVisible = it },
-        confirmPassword = confirmPassword,
-        onConfirmPasswordChange = {
-            confirmPassword = it
-            confirmPasswordError = null
-        },
+        confirmPasswordState = confirmPasswordState,
         confirmPasswordVisible = confirmPasswordVisible,
         onConfirmPasswordVisibleChange = { confirmPasswordVisible = it },
         onSaveClick = {
             var hasLocalError = false
+            val currentPassword = currentPasswordState.text.toString()
+            val newPassword = newPasswordState.text.toString()
+            val confirmPassword = confirmPasswordState.text.toString()
 
             if (hasPassword) {
                 if (currentPassword.isEmpty()) {
@@ -181,16 +186,13 @@ fun ChangePasswordScreen(
     appState: MyFinanceAppState,
     hasPassword: Boolean,
     isLoading: Boolean,
-    currentPassword: String,
-    onCurrentPasswordChange: (String) -> Unit,
+    currentPasswordState: TextFieldState,
     currentPasswordVisible: Boolean,
     onCurrentPasswordVisibleChange: (Boolean) -> Unit,
-    newPassword: String,
-    onNewPasswordChange: (String) -> Unit,
+    newPasswordState: TextFieldState,
     newPasswordVisible: Boolean,
     onNewPasswordVisibleChange: (Boolean) -> Unit,
-    confirmPassword: String,
-    onConfirmPasswordChange: (String) -> Unit,
+    confirmPasswordState: TextFieldState,
     confirmPasswordVisible: Boolean,
     onConfirmPasswordVisibleChange: (Boolean) -> Unit,
     onSaveClick: () -> Unit,
@@ -201,9 +203,9 @@ fun ChangePasswordScreen(
     remoteCurrentPasswordError: String? = null
 ) {
     val isSaveEnabled = !isLoading &&
-            newPassword.isNotEmpty() &&
-            confirmPassword.isNotEmpty() &&
-            (!hasPassword || currentPassword.isNotEmpty())
+            newPasswordState.text.isNotEmpty() &&
+            confirmPasswordState.text.isNotEmpty() &&
+            (!hasPassword || currentPasswordState.text.isNotEmpty())
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -232,16 +234,13 @@ fun ChangePasswordScreen(
                 ChangePasswordForm(
                     hasPassword = hasPassword,
                     isLoading = isLoading,
-                    currentPassword = currentPassword,
-                    onCurrentPasswordChange = onCurrentPasswordChange,
+                    currentPasswordState = currentPasswordState,
                     currentPasswordVisible = currentPasswordVisible,
                     onCurrentPasswordVisibleChange = onCurrentPasswordVisibleChange,
-                    newPassword = newPassword,
-                    onNewPasswordChange = onNewPasswordChange,
+                    newPasswordState = newPasswordState,
                     newPasswordVisible = newPasswordVisible,
                     onNewPasswordVisibleChange = onNewPasswordVisibleChange,
-                    confirmPassword = confirmPassword,
-                    onConfirmPasswordChange = onConfirmPasswordChange,
+                    confirmPasswordState = confirmPasswordState,
                     confirmPasswordVisible = confirmPasswordVisible,
                     onConfirmPasswordVisibleChange = onConfirmPasswordVisibleChange,
                     onSaveClick = onSaveClick,
@@ -314,16 +313,13 @@ fun ChangePasswordTopBar(
 fun ChangePasswordForm(
     hasPassword: Boolean,
     isLoading: Boolean,
-    currentPassword: String,
-    onCurrentPasswordChange: (String) -> Unit,
+    currentPasswordState: TextFieldState,
     currentPasswordVisible: Boolean,
     onCurrentPasswordVisibleChange: (Boolean) -> Unit,
-    newPassword: String,
-    onNewPasswordChange: (String) -> Unit,
+    newPasswordState: TextFieldState,
     newPasswordVisible: Boolean,
     onNewPasswordVisibleChange: (Boolean) -> Unit,
-    confirmPassword: String,
-    onConfirmPasswordChange: (String) -> Unit,
+    confirmPasswordState: TextFieldState,
     confirmPasswordVisible: Boolean,
     onConfirmPasswordVisibleChange: (Boolean) -> Unit,
     onSaveClick: () -> Unit,
@@ -332,7 +328,8 @@ fun ChangePasswordForm(
     confirmPasswordError: String? = null,
     remoteCurrentPasswordError: String? = null
 ) {
-    val colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+    val colors =
+        ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
 
     Column {
         if (hasPassword) {
@@ -345,8 +342,7 @@ fun ChangePasswordForm(
                 colors = colors,
                 content = {
                     PasswordField(
-                        value = currentPassword,
-                        onValueChange = onCurrentPasswordChange,
+                        state = currentPasswordState,
                         label = stringResource(id = R.string.current_password),
                         isVisible = currentPasswordVisible,
                         onVisibilityToggle = { onCurrentPasswordVisibleChange(!currentPasswordVisible) },
@@ -374,8 +370,7 @@ fun ChangePasswordForm(
             colors = colors,
             content = {
                 PasswordField(
-                    value = newPassword,
-                    onValueChange = onNewPasswordChange,
+                    state = newPasswordState,
                     label = stringResource(id = R.string.signup_password),
                     isVisible = newPasswordVisible,
                     onVisibilityToggle = { onNewPasswordVisibleChange(!newPasswordVisible) },
@@ -402,8 +397,7 @@ fun ChangePasswordForm(
             colors = colors,
             content = {
                 PasswordField(
-                    value = confirmPassword,
-                    onValueChange = onConfirmPasswordChange,
+                    state = confirmPasswordState,
                     label = stringResource(id = R.string.signup_password_confirm),
                     isVisible = confirmPasswordVisible,
                     onVisibilityToggle = { onConfirmPasswordVisibleChange(!confirmPasswordVisible) },
@@ -427,8 +421,7 @@ fun ChangePasswordForm(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PasswordField(
-    value: String,
-    onValueChange: (String) -> Unit,
+    state: TextFieldState,
     label: String,
     isVisible: Boolean,
     onVisibilityToggle: () -> Unit,
@@ -457,13 +450,14 @@ fun PasswordField(
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = null,
-                tint = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                tint = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                    alpha = 0.38f
+                )
             )
         }
         Box(modifier = Modifier.fillMaxWidth()) {
-            TextField(
-                value = value,
-                onValueChange = onValueChange,
+            SecureTextField(
+                state = state,
                 enabled = enabled,
                 placeholder = {
                     Text(
@@ -474,10 +468,12 @@ fun PasswordField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .then(
-                        if (contentType != null) Modifier.semantics { this.contentType = contentType } else Modifier
+                        if (contentType != null) Modifier.semantics {
+                            this.contentType = contentType
+                        } else Modifier
                     ),
                 textStyle = MaterialTheme.typography.bodyLarge,
-                visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                textObfuscationMode = if (isVisible) TextObfuscationMode.Visible else TextObfuscationMode.RevealLastTyped,
                 trailingIcon = {
                     IconButton(onClick = onVisibilityToggle) {
                         Icon(
@@ -499,16 +495,16 @@ fun PasswordField(
                 ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
-                    imeAction = imeAction
+                    imeAction = imeAction,
+                    autoCorrectEnabled = false
                 ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                    onDone = {
+                onKeyboardAction = {
+                    if (imeAction == ImeAction.Next) focusManager.moveFocus(FocusDirection.Down)
+                    else if (imeAction == ImeAction.Done) {
                         focusManager.clearFocus()
                         onDone()
                     }
-                ),
-                singleLine = true
+                }
             )
             if (error != null) {
                 Text(
@@ -533,16 +529,13 @@ private fun ChangePasswordPreview() {
             appState = appState,
             hasPassword = true,
             isLoading = false,
-            currentPassword = "oldpassword",
-            onCurrentPasswordChange = {},
+            currentPasswordState = rememberTextFieldState("oldpassword"),
             currentPasswordVisible = false,
             onCurrentPasswordVisibleChange = {},
-            newPassword = "newpassword",
-            onNewPasswordChange = {},
+            newPasswordState = rememberTextFieldState("newpassword"),
             newPasswordVisible = false,
             onNewPasswordVisibleChange = {},
-            confirmPassword = "newpassword",
-            onConfirmPasswordChange = {},
+            confirmPasswordState = rememberTextFieldState("newpassword"),
             confirmPasswordVisible = false,
             onConfirmPasswordVisibleChange = {},
             onSaveClick = {},

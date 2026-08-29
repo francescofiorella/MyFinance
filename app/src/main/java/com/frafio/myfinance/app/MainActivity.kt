@@ -20,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
@@ -114,14 +115,13 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                val decorators = listOf(
-                    rememberSaveableStateHolderNavEntryDecorator<NavKey>(),
-                    rememberViewModelStoreNavEntryDecorator()
-                )
-                val rootEntries = rememberDecoratedNavEntries(
-                    backStack = rootBackStack,
-                    entryDecorators = decorators,
-                    entryProvider = entryProvider {
+                val saveableStateHolderDecorator = rememberSaveableStateHolderNavEntryDecorator<NavKey>()
+                val viewModelStoreDecorator = rememberViewModelStoreNavEntryDecorator<NavKey>()
+                val decorators = remember(saveableStateHolderDecorator, viewModelStoreDecorator) {
+                    listOf(saveableStateHolderDecorator, viewModelStoreDecorator)
+                }
+                val provider = remember(appState, rootBackStack) {
+                    entryProvider {
                         authEntry(
                             appState = appState,
                             onAuthSuccess = {
@@ -158,6 +158,11 @@ class MainActivity : ComponentActivity() {
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
                         )
                     }
+                }
+                val rootEntries = rememberDecoratedNavEntries(
+                    backStack = rootBackStack,
+                    entryDecorators = decorators,
+                    entryProvider = provider
                 )
 
                 CompositionLocalProvider(LocalSnackbarHostState provides appState.snackbarHostState) {

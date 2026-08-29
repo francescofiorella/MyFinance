@@ -109,16 +109,6 @@ class AddViewModel @AssistedInject constructor(
 
     var expenseId by mutableStateOf(initialNavKey.transaction?.id ?: "")
 
-    var nameError by mutableStateOf<String?>(null)
-    var priceError by mutableStateOf<String?>(null)
-    var categoryError by mutableStateOf<String?>(null)
-
-    fun resetErrors() {
-        nameError = null
-        priceError = null
-        categoryError = null
-    }
-
     private val _uiEvents = MutableSharedFlow<AddUiEvent>()
     val uiEvents: SharedFlow<AddUiEvent> = _uiEvents.asSharedFlow()
 
@@ -129,57 +119,30 @@ class AddViewModel @AssistedInject constructor(
         _isAdding.value = isAdding
     }
 
-    fun onAddButtonClick() {
+    fun onAddButtonClick(
+        name: String,
+        priceString: String,
+        category: Int,
+        year: Int,
+        month: Int,
+        day: Int,
+        labels: List<String>
+    ) {
         viewModelScope.launch {
             try {
                 updateAddingState(true)
                 loadingRepository.startLoading()
 
-                name = name.trim()
-                priceString = priceString.trim()
+                val trimmedName = name.trim()
+                val trimmedPriceString = priceString.trim()
 
-                // check info
-                var hasError = false
-                nameError = null
-                priceError = null
-                categoryError = null
-
-                if (name.isEmpty()) {
-                    nameError = FinanceCode.EMPTY_NAME.message
-                    hasError = true
-                } else if (name == FirestoreEnums.NAMES.TOTAL.valueEn || name == FirestoreEnums.NAMES.TOTAL.valueIt) {
-                    nameError = FinanceCode.WRONG_NAME_TOTAL.message
-                    hasError = true
-                }
-
-                if (priceString.isEmpty()) {
-                    priceError = FinanceCode.EMPTY_AMOUNT.message
-                    hasError = true
-                } else if (priceString.toDoubleOrNull() == null || priceString.toDouble() == 0.0) {
-                    priceError = FinanceCode.WRONG_AMOUNT.message
-                    hasError = true
-                }
-
-                if (navKey.expenseCode == REQUEST_INCOME_CODE) {
-                    category = FirestoreEnums.CATEGORIES.INCOME.value
-                    labels = emptyList()
-                } else if (category == -1) {
-                    categoryError = FinanceCode.EMPTY_CATEGORY.message
-                    hasError = true
-                }
-
-                if (hasError) {
-                    updateAddingState(false)
-                    return@launch
-                }
-
-                val price = priceString.toDouble()
+                val price = trimmedPriceString.toDouble()
 
                 when (navKey.requestCode) {
                     REQUEST_ADD_CODE -> {
                         if (navKey.expenseCode == REQUEST_EXPENSE_CODE) {
                             val expense = Expense(
-                                name = name,
+                                name = trimmedName,
                                 price = price,
                                 year = year,
                                 month = month,
@@ -197,14 +160,14 @@ class AddViewModel @AssistedInject constructor(
                             }
                         } else {
                             val income = Income(
-                                name = name,
+                                name = trimmedName,
                                 price = price,
                                 year = year,
                                 month = month,
                                 day = day,
                                 timestamp = dateToUTCTimestamp(year, month, day),
-                                category = category,
-                                labels = labels
+                                category = FirestoreEnums.CATEGORIES.INCOME.value,
+                                labels = emptyList()
                             )
                             incomeRepository.addIncome(income).also {
                                 if (it.code == FinanceCode.INCOME_ADD_SUCCESS.code) {
@@ -219,7 +182,7 @@ class AddViewModel @AssistedInject constructor(
                     REQUEST_EDIT_CODE -> {
                         if (navKey.expenseCode == REQUEST_EXPENSE_CODE) {
                             val expense = Expense(
-                                name = name,
+                                name = trimmedName,
                                 price = price,
                                 year = year,
                                 month = month,
@@ -238,14 +201,14 @@ class AddViewModel @AssistedInject constructor(
                             }
                         } else {
                             val income = Income(
-                                name = name,
+                                name = trimmedName,
                                 price = price,
                                 year = year,
                                 month = month,
                                 day = day,
                                 timestamp = dateToUTCTimestamp(year, month, day),
-                                category = category,
-                                labels = labels,
+                                category = FirestoreEnums.CATEGORIES.INCOME.value,
+                                labels = emptyList(),
                                 id = expenseId
                             )
                             incomeRepository.editIncome(income).also {
@@ -260,6 +223,7 @@ class AddViewModel @AssistedInject constructor(
                 }
             } finally {
                 loadingRepository.stopLoading()
+                updateAddingState(false)
             }
         }
     }

@@ -25,8 +25,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.BottomSheetDefaults
@@ -51,6 +52,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,6 +86,9 @@ import com.frafio.myfinance.core.utils.getCurrencyIcon
 import com.frafio.myfinance.features.expenses.components.CategorySheet
 import com.frafio.myfinance.features.expenses.components.LabelsSheet
 import java.time.LocalDate
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import com.frafio.myfinance.core.data.enums.db.FinanceCode
+import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,23 +103,30 @@ fun AddScreen(
     val allLabels by viewModel.allLabels.collectAsStateWithLifecycle()
     val currencyCode by viewModel.currencyCode.collectAsStateWithLifecycle()
 
+    val nameState = rememberTextFieldState(viewModel.name)
+    val priceState = rememberTextFieldState(viewModel.priceString)
+
     var showCategorySheet by rememberSaveable { mutableStateOf(false) }
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     var showLabelsSheet by rememberSaveable { mutableStateOf(false) }
 
+    var nameError by remember { mutableStateOf<String?>(null) }
+    var priceError by remember { mutableStateOf<String?>(null) }
+    var categoryError by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(nameState.text) {
+        nameError = null
+    }
+
+    LaunchedEffect(priceState.text) {
+        priceError = null
+    }
+
     AddScreen(
         appState = appState,
         isAdding = isAdding,
-        name = viewModel.name,
-        onNameChange = {
-            viewModel.name = it
-            viewModel.nameError = null
-        },
-        priceString = viewModel.priceString,
-        onPriceChange = {
-            viewModel.priceString = it
-            viewModel.priceError = null
-        },
+        nameState = nameState,
+        priceState = priceState,
         dateString = viewModel.dateString ?: "",
         onDateClick = {
             focusManager.clearFocus()
@@ -132,19 +144,58 @@ fun AddScreen(
         },
         onLabelCheckedChanged = viewModel::onLabelCheckedChanged,
         navKey = viewModel.navKey,
-        onNavKeyChange = {
+        onNavKeyChange = { newNavKey ->
             focusManager.clearFocus()
-            viewModel.navKey = it
-            viewModel.resetErrors()
+            viewModel.navKey = newNavKey
+            nameError = null
+            priceError = null
+            categoryError = null
         },
         onSaveClick = {
             focusManager.clearFocus()
-            viewModel.onAddButtonClick()
+
+            val name = nameState.text.toString().trim()
+            val priceString = priceState.text.toString().trim()
+            var hasError = false
+
+            if (name.isEmpty()) {
+                nameError = FinanceCode.EMPTY_NAME.message
+                hasError = true
+            } else if (name == FirestoreEnums.NAMES.TOTAL.valueEn ||
+                name == FirestoreEnums.NAMES.TOTAL.valueIt) {
+                nameError = FinanceCode.WRONG_NAME_TOTAL.message
+                hasError = true
+            }
+
+            if (priceString.isEmpty()) {
+                priceError = FinanceCode.EMPTY_AMOUNT.message
+                hasError = true
+            } else if (priceString.toDoubleOrNull() == null || priceString.toDouble() == 0.0) {
+                priceError = FinanceCode.WRONG_AMOUNT.message
+                hasError = true
+            }
+
+            if (viewModel.navKey.expenseCode != AddViewModel.REQUEST_INCOME_CODE && viewModel.category == -1) {
+                categoryError = FinanceCode.EMPTY_CATEGORY.message
+                hasError = true
+            }
+
+            if (!hasError) {
+                viewModel.onAddButtonClick(
+                    name = name,
+                    priceString = priceString,
+                    category = viewModel.category,
+                    year = viewModel.year,
+                    month = viewModel.month,
+                    day = viewModel.day,
+                    labels = viewModel.labels
+                )
+            }
         },
         onBackClick = onBackClick,
-        nameError = viewModel.nameError,
-        priceError = viewModel.priceError,
-        categoryError = viewModel.categoryError,
+        nameError = nameError,
+        priceError = priceError,
+        categoryError = categoryError,
         currencyCode = currencyCode
     )
 
@@ -157,7 +208,7 @@ fun AddScreen(
         },
         onCategorySelected = {
             viewModel.category = it
-            viewModel.categoryError = null
+            categoryError = null
             if (showCategorySheet) {
                 showCategorySheet = false
             }
@@ -204,10 +255,8 @@ fun AddScreen(
 fun AddScreen(
     appState: MyFinanceAppState,
     isAdding: Boolean,
-    name: String,
-    onNameChange: (String) -> Unit,
-    priceString: String,
-    onPriceChange: (String) -> Unit,
+    nameState: TextFieldState,
+    priceState: TextFieldState,
     dateString: String,
     onDateClick: () -> Unit,
     category: Int,
@@ -260,8 +309,7 @@ fun AddScreen(
                         .animateContentSize()
                 ) {
                     NameAndLabelsCard(
-                        name = name,
-                        onNameChange = onNameChange,
+                        nameState = nameState,
                         nameError = nameError,
                         isAdding = isAdding,
                         navKey = navKey,
@@ -271,8 +319,7 @@ fun AddScreen(
                     )
 
                     TransactionForm(
-                        priceString = priceString,
-                        onPriceChange = onPriceChange,
+                        priceState = priceState,
                         priceError = priceError,
                         dateString = dateString,
                         onDateClick = onDateClick,
@@ -400,8 +447,7 @@ fun AddTopBar(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun NameAndLabelsCard(
-    name: String,
-    onNameChange: (String) -> Unit,
+    nameState: TextFieldState,
     nameError: String?,
     isAdding: Boolean,
     navKey: RootKey.AddEditTransaction,
@@ -449,8 +495,7 @@ fun NameAndLabelsCard(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Box(modifier = Modifier.fillMaxWidth()) {
                     TextField(
-                        value = name,
-                        onValueChange = onNameChange,
+                        state = nameState,
                         placeholder = {
                             Text(
                                 text = stringResource(
@@ -473,8 +518,8 @@ fun NameAndLabelsCard(
                                     painter = painterResource(id = R.drawable.ic_error_filled),
                                     contentDescription = null
                                 )
-                            } else if (name.isNotEmpty() && !isAdding) {
-                                IconButton(onClick = { onNameChange("") }) {
+                            } else if (nameState.text.isNotEmpty() && !isAdding) {
+                                IconButton(onClick = { nameState.edit { replace(0, length, "") } }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_cancel_filled),
                                         contentDescription = "Clear"
@@ -498,10 +543,10 @@ fun NameAndLabelsCard(
                             autoCorrectEnabled = false,
                             imeAction = ImeAction.Next
                         ),
-                        keyboardActions = KeyboardActions(onNext = {
+                        onKeyboardAction = {
                             focusManager.moveFocus(FocusDirection.Down)
-                        }),
-                        singleLine = true
+                        },
+                        lineLimits = TextFieldLineLimits.SingleLine
                     )
                     if (nameError != null) {
                         Text(
@@ -514,6 +559,7 @@ fun NameAndLabelsCard(
                         )
                     }
                 }
+// ...
 
                 AnimatedVisibility(
                     visible = navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE,
@@ -598,8 +644,7 @@ fun AddLabelChip(onClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TransactionForm(
-    priceString: String,
-    onPriceChange: (String) -> Unit,
+    priceState: TextFieldState,
     priceError: String?,
     dateString: String,
     onDateClick: () -> Unit,
@@ -625,8 +670,7 @@ fun TransactionForm(
             colors = colors,
             content = {
                 AmountField(
-                    priceString = priceString,
-                    onPriceChange = onPriceChange,
+                    priceState = priceState,
                     priceError = priceError,
                     isAdding = isAdding,
                     onSaveClick = onSaveClick,
@@ -638,6 +682,7 @@ fun TransactionForm(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 2.dp)
         )
+// ...
 
         // Date Field
         SegmentedListItem(
@@ -694,8 +739,7 @@ fun TransactionForm(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AmountField(
-    priceString: String,
-    onPriceChange: (String) -> Unit,
+    priceState: TextFieldState,
     priceError: String?,
     isAdding: Boolean,
     onSaveClick: () -> Unit,
@@ -723,10 +767,11 @@ fun AmountField(
         }
         Box(modifier = Modifier.fillMaxWidth()) {
             TextField(
-                value = priceString,
-                onValueChange = { text ->
-                    if (text.isEmpty() || text.toDoubleOrNull() != null || text == ".") {
-                        onPriceChange(text)
+                state = priceState,
+                inputTransformation = {
+                    val newText = asCharSequence().toString()
+                    if (newText.isNotEmpty() && newText.toDoubleOrNull() == null && newText != ".") {
+                        revertAllChanges()
                     }
                 },
                 placeholder = {
@@ -744,8 +789,8 @@ fun AmountField(
                             painter = painterResource(id = R.drawable.ic_error_filled),
                             contentDescription = null
                         )
-                    } else if (priceString.isNotEmpty() && !isAdding) {
-                        IconButton(onClick = { onPriceChange("") }) {
+                    } else if (priceState.text.isNotEmpty() && !isAdding) {
+                        IconButton(onClick = { priceState.edit { replace(0, length, "") } }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_cancel_filled),
                                 contentDescription = "Clear"
@@ -768,11 +813,11 @@ fun AmountField(
                     keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Done
                 ),
-                keyboardActions = KeyboardActions(onDone = {
+                onKeyboardAction = {
                     focusManager.clearFocus()
                     if (!isAdding) onSaveClick()
-                }),
-                singleLine = true
+                },
+                lineLimits = TextFieldLineLimits.SingleLine
             )
             if (priceError != null) {
                 Text(
@@ -1007,10 +1052,8 @@ fun AddScreenPreview() {
         AddScreen(
             appState = appState,
             isAdding = false,
-            name = "Test Expense",
-            onNameChange = {},
-            priceString = "10.0",
-            onPriceChange = {},
+            nameState = rememberTextFieldState("Test Expense"),
+            priceState = rememberTextFieldState("10.0"),
             dateString = "29 May 2026",
             onDateClick = {},
             category = 1,
