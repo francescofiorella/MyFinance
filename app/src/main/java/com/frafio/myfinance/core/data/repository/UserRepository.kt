@@ -66,6 +66,10 @@ class UserRepository @Inject constructor(
         return authManager.resetPassword(email)
     }
 
+    suspend fun changePassword(newPassword: String, currentPassword: String? = null): AuthResult {
+        return authManager.changePassword(newPassword, currentPassword)
+    }
+
     suspend fun userSignup(fullName: String, email: String, password: String): AuthResult {
         return authManager.signup(fullName, email, password)
     }

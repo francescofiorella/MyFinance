@@ -44,6 +44,10 @@
     <string name="auth_or">oppure</string>
     <string name="reset">Reimposta</string>
     <string name="password">Password</string>
+    <string name="change_password">Cambia la tua password</string>
+    <string name="short_password">La password deve essere lunga almeno 8 caratteri!</string>
+    <string name="password_not_match">Le password inserite non corrispondono!</string>
+    <string name="current_password">Inserisci password attuale</string>
 
     <string name="warning_home">Aggiungi la tua prima spesa!</string>
     <string name="warning_budget">Aggiungi la tua prima entrata!</string>

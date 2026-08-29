@@ -17,7 +17,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -36,13 +39,18 @@ fun AuthTextField(
     passwordVisible: Boolean = false,
     onPasswordVisibleChange: (Boolean) -> Unit = {},
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    contentType: ContentType? = null
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(
+                    if (contentType != null) Modifier.semantics { this.contentType = contentType } else Modifier
+                ),
             label = { Text(label) },
             leadingIcon = { Icon(painterResource(id = icon), contentDescription = null) },
             trailingIcon = {

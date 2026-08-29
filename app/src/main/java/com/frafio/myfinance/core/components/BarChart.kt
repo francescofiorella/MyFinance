@@ -266,7 +266,7 @@ private fun ChartBar(
             if (it) onClick()
         },
         content = {},
-        colors = ToggleButtonDefaults.toggleButtonColors(
+        colors = ToggleButtonDefaults.colors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             checkedContainerColor = MaterialTheme.colorScheme.primary
         ),

@@ -3,6 +3,7 @@ package com.frafio.myfinance.core.data.manager
 import android.util.Log
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseTooManyRequestsException
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -128,6 +129,27 @@ class AuthManager @Inject constructor(
                 AuthResult(AuthCode.EMAIL_NOT_SENT_TOO_MANY_REQUESTS)
             } else {
                 AuthResult(AuthCode.EMAIL_NOT_SENT)
+            }
+        }
+    }
+
+    suspend fun changePassword(newPassword: String, currentPassword: String? = null): AuthResult = withContext(Dispatchers.IO) {
+        val user = fUser ?: return@withContext AuthResult(AuthCode.USER_NOT_LOGGED)
+
+        return@withContext try {
+            if (currentPassword != null) {
+                val credential = EmailAuthProvider.getCredential(user.email!!, currentPassword)
+                user.reauthenticate(credential).await()
+            }
+            user.updatePassword(newPassword).await()
+            userPreferencesRepository.updateUser(user.toUser())
+            AuthResult(AuthCode.PASSWORD_UPDATED)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error changing password! ${e.localizedMessage}")
+            when (e) {
+                is FirebaseAuthWeakPasswordException -> AuthResult(AuthCode.WEAK_PASSWORD)
+                is FirebaseAuthInvalidCredentialsException -> AuthResult(AuthCode.WRONG_OLD_PASSWORD)
+                else -> AuthResult(AuthCode.PASSWORD_NOT_UPDATED)
             }
         }
     }

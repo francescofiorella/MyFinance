@@ -39,6 +39,9 @@ class UserPreferencesRepository @Inject constructor(
         val USER_PHOTO_URL = stringPreferencesKey("user_photo_url")
         val USER_LOCAL_PHOTO_PATH = stringPreferencesKey("user_local_photo_path")
         val USER_PROVIDER = intPreferencesKey("user_provider")
+        val USER_PROVIDERS = stringSetPreferencesKey("user_providers")
+        val USER_HAS_PASSWORD = booleanPreferencesKey("user_has_password")
+        val USER_IS_GOOGLE_LINKED = booleanPreferencesKey("user_is_google_linked")
         val USER_CREATION_YEAR = intPreferencesKey("user_creation_year")
         val USER_CREATION_MONTH = intPreferencesKey("user_creation_month")
         val USER_CREATION_DAY = intPreferencesKey("user_creation_day")
@@ -76,6 +79,9 @@ class UserPreferencesRepository @Inject constructor(
                     photoUrl = preferences[PreferencesKeys.USER_PHOTO_URL],
                     localPhotoPath = preferences[PreferencesKeys.USER_LOCAL_PHOTO_PATH],
                     provider = preferences[PreferencesKeys.USER_PROVIDER],
+                    providers = preferences[PreferencesKeys.USER_PROVIDERS]?.toList() ?: emptyList(),
+                    hasPassword = preferences[PreferencesKeys.USER_HAS_PASSWORD] ?: false,
+                    isGoogleLinked = preferences[PreferencesKeys.USER_IS_GOOGLE_LINKED] ?: false,
                     creationYear = preferences[PreferencesKeys.USER_CREATION_YEAR],
                     creationMonth = preferences[PreferencesKeys.USER_CREATION_MONTH],
                     creationDay = preferences[PreferencesKeys.USER_CREATION_DAY]
@@ -178,6 +184,9 @@ class UserPreferencesRepository @Inject constructor(
             preferences[PreferencesKeys.USER_PHOTO_URL] = user.photoUrl ?: ""
             preferences[PreferencesKeys.USER_LOCAL_PHOTO_PATH] = user.localPhotoPath ?: ""
             preferences[PreferencesKeys.USER_PROVIDER] = user.provider ?: User.EMAIL_PROVIDER
+            preferences[PreferencesKeys.USER_PROVIDERS] = user.providers.toSet()
+            preferences[PreferencesKeys.USER_HAS_PASSWORD] = user.hasPassword
+            preferences[PreferencesKeys.USER_IS_GOOGLE_LINKED] = user.isGoogleLinked
             preferences[PreferencesKeys.USER_CREATION_YEAR] = user.creationYear ?: 0
             preferences[PreferencesKeys.USER_CREATION_MONTH] = user.creationMonth ?: 0
             preferences[PreferencesKeys.USER_CREATION_DAY] = user.creationDay ?: 0
@@ -191,6 +200,9 @@ class UserPreferencesRepository @Inject constructor(
             preferences.remove(PreferencesKeys.USER_PHOTO_URL)
             preferences.remove(PreferencesKeys.USER_LOCAL_PHOTO_PATH)
             preferences.remove(PreferencesKeys.USER_PROVIDER)
+            preferences.remove(PreferencesKeys.USER_PROVIDERS)
+            preferences.remove(PreferencesKeys.USER_HAS_PASSWORD)
+            preferences.remove(PreferencesKeys.USER_IS_GOOGLE_LINKED)
             preferences.remove(PreferencesKeys.USER_CREATION_YEAR)
             preferences.remove(PreferencesKeys.USER_CREATION_MONTH)
             preferences.remove(PreferencesKeys.USER_CREATION_DAY)

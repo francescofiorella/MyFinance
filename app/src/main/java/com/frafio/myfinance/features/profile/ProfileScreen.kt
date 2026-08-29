@@ -60,7 +60,8 @@ fun ProfileScreen(
     viewModel: ProfileViewModel,
     initialUser: User? = null,
     initialProfilePicture: Bitmap? = null,
-    onManageLabels: () -> Unit
+    onManageLabels: () -> Unit,
+    onChangePassword: () -> Unit
 ) {
     val userState by viewModel.user.collectAsStateWithLifecycle()
     val profilePictureState by viewModel.profilePicture.collectAsStateWithLifecycle()
@@ -146,6 +147,7 @@ fun ProfileScreen(
         onDynamicColorChanged = { viewModel.setDynamicColor(it) },
         onManageLabels = onManageLabels,
         onSelectCurrency = { showCurrencySheet = true },
+        onChangePasswordClick = onChangePassword,
         currencyCode = currencyCode
     )
 }
@@ -166,6 +168,7 @@ private fun ProfileContent(
     onDynamicColorChanged: (Boolean) -> Unit,
     onManageLabels: () -> Unit,
     onSelectCurrency: () -> Unit,
+    onChangePasswordClick: () -> Unit,
     currencyCode: String
 ) {
     Column(
@@ -191,6 +194,7 @@ private fun ProfileContent(
             onDynamicColorChanged = onDynamicColorChanged,
             onManageLabels = onManageLabels,
             onSelectCurrency = onSelectCurrency,
+            onChangePasswordClick = onChangePasswordClick,
             currencyCode = currencyCode
         )
     }
@@ -238,6 +242,7 @@ private fun ProfileCards(
     onDynamicColorChanged: (Boolean) -> Unit,
     onManageLabels: () -> Unit,
     onSelectCurrency: () -> Unit,
+    onChangePasswordClick: () -> Unit,
     currencyCode: String
 ) {
     val colors = ListItemDefaults.colors(
@@ -260,7 +265,7 @@ private fun ProfileCards(
         colors = colors,
         shapes = ListItemDefaults.segmentedShapes(
             index = 0,
-            count = if (expanded || googleSignIn) 3 else 2,
+            count = if (expanded) 4 else if (googleSignIn) 3 else 2,
             defaultShapes = ListItemDefaults.shapes()
         ),
         leadingContent = {
@@ -326,7 +331,7 @@ private fun ProfileCards(
                 colors = colors,
                 shapes = ListItemDefaults.segmentedShapes(
                     index = 1,
-                    count = 3,
+                    count = 4,
                     defaultShapes = ListItemDefaults.shapes()
                 ),
                 leadingContent = {
@@ -375,7 +380,7 @@ private fun ProfileCards(
                 colors = colors,
                 shapes = ListItemDefaults.segmentedShapes(
                     index = 2,
-                    count = 3,
+                    count = 4,
                     defaultShapes = ListItemDefaults.shapes()
                 ),
                 leadingContent = {
@@ -396,6 +401,55 @@ private fun ProfileCards(
                 content = {
                     Text(
                         text = stringResource(id = R.string.edit_full_name),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                trailingContent = {
+                    Box(
+                        modifier = Modifier
+                            .width(32.dp)
+                            .height(40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
+                            contentDescription = null,
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 2.dp),
+            )
+
+            SegmentedListItem(
+                onClick = onChangePasswordClick,
+                colors = colors,
+                shapes = ListItemDefaults.segmentedShapes(
+                    index = 3,
+                    count = 4,
+                    defaultShapes = ListItemDefaults.shapes()
+                ),
+                leadingContent = {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.secondaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_password_filled),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                },
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.change_password),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -466,17 +520,11 @@ private fun ProfileCards(
     SegmentedListItem(
         onClick = {},
         colors = colors,
-        shapes = if (itemIndex == 0 && itemCount == 1) {
-            ListItemDefaults.shapes(
-                shape = ListItemDefaults.shapes().selectedShape
-            )
-        } else {
-            ListItemDefaults.segmentedShapes(
-                index = itemIndex,
-                count = itemCount,
-                defaultShapes = ListItemDefaults.shapes()
-            )
-        },
+        shapes = ListItemDefaults.segmentedShapes(
+            index = itemIndex,
+            count = itemCount,
+            defaultShapes = ListItemDefaults.shapes()
+        ),
         leadingContent = {
             Box(
                 modifier = Modifier
@@ -724,6 +772,7 @@ fun ProfilePreview() {
             onDynamicColorChanged = {},
             onManageLabels = {},
             onSelectCurrency = {},
+            onChangePasswordClick = {},
             currencyCode = "EUR"
         )
     }

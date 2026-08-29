@@ -157,8 +157,7 @@ fun LabelsContent(
                     onAddLabel(labelFieldValue.text.trim())
                     labelFieldValue = TextFieldValue("")
                     focusManager.clearFocus()
-                },
-                modifier = Modifier.padding(top = 16.dp)
+                }
             )
 
             if (isLabelsEmpty) {
@@ -330,23 +329,17 @@ fun LabelItem(
             ListItemDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
             ),
-        shapes = if (count > 1) {
-            ListItemDefaults.segmentedShapes(
-                index = index,
-                count = count,
-                defaultShapes = ListItemDefaults.shapes(
-                    shape = if (isEditing) {
-                        ListItemDefaults.shapes().selectedShape
-                    } else {
-                        ListItemDefaults.shapes().shape
-                    }
-                )
+        shapes = ListItemDefaults.segmentedShapes(
+            index = index,
+            count = count,
+            defaultShapes = ListItemDefaults.shapes(
+                shape = if (isEditing) {
+                    ListItemDefaults.shapes().selectedShape
+                } else {
+                    ListItemDefaults.shapes().shape
+                }
             )
-        } else {
-            ListItemDefaults.shapes(
-                shape = ListItemDefaults.shapes().selectedShape
-            )
-        },
+        ),
         leadingContent = {
             Box(
                 modifier = Modifier

@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,6 +48,7 @@ import com.frafio.myfinance.features.add.navigation.addEntry
 import com.frafio.myfinance.features.auth.navigation.authEntry
 import com.frafio.myfinance.features.home.HomeScreen
 import com.frafio.myfinance.features.labels.navigation.labelsEntry
+import com.frafio.myfinance.features.password.navigation.changePasswordEntry
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -91,6 +94,9 @@ class MainActivity : ComponentActivity() {
                 val appState = rememberMyFinanceAppState()
                 val rootBackStack = rememberNavBackStack(if (viewModel.userRepository.isUserLoggedIn()) RootKey.Home else RootKey.Auth)
 
+                val focusManager = LocalFocusManager.current
+                val keyboardController = LocalSoftwareKeyboardController.current
+
                 LaunchedEffect(isLoading) {
                     appState.showProgress = isLoading
                 }
@@ -99,6 +105,8 @@ class MainActivity : ComponentActivity() {
                     viewModel.mainEvents.collect { event ->
                         when (event) {
                             MainEvent.UserNotLogged, MainEvent.LogoutSuccess -> {
+                                focusManager.clearFocus()
+                                keyboardController?.hide()
                                 rootBackStack.clear()
                                 rootBackStack.add(RootKey.Auth)
                             }
@@ -142,6 +150,10 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                         labelsEntry(
+                            appState = appState,
+                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
+                        )
+                        changePasswordEntry(
                             appState = appState,
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
                         )

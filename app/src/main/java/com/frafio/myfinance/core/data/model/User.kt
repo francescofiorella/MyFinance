@@ -8,6 +8,9 @@ data class User(
     val photoUrl: String? = null,
     val localPhotoPath: String? = null,
     val provider: Int? = null,
+    val providers: List<String> = emptyList(),
+    val hasPassword: Boolean = false,
+    val isGoogleLinked: Boolean = false,
     val creationYear: Int? = null,
     val creationMonth: Int? = null,
     val creationDay: Int? = null

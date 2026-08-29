@@ -210,5 +210,29 @@ enum class AuthCode(val code: Int, val message: String) {
             Languages.ITALIANO.value -> "Aggiornamento nome utente non riuscito!"
             else -> "User full name not updated!" // english
         }
+    ),
+
+    PASSWORD_UPDATED(
+        104, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Password updated successfully!"
+            Languages.ITALIANO.value -> "Password aggiornata con successo!"
+            else -> "Password updated successfully!" // english
+        }
+    ),
+
+    PASSWORD_NOT_UPDATED(
+        105, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "Password not updated!"
+            Languages.ITALIANO.value -> "Password non aggiornata!"
+            else -> "Password not updated!" // english
+        }
+    ),
+
+    WRONG_OLD_PASSWORD(
+        106, when (getCurrentLanguage()) {
+            Languages.ENGLISH.value -> "The current password is incorrect"
+            Languages.ITALIANO.value -> "La password attuale non è corretta"
+            else -> "The current password is incorrect" // english
+        }
     )
 }

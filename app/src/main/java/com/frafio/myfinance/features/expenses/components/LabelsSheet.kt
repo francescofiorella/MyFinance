@@ -114,16 +114,10 @@ fun LabelItem(
         colors = ListItemDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         ),
-        shapes = if (count > 1) {
-            ListItemDefaults.segmentedShapes(
-                index = index,
-                count = count
-            )
-        } else {
-            ListItemDefaults.shapes(
-                shape = ListItemDefaults.shapes().selectedShape
-            )
-        },
+        shapes = ListItemDefaults.segmentedShapes(
+            index = index,
+            count = count
+        ),
         leadingContent = {
             Box(
                 modifier = Modifier

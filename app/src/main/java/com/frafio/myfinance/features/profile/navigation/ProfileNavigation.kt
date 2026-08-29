@@ -20,7 +20,8 @@ fun EntryProviderScope<NavKey>.profileEntry(
     appState: MyFinanceAppState,
     initialUser: User? = null,
     profilePicture: Bitmap? = null,
-    onManageLabels: () -> Unit
+    onManageLabels: () -> Unit,
+    onChangePassword: () -> Unit
 ) {
     entry<HomeTabKey.Profile> {
         val viewModel: ProfileViewModel = hiltViewModel()
@@ -70,7 +71,8 @@ fun EntryProviderScope<NavKey>.profileEntry(
             viewModel = viewModel,
             initialUser = initialUser,
             initialProfilePicture = profilePicture,
-            onManageLabels = onManageLabels
+            onManageLabels = onManageLabels,
+            onChangePassword = onChangePassword
         )
     }
 }

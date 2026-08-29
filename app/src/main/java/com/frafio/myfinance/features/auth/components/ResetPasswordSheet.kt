@@ -25,9 +25,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -81,7 +84,8 @@ fun ResetPasswordSheet(
                     value = emailFieldValue,
                     onValueChange = { emailFieldValue = it },
                     modifier = Modifier
-                        .weight(1f),
+                        .weight(1f)
+                        .semantics { contentType = ContentType.EmailAddress },
                     label = { Text(stringResource(id = R.string.login_signup_email)) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,

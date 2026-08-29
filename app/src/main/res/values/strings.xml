@@ -44,6 +44,10 @@
     <string name="auth_or">or</string>
     <string name="reset">Reset</string>
     <string name="password">Password</string>
+    <string name="change_password">Change your password</string>
+    <string name="short_password">The password must be at least 8 characters long!</string>
+    <string name="password_not_match">The entered passwords do not match!</string>
+    <string name="current_password">Enter current password</string>
 
     <string name="warning_home">Add your first expense!</string>
     <string name="warning_budget">Add your first income!</string>

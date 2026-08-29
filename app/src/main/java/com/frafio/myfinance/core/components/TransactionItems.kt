@@ -107,17 +107,11 @@ fun TransactionListItem(
     SegmentedListItem(
         onClick = onClick,
         onLongClick = onLongClick,
-        shapes = if (indexInGroup == 0 && countInGroup == 1) {
-            ListItemDefaults.shapes(
-                shape = ListItemDefaults.shapes().selectedShape
-            )
-        } else {
-            ListItemDefaults.segmentedShapes(
-                index = indexInGroup,
-                count = countInGroup,
-                defaultShapes = ListItemDefaults.shapes()
-            )
-        },
+        shapes = ListItemDefaults.segmentedShapes(
+            index = indexInGroup,
+            count = countInGroup,
+            defaultShapes = ListItemDefaults.shapes()
+        ),
         colors = colors,
         content = {
             Row(verticalAlignment = Alignment.CenterVertically) {

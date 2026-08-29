@@ -35,6 +35,7 @@ import com.frafio.myfinance.core.navigation.toEntries
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -72,6 +73,7 @@ fun HomeScreen(
 ) {
     val navigator = remember { Navigator(appState.navigationState) }
     val currentTab = appState.navigationState.currentTopLevelKey as HomeTabKey
+    val focusManager = LocalFocusManager.current
 
     val user by homeViewModel.user.collectAsStateWithLifecycle()
     val profilePicture by homeViewModel.profilePicture.collectAsStateWithLifecycle()
@@ -138,7 +140,10 @@ fun HomeScreen(
                 )
             )
         },
-        onLogoutClick = { homeViewModel.onLogoutButtonClick() },
+        onLogoutClick = {
+            focusManager.clearFocus()
+            homeViewModel.onLogoutButtonClick()
+        },
         onProPicClick = { navigator.navigate(HomeTabKey.Profile) },
         screenContent = {
             val homeEntries = appState.navigationState.toEntries(
@@ -179,7 +184,8 @@ fun HomeScreen(
                         appState = appState,
                         initialUser = user,
                         profilePicture = profilePicture,
-                        onManageLabels = { onNavigateToRoot(RootKey.Labels) }
+                        onManageLabels = { onNavigateToRoot(RootKey.Labels) },
+                        onChangePassword = { onNavigateToRoot(RootKey.ChangePassword) }
                     )
                 }
             )
