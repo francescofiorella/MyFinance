@@ -57,7 +57,7 @@ fun SelectProPicSheet(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                if (googlePhotoUrl != null) {
+                if (!googlePhotoUrl.isNullOrEmpty()) {
                     ImageSelectorButton(
                         modifier = Modifier.size(imageSize),
                         url = googlePhotoUrl,
