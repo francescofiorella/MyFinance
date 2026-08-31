@@ -41,7 +41,6 @@
     <string name="signup_password_confirm">Confirm your password</string>
     <string name="signup">Sign up</string>
     <string name="signup_login">Already have an account? Sign in</string>
-    <string name="auth_or">or</string>
     <string name="reset">Reset</string>
     <string name="password">Password</string>
     <string name="change_password">Change your password</string>
@@ -67,7 +66,10 @@
 
     <string name="use_dynamic_color">Dynamic colors</string>
 
+    <string name="authentication">Authentication</string>
     <string name="sign_up_provider">Signed up with Google</string>
+    <string name="sign_up_email">Signed up with email</string>
+    <string name="sign_up_google_email">Signed up\ with email and Google</string>
     <string name="signUpDate">Account created in %1$s</string>
 
     <string name="change_currency">Change currency</string>

@@ -105,7 +105,11 @@ fun AuthScreen(
             focusManager.clearFocus()
             scope.launch {
                 viewModel.startLoading()
-                handleGoogleSignIn(context, viewModel::onGoogleRequest) { message ->
+                handleGoogleSignIn(
+                    context = context,
+                    isSigningUp = uiState.isSigningUp,
+                    onSuccess = viewModel::onGoogleRequest
+                ) { message ->
                     appState.showSnackBar(message)
                     viewModel.stopLoading()
                 }
@@ -129,25 +133,42 @@ fun AuthScreen(
 
 private suspend fun handleGoogleSignIn(
     context: Context,
+    isSigningUp: Boolean,
     onSuccess: (Credential) -> Unit,
     onMessage: (String) -> Unit
 ) {
     val credentialManager = CredentialManager.create(context)
-    val googleIdOption = GetGoogleIdOption.Builder()
-        .setServerClientId(context.getString(R.string.default_web_client_id))
-        .setFilterByAuthorizedAccounts(true)
-        .build()
 
-    val request = GetCredentialRequest.Builder()
-        .addCredentialOption(googleIdOption)
-        .build()
+    suspend fun tryGetCredential(filter: Boolean): Credential? {
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setServerClientId(context.getString(R.string.default_web_client_id))
+            .setFilterByAuthorizedAccounts(filter)
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        return try {
+            credentialManager.getCredential(context = context, request = request).credential
+        } catch (_: NoCredentialException) {
+            null
+        }
+    }
 
     try {
-        val result = credentialManager.getCredential(context = context, request = request)
-        onSuccess(result.credential)
+        val credential = if (isSigningUp) {
+            tryGetCredential(false)
+        } else {
+            tryGetCredential(true) ?: tryGetCredential(false)
+        }
+
+        if (credential != null) {
+            onSuccess(credential)
+        } else {
+            onMessage(AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE).message)
+        }
     } catch (_: GetCredentialException) {
-        onMessage(AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE).message)
-    } catch (_: NoCredentialException) {
         onMessage(AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE).message)
     }
 }
@@ -260,7 +281,7 @@ private fun AuthContent(
                 ) {
                     Text(
                         text = stringResource(
-                            id = if (uiState.isSigningUp) R.string.auth_or else R.string.forgotten_password
+                            id = if (uiState.isSigningUp) R.string.or else R.string.forgotten_password
                         ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

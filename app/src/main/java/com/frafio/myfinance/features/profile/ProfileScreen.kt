@@ -78,7 +78,6 @@ fun ProfileScreen(
         lastProfilePicture = profilePictureState
     }
     val profilePicture = profilePictureState ?: lastProfilePicture
-    val googleSignIn = user?.provider == User.GOOGLE_PROVIDER
 
     val userPreferences by viewModel.userPreferences.collectAsStateWithLifecycle()
     val isDynamicColorChecked by viewModel.isSwitchDynamicColorChecked.collectAsStateWithLifecycle()
@@ -137,7 +136,6 @@ fun ProfileScreen(
         user = user,
         profilePicture = profilePicture,
         proPicChoice = userPreferences?.proPicChoice,
-        googleSignIn = googleSignIn,
         versionName = viewModel.versionName,
         isDynamicColorAvailable = viewModel.isDynamicColorAvailable,
         isDynamicColorChecked = isDynamicColorChecked,
@@ -158,7 +156,6 @@ private fun ProfileContent(
     user: User?,
     profilePicture: Bitmap?,
     proPicChoice: String?,
-    googleSignIn: Boolean,
     versionName: String,
     isDynamicColorAvailable: Boolean,
     isDynamicColorChecked: Boolean,
@@ -185,7 +182,6 @@ private fun ProfileContent(
 
         ProfileCards(
             user = user,
-            googleSignIn = googleSignIn,
             versionName = versionName,
             isDynamicColorAvailable = isDynamicColorAvailable,
             isDynamicColorChecked = isDynamicColorChecked,
@@ -233,7 +229,6 @@ private fun ProfileHeader(user: User?, profilePicture: Bitmap?, proPicChoice: St
 @Composable
 private fun ProfileCards(
     user: User?,
-    googleSignIn: Boolean,
     versionName: String,
     isDynamicColorAvailable: Boolean,
     isDynamicColorChecked: Boolean,
@@ -260,12 +255,15 @@ private fun ProfileCards(
 
     var expanded by rememberSaveable { mutableStateOf(false) }
 
+    val googleLinked = user?.isGoogleLinked == true
+    val emailLinked = user?.hasPassword == true
+
     SegmentedListItem(
         onClick = { expanded = !expanded },
         colors = colors,
         shapes = ListItemDefaults.segmentedShapes(
             index = 0,
-            count = if (expanded) 4 else if (googleSignIn) 3 else 2,
+            count = if (expanded) 4 else 3,
             defaultShapes = ListItemDefaults.shapes()
         ),
         leadingContent = {
@@ -476,53 +474,60 @@ private fun ProfileCards(
     }
 
     // Provider Card
-    if (googleSignIn) {
-        SegmentedListItem(
-            onClick = {},
-            colors = colors,
-            shapes = ListItemDefaults.segmentedShapes(
-                index = if (expanded) 0 else 1,
-                count = if (expanded) 2 else 3,
-                defaultShapes = ListItemDefaults.shapes()
-            ),
-            leadingContent = {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.secondaryContainer),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_google),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }
-            },
-            content = {
-                Text(
-                    text = stringResource(id = R.string.sign_up_provider),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
+    SegmentedListItem(
+        onClick = {},
+        colors = colors,
+        shapes = ListItemDefaults.segmentedShapes(
+            index = if (expanded) 0 else 1,
+            count = if (expanded) 2 else 3,
+            defaultShapes = ListItemDefaults.shapes()
+        ),
+        leadingContent = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(
+                        id = when {
+                            googleLinked && emailLinked -> R.drawable.ic_google
+                            googleLinked -> R.drawable.ic_google
+                            else -> R.drawable.ic_mail_filled
+                        }
+                    ),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 2.dp)
-        )
-    }
-
-    val itemCount = (if (expanded) 2 else 3) - (if (googleSignIn) 0 else 1)
-    val itemIndex = itemCount - 1
+            }
+        },
+        content = {
+            Text(
+                text = stringResource(
+                    id = when {
+                        googleLinked && emailLinked -> R.string.sign_up_google_email
+                        googleLinked -> R.string.sign_up_provider
+                        else -> R.string.sign_up_email
+                    }
+                ),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 2.dp)
+    )
 
     SegmentedListItem(
         onClick = {},
         colors = colors,
         shapes = ListItemDefaults.segmentedShapes(
-            index = itemIndex,
-            count = itemCount,
+            index = if (expanded) 1 else 2,
+            count = if (expanded) 2 else 3,
             defaultShapes = ListItemDefaults.shapes()
         ),
         leadingContent = {
@@ -758,11 +763,12 @@ fun ProfilePreview() {
                 photoUrl = null,
                 creationDay = 1,
                 creationMonth = 1,
-                creationYear = 2023
+                creationYear = 2023,
+                isGoogleLinked = true,
+                hasPassword = true
             ),
             profilePicture = null,
             proPicChoice = null,
-            googleSignIn = true,
             versionName = "MyFinance 1.0.0",
             isDynamicColorAvailable = true,
             isDynamicColorChecked = false,

@@ -41,7 +41,6 @@
     <string name="signup_password_confirm">Conferma la tua password</string>
     <string name="signup">Registrati</string>
     <string name="signup_login">Hai già un account? Accedi</string>
-    <string name="auth_or">oppure</string>
     <string name="reset">Reimposta</string>
     <string name="password">Password</string>
     <string name="change_password">Cambia la tua password</string>
@@ -65,7 +64,10 @@
 
     <string name="use_dynamic_color">Colori dinamici</string>
 
+    <string name="authentication">Autenticazione</string>
     <string name="sign_up_provider">Registrato con Google</string>
+    <string name="sign_up_email">Registrato con email</string>
+    <string name="sign_up_google_email">Registrato con email e Google</string>
     <string name="signUpDate">Account creato il %1$s</string>
 
     <string name="your_profile">Il tuo profilo</string>
