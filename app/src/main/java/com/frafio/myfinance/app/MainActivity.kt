@@ -1,5 +1,6 @@
 ﻿package com.frafio.myfinance.app
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +47,7 @@ import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.activeCurrencyCode
 import com.frafio.myfinance.core.utils.dateToExtendedString
+import com.frafio.myfinance.features.add.AddViewModel
 import com.frafio.myfinance.features.add.navigation.addEntry
 import com.frafio.myfinance.features.auth.navigation.authEntry
 import com.frafio.myfinance.features.home.HomeScreen
@@ -61,6 +64,8 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel by viewModels<HomeViewModel>()
 
+    private var shortcutAction = mutableStateOf<String?>(null)
+
     @Inject
     lateinit var loadingRepository: LoadingRepository
 
@@ -70,6 +75,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
+        shortcutAction.value = intent.action
 
         // Keep the splash screen on-screen until the UI state is loaded.
         splashScreen.setKeepOnScreenCondition {
@@ -81,6 +88,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
+            val action by shortcutAction
             val userPreferences by viewModel.userPreferences.collectAsStateWithLifecycle()
             val useDynamicColor = userPreferences?.dynamicColor ?: false
             val isLoading by loadingRepository.isLoading.collectAsStateWithLifecycle()
@@ -100,6 +108,25 @@ class MainActivity : ComponentActivity() {
 
                 LaunchedEffect(isLoading) {
                     appState.showProgress = isLoading
+                }
+
+                LaunchedEffect(action) {
+                    if (action == "com.frafio.myfinance.ADD_EXPENSE" || action == "com.frafio.myfinance.ADD_INCOME") {
+                        if (viewModel.userRepository.isUserLoggedIn()) {
+                            val expenseCode = if (action == "com.frafio.myfinance.ADD_EXPENSE") {
+                                AddViewModel.REQUEST_EXPENSE_CODE
+                            } else {
+                                AddViewModel.REQUEST_INCOME_CODE
+                            }
+                            rootBackStack.add(
+                                RootKey.AddEditTransaction(
+                                    requestCode = AddViewModel.REQUEST_ADD_CODE,
+                                    expenseCode = expenseCode
+                                )
+                            )
+                        }
+                        shortcutAction.value = null
+                    }
                 }
 
                 LaunchedEffect(Unit) {
@@ -215,6 +242,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        shortcutAction.value = intent.action
+    }
 
     private fun getDateChipLabel(startDate: LocalDate, endDate: LocalDate): String {
         return when (startDate.year) {

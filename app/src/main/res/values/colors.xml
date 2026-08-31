@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="launcher_icon_bg">#3D5576</color>
+    <color name="ic_shortcut">#FF3B608F</color>
 </resources>

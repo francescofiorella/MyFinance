@@ -111,6 +111,10 @@
     <string name="expense">Spesa</string>
     <string name="income">Entrata</string>
     <string name="save">Salva</string>
+
+    <string name="shortcut_new_expense">Nuova spesa</string>
+    <string name="shortcut_new_income">Nuova entrata</string>
+
     <string name="monthly">Mensile</string>
     <string name="annual">Annuale</string>
     <string name="expenses_by_category">Spese per categoria</string>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="new_expense"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_payments_outline"
+        android:shortcutShortLabel="@string/shortcut_new_expense"
+        android:shortcutLongLabel="@string/shortcut_new_expense">
+        <intent
+            android:action="com.frafio.myfinance.ADD_EXPENSE"
+            android:targetPackage="com.frafio.myfinance"
+            android:targetClass="com.frafio.myfinance.app.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="new_income"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_account_balance_filled"
+        android:shortcutShortLabel="@string/shortcut_new_income"
+        android:shortcutLongLabel="@string/shortcut_new_income">
+        <intent
+            android:action="com.frafio.myfinance.ADD_INCOME"
+            android:targetPackage="com.frafio.myfinance"
+            android:targetClass="com.frafio.myfinance.app.MainActivity" />
+    </shortcut>
+</shortcuts>

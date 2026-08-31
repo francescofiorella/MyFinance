@@ -106,6 +106,9 @@
     <string name="income">Income</string>
     <string name="save">Save</string>
 
+    <string name="shortcut_new_expense">New expense</string>
+    <string name="shortcut_new_income">New income</string>
+
     <string name="total">Total</string>
     <string name="monthly">Monthly</string>
     <string name="annual">Annual</string>
