@@ -417,23 +417,25 @@ fun ChangePasswordForm(
                 .padding(horizontal = 16.dp)
         )
 
-        Text(
-            text = stringResource(id = R.string.or),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.padding(vertical = 16.dp)
-        )
+        if (hasPassword) {
+            Text(
+                text = stringResource(id = R.string.or),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
 
-        FilledTonalButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 16.dp),
-            onClick = onResetPasswordClick,
-            enabled = !isLoading,
-            shapes = ButtonDefaults.shapes()
-        ) {
-            Text(text = stringResource(id = R.string.reset_password))
+            FilledTonalButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 16.dp),
+                onClick = onResetPasswordClick,
+                enabled = !isLoading,
+                shapes = ButtonDefaults.shapes()
+            ) {
+                Text(text = stringResource(id = R.string.reset_password))
+            }
         }
     }
 }
