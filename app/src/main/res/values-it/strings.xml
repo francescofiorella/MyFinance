@@ -45,13 +45,15 @@
     <string name="reset">Reimposta</string>
     <string name="password">Password</string>
     <string name="change_password">Cambia la tua password</string>
-    <string name="short_password">La password deve essere lunga almeno 8 caratteri!</string>
-    <string name="password_not_match">Le password inserite non corrispondono!</string>
+    <string name="short_password">Password troppo corta (min. 8 caratteri)</string>
+    <string name="password_not_match">Le password non coincidono</string>
     <string name="current_password">Inserisci password attuale</string>
+    <string name="reset_password">Reimposta password</string>
+    <string name="or">oppure</string>
 
-    <string name="warning_home">Aggiungi la tua prima spesa!</string>
-    <string name="warning_budget">Aggiungi la tua prima entrata!</string>
-    <string name="warning_labels">Aggiungi la tua prima etichetta!</string>
+    <string name="warning_home">Aggiungi la tua prima spesa</string>
+    <string name="warning_budget">Aggiungi la tua prima entrata</string>
+    <string name="warning_labels">Aggiungi la tua prima etichetta</string>
 
     <string name="expenses_today">Spese oggi</string>
     <string name="expenses_budget">Spesa su budget</string>
@@ -83,10 +85,10 @@
 
     <string name="total">Totale</string>
 
-    <string name="budget_updated">Budget aggiornato!</string>
-    <string name="income_deleted">Entrata eliminata!</string>
-    <string name="full_name_updated">Nome utente aggiornato!</string>
-    <string name="expense_deleted">Spesa eliminata!</string>
+    <string name="budget_updated">Budget aggiornato</string>
+    <string name="income_deleted">Entrata eliminata</string>
+    <string name="full_name_updated">Nome utente aggiornato</string>
+    <string name="expense_deleted">Spesa eliminata</string>
     <string name="firestore_quota_exceeded">Quota Firestore superata. La sincronizzazione è disabilitata.</string>
 
     <string name="housing">Abitazione</string>

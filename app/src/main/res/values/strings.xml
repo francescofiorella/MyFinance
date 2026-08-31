@@ -45,13 +45,15 @@
     <string name="reset">Reset</string>
     <string name="password">Password</string>
     <string name="change_password">Change your password</string>
-    <string name="short_password">The password must be at least 8 characters long!</string>
-    <string name="password_not_match">The entered passwords do not match!</string>
+    <string name="short_password">Password is too short (min. 8 characters)</string>
+    <string name="password_not_match">The confirmation password does not match</string>
     <string name="current_password">Enter current password</string>
+    <string name="reset_password">Reset password</string>
+    <string name="or">or</string>
 
-    <string name="warning_home">Add your first expense!</string>
-    <string name="warning_budget">Add your first income!</string>
-    <string name="warning_labels">Add your first label!</string>
+    <string name="warning_home">Add your first expense</string>
+    <string name="warning_budget">Add your first income</string>
+    <string name="warning_labels">Add your first label</string>
 
     <string name="expenses_today">Expenses today</string>
     <string name="expenses_budget">Expense on budget</string>
@@ -111,10 +113,10 @@
     <string name="date_range">Date range</string>
     <string name="annual_balance">Annual balance</string>
 
-    <string name="budget_updated">Budget updated!</string>
-    <string name="income_deleted">Income deleted!</string>
-    <string name="full_name_updated">User full name updated!</string>
-    <string name="expense_deleted">Expense deleted!</string>
+    <string name="budget_updated">Budget updated</string>
+    <string name="income_deleted">Income deleted</string>
+    <string name="full_name_updated">User full name updated</string>
+    <string name="expense_deleted">Expense deleted</string>
     <string name="firestore_quota_exceeded">Firestore quota exceeded. Syncing is disabled.</string>
 
     <string-array name="categories" translatable="false">

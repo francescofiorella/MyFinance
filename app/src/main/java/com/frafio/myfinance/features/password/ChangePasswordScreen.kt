@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,9 +20,11 @@ import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -153,7 +156,7 @@ fun ChangePasswordScreen(
             }
 
             if (newPassword.isEmpty()) {
-                newPasswordError = AuthResult(AuthCode.EMPTY_PASSWORD).message
+                newPasswordError = AuthResult(AuthCode.EMPTY_NEW_PASSWORD).message
                 hasLocalError = true
             } else if (newPassword.length < 8) {
                 newPasswordError = AuthResult(AuthCode.SHORT_PASSWORD).message
@@ -161,7 +164,7 @@ fun ChangePasswordScreen(
             }
 
             if (confirmPassword.isEmpty()) {
-                confirmPasswordError = AuthResult(AuthCode.EMPTY_CONFIRM_PASSWORD).message
+                confirmPasswordError = AuthResult(AuthCode.EMPTY_CONFIRM_NEW_PASSWORD).message
                 hasLocalError = true
             } else if (confirmPassword != newPassword) {
                 confirmPasswordError = AuthResult(AuthCode.PASSWORD_NOT_MATCH).message
@@ -173,6 +176,7 @@ fun ChangePasswordScreen(
             }
         },
         onBackClick = onBackClick,
+        onResetPasswordClick = { viewModel.resetPassword() },
         currentPasswordError = currentPasswordError,
         newPasswordError = newPasswordError,
         confirmPasswordError = confirmPasswordError,
@@ -197,16 +201,12 @@ fun ChangePasswordScreen(
     onConfirmPasswordVisibleChange: (Boolean) -> Unit,
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit,
+    onResetPasswordClick: () -> Unit,
     currentPasswordError: String? = null,
     newPasswordError: String? = null,
     confirmPasswordError: String? = null,
     remoteCurrentPasswordError: String? = null
 ) {
-    val isSaveEnabled = !isLoading &&
-            newPasswordState.text.isNotEmpty() &&
-            confirmPasswordState.text.isNotEmpty() &&
-            (!hasPassword || currentPasswordState.text.isNotEmpty())
-
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         snackbarHost = {
@@ -221,7 +221,7 @@ fun ChangePasswordScreen(
             ChangePasswordTopBar(
                 onBackClick = onBackClick,
                 onSaveClick = onSaveClick,
-                isSaveEnabled = isSaveEnabled
+                isSaveEnabled = !isLoading
             )
 
             Column(
@@ -244,6 +244,7 @@ fun ChangePasswordScreen(
                     confirmPasswordVisible = confirmPasswordVisible,
                     onConfirmPasswordVisibleChange = onConfirmPasswordVisibleChange,
                     onSaveClick = onSaveClick,
+                    onResetPasswordClick = onResetPasswordClick,
                     currentPasswordError = currentPasswordError,
                     newPasswordError = newPasswordError,
                     confirmPasswordError = confirmPasswordError,
@@ -323,6 +324,7 @@ fun ChangePasswordForm(
     confirmPasswordVisible: Boolean,
     onConfirmPasswordVisibleChange: (Boolean) -> Unit,
     onSaveClick: () -> Unit,
+    onResetPasswordClick: () -> Unit,
     currentPasswordError: String? = null,
     newPasswordError: String? = null,
     confirmPasswordError: String? = null,
@@ -331,7 +333,7 @@ fun ChangePasswordForm(
     val colors =
         ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
 
-    Column {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         if (hasPassword) {
             SegmentedListItem(
                 shapes = ListItemDefaults.segmentedShapes(
@@ -413,8 +415,26 @@ fun ChangePasswordForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 2.dp)
         )
+
+        Text(
+            text = stringResource(id = R.string.or),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(vertical = 16.dp)
+        )
+
+        FilledTonalButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 16.dp),
+            onClick = onResetPasswordClick,
+            enabled = !isLoading,
+            shapes = ButtonDefaults.shapes()
+        ) {
+            Text(text = stringResource(id = R.string.reset_password))
+        }
     }
 }
 
@@ -477,7 +497,12 @@ fun PasswordField(
                 trailingIcon = {
                     IconButton(onClick = onVisibilityToggle) {
                         Icon(
-                            painter = painterResource(id = if (isVisible) R.drawable.ic_visibility_filled else R.drawable.ic_visibility_off_filled),
+                            painter = painterResource(id = if (error != null)
+                                R.drawable.ic_error_filled
+                            else if(isVisible)
+                                R.drawable.ic_visibility_filled
+                            else
+                                R.drawable.ic_visibility_off_filled),
                             contentDescription = if (isVisible) "Hide password" else "Show password"
                         )
                     }
@@ -508,12 +533,13 @@ fun PasswordField(
             )
             if (error != null) {
                 Text(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 16.dp),
                     text = error,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = 16.dp)
+                    maxLines = 1
                 )
             }
         }
@@ -540,6 +566,7 @@ private fun ChangePasswordPreview() {
             onConfirmPasswordVisibleChange = {},
             onSaveClick = {},
             onBackClick = {},
+            onResetPasswordClick = {},
             currentPasswordError = null,
             newPasswordError = null,
             confirmPasswordError = null,

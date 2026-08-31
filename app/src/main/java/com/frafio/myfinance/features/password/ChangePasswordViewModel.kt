@@ -64,4 +64,17 @@ class ChangePasswordViewModel @Inject constructor(
             }
         }
     }
+
+    fun resetPassword() {
+        val email = user.value?.email ?: return
+        viewModelScope.launch {
+            try {
+                loadingRepository.startLoading()
+                val response = userRepository.resetPassword(email)
+                _uiEvents.emit(ChangePasswordUiEvent.ShowSnackBar(response.message))
+            } finally {
+                loadingRepository.stopLoading()
+            }
+        }
+    }
 }

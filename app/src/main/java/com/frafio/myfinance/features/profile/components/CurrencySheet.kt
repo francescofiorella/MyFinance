@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
@@ -112,7 +113,8 @@ fun CurrencySheet(
                     Spacer(modifier = Modifier.height(4.dp))
                     FilledTonalButton(
                         modifier = Modifier.fillMaxWidth().height(56.dp),
-                        onClick = { showAll = true }
+                        onClick = { showAll = true },
+                        shapes = ButtonDefaults.shapes()
                     ) {
                         Text(text = stringResource(id = R.string.show_all_currencies))
                     }

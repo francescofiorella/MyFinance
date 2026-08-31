@@ -15,14 +15,14 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -82,15 +82,21 @@ private fun GridItem(
     item: MenuItem,
     onDismiss: () -> Unit
 ) {
-    Surface(
-        modifier = modifier.alpha(if (item.enabled) 1f else 0.38f),
+    FilledTonalButton(
+        modifier = modifier,
+        contentPadding = PaddingValues(0.dp),
         onClick = {
             item.onClick()
             onDismiss()
         },
         enabled = item.enabled,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = RoundedCornerShape(16.dp)
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        shapes = ButtonDefaults.shapes(
+            shape = RoundedCornerShape(16.dp)
+        )
     ) {
         Column(
             modifier = Modifier
@@ -107,7 +113,6 @@ private fun GridItem(
                     text = item.symbol!!,
                     autoSize = TextAutoSize.StepBased(),
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurface,
                     fontFamily = GoogleSansFlexRoundFamily,
                     fontWeight = FontWeight.Bold
                 )
@@ -117,7 +122,6 @@ private fun GridItem(
                 Icon(
                     painter = painterResource(id = item.iconRes),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -126,7 +130,6 @@ private fun GridItem(
                 text = item.text ?: stringResource(id = item.textRes),
                 style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
