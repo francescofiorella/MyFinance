@@ -11,10 +11,8 @@ import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.PropertyName
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
-import java.util.Date
 
 @Parcelize
 @IgnoreExtraProperties
@@ -31,7 +29,7 @@ data class Income(
     override val labels: List<String> = emptyList(),
     override val updatedAt: Long? = null,
     @get:PropertyName("isDeleted") override val isDeleted: Boolean? = null,
-    @Contextual override val deleteAt: Date? = null,
+    override val deleteAt: Long? = null,
     @PrimaryKey @get:Exclude override var id: String = "$name$price$timestamp$category$labels"
 ) : Transaction, Parcelable {
     @Exclude

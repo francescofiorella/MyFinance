@@ -3,7 +3,6 @@ package com.frafio.myfinance.core.data.model
 import android.os.Parcelable
 import com.google.firebase.firestore.PropertyName
 import java.time.LocalDate
-import java.util.Date
 
 interface Transaction : Parcelable {
     val name: String?
@@ -17,7 +16,7 @@ interface Transaction : Parcelable {
     val updatedAt: Long?
     @get:PropertyName("isDeleted")
     val isDeleted: Boolean?
-    val deleteAt: Date?
+    val deleteAt: Long?
     val id: String
 
     fun getDateString(extended: Boolean = false): String

@@ -147,6 +147,14 @@ fun dateToUTCTimestamp(date: LocalDate): Long {
     return Timestamp.from(instant).time
 }
 
+fun currentTimestampUTC(): Long = System.currentTimeMillis()
+
+fun currentDeleteAtUTC(): Long {
+    val calendar = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"))
+    calendar.add(java.util.Calendar.DAY_OF_YEAR, 30)
+    return calendar.timeInMillis
+}
+
 fun String.capitalizeWords(): String = lowercase().split(" ").joinToString(" ") { word ->
     word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 }

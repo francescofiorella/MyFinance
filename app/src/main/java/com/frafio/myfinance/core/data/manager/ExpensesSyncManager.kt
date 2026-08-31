@@ -11,6 +11,7 @@ import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesData
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
+import com.frafio.myfinance.core.utils.currentTimestampUTC
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
@@ -60,7 +61,7 @@ class ExpensesSyncManager @Inject constructor(
             }
         }
         return if (changed) {
-            item.copy(labels = newLabels, updatedAt = System.currentTimeMillis())
+            item.copy(labels = newLabels, updatedAt = currentTimestampUTC())
         } else item
     }
 

@@ -12,6 +12,8 @@ import com.frafio.myfinance.core.data.model.Transaction
 import com.frafio.myfinance.core.data.repository.UserPreferencesData
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
+import com.frafio.myfinance.core.utils.currentDeleteAtUTC
+import com.frafio.myfinance.core.utils.currentTimestampUTC
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -24,7 +26,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.util.Calendar
 
 abstract class BaseSyncManager<T : Transaction>(
     private val userPreferencesRepository: UserPreferencesRepository,
@@ -63,7 +64,7 @@ abstract class BaseSyncManager<T : Transaction>(
 
     suspend fun add(item: T): FinanceResult = withContext(Dispatchers.IO) {
         val email = getUserEmail() ?: return@withContext FinanceResult(addFailureCode)
-        val itemWithTime = copyWithSyncFields(item, updatedAt = System.currentTimeMillis(), isDeleted = false, deleteAt = null)
+        val itemWithTime = copyWithSyncFields(item, updatedAt = currentTimestampUTC(), isDeleted = false, deleteAt = null)
         
         return@withContext try {
             val documentReference = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
@@ -87,7 +88,7 @@ abstract class BaseSyncManager<T : Transaction>(
 
     suspend fun edit(item: T): FinanceResult = withContext(Dispatchers.IO) {
         val email = getUserEmail() ?: return@withContext FinanceResult(editFailureCode)
-        val itemWithTime = copyWithSyncFields(item, updatedAt = System.currentTimeMillis(), isDeleted = false, deleteAt = null)
+        val itemWithTime = copyWithSyncFields(item, updatedAt = currentTimestampUTC(), isDeleted = false, deleteAt = null)
         
         return@withContext try {
             fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
@@ -106,13 +107,11 @@ abstract class BaseSyncManager<T : Transaction>(
     suspend fun delete(item: T): FinanceResult = withContext(Dispatchers.IO) {
         val email = getUserEmail() ?: return@withContext FinanceResult(deleteFailureCode)
         
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, 30)
-        val deleteAtDate = calendar.time
+        val deleteAtDate = currentDeleteAtUTC()
         
         val deletedItem = copyWithSyncFields(
             item, 
-            updatedAt = System.currentTimeMillis(), 
+            updatedAt = currentTimestampUTC(), 
             isDeleted = true, 
             deleteAt = deleteAtDate
         )
@@ -138,7 +137,7 @@ abstract class BaseSyncManager<T : Transaction>(
         isAddition: Boolean
     ): Long? = withContext(Dispatchers.IO) {
         val email = getUserEmail() ?: return@withContext null
-        val updatedAt = System.currentTimeMillis()
+        val updatedAt = currentTimestampUTC()
         
         return@withContext try {
             val operation = if (isAddition) {
@@ -163,7 +162,7 @@ abstract class BaseSyncManager<T : Transaction>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun copyWithSyncFields(item: T, updatedAt: Long, isDeleted: Boolean, deleteAt: java.util.Date?): T {
+    private fun copyWithSyncFields(item: T, updatedAt: Long, isDeleted: Boolean, deleteAt: Long?): T {
         return when (item) {
             is Expense -> item.copy(updatedAt = updatedAt, isDeleted = isDeleted, deleteAt = deleteAt) as T
             is Income -> item.copy(updatedAt = updatedAt, isDeleted = isDeleted, deleteAt = deleteAt) as T
@@ -214,9 +213,9 @@ abstract class BaseSyncManager<T : Transaction>(
                 }
             }
 
-            val maxUpdatedAt = remoteItems.mapNotNull { it.updatedAt }.maxOrNull() ?: System.currentTimeMillis()
+            val maxUpdatedAt = remoteItems.mapNotNull { it.updatedAt }.maxOrNull() ?: currentTimestampUTC()
             updateLastSync(maxUpdatedAt)
-            updateLastAppSync(System.currentTimeMillis())
+            updateLastAppSync(currentTimestampUTC())
             return@withContext maxUpdatedAt
         } catch (e: Exception) {
             Log.e("BaseSyncManager", "Error during full sync for $collectionName: ${e.localizedMessage}")
@@ -242,7 +241,7 @@ abstract class BaseSyncManager<T : Transaction>(
             }
             var currentLastSync = getLastSync(userPrefs)
             val currentLastAppSync = getLastAppSync(userPrefs)
-            val currentTime = System.currentTimeMillis()
+            val currentTime = currentTimestampUTC()
 
             if (currentLastAppSync != 0L && currentTime - currentLastAppSync >= SYNC_THRESHOLD_MS) {
                 Log.d("BaseSyncManager", "Performing full sync for $collectionName (last sync was > 29 days ago)")
@@ -272,7 +271,7 @@ abstract class BaseSyncManager<T : Transaction>(
                     if (snapshots != null) {
                         scope.launch(Dispatchers.IO) {
                             if (!snapshots.isEmpty) {
-                                updateLastAppSync(System.currentTimeMillis())
+                                updateLastAppSync(currentTimestampUTC())
                                 var maxUpdatedAt = currentLastSync
                                 val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels
                                 try {
