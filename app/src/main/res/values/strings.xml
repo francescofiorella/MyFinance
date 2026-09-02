@@ -107,6 +107,12 @@
     <string name="income">Income</string>
     <string name="save">Save</string>
 
+    <string name="delete_confirmation">Remove from your Account and all connected devices?</string>
+    <string name="delete_label_confirmation">Remove from your Account and all connected devices? This label will be removed from all associated expenses.</string>
+    <string name="delete_permanently">Delete permanently</string>
+    <string name="reset_password_confirmation">A reset link will be sent to your email address to change your password.</string>
+    <string name="send_email">Send email</string>
+
     <string name="shortcut_new_expense">New expense</string>
     <string name="shortcut_new_income">New income</string>
 

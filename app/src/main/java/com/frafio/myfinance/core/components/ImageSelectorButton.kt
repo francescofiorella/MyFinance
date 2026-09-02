@@ -140,7 +140,7 @@ private fun ImageSelectorButtonSelectedPreview() {
     MyFinanceTheme {
         Box(modifier = Modifier.size(200.dp), contentAlignment = Alignment.Center) {
             ImageSelectorButton(
-                drawable = R.drawable.image_profile_interface_pana,
+                drawable = R.drawable.image_profile_interface_cuate,
                 onClick = {},
                 isSelected = true
             )

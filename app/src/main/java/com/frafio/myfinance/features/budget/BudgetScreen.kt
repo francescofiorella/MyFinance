@@ -41,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.ConfirmationSheetDialog
 import com.frafio.myfinance.core.components.EditTransactionSheet
 import com.frafio.myfinance.core.components.EmptyListItem
 import com.frafio.myfinance.core.components.EmptyView
@@ -72,6 +73,7 @@ fun BudgetScreen(
 
     var showEditBudgetSheet by remember { mutableStateOf(value = false) }
     var showEditIncomeSheet by remember { mutableStateOf(value = false) }
+    var showDeletionConfirmationSheet by remember { mutableStateOf(value = false) }
     var editTargetIncome by remember { mutableStateOf<Income?>(value = null) }
 
     EditBudgetSheet(
@@ -111,11 +113,29 @@ fun BudgetScreen(
             }
         },
         onDelete = {
-            editTargetIncome?.let { viewModel.deleteIncome(it) }
             if (showEditIncomeSheet) {
                 showEditIncomeSheet = false
             }
+            showDeletionConfirmationSheet = true
         },
+    )
+
+    ConfirmationSheetDialog(
+        show = showDeletionConfirmationSheet,
+        onDismiss = {
+            if (showDeletionConfirmationSheet) {
+                showDeletionConfirmationSheet = false
+            }
+        },
+        headerText = R.string.delete_confirmation,
+        actionIcon = R.drawable.ic_delete_outline,
+        actionText = R.string.delete_permanently,
+        onActionClick = {
+            editTargetIncome?.let { viewModel.deleteIncome(it) }
+            if (showDeletionConfirmationSheet) {
+                showDeletionConfirmationSheet = false
+            }
+        }
     )
 
     BudgetContent(

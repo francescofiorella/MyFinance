@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppDateRangePickerDialog
+import com.frafio.myfinance.core.components.ConfirmationSheetDialog
 import com.frafio.myfinance.core.components.EditTransactionSheet
 import com.frafio.myfinance.core.components.EmptyListItem
 import com.frafio.myfinance.core.components.EmptyView
@@ -89,6 +90,7 @@ fun ExpensesScreen(
     var showCategorySheet by remember { mutableStateOf(value = false) }
     var showEditSheet by remember { mutableStateOf(value = false) }
     var showLabelsSheet by remember { mutableStateOf(value = false) }
+    var showDeletionConfirmationSheet by remember { mutableStateOf(value = false) }
     var showNewLabelInLabels by remember { mutableStateOf(value = true) }
     var showDatePickerRange by remember { mutableStateOf(value = false) }
 
@@ -183,10 +185,10 @@ fun ExpensesScreen(
             }
         },
         onDelete = {
-            editingExpense?.let { viewModel.deleteExpense(it) }
             if (showEditSheet) {
                 showEditSheet = false
             }
+            showDeletionConfirmationSheet = true
         },
     )
 
@@ -209,6 +211,24 @@ fun ExpensesScreen(
                 } else {
                     viewModel.removeLabelFromExpense(editingExpense!!, label)
                 }
+            }
+        }
+    )
+
+    ConfirmationSheetDialog(
+        show = showDeletionConfirmationSheet,
+        onDismiss = {
+            if (showDeletionConfirmationSheet) {
+                showDeletionConfirmationSheet = false
+            }
+        },
+        headerText = R.string.delete_confirmation,
+        actionIcon = R.drawable.ic_delete_outline,
+        actionText = R.string.delete_permanently,
+        onActionClick = {
+            editingExpense?.let { viewModel.deleteExpense(it) }
+            if (showDeletionConfirmationSheet) {
+                showDeletionConfirmationSheet = false
             }
         }
     )

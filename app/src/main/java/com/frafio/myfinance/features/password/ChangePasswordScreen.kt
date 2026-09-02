@@ -62,6 +62,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.ConfirmationSheetDialog
 import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
 import com.frafio.myfinance.core.data.model.AuthResult
@@ -94,6 +95,8 @@ fun ChangePasswordScreen(
     var confirmPasswordError by remember { mutableStateOf<String?>(null) }
     var remoteCurrentPasswordError by remember { mutableStateOf<String?>(null) }
 
+    var showDeletionConfirmationSheet by remember { mutableStateOf(value = false) }
+
     LaunchedEffect(currentPasswordState.text) {
         currentPasswordError = null
         remoteCurrentPasswordError = null
@@ -125,6 +128,24 @@ fun ChangePasswordScreen(
             }
         }
     }
+
+    ConfirmationSheetDialog(
+        show = showDeletionConfirmationSheet,
+        onDismiss = {
+            if (showDeletionConfirmationSheet) {
+                showDeletionConfirmationSheet = false
+            }
+        },
+        headerText = R.string.reset_password_confirmation,
+        actionIcon = R.drawable.ic_mail_outline,
+        actionText = R.string.send_email,
+        onActionClick = {
+            viewModel.resetPassword()
+            if (showDeletionConfirmationSheet) {
+                showDeletionConfirmationSheet = false
+            }
+        }
+    )
 
     ChangePasswordScreen(
         appState = appState,
@@ -176,7 +197,7 @@ fun ChangePasswordScreen(
             }
         },
         onBackClick = onBackClick,
-        onResetPasswordClick = { viewModel.resetPassword() },
+        onResetPasswordClick = { showDeletionConfirmationSheet = true },
         currentPasswordError = currentPasswordError,
         newPasswordError = newPasswordError,
         confirmPasswordError = confirmPasswordError,

@@ -59,6 +59,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.ConfirmationSheetDialog
 import com.frafio.myfinance.core.components.EmptyView
 import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.navigation.MyFinanceAppState
@@ -71,12 +72,38 @@ fun LabelsScreen(
     onBackClick: () -> Unit
 ) {
     val allLabels by viewModel.allLabels.collectAsStateWithLifecycle()
+    val editingLabel by viewModel.editingLabel.collectAsStateWithLifecycle()
+
+    var showDeletionConfirmationSheet by remember { mutableStateOf(value = false) }
+
+    ConfirmationSheetDialog(
+        show = showDeletionConfirmationSheet,
+        onDismiss = {
+            if (showDeletionConfirmationSheet) {
+                showDeletionConfirmationSheet = false
+            }
+            viewModel.setEditingLabel(null)
+        },
+        headerText = R.string.delete_label_confirmation,
+        actionIcon = R.drawable.ic_delete_outline,
+        actionText = R.string.delete_permanently,
+        onActionClick = {
+            editingLabel?.let { viewModel.deleteLabel(it) }
+            if (showDeletionConfirmationSheet) {
+                showDeletionConfirmationSheet = false
+            }
+            viewModel.setEditingLabel(null)
+        }
+    )
 
     LabelsContent(
         allLabels = allLabels,
         onBackClick = onBackClick,
         onAddLabel = { viewModel.addLabel(it) },
-        onDeleteLabel = { viewModel.deleteLabel(it) },
+        onDeleteLabel = {
+            viewModel.setEditingLabel(it)
+            showDeletionConfirmationSheet = true
+        },
         onEditLabel = { old, new -> viewModel.editLabel(old, new) },
         snackbarHost = { SwipeableSnackbarHost(hostState = appState.snackbarHostState) }
     )

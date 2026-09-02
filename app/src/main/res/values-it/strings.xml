@@ -113,6 +113,12 @@
     <string name="income">Entrata</string>
     <string name="save">Salva</string>
 
+    <string name="delete_confirmation">Rimuovere dal tuo Account e da tutti i dispositivi collegati?</string>
+    <string name="delete_label_confirmation">Rimuovere dal tuo Account e da tutti i dispositivi collegati? L\'etichetta verrà rimossa da tutte le spese a cui è associata.</string>
+    <string name="delete_permanently">Elimina definitivamente</string>
+    <string name="reset_password_confirmation">Verrà inviato un link alla tua casella di posta per modificare la password.</string>
+    <string name="send_email">Invia email</string>
+
     <string name="shortcut_new_expense">Nuova spesa</string>
     <string name="shortcut_new_income">Nuova entrata</string>
 
