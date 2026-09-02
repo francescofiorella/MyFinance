@@ -69,7 +69,8 @@ import java.time.LocalDate
 @Composable
 fun ExpensesScreen(
     viewModel: ExpensesViewModel,
-    onItemLongClick: (Expense, Int) -> Unit,
+    onEditExpense: (Expense, Int) -> Unit,
+    onDuplicateExpense: (Expense) -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
     modifier: Modifier = Modifier,
 ) {
@@ -167,7 +168,15 @@ fun ExpensesScreen(
         },
         onEdit = {
             editingExpense?.let {
-                onItemLongClick(it, expenses.indexOf(it))
+                onEditExpense(it, expenses.indexOf(it))
+            }
+            if (showEditSheet) {
+                showEditSheet = false
+            }
+        },
+        onDuplicate = {
+            editingExpense?.let {
+                onDuplicateExpense(it)
             }
             if (showEditSheet) {
                 showEditSheet = false

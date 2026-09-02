@@ -1,4 +1,4 @@
-package com.frafio.myfinance.core.components
+                                                                                      package com.frafio.myfinance.core.components
 
 import androidx.compose.foundation.background
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +21,7 @@ fun EditTransactionSheet(
     onDismiss: () -> Unit,
     onLabels: () -> Unit,
     onEdit: () -> Unit,
+    onDuplicate: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -29,6 +30,11 @@ fun EditTransactionSheet(
             iconRes = R.drawable.ic_edit_outline,
             textRes = R.string.edit,
             onClick = onEdit
+        ),
+        MenuItem(
+            iconRes = R.drawable.ic_content_copy_outline,
+            textRes = R.string.duplicate,
+            onClick = onDuplicate
         ),
         MenuItem(
             iconRes = R.drawable.ic_delete_outline,
@@ -84,6 +90,7 @@ fun EditTransactionSheetPreview() {
             onDismiss = {},
             onLabels = {},
             onEdit = {},
+            onDuplicate = {},
             onDelete = {},
             modifier = Modifier
                 .background(color = MaterialTheme.colorScheme.surfaceContainerLow)

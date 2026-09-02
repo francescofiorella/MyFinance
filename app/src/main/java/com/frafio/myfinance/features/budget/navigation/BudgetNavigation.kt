@@ -21,6 +21,7 @@ fun EntryProviderScope<NavKey>.budgetEntry(
     parentScrollEvents: Flow<Pair<String, Boolean>?>,
     resetParentScrollEvents: () -> Unit,
     onEditIncome: (Income, Int) -> Unit,
+    onDuplicateIncome: (Income) -> Unit
 ) {
     entry<HomeTabKey.Budget> {
         val viewModel: BudgetViewModel = hiltViewModel()
@@ -96,7 +97,8 @@ fun EntryProviderScope<NavKey>.budgetEntry(
 
         BudgetScreen(
             viewModel = viewModel,
-            onEditIncome = onEditIncome
+            onEditIncome = onEditIncome,
+            onDuplicateIncome = onDuplicateIncome
         )
     }
 }

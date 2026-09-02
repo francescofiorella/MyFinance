@@ -15,6 +15,7 @@
     <string name="remove">Rimuovi</string>
     <string name="undo">Annulla</string>
     <string name="close">Chiudi</string>
+    <string name="duplicate">Duplica</string>
 
     <string name="login_successful">Hai effettuato l\'accesso come</string>
 

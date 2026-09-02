@@ -61,6 +61,7 @@ import kotlinx.coroutines.flow.first
 fun BudgetScreen(
     viewModel: BudgetViewModel,
     onEditIncome: (Income, Int) -> Unit,
+    onDuplicateIncome: (Income) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val incomes by viewModel.incomes.collectAsStateWithLifecycle()
@@ -96,6 +97,14 @@ fun BudgetScreen(
         onEdit = {
             editTargetIncome?.let {
                 onEditIncome(it, incomes.indexOf(it))
+            }
+            if (showEditIncomeSheet) {
+                showEditIncomeSheet = false
+            }
+        },
+        onDuplicate = {
+            editTargetIncome?.let {
+                onDuplicateIncome(it)
             }
             if (showEditIncomeSheet) {
                 showEditIncomeSheet = false

@@ -153,13 +153,22 @@ fun HomeScreen(
                         appState = appState,
                         parentScrollEvents = homeViewModel.scrollEvents,
                         resetParentScrollEvents = homeViewModel::resetScrollEvent,
-                        onItemLongClick = { expense, position ->
+                        onEditExpense = { expense, position ->
                             onNavigateToRoot(
                                 RootKey.AddEditTransaction(
                                     requestCode = AddViewModel.REQUEST_EDIT_CODE,
                                     expenseCode = AddViewModel.REQUEST_EXPENSE_CODE,
                                     transaction = expense,
                                     position = position
+                                )
+                            )
+                        },
+                        onDuplicateExpense = { expense ->
+                            onNavigateToRoot(
+                                RootKey.AddEditTransaction(
+                                    requestCode = AddViewModel.REQUEST_ADD_CODE,
+                                    expenseCode = AddViewModel.REQUEST_EXPENSE_CODE,
+                                    transaction = expense
                                 )
                             )
                         },
@@ -176,6 +185,15 @@ fun HomeScreen(
                                     expenseCode = AddViewModel.REQUEST_INCOME_CODE,
                                     transaction = income,
                                     position = position
+                                )
+                            )
+                        },
+                        onDuplicateIncome = { income ->
+                            onNavigateToRoot(
+                                RootKey.AddEditTransaction(
+                                    requestCode = AddViewModel.REQUEST_ADD_CODE,
+                                    expenseCode = AddViewModel.REQUEST_INCOME_CODE,
+                                    transaction = income
                                 )
                             )
                         }

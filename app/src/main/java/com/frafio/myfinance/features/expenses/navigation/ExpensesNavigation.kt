@@ -19,7 +19,8 @@ fun EntryProviderScope<NavKey>.expensesEntry(
     appState: MyFinanceAppState,
     parentScrollEvents: Flow<Pair<String, Boolean>?>,
     resetParentScrollEvents: () -> Unit,
-    onItemLongClick: (Expense, Int) -> Unit,
+    onEditExpense: (Expense, Int) -> Unit,
+    onDuplicateExpense: (Expense) -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
 ) {
     entry<HomeTabKey.Expenses> {
@@ -77,7 +78,8 @@ fun EntryProviderScope<NavKey>.expensesEntry(
 
         ExpensesScreen(
             viewModel = viewModel,
-            onItemLongClick = onItemLongClick,
+            onEditExpense = onEditExpense,
+            onDuplicateExpense = onDuplicateExpense,
             getDateLabel = getDateLabel
         )
     }
