@@ -9,15 +9,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -147,7 +150,8 @@ fun LabelsContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
                 modifier = Modifier
@@ -177,6 +181,7 @@ fun LabelsContent(
             }
 
             NewLabelItem(
+                modifier = Modifier.widthIn(max = BottomSheetDefaults.SheetMaxWidth),
                 value = labelFieldValue,
                 onValueChange = { labelFieldValue = it },
                 isValid = isLabelValid,
@@ -194,7 +199,9 @@ fun LabelsContent(
                     message = R.string.warning_labels
                 )
             } else {
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier.widthIn(max = BottomSheetDefaults.SheetMaxWidth)
+                ) {
                     itemsIndexed(
                         items = allLabels,
                         key = { _, label -> label }
@@ -226,6 +233,8 @@ fun LabelsContent(
                             count = allLabels.size
                         )
                     }
+
+                    item { Spacer(modifier = Modifier.height(16.dp)) }
                 }
             }
         }

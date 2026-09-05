@@ -63,12 +63,13 @@ fun CategoriesDescriptionScreen(
 
             val categories = listOf(
                 CategoryItem(R.string.housing, R.drawable.ic_home_filled, R.string.housing_description),
-                CategoryItem(R.string.transportation, R.drawable.ic_directions_subway_filled, R.string.transportation_description),
                 CategoryItem(R.string.groceries, R.drawable.ic_shopping_cart_filled, R.string.groceries_description),
-                CategoryItem(R.string.health, R.drawable.ic_vaccines_filled, R.string.health_description),
                 CategoryItem(R.string.personal_care, R.drawable.ic_face_filled, R.string.personal_care_description),
                 CategoryItem(R.string.entertainment, R.drawable.ic_theater_comedy_filled, R.string.entertainment_description),
                 CategoryItem(R.string.education, R.drawable.ic_school_filled, R.string.education_description),
+                CategoryItem(R.string.dining, R.drawable.ic_restaurant_filled, R.string.dining_description),
+                CategoryItem(R.string.health, R.drawable.ic_vaccines_filled, R.string.health_description),
+                CategoryItem(R.string.transportation, R.drawable.ic_directions_subway_filled, R.string.transportation_description),
                 CategoryItem(R.string.miscellaneous, R.drawable.ic_grid_3x3_filled, R.string.miscellaneous_description)
             )
 
@@ -93,6 +94,8 @@ fun CategoriesDescriptionScreen(
                         totalCount = categories.size
                     )
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -458,6 +459,8 @@ fun ChangePasswordForm(
                 Text(text = stringResource(id = R.string.reset_password))
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 

@@ -105,12 +105,13 @@
     <string name="categories_description">Categories description</string>
     <string name="categories">Categories</string>
     <string name="housing_description">Manage your living expenses including rent or mortgage, property taxes, home insurance, utilities like water and electricity, and home maintenance.</string>
-    <string name="transportation_description">Track costs related to commuting, such as car payments, fuel, insurance, vehicle maintenance, and public transport fares.</string>
     <string name="groceries_description">Keep track of daily essentials, including food shopping and personal hygiene products.</string>
-    <string name="health_description">Monitor your healthcare spending, covering insurance premiums, medical bills, medications, and dental or vision care.</string>
     <string name="personal_care_description">Categorize expenses for your personal well-being, such as grooming, haircuts, clothing, and footwear.</string>
-    <string name="entertainment_description">Budget for leisure activities including dining out, food delivery, streaming subscriptions, travel, and vacations.</string>
+    <string name="entertainment_description">Budget for leisure activities including hobbies, theater, streaming subscriptions, travel, and vacations.</string>
     <string name="education_description">Track investments in learning, such as tuition fees, books, supplies, and professional development courses.</string>
+    <string name="dining_description">Manage your dining experiences, including restaurants, cafés, bars, fast food, and takeout meals.</string>
+    <string name="health_description">Monitor your healthcare spending, covering insurance premiums, medical bills, medications, and dental or vision care.</string>
+    <string name="transportation_description">Track costs related to commuting, such as car payments, fuel, insurance, vehicle maintenance, and public transport fares.</string>
     <string name="miscellaneous_description">Record other expenses like gifts, donations, pet care, and any unexpected costs that arise.</string>
 
     <string name="select">Select</string>
@@ -119,9 +120,9 @@
     <string name="save">Save</string>
 
     <string name="delete_confirmation">Remove from your Account and all connected devices?</string>
-    <string name="delete_label_confirmation">Remove from your Account and all connected devices? This label will be removed from all associated expenses.</string>
+    <string name="delete_label_confirmation">Remove from your Account and all connected devices? The associated expenses will not be deleted.</string>
     <string name="delete_permanently">Delete permanently</string>
-    <string name="reset_password_confirmation">A reset link will be sent to your email address to change your password.</string>
+    <string name="reset_password_confirmation">A reset link will be sent to your email address to reset and change your password.</string>
     <string name="send_email">Send email</string>
 
     <string name="shortcut_new_expense">New expense</string>

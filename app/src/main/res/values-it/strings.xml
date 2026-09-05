@@ -107,12 +107,13 @@
     <string name="categories_description">Descrizione categorie</string>
     <string name="categories">Categorie</string>
     <string name="housing_description">Gestisci le tue spese abitative, inclusi affitto o mutuo, tasse sulla proprietà, assicurazione sulla casa, utenze come acqua ed elettricità e manutenzione domestica.</string>
-    <string name="transportation_description">Tieni traccia dei costi relativi agli spostamenti, come rate dell\'auto, carburante, assicurazione, manutenzione del veicolo e biglietti dei mezzi pubblici.</string>
     <string name="groceries_description">Tieni traccia degli elementi essenziali quotidiani, inclusa la spesa alimentare e i prodotti per l\'igiene personale.</string>
-    <string name="health_description">Monitora le tue spese sanitarie, coprendo premi assicurativi, fatture mediche, farmaci e cure odontoiatriche o oculistiche.</string>
     <string name="personal_care_description">Categorizza le spese per il tuo benessere personale, come toelettatura, tagli di capelli, abbigliamento e calzature.</string>
-    <string name="entertainment_description">Budget per attività ricreative tra cui cene fuori, consegna di cibo, abbonamenti streaming, viaggi e vacanze.</string>
+    <string name="entertainment_description">Budget per attività ricreative tra cui hobby, cinema, abbonamenti streaming, viaggi e vacanze.</string>
     <string name="education_description">Tieni traccia degli investimenti nell\'apprendimento, come rette scolastiche, libri, materiale didattico e corsi di aggiornamento professionale.</string>
+    <string name="dining_description">Gestisci le tue esperienze di ristorazione, inclusi ristoranti, bar, caffè, fast food e pasti da asporto.</string>
+    <string name="health_description">Monitora le tue spese sanitarie, coprendo premi assicurativi, fatture mediche, farmaci e cure odontoiatriche o oculistiche.</string>
+    <string name="transportation_description">Tieni traccia dei costi relativi agli spostamenti, come rate dell\'auto, carburante, assicurazione, manutenzione del veicolo e biglietti dei mezzi pubblici.</string>
     <string name="miscellaneous_description">Registra altre spese come regali, donazioni, cura degli animali domestici e qualsiasi costo imprevisto che si presenti.</string>
 
     <string name="select">Seleziona</string>
@@ -125,9 +126,9 @@
     <string name="save">Salva</string>
 
     <string name="delete_confirmation">Rimuovere dal tuo Account e da tutti i dispositivi collegati?</string>
-    <string name="delete_label_confirmation">Rimuovere dal tuo Account e da tutti i dispositivi collegati? L\'etichetta verrà rimossa da tutte le spese a cui è associata.</string>
+    <string name="delete_label_confirmation">Rimuovere dal tuo Account e da tutti i dispositivi collegati? Le spese associate non veranno eliminate.</string>
     <string name="delete_permanently">Elimina definitivamente</string>
-    <string name="reset_password_confirmation">Verrà inviato un link alla tua casella di posta per modificare la password.</string>
+    <string name="reset_password_confirmation">Verrà inviato un link alla tua casella di posta per reimpostare e modificare la tua password.</string>
     <string name="send_email">Invia email</string>
 
     <string name="shortcut_new_expense">Nuova spesa</string>
