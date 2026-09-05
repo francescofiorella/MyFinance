@@ -61,6 +61,7 @@ fun ProfileScreen(
     initialUser: User? = null,
     initialProfilePicture: Bitmap? = null,
     onManageLabels: () -> Unit,
+    onCategoriesDescriptionClick: () -> Unit,
     onChangePassword: () -> Unit
 ) {
     val userState by viewModel.user.collectAsStateWithLifecycle()
@@ -144,6 +145,7 @@ fun ProfileScreen(
         onEditFullName = { showEditFullNameSheet = true },
         onDynamicColorChanged = { viewModel.setDynamicColor(it) },
         onManageLabels = onManageLabels,
+        onCategoriesDescriptionClick = onCategoriesDescriptionClick,
         onSelectCurrency = { showCurrencySheet = true },
         onChangePasswordClick = onChangePassword,
         currencyCode = currencyCode
@@ -164,6 +166,7 @@ private fun ProfileContent(
     onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
     onManageLabels: () -> Unit,
+    onCategoriesDescriptionClick: () -> Unit,
     onSelectCurrency: () -> Unit,
     onChangePasswordClick: () -> Unit,
     currencyCode: String
@@ -189,6 +192,7 @@ private fun ProfileContent(
             onEditFullName = onEditFullName,
             onDynamicColorChanged = onDynamicColorChanged,
             onManageLabels = onManageLabels,
+            onCategoriesDescriptionClick = onCategoriesDescriptionClick,
             onSelectCurrency = onSelectCurrency,
             onChangePasswordClick = onChangePasswordClick,
             currencyCode = currencyCode
@@ -236,6 +240,7 @@ private fun ProfileCards(
     onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
     onManageLabels: () -> Unit,
+    onCategoriesDescriptionClick: () -> Unit,
     onSelectCurrency: () -> Unit,
     onChangePasswordClick: () -> Unit,
     currencyCode: String
@@ -570,7 +575,7 @@ private fun ProfileCards(
         color = MaterialTheme.colorScheme.onSurface
     )
 
-    val myFinanceItemCount = (if (isDynamicColorAvailable) 1 else 0) + 3
+    val myFinanceItemCount = (if (isDynamicColorAvailable) 1 else 0) + 4
 
     SegmentedListItem(
         onClick = onManageLabels,
@@ -670,12 +675,61 @@ private fun ProfileCards(
             .padding(bottom = 2.dp),
     )
 
+    SegmentedListItem(
+        onClick = onCategoriesDescriptionClick,
+        colors = colors,
+        shapes = ListItemDefaults.segmentedShapes(
+            index = 2,
+            count = myFinanceItemCount,
+            defaultShapes = ListItemDefaults.shapes()
+        ),
+        leadingContent = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_info_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+        },
+        content = {
+            Text(
+                text = stringResource(id = R.string.categories_description),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        trailingContent = {
+            Box(
+                modifier = Modifier
+                    .width(32.dp)
+                    .height(40.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
+                    contentDescription = null,
+                )
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 2.dp),
+    )
+
     if (isDynamicColorAvailable) {
         SegmentedListItem(
             onClick = {},
             colors = colors,
             shapes = ListItemDefaults.segmentedShapes(
-                index = 2,
+                index = 3,
                 count = myFinanceItemCount,
                 defaultShapes = ListItemDefaults.shapes()
             ),
@@ -718,7 +772,7 @@ private fun ProfileCards(
         onClick = {},
         colors = colors,
         shapes = ListItemDefaults.segmentedShapes(
-            index = if (isDynamicColorAvailable) 3 else 2,
+            index = if (isDynamicColorAvailable) 4 else 3,
             count = myFinanceItemCount,
             defaultShapes = ListItemDefaults.shapes()
         ),
@@ -777,6 +831,7 @@ fun ProfilePreview() {
             onEditFullName = {},
             onDynamicColorChanged = {},
             onManageLabels = {},
+            onCategoriesDescriptionClick = {},
             onSelectCurrency = {},
             onChangePasswordClick = {},
             currencyCode = "EUR"

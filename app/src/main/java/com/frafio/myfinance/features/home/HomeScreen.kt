@@ -203,6 +203,7 @@ fun HomeScreen(
                         initialUser = user,
                         profilePicture = profilePicture,
                         onManageLabels = { onNavigateToRoot(RootKey.Labels) },
+                        onCategoriesDescriptionClick = { onNavigateToRoot(RootKey.CategoriesDescription) },
                         onChangePassword = { onNavigateToRoot(RootKey.ChangePassword) }
                     )
                 }

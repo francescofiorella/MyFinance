@@ -300,7 +300,7 @@ fun ChangePasswordTopBar(
             shapes = IconButtonDefaults.shapes(),
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_close_filled),
+                painter = painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
                 contentDescription = stringResource(id = R.string.back_arrow),
             )
         }

@@ -50,6 +50,7 @@ import com.frafio.myfinance.core.utils.dateToExtendedString
 import com.frafio.myfinance.features.add.AddViewModel
 import com.frafio.myfinance.features.add.navigation.addEntry
 import com.frafio.myfinance.features.auth.navigation.authEntry
+import com.frafio.myfinance.features.categories.navigation.categoriesDescriptionEntry
 import com.frafio.myfinance.features.home.HomeScreen
 import com.frafio.myfinance.features.labels.navigation.labelsEntry
 import com.frafio.myfinance.features.password.navigation.changePasswordEntry
@@ -182,6 +183,9 @@ class MainActivity : ComponentActivity() {
                         )
                         changePasswordEntry(
                             appState = appState,
+                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
+                        )
+                        categoriesDescriptionEntry(
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
                         )
                     }

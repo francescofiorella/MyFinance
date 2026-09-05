@@ -102,6 +102,17 @@
     <string name="transportation">Transportation</string>
     <string name="miscellaneous">Miscellaneous</string>
 
+    <string name="categories_description">Categories description</string>
+    <string name="categories">Categories</string>
+    <string name="housing_description">Manage your living expenses including rent or mortgage, property taxes, home insurance, utilities like water and electricity, and home maintenance.</string>
+    <string name="transportation_description">Track costs related to commuting, such as car payments, fuel, insurance, vehicle maintenance, and public transport fares.</string>
+    <string name="groceries_description">Keep track of daily essentials, including food shopping and personal hygiene products.</string>
+    <string name="health_description">Monitor your healthcare spending, covering insurance premiums, medical bills, medications, and dental or vision care.</string>
+    <string name="personal_care_description">Categorize expenses for your personal well-being, such as grooming, haircuts, clothing, and footwear.</string>
+    <string name="entertainment_description">Budget for leisure activities including dining out, food delivery, streaming subscriptions, travel, and vacations.</string>
+    <string name="education_description">Track investments in learning, such as tuition fees, books, supplies, and professional development courses.</string>
+    <string name="miscellaneous_description">Record other expenses like gifts, donations, pet care, and any unexpected costs that arise.</string>
+
     <string name="select">Select</string>
     <string name="expense">Expense</string>
     <string name="income">Income</string>
