@@ -91,7 +91,7 @@ fun AnnualBalanceCard(
                     )
                     Text(
                         text = balanceYear.toString(),
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                 }

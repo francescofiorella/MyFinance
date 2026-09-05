@@ -89,12 +89,20 @@ fun ExpensesByCategoryCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(R.string.expenses_by_category),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.expenses_by_category),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = date.format(formatter).replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase() else it.toString()
+                        },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
                 val previousInteractionSource = remember { MutableInteractionSource() }
                 val nextInteractionSource = remember { MutableInteractionSource() }
                 val todayInteractionSource = remember { MutableInteractionSource() }
@@ -233,15 +241,6 @@ fun ExpensesByCategoryCard(
                     resetSelectionHook = resetPieChart
                 )
             }
-
-            Text(
-                modifier = Modifier.padding(top = 8.dp),
-                text = date.format(formatter).replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase() else it.toString()
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }
