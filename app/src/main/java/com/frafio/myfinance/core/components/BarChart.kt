@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -62,6 +63,7 @@ fun BarChart(
     entries: List<BarChartEntry>,
     referenceValue: Double? = null,
     onBarClick: (Int) -> Unit = {},
+    onVisibleCountChanged: (Int) -> Unit = {},
     resetIndicatorHook: Boolean = false,
     barWidth: Dp = BarChartDefaults.BarWidth,
     barPadding: Dp = BarChartDefaults.BarPadding,
@@ -72,8 +74,11 @@ fun BarChart(
         val barItemWidth = barWidth + barPadding * 2
         val maxVisibleItems = (maxWidth / barItemWidth).toInt().coerceAtLeast(1)
 
-        val startIndex = (entries.size - maxVisibleItems).coerceAtLeast(0)
-        val visibleEntries = remember(entries, startIndex) { entries.drop(startIndex) }
+        LaunchedEffect(maxVisibleItems) {
+            onVisibleCountChanged(maxVisibleItems)
+        }
+
+        val visibleEntries = entries
 
         // Use rememberSaveable so that the selected index persists during screen rotation.
         var selectedIndex by rememberSaveable(resetIndicatorHook) {
@@ -89,7 +94,7 @@ fun BarChart(
         // Max value based on visible data for better scaling
         val maxValue = remember(visibleEntries, referenceValue) {
             // Ensure selectedIndex is within the visible range or valid for data
-            if (entries.isNotEmpty() && (selectedIndex < startIndex || selectedIndex >= entries.size)) {
+            if (entries.isNotEmpty() && (selectedIndex < 0 || selectedIndex >= entries.size)) {
                 selectedIndex = entries.size - 1
             }
             val max = visibleEntries.maxOfOrNull { it.value } ?: 0.0
@@ -148,8 +153,7 @@ fun BarChart(
                     }
                 ) {
                     visibleEntries.forEachIndexed { index, entry ->
-                        val originalIndex = index + startIndex
-                        val isSelected = selectedIndex == originalIndex
+                        val isSelected = selectedIndex == index
                         val barHeightFraction =
                             (entry.value / maxValue).toFloat().coerceIn(0.01f, 1f)
 
@@ -164,8 +168,8 @@ fun BarChart(
                                     heightFraction = barHeightFraction,
                                     isSelected = isSelected,
                                     onClick = {
-                                        selectedIndex = originalIndex
-                                        onBarClick(originalIndex)
+                                        selectedIndex = index
+                                        onBarClick(index)
                                     },
                                     interactionSource = interactionSources[index]
                                 )
@@ -219,8 +223,7 @@ fun BarChart(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 visibleEntries.forEachIndexed { index, entry ->
-                    val originalIndex = index + startIndex
-                    val isSelected = selectedIndex == originalIndex
+                    val isSelected = selectedIndex == index
                     val shortLabel = "%02d".format(entry.month).takeLast(2)
                     val extendedLabel = shortLabel + "/" + "%02d".format(entry.year).takeLast(2)
                     Text(

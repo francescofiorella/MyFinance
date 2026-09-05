@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Income
 
 @Dao
@@ -19,6 +20,9 @@ interface IncomeDao : BaseDao<Income> {
 
     @Query("SELECT COUNT(*) FROM income")
     fun getCount(): Flow<Int>
+
+    @Query("SELECT year, month FROM income ORDER BY year ASC, month ASC LIMIT 1")
+    fun getEarliestYearMonth(): Flow<DatePoint?>
 
     @Query("SELECT SUM(price) " +
             "FROM income " +

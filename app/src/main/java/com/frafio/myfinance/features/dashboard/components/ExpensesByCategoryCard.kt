@@ -53,7 +53,8 @@ fun ExpensesByCategoryCard(
     onPreviousDate: () -> Unit,
     onNextDate: () -> Unit,
     onToday: () -> Unit,
-    isNextDateEnabled: Boolean = true
+    isNextDateEnabled: Boolean = true,
+    isPreviousDateEnabled: Boolean = true
 ) {
     val values = remember(expenses) {
         val vals = MutableList(9) { 0.0 }
@@ -111,6 +112,7 @@ fun ExpensesByCategoryCard(
                                     .size(IconButtonDefaults.smallContainerSize())
                                     .animateWidth(previousInteractionSource),
                                 onClick = onPreviousDate,
+                                enabled = isPreviousDateEnabled,
                                 shapes = IconButtonDefaults.shapes(
                                     shape = IconButtonDefaults.smallSquareShape,
                                 ),

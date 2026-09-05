@@ -2,6 +2,7 @@ package com.frafio.myfinance.core.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import com.frafio.myfinance.core.data.dao.IncomeDao
+import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Income
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,6 +18,8 @@ class IncomesLocalRepository @Inject constructor(
 
     fun getPriceSumFromYear(year: Int): Flow<Double?> =
         incomeDao.getPriceSumOfYear(year)
+
+    fun getEarliestYearMonth(): Flow<DatePoint?> = incomeDao.getEarliestYearMonth()
 
     fun deleteAll() = incomeDao.deleteAll()
 }

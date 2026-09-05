@@ -43,7 +43,9 @@ fun MonthlyExpensesChartCard(
     onPreviousDate: () -> Unit,
     onNextDate: () -> Unit,
     onToday: () -> Unit,
-    isNextDateEnabled: Boolean = true
+    onVisibleCountChanged: (Int) -> Unit = {},
+    isNextDateEnabled: Boolean = true,
+    isPreviousDateEnabled: Boolean = true
 ) {
     var resetBarChart by remember { mutableStateOf(false) }
 
@@ -88,6 +90,7 @@ fun MonthlyExpensesChartCard(
                                     .size(IconButtonDefaults.smallContainerSize())
                                     .animateWidth(previousInteractionSource),
                                 onClick = onPreviousDate,
+                                enabled = isPreviousDateEnabled,
                                 shapes = IconButtonDefaults.shapes(
                                     shape = IconButtonDefaults.smallSquareShape,
                                 ),
@@ -149,6 +152,7 @@ fun MonthlyExpensesChartCard(
             BarChart(
                 entries = barChartData,
                 referenceValue = monthlyBudget,
+                onVisibleCountChanged = onVisibleCountChanged,
                 resetIndicatorHook = resetBarChart
             )
         }

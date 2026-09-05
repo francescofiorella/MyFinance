@@ -3,12 +3,12 @@ package com.frafio.myfinance.features.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.core.data.model.BarChartEntry
+import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
-import com.frafio.myfinance.core.utils.dateToUTCTimestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -43,7 +43,6 @@ class DashboardViewModel @Inject constructor(
     loadingRepository: LoadingRepository
 ) : ViewModel() {
 
-    private val pieChartEntriesSize = 24
     private val today = LocalDate.now()
 
     private val _monthShown = MutableStateFlow(true)
@@ -70,6 +69,26 @@ class DashboardViewModel @Inject constructor(
         .map { it ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
+    val earliestExpenseDate: StateFlow<DatePoint?> = expensesLocalRepository.getEarliestYearMonth()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val earliestIncomeDate: StateFlow<DatePoint?> = incomesLocalRepository.getEarliestYearMonth()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val earliestFinancialDate: StateFlow<DatePoint?> = combine(
+        earliestExpenseDate,
+        earliestIncomeDate
+    ) { earliestExpense, earliestIncome ->
+        when {
+            earliestExpense == null -> earliestIncome
+            earliestIncome == null -> earliestExpense
+            earliestExpense.year < earliestIncome.year -> earliestExpense
+            earliestExpense.year > earliestIncome.year -> earliestIncome
+            earliestExpense.month < earliestIncome.month -> earliestExpense
+            else -> earliestIncome
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
     private val _balanceYearShown = MutableStateFlow(today.year)
     val annualBalanceData: StateFlow<AnnualBalanceData> = _balanceYearShown
         .flatMapLatest { year ->
@@ -84,6 +103,15 @@ class DashboardViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             AnnualBalanceData(today.year, 0.0, 0.0)
         )
+
+    val isPreviousBalanceYearEnabled: StateFlow<Boolean> = combine(
+        _balanceYearShown,
+        earliestFinancialDate
+    ) { year, earliest ->
+        earliest?.let {
+            year > it.year
+        } ?: false
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val monthlyBudget: StateFlow<Double> = userPreferencesRepository.userPreferencesFlow
         .map { it.monthlyBudget }
@@ -109,6 +137,20 @@ class DashboardViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isPreviousPieChartDateEnabled: StateFlow<Boolean> = combine(
+        _pieChartDate,
+        _monthlyShownInPieChart,
+        earliestExpenseDate
+    ) { date, isMonthly, earliest ->
+        earliest?.let {
+            if (isMonthly) {
+                (date.year > it.year) || (date.year == it.year && date.monthValue > it.month)
+            } else {
+                date.year > it.year
+            }
+        } ?: false
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     private val _lastDateForBarChart = MutableStateFlow(
         today.with(TemporalAdjusters.firstDayOfMonth())
     )
@@ -117,44 +159,64 @@ class DashboardViewModel @Inject constructor(
         .map { it.isBefore(today.with(TemporalAdjusters.firstDayOfMonth())) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    private val _barChartVisibleItems = MutableStateFlow(6)
+
+    val isPreviousBarChartDateEnabled: StateFlow<Boolean> = combine(
+        _lastDateForBarChart,
+        _barChartVisibleItems,
+        earliestExpenseDate
+    ) { date, visibleItems, earliest ->
+        earliest?.let {
+            val oldestShown = date.minusMonths(visibleItems.toLong() - 1)
+            (oldestShown.year > it.year) || (oldestShown.year == it.year && oldestShown.monthValue > it.month)
+        } ?: false
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     private val _scrollToTop = MutableSharedFlow<Unit>(replay = 0)
     val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()
 
-    val barChartData: StateFlow<List<BarChartEntry>> = _lastDateForBarChart
-        .flatMapLatest { date ->
-            val nextMonth = date.plusMonths(1)
-            val lastTimestamp =
-                dateToUTCTimestamp(nextMonth.year, nextMonth.monthValue, nextMonth.dayOfMonth)
-            val firstDate = nextMonth.minusMonths(pieChartEntriesSize.toLong())
-            val firstTimestamp =
-                dateToUTCTimestamp(firstDate.year, firstDate.monthValue, firstDate.dayOfMonth)
-            expensesLocalRepository.getPriceSumAfterAndBefore(firstTimestamp, lastTimestamp).flatMapLatest { entries ->
-                val values = mutableListOf<BarChartEntry>()
-                var currentDate = date
-                var j = 0
-                repeat(pieChartEntriesSize) {
-                    if (j < entries.size
-                        && entries[j].year == currentDate.year
-                        && entries[j].month == currentDate.monthValue
-                    ) {
-                        values.add(BarChartEntry(
+    val barChartData: StateFlow<List<BarChartEntry>> = combine(
+        _lastDateForBarChart,
+        _barChartVisibleItems
+    ) { date, visibleItems ->
+        date to visibleItems
+    }.flatMapLatest { (date, visibleItems) ->
+        val nextMonth = date.plusMonths(1)
+        val firstDate = nextMonth.minusMonths(visibleItems.toLong())
+        expensesLocalRepository.getPriceSumAfterAndBefore(
+            firstDate.year, firstDate.monthValue,
+            nextMonth.year, nextMonth.monthValue
+        ).flatMapLatest { entries ->
+            val values = mutableListOf<BarChartEntry>()
+            var currentDate = date
+            var j = 0
+            repeat(visibleItems) {
+                if (j < entries.size
+                    && entries[j].year == currentDate.year
+                    && entries[j].month == currentDate.monthValue
+                ) {
+                    values.add(
+                        BarChartEntry(
                             value = entries[j].value,
                             year = entries[j].year,
                             month = entries[j].month
-                        ))
-                        j++
-                    } else {
-                        values.add(BarChartEntry(
+                        )
+                    )
+                    j++
+                } else {
+                    values.add(
+                        BarChartEntry(
                             value = 0.0,
                             year = currentDate.year,
                             month = currentDate.monthValue
-                        ))
-                    }
-                    currentDate = currentDate.minusMonths(1)
+                        )
+                    )
                 }
-                flowOf(values.reversed())
+                currentDate = currentDate.minusMonths(1)
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+            flowOf(values.reversed())
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val pieChartExpenses: StateFlow<List<Expense>> = combine(
         _pieChartDate,
@@ -205,6 +267,10 @@ class DashboardViewModel @Inject constructor(
 
     fun todayBarChartDate() {
         _lastDateForBarChart.value = today.with(TemporalAdjusters.firstDayOfMonth())
+    }
+
+    fun setBarChartVisibleItems(count: Int) {
+        _barChartVisibleItems.value = count
     }
 
     fun switchPieChartData(setMonthly: Boolean) {

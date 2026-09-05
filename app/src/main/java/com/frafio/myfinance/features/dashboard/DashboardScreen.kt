@@ -79,10 +79,13 @@ fun DashboardContent(
     val annualBalanceData by viewModel.annualBalanceData.collectAsStateWithLifecycle()
     val barChartData by viewModel.barChartData.collectAsStateWithLifecycle()
     val isNextBarDateEnabled by viewModel.isNextBarChartDateEnabled.collectAsStateWithLifecycle()
+    val isPreviousBarDateEnabled by viewModel.isPreviousBarChartDateEnabled.collectAsStateWithLifecycle()
     val pieExpenses by viewModel.pieChartExpenses.collectAsStateWithLifecycle()
     val pieDate by viewModel.pieChartDate.collectAsStateWithLifecycle()
     val monthlyShownInPie by viewModel.monthlyShownInPieChart.collectAsStateWithLifecycle()
     val isNextPieDateEnabled by viewModel.isNextPieChartDateEnabled.collectAsStateWithLifecycle()
+    val isPreviousPieDateEnabled by viewModel.isPreviousPieChartDateEnabled.collectAsStateWithLifecycle()
+    val isPreviousBalanceYearEnabled by viewModel.isPreviousBalanceYearEnabled.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -109,7 +112,9 @@ fun DashboardContent(
             onPreviousDate = { viewModel.previousBarChartDate() },
             onNextDate = { viewModel.nextBarChartDate() },
             onToday = { viewModel.todayBarChartDate() },
-            isNextDateEnabled = isNextBarDateEnabled
+            onVisibleCountChanged = { viewModel.setBarChartVisibleItems(it) },
+            isNextDateEnabled = isNextBarDateEnabled,
+            isPreviousDateEnabled = isPreviousBarDateEnabled
         )
         AnnualBalanceCard(
             balanceYear = annualBalanceData.year,
@@ -117,7 +122,8 @@ fun DashboardContent(
             expensesSum = annualBalanceData.expenses,
             onPreviousYear = { viewModel.previousBalanceYear() },
             onNextYear = { viewModel.nextBalanceYear() },
-            onToday = { viewModel.todayBalanceYear() }
+            onToday = { viewModel.todayBalanceYear() },
+            isPreviousYearEnabled = isPreviousBalanceYearEnabled
         )
         ExpensesByCategoryCard(
             expenses = pieExpenses,
@@ -127,7 +133,8 @@ fun DashboardContent(
             onPreviousDate = { viewModel.previousPieChartDate() },
             onNextDate = { viewModel.nextPieChartDate() },
             onToday = { viewModel.todayPieChartDate() },
-            isNextDateEnabled = isNextPieDateEnabled
+            isNextDateEnabled = isNextPieDateEnabled,
+            isPreviousDateEnabled = isPreviousPieDateEnabled
         )
         Spacer(modifier = Modifier.height(112.dp)) // Floating Action Button space
     }
@@ -172,6 +179,7 @@ fun DashboardPreview() {
                 onPreviousBarDate = {},
                 onTodayBarDate = {},
                 onNextBarDate = {},
+                onVisibleCountChangedBarChart = {},
                 onSwitchPieData = {},
                 onPreviousPieDate = {},
                 onNextPieDate = {},
@@ -203,12 +211,16 @@ private fun DashboardContent(
     onPreviousBarDate: () -> Unit,
     onNextBarDate: () -> Unit,
     onTodayBarDate: () -> Unit,
+    onVisibleCountChangedBarChart: (Int) -> Unit = {},
     isNextBarDateEnabled: Boolean = true,
+    isPreviousBarDateEnabled: Boolean = true,
     onSwitchPieData: (Boolean) -> Unit,
     onPreviousPieDate: () -> Unit,
     onNextPieDate: () -> Unit,
     onTodayPieData: () -> Unit,
-    isNextPieDateEnabled: Boolean = true
+    isNextPieDateEnabled: Boolean = true,
+    isPreviousPieDateEnabled: Boolean = true,
+    isPreviousBalanceYearEnabled: Boolean = true
 ) {
     Column(
         modifier = Modifier
@@ -236,7 +248,9 @@ private fun DashboardContent(
             onPreviousDate = onPreviousBarDate,
             onNextDate = onNextBarDate,
             onToday = onTodayBarDate,
-            isNextDateEnabled = isNextBarDateEnabled
+            onVisibleCountChanged = onVisibleCountChangedBarChart,
+            isNextDateEnabled = isNextBarDateEnabled,
+            isPreviousDateEnabled = isPreviousBarDateEnabled
         )
         AnnualBalanceCard(
             balanceYear = balanceYear,
@@ -244,7 +258,8 @@ private fun DashboardContent(
             expensesSum = expensesSum,
             onPreviousYear = onPreviousYear,
             onNextYear = onNextYear,
-            onToday = onTodayAnnualBalance
+            onToday = onTodayAnnualBalance,
+            isPreviousYearEnabled = isPreviousBalanceYearEnabled
         )
         ExpensesByCategoryCard(
             expenses = pieExpenses,
@@ -254,7 +269,8 @@ private fun DashboardContent(
             onPreviousDate = onPreviousPieDate,
             onNextDate = onNextPieDate,
             onToday = onTodayPieData,
-            isNextDateEnabled = isNextPieDateEnabled
+            isNextDateEnabled = isNextPieDateEnabled,
+            isPreviousDateEnabled = isPreviousPieDateEnabled
         )
     }
 }

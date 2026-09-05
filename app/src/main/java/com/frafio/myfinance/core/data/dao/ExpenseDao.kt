@@ -9,6 +9,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.frafio.myfinance.core.data.model.BarChartEntry
+import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
 
 @Dao
@@ -44,12 +45,16 @@ interface ExpenseDao : BaseDao<Expense> {
             "WHERE year=:year")
     fun getPriceSumOfYear(year: Int): Flow<Double?>
 
+    @Query("SELECT year, month FROM expense ORDER BY year ASC, month ASC LIMIT 1")
+    fun getEarliestYearMonth(): Flow<DatePoint?>
+
     @Query("SELECT SUM(price) as value, year, month " +
             "FROM expense " +
-            "WHERE timestamp>=:firstTimestamp AND timestamp<:lastTimestamp " +
+            "WHERE (year * 100 + month) >= (:startYear * 100 + :startMonth) " +
+            "  AND (year * 100 + month) < (:endYear * 100 + :endMonth) " +
             "GROUP BY year, month " +
             "ORDER BY year DESC, month DESC")
-    fun getPriceSumAfterAndBefore(firstTimestamp: Long, lastTimestamp: Long): Flow<List<BarChartEntry>>
+    fun getPriceSumAfterAndBefore(startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<BarChartEntry>>
 
     @Query("SELECT * " +
             "FROM expense " +
