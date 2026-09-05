@@ -70,6 +70,7 @@ class MyFinanceAppState(
         dismissFun: () -> Unit = {}
     ) {
         coroutineScope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
             val result = snackbarHostState.showSnackbar(
                 message = message,
                 actionLabel = actionText,

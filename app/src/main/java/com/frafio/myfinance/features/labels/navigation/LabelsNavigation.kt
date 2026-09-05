@@ -43,9 +43,12 @@ fun EntryProviderScope<NavKey>.labelsEntry(
                                 event.message,
                                 undoString,
                                 {
-                                    viewModel.undoDeleteLabel(appState.coroutineScope)
-                                },
-                                viewModel::resetLastDeletedLabel
+                                    viewModel.undoDeleteLabel(
+                                        appState.coroutineScope,
+                                        event.label,
+                                        event.affectedExpenses
+                                    )
+                                }
                             )
                         }
                     }

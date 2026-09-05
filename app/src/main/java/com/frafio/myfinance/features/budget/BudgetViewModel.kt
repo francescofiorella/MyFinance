@@ -175,7 +175,9 @@ class BudgetViewModel @Inject constructor(
             try {
                 loadingRepository.startLoading()
                 val response = incomeRepository.editIncome(income)
-                _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+                if (response.code != FinanceCode.INCOME_EDIT_SUCCESS.code) {
+                    _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+                }
             } finally {
                 loadingRepository.stopLoading()
             }

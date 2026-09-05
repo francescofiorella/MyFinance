@@ -2,6 +2,8 @@ package com.frafio.myfinance.features.labels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.frafio.myfinance.core.data.enums.db.FinanceCode
+import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.repository.ExpensesRepository
 import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
@@ -28,6 +30,7 @@ sealed interface LabelsUiEvent {
 
     data class LabelDeleted(
         val label: String,
+        val affectedExpenses: List<Expense>,
         val message: String
     ) : LabelsUiEvent
 }
@@ -70,10 +73,11 @@ class LabelsViewModel @Inject constructor(
             try {
                 loadingRepository.startLoading()
                 val deleteResult = expensesRepository.deleteLabel(label)
-                if (deleteResult.financeResult.code == com.frafio.myfinance.core.data.enums.db.FinanceCode.LABEL_DELETE_SUCCESS.code) {
+                if (deleteResult.financeResult.code == FinanceCode.LABEL_DELETE_SUCCESS.code) {
                     _uiEvents.emit(
                         LabelsUiEvent.LabelDeleted(
                             label = label,
+                            affectedExpenses = deleteResult.affectedExpenses,
                             message = deleteResult.financeResult.message
                         )
                     )
@@ -86,20 +90,18 @@ class LabelsViewModel @Inject constructor(
         }
     }
 
-    fun undoDeleteLabel(scope: CoroutineScope) {
+    fun undoDeleteLabel(scope: CoroutineScope, label: String, affectedExpenses: List<Expense>) {
         scope.launch {
             try {
                 loadingRepository.startLoading()
-                val result = expensesRepository.undoDeleteLabel()
-                _uiEvents.emit(LabelsUiEvent.ShowSnackBar(result.message))
+                val result = expensesRepository.undoDeleteLabel(label, affectedExpenses)
+                if (result.code != FinanceCode.LABELS_UPDATE_SUCCESS.code) {
+                    _uiEvents.emit(LabelsUiEvent.ShowSnackBar(result.message))
+                }
             } finally {
                 loadingRepository.stopLoading()
             }
         }
-    }
-
-    fun resetLastDeletedLabel() {
-        expensesRepository.resetLastDeletedLabel()
     }
 
     fun editLabel(oldName: String, newName: String) {

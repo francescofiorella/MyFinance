@@ -320,7 +320,9 @@ class ExpensesViewModel @Inject constructor(
             try {
                 loadingRepository.startLoading()
                 val response = expensesRepository.editExpense(expense)
-                _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
+                if (response.code != FinanceCode.EXPENSE_EDIT_SUCCESS.code) {
+                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
+                }
             } finally {
                 loadingRepository.stopLoading()
             }
