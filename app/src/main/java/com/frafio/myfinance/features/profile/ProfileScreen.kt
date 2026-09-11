@@ -578,10 +578,59 @@ private fun ProfileCards(
     val myFinanceItemCount = (if (isDynamicColorAvailable) 1 else 0) + 4
 
     SegmentedListItem(
-        onClick = onManageLabels,
+        onClick = onCategoriesDescriptionClick,
         colors = colors,
         shapes = ListItemDefaults.segmentedShapes(
             index = 0,
+            count = myFinanceItemCount,
+            defaultShapes = ListItemDefaults.shapes()
+        ),
+        leadingContent = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_grid_3x3_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+        },
+        content = {
+            Text(
+                text = stringResource(id = R.string.manage_categories),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        trailingContent = {
+            Box(
+                modifier = Modifier
+                    .width(32.dp)
+                    .height(40.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
+                    contentDescription = null,
+                )
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 2.dp),
+    )
+
+    SegmentedListItem(
+        onClick = onManageLabels,
+        colors = colors,
+        shapes = ListItemDefaults.segmentedShapes(
+            index = 1,
             count = myFinanceItemCount,
             defaultShapes = ListItemDefaults.shapes()
         ),
@@ -630,7 +679,7 @@ private fun ProfileCards(
         onClick = onSelectCurrency,
         colors = colors,
         shapes = ListItemDefaults.segmentedShapes(
-            index = 1,
+            index = 2,
             count = myFinanceItemCount,
             defaultShapes = ListItemDefaults.shapes()
         ),
@@ -652,55 +701,6 @@ private fun ProfileCards(
         content = {
             Text(
                 text = stringResource(id = R.string.change_currency),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        },
-        trailingContent = {
-            Box(
-                modifier = Modifier
-                    .width(32.dp)
-                    .height(40.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_keyboard_arrow_right_filled),
-                    contentDescription = null,
-                )
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 2.dp),
-    )
-
-    SegmentedListItem(
-        onClick = onCategoriesDescriptionClick,
-        colors = colors,
-        shapes = ListItemDefaults.segmentedShapes(
-            index = 2,
-            count = myFinanceItemCount,
-            defaultShapes = ListItemDefaults.shapes()
-        ),
-        leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.secondaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_info_filled),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-        },
-        content = {
-            Text(
-                text = stringResource(id = R.string.categories_description),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )

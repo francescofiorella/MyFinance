@@ -48,7 +48,7 @@ import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoriesDescriptionScreen(
+fun CategoriesScreen(
     onBackClick: () -> Unit
 ) {
     Scaffold(
@@ -59,7 +59,7 @@ fun CategoriesDescriptionScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            CategoriesDescriptionTopBar(onBackClick = onBackClick)
+            CategoriesTopBar(onBackClick = onBackClick)
 
             val categories = listOf(
                 CategoryItem(R.string.housing, R.drawable.ic_home_filled, R.string.housing_description),
@@ -102,7 +102,7 @@ fun CategoriesDescriptionScreen(
 }
 
 @Composable
-fun CategoriesDescriptionTopBar(onBackClick: () -> Unit) {
+fun CategoriesTopBar(onBackClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -238,8 +238,8 @@ data class CategoryItem(
 
 @Preview(showBackground = true)
 @Composable
-fun CategoriesDescriptionPreview() {
+fun CategoriesPreview() {
     MyFinanceTheme {
-        CategoriesDescriptionScreen(onBackClick = {})
+        CategoriesScreen(onBackClick = {})
     }
 }

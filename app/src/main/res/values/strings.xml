@@ -84,7 +84,6 @@
     <string name="edit_profile">Edit your profile</string>
     <string name="edit_propic">Select your profile picture</string>
     <string name="edit_full_name">Edit your full name</string>
-    <string name="manage_labels">Manage labels</string>
     <string name="no_expenses">No expenses</string>
     <string name="no_incomes">No incomes</string>
     <string name="enter_your_budget">Enter your monthly budget</string>
@@ -102,7 +101,8 @@
     <string name="transportation">Transportation</string>
     <string name="miscellaneous">Miscellaneous</string>
 
-    <string name="categories_description">Categories description</string>
+    <string name="manage_labels">Manage labels</string>
+    <string name="manage_categories">Manage categories</string>
     <string name="categories">Categories</string>
     <string name="housing_description">Manage your living expenses including rent or mortgage, property taxes, home insurance, utilities like water and electricity, and home maintenance.</string>
     <string name="groceries_description">Keep track of daily essentials, including food shopping and personal hygiene products.</string>

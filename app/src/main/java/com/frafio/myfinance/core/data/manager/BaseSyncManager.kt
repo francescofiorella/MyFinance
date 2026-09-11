@@ -166,7 +166,6 @@ abstract class BaseSyncManager<T : Transaction>(
         return when (item) {
             is Expense -> item.copy(updatedAt = updatedAt, isDeleted = isDeleted, deleteAt = deleteAt) as T
             is Income -> item.copy(updatedAt = updatedAt, isDeleted = isDeleted, deleteAt = deleteAt) as T
-            else -> item
         }
     }
 

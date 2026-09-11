@@ -78,7 +78,6 @@
     <string name="edit_profile">Modifica il tuo profilo</string>
     <string name="edit_propic">Seleziona la tua foto profilo</string>
     <string name="edit_full_name">Modifica il tuo nome</string>
-    <string name="manage_labels">Gestisci etichette</string>
     <string name="no_expenses">Nessuna spesa</string>
     <string name="no_incomes">Nessuna entrata</string>
     <string name="enter_your_budget">Inserisci il tuo budget mensile</string>
@@ -104,7 +103,8 @@
     <string name="transportation">Trasporti</string>
     <string name="miscellaneous">Varie</string>
 
-    <string name="categories_description">Descrizione categorie</string>
+    <string name="manage_labels">Gestisci etichette</string>
+    <string name="manage_categories">Gestisci categorie</string>
     <string name="categories">Categorie</string>
     <string name="housing_description">Gestisci le tue spese abitative, inclusi affitto o mutuo, tasse sulla proprietà, assicurazione sulla casa, utenze come acqua ed elettricità e manutenzione domestica.</string>
     <string name="groceries_description">Tieni traccia degli elementi essenziali quotidiani, inclusa la spesa alimentare e i prodotti per l\'igiene personale.</string>
