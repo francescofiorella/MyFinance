@@ -92,7 +92,8 @@ fun AuthForm(
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
-            contentType = ContentType.EmailAddress
+            contentType = ContentType.EmailAddress,
+            testTag = "email_field"
         )
 
         var passwordVisible by remember { mutableStateOf(false) }
@@ -116,7 +117,8 @@ fun AuthForm(
                 onNext = { focusManager.moveFocus(FocusDirection.Down) },
                 onDone = { focusManager.clearFocus(); onAuthClick() }
             ),
-            contentType = if (isSigningUp) ContentType.NewPassword else ContentType.Password
+            contentType = if (isSigningUp) ContentType.NewPassword else ContentType.Password,
+            testTag = "password_field"
         )
 
         AnimatedVisibility(

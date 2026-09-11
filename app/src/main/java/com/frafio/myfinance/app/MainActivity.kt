@@ -24,12 +24,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -70,6 +73,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var loadingRepository: LoadingRepository
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
 
@@ -198,7 +202,11 @@ class MainActivity : ComponentActivity() {
 
                 CompositionLocalProvider(LocalSnackbarHostState provides appState.snackbarHostState) {
                     Surface(
-                        modifier = Modifier.fillMaxSize(),
+                        // Exposes Modifier.testTag(...) as the accessibility resource-id so that
+                        // UiAutomator (Baseline Profile / Macrobenchmark) can find nodes via By.res().
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .semantics { testTagsAsResourceId = true },
                         color = MaterialTheme.colorScheme.surface
                     ) {
                         Box(modifier = Modifier.fillMaxSize()) {

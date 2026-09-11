@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -204,6 +205,7 @@ private fun AuthContent(
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 Spacer(modifier = Modifier.height(8.dp))
                 TextButton(
+                    modifier = Modifier.testTag("auth_toggle_mode"),
                     onClick = onToggleAuthMode,
                     enabled = !isLoading
                 ) {
@@ -264,7 +266,8 @@ private fun AuthContent(
                 Button(
                     onClick = onAuthClick,
                     enabled = !isLoading,
-                    shapes = ButtonDefaults.shapes()
+                    shapes = ButtonDefaults.shapes(),
+                    modifier = Modifier.testTag("login_button")
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_login_filled),
@@ -276,6 +279,7 @@ private fun AuthContent(
                 }
 
                 TextButton(
+                    modifier = Modifier.testTag("auth_forgot_password"),
                     onClick = onForgotPasswordClick,
                     enabled = !uiState.isSigningUp && !isLoading
                 ) {

@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,7 +30,9 @@ fun ListSheetItem(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier.alpha(if (item.enabled) 1f else 0.38f),
+        modifier = modifier
+            .then(if (item.testTag != null) Modifier.testTag(item.testTag) else Modifier)
+            .alpha(if (item.enabled) 1f else 0.38f),
         onClick = {
             item.onClick()
             onDismiss()

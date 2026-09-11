@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -474,6 +475,7 @@ fun ExpensesList(
     LazyColumn(
         state = listState,
         modifier = Modifier
+            .testTag("expenses_list")
             .fillMaxSize(),
     ) {
         itemsIndexed(
@@ -499,6 +501,7 @@ fun ExpensesList(
                 else -> {
                     val metadata = itemMetadata[index] ?: Pair(0, 1)
                     TransactionListItem(
+                        modifier = Modifier.testTag("expense_item"),
                         transaction = expense,
                         indexInGroup = metadata.first,
                         countInGroup = metadata.second,

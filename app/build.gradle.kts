@@ -9,20 +9,19 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     id("kotlin-parcelize")
+    alias(libs.plugins.baselineprofile)
 }
 
 android {
     namespace = "com.frafio.myfinance"
-    compileSdk {
-        version = release(37)
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.frafio.myfinance"
         minSdk = 29
         targetSdk = 37
-        versionCode = 4
-        versionName = "4.13.16"
+        versionCode = 4013017
+        versionName = "4.13.17"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -33,7 +32,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -50,6 +50,10 @@ android {
         buildConfig = true
         compose = true
     }
+}
+
+baselineProfile {
+    mergeIntoMain = true
 }
 
 kotlin {
@@ -69,6 +73,7 @@ dependencies {
 
     // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.profileinstaller)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.material3)
@@ -96,6 +101,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    "baselineProfile"(project(":baselineProfile"))
     ksp(libs.hilt.compiler)
     ksp(libs.metadata.jvm)
     implementation(libs.hilt.lifecycle.viewmodel.compose)

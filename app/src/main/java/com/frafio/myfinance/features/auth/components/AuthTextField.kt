@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
@@ -40,7 +41,8 @@ fun AuthTextField(
     onPasswordVisibleChange: (Boolean) -> Unit = {},
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    contentType: ContentType? = null
+    contentType: ContentType? = null,
+    testTag: String? = null
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         OutlinedTextField(
@@ -48,6 +50,9 @@ fun AuthTextField(
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
+                .then(
+                    if (testTag != null) Modifier.testTag(testTag) else Modifier
+                )
                 .then(
                     if (contentType != null) Modifier.semantics { this.contentType = contentType } else Modifier
                 ),

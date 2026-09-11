@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -77,6 +78,7 @@ fun CategoriesScreen(
 
             Column(
                 modifier = Modifier
+                    .testTag("categories_scroll")
                     .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
                     .fillMaxHeight()
                     .align(Alignment.CenterHorizontally)

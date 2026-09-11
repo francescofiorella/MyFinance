@@ -7,6 +7,8 @@ data class MenuItem(
     @DrawableRes val iconRes: Int = 0,
     @StringRes val textRes: Int = 0,
     val enabled: Boolean = true,
+    /** Exposed to UiAutomator as the node resource-id, for Baseline Profile generation. */
+    val testTag: String? = null,
     val onClick: () -> Unit
 ) {
     var text: String? = null

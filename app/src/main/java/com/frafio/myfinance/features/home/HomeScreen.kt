@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -210,6 +211,7 @@ fun HomeScreen(
             )
 
             NavDisplay(
+                modifier = Modifier.testTag("home_nav_display"),
                 entries = homeEntries,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
                 popTransitionSpec = { fadeIn() togetherWith fadeOut() },
@@ -255,6 +257,14 @@ private fun HomeScreenContent(
                 tabs.forEach { navKey ->
                     val isSelected = currentTab == navKey
                     item(
+                        modifier = Modifier.testTag(
+                            when (navKey) {
+                                HomeTabKey.Dashboard -> "tab_dashboard"
+                                HomeTabKey.Expenses -> "tab_expenses"
+                                HomeTabKey.Budget -> "tab_budget"
+                                HomeTabKey.Profile -> "tab_profile"
+                            }
+                        ),
                         selected = isSelected,
                         onClick = { onTabClick(navKey) },
                         icon = {
@@ -373,6 +383,7 @@ private fun MainScaffold(
                         },
                         actions = {
                             FilledTonalIconButton(
+                                modifier = Modifier.testTag("home_top_bar_action"),
                                 onClick = if (currentTab == HomeTabKey.Profile)
                                     onLogoutClick
                                 else
@@ -403,7 +414,10 @@ private fun MainScaffold(
                 }
             },
             floatingActionButton = {
-                MediumFloatingActionButton(onClick = onAddClick) {
+                MediumFloatingActionButton(
+                    modifier = Modifier.testTag("add_fab"),
+                    onClick = onAddClick
+                ) {
                     Icon(
                         painterResource(R.drawable.ic_add_filled),
                         contentDescription = stringResource(id = R.string.add)

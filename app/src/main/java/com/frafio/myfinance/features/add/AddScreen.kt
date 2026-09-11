@@ -60,6 +60,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
@@ -367,6 +368,7 @@ fun AddTopBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         FilledTonalIconButton(
+            modifier = Modifier.testTag("add_close_button"),
             onClick = {
                 if (isTypeSelectionVisible) {
                     onToggleTypeSelection(false)
@@ -387,6 +389,7 @@ fun AddTopBar(
         }
 
         TextButton(
+            modifier = Modifier.testTag("add_type_button"),
             onClick = {
                 focusManager.clearFocus()
                 onToggleTypeSelection(true)
@@ -430,6 +433,7 @@ fun AddTopBar(
 
         FilledIconButton(
             modifier = Modifier
+                .testTag("add_save_button")
                 .padding(end = 4.dp)
                 .width(52.dp),
             onClick = onSaveClick,
@@ -508,6 +512,7 @@ fun NameAndLabelsCard(
                             )
                         },
                         modifier = Modifier
+                            .testTag("add_name_field")
                             .fillMaxWidth()
                             .padding(end = 16.dp),
                         enabled = !isAdding,
@@ -780,7 +785,9 @@ fun AmountField(
                         style = MaterialTheme.typography.bodyLarge
                     )
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .testTag("add_amount_field")
+                    .fillMaxWidth(),
                 enabled = !isAdding,
                 textStyle = MaterialTheme.typography.bodyLarge,
                 trailingIcon = {

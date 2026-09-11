@@ -29,16 +29,19 @@ fun EditTransactionSheet(
         MenuItem(
             iconRes = R.drawable.ic_edit_outline,
             textRes = R.string.edit,
+            testTag = "transaction_edit",
             onClick = onEdit
         ),
         MenuItem(
             iconRes = R.drawable.ic_content_copy_outline,
             textRes = R.string.duplicate,
+            testTag = "transaction_duplicate",
             onClick = onDuplicate
         ),
         MenuItem(
             iconRes = R.drawable.ic_delete_outline,
             textRes = R.string.delete,
+            testTag = "transaction_delete",
             onClick = onDelete
         )
     )
@@ -48,6 +51,7 @@ fun EditTransactionSheet(
             MenuItem(
                 iconRes = R.drawable.ic_sell_outline,
                 textRes = R.string.labels,
+                testTag = "transaction_labels",
                 onClick = onLabels
             )
         )

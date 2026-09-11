@@ -46,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -200,7 +201,9 @@ fun LabelsContent(
                 )
             } else {
                 LazyColumn(
-                    modifier = Modifier.widthIn(max = BottomSheetDefaults.SheetMaxWidth)
+                    modifier = Modifier
+                        .testTag("labels_list")
+                        .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
                 ) {
                     itemsIndexed(
                         items = allLabels,

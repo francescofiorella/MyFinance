@@ -78,8 +78,6 @@ fun BarChart(
             onVisibleCountChanged(maxVisibleItems)
         }
 
-        val visibleEntries = entries
-
         // Use rememberSaveable so that the selected index persists during screen rotation.
         var selectedIndex by rememberSaveable(resetIndicatorHook) {
             mutableIntStateOf(
@@ -92,16 +90,16 @@ fun BarChart(
         }
 
         // Max value based on visible data for better scaling
-        val maxValue = remember(visibleEntries, referenceValue) {
+        val maxValue = remember(entries, referenceValue) {
             // Ensure selectedIndex is within the visible range or valid for data
             if (entries.isNotEmpty() && (selectedIndex < 0 || selectedIndex >= entries.size)) {
                 selectedIndex = entries.size - 1
             }
-            val max = visibleEntries.maxOfOrNull { it.value } ?: 0.0
+            val max = entries.maxOfOrNull { it.value } ?: 0.0
             if (max == 0.0) 1.0 else max
         }
 
-        val extendedLabel = remember(selectedIndex, visibleEntries) {
+        val extendedLabel = remember(selectedIndex, entries) {
             if (selectedIndex == -1) {
                 ""
             } else {
@@ -140,8 +138,8 @@ fun BarChart(
                     .height(barMaxHeight),
                 contentAlignment = Alignment.BottomStart
             ) {
-                val interactionSources = remember(visibleEntries.size) {
-                    List(visibleEntries.size) { MutableInteractionSource() }
+                val interactionSources = remember(entries.size) {
+                    List(entries.size) { MutableInteractionSource() }
                 }
                 ButtonGroup(
                     modifier = Modifier
@@ -152,7 +150,7 @@ fun BarChart(
                         ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
                     }
                 ) {
-                    visibleEntries.forEachIndexed { index, entry ->
+                    entries.forEachIndexed { index, entry ->
                         val isSelected = selectedIndex == index
                         val barHeightFraction =
                             (entry.value / maxValue).toFloat().coerceIn(0.01f, 1f)
@@ -186,7 +184,7 @@ fun BarChart(
                         animationSpec = tween(durationMillis = 500),
                         label = "ReferenceHeight"
                     )
-                    if (visibleEntries.isNotEmpty() && animatedHeightFraction in 0f..1f) {
+                    if (entries.isNotEmpty() && animatedHeightFraction in 0f..1f) {
                         HorizontalDivider(
                             modifier = Modifier
                                 .zIndex(-1f)
@@ -194,7 +192,7 @@ fun BarChart(
                                 .padding(bottom = barMaxHeight * animatedHeightFraction),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        if (visibleEntries[visibleEntries.size - 1].value <= referenceValue) {
+                        if (entries[entries.size - 1].value <= referenceValue) {
                             Text(
                                 modifier = Modifier
                                     .zIndex(-1f)
@@ -222,7 +220,7 @@ fun BarChart(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                visibleEntries.forEachIndexed { index, entry ->
+                entries.forEachIndexed { index, entry ->
                     val isSelected = selectedIndex == index
                     val shortLabel = "%02d".format(entry.month).takeLast(2)
                     val extendedLabel = shortLabel + "/" + "%02d".format(entry.year).takeLast(2)

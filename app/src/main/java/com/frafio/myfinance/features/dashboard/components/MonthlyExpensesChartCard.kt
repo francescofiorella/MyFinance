@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -87,6 +88,7 @@ fun MonthlyExpensesChartCard(
                         {
                             FilledTonalIconButton(
                                 modifier = Modifier
+                                    .testTag("bar_chart_prev")
                                     .size(IconButtonDefaults.smallContainerSize())
                                     .animateWidth(previousInteractionSource),
                                 onClick = onPreviousDate,
@@ -108,6 +110,7 @@ fun MonthlyExpensesChartCard(
                         {
                             FilledTonalIconButton(
                                 modifier = Modifier
+                                    .testTag("bar_chart_next")
                                     .size(IconButtonDefaults.smallContainerSize())
                                     .animateWidth(nextInteractionSource),
                                 onClick = onNextDate,
@@ -129,6 +132,7 @@ fun MonthlyExpensesChartCard(
                         {
                             FilledTonalIconButton(
                                 modifier = Modifier
+                                    .testTag("bar_chart_today")
                                     .width(52.dp)
                                     .animateWidth(todayInteractionSource),
                                 onClick = {

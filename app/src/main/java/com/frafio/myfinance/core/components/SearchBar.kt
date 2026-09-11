@@ -15,6 +15,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,7 +45,9 @@ fun SearchBar(
             TextField(
                 value = query,
                 onValueChange = onQueryChange,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .testTag("search_field")
+                    .weight(1f),
                 placeholder = { Text(stringResource(R.string.search)) },
                 leadingIcon = {
                     Icon(
@@ -74,7 +77,9 @@ fun SearchBar(
             )
             IconButton(
                 onClick = onFilterClick,
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier
+                    .testTag("search_filter_button")
+                    .padding(end = 8.dp)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_filter_list_filled),

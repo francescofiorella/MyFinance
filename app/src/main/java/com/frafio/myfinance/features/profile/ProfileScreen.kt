@@ -36,6 +36,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -173,6 +174,7 @@ private fun ProfileContent(
 ) {
     Column(
         modifier = modifier
+            .testTag("profile_scroll")
             .fillMaxSize()
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -320,6 +322,7 @@ private fun ProfileCards(
         },
         modifier = Modifier
             .fillMaxWidth()
+            .testTag("profile_edit_profile")
             .padding(horizontal = 16.dp)
             .padding(bottom = 2.dp),
     )
@@ -472,6 +475,7 @@ private fun ProfileCards(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .testTag("profile_change_password")
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 16.dp),
             )
@@ -622,6 +626,7 @@ private fun ProfileCards(
         },
         modifier = Modifier
             .fillMaxWidth()
+            .testTag("profile_manage_categories")
             .padding(horizontal = 16.dp)
             .padding(bottom = 2.dp),
     )
@@ -671,6 +676,7 @@ private fun ProfileCards(
         },
         modifier = Modifier
             .fillMaxWidth()
+            .testTag("profile_manage_labels")
             .padding(horizontal = 16.dp)
             .padding(bottom = 2.dp),
     )
@@ -720,6 +726,7 @@ private fun ProfileCards(
         },
         modifier = Modifier
             .fillMaxWidth()
+            .testTag("profile_change_currency")
             .padding(horizontal = 16.dp)
             .padding(bottom = 2.dp),
     )
