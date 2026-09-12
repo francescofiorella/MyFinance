@@ -1,130 +1,155 @@
-# App fixes needed to make the unit suite green
+# Test findings
 
-The unit tests assert the behaviour the app *should* have. Seven of them fail against the current
-code. Each entry below names the failing test, what it expects, what the app does instead, and the
-smallest fix. Nothing in `app/src/main` was changed to make a test pass; these are the follow-ups.
-Entries are removed as they are fixed.
+The unit tests assert the behaviour the app *should* have. When the app disagrees, the test stays
+red and the fix is listed here; entries are removed as they are fixed.
 
-Run: `./gradlew :app:testDebugUnitTest` (292 tests, 7 failing).
+Run: `./gradlew :app:testDebugUnitTest` (292 tests, all passing).
 
----
+## Open findings
 
-## 1. Null price crashes the totals helpers instead of counting as zero
-
-**Tests:** `FinanceUtilsTest.addTotalsToExpensesWithoutToday_nullPriceCountsAsZero`,
-`FinanceUtilsTest.addTotalsToIncomes_nullPriceCountsAsZero`
-**Where:** `core/utils/FinanceUtils.kt:233` (`total.price!! + expense.price!!`) and `:330`
-(`total.price!! + income.price!!`)
-`Transaction.price` is nullable and `addTotalsToExpenses` already treats a null as `0.0`
-(`expenses[j].price ?: 0.0`). The other two helpers dereference it, so one malformed row from
-Firestore throws `NullPointerException` inside the `expenses`/`incomes` flow and takes the screen
-down.
-**Fix:** `(expense.price ?: 0.0)` / `(income.price ?: 0.0)` in both places, matching the first helper.
-
-## 2. `addTotalsToIncomes` emits two rows with the same id
-
-**Test:** `FinanceUtilsTest.addTotalsToIncomes_everyRowHasADistinctId`
-**Where:** `core/utils/FinanceUtils.kt:283` and `:300`
-When the first income is from a past year, the placeholder TOTAL row and the JOLLY row for the
-current year both get `id = todayDate.year.toString()`. `BudgetScreen` keys its list on `id`, so
-Compose sees a duplicate key. The expenses variant avoids this with `total_…` / `jolly_…` prefixes.
-**Fix:** use the same scheme — `"total_${year}"` for the TOTAL row and `"jolly_${year}"` for the
-JOLLY row — and update any scroll-to-id caller that builds the year id (`HomeViewModel.onTransactionCommitted`
-passes `year.toString()` for incomes; it must produce the new TOTAL id).
-
-## 3. `AddViewModel.onAddButtonClick` crashes on an unparseable price
-
-**Tests:** `AddViewModelTest.onAddButtonClick_unparseablePrice_emitsWrongAmountInsteadOfCrashing`,
-`AddViewModelTest.onAddButtonClick_emptyPrice_emitsEmptyAmountInsteadOfCrashing`
-**Where:** `features/add/AddViewModel.kt:139` (`trimmedPriceString.toDouble()`)
-The call sits inside `viewModelScope.launch` with a `finally` but no `catch`, so a bad string
-throws `NumberFormatException` out of the coroutine and crashes the process.
-Today `AddScreen.kt:171-177` validates the field before calling the ViewModel, so the crash is only
-reachable if that guard is bypassed (a second caller, a refactor, a shortcut intent). The
-ViewModel is the public API and should be safe on its own; `FinanceCode.EMPTY_AMOUNT` and
-`WRONG_AMOUNT` already exist for exactly this.
-**Fix:** in the ViewModel, `val price = trimmedPriceString.toDoubleOrNull()`; when the string is
-blank emit `AddUiEvent.Error(FinanceResult(FinanceCode.EMPTY_AMOUNT))`, when it is non-null but
-unparseable emit `Error(FinanceResult(FinanceCode.WRONG_AMOUNT))`, and return. The screen-level
-check can then delegate to the same logic instead of duplicating it.
-
-## 4. `ProfileViewModel.isSwitchDynamicColorChecked` starts as `false` regardless of the stored preference
-
-**Test:** `ProfileViewModelTest.isSwitchDynamicColorChecked_startsFromPreferences`
-**Where:** `features/profile/ProfileViewModel.kt:63`
-The `stateIn` initial value is the literal `false`, while `userPreferences` (one line above) is
-initialised from `userPreferencesRepository.userPreferencesFlow.value`. With dynamic colour on, the
-switch renders off for the first frame and flips on once the flow is collected.
-**Fix:** `initialValue = userPreferencesRepository.userPreferencesFlow.value.dynamicColor`.
-
-## 5. `UserPreferencesRepositoryImpl.updateUser` turns nulls into `""` and `0`
-
-**Test:** `UserPreferencesRepositoryTest.updateUser_preservesNullFields`
-**Where:** `core/data/repository/UserPreferencesRepositoryImpl.kt:182-192` (write) and `:74-89` (read)
-A `User` with no photo, no local path or no creation date is written as `""` / `0` and read back
-that way. `getCreationDataString()` then renders `00/00/0000`, and `email = null` is written as
-`""`, which makes the `if (email != null)` read guard on line 75 always pass.
-**Fix:** write a key only when the value is non-null (`remove(key)` otherwise) and read it back as
-nullable; keep `email` as the presence marker but store it only when non-null. The test pins the
-round-trip: `updateUser(u)` followed by a read must equal `u`.
+None.
 
 ---
-
-## Not reachable from the JVM suite
-
-- `HomeViewModel`'s `RESOURCE_EXHAUSTED` branch (`FirestoreQuotaExceeded`). `FirebaseFirestoreException.Code`
-  fails static initialisation without a Firebase runtime, so neither constructing the exception nor
-  the `error.code ==` comparison can run on the JVM. Needs a Robolectric or instrumented test, or a
-  thin error type of the app's own between the managers and the ViewModel.
 
 ## Observed, but no test asserts either way — decide, then add a test
 
 These came up while writing the suite. Each is real behaviour, but whether it is a bug depends on a
 contract the code does not state. No test was kept for them so the suite does not enshrine an
-accident; pick the intended behaviour and a test follows directly.
+accident; pick the intended behaviour and a test follows directly from the example.
 
-- **`addTotalsToExpenses` groups positionally.** The same date appearing non-contiguously produces
-  two TOTAL rows for it (`core/utils/FinanceUtils.kt:142-180`). Fine if the input is always the
-  DAO's `ORDER BY` output, wrong if anything else ever calls it.
-- **`Expense`/`Income` default `id` renders null parts as the word `null`** — e.g.
-  `Expense(name = "A", price = 1.0, category = 2)` gets `id = "A1.0null2[]"`
-  (`core/data/model/Expense.kt:37`). It is the Room primary key and the Firestore document id; a
-  null `timestamp` therefore produces an id that can collide across days.
-- **`AddViewModel.onAddButtonClick` with an unknown `requestCode` does nothing** — no event, no
-  error, loading starts and stops (`features/add/AddViewModel.kt:142-222`). Only `1` and `2` are
-  handled; anything else is silently swallowed.
-- **`ExpensesViewModel.itemMetadata` / `BudgetViewModel.itemMetadata` throw on a row with no date**
-  — `getLocalDate()` dereferences `year!!`/`month!!`/`day!!`. A malformed Firestore document takes
-  the list screen down with the pipeline. Related to finding 1: the same rows are currently
-  accepted by the DAO.
-- **`Transaction.getPriceString()` throws on a null price** (`price!!`). Same class of input as
-  above; the alternative is rendering an empty string or `0.00`.
-- **`UserPreferencesRepositoryImpl` materialises a user for `updateUser(User(email = null))`**
-  because `email` is written as `""` — a direct consequence of finding 5; fixing that decides this.
-- **Every Firestore listener reports quota errors separately.** `HomeViewModel.updateUserData`
-  installs the same `onSyncError` on the root, expenses and incomes listeners, so a
-  `RESOURCE_EXHAUSTED` state emits `FirestoreQuotaExceeded` up to three times — three dialogs, if
-  the screen shows one per event.
-- `AuthViewModel.onGoogleRequest` calls `stopLoading()` without a matching `startLoading()`; it
-  relies on the screen having started it. Harmless with the ref-counted `LoadingRepository`, but the
-  contract is implicit.
-- `ExpensesViewModel.expenses` decides between `addTotalsToExpenses` and the `WithoutToday` variant
-  by reading `_searchQuery.value` / `_selectedCategories.value` / … *inside* `map`, not from the
-  combined `FilterParams`. A rapid filter change can pair a stale decision with a fresh list.
-- `ProfileViewModel.editFullName("   ")` and `ExpensesViewModel.addLabelToExpense(…, "   ")`
-  return early from inside `try`, so `startLoading()`/`stopLoading()` still bracket a no-op.
+### `addTotalsToExpenses` groups by position, not by date
 
-## Test-side adjustments made while writing the suite (not app findings)
+`core/utils/FinanceUtils.kt:142-187`. Consecutive rows with the same date form one group; the same
+date appearing again later starts a new group with its own TOTAL row.
 
-Listed so nothing looks like a silent concession. In each case the expectation is unchanged; only
-how the test observes it moved.
+```kotlin
+// today = 15 Jun
+addTotalsToExpenses(listOf(a /* 15 Jun */, b /* 14 Jun */, c /* 15 Jun */), today)
+// -> [TOTAL total_15_6_2024 (a only), a, TOTAL total_14_6_2024, b, TOTAL total_15_6_2024 (c only), c]
+```
 
-- **Loading brackets.** `startLoading()`/`stopLoading()` with no suspension in between cannot be
-  observed under an unconfined Main: the `StateFlow` conflates the `true` before the collector runs.
-  Six tests (`Auth`, `Profile`, `Budget`, `Expenses`) switch to `StandardTestDispatcher` +
-  `runCurrent()` via a `useStandardMain()` helper. The app really does start and stop loading.
-- **Caller-scope launches.** `LabelsViewModel.undoDeleteLabel(scope, …)` launches on the scope the
-  screen passes; in tests that is `backgroundScope`, which needs `advanceUntilIdle()` to run.
-- **`HomeViewModel.checkUser` needs a first local count.** `updateUserData` awaits
-  `getCount().first()` on both local repositories, so the fakes are seeded with an empty list in
-  `setup()` — Room emits a count immediately; the fakes do not until told to.
+Two rows share the key `total_15_6_2024`, which `ExpensesScreen` uses as the `LazyColumn` key.
+Harmless as long as every caller passes the DAO's `ORDER BY year DESC, month DESC, day DESC`
+output — which is the case today. Either document the precondition or sort inside the function.
+
+### A transaction built without a `timestamp` gets `null` inside its default id
+
+`core/data/model/Expense.kt:37` and `Income.kt`: `id = "$name$price$timestamp$category$labels"`.
+
+```kotlin
+Expense(name = "Coffee", price = 1.5, category = 5).id   // "Coffee1.5null5[]"
+```
+
+The id is the Room primary key, so two such rows on different days replace each other on insert.
+Today every producer sets `timestamp` (`AddViewModel` derives it from the date; the sync manager
+overwrites `id` with the Firestore document id), so the exposure is a future caller that forgets.
+Options: make `timestamp` non-null in the constructor, or derive the id from the date fields.
+
+### `AddViewModel.onAddButtonClick` silently ignores an unknown `requestCode`
+
+`features/add/AddViewModel.kt:149-231`. The `when (navKey.requestCode)` handles `1` (add) and `2`
+(edit) and has no `else`.
+
+```kotlin
+val vm = AddViewModel(…, RootKey.AddEditTransaction(requestCode = 3, expenseCode = 10))
+vm.onAddButtonClick("Coffee", "2.5", 5, 2024, 3, 7, emptyList())
+// -> no repository call, no uiEvent, isAdding true then false, loading starts and stops
+```
+
+The user sees the button do nothing. `RootKey.AddEditTransaction.requestCode` is a plain `Int`, so
+nothing prevents a third value. A sealed `RequestType` (or an `else -> error(…)`) closes this.
+
+### A row with no date crashes the list pipelines
+
+`getLocalDate()` dereferences `year!!`, `month!!`, `day!!` and is called from `addTotalsToExpenses`,
+`addTotalsToExpensesWithoutToday` and `ExpensesViewModel.itemMetadata`.
+
+```kotlin
+// Room accepts this row; nothing validates on insert
+Expense(name = "Ghost", price = 1.0, category = 5)   // year/month/day null
+
+// then, in ExpensesViewModel.expenses
+addTotalsToExpenses(listOf(ghost))   // NullPointerException inside the flow -> screen crashes
+```
+
+`BudgetViewModel.itemMetadata` compares nullable `year`s instead, so it does not throw, but the
+grouping for such a row is undefined. The DAO's sums and ordering accept these rows. Decide whether
+the model guarantees a date (make `year`/`month`/`day` non-null and reject at sync time) or whether
+the pipelines skip such rows.
+
+### `getPriceString()` throws on a null price
+
+`core/data/model/Expense.kt` / `Income.kt`: `doubleToPrice(price!!)`.
+
+```kotlin
+Expense(name = "Ghost", price = null, year = 2024, month = 6, day = 15).getPriceString()
+// -> NullPointerException
+```
+
+Since the totals helpers now treat a null price as `0.0`, rendering is the remaining crash site: a
+null-priced row reaches `TransactionItems` and the composable calls `getPriceString()`. Either render
+`"€ 0.00"` (matching the totals) or guarantee `price` at the model level.
+
+### A user without an email cannot be stored
+
+`core/data/repository/UserPreferencesRepositoryImpl.kt:75-76`. After the `updateUser` fix, a null
+field clears its key; `email` is also the presence marker on read.
+
+```kotlin
+updateUser(User(fullName = "Ada", email = null))
+userPreferencesFlow.first().user   // null — the name was written but is invisible
+```
+
+Firebase always supplies an email for password and Google accounts, so this is theoretical today.
+If a provider without email is ever added, make `User.email` non-null (so the compiler enforces the
+invariant) or add an explicit `user_present` key.
+
+### `AuthViewModel.onGoogleRequest` relies on the screen for the matching `startLoading()`
+
+`features/auth/AuthScreen.kt:108-121` calls `viewModel.startLoading()`, then `handleGoogleSignIn`
+calls either `onGoogleRequest` (which stops loading on completion) or the error callback (which
+stops it). Every normal path is balanced, but the pairing is split across two files and one
+`launch`:
+
+```
+scope.launch {
+    viewModel.startLoading()
+    handleGoogleSignIn(…)      // suspends inside credentialManager.getCredential(...)
+}
+```
+
+If that coroutine is cancelled while suspended — the composable leaves composition, or the activity
+is recreated — neither callback runs and the app-wide `LoadingRepository` stays at `true` until
+something else calls `stopLoading()`. Wrapping the call in `try { … } finally { stopLoading() }`
+inside the screen, or moving the whole flow into the ViewModel, makes the pairing local.
+
+### `ExpensesViewModel.expenses` reads the filters from `.value` inside `map`
+
+`features/expenses/ExpensesViewModel.kt:145-153`. The decision between `addTotalsToExpenses` (with
+the today block) and `addTotalsToExpensesWithoutToday` uses `_searchQuery.value`,
+`_selectedCategories.value`, `_selectedLabels.value` and `_dateRange.value` at the moment the
+mapped list arrives, not the values that produced that list.
+
+```
+t0  onSearchQueryChanged("a")   -> combine emits FilterParams("a"), DB query starts
+t1  onSearchQueryChanged("")    -> combine emits FilterParams(""), second DB query starts
+t2  result for "a" arrives      -> map sees _searchQuery.value == "" -> addTotalsToExpenses
+                                   (today TOTAL + JOLLY rows prepended to a search result)
+t3  result for "" arrives       -> correct
+```
+
+The wrong list is visible between t2 and t3. Carrying `FilterParams` through to the `map` (e.g. by
+mapping `Pair(params, list)` out of `flatMapLatest`) removes the race.
+
+### No-op writes still flash the loading indicator
+
+`ProfileViewModel.editFullName` and `ExpensesViewModel.addLabelToExpense` validate *after*
+`startLoading()`, returning from inside the `try`, so `finally` still runs `stopLoading()`.
+
+```kotlin
+viewModel.editFullName("   ")
+// isLoading: false -> true -> false, no repository call, no event
+```
+
+On the main thread this is a single frame; a `LinearWavyProgressIndicator` bound to `isLoading` can
+still blink. Validate before `startLoading()`.
