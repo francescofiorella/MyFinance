@@ -63,11 +63,11 @@ class ProfileViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value.dynamicColor)
 
     fun editFullName(fullName: String, notify: Boolean = true) {
+        val trimmedFullName = fullName.trim()
+        if (trimmedFullName.isEmpty()) return
         viewModelScope.launch {
             try {
                 loadingRepository.startLoading()
-                val trimmedFullName = fullName.trim()
-                if (trimmedFullName.isEmpty()) return@launch
                 val previousFN = user.value?.fullName ?: ""
                 val response = userRepository.updateFullName(trimmedFullName)
                 if (response.code == AuthCode.USER_FULL_NAME_UPDATED.code) {

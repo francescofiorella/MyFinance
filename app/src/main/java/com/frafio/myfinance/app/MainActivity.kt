@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
                             }
                             rootBackStack.add(
                                 RootKey.AddEditTransaction(
-                                    requestCode = AddViewModel.REQUEST_ADD_CODE,
+                                    requestType = RootKey.RequestType.Add,
                                     expenseCode = expenseCode
                                 )
                             )

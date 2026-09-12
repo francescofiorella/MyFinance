@@ -109,14 +109,17 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun editFullName_blank_doesNotCallTheRepository() = runTest {
+    fun editFullName_blank_isANoOpThatNeverStartsLoading() = runTest {
+        useStandardMain()
+        val loading = collectLoading()
         val events = collectEvents()
 
         viewModel.editFullName("   ")
+        runCurrent()
 
         assertThat(userRepository.fullNameUpdates).isEmpty()
         assertThat(events).isEmpty()
-        assertThat(loadingRepository.isLoading.value).isFalse()
+        assertThat(loading).containsExactly(false)
     }
 
     @Test

@@ -105,15 +105,18 @@ class AuthViewModel @Inject constructor(
 
     fun onGoogleRequest(credential: Credential) {
         viewModelScope.launch {
-            val result = userRepository.userLogin(credential)
-            
-            if (result.code == AuthCode.LOGIN_SUCCESS.code) {
-                _uiEvents.emit(AuthUiEvent.Success)
-            } else {
-                _uiEvents.emit(AuthUiEvent.Error(result.message))
-            }
+            try {
+                loadingRepository.startLoading()
+                val result = userRepository.userLogin(credential)
 
-            loadingRepository.stopLoading()
+                if (result.code == AuthCode.LOGIN_SUCCESS.code) {
+                    _uiEvents.emit(AuthUiEvent.Success)
+                } else {
+                    _uiEvents.emit(AuthUiEvent.Error(result.message))
+                }
+            } finally {
+                loadingRepository.stopLoading()
+            }
         }
     }
 

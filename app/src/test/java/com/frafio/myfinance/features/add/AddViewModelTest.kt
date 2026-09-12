@@ -6,8 +6,6 @@ import com.frafio.myfinance.core.data.model.FinanceResult
 import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
-import com.frafio.myfinance.features.add.AddViewModel.Companion.REQUEST_ADD_CODE
-import com.frafio.myfinance.features.add.AddViewModel.Companion.REQUEST_EDIT_CODE
 import com.frafio.myfinance.features.add.AddViewModel.Companion.REQUEST_EXPENSE_CODE
 import com.frafio.myfinance.features.add.AddViewModel.Companion.REQUEST_INCOME_CODE
 import com.frafio.myfinance.testing.data.testExpense
@@ -46,8 +44,8 @@ class AddViewModelTest {
         expensesRepository, incomeRepository, loadingRepository, userPreferencesRepository, navKey,
     )
 
-    private val addExpense = RootKey.AddEditTransaction(REQUEST_ADD_CODE, REQUEST_EXPENSE_CODE)
-    private val addIncome = RootKey.AddEditTransaction(REQUEST_ADD_CODE, REQUEST_INCOME_CODE)
+    private val addExpense = RootKey.AddEditTransaction(RootKey.RequestType.Add, REQUEST_EXPENSE_CODE)
+    private val addIncome = RootKey.AddEditTransaction(RootKey.RequestType.Add, REQUEST_INCOME_CODE)
 
     // region initial state
 
@@ -73,7 +71,7 @@ class AddViewModelTest {
             name = "Rent", price = 12.5, date = LocalDate.of(2023, 4, 9),
             category = FirestoreEnums.CATEGORIES.HOUSING.value, labels = listOf("home"), id = "abc",
         )
-        val viewModel = viewModel(RootKey.AddEditTransaction(REQUEST_EDIT_CODE, REQUEST_EXPENSE_CODE, expense))
+        val viewModel = viewModel(RootKey.AddEditTransaction(RootKey.RequestType.Edit, REQUEST_EXPENSE_CODE, expense))
 
         assertThat(viewModel.name).isEqualTo("Rent")
         assertThat(viewModel.priceString).isEqualTo("12.5")
@@ -87,8 +85,8 @@ class AddViewModelTest {
 
     @Test
     fun priceString_dropsDecimalsForWholeAmounts() {
-        val whole = viewModel(RootKey.AddEditTransaction(REQUEST_EDIT_CODE, REQUEST_EXPENSE_CODE, testExpense(price = 12.0)))
-        val fractional = viewModel(RootKey.AddEditTransaction(REQUEST_EDIT_CODE, REQUEST_EXPENSE_CODE, testExpense(price = 12.5)))
+        val whole = viewModel(RootKey.AddEditTransaction(RootKey.RequestType.Edit, REQUEST_EXPENSE_CODE, testExpense(price = 12.0)))
+        val fractional = viewModel(RootKey.AddEditTransaction(RootKey.RequestType.Edit, REQUEST_EXPENSE_CODE, testExpense(price = 12.5)))
 
         assertThat(whole.priceString).isEqualTo("12")
         assertThat(fractional.priceString).isEqualTo("12.5")
@@ -96,7 +94,7 @@ class AddViewModelTest {
 
     @Test
     fun dateString_reflectsTheCurrentDateFields() {
-        val viewModel = viewModel(RootKey.AddEditTransaction(REQUEST_EDIT_CODE, REQUEST_EXPENSE_CODE, testExpense(date = LocalDate.of(2024, 1, 5))))
+        val viewModel = viewModel(RootKey.AddEditTransaction(RootKey.RequestType.Edit, REQUEST_EXPENSE_CODE, testExpense(date = LocalDate.of(2024, 1, 5))))
         assertThat(viewModel.dateString).isEqualTo("05 Jan 2024")
 
         viewModel.month = 12
@@ -213,7 +211,7 @@ class AddViewModelTest {
     @Test
     fun edit_expense_keepsTheOriginalId() = runTest {
         val original = testExpense(id = "keep-me")
-        val viewModel = viewModel(RootKey.AddEditTransaction(REQUEST_EDIT_CODE, REQUEST_EXPENSE_CODE, original))
+        val viewModel = viewModel(RootKey.AddEditTransaction(RootKey.RequestType.Edit, REQUEST_EXPENSE_CODE, original))
         val events = collectEvents(viewModel)
 
         viewModel.onAddButtonClick("Renamed", "9", 1, 2024, 1, 2, listOf("x"))
@@ -230,7 +228,7 @@ class AddViewModelTest {
     @Test
     fun edit_expense_failure_emitsError() = runTest {
         expensesRepository.editResult = FinanceResult(FinanceCode.EXPENSE_EDIT_FAILURE)
-        val viewModel = viewModel(RootKey.AddEditTransaction(REQUEST_EDIT_CODE, REQUEST_EXPENSE_CODE, testExpense()))
+        val viewModel = viewModel(RootKey.AddEditTransaction(RootKey.RequestType.Edit, REQUEST_EXPENSE_CODE, testExpense()))
         val events = collectEvents(viewModel)
 
         viewModel.onAddButtonClick("X", "1", 1, 2024, 1, 2, emptyList())
@@ -241,7 +239,7 @@ class AddViewModelTest {
     @Test
     fun edit_income_keepsTheOriginalIdAndDropsLabels() = runTest {
         val original = testIncome(id = "keep-me")
-        val viewModel = viewModel(RootKey.AddEditTransaction(REQUEST_EDIT_CODE, REQUEST_INCOME_CODE, original))
+        val viewModel = viewModel(RootKey.AddEditTransaction(RootKey.RequestType.Edit, REQUEST_INCOME_CODE, original))
         val events = collectEvents(viewModel)
 
         viewModel.onAddButtonClick("Bonus", "50", 7, 2024, 6, 30, listOf("ignored"))

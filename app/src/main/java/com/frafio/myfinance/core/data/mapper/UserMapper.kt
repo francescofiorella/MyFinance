@@ -6,7 +6,7 @@ import java.util.Calendar
 
 fun FirebaseUser.toUser(): User = buildUser(
     displayName = displayName,
-    email = email,
+    email = checkNotNull(email) { "Firebase user $uid has no email; every supported provider must supply one" },
     photoUrl = photoUrl?.toString(),
     providerIds = providerData.map { it.providerId },
     providerId = providerId,
@@ -15,7 +15,7 @@ fun FirebaseUser.toUser(): User = buildUser(
 
 internal fun buildUser(
     displayName: String?,
-    email: String?,
+    email: String,
     photoUrl: String?,
     providerIds: List<String>,
     providerId: String,
@@ -47,5 +47,17 @@ internal fun buildUser(
         month = calendar.get(Calendar.MONTH) + 1
         year = calendar.get(Calendar.YEAR)
     }
-    return User(displayName, email, userPic, null, provider, providers, hasPassword, isGoogleLinked, year, month, day)
+    return User(
+        fullName = displayName,
+        email = email,
+        photoUrl = userPic,
+        localPhotoPath = null,
+        provider = provider,
+        providers = providers,
+        hasPassword = hasPassword,
+        isGoogleLinked = isGoogleLinked,
+        creationYear = year,
+        creationMonth = month,
+        creationDay = day
+    )
 }

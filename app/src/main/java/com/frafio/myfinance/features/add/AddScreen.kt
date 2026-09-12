@@ -402,7 +402,7 @@ fun AddTopBar(
                     TextFieldDefaults.colors().focusedTextColor
                 }
             ),
-            enabled = navKey.requestCode == AddViewModel.REQUEST_ADD_CODE && !isAdding
+            enabled = navKey.requestType == RootKey.RequestType.Add && !isAdding
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -415,7 +415,7 @@ fun AddTopBar(
                     ),
                     style = MaterialTheme.typography.titleLarge,
                 )
-                if (navKey.requestCode == AddViewModel.REQUEST_ADD_CODE) {
+                if (navKey.requestType == RootKey.RequestType.Add) {
                     Icon(
                         modifier = Modifier
                             .padding(start = 4.dp),
@@ -1069,7 +1069,7 @@ fun AddScreenPreview() {
             onLabelClick = {},
             onLabelCheckedChanged = { _, _ -> },
             navKey = RootKey.AddEditTransaction(
-                requestCode = AddViewModel.REQUEST_ADD_CODE,
+                requestType = RootKey.RequestType.Add,
                 expenseCode = AddViewModel.REQUEST_EXPENSE_CODE
             ),
             onNavKeyChange = {},

@@ -95,7 +95,7 @@ class ExpensesViewModel @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val allFilteredExpenses: Flow<List<Expense>> = combine(
+    private val allFilteredExpenses: Flow<Pair<FilterParams, List<Expense>>> = combine(
         _searchQuery,
         _selectedCategories,
         _selectedLabels,
@@ -128,7 +128,7 @@ class ExpensesViewModel @Inject constructor(
             )
         }
 
-        if (params.labels.isEmpty()) {
+        val labelled = if (params.labels.isEmpty()) {
             flow
         } else {
             flow.map { list ->
@@ -137,15 +137,14 @@ class ExpensesViewModel @Inject constructor(
                 }
             }
         }
+        labelled.map { list -> params to list }
     }
 
     val expenses: StateFlow<List<Expense>> = allFilteredExpenses
-        .combine(_limit) { list, limit ->
-            list.take(limit.toInt())
-        }.map { limitedList ->
-            if (_searchQuery.value.isEmpty() && _selectedCategories.value.isEmpty() &&
-                _selectedLabels.value.isEmpty() && _dateRange.value == null
-            ) {
+        .combine(_limit) { (params, list), limit ->
+            params to list.take(limit.toInt())
+        }.map { (params, limitedList) ->
+            if (params.isEmpty) {
                 addTotalsToExpenses(limitedList)
             } else {
                 addTotalsToExpensesWithoutToday(limitedList)
@@ -155,7 +154,7 @@ class ExpensesViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val totalFilteredExpenses: StateFlow<Double> = allFilteredExpenses
-        .map { list -> list.sumOf { it.price ?: 0.0 } }
+        .map { (_, list) -> list.sumOf { it.price ?: 0.0 } }
         .flowOn(defaultDispatcher)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
@@ -275,11 +274,11 @@ class ExpensesViewModel @Inject constructor(
     }
 
     fun addLabelToExpense(expense: Expense, label: String) {
+        val trimmedLabel = label.trim()
+        if (trimmedLabel.isEmpty() || expense.labels.contains(trimmedLabel)) return
         viewModelScope.launch {
             try {
                 loadingRepository.startLoading()
-                val trimmedLabel = label.trim()
-                if (trimmedLabel.isEmpty() || expense.labels.contains(trimmedLabel)) return@launch
                 val response = expensesRepository.updateExpenseLabels(expense.id, trimmedLabel, true)
                 if (response.code == FinanceCode.EXPENSE_EDIT_FAILURE.code) {
                     _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
@@ -338,4 +337,7 @@ private data class FilterParams(
     val categories: List<Int>,
     val labels: List<String>,
     val dateRange: Pair<LocalDate, LocalDate>?
-)
+) {
+    val isEmpty: Boolean
+        get() = query.isEmpty() && categories.isEmpty() && labels.isEmpty() && dateRange == null
+}

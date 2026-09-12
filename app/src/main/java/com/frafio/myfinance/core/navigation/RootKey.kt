@@ -22,8 +22,17 @@ sealed interface RootKey : NavKey {
     data object CategoriesDescription : RootKey
 
     @Serializable
+    sealed interface RequestType {
+        @Serializable
+        data object Add : RequestType
+
+        @Serializable
+        data object Edit : RequestType
+    }
+
+    @Serializable
     data class AddEditTransaction(
-        val requestCode: Int,
+        val requestType: RequestType,
         val expenseCode: Int,
         val transaction: Transaction? = null,
         val position: Int? = null

@@ -108,13 +108,17 @@ fun AuthScreen(
         onGoogleClick = {
             focusManager.clearFocus()
             scope.launch {
-                viewModel.startLoading()
-                handleGoogleSignIn(
-                    context = context,
-                    isSigningUp = uiState.isSigningUp,
-                    onSuccess = viewModel::onGoogleRequest
-                ) { message ->
-                    appState.showSnackBar(message)
+                // Covers only the credential fetch; onGoogleRequest brackets the sign-in itself.
+                try {
+                    viewModel.startLoading()
+                    handleGoogleSignIn(
+                        context = context,
+                        isSigningUp = uiState.isSigningUp,
+                        onSuccess = viewModel::onGoogleRequest
+                    ) { message ->
+                        appState.showSnackBar(message)
+                    }
+                } finally {
                     viewModel.stopLoading()
                 }
             }

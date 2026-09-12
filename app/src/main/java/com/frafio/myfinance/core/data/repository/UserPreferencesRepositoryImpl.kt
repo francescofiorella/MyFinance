@@ -181,7 +181,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
     override suspend fun updateUser(user: User) {
         dataStore.edit { preferences ->
             preferences.setOrRemove(PreferencesKeys.USER_FULL_NAME, user.fullName)
-            preferences.setOrRemove(PreferencesKeys.USER_EMAIL, user.email)
+            preferences[PreferencesKeys.USER_EMAIL] = user.email
             preferences.setOrRemove(PreferencesKeys.USER_PHOTO_URL, user.photoUrl)
             preferences.setOrRemove(PreferencesKeys.USER_LOCAL_PHOTO_PATH, user.localPhotoPath)
             preferences.setOrRemove(PreferencesKeys.USER_PROVIDER, user.provider)

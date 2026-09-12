@@ -47,7 +47,7 @@ fun testIncome(
 )
 
 fun testUser(
-    email: String? = "ada@example.com",
+    email: String = "ada@example.com",
     fullName: String? = "Ada Lovelace",
     photoUrl: String? = null,
     provider: Int = User.EMAIL_PROVIDER,

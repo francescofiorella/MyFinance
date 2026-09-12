@@ -131,7 +131,7 @@ fun HomeScreen(
         onAddClick = {
             homeViewModel.navigateTo(
                 RootKey.AddEditTransaction(
-                    requestCode = AddViewModel.REQUEST_ADD_CODE,
+                    requestType = RootKey.RequestType.Add,
                     expenseCode = AddViewModel.REQUEST_EXPENSE_CODE
                 )
             )
@@ -152,7 +152,7 @@ fun HomeScreen(
                         onEditExpense = { expense, position ->
                             onNavigateToRoot(
                                 RootKey.AddEditTransaction(
-                                    requestCode = AddViewModel.REQUEST_EDIT_CODE,
+                                    requestType = RootKey.RequestType.Edit,
                                     expenseCode = AddViewModel.REQUEST_EXPENSE_CODE,
                                     transaction = expense,
                                     position = position
@@ -162,7 +162,7 @@ fun HomeScreen(
                         onDuplicateExpense = { expense ->
                             onNavigateToRoot(
                                 RootKey.AddEditTransaction(
-                                    requestCode = AddViewModel.REQUEST_ADD_CODE,
+                                    requestType = RootKey.RequestType.Add,
                                     expenseCode = AddViewModel.REQUEST_EXPENSE_CODE,
                                     transaction = expense
                                 )
@@ -177,7 +177,7 @@ fun HomeScreen(
                         onEditIncome = { income, position ->
                             onNavigateToRoot(
                                 RootKey.AddEditTransaction(
-                                    requestCode = AddViewModel.REQUEST_EDIT_CODE,
+                                    requestType = RootKey.RequestType.Edit,
                                     expenseCode = AddViewModel.REQUEST_INCOME_CODE,
                                     transaction = income,
                                     position = position
@@ -187,7 +187,7 @@ fun HomeScreen(
                         onDuplicateIncome = { income ->
                             onNavigateToRoot(
                                 RootKey.AddEditTransaction(
-                                    requestCode = AddViewModel.REQUEST_ADD_CODE,
+                                    requestType = RootKey.RequestType.Add,
                                     expenseCode = AddViewModel.REQUEST_INCOME_CODE,
                                     transaction = income
                                 )

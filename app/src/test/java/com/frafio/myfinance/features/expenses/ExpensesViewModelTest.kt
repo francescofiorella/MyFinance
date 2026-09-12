@@ -187,6 +187,33 @@ class ExpensesViewModelTest {
     }
 
     @Test
+    fun expenses_withAWhitespaceOnlyQuery_keepTheTodayBlock() = runTest {
+        // The query is trimmed before it reaches the DB, so a blank query is no filter at all.
+        collectExpenses()
+        expensesLocalRepository.sendExpenses(testExpense(name = "Old", date = yesterday))
+
+        viewModel.onSearchQueryChanged("   ")
+
+        assertThat(viewModel.expenses.value.map { it.category }.take(2))
+            .containsExactly(totalCategory, jollyCategory).inOrder()
+    }
+
+    @Test
+    fun expenses_decisionFollowsTheParamsThatProducedTheList() = runTest {
+        // Two filter changes back to back: the list for each must be shaped by its own params.
+        collectExpenses()
+        val old = testExpense(name = "Old", date = yesterday)
+        expensesLocalRepository.sendExpenses(old)
+
+        viewModel.onSearchQueryChanged("Old")
+        assertThat(viewModel.expenses.value.none { it.category == jollyCategory }).isTrue()
+
+        viewModel.onSearchQueryChanged("")
+        assertThat(viewModel.expenses.value.map { it.category }.take(2))
+            .containsExactly(totalCategory, jollyCategory).inOrder()
+    }
+
+    @Test
     fun expenses_areLimitedToFiftyUntilLoadMore() = runTest {
         collectExpenses()
         val many = (1..70).map { testExpense(name = "E$it", date = today) }
@@ -376,16 +403,19 @@ class ExpensesViewModelTest {
     }
 
     @Test
-    fun addLabelToExpense_blankOrDuplicate_isANoOp() = runTest {
+    fun addLabelToExpense_blankOrDuplicate_isANoOpThatNeverStartsLoading() = runTest {
+        useStandardMain()
+        val loading = collectLoading()
         val events = collectEvents()
         val expense = testExpense(labels = listOf("work"))
 
         viewModel.addLabelToExpense(expense, "   ")
         viewModel.addLabelToExpense(expense, "work")
+        runCurrent()
 
         assertThat(expensesRepository.expenseLabelCalls).isEmpty()
         assertThat(events).isEmpty()
-        assertThat(loadingRepository.isLoading.value).isFalse()
+        assertThat(loading).containsExactly(false)
     }
 
     @Test

@@ -9,7 +9,7 @@ class UserMapperTest {
 
     private fun build(
         displayName: String? = "Ada",
-        email: String? = "ada@example.com",
+        email: String = "ada@example.com",
         photoUrl: String? = null,
         providerIds: List<String> = listOf("password"),
         providerId: String = "firebase",

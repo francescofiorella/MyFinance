@@ -66,8 +66,6 @@ class AddViewModel @AssistedInject constructor(
     }
 
     companion object {
-        const val REQUEST_ADD_CODE: Int = 1
-        const val REQUEST_EDIT_CODE: Int = 2
         const val REQUEST_EXPENSE_CODE: Int = 10
         const val REQUEST_INCOME_CODE: Int = 11
     }
@@ -146,8 +144,8 @@ class AddViewModel @AssistedInject constructor(
                     return@launch
                 }
 
-                when (navKey.requestCode) {
-                    REQUEST_ADD_CODE -> {
+                when (navKey.requestType) {
+                    RootKey.RequestType.Add -> {
                         if (navKey.expenseCode == REQUEST_EXPENSE_CODE) {
                             val expense = Expense(
                                 name = trimmedName,
@@ -187,7 +185,7 @@ class AddViewModel @AssistedInject constructor(
                         }
                     }
 
-                    REQUEST_EDIT_CODE -> {
+                    RootKey.RequestType.Edit -> {
                         if (navKey.expenseCode == REQUEST_EXPENSE_CODE) {
                             val expense = Expense(
                                 name = trimmedName,

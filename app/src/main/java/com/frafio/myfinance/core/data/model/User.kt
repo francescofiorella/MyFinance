@@ -4,7 +4,7 @@ import com.frafio.myfinance.core.utils.dateToString
 
 data class User(
     val fullName: String? = null,
-    val email: String? = null,
+    val email: String,
     val photoUrl: String? = null,
     val localPhotoPath: String? = null,
     val provider: Int? = null,

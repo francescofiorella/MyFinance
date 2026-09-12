@@ -131,6 +131,7 @@ fun getCategoryTextColor(categoryId: Int?, default: Color, isDark: Boolean): Col
     }
 }
 
+// Groups consecutive rows by date, so expenses must already be sorted newest-first as the DAO returns them.
 fun addTotalsToExpenses(expenses: List<Expense>, today: LocalDate = LocalDate.now()): List<Expense> {
     if (expenses.isEmpty()) return emptyList()
 
