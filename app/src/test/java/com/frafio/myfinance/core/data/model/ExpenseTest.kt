@@ -65,21 +65,10 @@ class ExpenseTest {
     }
 
     @Test
-    fun getPriceString_throwsWhenPriceIsNull() {
-        assertThrows(NullPointerException::class.java) { testExpense(price = null).getPriceString() }
-    }
-
-    @Test
     fun defaultId_concatenatesNamePriceTimestampCategoryAndLabels() {
         // This is the Room primary key; changing the format silently duplicates rows on sync.
         val expense = Expense(name = "A", price = 1.0, timestamp = 5L, category = 2, labels = listOf("x"))
         assertThat(expense.id).isEqualTo("A1.052[x]")
-    }
-
-    @Test
-    fun defaultId_rendersNullPartsAsTheWordNull() {
-        val expense = Expense(name = "A", price = 1.0, timestamp = null, category = 2)
-        assertThat(expense.id).isEqualTo("A1.0null2[]")
     }
 
     @Test

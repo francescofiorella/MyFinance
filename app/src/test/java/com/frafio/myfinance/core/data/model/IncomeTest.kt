@@ -59,11 +59,6 @@ class IncomeTest {
     }
 
     @Test
-    fun getPriceString_throwsWhenPriceIsNull() {
-        assertThrows(NullPointerException::class.java) { testIncome(price = null).getPriceString() }
-    }
-
-    @Test
     fun defaultId_concatenatesNamePriceTimestampCategoryAndLabels() {
         val income = Income(name = "S", price = 10.0, timestamp = 7L, category = 101)
         assertThat(income.id).isEqualTo("S10.07101[]")

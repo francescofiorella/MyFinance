@@ -34,10 +34,9 @@ class AuthCodeTest {
     }
 
     @Test
-    fun codes_areUniqueExceptForTheKnownCollision() {
-        // TODO: EMPTY_NEW_PASSWORD and EMPTY_CONFIRM_NEW_PASSWORD both use 26.
-        val duplicated = AuthCode.entries.groupBy { it.code }.filterValues { it.size > 1 }.keys
-        assertThat(duplicated).containsExactly(26)
+    fun codes_areUnique() {
+        val duplicated = AuthCode.entries.groupBy { it.code }.filterValues { it.size > 1 }
+        assertThat(duplicated).isEmpty()
     }
 
     @Test

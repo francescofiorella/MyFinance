@@ -6,7 +6,6 @@ import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.data.testIncome
 import com.google.common.truth.Truth.assertThat
-import org.junit.Assert.assertThrows
 import org.junit.Test
 import java.time.LocalDate
 
@@ -125,20 +124,6 @@ class FinanceUtilsTest {
     }
 
     @Test
-    fun addTotalsToExpenses_groupsPositionallyNotByValue() {
-        // Characterization: the same date appearing non-contiguously yields two TOTAL rows.
-        val a = testExpense(name = "A", price = 1.0, date = today)
-        val b = testExpense(name = "B", price = 1.0, date = yesterday)
-        val c = testExpense(name = "C", price = 1.0, date = today)
-
-        val result = addTotalsToExpenses(listOf(a, b, c), today)
-
-        assertThat(result.filter { it.category == totalCategory }.map { it.id })
-            .containsExactly("total_${today.id()}", "total_${yesterday.id()}", "total_${today.id()}")
-            .inOrder()
-    }
-
-    @Test
     fun addTotalsToExpenses_defaultsTodayToNow() {
         val onNow = testExpense(date = LocalDate.now())
 
@@ -186,12 +171,13 @@ class FinanceUtilsTest {
     }
 
     @Test
-    fun addTotalsToExpensesWithoutToday_nullPriceThrows() {
-        val unpriced = testExpense(price = null)
+    fun addTotalsToExpensesWithoutToday_nullPriceCountsAsZero() {
+        val priced = testExpense(name = "Priced", price = 5.0, date = today)
+        val unpriced = testExpense(name = "Unpriced", price = null, date = today)
 
-        assertThrows(NullPointerException::class.java) {
-            addTotalsToExpensesWithoutToday(listOf(unpriced))
-        }
+        val result = addTotalsToExpensesWithoutToday(listOf(priced, unpriced))
+
+        assertThat(result[0].price).isEqualTo(5.0)
     }
 
     // endregion
@@ -233,15 +219,13 @@ class FinanceUtilsTest {
     }
 
     @Test
-    fun addTotalsToIncomes_currentYearTotalAndJollyShareAnId() {
-        // Characterization: both placeholder rows carry id == today.year, a duplicate-key risk
-        // for any keyed list rendering them.
+    fun addTotalsToIncomes_everyRowHasADistinctId() {
+        // The list is rendered with ids as keys, so placeholder rows must not collide.
         val old = testIncome(date = LocalDate.of(2022, 5, 1))
 
         val result = addTotalsToIncomes(listOf(old), today)
 
-        assertThat(result[0].id).isEqualTo("2024")
-        assertThat(result[1].id).isEqualTo("2024")
+        assertThat(result.map { it.id }).containsNoDuplicates()
     }
 
     @Test
@@ -282,21 +266,13 @@ class FinanceUtilsTest {
     }
 
     @Test
-    fun addTotalsToIncomes_nullYearThrows() {
-        val noYear = Income(name = "X", price = 1.0, year = null, month = 1, day = 1)
+    fun addTotalsToIncomes_nullPriceCountsAsZero() {
+        val priced = testIncome(name = "Priced", price = 40.0, date = LocalDate.of(2024, 3, 1))
+        val unpriced = testIncome(name = "Unpriced", price = null, date = LocalDate.of(2024, 2, 1))
 
-        assertThrows(NullPointerException::class.java) {
-            addTotalsToIncomes(listOf(noYear), today)
-        }
-    }
+        val result = addTotalsToIncomes(listOf(priced, unpriced), today)
 
-    @Test
-    fun addTotalsToIncomes_nullPriceThrows() {
-        val unpriced = testIncome(price = null, date = LocalDate.of(2024, 3, 1))
-
-        assertThrows(NullPointerException::class.java) {
-            addTotalsToIncomes(listOf(unpriced), today)
-        }
+        assertThat(result[0].isYearTotal(2024, 40.0)).isTrue()
     }
 
     // endregion

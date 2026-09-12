@@ -29,6 +29,8 @@ class TestUserRepository : UserRepository {
     var signupResult = AuthResult(AuthCode.SIGNUP_SUCCESS)
     var logoutResult = AuthResult(AuthCode.LOGOUT_SUCCESS)
     var isUserLoggedResult = AuthResult(AuthCode.USER_LOGGED)
+    /** When set, [isUserLogged] throws it instead of answering. */
+    var isUserLoggedError: Exception? = null
     var loggedIn = true
 
     val fullNameUpdates = mutableListOf<String>()
@@ -76,7 +78,10 @@ class TestUserRepository : UserRepository {
         return logoutResult
     }
 
-    override suspend fun isUserLogged(): AuthResult = isUserLoggedResult
+    override suspend fun isUserLogged(): AuthResult {
+        isUserLoggedError?.let { throw it }
+        return isUserLoggedResult
+    }
 
     override suspend fun syncProfilePicture(photoUrl: String?) {
         syncedPhotoUrls += photoUrl

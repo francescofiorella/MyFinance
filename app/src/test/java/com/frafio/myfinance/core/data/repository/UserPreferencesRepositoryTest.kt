@@ -115,29 +115,13 @@ class UserPreferencesRepositoryTest {
     }
 
     @Test
-    fun updateUser_storesNullsAsEmptyStringsAndZeros() = testScope.runTest {
-        subject.updateUser(User(email = "ada@example.com"))
+    fun updateUser_preservesNullFields() = testScope.runTest {
+        val sparse = User(email = "ada@example.com")
 
-        val stored = subject.userPreferencesFlow.first().user
-        assertThat(stored).isNotNull()
-        assertThat(stored!!.fullName).isEmpty()
-        assertThat(stored.photoUrl).isEmpty()
-        assertThat(stored.localPhotoPath).isEmpty()
-        assertThat(stored.provider).isEqualTo(User.EMAIL_PROVIDER)
-        assertThat(stored.creationYear).isEqualTo(0)
-        assertThat(stored.creationMonth).isEqualTo(0)
-        assertThat(stored.creationDay).isEqualTo(0)
-    }
+        subject.updateUser(sparse)
 
-    @Test
-    fun updateUser_withNullEmail_stillMaterialisesAUserRow() = testScope.runTest {
-        subject.updateUser(User(fullName = "Nameless", email = null))
-
-        // email is written as "" and "" != null, so a user row still materialises.
-        assertThat(subject.userPreferencesFlow.first().user).isNotNull()
-
-        subject.clearUserData()
-        assertThat(subject.userPreferencesFlow.first().user).isNull()
+        // A user with no creation date must not come back as 00/00/0000.
+        assertThat(subject.userPreferencesFlow.first().user).isEqualTo(sparse)
     }
 
     @Test
