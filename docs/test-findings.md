@@ -85,8 +85,34 @@ round-trip: `updateUser(u)` followed by a read must equal `u`.
   the `error.code ==` comparison can run on the JVM. Needs a Robolectric or instrumented test, or a
   thin error type of the app's own between the managers and the ViewModel.
 
-## Noticed while writing the tests, not test-backed
+## Observed, but no test asserts either way — decide, then add a test
 
+These came up while writing the suite. Each is real behaviour, but whether it is a bug depends on a
+contract the code does not state. No test was kept for them so the suite does not enshrine an
+accident; pick the intended behaviour and a test follows directly.
+
+- **`addTotalsToExpenses` groups positionally.** The same date appearing non-contiguously produces
+  two TOTAL rows for it (`core/utils/FinanceUtils.kt:142-180`). Fine if the input is always the
+  DAO's `ORDER BY` output, wrong if anything else ever calls it.
+- **`Expense`/`Income` default `id` renders null parts as the word `null`** — e.g.
+  `Expense(name = "A", price = 1.0, category = 2)` gets `id = "A1.0null2[]"`
+  (`core/data/model/Expense.kt:35`). It is the Room primary key and the Firestore document id; a
+  null `timestamp` therefore produces an id that can collide across days.
+- **`AddViewModel.onAddButtonClick` with an unknown `requestCode` does nothing** — no event, no
+  error, loading starts and stops (`features/add/AddViewModel.kt:142-222`). Only `1` and `2` are
+  handled; anything else is silently swallowed.
+- **`ExpensesViewModel.itemMetadata` / `BudgetViewModel.itemMetadata` throw on a row with no date**
+  — `getLocalDate()` dereferences `year!!`/`month!!`/`day!!`. A malformed Firestore document takes
+  the list screen down with the pipeline. Related to finding 2: the same rows are currently
+  accepted by the DAO.
+- **`Transaction.getPriceString()` throws on a null price** (`price!!`). Same class of input as
+  above; the alternative is rendering an empty string or `0.00`.
+- **`UserPreferencesRepositoryImpl` materialises a user for `updateUser(User(email = null))`**
+  because `email` is written as `""` — a direct consequence of finding 6; fixing that decides this.
+- **Every Firestore listener reports quota errors separately.** `HomeViewModel.updateUserData`
+  installs the same `onSyncError` on the root, expenses and incomes listeners, so a
+  `RESOURCE_EXHAUSTED` state emits `FirestoreQuotaExceeded` up to three times — three dialogs, if
+  the screen shows one per event.
 - `AuthViewModel.onGoogleRequest` calls `stopLoading()` without a matching `startLoading()`; it
   relies on the screen having started it. Harmless with the ref-counted `LoadingRepository`, but the
   contract is implicit.
@@ -95,3 +121,18 @@ round-trip: `updateUser(u)` followed by a read must equal `u`.
   combined `FilterParams`. A rapid filter change can pair a stale decision with a fresh list.
 - `ProfileViewModel.editFullName("   ")` and `ExpensesViewModel.addLabelToExpense(…, "   ")`
   return early from inside `try`, so `startLoading()`/`stopLoading()` still bracket a no-op.
+
+## Test-side adjustments made while writing the suite (not app findings)
+
+Listed so nothing looks like a silent concession. In each case the expectation is unchanged; only
+how the test observes it moved.
+
+- **Loading brackets.** `startLoading()`/`stopLoading()` with no suspension in between cannot be
+  observed under an unconfined Main: the `StateFlow` conflates the `true` before the collector runs.
+  Six tests (`Auth`, `Profile`, `Budget`, `Expenses`) switch to `StandardTestDispatcher` +
+  `runCurrent()` via a `useStandardMain()` helper. The app really does start and stop loading.
+- **Caller-scope launches.** `LabelsViewModel.undoDeleteLabel(scope, …)` launches on the scope the
+  screen passes; in tests that is `backgroundScope`, which needs `advanceUntilIdle()` to run.
+- **`HomeViewModel.checkUser` needs a first local count.** `updateUserData` awaits
+  `getCount().first()` on both local repositories, so the fakes are seeded with an empty list in
+  `setup()` — Room emits a count immediately; the fakes do not until told to.
