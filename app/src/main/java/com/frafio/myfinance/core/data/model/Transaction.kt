@@ -1,10 +1,12 @@
 package com.frafio.myfinance.core.data.model
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.google.firebase.firestore.PropertyName
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
+@Keep
 @Serializable
 sealed interface Transaction : Parcelable {
     val name: String?

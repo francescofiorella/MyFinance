@@ -1,6 +1,7 @@
 package com.frafio.myfinance.core.data.model
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -15,6 +16,7 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
+@Keep
 @Parcelize
 @Immutable
 @IgnoreExtraProperties
