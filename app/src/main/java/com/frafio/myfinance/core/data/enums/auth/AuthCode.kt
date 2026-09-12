@@ -157,7 +157,7 @@ enum class AuthCode(val code: Int, val message: String) {
     ),
 
     EMPTY_CONFIRM_NEW_PASSWORD(
-        26, when (getCurrentLanguage()) {
+        27, when (getCurrentLanguage()) {
             Languages.ENGLISH.value -> "Confirm the new password"
             Languages.ITALIANO.value -> "Conferma la nuova password"
             else -> "Confirm the new password" // english
