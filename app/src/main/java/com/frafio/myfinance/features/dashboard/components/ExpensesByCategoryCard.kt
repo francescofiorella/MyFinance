@@ -28,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -118,7 +117,6 @@ fun ExpensesByCategoryCard(
                         {
                             FilledTonalIconButton(
                                 modifier = Modifier
-                                    .testTag("pie_chart_prev")
                                     .size(IconButtonDefaults.smallContainerSize())
                                     .animateWidth(previousInteractionSource),
                                 onClick = onPreviousDate,
@@ -140,7 +138,6 @@ fun ExpensesByCategoryCard(
                         {
                             FilledTonalIconButton(
                                 modifier = Modifier
-                                    .testTag("pie_chart_next")
                                     .size(IconButtonDefaults.smallContainerSize())
                                     .animateWidth(nextInteractionSource),
                                 onClick = onNextDate,
@@ -162,7 +159,6 @@ fun ExpensesByCategoryCard(
                         {
                             FilledTonalIconButton(
                                 modifier = Modifier
-                                    .testTag("pie_chart_today")
                                     .width(52.dp)
                                     .animateWidth(todayInteractionSource),
                                 onClick = {
@@ -193,7 +189,6 @@ fun ExpensesByCategoryCard(
                 customItem(
                     {
                         FilledTonalToggleButton(
-                            modifier = Modifier.testTag("pie_chart_monthly"),
                             checked = monthlyShown,
                             onCheckedChange = {
                                 onSwitchData(true)
@@ -213,7 +208,6 @@ fun ExpensesByCategoryCard(
                 customItem(
                     {
                         FilledTonalToggleButton(
-                            modifier = Modifier.testTag("pie_chart_annual"),
                             checked = !monthlyShown,
                             onCheckedChange = {
                                 onSwitchData(false)

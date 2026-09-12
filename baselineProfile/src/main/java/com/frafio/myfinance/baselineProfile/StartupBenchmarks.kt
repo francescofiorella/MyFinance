@@ -13,25 +13,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * This test class benchmarks the speed of app startup.
- * Run this benchmark to verify how effective a Baseline Profile is.
- * It does this by comparing [CompilationMode.None], which represents the app with no Baseline
- * Profiles optimizations, and [CompilationMode.Partial], which uses Baseline Profiles.
- *
- * Run this benchmark to see startup measurements and captured system traces for verifying
- * the effectiveness of your Baseline Profiles. You can run it directly from Android
- * Studio as an instrumentation test, or run all benchmarks for a variant, for example benchmarkRelease,
- * with this Gradle task:
- * ```
- * ./gradlew :baselineProfile:connectedBenchmarkReleaseAndroidTest
- * ```
- *
- * You should run the benchmarks on a physical device, not an Android emulator, because the
- * emulator doesn't represent real world performance and shares system resources with its host.
- *
- * For more information, see the [Macrobenchmark documentation](https://d.android.com/macrobenchmark#create-macrobenchmark)
- * and the [instrumentation arguments documentation](https://d.android.com/topic/performance/benchmarking/macrobenchmark-instrumentation-args).
- **/
+ * Cold-start timing, plain launch and via the ADD_EXPENSE shortcut, with and without the
+ * Baseline Profile. Compare median `timeToInitialDisplayMs` between the two compilation modes.
+ * See README.md for the command and reference numbers.
+ */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class StartupBenchmarks {
@@ -47,12 +32,13 @@ class StartupBenchmarks {
     fun startupCompilationBaselineProfiles() =
         benchmark(CompilationMode.Partial(BaselineProfileMode.Require))
 
+    // Short names on purpose: the output path was hitting Windows' 260-char limit.
     @Test
-    fun addExpenseShortcutCompilationNone() =
+    fun shortcutCompilationNone() =
         benchmark(CompilationMode.None(), shortcutAction = "com.frafio.myfinance.ADD_EXPENSE")
 
     @Test
-    fun addExpenseShortcutCompilationBaselineProfiles() =
+    fun shortcutCompilationBaselineProfiles() =
         benchmark(CompilationMode.Partial(BaselineProfileMode.Require), shortcutAction = "com.frafio.myfinance.ADD_EXPENSE")
 
     private fun benchmark(
@@ -60,12 +46,17 @@ class StartupBenchmarks {
         shortcutAction: String? = null
     ) {
         rule.measureRepeated(
-            packageName = "com.frafio.myfinance",
+            packageName = PACKAGE_NAME,
             metrics = listOf(StartupTimingMetric()),
             compilationMode = compilationMode,
             startupMode = StartupMode.COLD,
             iterations = 10,
             setupBlock = {
+                // For COLD the harness kills the process after this block, so the launch here
+                // never reaches the measured one.
+                pressHome()
+                startActivityAndWait()
+                signIn()
                 pressHome()
             },
             measureBlock = {
@@ -73,7 +64,7 @@ class StartupBenchmarks {
                     startActivityAndWait(
                         Intent().apply {
                             action = shortcutAction
-                            `package` = "com.frafio.myfinance"
+                            `package` = PACKAGE_NAME
                         }
                     )
                 } else {
