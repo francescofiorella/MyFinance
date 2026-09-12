@@ -96,7 +96,7 @@ accident; pick the intended behaviour and a test follows directly.
   DAO's `ORDER BY` output, wrong if anything else ever calls it.
 - **`Expense`/`Income` default `id` renders null parts as the word `null`** — e.g.
   `Expense(name = "A", price = 1.0, category = 2)` gets `id = "A1.0null2[]"`
-  (`core/data/model/Expense.kt:35`). It is the Room primary key and the Firestore document id; a
+  (`core/data/model/Expense.kt:37`). It is the Room primary key and the Firestore document id; a
   null `timestamp` therefore produces an id that can collide across days.
 - **`AddViewModel.onAddButtonClick` with an unknown `requestCode` does nothing** — no event, no
   error, loading starts and stops (`features/add/AddViewModel.kt:142-222`). Only `1` and `2` are
