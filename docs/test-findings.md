@@ -3,7 +3,7 @@
 The unit tests assert the behaviour the app *should* have. When the app disagrees, the test stays
 red and the fix is listed here; entries are removed as they are fixed.
 
-Run: `./gradlew :app:testDebugUnitTest` (292 tests, all passing).
+Run: `./gradlew :app:testDebugUnitTest` (294 tests, all passing).
 
 ## Open findings
 
@@ -11,145 +11,76 @@ None.
 
 ---
 
-## Observed, but no test asserts either way — decide, then add a test
+## Observed, but no test asserts either way — one decision covers all three
 
-These came up while writing the suite. Each is real behaviour, but whether it is a bug depends on a
-contract the code does not state. No test was kept for them so the suite does not enshrine an
-accident; pick the intended behaviour and a test follows directly from the example.
+The three remaining items are the same question asked three ways: **should `Expense` / `Income`
+guarantee their fields at the type level?** Today `name`, `price`, `year`, `month`, `day`,
+`timestamp` and `category` are all nullable (`labels` is a non-null `List`). Nothing in the app
+ever writes a null for any of them — `AddScreen` and `AddViewModel` reject empty input, and the
+ViewModel derives `timestamp` from the date — so every case below is reachable only through data
+the app did not produce (a document written by an older version or edited in the Firebase console)
+or through a future Kotlin caller that omits a field.
 
-### `addTotalsToExpenses` groups by position, not by date
-
-`core/utils/FinanceUtils.kt:142-187`. Consecutive rows with the same date form one group; the same
-date appearing again later starts a new group with its own TOTAL row.
-
-```kotlin
-// today = 15 Jun
-addTotalsToExpenses(listOf(a /* 15 Jun */, b /* 14 Jun */, c /* 15 Jun */), today)
-// -> [TOTAL total_15_6_2024 (a only), a, TOTAL total_14_6_2024, b, TOTAL total_15_6_2024 (c only), c]
-```
-
-Two rows share the key `total_15_6_2024`, which `ExpensesScreen` uses as the `LazyColumn` key.
-Harmless as long as every caller passes the DAO's `ORDER BY year DESC, month DESC, day DESC`
-output — which is the case today. Either document the precondition or sort inside the function.
-
-### A transaction built without a `timestamp` gets `null` inside its default id
+### Any null component renders as the word `null` inside the default id
 
 `core/data/model/Expense.kt:37` and `Income.kt`: `id = "$name$price$timestamp$category$labels"`.
+This is not specific to `timestamp`; every nullable component behaves the same way.
 
 ```kotlin
-Expense(name = "Coffee", price = 1.5, category = 5).id   // "Coffee1.5null5[]"
+Expense(name = "Coffee", price = 1.5, category = 5).id              // "Coffee1.5null5[]"
+Expense(name = "Coffee", timestamp = 1L, category = 5).id           // "Coffeenull15[]"
 ```
 
-The id is the Room primary key, so two such rows on different days replace each other on insert.
-Today every producer sets `timestamp` (`AddViewModel` derives it from the date; the sync manager
-overwrites `id` with the Firestore document id), so the exposure is a future caller that forgets.
-Options: make `timestamp` non-null in the constructor, or derive the id from the date fields.
+The id is the Room primary key and the Firestore document id, so two rows that differ only in the
+missing field replace each other on insert. `timestamp` is the one worth watching because it is the
+only component the caller does not type in — it is computed — so it is the one a new call site could
+plausibly forget.
 
-### `AddViewModel.onAddButtonClick` silently ignores an unknown `requestCode`
+### `getLocalDate()` throws when the date fields are null
 
-`features/add/AddViewModel.kt:149-231`. The `when (navKey.requestCode)` handles `1` (add) and `2`
-(edit) and has no `else`.
+`Expense.getLocalDate()` is `LocalDate.of(year!!, month!!, day!!)` — it does not return null, it
+throws `NullPointerException`. The fields are `Int?` only because Firestore's `toObject()` fills a
+class from the document and leaves any absent field at its default, which is `null` here. A
+document that lacks `year` therefore yields a row with `year == null`, Room stores it without
+complaint, and the first pipeline to call `getLocalDate()` — `addTotalsToExpenses` in
+`ExpensesViewModel.expenses` — takes the screen down.
 
 ```kotlin
-val vm = AddViewModel(…, RootKey.AddEditTransaction(requestCode = 3, expenseCode = 10))
-vm.onAddButtonClick("Coffee", "2.5", 5, 2024, 3, 7, emptyList())
-// -> no repository call, no uiEvent, isAdding true then false, loading starts and stops
+val ghost = Expense(name = "Ghost", price = 1.0, category = 5)   // year/month/day null
+addTotalsToExpenses(listOf(ghost))                               // NullPointerException
 ```
-
-The user sees the button do nothing. `RootKey.AddEditTransaction.requestCode` is a plain `Int`, so
-nothing prevents a third value. A sealed `RequestType` (or an `else -> error(…)`) closes this.
-
-### A row with no date crashes the list pipelines
-
-`getLocalDate()` dereferences `year!!`, `month!!`, `day!!` and is called from `addTotalsToExpenses`,
-`addTotalsToExpensesWithoutToday` and `ExpensesViewModel.itemMetadata`.
-
-```kotlin
-// Room accepts this row; nothing validates on insert
-Expense(name = "Ghost", price = 1.0, category = 5)   // year/month/day null
-
-// then, in ExpensesViewModel.expenses
-addTotalsToExpenses(listOf(ghost))   // NullPointerException inside the flow -> screen crashes
-```
-
-`BudgetViewModel.itemMetadata` compares nullable `year`s instead, so it does not throw, but the
-grouping for such a row is undefined. The DAO's sums and ordering accept these rows. Decide whether
-the model guarantees a date (make `year`/`month`/`day` non-null and reject at sync time) or whether
-the pipelines skip such rows.
 
 ### `getPriceString()` throws on a null price
 
-`core/data/model/Expense.kt` / `Income.kt`: `doubleToPrice(price!!)`.
+`doubleToPrice(price!!)`. The totals helpers now treat a null price as `0.0`, so this is the last
+crash site for a null-priced row: `TransactionItems` calls `getPriceString()` while rendering it.
 
 ```kotlin
 Expense(name = "Ghost", price = null, year = 2024, month = 6, day = 15).getPriceString()
 // -> NullPointerException
 ```
 
-Since the totals helpers now treat a null price as `0.0`, rendering is the remaining crash site: a
-null-priced row reaches `TransactionItems` and the composable calls `getPriceString()`. Either render
-`"€ 0.00"` (matching the totals) or guarantee `price` at the model level.
+### What making the fields non-null would mean
 
-### A user without an email cannot be stored
+Firestore is not the obstacle. Its mapper needs a no-arg constructor (satisfied when every
+parameter has a default) and then writes fields reflectively, where Kotlin nullability is not
+checked. So an *absent* field keeps its default (`price: Double = 0.0`), which is exactly the
+tolerant behaviour wanted; a field that is *explicitly* `null` in a document would be written into a
+non-null field and fail on first read instead of when rendered — same class of crash, moved
+earlier, and only for documents this app never wrote.
 
-`core/data/repository/UserPreferencesRepositoryImpl.kt:75-76`. After the `updateUser` fix, a null
-field clears its key; `email` is also the presence marker on read.
+The real cost is Room. `price REAL` becoming `price REAL NOT NULL` is a schema change, so the
+database version must bump, and `MyFinanceDatabase` uses `fallbackToDestructiveMigration` with
+`exportSchema = false`: every device drops its local cache on first launch after the update and
+re-downloads from Firestore (the `onDestructiveMigration` callback resets the sync timestamps, so
+the re-sync is automatic).
 
-```kotlin
-updateUser(User(fullName = "Ada", email = null))
-userPreferencesFlow.first().user   // null — the name was written but is invisible
-```
+Options:
 
-Firebase always supplies an email for password and Google accounts, so this is theoretical today.
-If a provider without email is ever added, make `User.email` non-null (so the compiler enforces the
-invariant) or add an explicit `user_present` key.
-
-### `AuthViewModel.onGoogleRequest` relies on the screen for the matching `startLoading()`
-
-`features/auth/AuthScreen.kt:108-121` calls `viewModel.startLoading()`, then `handleGoogleSignIn`
-calls either `onGoogleRequest` (which stops loading on completion) or the error callback (which
-stops it). Every normal path is balanced, but the pairing is split across two files and one
-`launch`:
-
-```
-scope.launch {
-    viewModel.startLoading()
-    handleGoogleSignIn(…)      // suspends inside credentialManager.getCredential(...)
-}
-```
-
-If that coroutine is cancelled while suspended — the composable leaves composition, or the activity
-is recreated — neither callback runs and the app-wide `LoadingRepository` stays at `true` until
-something else calls `stopLoading()`. Wrapping the call in `try { … } finally { stopLoading() }`
-inside the screen, or moving the whole flow into the ViewModel, makes the pairing local.
-
-### `ExpensesViewModel.expenses` reads the filters from `.value` inside `map`
-
-`features/expenses/ExpensesViewModel.kt:145-153`. The decision between `addTotalsToExpenses` (with
-the today block) and `addTotalsToExpensesWithoutToday` uses `_searchQuery.value`,
-`_selectedCategories.value`, `_selectedLabels.value` and `_dateRange.value` at the moment the
-mapped list arrives, not the values that produced that list.
-
-```
-t0  onSearchQueryChanged("a")   -> combine emits FilterParams("a"), DB query starts
-t1  onSearchQueryChanged("")    -> combine emits FilterParams(""), second DB query starts
-t2  result for "a" arrives      -> map sees _searchQuery.value == "" -> addTotalsToExpenses
-                                   (today TOTAL + JOLLY rows prepended to a search result)
-t3  result for "" arrives       -> correct
-```
-
-The wrong list is visible between t2 and t3. Carrying `FilterParams` through to the `map` (e.g. by
-mapping `Pair(params, list)` out of `flatMapLatest`) removes the race.
-
-### No-op writes still flash the loading indicator
-
-`ProfileViewModel.editFullName` and `ExpensesViewModel.addLabelToExpense` validate *after*
-`startLoading()`, returning from inside the `try`, so `finally` still runs `stopLoading()`.
-
-```kotlin
-viewModel.editFullName("   ")
-// isLoading: false -> true -> false, no repository call, no event
-```
-
-On the main thread this is a single frame; a `LinearWavyProgressIndicator` bound to `isLoading` can
-still blink. Validate before `startLoading()`.
+1. **Non-null fields with defaults** — `name: String = ""`, `price: Double = 0.0`,
+   `year/month/day: Int = 0`, `timestamp: Long = 0L`, `category: Int = -1`. Closes all three items
+   at the type level; the `!!` calls disappear; one destructive migration.
+2. **Keep the model nullable, make the readers tolerant** — `getPriceString()` renders `0.00` for a
+   null price, the list pipelines skip rows without a date. No migration; the invariant stays
+   informal and the id scheme is unchanged.
+3. **Leave as is** — accept that malformed remote data crashes the list screens.
