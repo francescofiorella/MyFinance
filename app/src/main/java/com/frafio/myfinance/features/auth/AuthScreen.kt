@@ -10,13 +10,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -52,6 +54,7 @@ import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.SwipeableSnackbarHost
+import com.frafio.myfinance.core.components.rememberImeTargetInsets
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
 import com.frafio.myfinance.core.data.model.AuthResult
 import com.frafio.myfinance.core.navigation.MyFinanceAppState
@@ -192,13 +195,17 @@ private fun AuthContent(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = { SwipeableSnackbarHost(hostState = appState.snackbarHostState) },
         bottomBar = {
+            // Keyboard-driven padding comes from imeAnimationTarget (not WindowInsets.ime),
+            // which cannot get stuck at keyboard height after a cancelled hide animation.
+            val imeInsets = rememberImeTargetInsets()
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .windowInsetsPadding(
-                        WindowInsets.safeDrawing.only(
-                            WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal
-                        )
+                        WindowInsets.systemBars
+                            .union(WindowInsets.displayCutout)
+                            .union(imeInsets)
+                            .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

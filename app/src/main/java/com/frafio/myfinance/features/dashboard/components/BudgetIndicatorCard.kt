@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
@@ -69,15 +70,14 @@ fun BudgetIndicatorCard(
             )
 
             if (monthlyBudget > 0.0) {
-                val stroke = Stroke(
-                    width =
-                        with(LocalDensity.current) {
-                            12.dp.toPx()
-                        },
-                    cap = StrokeCap.Round,
-                )
-                val amplitude = with(LocalDensity.current) {
-                    0.2.dp.toPx()
+                val strokeWidth = with(LocalDensity.current) {
+                    12.dp.toPx()
+                }
+                val stroke = remember(strokeWidth) {
+                    Stroke(
+                        width = strokeWidth,
+                        cap = StrokeCap.Round,
+                    )
                 }
                 val progress = (amount / totalBudget).toFloat()
                 val animatedProgress by animateFloatAsState(
@@ -85,20 +85,22 @@ fun BudgetIndicatorCard(
                     animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
                     label = "progressAnimation"
                 )
+
                 LinearWavyProgressIndicator(
                     color = if (progress <= 1f)
                         MaterialTheme.colorScheme.primary
                     else
                         MaterialTheme.colorScheme.error,
                     stopSize = 8.dp,
-                    amplitude = { amplitude },
+                    amplitude = { 0.93f },
                     waveSpeed = 0.dp,
                     stroke = stroke,
                     trackStroke = stroke,
                     progress = { animatedProgress },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(36.dp)
+                        .padding(vertical = 8.dp)
+                        .height(26.dp)
                 )
 
                 Row(modifier = Modifier.fillMaxWidth()) {
