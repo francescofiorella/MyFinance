@@ -20,8 +20,8 @@ android {
         applicationId = "com.frafio.myfinance"
         minSdk = 29
         targetSdk = 37
-        versionCode = 4013017
-        versionName = "4.13.17"
+        versionCode = 5000001
+        versionName = "5.0.1"
 
         vectorDrawables {
             useSupportLibrary = true
