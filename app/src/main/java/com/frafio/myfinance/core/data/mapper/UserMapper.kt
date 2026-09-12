@@ -4,14 +4,30 @@ import com.frafio.myfinance.core.data.model.User
 import com.google.firebase.auth.FirebaseUser
 import java.util.Calendar
 
-fun FirebaseUser.toUser(): User {
+fun FirebaseUser.toUser(): User = buildUser(
+    displayName = displayName,
+    email = email,
+    photoUrl = photoUrl?.toString(),
+    providerIds = providerData.map { it.providerId },
+    providerId = providerId,
+    creationTimestamp = metadata?.creationTimestamp
+)
+
+internal fun buildUser(
+    displayName: String?,
+    email: String?,
+    photoUrl: String?,
+    providerIds: List<String>,
+    providerId: String,
+    creationTimestamp: Long?
+): User {
     var userPic = ""
-    this.photoUrl?.let { uri ->
-        userPic = uri.toString().replace("s96-c", "s400-c")
+    photoUrl?.let { url ->
+        userPic = url.replace("s96-c", "s400-c")
     }
-    val providers = this.providerData.map { it.providerId }.toMutableList()
-    if (!providers.contains(this.providerId)) {
-        providers.add(this.providerId)
+    val providers = providerIds.toMutableList()
+    if (!providers.contains(providerId)) {
+        providers.add(providerId)
     }
 
     val hasPassword = providers.any { it.contains("password") }
@@ -24,12 +40,12 @@ fun FirebaseUser.toUser(): User {
     var day: Int? = null
     var month: Int? = null
     var year: Int? = null
-    this.metadata?.let {
+    creationTimestamp?.let {
         val calendar = Calendar.getInstance()
-        calendar.timeInMillis = it.creationTimestamp
+        calendar.timeInMillis = it
         day = calendar.get(Calendar.DAY_OF_MONTH)
         month = calendar.get(Calendar.MONTH) + 1
         year = calendar.get(Calendar.YEAR)
     }
-    return User(this.displayName, this.email, userPic, null, provider, providers, hasPassword, isGoogleLinked, year, month, day)
+    return User(displayName, email, userPic, null, provider, providers, hasPassword, isGoogleLinked, year, month, day)
 }

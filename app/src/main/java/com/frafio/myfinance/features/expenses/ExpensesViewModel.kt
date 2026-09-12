@@ -14,7 +14,9 @@ import com.frafio.myfinance.core.utils.addTotalsToExpenses
 import com.frafio.myfinance.core.utils.addTotalsToExpensesWithoutToday
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import com.frafio.myfinance.core.di.Dispatcher
+import com.frafio.myfinance.core.di.MyFinanceDispatchers.Default
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -49,7 +51,8 @@ class ExpensesViewModel @Inject constructor(
     private val expensesRepository: ExpensesRepository,
     private val expensesLocalRepository: ExpensesLocalRepository,
     userPreferencesRepository: UserPreferencesRepository,
-    private val loadingRepository: LoadingRepository
+    private val loadingRepository: LoadingRepository,
+    @Dispatcher(Default) private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -147,13 +150,13 @@ class ExpensesViewModel @Inject constructor(
             } else {
                 addTotalsToExpensesWithoutToday(limitedList)
             }
-        }.flowOn(Dispatchers.Default)
+        }.flowOn(defaultDispatcher)
         .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val totalFilteredExpenses: StateFlow<Double> = allFilteredExpenses
         .map { list -> list.sumOf { it.price ?: 0.0 } }
-        .flowOn(Dispatchers.Default)
+        .flowOn(defaultDispatcher)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
     val itemMetadata: StateFlow<Map<Int, Pair<Int, Int>>> = expenses
@@ -186,7 +189,7 @@ class ExpensesViewModel @Inject constructor(
             }
             result
         }
-        .flowOn(Dispatchers.Default)
+        .flowOn(defaultDispatcher)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
     fun onSearchQueryChanged(query: String) {

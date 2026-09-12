@@ -1,54 +1,40 @@
 package com.frafio.myfinance.core.data.repository
 
-import com.frafio.myfinance.core.data.dao.ExpenseDao
 import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ExpensesLocalRepository @Inject constructor(
-    private val expenseDao: ExpenseDao
-) {
+interface ExpensesLocalRepository {
 
-    fun getWithFilter(name: String, categories: List<Int>): Flow<List<Expense>> =
-        expenseDao.getWithFilter(name, categories)
+    fun getWithFilter(name: String, categories: List<Int>): Flow<List<Expense>>
 
-    fun getWithFilterDate(name: String, categories: List<Int>, firstTimestamp: Long, lastTimestamp: Long): Flow<List<Expense>> =
-        expenseDao.getWithFilterDate(name, categories, firstTimestamp, lastTimestamp)
+    fun getWithFilterDate(name: String, categories: List<Int>, firstTimestamp: Long, lastTimestamp: Long): Flow<List<Expense>>
 
-    fun getCount(): Flow<Int> = expenseDao.getCount()
+    fun getCount(): Flow<Int>
 
-    fun getPriceSumFromDay(year: Int, month: Int, day: Int): Flow<Double?> =
-        expenseDao.getPriceSumOfDay(year, month, day)
+    fun getPriceSumFromDay(year: Int, month: Int, day: Int): Flow<Double?>
 
-    fun getPriceSumFromMonth(year: Int, month: Int): Flow<Double?> =
-        expenseDao.getPriceSumOfMonth(year, month)
+    fun getPriceSumFromMonth(year: Int, month: Int): Flow<Double?>
 
-    fun getPriceSumFromYear(year: Int): Flow<Double?> =
-        expenseDao.getPriceSumOfYear(year)
+    fun getPriceSumFromYear(year: Int): Flow<Double?>
 
     fun getPriceSumAfterAndBefore(
         startYear: Int,
         startMonth: Int,
         endYear: Int,
         endMonth: Int
-    ): Flow<List<BarChartEntry>> =
-        expenseDao.getPriceSumAfterAndBefore(startYear, startMonth, endYear, endMonth)
+    ): Flow<List<BarChartEntry>>
 
-    fun getEarliestYearMonth(): Flow<DatePoint?> = expenseDao.getEarliestYearMonth()
+    fun getEarliestYearMonth(): Flow<DatePoint?>
 
-    fun getExpensesOfMonth(year: Int, month: Int): Flow<List<Expense>> =
-        expenseDao.getExpensesOfMonth(year, month)
+    fun getExpensesOfMonth(year: Int, month: Int): Flow<List<Expense>>
 
-    fun getExpensesOfYear(year: Int): Flow<List<Expense>> =
-        expenseDao.getExpensesOfYear(year)
+    fun getExpensesOfYear(year: Int): Flow<List<Expense>>
 
-    fun getAllSync(): List<Expense> = expenseDao.getAllSync()
+    fun getAllSync(): List<Expense>
 
-    suspend fun getById(id: String): Expense? = expenseDao.getById(id)
+    suspend fun getById(id: String): Expense?
 
-    fun deleteAll() = expenseDao.deleteAll()
+    fun deleteAll()
 }

@@ -131,11 +131,11 @@ fun getCategoryTextColor(categoryId: Int?, default: Color, isDark: Boolean): Col
     }
 }
 
-fun addTotalsToExpenses(expenses: List<Expense>): List<Expense> {
+fun addTotalsToExpenses(expenses: List<Expense>, today: LocalDate = LocalDate.now()): List<Expense> {
     if (expenses.isEmpty()) return emptyList()
 
     val result = ArrayList<Expense>(expenses.size + 10)
-    val todayDate = LocalDate.now()
+    val todayDate = today
     var todayAdded = false
 
     var i = 0
@@ -269,10 +269,10 @@ fun addTotalsToExpensesWithoutToday(expenses: List<Expense>): List<Expense> {
     return expenseList
 }
 
-fun addTotalsToIncomes(incomes: List<Income>): List<Income> {
+fun addTotalsToIncomes(incomes: List<Income>, today: LocalDate = LocalDate.now()): List<Income> {
     val incomeList = mutableListOf<Income>()
 
-    val todayDate = LocalDate.now()
+    val todayDate = today
     var total = Income(
         name = FirestoreEnums.NAMES.TOTAL.value,
         price = 0.0,

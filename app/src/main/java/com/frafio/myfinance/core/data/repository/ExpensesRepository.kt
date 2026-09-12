@@ -1,83 +1,49 @@
 package com.frafio.myfinance.core.data.repository
 
-import com.frafio.myfinance.core.data.manager.ExpensesSyncManager
 import com.frafio.myfinance.core.data.model.DeleteLabelResult
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ExpensesRepository @Inject constructor(private val expensesManager: ExpensesSyncManager) {
+interface ExpensesRepository {
 
-    suspend fun deleteExpense(expense: Expense): FinanceResult {
-        return expensesManager.delete(expense)
-    }
+    suspend fun deleteExpense(expense: Expense): FinanceResult
 
-    suspend fun addExpense(expense: Expense): FinanceResult {
-        return expensesManager.add(expense)
-    }
+    suspend fun addExpense(expense: Expense): FinanceResult
 
-    suspend fun editExpense(expense: Expense): FinanceResult {
-        return expensesManager.edit(expense)
-    }
+    suspend fun editExpense(expense: Expense): FinanceResult
 
-    suspend fun setDynamicColorActive(active: Boolean) {
-        expensesManager.setDynamicColorActive(active)
-    }
+    suspend fun setDynamicColorActive(active: Boolean)
 
-    suspend fun setMonthlyBudget(budget: Double): FinanceResult {
-        return expensesManager.setMonthlyBudget(budget)
-    }
+    suspend fun setMonthlyBudget(budget: Double): FinanceResult
 
-    suspend fun setCurrencyCode(currencyCode: String): FinanceResult {
-        return expensesManager.setCurrencyCode(currencyCode)
-    }
+    suspend fun setCurrencyCode(currencyCode: String): FinanceResult
 
-    suspend fun setProPicChoice(choice: String): FinanceResult {
-        return expensesManager.setProPicChoice(choice)
-    }
+    suspend fun setProPicChoice(choice: String): FinanceResult
 
-    suspend fun updateExpenseLabels(expenseId: String, label: String, isAddition: Boolean): FinanceResult {
-        return expensesManager.updateExpenseLabels(expenseId, label, isAddition)
-    }
+    suspend fun updateExpenseLabels(expenseId: String, label: String, isAddition: Boolean): FinanceResult
 
-    suspend fun addLabel(label: String): FinanceResult {
-        return expensesManager.addLabel(label)
-    }
+    suspend fun addLabel(label: String): FinanceResult
 
-    suspend fun deleteLabel(label: String): DeleteLabelResult {
-        return expensesManager.deleteLabel(label)
-    }
+    suspend fun deleteLabel(label: String): DeleteLabelResult
 
-    suspend fun editLabel(oldName: String, newName: String): FinanceResult {
-        return expensesManager.editLabel(oldName, newName)
-    }
+    suspend fun editLabel(oldName: String, newName: String): FinanceResult
 
-    suspend fun undoDeleteLabel(label: String, affectedExpenses: List<Expense>): FinanceResult {
-        return expensesManager.undoDeleteLabel(label, affectedExpenses)
-    }
+    suspend fun undoDeleteLabel(label: String, affectedExpenses: List<Expense>): FinanceResult
 
     fun startSnapshotListener(
         scope: CoroutineScope,
         onInitialSync: CompletableDeferred<Unit>? = null,
         onError: ((FirebaseFirestoreException) -> Unit)? = null
-    ) {
-        expensesManager.startSnapshotListener(scope, onInitialSync, onError)
-    }
+    )
 
     fun startRootSnapshotListener(
         scope: CoroutineScope,
         onInitialSync: CompletableDeferred<Unit>? = null,
         onError: ((FirebaseFirestoreException) -> Unit)? = null
-    ) {
-        expensesManager.startRootSnapshotListener(scope, onInitialSync, onError)
-    }
+    )
 
-    fun stopSnapshotListener() {
-        expensesManager.stopSnapshotListener()
-    }
+    fun stopSnapshotListener()
 }

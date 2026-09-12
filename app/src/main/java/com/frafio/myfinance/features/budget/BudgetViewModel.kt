@@ -13,7 +13,9 @@ import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.utils.addTotalsToIncomes
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import com.frafio.myfinance.core.di.Dispatcher
+import com.frafio.myfinance.core.di.MyFinanceDispatchers.Default
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -46,7 +48,8 @@ class BudgetViewModel @Inject constructor(
     private val incomeRepository: IncomeRepository,
     incomesLocalRepository: IncomesLocalRepository,
     userPreferencesRepository: UserPreferencesRepository,
-    private val loadingRepository: LoadingRepository
+    private val loadingRepository: LoadingRepository,
+    @Dispatcher(Default) private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _limit = MutableStateFlow(DEFAULT_LIMIT_INCOMES)
@@ -72,7 +75,7 @@ class BudgetViewModel @Inject constructor(
         .map { limitedList ->
             addTotalsToIncomes(limitedList)
         }
-        .flowOn(Dispatchers.Default)
+        .flowOn(defaultDispatcher)
         .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -118,7 +121,7 @@ class BudgetViewModel @Inject constructor(
             }
             result
         }
-        .flowOn(Dispatchers.Default)
+        .flowOn(defaultDispatcher)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
     fun loadMore() {
