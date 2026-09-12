@@ -1,23 +1,15 @@
 # App fixes needed to make the unit suite green
 
-The unit tests assert the behaviour the app *should* have. Eight of them fail against the current
+The unit tests assert the behaviour the app *should* have. Seven of them fail against the current
 code. Each entry below names the failing test, what it expects, what the app does instead, and the
 smallest fix. Nothing in `app/src/main` was changed to make a test pass; these are the follow-ups.
+Entries are removed as they are fixed.
 
-Run: `./gradlew :app:testDebugUnitTest` (292 tests, 8 failing).
+Run: `./gradlew :app:testDebugUnitTest` (292 tests, 7 failing).
 
 ---
 
-## 1. `AuthCode` has two entries with code 26
-
-**Test:** `AuthCodeTest.codes_areUnique`
-**Where:** `core/data/enums/auth/AuthCode.kt:151` and `:159`
-`EMPTY_NEW_PASSWORD` and `EMPTY_CONFIRM_NEW_PASSWORD` both declare `26`. Every consumer compares
-`AuthResult.code` as an `Int`, so any branch on one of them silently matches the other.
-**Fix:** give `EMPTY_CONFIRM_NEW_PASSWORD` its own code (`27` is free) and check nothing persists
-the numeric value.
-
-## 2. Null price crashes the totals helpers instead of counting as zero
+## 1. Null price crashes the totals helpers instead of counting as zero
 
 **Tests:** `FinanceUtilsTest.addTotalsToExpensesWithoutToday_nullPriceCountsAsZero`,
 `FinanceUtilsTest.addTotalsToIncomes_nullPriceCountsAsZero`
@@ -29,7 +21,7 @@ Firestore throws `NullPointerException` inside the `expenses`/`incomes` flow and
 down.
 **Fix:** `(expense.price ?: 0.0)` / `(income.price ?: 0.0)` in both places, matching the first helper.
 
-## 3. `addTotalsToIncomes` emits two rows with the same id
+## 2. `addTotalsToIncomes` emits two rows with the same id
 
 **Test:** `FinanceUtilsTest.addTotalsToIncomes_everyRowHasADistinctId`
 **Where:** `core/utils/FinanceUtils.kt:283` and `:300`
@@ -40,7 +32,7 @@ Compose sees a duplicate key. The expenses variant avoids this with `total_…` 
 JOLLY row — and update any scroll-to-id caller that builds the year id (`HomeViewModel.onTransactionCommitted`
 passes `year.toString()` for incomes; it must produce the new TOTAL id).
 
-## 4. `AddViewModel.onAddButtonClick` crashes on an unparseable price
+## 3. `AddViewModel.onAddButtonClick` crashes on an unparseable price
 
 **Tests:** `AddViewModelTest.onAddButtonClick_unparseablePrice_emitsWrongAmountInsteadOfCrashing`,
 `AddViewModelTest.onAddButtonClick_emptyPrice_emitsEmptyAmountInsteadOfCrashing`
@@ -56,7 +48,7 @@ blank emit `AddUiEvent.Error(FinanceResult(FinanceCode.EMPTY_AMOUNT))`, when it 
 unparseable emit `Error(FinanceResult(FinanceCode.WRONG_AMOUNT))`, and return. The screen-level
 check can then delegate to the same logic instead of duplicating it.
 
-## 5. `ProfileViewModel.isSwitchDynamicColorChecked` starts as `false` regardless of the stored preference
+## 4. `ProfileViewModel.isSwitchDynamicColorChecked` starts as `false` regardless of the stored preference
 
 **Test:** `ProfileViewModelTest.isSwitchDynamicColorChecked_startsFromPreferences`
 **Where:** `features/profile/ProfileViewModel.kt:63`
@@ -65,7 +57,7 @@ initialised from `userPreferencesRepository.userPreferencesFlow.value`. With dyn
 switch renders off for the first frame and flips on once the flow is collected.
 **Fix:** `initialValue = userPreferencesRepository.userPreferencesFlow.value.dynamicColor`.
 
-## 6. `UserPreferencesRepositoryImpl.updateUser` turns nulls into `""` and `0`
+## 5. `UserPreferencesRepositoryImpl.updateUser` turns nulls into `""` and `0`
 
 **Test:** `UserPreferencesRepositoryTest.updateUser_preservesNullFields`
 **Where:** `core/data/repository/UserPreferencesRepositoryImpl.kt:182-192` (write) and `:74-89` (read)
@@ -103,12 +95,12 @@ accident; pick the intended behaviour and a test follows directly.
   handled; anything else is silently swallowed.
 - **`ExpensesViewModel.itemMetadata` / `BudgetViewModel.itemMetadata` throw on a row with no date**
   — `getLocalDate()` dereferences `year!!`/`month!!`/`day!!`. A malformed Firestore document takes
-  the list screen down with the pipeline. Related to finding 2: the same rows are currently
+  the list screen down with the pipeline. Related to finding 1: the same rows are currently
   accepted by the DAO.
 - **`Transaction.getPriceString()` throws on a null price** (`price!!`). Same class of input as
   above; the alternative is rendering an empty string or `0.00`.
 - **`UserPreferencesRepositoryImpl` materialises a user for `updateUser(User(email = null))`**
-  because `email` is written as `""` — a direct consequence of finding 6; fixing that decides this.
+  because `email` is written as `""` — a direct consequence of finding 5; fixing that decides this.
 - **Every Firestore listener reports quota errors separately.** `HomeViewModel.updateUserData`
   installs the same `onSyncError` on the root, expenses and incomes listeners, so a
   `RESOURCE_EXHAUSTED` state emits `FirestoreQuotaExceeded` up to three times — three dialogs, if
