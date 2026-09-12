@@ -60,7 +60,7 @@ class ProfileViewModel @Inject constructor(
 
     val isSwitchDynamicColorChecked: StateFlow<Boolean> = userPreferences
         .map { it?.dynamicColor ?: false }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value.dynamicColor)
 
     fun editFullName(fullName: String, notify: Boolean = true) {
         viewModelScope.launch {

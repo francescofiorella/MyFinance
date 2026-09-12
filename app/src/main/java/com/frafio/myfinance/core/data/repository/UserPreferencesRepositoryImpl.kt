@@ -1,6 +1,7 @@
 package com.frafio.myfinance.core.data.repository
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -179,18 +180,23 @@ class UserPreferencesRepositoryImpl @Inject constructor(
 
     override suspend fun updateUser(user: User) {
         dataStore.edit { preferences ->
-            preferences[PreferencesKeys.USER_FULL_NAME] = user.fullName ?: ""
-            preferences[PreferencesKeys.USER_EMAIL] = user.email ?: ""
-            preferences[PreferencesKeys.USER_PHOTO_URL] = user.photoUrl ?: ""
-            preferences[PreferencesKeys.USER_LOCAL_PHOTO_PATH] = user.localPhotoPath ?: ""
-            preferences[PreferencesKeys.USER_PROVIDER] = user.provider ?: User.EMAIL_PROVIDER
+            preferences.setOrRemove(PreferencesKeys.USER_FULL_NAME, user.fullName)
+            preferences.setOrRemove(PreferencesKeys.USER_EMAIL, user.email)
+            preferences.setOrRemove(PreferencesKeys.USER_PHOTO_URL, user.photoUrl)
+            preferences.setOrRemove(PreferencesKeys.USER_LOCAL_PHOTO_PATH, user.localPhotoPath)
+            preferences.setOrRemove(PreferencesKeys.USER_PROVIDER, user.provider)
             preferences[PreferencesKeys.USER_PROVIDERS] = user.providers.toSet()
             preferences[PreferencesKeys.USER_HAS_PASSWORD] = user.hasPassword
             preferences[PreferencesKeys.USER_IS_GOOGLE_LINKED] = user.isGoogleLinked
-            preferences[PreferencesKeys.USER_CREATION_YEAR] = user.creationYear ?: 0
-            preferences[PreferencesKeys.USER_CREATION_MONTH] = user.creationMonth ?: 0
-            preferences[PreferencesKeys.USER_CREATION_DAY] = user.creationDay ?: 0
+            preferences.setOrRemove(PreferencesKeys.USER_CREATION_YEAR, user.creationYear)
+            preferences.setOrRemove(PreferencesKeys.USER_CREATION_MONTH, user.creationMonth)
+            preferences.setOrRemove(PreferencesKeys.USER_CREATION_DAY, user.creationDay)
         }
+    }
+
+    // Absent keys read back as null, so a null field must clear the key rather than store a placeholder.
+    private fun <T> MutablePreferences.setOrRemove(key: Preferences.Key<T>, value: T?) {
+        if (value == null) remove(key) else this[key] = value
     }
 
     override suspend fun clearUserData() {

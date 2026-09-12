@@ -136,7 +136,15 @@ class AddViewModel @AssistedInject constructor(
                 val trimmedName = name.trim()
                 val trimmedPriceString = priceString.trim()
 
-                val price = trimmedPriceString.toDouble()
+                if (trimmedPriceString.isEmpty()) {
+                    _uiEvents.emit(AddUiEvent.Error(FinanceResult(FinanceCode.EMPTY_AMOUNT)))
+                    return@launch
+                }
+                val price = trimmedPriceString.toDoubleOrNull()
+                if (price == null || price == 0.0) {
+                    _uiEvents.emit(AddUiEvent.Error(FinanceResult(FinanceCode.WRONG_AMOUNT)))
+                    return@launch
+                }
 
                 when (navKey.requestCode) {
                     REQUEST_ADD_CODE -> {

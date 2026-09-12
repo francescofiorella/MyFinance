@@ -4,7 +4,6 @@ import com.frafio.myfinance.core.data.manager.ExpensesSyncManager
 import com.frafio.myfinance.core.data.model.DeleteLabelResult
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
-import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
@@ -63,18 +62,16 @@ class ExpensesRepositoryImpl @Inject constructor(private val expensesManager: Ex
 
     override fun startSnapshotListener(
         scope: CoroutineScope,
-        onInitialSync: CompletableDeferred<Unit>?,
-        onError: ((FirebaseFirestoreException) -> Unit)?
+        onInitialSync: CompletableDeferred<Unit>?
     ) {
-        expensesManager.startSnapshotListener(scope, onInitialSync, onError)
+        expensesManager.startSnapshotListener(scope, onInitialSync)
     }
 
     override fun startRootSnapshotListener(
         scope: CoroutineScope,
-        onInitialSync: CompletableDeferred<Unit>?,
-        onError: ((FirebaseFirestoreException) -> Unit)?
+        onInitialSync: CompletableDeferred<Unit>?
     ) {
-        expensesManager.startRootSnapshotListener(scope, onInitialSync, onError)
+        expensesManager.startRootSnapshotListener(scope, onInitialSync)
     }
 
     override fun stopSnapshotListener() {

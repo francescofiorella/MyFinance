@@ -4,7 +4,6 @@ import com.frafio.myfinance.core.data.enums.db.FinanceCode
 import com.frafio.myfinance.core.data.model.FinanceResult
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.repository.IncomeRepository
-import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 
@@ -24,7 +23,6 @@ class TestIncomeRepository : IncomeRepository {
 
     /** When false, the deferred handed to [startSnapshotListener] is left pending. */
     var completeInitialSyncImmediately = true
-    var errorToEmit: FirebaseFirestoreException? = null
     var snapshotListenerRunning = false
         private set
     var stopCallCount = 0
@@ -47,11 +45,9 @@ class TestIncomeRepository : IncomeRepository {
 
     override fun startSnapshotListener(
         scope: CoroutineScope,
-        onInitialSync: CompletableDeferred<Unit>?,
-        onError: ((FirebaseFirestoreException) -> Unit)?
+        onInitialSync: CompletableDeferred<Unit>?
     ) {
         snapshotListenerRunning = true
-        errorToEmit?.let { onError?.invoke(it) }
         if (completeInitialSyncImmediately) onInitialSync?.complete(Unit)
     }
 

@@ -2,7 +2,6 @@ package com.frafio.myfinance.core.data.repository
 
 import com.frafio.myfinance.core.data.model.FinanceResult
 import com.frafio.myfinance.core.data.model.Income
-import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 
@@ -16,8 +15,7 @@ interface IncomeRepository {
 
     fun startSnapshotListener(
         scope: CoroutineScope,
-        onInitialSync: CompletableDeferred<Unit>? = null,
-        onError: ((FirebaseFirestoreException) -> Unit)? = null
+        onInitialSync: CompletableDeferred<Unit>? = null
     )
 
     fun stopSnapshotListener()

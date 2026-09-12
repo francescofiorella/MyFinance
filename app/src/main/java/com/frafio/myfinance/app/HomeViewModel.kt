@@ -16,7 +16,6 @@ import com.frafio.myfinance.core.data.repository.UserPreferencesData
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.repository.UserRepository
 import com.frafio.myfinance.core.data.storage.ProfileImageStorage
-import com.google.firebase.firestore.FirebaseFirestoreException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
@@ -50,7 +49,6 @@ sealed class HomeUiEvent {
         val dismissFun: () -> Unit = {}
     ) : HomeUiEvent()
     object LoginSuccess : HomeUiEvent()
-    object FirestoreQuotaExceeded : HomeUiEvent()
 }
 
 sealed interface HomeUiState {
@@ -118,7 +116,7 @@ class HomeViewModel @Inject constructor(
             val scrollId = if (isExpense) {
                 "total_${day}_${month}_${year}"
             } else {
-                year.toString()
+                "total_$year"
             }
 
             _scrollEvents.emit(scrollId to isExpense)
@@ -178,21 +176,13 @@ class HomeViewModel @Inject constructor(
         val expensesSync = CompletableDeferred<Unit>()
         val incomesSync = CompletableDeferred<Unit>()
         val rootSync = CompletableDeferred<Unit>()
-        
-        val onSyncError: (FirebaseFirestoreException) -> Unit = { error ->
-            viewModelScope.launch {
-                if (error.code == FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED) {
-                    _uiEvents.emit(HomeUiEvent.FirestoreQuotaExceeded)
-                }
-            }
-        }
 
         userRepository.syncProfilePicture(userPrefs.user?.photoUrl)
         
         // Start snapshot listeners
-        expensesRepository.startRootSnapshotListener(viewModelScope, rootSync, onSyncError)
-        expensesRepository.startSnapshotListener(viewModelScope, expensesSync, onSyncError)
-        incomeRepository.startSnapshotListener(viewModelScope, incomesSync, onSyncError)
+        expensesRepository.startRootSnapshotListener(viewModelScope, rootSync)
+        expensesRepository.startSnapshotListener(viewModelScope, expensesSync)
+        incomeRepository.startSnapshotListener(viewModelScope, incomesSync)
 
         // Wait for initial sync
         rootSync.await()

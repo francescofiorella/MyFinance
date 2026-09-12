@@ -13,7 +13,6 @@ import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
 import com.frafio.myfinance.core.utils.currentTimestampUTC
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.CompletableDeferred
@@ -249,8 +248,7 @@ class ExpensesSyncManager @Inject constructor(
 
     fun startRootSnapshotListener(
         scope: CoroutineScope,
-        onInitialSync: CompletableDeferred<Unit>? = null,
-        onError: ((FirebaseFirestoreException) -> Unit)? = null
+        onInitialSync: CompletableDeferred<Unit>? = null
     ) {
         if (rootListener != null) {
             onInitialSync?.complete(Unit)
@@ -268,7 +266,6 @@ class ExpensesSyncManager @Inject constructor(
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
                         onInitialSync?.complete(Unit)
-                        onError?.invoke(error)
                         return@addSnapshotListener
                     }
                     if (snapshot != null && snapshot.exists()) {

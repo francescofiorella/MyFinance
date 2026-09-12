@@ -271,12 +271,12 @@ class BudgetViewModelTest {
 
     @Test
     fun scrollToId_replaysToLateSubscribers() = runTest {
-        viewModel.scrollToId("2024")
+        viewModel.scrollToId("total_2024")
 
         val ids = mutableListOf<String?>()
         backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.scrollToId.toList(ids) }
 
-        assertThat(ids).containsExactly("2024")
+        assertThat(ids).containsExactly("total_2024")
     }
 
     private fun TestScope.collectEvents(): List<BudgetUiEvent> {

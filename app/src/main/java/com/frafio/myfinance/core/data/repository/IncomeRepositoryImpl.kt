@@ -3,7 +3,6 @@ package com.frafio.myfinance.core.data.repository
 import com.frafio.myfinance.core.data.manager.IncomesSyncManager
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.model.FinanceResult
-import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
@@ -25,10 +24,9 @@ class IncomeRepositoryImpl @Inject constructor(private val incomesManager: Incom
 
     override fun startSnapshotListener(
         scope: CoroutineScope,
-        onInitialSync: CompletableDeferred<Unit>?,
-        onError: ((FirebaseFirestoreException) -> Unit)?
+        onInitialSync: CompletableDeferred<Unit>?
     ) {
-        incomesManager.startSnapshotListener(scope, onInitialSync, onError)
+        incomesManager.startSnapshotListener(scope, onInitialSync)
     }
 
     override fun stopSnapshotListener() {

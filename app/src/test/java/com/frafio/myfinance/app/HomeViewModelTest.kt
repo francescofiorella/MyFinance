@@ -196,7 +196,7 @@ class HomeViewModelTest {
         viewModel.onTransactionCommitted(isExpense = false, day = 5, month = 3, year = 2024)
 
         assertThat(navEvents).containsExactly(HomeTabKey.Budget)
-        assertThat(scrolls).containsExactly("2024" to false)
+        assertThat(scrolls).containsExactly("total_2024" to false)
     }
 
     @Test

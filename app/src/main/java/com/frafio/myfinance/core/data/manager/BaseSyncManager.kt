@@ -16,7 +16,6 @@ import com.frafio.myfinance.core.utils.currentDeleteAtUTC
 import com.frafio.myfinance.core.utils.currentTimestampUTC
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CompletableDeferred
@@ -224,8 +223,7 @@ abstract class BaseSyncManager<T : Transaction>(
 
     fun startSnapshotListener(
         scope: CoroutineScope,
-        onInitialSync: CompletableDeferred<Unit>? = null,
-        onError: ((FirebaseFirestoreException) -> Unit)? = null
+        onInitialSync: CompletableDeferred<Unit>? = null
     ) {
         if (snapshotListener != null) {
             onInitialSync?.complete(Unit)
@@ -263,7 +261,6 @@ abstract class BaseSyncManager<T : Transaction>(
                     if (error != null) {
                         Log.e("BaseSyncManager", "Listen failed for $collectionName: ${error.localizedMessage}")
                         onInitialSync?.complete(Unit)
-                        onError?.invoke(error)
                         return@addSnapshotListener
                     }
 

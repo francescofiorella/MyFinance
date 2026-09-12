@@ -5,7 +5,6 @@ import com.frafio.myfinance.core.data.model.DeleteLabelResult
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
 import com.frafio.myfinance.core.data.repository.ExpensesRepository
-import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 
@@ -42,7 +41,6 @@ class TestExpensesRepository : ExpensesRepository {
 
     /** When false, the deferred handed to [startSnapshotListener] is left pending. */
     var completeInitialSyncImmediately = true
-    var errorToEmit: FirebaseFirestoreException? = null
     var snapshotListenerRunning = false
         private set
     var rootSnapshotListenerRunning = false
@@ -115,21 +113,17 @@ class TestExpensesRepository : ExpensesRepository {
 
     override fun startSnapshotListener(
         scope: CoroutineScope,
-        onInitialSync: CompletableDeferred<Unit>?,
-        onError: ((FirebaseFirestoreException) -> Unit)?
+        onInitialSync: CompletableDeferred<Unit>?
     ) {
         snapshotListenerRunning = true
-        errorToEmit?.let { onError?.invoke(it) }
         if (completeInitialSyncImmediately) onInitialSync?.complete(Unit)
     }
 
     override fun startRootSnapshotListener(
         scope: CoroutineScope,
-        onInitialSync: CompletableDeferred<Unit>?,
-        onError: ((FirebaseFirestoreException) -> Unit)?
+        onInitialSync: CompletableDeferred<Unit>?
     ) {
         rootSnapshotListenerRunning = true
-        errorToEmit?.let { onError?.invoke(it) }
         if (completeInitialSyncImmediately) onInitialSync?.complete(Unit)
     }
 

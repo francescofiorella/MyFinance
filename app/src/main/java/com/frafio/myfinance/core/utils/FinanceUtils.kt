@@ -230,7 +230,7 @@ fun addTotalsToExpensesWithoutToday(expenses: List<Expense>): List<Expense> {
         if (total.id == "total_${expense.getTotalId()}") { // Update the total
             total = Expense(
                 name = FirestoreEnums.NAMES.TOTAL.value,
-                price = total.price!! + expense.price!!,
+                price = (total.price ?: 0.0) + (expense.price ?: 0.0),
                 year = expense.year,
                 month = expense.month,
                 day = expense.day,
@@ -251,7 +251,7 @@ fun addTotalsToExpensesWithoutToday(expenses: List<Expense>): List<Expense> {
             // Create new total
             total = Expense(
                 name = FirestoreEnums.NAMES.TOTAL.value,
-                price = expense.price,
+                price = expense.price ?: 0.0,
                 year = expense.year,
                 month = expense.month,
                 day = expense.day,
@@ -280,7 +280,7 @@ fun addTotalsToIncomes(incomes: List<Income>, today: LocalDate = LocalDate.now()
         month = 0,
         day = 0,
         category = FirestoreEnums.CATEGORIES.TOTAL.value,
-        id = todayDate.year.toString()
+        id = "total_${todayDate.year}"
     )
     var currentIncomes = mutableListOf<Income>()
 
@@ -297,7 +297,7 @@ fun addTotalsToIncomes(incomes: List<Income>, today: LocalDate = LocalDate.now()
                 month = todayDate.monthValue,
                 day = todayDate.dayOfMonth,
                 category = FirestoreEnums.CATEGORIES.JOLLY.value,
-                id = todayDate.year.toString()
+                id = "jolly_${todayDate.year}"
             )
             incomeList.add(total)
             total = Income(
@@ -307,7 +307,7 @@ fun addTotalsToIncomes(incomes: List<Income>, today: LocalDate = LocalDate.now()
                 month = 0,
                 day = 0,
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = income.year.toString()
+                id = "total_${income.year}"
             )
         } else if (isFirstIncome && income.year!! > todayDate.year) {
             total = Income(
@@ -317,7 +317,7 @@ fun addTotalsToIncomes(incomes: List<Income>, today: LocalDate = LocalDate.now()
                 month = 0,
                 day = 0,
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = income.year.toString()
+                id = "total_${income.year}"
             )
         }
 
@@ -327,7 +327,7 @@ fun addTotalsToIncomes(incomes: List<Income>, today: LocalDate = LocalDate.now()
         if (total.year!! == income.year) { // Se totale corrisponde, aggiorna
             total = Income(
                 name = total.name,
-                price = total.price!! + income.price!!,
+                price = (total.price ?: 0.0) + (income.price ?: 0.0),
                 year = total.year,
                 month = total.month,
                 day = total.day,
@@ -345,12 +345,12 @@ fun addTotalsToIncomes(incomes: List<Income>, today: LocalDate = LocalDate.now()
             currentIncomes = mutableListOf()
             total = Income(
                 name = FirestoreEnums.NAMES.TOTAL.value,
-                price = income.price,
+                price = income.price ?: 0.0,
                 year = income.year,
                 month = 0,
                 day = 0,
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                id = income.year.toString()
+                id = "total_${income.year}"
             )
             currentIncomes.add(income)
         }

@@ -3,7 +3,6 @@ package com.frafio.myfinance.core.data.repository
 import com.frafio.myfinance.core.data.model.DeleteLabelResult
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
-import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 
@@ -35,14 +34,12 @@ interface ExpensesRepository {
 
     fun startSnapshotListener(
         scope: CoroutineScope,
-        onInitialSync: CompletableDeferred<Unit>? = null,
-        onError: ((FirebaseFirestoreException) -> Unit)? = null
+        onInitialSync: CompletableDeferred<Unit>? = null
     )
 
     fun startRootSnapshotListener(
         scope: CoroutineScope,
-        onInitialSync: CompletableDeferred<Unit>? = null,
-        onError: ((FirebaseFirestoreException) -> Unit)? = null
+        onInitialSync: CompletableDeferred<Unit>? = null
     )
 
     fun stopSnapshotListener()

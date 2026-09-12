@@ -81,7 +81,6 @@ fun HomeScreen(
     val userPreferences by homeViewModel.userPreferences.collectAsStateWithLifecycle()
 
     val loginSuccessString = stringResource(id = R.string.login_successful)
-    val quotaExceededString = stringResource(id = R.string.firestore_quota_exceeded)
 
     LaunchedEffect(homeViewModel.navEvents) {
         homeViewModel.navEvents.collect { key ->
@@ -111,10 +110,6 @@ fun HomeScreen(
 
                 HomeUiEvent.LoginSuccess -> {
                     appState.showSnackBar("$loginSuccessString ${homeViewModel.getFullName()}")
-                }
-
-                HomeUiEvent.FirestoreQuotaExceeded -> {
-                    appState.showSnackBar(quotaExceededString)
                 }
             }
         }

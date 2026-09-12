@@ -248,8 +248,8 @@ class FinanceUtilsTest {
         val result = addTotalsToIncomes(listOf(a24, b24, c23), today)
 
         assertThat(result.map { it.id }).containsExactly(
-            "2024", a24.id, b24.id,
-            "2023", c23.id,
+            "total_2024", a24.id, b24.id,
+            "total_2023", c23.id,
         ).inOrder()
         assertThat(result[0].price).isEqualTo(3.0)
         assertThat(result[3].price).isEqualTo(10.0)
@@ -296,7 +296,7 @@ class FinanceUtilsTest {
     private fun Income.isYearTotal(totalYear: Int, sum: Double): Boolean =
         name == totalName &&
             category == totalCategory &&
-            id == totalYear.toString() &&
+            id == "total_$totalYear" &&
             year == totalYear &&
             price == sum
 }
