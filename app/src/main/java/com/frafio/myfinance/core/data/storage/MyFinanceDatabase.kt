@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
  * 1 - Initial version
  * 2 - "labels" attribute added to Expense and Income
  * 3 - "updatedAt", "isDeleted", and "deleteAt" added to Expense and Income
+ * 4 - Expense and Income have non-nullable arguments
  */
 @Database(
     entities = [Expense::class, Income::class],
