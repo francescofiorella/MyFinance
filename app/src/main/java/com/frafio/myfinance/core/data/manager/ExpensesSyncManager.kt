@@ -187,9 +187,9 @@ class ExpensesSyncManager @Inject constructor(
             updatedLabels.remove(label)
             val updatedExpense = expense.copy(
                 timestamp = dateToUTCTimestamp(
-                    expense.year!!,
-                    expense.month!!,
-                    expense.day!!
+                    expense.year,
+                    expense.month,
+                    expense.day
                 ),
                 labels = updatedLabels
             )
@@ -229,9 +229,9 @@ class ExpensesSyncManager @Inject constructor(
             val updatedLabels = expense.labels.map { if (it == oldName) trimmedNewName else it }
             val updatedExpense = expense.copy(
                 timestamp = dateToUTCTimestamp(
-                    expense.year!!,
-                    expense.month!!,
-                    expense.day!!
+                    expense.year,
+                    expense.month,
+                    expense.day
                 ),
                 labels = updatedLabels
             )

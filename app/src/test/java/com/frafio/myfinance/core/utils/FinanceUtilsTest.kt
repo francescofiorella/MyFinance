@@ -93,16 +93,6 @@ class FinanceUtilsTest {
     }
 
     @Test
-    fun addTotalsToExpenses_nullPriceCountsAsZero() {
-        val priced = testExpense(name = "Priced", price = 5.0, date = today)
-        val unpriced = testExpense(name = "Unpriced", price = null, date = today)
-
-        val result = addTotalsToExpenses(listOf(priced, unpriced), today)
-
-        assertThat(result[0].price).isEqualTo(5.0)
-    }
-
-    @Test
     fun addTotalsToExpenses_totalAndJollyIdsUseUnpaddedDayMonthYear() {
         val single = testExpense(date = LocalDate.of(2024, 3, 5))
         val todayIs = LocalDate.of(2024, 3, 9)
@@ -129,7 +119,7 @@ class FinanceUtilsTest {
 
         val result = addTotalsToExpenses(listOf(onNow))
 
-        assertThat(result[0].isTotalFor(LocalDate.now(), onNow.price!!)).isTrue()
+        assertThat(result[0].isTotalFor(LocalDate.now(), onNow.price)).isTrue()
         assertThat(result.none { it.category == jollyCategory }).isTrue()
     }
 
@@ -168,16 +158,6 @@ class FinanceUtilsTest {
         ).inOrder()
         assertThat(result[0].price).isEqualTo(3.0)
         assertThat(result[3].price).isEqualTo(10.0)
-    }
-
-    @Test
-    fun addTotalsToExpensesWithoutToday_nullPriceCountsAsZero() {
-        val priced = testExpense(name = "Priced", price = 5.0, date = today)
-        val unpriced = testExpense(name = "Unpriced", price = null, date = today)
-
-        val result = addTotalsToExpensesWithoutToday(listOf(priced, unpriced))
-
-        assertThat(result[0].price).isEqualTo(5.0)
     }
 
     // endregion
@@ -263,16 +243,6 @@ class FinanceUtilsTest {
 
         assertThat(result[0].month).isEqualTo(0)
         assertThat(result[0].day).isEqualTo(0)
-    }
-
-    @Test
-    fun addTotalsToIncomes_nullPriceCountsAsZero() {
-        val priced = testIncome(name = "Priced", price = 40.0, date = LocalDate.of(2024, 3, 1))
-        val unpriced = testIncome(name = "Unpriced", price = null, date = LocalDate.of(2024, 2, 1))
-
-        val result = addTotalsToIncomes(listOf(priced, unpriced), today)
-
-        assertThat(result[0].isYearTotal(2024, 40.0)).isTrue()
     }
 
     // endregion

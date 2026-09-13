@@ -34,10 +34,9 @@ class ExpenseTest {
     }
 
     @Test
-    fun getLocalDate_throwsWhenAnyPartIsNull() {
-        assertThrows(NullPointerException::class.java) { Expense(year = null, month = 1, day = 1).getLocalDate() }
-        assertThrows(NullPointerException::class.java) { Expense(year = 2024, month = null, day = 1).getLocalDate() }
-        assertThrows(NullPointerException::class.java) { Expense(year = 2024, month = 1, day = null).getLocalDate() }
+    fun getLocalDate_throwsWhenTheDateIsUnset() {
+        // The defaults are 0/0/0, which is not a date; an unset row must not pass silently.
+        assertThrows(DateTimeException::class.java) { Expense(name = "x").getLocalDate() }
     }
 
     @Test
@@ -50,12 +49,6 @@ class ExpenseTest {
         val expense = testExpense(date = LocalDate.of(2024, 1, 15))
         assertThat(expense.getDateString(extended = false)).isEqualTo("15/01/2024")
         assertThat(expense.getDateString(extended = true)).isEqualTo("15 Jan 2024")
-    }
-
-    @Test
-    fun getDateString_isEmptyNotNullWhenDateIsMissing() {
-        assertThat(Expense(name = "x").getDateString()).isEmpty()
-        assertThat(Expense(name = "x").getDateString(extended = true)).isEmpty()
     }
 
     @Test

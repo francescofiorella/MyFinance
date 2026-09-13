@@ -46,5 +46,21 @@ Tests assert the behaviour the app should have. When the app disagrees, the test
 fix is listed in [docs/test-findings.md](docs/test-findings.md), together with behaviours that were
 observed but deliberately not asserted.
 
+### Checking the remote data after the non-null model change
+
+`Expense` and `Income` fields are non-null with defaults, so a Firestore document that lacks a field
+loads silently with `""`, `0.0`, `0` or `-1`, and a document with an explicit `null` cannot be
+deserialised at all. `DocumentIntegrity` checks every document on its way in and logs under one tag.
+On the first launch after updating, watch the sync with:
+
+```
+adb logcat -s DataIntegrity
+```
+
+One `I` line per collection (`payments: 120 of 120 documents loaded`) means the remote data is
+complete. A `W` line names a document that was loaded through defaults and which fields it lacked;
+an `E` line names a document that was skipped because a required field is explicitly `null`. Both
+include the full document path so it can be fixed in the Firebase console.
+
 Not covered yet: Room DAO queries (instrumented tests), the Firestore sync managers (no injection
 seam for `FirebaseFirestore`/`FirebaseAuth`), Compose UI, and screenshot tests.

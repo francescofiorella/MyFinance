@@ -29,10 +29,9 @@ class IncomeTest {
     }
 
     @Test
-    fun getLocalDate_throwsWhenAnyPartIsNull() {
-        assertThrows(NullPointerException::class.java) { Income(year = null, month = 1, day = 1).getLocalDate() }
-        assertThrows(NullPointerException::class.java) { Income(year = 2024, month = null, day = 1).getLocalDate() }
-        assertThrows(NullPointerException::class.java) { Income(year = 2024, month = 1, day = null).getLocalDate() }
+    fun getLocalDate_throwsWhenTheDateIsUnset() {
+        // The defaults are 0/0/0, which is not a date; an unset row must not pass silently.
+        assertThrows(DateTimeException::class.java) { Income(name = "x").getLocalDate() }
     }
 
     @Test
@@ -45,11 +44,6 @@ class IncomeTest {
         val income = testIncome(date = LocalDate.of(2024, 1, 31))
         assertThat(income.getDateString(extended = false)).isEqualTo("31/01/2024")
         assertThat(income.getDateString(extended = true)).isEqualTo("31 Jan 2024")
-    }
-
-    @Test
-    fun getDateString_isEmptyNotNullWhenDateIsMissing() {
-        assertThat(Income(name = "x").getDateString()).isEmpty()
     }
 
     @Test

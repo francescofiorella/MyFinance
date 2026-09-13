@@ -59,8 +59,8 @@ fun ExpensesByCategoryCard(
     val values = remember(expenses) {
         val vals = MutableList(9) { 0.0 }
         expenses.forEach { p ->
-            if (p.category != null && p.category <= 8) {
-                vals[p.category] += p.price ?: 0.0
+            if (p.category in 0..8) {
+                vals[p.category] += p.price
             }
         }
         vals

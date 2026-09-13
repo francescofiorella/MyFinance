@@ -47,8 +47,8 @@ class TestExpensesLocalRepository : ExpensesLocalRepository {
         return expensesFlow.map { expenses ->
             expenses.filter {
                 it.matches(name, categories) &&
-                    (it.timestamp ?: 0L) >= firstTimestamp &&
-                    (it.timestamp ?: 0L) < lastTimestamp
+                    it.timestamp >= firstTimestamp &&
+                    it.timestamp < lastTimestamp
             }.sortedForList()
         }
     }
@@ -77,20 +77,18 @@ class TestExpensesLocalRepository : ExpensesLocalRepository {
         val start = startYear * 100 + startMonth
         val end = endYear * 100 + endMonth
         expenses
-            .filter { it.year != null && it.month != null }
-            .filter { (it.year!! * 100 + it.month!!) in start until end }
-            .groupBy { it.year!! to it.month!! }
+            .filter { (it.year * 100 + it.month) in start until end }
+            .groupBy { it.year to it.month }
             .map { (yearMonth, group) ->
-                BarChartEntry(group.sumOf { it.price ?: 0.0 }, yearMonth.first, yearMonth.second)
+                BarChartEntry(group.sumOf { it.price }, yearMonth.first, yearMonth.second)
             }
             .sortedWith(compareByDescending<BarChartEntry> { it.year }.thenByDescending { it.month })
     }
 
     override fun getEarliestYearMonth(): Flow<DatePoint?> = expensesFlow.map { expenses ->
         expenses
-            .filter { it.year != null && it.month != null }
-            .minByOrNull { it.year!! * 100 + it.month!! }
-            ?.let { DatePoint(it.year!!, it.month!!) }
+            .minByOrNull { it.year * 100 + it.month }
+            ?.let { DatePoint(it.year, it.month) }
     }
 
     override fun getExpensesOfMonth(year: Int, month: Int): Flow<List<Expense>> =
@@ -119,7 +117,7 @@ class TestExpensesLocalRepository : ExpensesLocalRepository {
 
     // Mirrors the DAO's prefix-or-word-start LIKE predicate.
     private fun Expense.matches(name: String, categories: List<Int>): Boolean {
-        val expenseName = this.name.orEmpty()
+        val expenseName = this.name
         val nameMatches = expenseName.startsWith(name, ignoreCase = true) ||
             expenseName.contains(" $name", ignoreCase = true)
         return nameMatches && category in categories
@@ -127,14 +125,14 @@ class TestExpensesLocalRepository : ExpensesLocalRepository {
 
     // ORDER BY year DESC, month DESC, day DESC, price DESC, category DESC
     private fun List<Expense>.sortedForList(): List<Expense> = sortedWith(
-        compareByDescending<Expense> { it.year ?: Int.MIN_VALUE }
-            .thenByDescending { it.month ?: Int.MIN_VALUE }
-            .thenByDescending { it.day ?: Int.MIN_VALUE }
-            .thenByDescending { it.price ?: Double.MIN_VALUE }
-            .thenByDescending { it.category ?: Int.MIN_VALUE }
+        compareByDescending<Expense> { it.year }
+            .thenByDescending { it.month }
+            .thenByDescending { it.day }
+            .thenByDescending { it.price }
+            .thenByDescending { it.category }
     )
 
     // SUM(price) is NULL when no rows match.
     private fun List<Expense>.sumOrNull(): Double? =
-        mapNotNull { it.price }.takeIf { it.isNotEmpty() }?.sum()
+        map { it.price }.takeIf { it.isNotEmpty() }?.sum()
 }

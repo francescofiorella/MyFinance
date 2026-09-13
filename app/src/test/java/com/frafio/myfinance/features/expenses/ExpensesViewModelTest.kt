@@ -236,18 +236,6 @@ class ExpensesViewModelTest {
     }
 
     @Test
-    fun totalFilteredExpenses_treatsNullPriceAsZero() = runTest {
-        backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.totalFilteredExpenses.collect() }
-
-        expensesLocalRepository.sendExpenses(
-            testExpense(name = "A", price = 2.5, date = today),
-            testExpense(name = "B", price = null, date = today),
-        )
-
-        assertThat(viewModel.totalFilteredExpenses.value).isEqualTo(2.5)
-    }
-
-    @Test
     fun isExpensesEmpty_isNullDuringFirstSyncAndTrueAfterWithNoData() = runTest {
         assertThat(viewModel.isExpensesEmpty.value).isNull()
         backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.isExpensesEmpty.collect() }

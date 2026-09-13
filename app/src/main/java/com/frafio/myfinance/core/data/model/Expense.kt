@@ -23,13 +23,13 @@ import java.time.LocalDate
 @Entity
 @Serializable
 data class Expense(
-    override val name: String? = null,
-    override val price: Double? = null,
-    override val year: Int? = null,
-    override val month: Int? = null,
-    override val day: Int? = null,
-    override var timestamp: Long? = null,
-    override val category: Int? = null,
+    override val name: String = "",
+    override val price: Double = 0.0,
+    override val year: Int = 0,
+    override val month: Int = 0,
+    override val day: Int = 0,
+    override var timestamp: Long = 0L,
+    override val category: Int = -1,
     override val labels: List<String> = emptyList(),
     override val updatedAt: Long? = null,
     @get:PropertyName("isDeleted") override val isDeleted: Boolean? = null,
@@ -52,15 +52,15 @@ data class Expense(
 
     @Exclude
     override fun getLocalDate(): LocalDate {
-        return LocalDate.of(year!!, month!!, day!!)
+        return LocalDate.of(year, month, day)
     }
 
     @Exclude
     override fun getPriceString(showDecimal: Boolean): String {
         return if (showDecimal) {
-            doubleToPrice(price!!)
+            doubleToPrice(price)
         } else {
-            doubleToPriceWithoutDecimals(price!!)
+            doubleToPriceWithoutDecimals(price)
         }
     }
 }

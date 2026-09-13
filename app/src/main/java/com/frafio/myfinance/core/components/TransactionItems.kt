@@ -75,7 +75,7 @@ fun TotalItem(
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.weight(1f))
-        if ((transaction.price ?: 0.0) >= 0) {
+        if (transaction.price >= 0) {
             Text(
                 text = transaction.getPriceString(true),
                 style = MaterialTheme.typography.labelMedium,
@@ -142,7 +142,7 @@ fun TransactionListItem(
                         contentAlignment = Alignment.Center
                     ) {
                         val firstLetter =
-                            transaction.name?.firstOrNull()?.uppercaseChar()?.toString() ?: ""
+                            transaction.name.firstOrNull()?.uppercaseChar()?.toString() ?: ""
                         Text(
                             modifier = Modifier
                                 .width(24.dp)
@@ -162,7 +162,7 @@ fun TransactionListItem(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = transaction.name ?: "",
+                        text = transaction.name,
                         style = MaterialTheme.typography.bodyLarge
                     )
                     val supportingText = if (transaction is Income) {

@@ -12,9 +12,9 @@ import java.time.LocalDate
 // can never disagree with itself the way a hand-built Expense can.
 fun testExpense(
     name: String = "Coffee",
-    price: Double? = 1.5,
+    price: Double = 1.5,
     date: LocalDate = LocalDate.of(2024, 1, 15),
-    category: Int? = FirestoreEnums.CATEGORIES.DINING.value,
+    category: Int = FirestoreEnums.CATEGORIES.DINING.value,
     labels: List<String> = emptyList(),
     id: String = "expense-$name-$date",
 ): Expense = Expense(
@@ -31,9 +31,9 @@ fun testExpense(
 
 fun testIncome(
     name: String = "Salary",
-    price: Double? = 1000.0,
+    price: Double = 1000.0,
     date: LocalDate = LocalDate.of(2024, 1, 31),
-    category: Int? = FirestoreEnums.CATEGORIES.INCOME.value,
+    category: Int = FirestoreEnums.CATEGORIES.INCOME.value,
     id: String = "income-$name-$date",
 ): Income = Income(
     name = name,

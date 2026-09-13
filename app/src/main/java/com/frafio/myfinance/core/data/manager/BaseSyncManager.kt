@@ -180,6 +180,7 @@ abstract class BaseSyncManager<T : Transaction>(
 
             val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels
             val remoteItems = snapshots.documents.mapNotNull { doc ->
+                if (!DocumentIntegrity.verify(doc)) return@mapNotNull null
                 val item = doc.toObject(clazz)
                 when (item) {
                     is Expense -> item.id = doc.id
@@ -187,6 +188,10 @@ abstract class BaseSyncManager<T : Transaction>(
                 }
                 item
             }
+            Log.i(
+                DocumentIntegrity.TAG,
+                "$collectionName: ${remoteItems.size} of ${snapshots.size()} documents loaded"
+            )
 
             val remoteIds = remoteItems.map { it.id }.toSet()
             val localItems = baseDao.getAllSync()
@@ -269,10 +274,13 @@ abstract class BaseSyncManager<T : Transaction>(
                             if (!snapshots.isEmpty) {
                                 updateLastAppSync(currentTimestampUTC())
                                 var maxUpdatedAt = currentLastSync
+                                var loaded = 0
                                 val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels
                                 try {
                                     database.withTransaction {
                                         snapshots.documentChanges.forEach { dc ->
+                                            if (!DocumentIntegrity.verify(dc.document)) return@forEach
+                                            loaded++
                                             val item = dc.document.toObject(clazz)
                                             when (item) {
                                                 is Expense -> item.id = dc.document.id
@@ -294,6 +302,12 @@ abstract class BaseSyncManager<T : Transaction>(
                                     if (maxUpdatedAt > currentLastSync) {
                                         currentLastSync = maxUpdatedAt
                                         updateLastSync(maxUpdatedAt)
+                                    }
+                                    if (isFirstSnapshot) {
+                                        Log.i(
+                                            DocumentIntegrity.TAG,
+                                            "$collectionName: $loaded of ${snapshots.documentChanges.size} documents loaded"
+                                        )
                                     }
                                 } catch (e: Exception) {
                                     Log.e("BaseSyncManager", "Critical error in snapshot processor for $collectionName", e)

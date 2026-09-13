@@ -22,24 +22,23 @@ class TestIncomesLocalRepository : IncomesLocalRepository {
     // ORDER BY year DESC, month DESC, day DESC, price DESC
     override fun getAll(): Flow<List<Income>> = incomesFlow.map { incomes ->
         incomes.sortedWith(
-            compareByDescending<Income> { it.year ?: Int.MIN_VALUE }
-                .thenByDescending { it.month ?: Int.MIN_VALUE }
-                .thenByDescending { it.day ?: Int.MIN_VALUE }
-                .thenByDescending { it.price ?: Double.MIN_VALUE }
+            compareByDescending<Income> { it.year }
+                .thenByDescending { it.month }
+                .thenByDescending { it.day }
+                .thenByDescending { it.price }
         )
     }
 
     override fun getCount(): Flow<Int> = incomesFlow.map { it.size }
 
     override fun getPriceSumFromYear(year: Int): Flow<Double?> = incomesFlow.map { incomes ->
-        incomes.filter { it.year == year }.mapNotNull { it.price }.takeIf { it.isNotEmpty() }?.sum()
+        incomes.filter { it.year == year }.map { it.price }.takeIf { it.isNotEmpty() }?.sum()
     }
 
     override fun getEarliestYearMonth(): Flow<DatePoint?> = incomesFlow.map { incomes ->
         incomes
-            .filter { it.year != null && it.month != null }
-            .minByOrNull { it.year!! * 100 + it.month!! }
-            ?.let { DatePoint(it.year!!, it.month!!) }
+            .minByOrNull { it.year * 100 + it.month }
+            ?.let { DatePoint(it.year, it.month) }
     }
 
     override fun deleteAll() {

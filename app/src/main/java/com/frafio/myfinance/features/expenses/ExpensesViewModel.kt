@@ -154,7 +154,7 @@ class ExpensesViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val totalFilteredExpenses: StateFlow<Double> = allFilteredExpenses
-        .map { (_, list) -> list.sumOf { it.price ?: 0.0 } }
+        .map { (_, list) -> list.sumOf { it.price } }
         .flowOn(defaultDispatcher)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
@@ -256,7 +256,7 @@ class ExpensesViewModel @Inject constructor(
             try {
                 loadingRepository.startLoading()
                 val updated = expense.copy(
-                    timestamp = dateToUTCTimestamp(expense.year!!, expense.month!!, expense.day!!),
+                    timestamp = dateToUTCTimestamp(expense.year, expense.month, expense.day),
                     category = newCategory
                 )
                 val response = expensesRepository.editExpense(updated)

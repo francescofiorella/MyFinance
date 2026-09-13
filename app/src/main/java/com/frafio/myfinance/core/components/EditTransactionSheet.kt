@@ -63,11 +63,11 @@ fun EditTransactionSheet(
     ) {
         ListSheetDialog(
             icon = if (transaction is Expense) {
-                getCategoryIcon(transaction.category ?: 0)
+                getCategoryIcon(transaction.category)
             } else {
                 null
             },
-            title = transaction.name ?: "",
+            title = transaction.name,
             label = transaction.getDateString(),
             labelFirst = false,
             endContent = transaction.getPriceString(),
