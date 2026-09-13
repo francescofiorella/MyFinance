@@ -136,7 +136,6 @@ fun addTotalsToExpenses(expenses: List<Expense>, today: LocalDate = LocalDate.no
     if (expenses.isEmpty()) return emptyList()
 
     val result = ArrayList<Expense>(expenses.size + 10)
-    val todayDate = today
     var todayAdded = false
 
     var i = 0
@@ -144,10 +143,10 @@ fun addTotalsToExpenses(expenses: List<Expense>, today: LocalDate = LocalDate.no
         val groupDate = expenses[i].getLocalDate()
 
         // Insert "Today" if we reached it or passed it
-        if (!todayAdded && !groupDate.isAfter(todayDate)) {
-            if (groupDate.isBefore(todayDate)) {
+        if (!todayAdded && !groupDate.isAfter(today)) {
+            if (groupDate.isBefore(today)) {
                 // Today is missing, add empty today block
-                addTodayBlock(result, todayDate)
+                addTodayBlock(result, today)
             }
             todayAdded = true
         }
@@ -182,7 +181,7 @@ fun addTotalsToExpenses(expenses: List<Expense>, today: LocalDate = LocalDate.no
 
     // If today was never reached (all future expenses)
     if (!todayAdded) {
-        addTodayBlock(result, todayDate)
+        addTodayBlock(result, today)
     }
 
     return result
@@ -273,32 +272,31 @@ fun addTotalsToExpensesWithoutToday(expenses: List<Expense>): List<Expense> {
 fun addTotalsToIncomes(incomes: List<Income>, today: LocalDate = LocalDate.now()): List<Income> {
     val incomeList = mutableListOf<Income>()
 
-    val todayDate = today
     var total = Income(
         name = FirestoreEnums.NAMES.TOTAL.value,
         price = 0.0,
-        year = todayDate.year,
+        year = today.year,
         month = 0,
         day = 0,
         category = FirestoreEnums.CATEGORIES.TOTAL.value,
-        id = "total_${todayDate.year}"
+        id = "total_${today.year}"
     )
     var currentIncomes = mutableListOf<Income>()
 
     var isFirstIncome = true
     incomes.forEach { income ->
-        if (isFirstIncome && todayDate.year > income.year) {
+        if (isFirstIncome && today.year > income.year) {
             // Inserisci totale a 0.0 per oggi
             incomeList.add(total)
             // Add empty income (with random name, jolly category, and price to 0.0)
             total = Income(
                 name = "",
                 price = 0.0,
-                year = todayDate.year,
-                month = todayDate.monthValue,
-                day = todayDate.dayOfMonth,
+                year = today.year,
+                month = today.monthValue,
+                day = today.dayOfMonth,
                 category = FirestoreEnums.CATEGORIES.JOLLY.value,
-                id = "jolly_${todayDate.year}"
+                id = "jolly_${today.year}"
             )
             incomeList.add(total)
             total = Income(
@@ -310,7 +308,7 @@ fun addTotalsToIncomes(incomes: List<Income>, today: LocalDate = LocalDate.now()
                 category = FirestoreEnums.CATEGORIES.TOTAL.value,
                 id = "total_${income.year}"
             )
-        } else if (isFirstIncome && income.year > todayDate.year) {
+        } else if (isFirstIncome && income.year > today.year) {
             total = Income(
                 name = FirestoreEnums.NAMES.TOTAL.value,
                 price = 0.0,
