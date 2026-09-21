@@ -148,7 +148,7 @@ fun ExpensesCard(
             trailingContent = {
                 Text(
                     modifier = Modifier.padding(end = 8.dp),
-                    text = if (todaySum < 1000)
+                    text = if (amount < 1000)
                         doubleToPrice(amount)
                     else
                         doubleToPriceWithoutDecimals(amount),

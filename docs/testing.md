@@ -275,16 +275,17 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 | Navigation (`Navigator`, `NavigationState`, `MyFinanceAppState`) | `core/navigation/…` |
 | Theme resolution (Robolectric) | `core/theme/ThemeTest` |
 | Shared Compose components (Robolectric) | `core/components/…Test` |
+| Feature components: auth form and fields, dashboard cards, filter chips and sheets, profile sheets, budget sheet, labels list | `features/*/components/…Test`, `features/auth/AuthContentTest`, `features/labels/LabelsContentTest` |
 | Screens, app shell and components as golden images (Roborazzi) | `**/*ScreenshotTests`, `app/src/test/screenshots` |
 | Utilities, models, enums | `core/utils/…`, `core/data/model/…`, `core/data/enums/…` |
 | Transaction wire format (`toFirestoreMap` vs Firestore's reflective mapper, plain JVM) | `core/data/model/FirestoreMappingTest` |
 
 ## Not covered yet
 
-- **Feature components and screen logic** — the same Robolectric technique as `core/components`
-  (the screens already carry `Modifier.testTag`); screens are only covered as images so far.
-  `PieChart` arcs and the date-picker dialogs are also uncovered: the arcs have no semantics, the
-  dialogs are Material's. Roborazzi's accessibility checks (`roborazzi-accessibility-check`) are
+- **Screen logic** — the screens' own state handling (loading / empty / error branches wired to a
+  ViewModel) is covered only as images; the components inside them are tested. `PieChart` arcs
+  and the date-picker dialogs are also uncovered: the arcs have no semantics, the dialogs are
+  Material's. Roborazzi's accessibility checks (`roborazzi-accessibility-check`) are
   not enabled: several icons still have `contentDescription = null`.
 - **Google sign-in** — `androidx.credentials.Credential` needs an `android.os.Bundle`, which the
   JVM cannot build.

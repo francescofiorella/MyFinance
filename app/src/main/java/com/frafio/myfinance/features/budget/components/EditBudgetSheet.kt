@@ -58,8 +58,8 @@ fun EditBudgetSheet(
     }
 
     val isConfirmEnabled = remember(budgetTextFieldValue.text) {
-        val newBudget = budgetTextFieldValue.text.toDoubleOrNull() ?: 0.0
-        budgetTextFieldValue.text.isNotEmpty() && newBudget != budget
+        val newBudget = budgetTextFieldValue.text.toDoubleOrNull()
+        newBudget != null && newBudget != budget
     }
 
     AdaptiveSheet(
