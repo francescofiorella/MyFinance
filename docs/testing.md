@@ -113,6 +113,17 @@ unit-test variant reads the debug manifest, so a `testImplementation` would not 
 jar per API level used (about 100 MB each) into `~/.m2`; Robolectric classes add roughly a minute
 to the suite, plain JVM tests are unaffected.
 
+Component tests live in `core/components/` and use two helpers from `testing/util/ComposeTestHelpers.kt`:
+`setThemedContent { … }` wraps the content in `MyFinanceTheme`, and `string(R.string.x)` resolves a
+resource the way the composable does, so assertions never hard-code UI text. Passing
+`setThemedContent(inline = true)` sets `LocalInspectionMode`, which makes `AdaptiveSheet` render its
+content directly instead of inside `ModalBottomSheet` — the same path previews take — so the
+sheet-based components (`EditTransactionSheet`, `ConfirmationSheetDialog`) are tested through their
+header, items and callbacks; the bottom sheet itself is Material's. Two Robolectric quirks: it
+measures text a few pixels wide, so a swipe has to be aimed at the container (`onRoot()` with explicit
+coordinates) rather than at a `Text` node; and an `Image` with a null `contentDescription` has no
+semantics node, so `EmptyViewTest` reads the illustration's presence from where the message lands.
+
 ## Instrumented tests
 
 Room DAO and `Converters` tests live in `app/src/androidTest` and run on a device:
@@ -150,13 +161,15 @@ on the device.
 | Room DAOs and `Converters` (device) | `androidTest/…/core/data/dao/…`, `…/converters/…` |
 | Navigation (`Navigator`, `NavigationState`, `MyFinanceAppState`) | `core/navigation/…` |
 | Theme resolution (Robolectric) | `core/theme/ThemeTest` |
+| Shared Compose components (Robolectric) | `core/components/…Test` |
 | Utilities, models, enums | `core/utils/…`, `core/data/model/…`, `core/data/enums/…` |
 
 ## Not covered yet
 
 - **Firestore sync managers and `AuthManager`** — they obtain `FirebaseFirestore`/`FirebaseAuth`
   inline, so there is no seam for a fake; a `RemoteDataSource` interface would unlock them.
-- **Compose components and screens** — logic tests on Robolectric (the setup is in place and the
-  screens already carry `Modifier.testTag`) and Roborazzi screenshots.
+- **Feature components and screens** — the same Robolectric technique as `core/components` (the
+  screens already carry `Modifier.testTag`), and Roborazzi screenshots. `PieChart` arcs and the
+  date-picker dialogs are also uncovered: the arcs have no semantics, the dialogs are Material's.
 - **Google sign-in** — `androidx.credentials.Credential` needs an `android.os.Bundle`, which the
   JVM cannot build.
