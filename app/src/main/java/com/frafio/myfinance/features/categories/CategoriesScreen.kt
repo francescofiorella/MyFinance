@@ -2,6 +2,8 @@ package com.frafio.myfinance.features.categories
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -65,7 +67,7 @@ fun CategoriesScreen(
             val categories = listOf(
                 CategoryItem(R.string.housing, R.drawable.ic_home_filled, R.string.housing_description),
                 CategoryItem(R.string.groceries, R.drawable.ic_shopping_cart_filled, R.string.groceries_description),
-                CategoryItem(R.string.personal_care, R.drawable.ic_face_filled, R.string.personal_care_description),
+                CategoryItem(R.string.personal_care, R.drawable.ic_self_care_filled, R.string.personal_care_description),
                 CategoryItem(R.string.entertainment, R.drawable.ic_theater_comedy_filled, R.string.entertainment_description),
                 CategoryItem(R.string.education, R.drawable.ic_school_filled, R.string.education_description),
                 CategoryItem(R.string.dining, R.drawable.ic_restaurant_filled, R.string.dining_description),
@@ -213,8 +215,8 @@ fun CategoryExpandableItem(
 
                 AnimatedVisibility(
                     visible = isExpanded,
-                    enter = expandVertically(),
-                    exit = shrinkVertically()
+                    enter = expandVertically(MaterialTheme.motionScheme.fastSpatialSpec()) + fadeIn(MaterialTheme.motionScheme.fastSpatialSpec()),
+                    exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()) + fadeOut(MaterialTheme.motionScheme.fastSpatialSpec())
                 ) {
                     Text(
                         text = stringResource(id = category.descriptionRes),

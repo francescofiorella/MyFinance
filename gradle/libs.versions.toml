@@ -36,7 +36,7 @@ truth = "1.4.5"
 androidxTestCore = "1.7.0"
 androidxTestRunner = "1.7.0"
 robolectric = "4.17"
-roborazzi = "1.56.0"
+roborazzi = "1.75.0"
 turbine = "1.2.1"
 
 [libraries]
