@@ -98,6 +98,21 @@ adb logcat -s DataIntegrity
 Both carry the full document path for the Firebase console. Tombstones (`isDeleted == true`) are
 not checked.
 
+## Compose tests on the JVM
+
+Tests that need a composition run under Robolectric in `app/src/test`, next to the plain JVM tests:
+`@RunWith(RobolectricTestRunner::class)` plus `createComposeRule()`. `app/src/test/resources/robolectric.properties`
+pins the simulated API level to 35; a method can override it with `@Config(sdk = [30])`, and
+`@Config(qualifiers = "night")` switches system dark mode. `ThemeTest` is the model: it sets content
+inside `MyFinanceTheme` and asserts on `MaterialTheme.colorScheme` from within the composition.
+
+The setup lives in `app/build.gradle.kts`: `unitTests.isIncludeAndroidResources = true` so Robolectric
+sees the merged manifest and resources, and `ui-test-manifest` as a `debugImplementation` — the
+unit-test variant reads the debug manifest, so a `testImplementation` would not register the
+`ComponentActivity` that `createComposeRule()` launches. The first run downloads one `android-all`
+jar per API level used (about 100 MB each) into `~/.m2`; Robolectric classes add roughly a minute
+to the suite, plain JVM tests are unaffected.
+
 ## Instrumented tests
 
 Room DAO and `Converters` tests live in `app/src/androidTest` and run on a device:
@@ -134,13 +149,14 @@ on the device.
 | Repositories, mapper, integrity check | `core/data/…` |
 | Room DAOs and `Converters` (device) | `androidTest/…/core/data/dao/…`, `…/converters/…` |
 | Navigation (`Navigator`, `NavigationState`, `MyFinanceAppState`) | `core/navigation/…` |
+| Theme resolution (Robolectric) | `core/theme/ThemeTest` |
 | Utilities, models, enums | `core/utils/…`, `core/data/model/…`, `core/data/enums/…` |
 
 ## Not covered yet
 
 - **Firestore sync managers and `AuthManager`** — they obtain `FirebaseFirestore`/`FirebaseAuth`
   inline, so there is no seam for a fake; a `RemoteDataSource` interface would unlock them.
-- **Compose UI** — logic tests (Robolectric + `ui-test-junit4`; the screens already carry
-  `Modifier.testTag`) and Roborazzi screenshots.
+- **Compose components and screens** — logic tests on Robolectric (the setup is in place and the
+  screens already carry `Modifier.testTag`) and Roborazzi screenshots.
 - **Google sign-in** — `androidx.credentials.Credential` needs an `android.os.Bundle`, which the
   JVM cannot build.
