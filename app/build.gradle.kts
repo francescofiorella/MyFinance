@@ -53,8 +53,8 @@ android {
 
     // Fakes and Hilt test modules used by both the JVM and the instrumented suite.
     sourceSets {
-        getByName("test") { kotlin.srcDir("src/sharedTest/java") }
-        getByName("androidTest") { kotlin.srcDir("src/sharedTest/java") }
+        getByName("test") { kotlin.directories.add("src/sharedTest/java") }
+        getByName("androidTest") { kotlin.directories.add("src/sharedTest/java") }
     }
 
     buildFeatures {
@@ -141,7 +141,6 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.compose.ui.test)
     testImplementation(libs.hilt.android.testing)
-    kspTest(libs.hilt.compiler)
     debugImplementation(libs.androidx.compose.ui.testManifest)
 
     androidTestImplementation(libs.androidx.junit)
@@ -153,7 +152,6 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.hilt.android.testing)
-    kspAndroidTest(libs.hilt.compiler)
 }
 
 // AuthCode/FinanceCode resolve their messages from Locale.getDefault() in static init,

@@ -171,7 +171,7 @@ Firebase. The pieces, all ported from nowinandroid:
   defaults (logged in, sync completes at once).
 - **Shared sources.** The fakes, fixtures and DI modules live in `app/src/sharedTest`, registered as
   a Kotlin source directory of both `test` and `androidTest` in `app/build.gradle.kts`
-  (`kotlin.srcDir`; `java.srcDir` is not picked up by AGP 9's built-in Kotlin). The old
+  (`kotlin.directories`; a `java` source directory is not picked up by AGP 9's built-in Kotlin). The old
   `androidTest/…/DaoFixtures.kt` copy went away with it.
 - **Seeding.** `NavigationTest` uses `createAndroidComposeRule<MainActivity>()` and injects the
   concrete fakes plus `ExpenseDao`/`UserPreferencesRepository` to seed data in `@Before`; the screens
@@ -190,7 +190,8 @@ Firebase. The pieces, all ported from nowinandroid:
 `HiltComponentActivity` (`app/src/debug`, declared in the debug manifest) is the host for future
 Robolectric tests that need `hiltViewModel()`: `@Config(application = HiltTestApplication::class)`
 plus `createAndroidComposeRule<HiltComponentActivity>()`, with the same test modules
-(`kspTest(hilt-compiler)` and `hilt-android-testing` are already on the unit-test classpath).
+(`hilt-android-testing` is already on the unit-test classpath; the Hilt plugin adds its compiler to
+every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 
 ## What is covered
 
