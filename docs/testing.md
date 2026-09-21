@@ -41,6 +41,9 @@ hand-written fakes, direct ViewModel construction.
 - **Real DataStore, in memory.** `UserPreferencesRepositoryTest` runs the production implementation
   over `testing/util/InMemoryDataStore`, so the `Preferences` key mapping is exercised rather than
   faked.
+  `core/di/DataStoreModuleTest` opens the real file once (DataStore allows one instance per
+  file per process). The legacy `SharedPreferences` migration is gone: its keys had been renamed
+  away in June 2026, so it copied values nobody read; an old `SHARED_PREFERENCES` file is ignored.
 - **Fixtures.** `testing/data/TestTransactions.kt` builds `Expense`, `Income`, `User` and
   `UserPreferencesData` with defaults; `year/month/day` and `timestamp` always derive from one
   `LocalDate`, so a fixture cannot disagree with itself.

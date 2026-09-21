@@ -2,7 +2,6 @@ package com.frafio.myfinance.core.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
@@ -21,12 +20,6 @@ object DataStoreModule {
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
         return PreferenceDataStoreFactory.create(
-            migrations = listOf(
-                SharedPreferencesMigration(
-                    context,
-                    "SHARED_PREFERENCES"
-                )
-            ),
             produceFile = { context.preferencesDataStoreFile("user_preferences") }
         )
     }
