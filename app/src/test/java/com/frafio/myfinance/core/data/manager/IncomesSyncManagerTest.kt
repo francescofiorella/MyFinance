@@ -8,7 +8,7 @@ import com.frafio.myfinance.testing.data.testIncome
 import com.frafio.myfinance.testing.data.testPreferences
 import com.frafio.myfinance.testing.data.testUser
 import com.frafio.myfinance.testing.remote.TestRemoteDataSource
-import com.frafio.myfinance.testing.remote.toRemoteMap
+import com.frafio.myfinance.core.data.remote.toFirestoreMap
 import com.frafio.myfinance.testing.repository.TestUserPreferencesRepository
 import com.frafio.myfinance.testing.util.DatabaseTest
 import com.google.common.truth.Truth.assertThat
@@ -217,7 +217,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
 
     @Test
     fun startSnapshotListener_documentWithNulls_isSkipped() = runBlocking<Unit> {
-        remote.documentData = { item -> item.toRemoteMap() + (FirestoreEnums.FIELDS.PRICE.value to null) }
+        remote.documentData = { item -> item.toFirestoreMap() + (FirestoreEnums.FIELDS.PRICE.value to null) }
         val initialSync = CompletableDeferred<Unit>()
         subject.startSnapshotListener(scope, initialSync)
         awaitUntil { remote.activeListeners == 1 }
@@ -231,7 +231,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
 
     @Test
     fun startSnapshotListener_documentMissingAField_isLoadedWithDefaults() = runBlocking<Unit> {
-        remote.documentData = { item -> item.toRemoteMap() - FirestoreEnums.FIELDS.CATEGORY.value }
+        remote.documentData = { item -> item.toFirestoreMap() - FirestoreEnums.FIELDS.CATEGORY.value }
         val initialSync = CompletableDeferred<Unit>()
         subject.startSnapshotListener(scope, initialSync)
         awaitUntil { remote.activeListeners == 1 }

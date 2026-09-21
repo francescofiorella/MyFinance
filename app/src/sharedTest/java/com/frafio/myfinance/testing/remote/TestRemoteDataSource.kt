@@ -1,6 +1,5 @@
 package com.frafio.myfinance.testing.remote
 
-import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.model.Transaction
@@ -8,6 +7,7 @@ import com.frafio.myfinance.core.data.remote.RemoteDataSource
 import com.frafio.myfinance.core.data.remote.RemoteDocument
 import com.frafio.myfinance.core.data.remote.RemoteListener
 import com.frafio.myfinance.core.data.remote.RemoteSnapshot
+import com.frafio.myfinance.core.data.remote.toFirestoreMap
 
 /**
  * In-memory stand-in for Firestore. Documents live in [collections] keyed by collection then id;
@@ -22,7 +22,7 @@ class TestRemoteDataSource : RemoteDataSource {
     var failNext: Throwable? = null
 
     /** Applied to every document handed to the manager; a test can strip or null a field. */
-    var documentData: (Transaction) -> Map<String, Any?>? = { it.toRemoteMap() }
+    var documentData: (Transaction) -> Map<String, Any?>? = { it.toFirestoreMap() }
 
     val added = mutableListOf<Pair<String, Transaction>>()
     val sets = mutableListOf<Triple<String, String, Transaction>>()
@@ -140,20 +140,6 @@ class TestRemoteDataSource : RemoteDataSource {
         RemoteDocument(id = id, path = "purchases/user/$collection/$id", data = documentData(this)) { this }
 }
 
-/** The fields Firestore would hold for a transaction, keyed as `DocumentIntegrity` expects. */
-fun Transaction.toRemoteMap(): Map<String, Any?> = mapOf(
-    FirestoreEnums.FIELDS.NAME.value to name,
-    FirestoreEnums.FIELDS.PRICE.value to price,
-    FirestoreEnums.FIELDS.YEAR.value to year,
-    FirestoreEnums.FIELDS.MONTH.value to month,
-    FirestoreEnums.FIELDS.DAY.value to day,
-    FirestoreEnums.FIELDS.TIMESTAMP.value to timestamp,
-    FirestoreEnums.FIELDS.CATEGORY.value to category,
-    FirestoreEnums.FIELDS.LABELS.value to labels,
-    FirestoreEnums.FIELDS.UPDATED_AT.value to updatedAt,
-    FirestoreEnums.FIELDS.IS_DELETED.value to isDeleted,
-    FirestoreEnums.FIELDS.DELETE_AT.value to deleteAt,
-)
 
 private fun Transaction.withId(newId: String): Transaction = when (this) {
     is Expense -> copy(id = newId)

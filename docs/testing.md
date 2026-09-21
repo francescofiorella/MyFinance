@@ -277,7 +277,7 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 | Shared Compose components (Robolectric) | `core/components/…Test` |
 | Screens, app shell and components as golden images (Roborazzi) | `**/*ScreenshotTests`, `app/src/test/screenshots` |
 | Utilities, models, enums | `core/utils/…`, `core/data/model/…`, `core/data/enums/…` |
-| Model ↔ Firestore wire mapping (`CustomClassMapper`, plain JVM) | `core/data/model/FirestoreMappingTest` |
+| Transaction wire format (`toFirestoreMap` vs Firestore's reflective mapper, plain JVM) | `core/data/model/FirestoreMappingTest` |
 
 ## Not covered yet
 

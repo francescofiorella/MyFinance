@@ -29,10 +29,10 @@ class FirestoreRemoteDataSource @Inject constructor() : RemoteDataSource {
         RemoteDocument(id = id, path = reference.path, data = data) { toObject(type) }
 
     override suspend fun <T : Transaction> add(email: String, collection: String, item: T): String =
-        collection(email, collection).add(item).await().id
+        collection(email, collection).add(item.toFirestoreMap()).await().id
 
     override suspend fun <T : Transaction> set(email: String, collection: String, id: String, item: T) {
-        collection(email, collection).document(id).set(item).await()
+        collection(email, collection).document(id).set(item.toFirestoreMap()).await()
     }
 
     override suspend fun updateArrayField(

@@ -1,9 +1,9 @@
 package com.frafio.myfinance.core.data.model
 
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
+import com.frafio.myfinance.core.data.remote.toFirestoreMap
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.data.testIncome
-import com.frafio.myfinance.testing.remote.toRemoteMap
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.firestore.util.CustomClassMapper
 import org.junit.Assert.assertThrows
@@ -11,12 +11,14 @@ import org.junit.Test
 import java.time.LocalDate
 
 /**
- * The mapping Firestore applies in `DocumentSnapshot.toObject` / `set(item)`, run through the same
- * `CustomClassMapper`. It is what the non-null defaults and `DocumentIntegrity` rely on.
+ * Writes go out as the explicit `toFirestoreMap()`; reads come back through Firestore's
+ * `CustomClassMapper` (`DocumentSnapshot.toObject`). These pin both: the explicit map is what the
+ * reflective mapper would produce from the public API (so the two never drift), and the
+ * reflective read honours the non-null defaults `DocumentIntegrity` relies on.
  *
  * Plain JVM on purpose: under Robolectric the framework jar exposes the hidden
- * `Parcelable.getStability()`, which the mapper would serialise as a `stability` field; on a
- * device that member is hidden from app reflection, as it is in the SDK stubs used here.
+ * `Parcelable.getStability()`, which the reflective mapper serialises as a `stability` field —
+ * the reason writes no longer go through it.
  */
 class FirestoreMappingTest {
 
@@ -37,25 +39,26 @@ class FirestoreMappingTest {
         mapValues { (_, v) -> if (v is Int) v.toLong() else v }
 
     @Test
-    fun serialize_expense_producesTheWireFields() {
-        val wire = serialize(expense)
+    fun toFirestoreMap_expense_matchesTheReflectiveMapping() {
+        val wire = expense.toFirestoreMap()
 
-        assertThat(wire).containsExactlyEntriesIn(expense.toRemoteMap())
+        assertThat(wire).containsExactlyEntriesIn(serialize(expense))
         assertThat(wire.keys).doesNotContain("id")
         assertThat(wire.keys).doesNotContain("totalId")
+        assertThat(wire.keys).doesNotContain("stability")
         assertThat(wire.keys).contains(FirestoreEnums.FIELDS.IS_DELETED.value)
     }
 
     @Test
-    fun serialize_income_producesTheWireFields() {
+    fun toFirestoreMap_income_matchesTheReflectiveMapping() {
         val income = testIncome(id = "abc").copy(updatedAt = 5L, isDeleted = true, deleteAt = 9L)
 
-        assertThat(serialize(income)).containsExactlyEntriesIn(income.toRemoteMap())
+        assertThat(income.toFirestoreMap()).containsExactlyEntriesIn(serialize(income))
     }
 
     @Test
     fun deserialize_fullDocument_roundTrips() {
-        val restored = deserialize(expense.toRemoteMap().asFirestoreWouldReturn(), Expense::class.java)
+        val restored = deserialize(expense.toFirestoreMap().asFirestoreWouldReturn(), Expense::class.java)
         restored.id = "abc"
 
         assertThat(restored).isEqualTo(expense)
@@ -63,7 +66,7 @@ class FirestoreMappingTest {
 
     @Test
     fun deserialize_kotlinTypedMap_roundTripsToo() {
-        val restored = deserialize(expense.toRemoteMap(), Expense::class.java)
+        val restored = deserialize(expense.toFirestoreMap(), Expense::class.java)
         restored.id = "abc"
 
         assertThat(restored).isEqualTo(expense)
@@ -71,7 +74,7 @@ class FirestoreMappingTest {
 
     @Test
     fun deserialize_missingFields_takeTheDefaults() {
-        val partial = expense.toRemoteMap().asFirestoreWouldReturn() -
+        val partial = expense.toFirestoreMap().asFirestoreWouldReturn() -
             setOf(FirestoreEnums.FIELDS.CATEGORY.value, FirestoreEnums.FIELDS.LABELS.value, FirestoreEnums.FIELDS.UPDATED_AT.value)
 
         val restored = deserialize(partial, Expense::class.java)
@@ -84,14 +87,14 @@ class FirestoreMappingTest {
 
     @Test
     fun deserialize_explicitNull_inANonNullField_fails() {
-        val broken = expense.toRemoteMap().asFirestoreWouldReturn() + (FirestoreEnums.FIELDS.PRICE.value to null)
+        val broken = expense.toFirestoreMap().asFirestoreWouldReturn() + (FirestoreEnums.FIELDS.PRICE.value to null)
 
         assertThrows(RuntimeException::class.java) { deserialize(broken, Expense::class.java) }
     }
 
     @Test
     fun deserialize_unknownKeys_areIgnored() {
-        val extra = expense.toRemoteMap().asFirestoreWouldReturn() + mapOf("id" to "remote", "foo" to "bar")
+        val extra = expense.toFirestoreMap().asFirestoreWouldReturn() + mapOf("id" to "remote", "foo" to "bar")
 
         val restored = deserialize(extra, Expense::class.java)
 
@@ -102,7 +105,7 @@ class FirestoreMappingTest {
 
     @Test
     fun deserialize_tombstone() {
-        val tomb = expense.copy(isDeleted = true, deleteAt = 2_000L).toRemoteMap().asFirestoreWouldReturn()
+        val tomb = expense.copy(isDeleted = true, deleteAt = 2_000L).toFirestoreMap().asFirestoreWouldReturn()
 
         val restored = deserialize(tomb, Expense::class.java)
 
@@ -114,7 +117,7 @@ class FirestoreMappingTest {
     fun income_roundTrips() {
         val income = testIncome(name = "Salary", price = 2500.0, id = "abc").copy(updatedAt = 7L, isDeleted = false)
 
-        val restored = deserialize(income.toRemoteMap().asFirestoreWouldReturn(), Income::class.java)
+        val restored = deserialize(income.toFirestoreMap().asFirestoreWouldReturn(), Income::class.java)
         restored.id = "abc"
 
         assertThat(restored).isEqualTo(income)
