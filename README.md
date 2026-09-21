@@ -7,3 +7,5 @@ The app is developed in Kotlin with Android Studio and, so far, four version wer
 - The second version uses the Material Design guidelines and the MVVM Design Pattern.
 - In the third version, the app design was upgraded to Material You.
 - The fourth version tries to improve the user experience by implementing a category system. In addition, incomes and budget management has been implemented, along with more useful plots.
+
+Tests: see [docs/testing.md](docs/testing.md).
