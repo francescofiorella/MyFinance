@@ -5,6 +5,7 @@ import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
 import com.frafio.myfinance.testing.data.testExpense
+import com.frafio.myfinance.testing.util.DatabaseTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

@@ -7,20 +7,21 @@ import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.DeleteLabelResult
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
+import com.frafio.myfinance.core.data.remote.RemoteDataSource
+import com.frafio.myfinance.core.data.remote.RemoteListener
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesData
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
+import com.frafio.myfinance.core.di.Dispatcher
+import com.frafio.myfinance.core.di.MyFinanceDispatchers
 import com.frafio.myfinance.core.utils.currentTimestampUTC
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,8 +31,10 @@ class ExpensesSyncManager @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val expensesLocalRepository: ExpensesLocalRepository,
     database: MyFinanceDatabase,
-    expenseDao: ExpenseDao
-) : BaseSyncManager<Expense>(userPreferencesRepository, database, Expense::class.java) {
+    expenseDao: ExpenseDao,
+    remote: RemoteDataSource,
+    @Dispatcher(MyFinanceDispatchers.IO) ioDispatcher: CoroutineDispatcher
+) : BaseSyncManager<Expense>(userPreferencesRepository, database, Expense::class.java, remote, ioDispatcher) {
 
     override val collectionName: String = FirestoreEnums.FIELDS.PAYMENTS.value
     override val baseDao = expenseDao
@@ -64,15 +67,10 @@ class ExpensesSyncManager @Inject constructor(
         } else item
     }
 
-    suspend fun setMonthlyBudget(budget: Double): FinanceResult = withContext(Dispatchers.IO) {
+    suspend fun setMonthlyBudget(budget: Double): FinanceResult = withContext(ioDispatcher) {
         val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
         return@withContext try {
-            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .set(
-                    hashMapOf(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value to budget),
-                    SetOptions.merge()
-                ).await()
+            remote.mergeUserFields(email, hashMapOf(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value to budget))
             userPreferencesRepository.updateMonthlyBudget(budget)
             FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
         } catch (_: Exception) {
@@ -80,15 +78,10 @@ class ExpensesSyncManager @Inject constructor(
         }
     }
 
-    suspend fun setCurrencyCode(currencyCode: String): FinanceResult = withContext(Dispatchers.IO) {
+    suspend fun setCurrencyCode(currencyCode: String): FinanceResult = withContext(ioDispatcher) {
         val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
         return@withContext try {
-            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .set(
-                    hashMapOf(FirestoreEnums.FIELDS.CURRENCY_CODE.value to currencyCode),
-                    SetOptions.merge()
-                ).await()
+            remote.mergeUserFields(email, hashMapOf(FirestoreEnums.FIELDS.CURRENCY_CODE.value to currencyCode))
             userPreferencesRepository.updateCurrencyCode(currencyCode)
             FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
         } catch (_: Exception) {
@@ -96,15 +89,10 @@ class ExpensesSyncManager @Inject constructor(
         }
     }
 
-    suspend fun setProPicChoice(choice: String): FinanceResult = withContext(Dispatchers.IO) {
+    suspend fun setProPicChoice(choice: String): FinanceResult = withContext(ioDispatcher) {
         val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.BUDGET_UPDATE_FAILURE)
         return@withContext try {
-            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .set(
-                    hashMapOf(FirestoreEnums.FIELDS.PRO_PIC_CHOICE.value to choice),
-                    SetOptions.merge()
-                ).await()
+            remote.mergeUserFields(email, hashMapOf(FirestoreEnums.FIELDS.PRO_PIC_CHOICE.value to choice))
             userPreferencesRepository.updateProPicChoice(choice)
             FinanceResult(FinanceCode.BUDGET_UPDATE_SUCCESS)
         } catch (_: Exception) {
@@ -115,14 +103,11 @@ class ExpensesSyncManager @Inject constructor(
     suspend fun setLabels(
         labels: List<String>,
         successCode: FinanceCode = FinanceCode.LABELS_UPDATE_SUCCESS
-    ): FinanceResult = withContext(Dispatchers.IO) {
+    ): FinanceResult = withContext(ioDispatcher) {
         val email = getUserEmail() ?: return@withContext FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
         val sortedLabels = labels.sorted()
         return@withContext try {
-            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .set(hashMapOf(FirestoreEnums.FIELDS.LABELS.value to sortedLabels), SetOptions.merge())
-                .await()
+            remote.mergeUserFields(email, hashMapOf(FirestoreEnums.FIELDS.LABELS.value to sortedLabels))
             userPreferencesRepository.updateLabels(sortedLabels)
             FinanceResult(successCode)
         } catch (_: Exception) {
@@ -130,7 +115,7 @@ class ExpensesSyncManager @Inject constructor(
         }
     }
 
-    suspend fun addLabel(label: String): FinanceResult = withContext(Dispatchers.IO) {
+    suspend fun addLabel(label: String): FinanceResult = withContext(ioDispatcher) {
         val trimmedLabel = label.trim()
         if (trimmedLabel.isEmpty()) return@withContext FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
         val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels
@@ -142,7 +127,7 @@ class ExpensesSyncManager @Inject constructor(
         expenseId: String,
         label: String,
         isAddition: Boolean
-    ): FinanceResult = withContext(Dispatchers.IO) {
+    ): FinanceResult = withContext(ioDispatcher) {
         val updatedAt = updateArrayField(
             expenseId,
             FirestoreEnums.FIELDS.LABELS.value,
@@ -170,7 +155,7 @@ class ExpensesSyncManager @Inject constructor(
         }
     }
 
-    suspend fun deleteLabel(label: String): DeleteLabelResult = withContext(Dispatchers.IO) {
+    suspend fun deleteLabel(label: String): DeleteLabelResult = withContext(ioDispatcher) {
         val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels.toMutableList()
         if (!currentLabels.remove(label)) return@withContext DeleteLabelResult(FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE))
 
@@ -199,7 +184,7 @@ class ExpensesSyncManager @Inject constructor(
         DeleteLabelResult(result, affectedExpenses)
     }
 
-    suspend fun undoDeleteLabel(label: String, affectedExpenses: List<Expense>): FinanceResult = withContext(Dispatchers.IO) {
+    suspend fun undoDeleteLabel(label: String, affectedExpenses: List<Expense>): FinanceResult = withContext(ioDispatcher) {
         val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels.toMutableList()
         if (!currentLabels.contains(label)) {
             currentLabels.add(label)
@@ -213,7 +198,7 @@ class ExpensesSyncManager @Inject constructor(
         FinanceResult(FinanceCode.LABELS_UPDATE_SUCCESS)
     }
 
-    suspend fun editLabel(oldName: String, newName: String): FinanceResult = withContext(Dispatchers.IO) {
+    suspend fun editLabel(oldName: String, newName: String): FinanceResult = withContext(ioDispatcher) {
         val trimmedNewName = newName.trim()
         if (trimmedNewName.isEmpty()) return@withContext FinanceResult(FinanceCode.LABELS_UPDATE_FAILURE)
         val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels.toMutableList()
@@ -244,7 +229,7 @@ class ExpensesSyncManager @Inject constructor(
         userPreferencesRepository.updateDynamicColor(active)
     }
 
-    private var rootListener: ListenerRegistration? = null
+    private var rootListener: RemoteListener? = null
 
     fun startRootSnapshotListener(
         scope: CoroutineScope,
@@ -255,47 +240,45 @@ class ExpensesSyncManager @Inject constructor(
             return
         }
 
-        scope.launch(Dispatchers.IO) {
+        scope.launch(ioDispatcher) {
             val email = getUserEmail() ?: run {
                 onInitialSync?.complete(Unit)
                 return@launch
             }
             var isFirstSnapshot = true
-            rootListener = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .addSnapshotListener { snapshot, error ->
-                    if (error != null) {
-                        onInitialSync?.complete(Unit)
-                        return@addSnapshotListener
-                    }
-                    if (snapshot != null && snapshot.exists()) {
-                        scope.launch(Dispatchers.IO) {
-                            val budget = snapshot.data?.get(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value)
-                                .toString().toDoubleOrNull() ?: 0.0
-                            userPreferencesRepository.updateMonthlyBudget(budget)
-
-                            val currencyCode = snapshot.data?.get(FirestoreEnums.FIELDS.CURRENCY_CODE.value) as? String ?: "EUR"
-                            userPreferencesRepository.updateCurrencyCode(currencyCode)
-
-                            val labelsValue = snapshot.data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
-                            val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()
-                            userPreferencesRepository.updateLabels(labels)
-
-                            val proPicChoice = snapshot.data?.get(FirestoreEnums.FIELDS.PRO_PIC_CHOICE.value) as? String
-                            if (proPicChoice != null) {
-                                userPreferencesRepository.updateProPicChoice(proPicChoice)
-                            }
-
-                            if (isFirstSnapshot) {
-                                isFirstSnapshot = false
-                                onInitialSync?.complete(Unit)
-                            }
-                        }
-                    } else if (isFirstSnapshot) {
-                        isFirstSnapshot = false
-                        onInitialSync?.complete(Unit)
-                    }
+            rootListener = remote.listenUser(email) { exists, data, error ->
+                if (error != null) {
+                    onInitialSync?.complete(Unit)
+                    return@listenUser
                 }
+                if (exists) {
+                    scope.launch(ioDispatcher) {
+                        val budget = data?.get(FirestoreEnums.FIELDS.MONTHLY_BUDGET.value)
+                            .toString().toDoubleOrNull() ?: 0.0
+                        userPreferencesRepository.updateMonthlyBudget(budget)
+
+                        val currencyCode = data?.get(FirestoreEnums.FIELDS.CURRENCY_CODE.value) as? String ?: "EUR"
+                        userPreferencesRepository.updateCurrencyCode(currencyCode)
+
+                        val labelsValue = data?.get(FirestoreEnums.FIELDS.LABELS.value) as? List<*>
+                        val labels = (labelsValue?.filterIsInstance<String>() ?: emptyList()).sorted()
+                        userPreferencesRepository.updateLabels(labels)
+
+                        val proPicChoice = data?.get(FirestoreEnums.FIELDS.PRO_PIC_CHOICE.value) as? String
+                        if (proPicChoice != null) {
+                            userPreferencesRepository.updateProPicChoice(proPicChoice)
+                        }
+
+                        if (isFirstSnapshot) {
+                            isFirstSnapshot = false
+                            onInitialSync?.complete(Unit)
+                        }
+                    }
+                } else if (isFirstSnapshot) {
+                    isFirstSnapshot = false
+                    onInitialSync?.complete(Unit)
+                }
+            }
         }
     }
 

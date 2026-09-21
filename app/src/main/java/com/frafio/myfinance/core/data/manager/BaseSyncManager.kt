@@ -9,36 +9,32 @@ import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.model.Transaction
+import com.frafio.myfinance.core.data.remote.RemoteDataSource
+import com.frafio.myfinance.core.data.remote.RemoteListener
 import com.frafio.myfinance.core.data.repository.UserPreferencesData
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.storage.MyFinanceDatabase
 import com.frafio.myfinance.core.utils.currentDeleteAtUTC
 import com.frafio.myfinance.core.utils.currentTimestampUTC
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 abstract class BaseSyncManager<T : Transaction>(
     private val userPreferencesRepository: UserPreferencesRepository,
     protected val database: MyFinanceDatabase,
-    private val clazz: Class<T>
+    private val clazz: Class<T>,
+    protected val remote: RemoteDataSource,
+    protected val ioDispatcher: CoroutineDispatcher
 ) {
     companion object {
         const val DEFAULT_LIMIT_EXPENSES: Long = 50
         const val DEFAULT_LIMIT_INCOMES: Long = 100
         const val SYNC_THRESHOLD_MS = 29L * 24L * 60L * 60L * 1000L // 29 days in ms
     }
-    protected val fStore: FirebaseFirestore
-        get() = FirebaseFirestore.getInstance()
-
     protected abstract val collectionName: String
     protected abstract val baseDao: BaseDao<T>
     protected abstract val listUpdateSuccessCode: FinanceCode
@@ -61,20 +57,17 @@ abstract class BaseSyncManager<T : Transaction>(
         return userPreferencesRepository.userPreferencesFlow.first().user?.email
     }
 
-    suspend fun add(item: T): FinanceResult = withContext(Dispatchers.IO) {
+    suspend fun add(item: T): FinanceResult = withContext(ioDispatcher) {
         val email = getUserEmail() ?: return@withContext FinanceResult(addFailureCode)
         val itemWithTime = copyWithSyncFields(item, updatedAt = currentTimestampUTC(), isDeleted = false, deleteAt = null)
         
         return@withContext try {
-            val documentReference = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .collection(collectionName)
-                .add(itemWithTime).await()
+            val remoteId = remote.add(email, collectionName, itemWithTime)
             
             // Set ID
             when (itemWithTime) {
-                is Expense -> itemWithTime.id = documentReference.id
-                is Income -> itemWithTime.id = documentReference.id
+                is Expense -> itemWithTime.id = remoteId
+                is Income -> itemWithTime.id = remoteId
             }
             
             baseDao.upsert(itemWithTime)
@@ -85,15 +78,12 @@ abstract class BaseSyncManager<T : Transaction>(
         }
     }
 
-    suspend fun edit(item: T): FinanceResult = withContext(Dispatchers.IO) {
+    suspend fun edit(item: T): FinanceResult = withContext(ioDispatcher) {
         val email = getUserEmail() ?: return@withContext FinanceResult(editFailureCode)
         val itemWithTime = copyWithSyncFields(item, updatedAt = currentTimestampUTC(), isDeleted = false, deleteAt = null)
         
         return@withContext try {
-            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .collection(collectionName)
-                .document(itemWithTime.id).set(itemWithTime).await()
+            remote.set(email, collectionName, itemWithTime.id, itemWithTime)
             
             baseDao.upsert(itemWithTime)
             FinanceResult(editSuccessCode)
@@ -103,7 +93,7 @@ abstract class BaseSyncManager<T : Transaction>(
         }
     }
 
-    suspend fun delete(item: T): FinanceResult = withContext(Dispatchers.IO) {
+    suspend fun delete(item: T): FinanceResult = withContext(ioDispatcher) {
         val email = getUserEmail() ?: return@withContext FinanceResult(deleteFailureCode)
         
         val deleteAtDate = currentDeleteAtUTC()
@@ -116,10 +106,7 @@ abstract class BaseSyncManager<T : Transaction>(
         )
         
         return@withContext try {
-            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .collection(collectionName)
-                .document(deletedItem.id).set(deletedItem).await()
+            remote.set(email, collectionName, deletedItem.id, deletedItem)
             
             baseDao.deleteById(deletedItem.id)
             FinanceResult(deleteSuccessCode)
@@ -134,25 +121,12 @@ abstract class BaseSyncManager<T : Transaction>(
         fieldName: String,
         value: Any,
         isAddition: Boolean
-    ): Long? = withContext(Dispatchers.IO) {
+    ): Long? = withContext(ioDispatcher) {
         val email = getUserEmail() ?: return@withContext null
         val updatedAt = currentTimestampUTC()
         
         return@withContext try {
-            val operation = if (isAddition) {
-                FieldValue.arrayUnion(value)
-            } else {
-                FieldValue.arrayRemove(value)
-            }
-            
-            fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .collection(collectionName)
-                .document(id)
-                .update(
-                    fieldName, operation,
-                    FirestoreEnums.FIELDS.UPDATED_AT.value, updatedAt
-                ).await()
+            remote.updateArrayField(email, collectionName, id, fieldName, value, isAddition, updatedAt)
             updatedAt
         } catch (e: Exception) {
             Log.e("BaseSyncManager", "Error updating array field $fieldName in $collectionName: ${e.localizedMessage}")
@@ -168,20 +142,16 @@ abstract class BaseSyncManager<T : Transaction>(
         }
     }
 
-    private var snapshotListener: ListenerRegistration? = null
+    private var snapshotListener: RemoteListener? = null
 
-    private suspend fun performFullSync(email: String): Long? = withContext(Dispatchers.IO) {
+    private suspend fun performFullSync(email: String): Long? = withContext(ioDispatcher) {
         try {
-            val snapshots = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .collection(collectionName)
-                .get()
-                .await()
+            val documents = remote.getAll(email, collectionName, clazz)
 
             val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels
-            val remoteItems = snapshots.documents.mapNotNull { doc ->
-                if (!DocumentIntegrity.verify(doc)) return@mapNotNull null
-                val item = doc.toObject(clazz)
+            val remoteItems = documents.mapNotNull { doc ->
+                if (!DocumentIntegrity.verify(doc.path, doc.data)) return@mapNotNull null
+                val item = doc.decode()
                 when (item) {
                     is Expense -> item.id = doc.id
                     is Income -> item.id = doc.id
@@ -190,7 +160,7 @@ abstract class BaseSyncManager<T : Transaction>(
             }
             Log.i(
                 DocumentIntegrity.TAG,
-                "$collectionName: ${remoteItems.size} of ${snapshots.size()} documents loaded"
+                "$collectionName: ${remoteItems.size} of ${documents.size} documents loaded"
             )
 
             val remoteIds = remoteItems.map { it.id }.toSet()
@@ -235,7 +205,7 @@ abstract class BaseSyncManager<T : Transaction>(
             return
         }
 
-        scope.launch(Dispatchers.IO) {
+        scope.launch(ioDispatcher) {
             val userPrefs = userPreferencesRepository.userPreferencesFlow.first()
             val email = userPrefs.user?.email ?: run {
                 onInitialSync?.complete(Unit)
@@ -257,73 +227,68 @@ abstract class BaseSyncManager<T : Transaction>(
 
             Log.d("BaseSyncManager", "Starting listener for $collectionName. lastSync: $currentLastSync, user: $email")
 
-            snapshotListener = fStore.collection(FirestoreEnums.FIELDS.PURCHASES.value)
-                .document(email)
-                .collection(collectionName)
-                .whereGreaterThan(FirestoreEnums.FIELDS.UPDATED_AT.value, currentLastSync)
-                .orderBy(FirestoreEnums.FIELDS.UPDATED_AT.value, Query.Direction.ASCENDING)
-                .addSnapshotListener { snapshots, error ->
-                    if (error != null) {
-                        Log.e("BaseSyncManager", "Listen failed for $collectionName: ${error.localizedMessage}")
-                        onInitialSync?.complete(Unit)
-                        return@addSnapshotListener
-                    }
+            snapshotListener = remote.listenChanges(email, collectionName, currentLastSync, clazz) { snapshots, error ->
+                if (error != null) {
+                    Log.e("BaseSyncManager", "Listen failed for $collectionName: ${error.localizedMessage}")
+                    onInitialSync?.complete(Unit)
+                    return@listenChanges
+                }
 
-                    if (snapshots != null) {
-                        scope.launch(Dispatchers.IO) {
-                            if (!snapshots.isEmpty) {
-                                updateLastAppSync(currentTimestampUTC())
-                                var maxUpdatedAt = currentLastSync
-                                var loaded = 0
-                                val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels
-                                try {
-                                    database.withTransaction {
-                                        snapshots.documentChanges.forEach { dc ->
-                                            if (!DocumentIntegrity.verify(dc.document)) return@forEach
-                                            loaded++
-                                            val item = dc.document.toObject(clazz)
-                                            when (item) {
-                                                is Expense -> item.id = dc.document.id
-                                                is Income -> item.id = dc.document.id
-                                            }
+                if (snapshots != null) {
+                    scope.launch(ioDispatcher) {
+                        if (!snapshots.isEmpty) {
+                            updateLastAppSync(currentTimestampUTC())
+                            var maxUpdatedAt = currentLastSync
+                            var loaded = 0
+                            val currentLabels = userPreferencesRepository.userPreferencesFlow.first().labels
+                            try {
+                                database.withTransaction {
+                                    snapshots.changes.forEach { doc ->
+                                        if (!DocumentIntegrity.verify(doc.path, doc.data)) return@forEach
+                                        loaded++
+                                        val item = doc.decode() ?: return@forEach
+                                        when (item) {
+                                            is Expense -> item.id = doc.id
+                                            is Income -> item.id = doc.id
+                                        }
 
-                                            if (item.updatedAt != null && item.updatedAt!! > maxUpdatedAt) {
-                                                maxUpdatedAt = item.updatedAt!!
-                                            }
+                                        if (item.updatedAt != null && item.updatedAt!! > maxUpdatedAt) {
+                                            maxUpdatedAt = item.updatedAt!!
+                                        }
 
-                                            if (item.isDeleted == true) {
-                                                baseDao.deleteById(item.id)
-                                            } else {
-                                                val finalItem = onPreUpsert(item, currentLabels)
-                                                baseDao.upsert(finalItem)
-                                            }
+                                        if (item.isDeleted == true) {
+                                            baseDao.deleteById(item.id)
+                                        } else {
+                                            val finalItem = onPreUpsert(item, currentLabels)
+                                            baseDao.upsert(finalItem)
                                         }
                                     }
-                                    if (maxUpdatedAt > currentLastSync) {
-                                        currentLastSync = maxUpdatedAt
-                                        updateLastSync(maxUpdatedAt)
-                                    }
-                                    if (isFirstSnapshot) {
-                                        Log.i(
-                                            DocumentIntegrity.TAG,
-                                            "$collectionName: $loaded of ${snapshots.documentChanges.size} documents loaded"
-                                        )
-                                    }
-                                } catch (e: Exception) {
-                                    Log.e("BaseSyncManager", "Critical error in snapshot processor for $collectionName", e)
                                 }
-                            }
-
-                            if (isFirstSnapshot) {
-                                isFirstSnapshot = false
-                                onInitialSync?.complete(Unit)
+                                if (maxUpdatedAt > currentLastSync) {
+                                    currentLastSync = maxUpdatedAt
+                                    updateLastSync(maxUpdatedAt)
+                                }
+                                if (isFirstSnapshot) {
+                                    Log.i(
+                                        DocumentIntegrity.TAG,
+                                        "$collectionName: $loaded of ${snapshots.changes.size} documents loaded"
+                                    )
+                                }
+                            } catch (e: Exception) {
+                                Log.e("BaseSyncManager", "Critical error in snapshot processor for $collectionName", e)
                             }
                         }
-                    } else if (isFirstSnapshot) {
-                        isFirstSnapshot = false
-                        onInitialSync?.complete(Unit)
+
+                        if (isFirstSnapshot) {
+                            isFirstSnapshot = false
+                            onInitialSync?.complete(Unit)
+                        }
                     }
+                } else if (isFirstSnapshot) {
+                    isFirstSnapshot = false
+                    onInitialSync?.complete(Unit)
                 }
+            }
         }
     }
 

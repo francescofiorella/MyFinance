@@ -3,6 +3,7 @@ package com.frafio.myfinance.core.data.dao
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.testing.data.testIncome
+import com.frafio.myfinance.testing.util.DatabaseTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

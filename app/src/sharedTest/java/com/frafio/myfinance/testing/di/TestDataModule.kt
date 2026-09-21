@@ -9,11 +9,13 @@ import com.frafio.myfinance.core.data.repository.IncomesLocalRepositoryImpl
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepositoryImpl
 import com.frafio.myfinance.core.data.repository.UserRepository
+import com.frafio.myfinance.core.data.remote.RemoteDataSource
 import com.frafio.myfinance.core.data.storage.ProfileImageStorage
 import com.frafio.myfinance.core.di.DataModule
 import com.frafio.myfinance.testing.repository.TestExpensesRepository
 import com.frafio.myfinance.testing.repository.TestIncomeRepository
 import com.frafio.myfinance.testing.repository.TestUserRepository
+import com.frafio.myfinance.testing.remote.TestRemoteDataSource
 import com.frafio.myfinance.testing.storage.TestProfileImageStorage
 import dagger.Binds
 import dagger.Module
@@ -52,6 +54,9 @@ abstract class TestDataModule {
     @Binds
     abstract fun bindsProfileImageStorage(fake: TestProfileImageStorage): ProfileImageStorage
 
+    @Binds
+    abstract fun bindsRemoteDataSource(fake: TestRemoteDataSource): RemoteDataSource
+
     companion object {
         @Provides
         @Singleton
@@ -68,5 +73,9 @@ abstract class TestDataModule {
         @Provides
         @Singleton
         fun providesTestProfileImageStorage() = TestProfileImageStorage()
+
+        @Provides
+        @Singleton
+        fun providesTestRemoteDataSource() = TestRemoteDataSource()
     }
 }

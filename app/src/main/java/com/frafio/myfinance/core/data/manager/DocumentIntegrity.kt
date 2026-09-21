@@ -2,7 +2,6 @@ package com.frafio.myfinance.core.data.manager
 
 import android.util.Log
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
-import com.google.firebase.firestore.DocumentSnapshot
 
 /**
  * Reports transaction documents that would only load through the model's default values.
@@ -37,8 +36,8 @@ object DocumentIntegrity {
     }
 
     /** Logs a malformed document and returns whether it is safe to deserialise. */
-    fun verify(document: DocumentSnapshot): Boolean {
-        val report = check(document.reference.path, document.data) ?: return true
+    fun verify(path: String, data: Map<String, Any?>?): Boolean {
+        val report = check(path, data) ?: return true
         if (report.isLoadable) {
             Log.w(TAG, "${report.path}: missing ${report.missing} (defaults applied)")
         } else {

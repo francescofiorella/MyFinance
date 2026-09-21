@@ -23,6 +23,15 @@ hand-written fakes, direct ViewModel construction.
   interface and add hooks such as `sendExpenses(...)` or `setUser(...)`. The local-repository fakes
   replicate the DAO's filtering, ordering and null-on-empty sums so ViewModel tests see the same
   shapes the app does. ViewModels are constructed directly with those fakes, never through Hilt.
+- **The remote store is an interface.** `core/data/remote/RemoteDataSource` is everything the sync
+  managers need from Firestore in plain types (`RemoteDocument` = id, path, raw fields, decoder;
+  `RemoteSnapshot`; `RemoteListener`) — no Firebase class crosses it. `FirestoreRemoteDataSource`
+  is the only implementation that names Firebase; `testing/remote/TestRemoteDataSource` stores
+  documents in memory, records every call, and drives the listeners from the test
+  (`sendChanges`, `sendUserSnapshot`, `sendListenerError`), with `failNext` for a network error.
+  The manager tests run under Robolectric with the real DAOs on an in-memory database
+  (`testing/util/DatabaseTest`, shared with the device DAO tests) and a real IO dispatcher, so
+  Room's main-thread guard stays armed; see `docs/room-main-thread.md` for why that matters.
 - **Real DataStore, in memory.** `UserPreferencesRepositoryTest` runs the production implementation
   over `testing/util/InMemoryDataStore`, so the `Preferences` key mapping is exercised rather than
   faked.
@@ -250,6 +259,7 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 |---|---|
 | ViewModels (all nine) | `features/*/…ViewModelTest`, `app/HomeViewModelTest` |
 | Repositories, mapper, integrity check | `core/data/…` |
+| Sync managers over a fake remote and in-memory Room (Robolectric) | `core/data/manager/…SyncManagerTest` |
 | Room DAOs and `Converters` (device) | `androidTest/…/core/data/dao/…`, `…/converters/…` |
 | App navigation, login, shortcuts (device, Hilt) | `androidTest/…/app/NavigationTest`, `…/LaunchTest` |
 | Navigation (`Navigator`, `NavigationState`, `MyFinanceAppState`) | `core/navigation/…` |
@@ -260,9 +270,8 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 
 ## Not covered yet
 
-- **Firestore sync managers and `AuthManager`** — they obtain `FirebaseFirestore`/`FirebaseAuth`
-  inline, so there is no seam for a fake; a `RemoteDataSource` interface would unlock them. The
-  Hilt tests bypass them entirely through `TestDataModule`.
+- **`AuthManager`** — still obtains `FirebaseAuth` inline; the same seam as `RemoteDataSource`
+  (an `AuthDataSource`) would unlock it. The Hilt tests bypass it through `TestDataModule`.
 - **Feature components and screen logic** — the same Robolectric technique as `core/components`
   (the screens already carry `Modifier.testTag`); screens are only covered as images so far.
   `PieChart` arcs and the date-picker dialogs are also uncovered: the arcs have no semantics, the
