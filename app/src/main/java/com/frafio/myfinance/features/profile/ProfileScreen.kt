@@ -154,7 +154,7 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileContent(
+internal fun ProfileContent(
     modifier: Modifier = Modifier,
     user: User?,
     profilePicture: Bitmap?,

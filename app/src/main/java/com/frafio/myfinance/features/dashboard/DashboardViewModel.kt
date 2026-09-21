@@ -43,7 +43,7 @@ class DashboardViewModel @Inject constructor(
     loadingRepository: LoadingRepository
 ) : ViewModel() {
 
-    private val today = LocalDate.now()
+    val today: LocalDate = LocalDate.now()
 
     private val _monthShown = MutableStateFlow(true)
     val monthShown: StateFlow<Boolean> = _monthShown.asStateFlow()

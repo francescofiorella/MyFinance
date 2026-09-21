@@ -10,7 +10,8 @@ The HTML report lands in `app/build/reports/tests/testDebugUnitTest/index.html`.
 task, not a bare `./gradlew test`: the `:baselineProfile` module has no unit tests and needs a
 connected device for everything else. From Android Studio, the gutter ▶ next to a test class or
 method runs it as an *Android JUnit* configuration; an *Android App* configuration only launches
-the app.
+the app. The run also verifies the screenshot goldens — if it goes red right after a UI change,
+see [Screenshot tests](#screenshot-tests-roborazzi).
 
 ## Conventions
 
@@ -124,6 +125,56 @@ measures text a few pixels wide, so a swipe has to be aimed at the container (`o
 coordinates) rather than at a `Text` node; and an `Image` with a null `contentDescription` has no
 semantics node, so `EmptyViewTest` reads the illustration's presence from where the message lands.
 
+## Screenshot tests (Roborazzi)
+
+Every screen and the shared components have golden PNGs under `app/src/test/screenshots/`,
+recorded on Robolectric with Roborazzi. **Whenever you change how a screen or component looks**,
+run these in order:
+
+```
+./gradlew :app:verifyRoborazziDebug     # 1. Did anything look different? Fails and lists the screens that changed.
+./gradlew :app:compareRoborazziDebug    # 2. Show me. Writes reference | diff | new images to app/build/outputs/roborazzi/*_compare.png.
+./gradlew :app:recordRoborazziDebug     # 3. Yes, that is what I meant. Overwrites the goldens; commit the changed PNGs together with the UI change.
+```
+
+Step 1 also happens inside the normal `./gradlew :app:testDebugUnitTest` (`roborazzi.test.verify=true`
+in `gradle.properties`), so a red unit-test run after a UI edit means "go to step 2". Only record
+after looking at the diff: recording over an unintended change hides a regression. A brand-new
+screen needs a test plus a first `recordRoborazziDebug`; `verify` fails while a golden is missing.
+
+### How the tests are written
+
+- Classes are named `*ScreenshotTests` and carry `@RunWith(RobolectricTestRunner::class)`,
+  `@GraphicsMode(NATIVE)`, `@LooperMode(PAUSED)` and `createAndroidComposeRule<ComponentActivity>()`.
+- Helpers in `app/src/test/…/testing/screenshot/ScreenshotHelpers.kt`:
+  - `captureMultiDevice("Name") { … }` — one PNG per `DefaultTestDevices` entry: `phone` (411×891 dp),
+    `foldable` (673×841), `tablet` (1280×800), all at 420 dpi → `Name_phone.png` etc.
+  - `capturePhoneDark("Name") { … }` → `Name_phone_dark.png`.
+  - `captureForDevice(spec, "Name", deviceName = …)` for a single size (empty, loading and error
+    states use the phone only).
+  - `captureMultiTheme("Component") { description -> … }` — light/dark × dynamic/notDynamic →
+    `Component/Component_light_notDynamic.png` and three siblings.
+  Each helper sets the Robolectric qualifiers, turns `LocalInspectionMode` on (sheets built on
+  `AdaptiveSheet` render inline) and wraps the body in `MyFinanceTheme` plus a `Surface` painted
+  with `colorScheme.background` — the tab contents (Dashboard, Expenses, Budget, Profile) are
+  transparent and get that colour from the Home scaffold in the app.
+- Dark mode goes through `DeviceConfigurationOverride.DarkMode`, not `@Config(qualifiers = "night")`:
+  it flips `LocalConfiguration`, which both `MyFinanceTheme`'s default and the components that call
+  `isSystemInDarkTheme()` directly (`EmptyView`, `PieChart`, `AnnualBalanceCard`) read.
+- Screens are rendered through their stateless content composables (`AuthContent`,
+  `HomeScreenContent`, `DashboardContent`, `ExpensesContent`, `BudgetContent`, `ProfileContent`,
+  the stateless `AddScreen`/`ChangePasswordScreen` overloads, `LabelsContent`, `CategoriesScreen`),
+  with fixtures from `testing/screenshot/ScreenshotFixtures.kt`. Nothing may depend on the real
+  clock: `screenshotToday` is fixed, and `ExpensesCard`/`AnnualBalanceCard` take `today` /
+  `isNextYearEnabled` from the caller instead of reading `LocalDate.now()`.
+- The app shell (`HomeShellScreenshotTests`) renders `HomeScreenContent` under
+  `DeviceConfigurationOverride.ForcedSize` with an explicit `WindowAdaptiveInfo`, which is how the
+  navigation bar vs rail decision is made in `HomeScreen`.
+- Goldens are stored at half scale (`resizeScale = 0.5`) and compared pixel-exactly
+  (`changeThreshold = 0f`). Fonts are bundled and the illustrations are vectors, so the output is
+  stable on one machine. There is no CI: the goldens are recorded on the developer's machine, and
+  a different OS or font stack would render slightly differently and need a re-record.
+
 ## Instrumented tests
 
 Instrumented tests live in `app/src/androidTest` and run on a device:
@@ -204,6 +255,7 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 | Navigation (`Navigator`, `NavigationState`, `MyFinanceAppState`) | `core/navigation/…` |
 | Theme resolution (Robolectric) | `core/theme/ThemeTest` |
 | Shared Compose components (Robolectric) | `core/components/…Test` |
+| Screens, app shell and components as golden images (Roborazzi) | `**/*ScreenshotTests`, `app/src/test/screenshots` |
 | Utilities, models, enums | `core/utils/…`, `core/data/model/…`, `core/data/enums/…` |
 
 ## Not covered yet
@@ -211,8 +263,10 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 - **Firestore sync managers and `AuthManager`** — they obtain `FirebaseFirestore`/`FirebaseAuth`
   inline, so there is no seam for a fake; a `RemoteDataSource` interface would unlock them. The
   Hilt tests bypass them entirely through `TestDataModule`.
-- **Feature components and screens** — the same Robolectric technique as `core/components` (the
-  screens already carry `Modifier.testTag`), and Roborazzi screenshots. `PieChart` arcs and the
-  date-picker dialogs are also uncovered: the arcs have no semantics, the dialogs are Material's.
+- **Feature components and screen logic** — the same Robolectric technique as `core/components`
+  (the screens already carry `Modifier.testTag`); screens are only covered as images so far.
+  `PieChart` arcs and the date-picker dialogs are also uncovered: the arcs have no semantics, the
+  dialogs are Material's. Roborazzi's accessibility checks (`roborazzi-accessibility-check`) are
+  not enabled: several icons still have `contentDescription = null`.
 - **Google sign-in** — `androidx.credentials.Credential` needs an `android.os.Bundle`, which the
   JVM cannot build.

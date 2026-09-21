@@ -182,7 +182,7 @@ private suspend fun handleGoogleSignIn(
 }
 
 @Composable
-private fun AuthContent(
+internal fun AuthContent(
     appState: MyFinanceAppState,
     uiState: AuthUiState,
     isLoading: Boolean,

@@ -219,7 +219,7 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-private fun HomeScreenContent(
+internal fun HomeScreenContent(
     appState: MyFinanceAppState,
     currentTab: HomeTabKey,
     profilePicture: Bitmap?,

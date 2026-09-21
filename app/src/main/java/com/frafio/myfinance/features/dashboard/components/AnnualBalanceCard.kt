@@ -59,7 +59,8 @@ fun AnnualBalanceCard(
     onPreviousYear: () -> Unit,
     onNextYear: () -> Unit,
     onToday: () -> Unit,
-    isPreviousYearEnabled: Boolean = true
+    isPreviousYearEnabled: Boolean = true,
+    isNextYearEnabled: Boolean = true
 ) {
     val balance = incomesSum - expensesSum
 
@@ -134,7 +135,7 @@ fun AnnualBalanceCard(
                                     .size(IconButtonDefaults.smallContainerSize())
                                     .animateWidth(nextInteractionSource),
                                 onClick = onNextYear,
-                                enabled = balanceYear < LocalDate.now().year,
+                                enabled = isNextYearEnabled,
                                 shapes = IconButtonDefaults.shapes(
                                     shape = IconButtonDefaults.smallSquareShape,
                                 ),

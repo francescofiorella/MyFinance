@@ -35,14 +35,14 @@ fun ExpensesCard(
     todaySum: Double,
     monthShown: Boolean,
     thisMonthSum: Double,
-    thisYearSum: Double
+    thisYearSum: Double,
+    today: LocalDate = LocalDate.now()
 ) {
-    val now = LocalDate.now()
-    val day = now.format(DateTimeFormatter.ofPattern("dd"))
-    val month = now.format(DateTimeFormatter.ofPattern("MMMM")).replaceFirstChar {
+    val day = today.format(DateTimeFormatter.ofPattern("dd"))
+    val month = today.format(DateTimeFormatter.ofPattern("MMMM")).replaceFirstChar {
         if (it.isLowerCase()) it.titlecase() else it.toString()
     }
-    val year = now.year
+    val year = today.year
 
     val colors = ListItemDefaults.colors(
         containerColor = MaterialTheme.colorScheme.surfaceContainer

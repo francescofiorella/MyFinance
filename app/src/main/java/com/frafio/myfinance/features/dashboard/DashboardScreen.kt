@@ -106,7 +106,8 @@ fun DashboardContent(
             todaySum = todaySum,
             monthShown = monthShown,
             thisMonthSum = thisMonthSum,
-            thisYearSum = thisYearSum
+            thisYearSum = thisYearSum,
+            today = viewModel.today
         )
         MonthlyExpensesChartCard(
             barChartData = barChartData,
@@ -125,7 +126,8 @@ fun DashboardContent(
             onPreviousYear = { viewModel.previousBalanceYear() },
             onNextYear = { viewModel.nextBalanceYear() },
             onToday = { viewModel.todayBalanceYear() },
-            isPreviousYearEnabled = isPreviousBalanceYearEnabled
+            isPreviousYearEnabled = isPreviousBalanceYearEnabled,
+            isNextYearEnabled = annualBalanceData.year < viewModel.today.year
         )
         ExpensesByCategoryCard(
             expenses = pieExpenses,
@@ -148,6 +150,7 @@ fun DashboardPreview() {
     MyFinanceTheme {
         Box(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
             DashboardContent(
+                today = LocalDate.of(2024, 5, 29),
                 monthShown = true,
                 thisMonthSum = 450.0,
                 thisYearSum = 5400.0,
@@ -171,7 +174,7 @@ fun DashboardPreview() {
                     BarChartEntry(170.0, 2024, 12)
                 ),
                 pieExpenses = emptyList(),
-                pieDate = LocalDate.now(),
+                pieDate = LocalDate.of(2024, 5, 29),
                 monthlyShownInPie = true,
                 scrollState = rememberScrollState(),
                 onToggleMonthShown = {},
@@ -192,7 +195,8 @@ fun DashboardPreview() {
 }
 
 @Composable
-private fun DashboardContent(
+internal fun DashboardContent(
+    today: LocalDate,
     monthShown: Boolean,
     thisMonthSum: Double,
     thisYearSum: Double,
@@ -242,7 +246,8 @@ private fun DashboardContent(
             todaySum = todaySum,
             monthShown = monthShown,
             thisMonthSum = thisMonthSum,
-            thisYearSum = thisYearSum
+            thisYearSum = thisYearSum,
+            today = today
         )
         MonthlyExpensesChartCard(
             barChartData = barChartData,
@@ -261,7 +266,8 @@ private fun DashboardContent(
             onPreviousYear = onPreviousYear,
             onNextYear = onNextYear,
             onToday = onTodayAnnualBalance,
-            isPreviousYearEnabled = isPreviousBalanceYearEnabled
+            isPreviousYearEnabled = isPreviousBalanceYearEnabled,
+            isNextYearEnabled = balanceYear < today.year
         )
         ExpensesByCategoryCard(
             expenses = pieExpenses,
