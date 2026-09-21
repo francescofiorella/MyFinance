@@ -12,6 +12,8 @@ import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepositoryImpl
 import com.frafio.myfinance.core.data.repository.UserRepository
 import com.frafio.myfinance.core.data.repository.UserRepositoryImpl
+import com.frafio.myfinance.core.data.remote.AuthDataSource
+import com.frafio.myfinance.core.data.remote.FirebaseAuthDataSource
 import com.frafio.myfinance.core.data.remote.FirestoreRemoteDataSource
 import com.frafio.myfinance.core.data.remote.RemoteDataSource
 import com.frafio.myfinance.core.data.storage.ProfileImageStorage
@@ -48,4 +50,7 @@ abstract class DataModule {
 
     @Binds
     abstract fun bindsRemoteDataSource(impl: FirestoreRemoteDataSource): RemoteDataSource
+
+    @Binds
+    abstract fun bindsAuthDataSource(impl: FirebaseAuthDataSource): AuthDataSource
 }

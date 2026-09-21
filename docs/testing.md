@@ -31,7 +31,13 @@ hand-written fakes, direct ViewModel construction.
   (`sendChanges`, `sendUserSnapshot`, `sendListenerError`), with `failNext` for a network error.
   The manager tests run under Robolectric with the real DAOs on an in-memory database
   (`testing/util/DatabaseTest`, shared with the device DAO tests) and a real IO dispatcher, so
-  Room's main-thread guard stays armed; see `docs/room-main-thread.md` for why that matters.
+  Room's main-thread guard stays armed (a manager that dropped `withContext(ioDispatcher)` would
+  fail here as on a phone).
+- **So is the identity provider.** `core/data/remote/AuthDataSource` is what `AuthManager` needs
+  from Firebase Auth; failures arrive as `AuthException(kind, errorCode)`, translated once in
+  `FirebaseAuthDataSource`, so every `AuthCode` mapping is plain Kotlin and `AuthManagerTest`
+  covers each outcome through `testing/remote/TestAuthDataSource` (`signInFailure = AuthException(…)`
+  and friends). The only Firebase-facing code left untested is the two adapters.
 - **Real DataStore, in memory.** `UserPreferencesRepositoryTest` runs the production implementation
   over `testing/util/InMemoryDataStore`, so the `Preferences` key mapping is exercised rather than
   faked.
@@ -260,6 +266,7 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 | ViewModels (all nine) | `features/*/…ViewModelTest`, `app/HomeViewModelTest` |
 | Repositories, mapper, integrity check | `core/data/…` |
 | Sync managers over a fake remote and in-memory Room (Robolectric) | `core/data/manager/…SyncManagerTest` |
+| `AuthManager` over a fake identity provider | `core/data/manager/AuthManagerTest` |
 | Room DAOs and `Converters` (device) | `androidTest/…/core/data/dao/…`, `…/converters/…` |
 | App navigation, login, shortcuts (device, Hilt) | `androidTest/…/app/NavigationTest`, `…/LaunchTest` |
 | Navigation (`Navigator`, `NavigationState`, `MyFinanceAppState`) | `core/navigation/…` |
@@ -270,8 +277,6 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 
 ## Not covered yet
 
-- **`AuthManager`** — still obtains `FirebaseAuth` inline; the same seam as `RemoteDataSource`
-  (an `AuthDataSource`) would unlock it. The Hilt tests bypass it through `TestDataModule`.
 - **Feature components and screen logic** — the same Robolectric technique as `core/components`
   (the screens already carry `Modifier.testTag`); screens are only covered as images so far.
   `PieChart` arcs and the date-picker dialogs are also uncovered: the arcs have no semantics, the
@@ -279,3 +284,6 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
   not enabled: several icons still have `contentDescription = null`.
 - **Google sign-in** — `androidx.credentials.Credential` needs an `android.os.Bundle`, which the
   JVM cannot build.
+- **The two Firebase adapters** — `FirestoreRemoteDataSource` and `FirebaseAuthDataSource` are
+  straight ports of the old inline calls and need a Firebase project to run; a manual smoke on the
+  phone (log in, add an expense, change the budget, log out) covers them after changes.
