@@ -126,17 +126,17 @@ semantics node, so `EmptyViewTest` reads the illustration's presence from where 
 
 ## Instrumented tests
 
-Room DAO and `Converters` tests live in `app/src/androidTest` and run on a device:
+Instrumented tests live in `app/src/androidTest` and run on a device:
 
 ```
 ./gradlew :app:connectedDebugAndroidTest
 ```
 
-Report: `app/build/reports/androidTests/connected/debug/index.html`. They follow nowinandroid's
-`DatabaseTest` pattern — an abstract base builds a fresh `Room.inMemoryDatabaseBuilder` database per
-test and closes it after; no rules, no Hilt, no sign-in. They never launch `MainActivity`, so a
-logged-out phone is fine. Method names use the `method_condition_expectation` form the clone's
-`androidTest` lint expects.
+Report: `app/build/reports/androidTests/connected/debug/index.html`. The Room DAO and `Converters`
+tests follow nowinandroid's `DatabaseTest` pattern — an abstract base builds a fresh
+`Room.inMemoryDatabaseBuilder` database per test and closes it after; no rules, no Hilt, no sign-in.
+They never launch `MainActivity`, so a locked phone is fine; the Hilt tests below do launch it.
+Method names use the `method_condition_expectation` form the clone's `androidTest` lint expects.
 
 Two things about the install:
 
@@ -152,6 +152,46 @@ the two `LIKE` clauses declare `ESCAPE '\'`, so `%` and `_` in what the user typ
 `ExpensesLocalRepositoryImplTest` covers the escaping on the JVM; `ExpenseDaoTest` covers the clause
 on the device.
 
+## Hilt instrumented tests
+
+`app/NavigationTest` and `app/LaunchTest` drive the real `MainActivity` on the device without
+Firebase. The pieces, all ported from nowinandroid:
+
+- **Runner.** `testInstrumentationRunner` is `testing/MyFinanceTestRunner` (`androidTest`), which
+  swaps the `Application` for `HiltTestApplication`. Tests that do not use Hilt, such as the DAO
+  tests, run under it unchanged.
+- **Test graph.** Four `@TestInstallIn` modules in `testing/di/` replace their production modules
+  for every `@HiltAndroidTest`: `TestDispatchersModule` (both qualifiers → one
+  `UnconfinedTestDispatcher`), `TestDataStoreModule` (`InMemoryDataStore`), `TestDatabaseModule`
+  (`Room.inMemoryDatabaseBuilder`) and `TestDataModule`. The last keeps the real local repositories
+  and `UserPreferencesRepositoryImpl` over that in-memory storage and binds the fakes for
+  `UserRepository`, `ExpensesRepository`, `IncomeRepository` and `ProfileImageStorage`, so no code
+  path constructs `FirebaseAuth` or `FirebaseFirestore`. `HiltAndroidRule` rebuilds the component
+  per test: every test starts with an empty database and empty preferences, and the fakes at their
+  defaults (logged in, sync completes at once).
+- **Shared sources.** The fakes, fixtures and DI modules live in `app/src/sharedTest`, registered as
+  a Kotlin source directory of both `test` and `androidTest` in `app/build.gradle.kts`
+  (`kotlin.srcDir`; `java.srcDir` is not picked up by AGP 9's built-in Kotlin). The old
+  `androidTest/…/DaoFixtures.kt` copy went away with it.
+- **Seeding.** `NavigationTest` uses `createAndroidComposeRule<MainActivity>()` and injects the
+  concrete fakes plus `ExpenseDao`/`UserPreferencesRepository` to seed data in `@Before`; the screens
+  react live. State that must exist *before* the activity (a logged-out user, a shortcut intent)
+  belongs in `LaunchTest`, which uses `createEmptyComposeRule()` and `ActivityScenario.launch` after
+  `hiltRule.inject()`.
+- **Splash.** `MainActivity` keeps the splash until `checkUser()` completes, so the first thing a
+  test does is `waitUntilExactlyOneExists(hasTestTag("tab_dashboard"))` (or `login_button`).
+- **Empty states.** Dashboard, Expenses and Labels render `EmptyView` without data, so their content
+  tags (`dashboard_scroll`, `expenses_list`, `labels_list`) only exist once something is seeded;
+  `LaunchTest.freshStart_withoutData_showsTheEmptyDashboard` pins the empty case.
+- **The phone must be unlocked.** The DAO tests pass on a locked phone; anything that launches an
+  activity is paused immediately (`wm_pause_activity … sleep`) and fails with "No compose
+  hierarchies found". Enable *Stay awake* in Developer options for long runs.
+
+`HiltComponentActivity` (`app/src/debug`, declared in the debug manifest) is the host for future
+Robolectric tests that need `hiltViewModel()`: `@Config(application = HiltTestApplication::class)`
+plus `createAndroidComposeRule<HiltComponentActivity>()`, with the same test modules
+(`kspTest(hilt-compiler)` and `hilt-android-testing` are already on the unit-test classpath).
+
 ## What is covered
 
 | Layer | Where |
@@ -159,6 +199,7 @@ on the device.
 | ViewModels (all nine) | `features/*/…ViewModelTest`, `app/HomeViewModelTest` |
 | Repositories, mapper, integrity check | `core/data/…` |
 | Room DAOs and `Converters` (device) | `androidTest/…/core/data/dao/…`, `…/converters/…` |
+| App navigation, login, shortcuts (device, Hilt) | `androidTest/…/app/NavigationTest`, `…/LaunchTest` |
 | Navigation (`Navigator`, `NavigationState`, `MyFinanceAppState`) | `core/navigation/…` |
 | Theme resolution (Robolectric) | `core/theme/ThemeTest` |
 | Shared Compose components (Robolectric) | `core/components/…Test` |
@@ -167,7 +208,8 @@ on the device.
 ## Not covered yet
 
 - **Firestore sync managers and `AuthManager`** — they obtain `FirebaseFirestore`/`FirebaseAuth`
-  inline, so there is no seam for a fake; a `RemoteDataSource` interface would unlock them.
+  inline, so there is no seam for a fake; a `RemoteDataSource` interface would unlock them. The
+  Hilt tests bypass them entirely through `TestDataModule`.
 - **Feature components and screens** — the same Robolectric technique as `core/components` (the
   screens already carry `Modifier.testTag`), and Roborazzi screenshots. `PieChart` arcs and the
   date-picker dialogs are also uncovered: the arcs have no semantics, the dialogs are Material's.

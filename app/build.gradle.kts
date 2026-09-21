@@ -27,7 +27,7 @@ android {
             useSupportLibrary = true
         }
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.frafio.myfinance.testing.MyFinanceTestRunner"
     }
 
     buildTypes {
@@ -48,6 +48,13 @@ android {
 
     testOptions {
         unitTests.isIncludeAndroidResources = true
+        animationsDisabled = true
+    }
+
+    // Fakes and Hilt test modules used by both the JVM and the instrumented suite.
+    sourceSets {
+        getByName("test") { kotlin.srcDir("src/sharedTest/java") }
+        getByName("androidTest") { kotlin.srcDir("src/sharedTest/java") }
     }
 
     buildFeatures {
@@ -133,6 +140,8 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.compose.ui.test)
+    testImplementation(libs.hilt.android.testing)
+    kspTest(libs.hilt.compiler)
     debugImplementation(libs.androidx.compose.ui.testManifest)
 
     androidTestImplementation(libs.androidx.junit)
@@ -141,6 +150,10 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.truth)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
 }
 
 // AuthCode/FinanceCode resolve their messages from Locale.getDefault() in static init,
