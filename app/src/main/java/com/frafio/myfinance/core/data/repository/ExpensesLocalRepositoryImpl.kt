@@ -14,10 +14,10 @@ class ExpensesLocalRepositoryImpl @Inject constructor(
 ) : ExpensesLocalRepository {
 
     override fun getWithFilter(name: String, categories: List<Int>): Flow<List<Expense>> =
-        expenseDao.getWithFilter(name, categories)
+        expenseDao.getWithFilter(name.escapeForLike(), categories)
 
     override fun getWithFilterDate(name: String, categories: List<Int>, firstTimestamp: Long, lastTimestamp: Long): Flow<List<Expense>> =
-        expenseDao.getWithFilterDate(name, categories, firstTimestamp, lastTimestamp)
+        expenseDao.getWithFilterDate(name.escapeForLike(), categories, firstTimestamp, lastTimestamp)
 
     override fun getCount(): Flow<Int> = expenseDao.getCount()
 
@@ -52,3 +52,7 @@ class ExpensesLocalRepositoryImpl @Inject constructor(
 
     override fun deleteAll() = expenseDao.deleteAll()
 }
+
+// The DAO queries declare ESCAPE '\', so a search term is matched literally rather than as a LIKE pattern.
+internal fun String.escapeForLike(): String =
+    replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")

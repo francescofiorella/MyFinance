@@ -16,13 +16,13 @@ import com.frafio.myfinance.core.data.model.Expense
 interface ExpenseDao : BaseDao<Expense> {
     @Query("SELECT * " +
             "FROM expense " +
-            "WHERE (name LIKE :name || '%' OR name LIKE '% ' || :name || '%') AND category IN (:categories) " +
+            "WHERE (name LIKE :name || '%' ESCAPE '\\' OR name LIKE '% ' || :name || '%' ESCAPE '\\') AND category IN (:categories) " +
             "ORDER BY year DESC, month DESC, day DESC, price DESC, category DESC")
     fun getWithFilter(name: String, categories: List<Int>): Flow<List<Expense>>
 
     @Query("SELECT * " +
             "FROM expense " +
-            "WHERE (name LIKE :name || '%' OR name LIKE '% ' || :name || '%') AND category IN (:categories) AND timestamp>=:firstTimestamp AND timestamp<:lastTimestamp " +
+            "WHERE (name LIKE :name || '%' ESCAPE '\\' OR name LIKE '% ' || :name || '%' ESCAPE '\\') AND category IN (:categories) AND timestamp>=:firstTimestamp AND timestamp<:lastTimestamp " +
             "ORDER BY year DESC, month DESC, day DESC, price DESC, category DESC")
     fun getWithFilterDate(name: String, categories: List<Int>, firstTimestamp: Long, lastTimestamp: Long): Flow<List<Expense>>
 

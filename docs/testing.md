@@ -98,20 +98,46 @@ adb logcat -s DataIntegrity
 Both carry the full document path for the Firebase console. Tombstones (`isDeleted == true`) are
 not checked.
 
+## Instrumented tests
+
+Room DAO and `Converters` tests live in `app/src/androidTest` and run on a device:
+
+```
+./gradlew :app:connectedDebugAndroidTest
+```
+
+Report: `app/build/reports/androidTests/connected/debug/index.html`. They follow nowinandroid's
+`DatabaseTest` pattern — an abstract base builds a fresh `Room.inMemoryDatabaseBuilder` database per
+test and closes it after; no rules, no Hilt, no sign-in. They never launch `MainActivity`, so a
+logged-out phone is fine. Method names use the `method_condition_expectation` form the clone's
+`androidTest` lint expects.
+
+Two things about the install:
+
+- The test build is signed with the debug keystore. If the phone has a release-signed build under
+  the same `applicationId`, the install fails with `INSTALL_FAILED_UPDATE_INCOMPATIBLE`; uninstall it
+  first (`adb uninstall com.frafio.myfinance`). That drops the local database, which re-syncs from
+  Firestore, and the Firebase session, so log in again on the debug build afterwards.
+- `gradle.properties` sets `android.injected.androidTest.leaveApksInstalledAfterRun=true` so the app
+  is not uninstalled after every run (the AGP default), which would repeat that login each time.
+
+The search term reaches the DAO already escaped (`ExpensesLocalRepositoryImpl.escapeForLike`) and
+the two `LIKE` clauses declare `ESCAPE '\'`, so `%` and `_` in what the user types are literal.
+`ExpensesLocalRepositoryImplTest` covers the escaping on the JVM; `ExpenseDaoTest` covers the clause
+on the device.
+
 ## What is covered
 
 | Layer | Where |
 |---|---|
 | ViewModels (all nine) | `features/*/…ViewModelTest`, `app/HomeViewModelTest` |
 | Repositories, mapper, integrity check | `core/data/…` |
+| Room DAOs and `Converters` (device) | `androidTest/…/core/data/dao/…`, `…/converters/…` |
 | Navigation (`Navigator`, `NavigationState`, `MyFinanceAppState`) | `core/navigation/…` |
 | Utilities, models, enums | `core/utils/…`, `core/data/model/…`, `core/data/enums/…` |
 
 ## Not covered yet
 
-- **Room DAO queries** — the `LIKE` predicate and the `year * 100 + month` range are only
-  re-implemented by the fakes. Needs instrumented tests (`Room.inMemoryDatabaseBuilder`, a device or
-  a Gradle managed device).
 - **Firestore sync managers and `AuthManager`** — they obtain `FirebaseFirestore`/`FirebaseAuth`
   inline, so there is no seam for a fake; a `RemoteDataSource` interface would unlock them.
 - **Compose UI** — logic tests (Robolectric + `ui-test-junit4`; the screens already carry
