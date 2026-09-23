@@ -1,0 +1,35 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Update Dependency Verification" type="GradleRunConfiguration" factoryName="Gradle">
+    <ExternalSystemSettings>
+      <option name="executionName" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="--write-verification-metadata sha256 --no-configuration-cache -I gradle/verification/resolve-all-configurations.gradle -x uploadCrashlyticsMappingFileRelease" />
+      <option name="taskDescriptions">
+        <list />
+      </option>
+      <option name="taskNames">
+        <list>
+          <option value="resolveAllConfigurations" />
+          <option value=":app:assembleDebug" />
+          <option value=":app:assembleRelease" />
+          <option value=":app:assembleDebugAndroidTest" />
+          <option value=":app:testDebugUnitTest" />
+          <option value=":app:lintDebug" />
+          <option value=":app:createDebugCombinedCoverageReport" />
+          <option value=":lint:test" />
+          <option value=":baselineProfile:assemble" />
+        </list>
+      </option>
+      <option name="vmOptions" />
+    </ExternalSystemSettings>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+    <DebugAllEnabled>false</DebugAllEnabled>
+    <RunAsTest>false</RunAsTest>
+    <GradleProfilingDisabled>false</GradleProfilingDisabled>
+    <GradleCoverageDisabled>false</GradleCoverageDisabled>
+    <method v="2" />
+  </configuration>
+</component>
