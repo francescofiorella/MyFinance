@@ -10,8 +10,8 @@ The HTML report lands in `app/build/reports/tests/testDebugUnitTest/index.html`.
 task, not a bare `./gradlew test`: the `:baselineProfile` module has no unit tests and needs a
 connected device for everything else. From Android Studio, the gutter ▶ next to a test class or
 method runs it as an *Android JUnit* configuration; an *Android App* configuration only launches
-the app. The screenshot tests run too, but their goldens are compared on CI, not here — see
-[Screenshot tests](#screenshot-tests-roborazzi) and [Continuous integration](#continuous-integration).
+the app. The run also verifies the screenshot goldens — if it goes red right after a UI change,
+see [Screenshot tests](#screenshot-tests-roborazzi).
 
 ## Conventions
 
@@ -191,25 +191,25 @@ accessibility services do); `performTextInput` already works through semantics.
 ## Screenshot tests (Roborazzi)
 
 Every screen and the shared components have golden PNGs under `app/src/test/screenshots/`,
-recorded on Robolectric with Roborazzi. **The goldens belong to CI**: they are recorded on Linux,
-where CI verifies them, because a Windows render differs from a Linux one by a few pixels on every
-screen and the comparison is pixel-exact. So on this PC:
+recorded on Robolectric with Roborazzi. Windows and CI's Linux runner render them identically — the
+first CI run verified the Windows-recorded goldens pixel for pixel — so they can be recorded and
+verified on either. **Whenever you change how a screen or component looks**, run these in order:
 
-- `./gradlew :app:testDebugUnitTest` runs the screenshot tests like any other — every screen is
-  rendered and its [accessibility checks](#accessibility-checks) still fail the test — but does not
-  compare pixels (`roborazzi.test.verify=false` in `gradle.properties`).
-- `./gradlew :app:compareRoborazziDebug` writes reference | diff | new images to
-  `app/build/outputs/roborazzi/*_compare.png` to look at a change; expect a little Windows-vs-Linux
-  noise besides it. `-Proborazzi.test.verify=true` turns the comparison on for one run.
-- **Never commit goldens recorded here** (`recordRoborazziDebug`): the next CI run would fail on them.
+```
+./gradlew :app:verifyRoborazziDebug     # 1. Did anything look different? Fails and lists the screens that changed.
+./gradlew :app:compareRoborazziDebug    # 2. Show me. Writes reference | diff | new images to app/build/outputs/roborazzi/*_compare.png.
+./gradlew :app:recordRoborazziDebug     # 3. Yes, that is what I meant. Overwrites the goldens; commit the changed PNGs together with the UI change.
+```
 
-**Whenever you change how a screen or component looks**: push; CI's *checks* job fails on the screens
-that changed and uploads their `*_compare.png` as the `screenshot-diffs` artifact. Look at them; if
-the change is the one you meant, run the **Record screenshots** workflow (GitHub → Actions → Record
-screenshots → Run workflow, on your branch), which records on Linux and commits the new goldens; then
-`git pull` and re-run CI (commits made by a workflow do not start a new run by themselves). Only
-record after looking at the diff: recording over an unintended change hides a regression. A
-brand-new screen needs a test plus a recording run; verification fails while a golden is missing.
+Step 1 also happens inside the normal `./gradlew :app:testDebugUnitTest` (`roborazzi.test.verify=true`
+in `gradle.properties`) and in CI's *checks* job, so a red run after a UI edit means "go to step 2";
+on CI the `screenshot-diffs` artifact holds the `*_compare.png` images. Only record after looking at
+the diff: recording over an unintended change hides a regression. A brand-new screen needs a test
+plus a first recording; `verify` fails while a golden is missing. Step 3 can also run on CI: the
+**Record screenshots** workflow (GitHub → Actions → Record screenshots → Run workflow) records on
+Linux and commits the goldens to the chosen branch — then `git pull`, and re-run CI, since a commit
+made by a workflow does not start a new run. If the two platforms ever stop matching (a Robolectric
+or font change), record on CI only: that is the platform the goldens are verified on.
 
 ### How the tests are written
 
@@ -241,7 +241,7 @@ brand-new screen needs a test plus a recording run; verification fails while a g
   navigation bar vs rail decision is made in `HomeScreen`.
 - Goldens are stored at half scale (`resizeScale = 0.5`) and compared pixel-exactly
   (`changeThreshold = 0f`). Fonts are bundled and the illustrations are vectors, so the output is
-  stable on one platform — which is why they are recorded and verified on CI's Linux runner only.
+  stable — identical on Windows and on CI's Linux runner.
 
 ### Accessibility checks
 
