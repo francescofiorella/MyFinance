@@ -430,7 +430,7 @@ verification failed* until the file is refreshed. Run the **Update Dependency Ve
 configuration in Android Studio, or:
 
 ```
-./gradlew --write-verification-metadata sha256 --no-configuration-cache -I gradle/verification/resolve-all-configurations.gradle resolveAllConfigurations :app:assembleDebug :app:assembleRelease :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug :app:createDebugCombinedCoverageReport :lint:test :baselineProfile:assemble -x uploadCrashlyticsMappingFileRelease
+./gradlew --write-verification-metadata sha256 --no-configuration-cache -I gradle/verification/resolve-all-configurations.gradle resolveAllConfigurations :app:assembleDebug :app:assembleRelease :app:assembleBenchmarkRelease :app:assembleNonMinifiedRelease :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug :app:createDebugCombinedCoverageReport :lint:test :baselineProfile:assemble -x uploadCrashlyticsMappingFileRelease
 ```
 
 It runs every kind of build once so each download is seen, and
