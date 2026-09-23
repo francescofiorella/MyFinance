@@ -9,11 +9,7 @@ import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.DeviceConfigurationOverride
-import androidx.compose.ui.test.ForcedSize
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.frafio.myfinance.core.navigation.HomeTabKey
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
@@ -31,15 +27,11 @@ import org.robolectric.annotation.LooperMode
 /** The app shell (navigation bar vs rail, top bar, FAB) at the three width classes. */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(qualifiers = "w1400dp-h1000dp-420dpi")
 @LooperMode(LooperMode.Mode.PAUSED)
 class HomeShellScreenshotTests {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
-
-    // The canvas only has to fit every size; the width class is passed explicitly, as HomeScreen does.
-    private val canvas = DeviceSpec(1400, 1000)
 
     @Test
     fun compactWidth_showsNavigationBar() = shell("compactWidth_showsNavigationBar", 411, 891)
@@ -54,10 +46,9 @@ class HomeShellScreenshotTests {
     fun profileTab_showsLogoutAction() = shell("profileTab_showsLogoutAction", 411, 891, tab = HomeTabKey.Profile)
 
     private fun shell(name: String, widthDp: Int, heightDp: Int, tab: HomeTabKey = HomeTabKey.Dashboard) {
-        composeTestRule.captureForDevice(canvas, name, deviceName = "shell") {
-            DeviceConfigurationOverride(DeviceConfigurationOverride.ForcedSize(DpSize(widthDp.dp, heightDp.dp))) {
-                HomeShell(widthDp, heightDp, tab)
-            }
+        // The device size is the layout size: `ForcedSize` only rescales density, it does not constrain.
+        composeTestRule.captureForDevice(DeviceSpec(widthDp, heightDp), name, deviceName = "shell") {
+            HomeShell(widthDp, heightDp, tab)
         }
     }
 

@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.test.DarkMode
 import androidx.compose.ui.test.DeviceConfigurationOverride
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -23,6 +25,8 @@ import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.RoborazziOptions.CompareOptions
 import com.github.takahirom.roborazzi.RoborazziOptions.RecordOptions
 import com.github.takahirom.roborazzi.captureRoboImage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.robolectric.RuntimeEnvironment
 
 /** Pixel-perfect comparison; goldens stored at half size. */
@@ -130,4 +134,40 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.c
             )
         }
     }
+}
+
+/**
+ * Like [captureForDevice], but runs [action] on a composition-scoped coroutine after the content is
+ * set and before the capture — the way to show a snackbar in a golden. [capture] names the node to
+ * photograph; an inset override wraps the content in an `AndroidView`, so those tests capture a
+ * tagged node instead of the root.
+ */
+fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.captureAfter(
+    device: DeviceSpec,
+    screenshotName: String,
+    deviceName: String,
+    darkMode: Boolean = false,
+    capture: () -> SemanticsNodeInteraction = { onRoot() },
+    action: suspend CoroutineScope.() -> Unit = {},
+    body: @Composable () -> Unit,
+) {
+    RuntimeEnvironment.setQualifiers("w${device.widthDp}dp-h${device.heightDp}dp-${device.dpi}dpi")
+
+    lateinit var scope: CoroutineScope
+    activity.setContent {
+        scope = rememberCoroutineScope()
+        CompositionLocalProvider(LocalInspectionMode provides true) {
+            DeviceConfigurationOverride(DeviceConfigurationOverride.DarkMode(darkMode)) {
+                MyFinanceTheme(darkTheme = darkMode, dynamicColor = false) {
+                    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                        body()
+                    }
+                }
+            }
+        }
+    }
+    scope.launch { action() }
+    waitForIdle()
+
+    capture().captureRoboImage("$SCREENSHOTS_DIR/${screenshotName}_$deviceName.png", roborazziOptions = DefaultRoborazziOptions)
 }

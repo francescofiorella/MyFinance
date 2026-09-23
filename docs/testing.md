@@ -139,6 +139,18 @@ The download is driven by `MockWebServer` (OkHttp 4.12.0, the version Coil pulls
 `OkHttpClient`, and the repository writes through the real `ProfileImageStorageImpl` into
 Robolectric's `filesDir`.
 
+`captureAfter` is `captureForDevice` plus a coroutine that runs after composition and before the
+capture — how the snackbar goldens show a snackbar. They call `snackbarHostState.showSnackbar(…,
+duration = Indefinite)` directly, because `MyFinanceAppState.showSnackBar` hard-codes `Short` and the
+snackbar would dismiss itself before the capture. `SnackbarInsetsScreenshotTests` fakes a status bar
+and navigation bars with a `DeviceConfigurationOverride.WindowInsets` helper copied from nowinandroid
+(Compose has no public inset override); since that helper wraps the content in an `AndroidView`, those
+tests capture a tagged node instead of `onRoot()`.
+
+The device passed to a capture is the layout size: `DeviceConfigurationOverride.ForcedSize` only
+rescales density, so a golden recorded on a big canvas with a small `ForcedSize` shows the big layout.
+Pass `DeviceSpec(width, height)` per case instead.
+
 Component tests live in `core/components/` and use two helpers from `testing/util/ComposeTestHelpers.kt`:
 `setThemedContent { … }` wraps the content in `MyFinanceTheme`, and `string(R.string.x)` resolves a
 resource the way the composable does, so assertions never hard-code UI text. Passing
@@ -297,6 +309,7 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 | Shared Compose components (Robolectric) | `core/components/…Test` |
 | Feature components: auth form and fields, dashboard cards, filter chips and sheets, profile sheets, budget sheet, labels list | `features/*/components/…Test`, `features/auth/AuthContentTest`, `features/labels/LabelsContentTest` |
 | Screens over their ViewModels: loading / empty / populated, validation, sheets, callbacks | `features/*/…ScreenTest` |
+| Snackbar placement at three widths, with and without system insets | `app/Snackbar(Insets)ScreenshotTests` |
 | Screens, app shell and components as golden images (Roborazzi) | `**/*ScreenshotTests`, `app/src/test/screenshots` |
 | Utilities, models, enums | `core/utils/…`, `core/data/model/…`, `core/data/enums/…` |
 | Transaction wire format (`toFirestoreMap` vs Firestore's reflective mapper, plain JVM) | `core/data/model/FirestoreMappingTest` |
