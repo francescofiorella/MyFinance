@@ -52,6 +52,12 @@ android {
         animationsDisabled = true
     }
 
+    // New errors fail lintDebug; the baseline holds the issues accepted so far (docs/testing.md).
+    lint {
+        abortOnError = true
+        baseline = file("lint-baseline.xml")
+    }
+
     // Fakes and Hilt test modules used by both the JVM and the instrumented suite.
     sourceSets {
         getByName("test") { kotlin.directories.add("src/sharedTest/java") }
