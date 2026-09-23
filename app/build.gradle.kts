@@ -64,10 +64,9 @@ android {
         jacocoVersion = libs.versions.jacoco.get()
     }
 
-    // New errors fail lintDebug; the baseline holds the issues accepted so far (docs/testing.md).
+    // New errors fail lintDebug (docs/testing.md#lint).
     lint {
         abortOnError = true
-        baseline = file("lint-baseline.xml")
     }
 
     // Fakes and Hilt test modules used by both the JVM and the instrumented suite.

@@ -396,12 +396,11 @@ Studio highlights both in the open file; for the whole project run
 ```
 
 Report: `app/build/reports/lint-results-debug.html`. A new **error** fails the task (and, through
-`lintVitalRelease`, a release build); warnings are listed but do not fail. `app/lint-baseline.xml`
-holds the warnings accepted so far — three long vector paths in the `image_consulting_cuate`
-illustration, kept because simplifying it would change the empty-state goldens — so only new problems
-show up. Fix a new issue rather than baselining it; regenerate
-the baseline (`./gradlew :app:updateLintBaseline`) only after deciding an issue stays, and review the
-diff.
+`lintVitalRelease`, a release build); warnings are listed but do not fail. The project is clean:
+there is no baseline file. Fix a new issue rather than hiding it; when a warning is a deliberate
+choice, suppress it where it happens with `tools:ignore` (XML) or `@Suppress` (Kotlin) and a
+comment saying why — as `image_consulting_cuate.xml` does for its long vector paths, kept because
+simplifying them would change the empty-state goldens.
 
 The custom rules live in the `:lint` module (the nowinandroid pattern), wired into the app with
 `lintChecks(project(":lint"))`. Each one enforces a convention from this document:
