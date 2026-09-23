@@ -15,7 +15,7 @@ class HardcodedContentDescriptionDetectorTest {
     @Test
     fun literals_namedPositionalTemplateAndSemantics_areReported() {
         check(
-            """
+            $$"""
             package test
 
             import androidx.compose.material3.Icon
@@ -27,7 +27,7 @@ class HardcodedContentDescriptionDetectorTest {
             fun Screen(name: String) {
                 Icon(painter = 0, contentDescription = "Close")
                 Icon(0, "Close")
-                Icon(0, contentDescription = "Remove ${'$'}name")
+                Icon(0, contentDescription = "Remove $name")
                 semantics { contentDescription = "Chart" }
             }
             """,

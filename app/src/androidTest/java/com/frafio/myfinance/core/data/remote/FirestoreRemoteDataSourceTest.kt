@@ -18,6 +18,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.BeforeClass
 import org.junit.Test
 import java.time.LocalDate
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * The real adapter against the Firestore emulator: the wire format, the decoder, the array and merge
@@ -45,7 +46,7 @@ class FirestoreRemoteDataSourceTest {
 
     private suspend fun raw(path: String): DocumentSnapshot = FirebaseFirestore.getInstance().document(path).get().await()
 
-    private suspend fun <E> Channel<E>.next(): E = withTimeout(10_000) { receive() }
+    private suspend fun <E> Channel<E>.next(): E = withTimeout(10_000.milliseconds) { receive() }
 
     private fun <T : Transaction> listen(collection: String, since: Long, type: Class<T>): Pair<Channel<RemoteSnapshot<T>>, RemoteListener> {
         val events = Channel<RemoteSnapshot<T>>(Channel.UNLIMITED)
@@ -195,7 +196,7 @@ class FirestoreRemoteDataSourceTest {
         listener.remove()
         subject.set(email, payments, "a", expense(updatedAt = 10L))
 
-        assertThat(withTimeoutOrNull(2_000) { events.receive() }).isNull()
+        assertThat(withTimeoutOrNull(2_000.milliseconds) { events.receive() }).isNull()
     }
 
     // endregion
