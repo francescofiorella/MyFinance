@@ -36,7 +36,7 @@ fun ExpensesCard(
     monthShown: Boolean,
     thisMonthSum: Double,
     thisYearSum: Double,
-    today: LocalDate = LocalDate.now()
+    today: LocalDate
 ) {
     val day = today.format(DateTimeFormatter.ofPattern("dd"))
     val month = today.format(DateTimeFormatter.ofPattern("MMMM")).replaceFirstChar {
@@ -172,7 +172,8 @@ fun ExpensesCardPreview() {
             todaySum = 25.0,
             monthShown = true,
             thisMonthSum = 450.0,
-            thisYearSum = 5400.0
+            thisYearSum = 5400.0,
+            today = LocalDate.now()
         )
     }
 }

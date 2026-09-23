@@ -25,3 +25,4 @@ dependencyResolutionManagement {
 rootProject.name = "MyFinance"
 include(":app")
 include(":baselineProfile")
+include(":lint")

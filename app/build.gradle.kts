@@ -82,6 +82,8 @@ kotlin {
 }
 
 dependencies {
+    lintChecks(project(":lint"))
+
     // AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)

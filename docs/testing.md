@@ -60,7 +60,8 @@ hand-written fakes, direct ViewModel construction.
   a state gets a `stateDescription` (`expanded`/`collapsed`); toggles and selectable items use
   Compose's own toggle/`selected` semantics instead. Tests find controls by these labels
   (`string(R.string.remove_item, "Dinner")`; `string()` takes format arguments), so a wrong label
-  fails a test. `app/AccessibilityTest` pins the rules the ATF checks cannot see.
+  fails a test. `app/AccessibilityTest` pins the rules the ATF checks cannot see, and the
+  `HardcodedContentDescription` [lint](#lint) rule rejects literals.
 
 ## Testing ViewModels
 
@@ -380,6 +381,37 @@ plus `createAndroidComposeRule<HiltComponentActivity>()`, with the same test mod
 (`hilt-android-testing` is already on the unit-test classpath; the Hilt plugin adds its compiler to
 every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 
+## Lint
+
+Android Lint reads the code without running it: the built-in checks plus four of our own. Android
+Studio highlights both in the open file; for the whole project run
+
+```
+./gradlew :app:lintDebug      # or the "Run Lint" configuration
+```
+
+Report: `app/build/reports/lint-results-debug.html`. A new **error** fails the task (and, through
+`lintVitalRelease`, a release build); warnings are listed but do not fail. `app/lint-baseline.xml`
+holds the warnings accepted so far — unused launcher resources and strings, long vector paths in one
+illustration — so only new problems show up. Fix a new issue rather than baselining it; regenerate
+the baseline (`./gradlew :app:updateLintBaseline`) only after deciding an issue stays, and review the
+diff.
+
+The custom rules live in the `:lint` module (the nowinandroid pattern), wired into the app with
+`lintChecks(project(":lint"))`. Each one enforces a convention from this document:
+
+| Issue id | Severity | Rule | Why |
+|---|---|---|---|
+| `HardcodedContentDescription` | Error | `contentDescription` is never a string literal (argument or `semantics { }`); previews are exempt | a literal is English in every locale and bypasses `values-it` (see Content descriptions) |
+| `ClockInComposition` | Error | no `LocalDate.now()`, `System.currentTimeMillis()`, `Calendar.getInstance()` and friends while composing — in a composable body, its default arguments, a `@Composable` content lambda or `remember { }`; effect and callback lambdas and previews are fine | a composable that reads the clock renders differently every day, which breaks the screenshot goldens |
+| `FirebaseOutsideAdapter` | Error | `FirebaseFirestore.getInstance()`, `FirebaseAuth.getInstance()`, `Firebase.firestore`, `Firebase.auth` only in `FirestoreRemoteDataSource` and `FirebaseAuthDataSource` | everything else must go through `RemoteDataSource` / `AuthDataSource`, which the tests fake |
+| `TestMethodPrefix` | Warning | a `@Test` function does not start with `test` (quick fix removes it) | the naming convention; ported from nowinandroid |
+
+A rule is a `Detector` in `lint/src/main/kotlin/…/lint/`, listed in `MyFinanceIssueRegistry`, with a
+test in `lint/src/test` that runs it on small source files (`Stubs` supplies the Compose, JUnit and
+Firebase declarations it needs) and pins the exact report. `./gradlew :lint:test` runs those tests;
+after a Gradle sync the editor picks up a changed rule.
+
 ## What is covered
 
 | Layer | Where |
@@ -402,6 +434,7 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 | Screens, app shell and components as golden images, with ATF accessibility checks (Roborazzi) | `**/*ScreenshotTests`, `app/src/test/screenshots` |
 | Utilities, models, enums | `core/utils/…`, `core/data/model/…`, `core/data/enums/…` |
 | Transaction wire format (`toFirestoreMap` vs Firestore's reflective mapper, plain JVM) | `core/data/model/FirestoreMappingTest` |
+| The custom lint rules on sample sources | `lint/src/test/…/lint/…DetectorTest` |
 
 ## Not covered yet
 
