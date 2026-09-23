@@ -22,8 +22,10 @@ class ProfileImageStorageImpl @Inject constructor(
 
     override suspend fun saveImage(inputStream: InputStream): String? = withContext(Dispatchers.IO) {
         try {
+            // Decode before opening the file: opening it truncates, so undecodable bytes
+            // (an error page served with 200, a truncated download) would destroy the stored picture.
+            val bitmap = BitmapFactory.decodeStream(inputStream) ?: return@withContext null
             val file = File(context.filesDir, PROFILE_PIC_NAME)
-            val bitmap = BitmapFactory.decodeStream(inputStream)
             FileOutputStream(file).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
             }

@@ -132,6 +132,13 @@ unit-test variant reads the debug manifest, so a `testImplementation` would not 
 jar per API level used (about 100 MB each) into `~/.m2`; Robolectric classes add roughly a minute
 to the suite, plain JVM tests are unaffected.
 
+Tests that decode or write bitmaps (`ProfileImageStorageImplTest`, `UserRepositoryImplTest`) need
+`@GraphicsMode(GraphicsMode.Mode.NATIVE)`: in Robolectric's legacy mode `Bitmap.compress` writes a
+stub and `BitmapFactory.decodeStream` returns a 1×1 bitmap, so sizes and round trips mean nothing.
+The download is driven by `MockWebServer` (OkHttp 4.12.0, the version Coil pulls in) against the real
+`OkHttpClient`, and the repository writes through the real `ProfileImageStorageImpl` into
+Robolectric's `filesDir`.
+
 Component tests live in `core/components/` and use two helpers from `testing/util/ComposeTestHelpers.kt`:
 `setThemedContent { … }` wraps the content in `MyFinanceTheme`, and `string(R.string.x)` resolves a
 resource the way the composable does, so assertions never hard-code UI text. Passing
@@ -280,6 +287,7 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 |---|---|
 | ViewModels (all nine) | `features/*/…ViewModelTest`, `app/HomeViewModelTest` |
 | Repositories, mapper, integrity check | `core/data/…` |
+| Profile picture download and storage (MockWebServer + real file I/O) | `core/data/repository/UserRepositoryImplTest`, `core/data/storage/ProfileImageStorageImplTest` |
 | Sync managers over a fake remote and in-memory Room (Robolectric) | `core/data/manager/…SyncManagerTest` |
 | `AuthManager` over a fake identity provider | `core/data/manager/AuthManagerTest` |
 | Room DAOs and `Converters` (device) | `androidTest/…/core/data/dao/…`, `…/converters/…` |

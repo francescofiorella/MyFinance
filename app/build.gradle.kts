@@ -21,8 +21,8 @@ android {
         applicationId = "com.frafio.myfinance"
         minSdk = 29
         targetSdk = 37
-        versionCode = 5000003
-        versionName = "5.0.3"
+        versionCode = 5000004
+        versionName = "5.0.4"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -140,6 +140,7 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(libs.turbine)
     testImplementation(libs.robolectric)
+    testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.roborazzi)
     testImplementation(libs.roborazzi.compose)
     testImplementation(libs.androidx.compose.ui.test)
