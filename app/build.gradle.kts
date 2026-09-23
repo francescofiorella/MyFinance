@@ -170,11 +170,13 @@ dependencies {
 // The adapter tests reach the Firebase emulators on this PC through 127.0.0.1 on the device.
 val firebaseEmulatorPortReverses = listOf(8080, 9099).map { port ->
     tasks.register<Exec>("firebaseEmulatorReverse$port") {
+        description = "Forwards port $port on the connected device to the Firebase emulator on this PC (adb reverse)."
         executable = androidComponents.sdkComponents.adb.get().asFile.absolutePath
         args("reverse", "tcp:$port", "tcp:$port")
     }
 }
 val firebaseEmulatorReverse = tasks.register("firebaseEmulatorReverse") {
+    description = "Forwards the Firestore (8080) and Auth (9099) emulator ports to the device; runs before connectedDebugAndroidTest."
     dependsOn(firebaseEmulatorPortReverses)
 }
 tasks.matching { it.name == "connectedDebugAndroidTest" }.configureEach {

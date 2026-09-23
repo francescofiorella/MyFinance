@@ -9,6 +9,7 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
+import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.uast.UBinaryExpression
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UElement
@@ -28,11 +29,21 @@ class HardcodedContentDescriptionDetector : Detector(), SourceCodeScanner {
     override fun createUastHandler(context: JavaContext): UElementHandler = object : UElementHandler() {
 
         override fun visitCallExpression(node: UCallExpression) {
+            // A named argument is read from the source; resolving the callee is only needed for a
+            // positional one, and library calls do not always resolve in the editor.
+            val named = node.valueArguments.filter { it.argumentName() == CONTENT_DESCRIPTION }
+            if (named.isNotEmpty()) {
+                named.forEach(::check)
+                return
+            }
             val method = node.resolve() ?: return
             context.evaluator.computeArgumentMapping(node, method).forEach { (argument, parameter) ->
                 if (parameter.name == CONTENT_DESCRIPTION) check(argument)
             }
         }
+
+        private fun UExpression.argumentName(): String? =
+            (sourcePsi?.parent as? KtValueArgument)?.getArgumentName()?.asName?.identifier
 
         // `Modifier.semantics { contentDescription = "…" }`
         override fun visitBinaryExpression(node: UBinaryExpression) {
