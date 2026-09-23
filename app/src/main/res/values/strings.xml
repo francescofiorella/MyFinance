@@ -52,8 +52,6 @@
     <string name="reset">Reset</string>
     <string name="password">Password</string>
     <string name="change_password">Change your password</string>
-    <string name="short_password">Password is too short (min. 8 characters)</string>
-    <string name="password_not_match">The confirmation password does not match</string>
     <string name="current_password">Enter current password</string>
     <string name="reset_password">Reset password</string>
     <string name="or">or</string>
@@ -76,7 +74,6 @@
 
     <string name="use_dynamic_color">Dynamic colors</string>
 
-    <string name="authentication">Authentication</string>
     <string name="sign_up_provider">Signed up with Google</string>
     <string name="sign_up_email">Signed up with email</string>
     <string name="sign_up_google_email">Signed up\ with email and Google</string>

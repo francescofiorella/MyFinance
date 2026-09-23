@@ -34,37 +34,4 @@
             column="25"/>
     </issue>
 
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.short_password` appears to be unused"
-        errorLine1="    &lt;string name=&quot;short_password&quot;>Password is too short (min. 8 characters)&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="55"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.password_not_match` appears to be unused"
-        errorLine1="    &lt;string name=&quot;password_not_match&quot;>The confirmation password does not match&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="56"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.authentication` appears to be unused"
-        errorLine1="    &lt;string name=&quot;authentication&quot;>Authentication&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="79"
-            column="13"/>
-    </issue>
-
 </issues>

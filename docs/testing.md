@@ -392,8 +392,9 @@ Studio highlights both in the open file; for the whole project run
 
 Report: `app/build/reports/lint-results-debug.html`. A new **error** fails the task (and, through
 `lintVitalRelease`, a release build); warnings are listed but do not fail. `app/lint-baseline.xml`
-holds the warnings accepted so far — unused launcher resources and strings, long vector paths in one
-illustration — so only new problems show up. Fix a new issue rather than baselining it; regenerate
+holds the warnings accepted so far — three long vector paths in the `image_consulting_cuate`
+illustration, kept because simplifying it would change the empty-state goldens — so only new problems
+show up. Fix a new issue rather than baselining it; regenerate
 the baseline (`./gradlew :app:updateLintBaseline`) only after deciding an issue stays, and review the
 diff.
 
