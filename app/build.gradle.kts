@@ -159,6 +159,20 @@ dependencies {
     androidTestImplementation(libs.hilt.android.testing)
 }
 
+// The adapter tests reach the Firebase emulators on this PC through 127.0.0.1 on the device.
+val firebaseEmulatorPortReverses = listOf(8080, 9099).map { port ->
+    tasks.register<Exec>("firebaseEmulatorReverse$port") {
+        executable = androidComponents.sdkComponents.adb.get().asFile.absolutePath
+        args("reverse", "tcp:$port", "tcp:$port")
+    }
+}
+val firebaseEmulatorReverse = tasks.register("firebaseEmulatorReverse") {
+    dependsOn(firebaseEmulatorPortReverses)
+}
+tasks.matching { it.name == "connectedDebugAndroidTest" }.configureEach {
+    dependsOn(firebaseEmulatorReverse)
+}
+
 // AuthCode/FinanceCode resolve their messages from Locale.getDefault() in static init,
 // so the test JVM must start with a fixed locale.
 tasks.withType<Test>().configureEach {

@@ -9,3 +9,7 @@
 .cxx
 local.properties
 .artifacts
+
+# Firebase emulator logs
+firebase-debug.log
+firestore-debug.log

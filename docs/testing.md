@@ -37,7 +37,8 @@ hand-written fakes, direct ViewModel construction.
   from Firebase Auth; failures arrive as `AuthException(kind, errorCode)`, translated once in
   `FirebaseAuthDataSource`, so every `AuthCode` mapping is plain Kotlin and `AuthManagerTest`
   covers each outcome through `testing/remote/TestAuthDataSource` (`signInFailure = AuthException(…)`
-  and friends). The only Firebase-facing code left untested is the two adapters.
+  and friends). The two adapters themselves run against the Firebase emulators on the device
+  (see [Firebase emulator tests](#firebase-emulator-tests)).
 - **Real DataStore, in memory.** `UserPreferencesRepositoryTest` runs the production implementation
   over `testing/util/InMemoryDataStore`, so the `Preferences` key mapping is exercised rather than
   faked.
@@ -257,9 +258,12 @@ never `Matchers.anything()`, with a one-line reason above it. The only suppressi
 
 ## Instrumented tests
 
-Instrumented tests live in `app/src/androidTest` and run on a device:
+Instrumented tests live in `app/src/androidTest` and run on a device. The Firebase adapter tests
+are part of the run and need the [Firebase emulators](#firebase-emulator-tests) running on this PC
+first; without them those two classes fail and say so:
 
 ```
+firebase emulators:start --only auth,firestore   # separate terminal, repo root; see below
 ./gradlew :app:connectedDebugAndroidTest
 ```
 
@@ -282,6 +286,58 @@ The search term reaches the DAO already escaped (`ExpensesLocalRepositoryImpl.es
 the two `LIKE` clauses declare `ESCAPE '\'`, so `%` and `_` in what the user types are literal.
 `ExpensesLocalRepositoryImplTest` covers the escaping on the JVM; `ExpenseDaoTest` covers the clause
 on the device.
+
+## Firebase emulator tests
+
+`core/data/remote/FirestoreRemoteDataSourceTest` and `FirebaseAuthDataSourceTest` run the two real
+Firebase adapters on the phone against the [Firebase Emulator Suite](https://firebase.google.com/docs/emulator-suite)
+— local stand-ins for Firestore and Auth running on this PC. They check what the fakes
+(`TestRemoteDataSource`, `TestAuthDataSource`) assume: the fields `toFirestoreMap()` writes decode
+back through `toObject()`, `arrayUnion`/`arrayRemove` and merges behave, the `updatedAt > since`
+listener arrives oldest first, and each Firebase failure becomes the `AuthException` kind and
+`ERROR_*` code `AuthManager` switches on. No Android emulator is involved: "emulator" here is the
+Firebase one, and the tests run on the phone.
+
+**Setup, once.** The CLI is Google's standalone `firebase-tools-win.exe` (bundles its own Node),
+saved as `%USERPROFILE%\bin\firebase.exe`; download it from `https://firebase.tools/bin/win/latest`.
+The emulators need Java 21+, and the `java` on PATH may be older, so point the shell at Android
+Studio's bundled JDK. The first start downloads the emulator jars to `~/.cache/firebase`.
+
+**Every device run.** In a separate PowerShell, from the repo root, and leave it running:
+
+```
+$env:JAVA_HOME = "$env:LOCALAPPDATA\Programs\Android Studio\jbr"; $env:Path = "$env:JAVA_HOME\bin;$env:Path"
+firebase emulators:start --only auth,firestore
+```
+
+`firebase.json` fixes the ports (Auth 9099, Firestore 8080, no UI) and `.firebaserc` the project id,
+which must match `google-services.json`. There is no rules file, so the emulator allows every read
+and write: these are adapter tests, not rules tests.
+
+How the pieces connect:
+
+- **`adb reverse`.** `connectedDebugAndroidTest` depends on `firebaseEmulatorReverse`, which runs
+  `adb reverse` for both ports, so `127.0.0.1` on the phone is this PC. With more than one device
+  attached adb needs `-s`; keep one connected.
+- **Cleartext, debug only.** The emulators speak plain HTTP, which the main manifest forbids
+  (`usesCleartextTraffic="false"`). `app/src/debug/res/xml/network_security_config.xml` allows it for
+  `127.0.0.1` and `localhost` only; release builds are untouched.
+- **`testing/firebase/FirebaseEmulator`.** `connect()` probes both ports over HTTP (a bare socket
+  connect is not enough: `adb reverse` accepts it even when nothing listens on the PC), then calls
+  `useEmulator` on Firestore (memory cache) and Auth. `useEmulator` throws once an instance is in
+  use, so a test that forgot to connect fails instead of reaching the real project. `clearFirestore()`
+  and `clearAuth()` wipe the emulators in `@BeforeClass`; `oobCodes()` lists the mails Auth would
+  have sent.
+- **Isolation.** Every test uses its own random email, so documents (`purchases/<email>/…`) and
+  accounts never collide between tests, and listener tests wait on a `Channel` with a timeout.
+- **Google sign-in** is covered here: the Auth emulator accepts an unsigned JSON id token.
+
+**What the emulator cannot show.** It answers with the *legacy* error codes (`ERROR_WRONG_PASSWORD`,
+`ERROR_USER_NOT_FOUND`). A production project with email-enumeration protection (the Firebase
+default since September 2023) answers both a wrong password and an unknown user with
+`ERROR_INVALID_CREDENTIAL`, which `AuthManager` sends to its generic branch. Whether
+`myfinance-fadef` has the protection on is a console setting; try a wrong password on the phone to see
+which message comes back.
 
 ## Hilt instrumented tests
 
@@ -335,6 +391,7 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 | `AuthManager` over a fake identity provider | `core/data/manager/AuthManagerTest` |
 | Room DAOs and `Converters` (device) | `androidTest/…/core/data/dao/…`, `…/converters/…` |
 | App navigation, login, shortcuts (device, Hilt) | `androidTest/…/app/NavigationTest`, `…/LaunchTest` |
+| The Firebase adapters against the Firebase emulators (device) | `androidTest/…/core/data/remote/FirestoreRemoteDataSourceTest`, `…/FirebaseAuthDataSourceTest` |
 | Navigation (`Navigator`, `NavigationState`, `MyFinanceAppState`) | `core/navigation/…` |
 | Theme resolution (Robolectric) | `core/theme/ThemeTest` |
 | Shared Compose components (Robolectric) | `core/components/…Test` |
@@ -351,8 +408,8 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 - **`HomeScreen` and the navigation entries** — the tab entries call `hiltViewModel()` and the
   entries own the snackbar/undo reactions; the shell is covered by `HomeShellScreenshotTests` and
   the device `NavigationTest`. The date-picker dialogs are also uncovered: they are Material's.
-- **Google sign-in** — `androidx.credentials.Credential` needs an `android.os.Bundle`, which the
-  JVM cannot build.
-- **The two Firebase adapters** — `FirestoreRemoteDataSource` and `FirebaseAuthDataSource` are
-  straight ports of the old inline calls and need a Firebase project to run; a manual smoke on the
-  phone (log in, add an expense, change the budget, log out) covers them after changes.
+- **Google sign-in, before the adapter** — `androidx.credentials.Credential` needs an
+  `android.os.Bundle`, which the JVM cannot build, so the Credential Manager step in `AuthViewModel`
+  is untested; the adapter's `signInWithGoogle` is covered on the Auth emulator.
+- **Production security rules and error codes** — the rules are not in the repo and the emulator
+  runs open; the enumeration-protection caveat is under [Firebase emulator tests](#firebase-emulator-tests).
