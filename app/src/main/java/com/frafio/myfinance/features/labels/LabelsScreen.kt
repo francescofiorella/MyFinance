@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,6 +36,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
@@ -65,6 +67,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.ConfirmationSheetDialog
 import com.frafio.myfinance.core.components.EmptyView
+import com.frafio.myfinance.core.components.rememberImeTargetInsets
 import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -146,7 +149,9 @@ fun LabelsContent(
     Scaffold(
         modifier = modifier,
         snackbarHost = snackbarHost,
-        containerColor = MaterialTheme.colorScheme.surface
+        containerColor = MaterialTheme.colorScheme.surface,
+        // Edge-to-edge disables adjustResize: the list must make room for the keyboard itself.
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(rememberImeTargetInsets())
     ) { paddingValues ->
         Column(
             modifier = Modifier

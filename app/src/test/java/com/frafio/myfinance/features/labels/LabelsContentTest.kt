@@ -1,9 +1,21 @@
 package com.frafio.myfinance.features.labels
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.DeviceConfigurationOverride
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -11,8 +23,14 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
+import androidx.core.graphics.Insets
+import androidx.core.view.WindowInsetsCompat
 import com.frafio.myfinance.R
+import com.frafio.myfinance.testing.screenshot.WindowInsets
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.frafio.myfinance.testing.util.string
 import com.google.common.truth.Truth.assertThat
@@ -135,5 +153,45 @@ class LabelsContentTest {
         composeTestRule.onAllNodesWithContentDescription(string(R.string.delete))[1].performClick()
 
         assertThat(events).containsExactly("delete:Rent")
+    }
+
+    @Test
+    fun editingTheLastLabel_keepsTheFieldAboveTheKeyboard() {
+        val keyboardHeight = 300.dp
+        var insets by mutableStateOf(WindowInsetsCompat.Builder().build())
+        lateinit var density: Density
+        composeTestRule.setThemedContent {
+            density = LocalDensity.current
+            Box(Modifier.fillMaxSize().testTag("root")) {
+                DeviceConfigurationOverride(DeviceConfigurationOverride.WindowInsets(insets)) {
+                    LabelsContent(
+                        allLabels = (1..20).map { "Label $it" },
+                        onBackClick = {},
+                        onAddLabel = {},
+                        onDeleteLabel = {},
+                        onEditLabel = { _, _ -> },
+                        snackbarHost = {},
+                    )
+                }
+            }
+        }
+        composeTestRule.onNodeWithTag("labels_list").performScrollToNode(hasText("Label 20"))
+        // A lazy list's semantics order is not its visual order: take the Edit button in Label 20's row.
+        val row = composeTestRule.onNodeWithText("Label 20").fetchSemanticsNode().boundsInRoot
+        val editButtons = composeTestRule.onAllNodesWithContentDescription(string(R.string.edit))
+        val inRow = editButtons.fetchSemanticsNodes().indexOfFirst { it.boundsInRoot.center.y in row.top..row.bottom }
+        editButtons[inRow].performClick()
+        editField().assert(hasText("Label 20"))
+
+        // The keyboard opens once the field has focus, as on a phone.
+        val keyboardPx = with(density) { keyboardHeight.roundToPx() }
+        insets = WindowInsetsCompat.Builder()
+            .setInsets(WindowInsetsCompat.Type.ime(), Insets.of(0, 0, 0, keyboardPx))
+            .setVisible(WindowInsetsCompat.Type.ime(), true)
+            .build()
+        composeTestRule.waitForIdle()
+
+        val keyboardTop = composeTestRule.onNodeWithTag("root").getBoundsInRoot().bottom - keyboardHeight
+        assertThat(editField().getBoundsInRoot().bottom.value).isAtMost(keyboardTop.value)
     }
 }
