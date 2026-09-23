@@ -208,8 +208,11 @@ tasks.withType<Test>().configureEach {
     }
 }
 
-jacoco {
-    toolVersion = libs.versions.jacoco.get()
+// A plugin resets Gradle's JaCoCo to its bundled default in its own afterEvaluate; this one runs later.
+afterEvaluate {
+    jacoco {
+        toolVersion = libs.versions.jacoco.get()
+    }
 }
 
 sonar {
@@ -239,6 +242,9 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("debug")
     val report = tasks.register<JacocoReport>("create${variant.name.replaceFirstChar(Char::titlecase)}CombinedCoverageReport") {
         description = "Merges the unit-test and device-test JaCoCo data of ${variant.name} into one XML/HTML report."
         group = "verification"
+        // Reads their coverage files when they run in the same build, without forcing them to run.
+        val variantName = variant.name.replaceFirstChar(Char::titlecase)
+        mustRunAfter("test${variantName}UnitTest", "connected${variantName}AndroidTest")
         classDirectories.setFrom(
             classJars,
             classDirs.map { dirs -> dirs.map { dir -> objectFactory.fileTree().setDir(dir).exclude(exclusions) } },
