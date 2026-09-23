@@ -10,8 +10,8 @@ The HTML report lands in `app/build/reports/tests/testDebugUnitTest/index.html`.
 task, not a bare `./gradlew test`: the `:baselineProfile` module has no unit tests and needs a
 connected device for everything else. From Android Studio, the gutter ▶ next to a test class or
 method runs it as an *Android JUnit* configuration; an *Android App* configuration only launches
-the app. The run also verifies the screenshot goldens — if it goes red right after a UI change,
-see [Screenshot tests](#screenshot-tests-roborazzi).
+the app. The screenshot tests run too, but their goldens are compared on CI, not here — see
+[Screenshot tests](#screenshot-tests-roborazzi) and [Continuous integration](#continuous-integration).
 
 ## Conventions
 
@@ -191,19 +191,25 @@ accessibility services do); `performTextInput` already works through semantics.
 ## Screenshot tests (Roborazzi)
 
 Every screen and the shared components have golden PNGs under `app/src/test/screenshots/`,
-recorded on Robolectric with Roborazzi. **Whenever you change how a screen or component looks**,
-run these in order:
+recorded on Robolectric with Roborazzi. **The goldens belong to CI**: they are recorded on Linux,
+where CI verifies them, because a Windows render differs from a Linux one by a few pixels on every
+screen and the comparison is pixel-exact. So on this PC:
 
-```
-./gradlew :app:verifyRoborazziDebug     # 1. Did anything look different? Fails and lists the screens that changed.
-./gradlew :app:compareRoborazziDebug    # 2. Show me. Writes reference | diff | new images to app/build/outputs/roborazzi/*_compare.png.
-./gradlew :app:recordRoborazziDebug     # 3. Yes, that is what I meant. Overwrites the goldens; commit the changed PNGs together with the UI change.
-```
+- `./gradlew :app:testDebugUnitTest` runs the screenshot tests like any other — every screen is
+  rendered and its [accessibility checks](#accessibility-checks) still fail the test — but does not
+  compare pixels (`roborazzi.test.verify=false` in `gradle.properties`).
+- `./gradlew :app:compareRoborazziDebug` writes reference | diff | new images to
+  `app/build/outputs/roborazzi/*_compare.png` to look at a change; expect a little Windows-vs-Linux
+  noise besides it. `-Proborazzi.test.verify=true` turns the comparison on for one run.
+- **Never commit goldens recorded here** (`recordRoborazziDebug`): the next CI run would fail on them.
 
-Step 1 also happens inside the normal `./gradlew :app:testDebugUnitTest` (`roborazzi.test.verify=true`
-in `gradle.properties`), so a red unit-test run after a UI edit means "go to step 2". Only record
-after looking at the diff: recording over an unintended change hides a regression. A brand-new
-screen needs a test plus a first `recordRoborazziDebug`; `verify` fails while a golden is missing.
+**Whenever you change how a screen or component looks**: push; CI's *checks* job fails on the screens
+that changed and uploads their `*_compare.png` as the `screenshot-diffs` artifact. Look at them; if
+the change is the one you meant, run the **Record screenshots** workflow (GitHub → Actions → Record
+screenshots → Run workflow, on your branch), which records on Linux and commits the new goldens; then
+`git pull` and re-run CI (commits made by a workflow do not start a new run by themselves). Only
+record after looking at the diff: recording over an unintended change hides a regression. A
+brand-new screen needs a test plus a recording run; verification fails while a golden is missing.
 
 ### How the tests are written
 
@@ -235,8 +241,7 @@ screen needs a test plus a first `recordRoborazziDebug`; `verify` fails while a 
   navigation bar vs rail decision is made in `HomeScreen`.
 - Goldens are stored at half scale (`resizeScale = 0.5`) and compared pixel-exactly
   (`changeThreshold = 0f`). Fonts are bundled and the illustrations are vectors, so the output is
-  stable on one machine. There is no CI: the goldens are recorded on the developer's machine, and
-  a different OS or font stack would render slightly differently and need a re-record.
+  stable on one platform — which is why they are recorded and verified on CI's Linux runner only.
 
 ### Accessibility checks
 
@@ -412,6 +417,41 @@ A rule is a `Detector` in `lint/src/main/kotlin/…/lint/`, listed in `MyFinance
 test in `lint/src/test` that runs it on small source files (`Stubs` supplies the Compose, JUnit and
 Firebase declarations it needs) and pins the exact report. `./gradlew :lint:test` runs those tests;
 after a Gradle sync the editor picks up a changed rule.
+
+## Continuous integration
+
+GitHub Actions runs everything above on every push to `main`, every pull request, and on demand
+(Actions → CI → Run workflow). `.github/workflows/ci.yml` has two jobs:
+
+- **checks** (~15 min) — `lintDebug` and the custom-rule tests, the debug APK, and the JVM suite
+  with the screenshot goldens verified. On failure it uploads `jvm-test-reports`, `lint-reports`
+  and, for screenshots, `screenshot-diffs` (the `*_compare.png` images).
+- **device** (~25 min) — an API 37 Android emulator on the runner plus the Firebase emulators
+  (`firebase emulators:exec … connectedDebugAndroidTest`), so all device tests run, the adapter
+  tests included (`firebaseEmulatorReverse` works on an emulator as on the phone). Then the JVM
+  suite again for coverage, the combined coverage report, the lint report, and the SonarCloud
+  analysis. Uploads `device-test-reports` and `coverage-report`.
+
+`.github/workflows/record-screenshots.yml` (Actions → Record screenshots → Run workflow) records the
+goldens on Linux and commits them to the chosen branch; see [Screenshot tests](#screenshot-tests-roborazzi).
+`.github/ci-gradle.properties` replaces the local Gradle settings on the runner (no daemon, three
+workers). The runner uses JDK 21, the same as the project's daemon JDK.
+
+**Coverage.** The debug build has `enableUnitTestCoverage` and `enableAndroidTestCoverage`
+(JaCoCo, with `includeNoLocationClasses` so classes loaded by Robolectric are counted).
+`./gradlew :app:createDebugCombinedCoverageReport`, run after `testDebugUnitTest` and/or
+`connectedDebugAndroidTest`, merges both into `app/build/reports/jacoco/createDebugCombinedCoverageReport/`
+(HTML to read, XML for SonarCloud); generated code (BuildConfig, Hilt/Dagger, Room `_Impl`,
+`ComposableSingletons`) is excluded — the `R` classes still appear, since they come from a jar the
+exclusions do not reach, but they contain no lines and do not change the figures. It works locally
+too: after both suites it reported about 90 % of lines and 73 % of branches.
+
+**SonarCloud.** The *device* job runs `./gradlew sonar` (plugin `org.sonarqube`, configured in the
+root `build.gradle.kts`), which uploads the code, the JUnit results, the combined coverage and the
+lint findings to `francescofiorella_MyFinance`. The token is the repository secret `SONAR_TOKEN`;
+without it (a fork) the step is skipped. The project's Automatic Analysis is switched off — CI
+analysis and Automatic Analysis cannot both be on. The quality gate is the default "Sonar way",
+whose "≥ 80 % coverage on new code" condition shows on SonarCloud but does not fail CI.
 
 ## What is covered
 

@@ -3,6 +3,11 @@ plugins {
     alias(libs.plugins.baselineprofile)
 }
 
+// Generates the baseline profile; nothing here for SonarCloud to analyse.
+sonar {
+    isSkipProject = true
+}
+
 android {
     namespace = "com.frafio.myfinance.baselineProfile"
     compileSdk = 37

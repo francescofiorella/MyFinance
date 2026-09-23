@@ -1,6 +1,9 @@
+import com.android.build.api.artifact.ScopedArtifact
+import com.android.build.api.variant.ScopedArtifacts
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
+    jacoco
     alias(libs.plugins.android.application)
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.devtools.ksp)
@@ -32,6 +35,11 @@ android {
     }
 
     buildTypes {
+        // Coverage for both suites; only debug, so release stays non-debuggable.
+        debug {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -50,6 +58,10 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
         animationsDisabled = true
+    }
+
+    testCoverage {
+        jacocoVersion = libs.versions.jacoco.get()
     }
 
     // New errors fail lintDebug; the baseline holds the issues accepted so far (docs/testing.md).
@@ -189,4 +201,64 @@ tasks.withType<Test>().configureEach {
     systemProperty("user.language", "en")
     systemProperty("user.country", "US")
     defaultCharacterEncoding = "UTF-8"
+    // Robolectric loads app classes through its own class loader; JaCoCo must follow them.
+    extensions.configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
+jacoco {
+    toolVersion = libs.versions.jacoco.get()
+}
+
+sonar {
+    properties {
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            layout.buildDirectory.file("reports/jacoco/createDebugCombinedCoverageReport/createDebugCombinedCoverageReport.xml").get().asFile.path,
+        )
+        property("sonar.androidLint.reportPaths", layout.buildDirectory.file("reports/lint-results-debug.xml").get().asFile.path)
+    }
+}
+
+// Unit-test and device-test coverage merged into one report for SonarCloud; after nowinandroid's
+// Jacoco.kt. Run it after testDebugUnitTest and connectedDebugAndroidTest.
+androidComponents.onVariants(androidComponents.selector().withBuildType("debug")) { variant ->
+    // Locals only: the configuration cache cannot store lambdas that reach back into this script.
+    val exclusions = listOf(
+        "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
+        "**/*_Hilt*.class", "**/Hilt_*.class", "**/hilt_aggregated_deps/**", "**/dagger/**",
+        "**/*_Factory*.class", "**/*_MembersInjector.class", "**/*Module_*.class",
+        "**/*_Impl*.class", "**/ComposableSingletons*.class",
+    )
+    val objectFactory = objects
+    val classJars = objectFactory.listProperty(RegularFile::class.java)
+    val classDirs = objectFactory.listProperty(Directory::class.java)
+    val buildDir = layout.buildDirectory
+    val report = tasks.register<JacocoReport>("create${variant.name.replaceFirstChar(Char::titlecase)}CombinedCoverageReport") {
+        description = "Merges the unit-test and device-test JaCoCo data of ${variant.name} into one XML/HTML report."
+        group = "verification"
+        classDirectories.setFrom(
+            classJars,
+            classDirs.map { dirs -> dirs.map { dir -> objectFactory.fileTree().setDir(dir).exclude(exclusions) } },
+        )
+        sourceDirectories.setFrom(
+            files(
+                variant.sources.java?.all?.map { dirs -> dirs.map { it.asFile.path } } ?: provider { emptyList<String>() },
+                variant.sources.kotlin?.all?.map { dirs -> dirs.map { it.asFile.path } } ?: provider { emptyList<String>() },
+            ),
+        )
+        executionData.setFrom(
+            objectFactory.fileTree().from(buildDir.dir("outputs/unit_test_code_coverage/${variant.name}UnitTest")).include("**/*.exec"),
+            objectFactory.fileTree().from(buildDir.dir("outputs/code_coverage/${variant.name}AndroidTest")).include("**/*.ec"),
+        )
+        reports {
+            xml.required = true
+            html.required = true
+        }
+    }
+    variant.artifacts.forScope(ScopedArtifacts.Scope.PROJECT)
+        .use(report)
+        .toGet(ScopedArtifact.CLASSES, { _ -> classJars }, { _ -> classDirs })
 }

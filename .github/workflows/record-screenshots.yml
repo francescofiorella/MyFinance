@@ -1,0 +1,43 @@
+name: Record screenshots
+
+# Run by hand after an intended UI change: records the Roborazzi goldens on Linux, the platform CI
+# verifies them on, and commits them to the selected branch.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: record-screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  record:
+    name: Record the goldens
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Use the CI Gradle properties
+        run: mkdir -p ~/.gradle && cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Record
+        run: ./gradlew :app:recordRoborazziDebug
+
+      - name: Commit the goldens
+        uses: stefanzweifel/git-auto-commit-action@v7.2.0
+        with:
+          commit_message: Record screenshot goldens on CI
+          file_pattern: app/src/test/screenshots

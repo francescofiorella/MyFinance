@@ -9,4 +9,14 @@ plugins {
     alias(libs.plugins.android.test) apply false
     alias(libs.plugins.baselineprofile) apply false
     alias(libs.plugins.roborazzi) apply false
+    alias(libs.plugins.sonarqube)
+}
+
+// SonarCloud analysis, run by CI (docs/testing.md#continuous-integration); the token comes from SONAR_TOKEN.
+sonar {
+    properties {
+        property("sonar.projectKey", "francescofiorella_MyFinance")
+        property("sonar.organization", "francescofiorella")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
