@@ -36,13 +36,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.mipmap.ic_launcher_foreground` appears to be unused">
-        <location
-            file="src/main/res/mipmap-hdpi/ic_launcher_foreground.webp"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.string.short_password` appears to be unused"
         errorLine1="    &lt;string name=&quot;short_password&quot;>Password is too short (min. 8 characters)&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
