@@ -19,6 +19,18 @@ if (-not (Test-Path $firebase)) {
     throw "Firebase CLI not found: download https://firebase.tools/bin/win/latest to $firebase"
 }
 
+# Stopping a run from Android Studio ends this script but can leave the emulators running and
+# holding their ports, so clear any left from an earlier run. Only the Firebase CLI and the
+# Firestore emulator's java process are matched, never whatever else may use port 8080.
+$leftovers = Get-CimInstance Win32_Process | Where-Object {
+    ($_.Name -eq 'java.exe' -and $_.CommandLine -match 'cloud-firestore-emulator') -or
+    ($_.Name -eq 'firebase.exe' -and $_.CommandLine -match 'emulators:')
+}
+foreach ($process in $leftovers) {
+    Write-Host "Stopping a leftover emulator process ($($process.Name), pid $($process.ProcessId))"
+    Stop-Process -Id $process.ProcessId -Force -ErrorAction SilentlyContinue
+}
+
 if ($Exec) {
     & $firebase emulators:exec --only auth,firestore '.\gradlew.bat :app:connectedDebugAndroidTest'
 } else {
