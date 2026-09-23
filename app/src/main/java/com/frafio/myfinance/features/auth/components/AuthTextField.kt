@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -81,7 +82,8 @@ fun AuthTextField(
             isError = error != null,
             enabled = enabled,
             visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = keyboardOptions,
+            // A password keyboard never learns or suggests what is typed, whatever the caller passed.
+            keyboardOptions = if (isPassword) keyboardOptions.copy(keyboardType = KeyboardType.Password) else keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = true,
             shape = MaterialTheme.shapes.largeIncreased

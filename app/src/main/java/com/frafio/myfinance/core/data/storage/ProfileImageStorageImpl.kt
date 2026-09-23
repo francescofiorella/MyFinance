@@ -3,6 +3,7 @@ package com.frafio.myfinance.core.data.storage
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -54,8 +55,8 @@ class ProfileImageStorageImpl @Inject constructor(
 
     override fun deleteImage() {
         val file = File(context.filesDir, PROFILE_PIC_NAME)
-        if (file.exists()) {
-            file.delete()
+        if (file.exists() && !file.delete()) {
+            Log.w("ProfileImageStorage", "Could not delete the stored profile picture")
         }
     }
 }

@@ -32,7 +32,7 @@ jobs:
           java-version: 21
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
       - name: Lint and the custom lint rules
         run: ./gradlew :app:lintDebug :lint:test
@@ -74,7 +74,7 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - name: Free disk space for the emulator image
-        uses: jlumbroso/free-disk-space@v2.0.0
+        uses: jlumbroso/free-disk-space@ceedf095f4ec1a097402bc6bd80831f2e1a6fde6 # v2.0.0
         with:
           android: false
           tool-cache: true
@@ -106,12 +106,12 @@ jobs:
           java-version: 21
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
       - name: Install the Firebase CLI
         run: |
           mkdir -p "$HOME/.local/bin"
-          curl -sSL -o "$HOME/.local/bin/firebase" https://firebase.tools/bin/linux/latest
+          curl --proto '=https' --tlsv1.2 -sSfL -o "$HOME/.local/bin/firebase" https://firebase.tools/bin/linux/latest
           chmod +x "$HOME/.local/bin/firebase"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
@@ -122,7 +122,7 @@ jobs:
           key: firebase-emulators-${{ runner.os }}-${{ hashFiles('firebase.json') }}
 
       - name: Device tests against the Firebase emulators
-        uses: reactivecircus/android-emulator-runner@v2.38.0
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           # The newest test-optimised (ATD) image; the full API 37 image did not boot on the runner.
           api-level: 36

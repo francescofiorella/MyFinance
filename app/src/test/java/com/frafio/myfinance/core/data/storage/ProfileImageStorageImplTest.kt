@@ -9,6 +9,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.GraphicsMode
+import org.robolectric.shadows.ShadowLog
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -85,6 +86,22 @@ class ProfileImageStorageImplTest {
     fun loadBitmap_withoutASavedImage_isNull() = runBlocking {
         assertThat(subject.loadBitmap()).isNull()
         assertThat(subject.loadBitmapSync()).isNull()
+    }
+
+    @Test
+    fun deleteImage_thatFails_isLogged() {
+        // A non-empty directory where the picture belongs cannot be deleted.
+        file.mkdirs()
+        File(file, "blocker").writeText("x")
+        try {
+            subject.deleteImage()
+
+            assertThat(file.exists()).isTrue()
+            assertThat(ShadowLog.getLogsForTag("ProfileImageStorage").map { it.msg })
+                .containsExactly("Could not delete the stored profile picture")
+        } finally {
+            file.deleteRecursively()
+        }
     }
 
     @Test
