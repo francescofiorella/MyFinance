@@ -124,9 +124,13 @@ jobs:
       - name: Device tests against the Firebase emulators
         uses: reactivecircus/android-emulator-runner@v2.38.0
         with:
-          api-level: '37.0'
-          target: google_apis
+          # The newest test-optimised (ATD) image; the full API 37 image did not boot on the runner.
+          api-level: 36
+          target: google_atd
           arch: x86_64
+          cores: 4
+          ram-size: 4096M
+          emulator-boot-timeout: 900
           disable-animations: true
           disk-size: 6000M
           heap-size: 600M

@@ -426,7 +426,8 @@ GitHub Actions runs everything above on every push to `main`, every pull request
 - **checks** (~15 min) — `lintDebug` and the custom-rule tests, the debug APK, and the JVM suite
   with the screenshot goldens verified. On failure it uploads `jvm-test-reports`, `lint-reports`
   and, for screenshots, `screenshot-diffs` (the `*_compare.png` images).
-- **device** (~25 min) — an API 37 Android emulator on the runner plus the Firebase emulators
+- **device** (~25 min) — an API 36 Android emulator on the runner (the `google_atd` test image, the
+  newest that boots there; API 37 is covered by the phone locally) plus the Firebase emulators
   (`firebase emulators:exec … connectedDebugAndroidTest`), so all device tests run, the adapter
   tests included (`firebaseEmulatorReverse` works on an emulator as on the phone). Then the JVM
   suite again for coverage, the combined coverage report, the lint report, and the SonarCloud
