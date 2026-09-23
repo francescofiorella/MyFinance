@@ -46,6 +46,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -199,6 +205,12 @@ fun PieChart(
         items.indices.forEach { index ->
             if (floatValues[index] > 0f || animatedValues[index].value > 0.01f) {
                 PieChartArc(
+                    contentDescription = stringResource(
+                        R.string.chart_slice,
+                        items[index].label,
+                        doubleToPriceWithoutDecimals(items[index].value)
+                    ),
+                    isSelected = selectedArcIndex == index,
                     color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark),
                     iconPainter = painterResource(items[index].icon),
                     iconOnColor = getCategoryOnContainerColor(index, default = MaterialTheme.colorScheme.surface, isDark = isDark),
@@ -261,6 +273,8 @@ fun PieChart(
 
 @Composable
 private fun PieChartArc(
+    contentDescription: String,
+    isSelected: Boolean,
     color: Color,
     iconPainter: Painter,
     iconOnColor: Color,
@@ -297,6 +311,15 @@ private fun PieChartArc(
                     shape = ArcShape(start, sweep, strokePx + tapExtraPx, radPx)
                     clip = true
                     alpha = alphaState.value
+                }
+                .semantics {
+                    this.contentDescription = contentDescription
+                    role = Role.Button
+                    selected = isSelected
+                    onClick {
+                        onRelease()
+                        true
+                    }
                 }
                 .pointerInput(onPress, onRelease, onCancel) {
                     detectTapGestures(

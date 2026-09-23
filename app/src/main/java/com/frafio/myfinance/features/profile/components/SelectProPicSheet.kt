@@ -62,19 +62,19 @@ fun SelectProPicSheet(
                         modifier = Modifier.size(imageSize),
                         url = googlePhotoUrl,
                         onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value) },
-                        contentDescription = stringResource(id = R.string.profile_picture),
+                        contentDescription = stringResource(id = R.string.google_profile_picture),
                         containerSize = imageSize,
                         contentSize = iconSize,
                         isSelected = currentProPic == FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value
                     )
                 }
 
-                avatarOptions.forEach { option ->
+                avatarOptions.forEachIndexed { index, option ->
                     ImageSelectorButton(
                         modifier = Modifier.size(imageSize),
                         drawable = option.drawableRes,
                         onClick = { onSelectPhoto(option.id) },
-                        contentDescription = stringResource(id = R.string.profile_picture),
+                        contentDescription = stringResource(id = R.string.avatar_position, index + 1, avatarOptions.size),
                         containerSize = imageSize,
                         contentSize = iconSize,
                         isSelected = currentProPic == option.id

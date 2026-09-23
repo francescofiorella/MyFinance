@@ -304,7 +304,7 @@ fun ChangePasswordTopBar(
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
-                contentDescription = stringResource(id = R.string.back_arrow),
+                contentDescription = stringResource(id = R.string.navigate_up),
             )
         }
 
@@ -531,7 +531,7 @@ fun PasswordField(
                                 R.drawable.ic_visibility_filled
                             else
                                 R.drawable.ic_visibility_off_filled),
-                            contentDescription = if (isVisible) "Hide password" else "Show password"
+                            contentDescription = stringResource(if (isVisible) R.string.hide_password else R.string.show_password)
                         )
                     }
                 },

@@ -7,7 +7,7 @@ import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -71,11 +71,9 @@ class ExpensesComponentsTest {
         composeTestRule.onNodeWithText("Last 7 days").assertIsDisplayed()
         composeTestRule.onNodeWithText(string(getCategoryName(CATEGORIES.HOUSING.value))).assertIsDisplayed()
 
-        // Chips render in the order labels, date, categories.
-        val remove = composeTestRule.onAllNodesWithContentDescription(string(R.string.remove))
-        remove[0].performClick()
-        remove[1].performClick()
-        remove[2].performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.remove_item, "Dinner")).performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.remove_item, "Last 7 days")).performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.remove_item, string(getCategoryName(CATEGORIES.HOUSING.value)))).performClick()
 
         assertThat(events).containsExactly("label:Dinner", "date", "category:${CATEGORIES.HOUSING.value}").inOrder()
     }
@@ -85,7 +83,7 @@ class ExpensesComponentsTest {
         setChipBar(emptyList(), listOf("Dinner"), null)
 
         composeTestRule.onNodeWithText("Last 7 days").assertDoesNotExist()
-        composeTestRule.onAllNodesWithContentDescription(string(R.string.remove))[0].performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.remove_item, "Dinner")).performClick()
         assertThat(events).containsExactly("label:Dinner")
     }
 

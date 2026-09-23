@@ -34,6 +34,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,6 +45,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPrice
@@ -154,9 +158,13 @@ fun BarChart(
                         val isSelected = selectedIndex == index
                         val barHeightFraction =
                             (entry.value / maxValue).toFloat().coerceIn(0.01f, 1f)
-
                         customItem(
                             {
+                                val barDescription = stringResource(
+                                    R.string.chart_bar,
+                                    YearMonth.of(entry.year, entry.month).format(DateTimeFormatter.ofPattern("MMMM yyyy")),
+                                    doubleToPrice(entry.value)
+                                )
                                 ChartBar(
                                     modifier = Modifier
                                         .weight(1f)
@@ -165,6 +173,7 @@ fun BarChart(
                                     barPadding = barPadding,
                                     heightFraction = barHeightFraction,
                                     isSelected = isSelected,
+                                    contentDescription = barDescription,
                                     onClick = {
                                         selectedIndex = index
                                         onBarClick(index)
@@ -253,6 +262,7 @@ private fun ChartBar(
     barPadding: Dp = 3.dp,
     heightFraction: Float,
     isSelected: Boolean,
+    contentDescription: String,
     onClick: () -> Unit,
     interactionSource: MutableInteractionSource
 ) {
@@ -272,6 +282,7 @@ private fun ChartBar(
             checkedContainerColor = MaterialTheme.colorScheme.primary
         ),
         modifier = modifier
+            .semantics { this.contentDescription = contentDescription }
             .fillMaxHeight(animatedHeightFraction)
             .padding(horizontal = barPadding)
             .width(barWidth),

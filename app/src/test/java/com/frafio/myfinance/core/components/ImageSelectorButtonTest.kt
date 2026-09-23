@@ -26,7 +26,7 @@ class ImageSelectorButtonTest {
     fun unselected_isEnabledAndReportsClicks() {
         var clicks = 0
         composeTestRule.setThemedContent {
-            ImageSelectorButton(drawable = R.drawable.image_profile_interface_cuate, onClick = { clicks++ })
+            ImageSelectorButton(drawable = R.drawable.image_profile_interface_cuate, onClick = { clicks++ }, contentDescription = "Avatar")
         }
 
         composeTestRule.onNode(hasClickAction()).assertIsEnabled().performClick()
@@ -38,7 +38,7 @@ class ImageSelectorButtonTest {
     fun selected_isNotEnabled() {
         var clicks = 0
         composeTestRule.setThemedContent {
-            ImageSelectorButton(drawable = R.drawable.image_profile_interface_cuate, onClick = { clicks++ }, isSelected = true)
+            ImageSelectorButton(drawable = R.drawable.image_profile_interface_cuate, onClick = { clicks++ }, contentDescription = "Avatar", isSelected = true)
         }
 
         composeTestRule.onNode(hasClickAction()).assertIsNotEnabled().performClick()

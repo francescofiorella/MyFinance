@@ -56,7 +56,7 @@ class LabelsContentTest {
         composeTestRule.onNodeWithTag("labels_list").assertIsDisplayed()
         composeTestRule.onNodeWithText("Food").assertIsDisplayed()
         composeTestRule.onNodeWithText("Rent").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription(string(R.string.back_arrow)).performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.navigate_up)).performClick()
 
         assertThat(events).containsExactly("back")
     }
@@ -89,7 +89,7 @@ class LabelsContentTest {
         newLabelField().performTextInput("food")
 
         confirm().assertIsNotEnabled()
-        composeTestRule.onNodeWithContentDescription("Clear").performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.clear)).performClick()
         confirm().assertDoesNotExist()
     }
 

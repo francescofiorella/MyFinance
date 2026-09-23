@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -68,12 +69,12 @@ fun AuthTextField(
                     IconButton(onClick = { onPasswordVisibleChange(!passwordVisible) }) {
                         Icon(
                             painter = painterResource(id = if (passwordVisible) R.drawable.ic_visibility_filled else R.drawable.ic_visibility_off_filled),
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            contentDescription = stringResource(if (passwordVisible) R.string.hide_password else R.string.show_password)
                         )
                     }
                 } else if (value.isNotEmpty() && enabled) {
                     IconButton(onClick = { onValueChange("") }) {
-                        Icon(painter = painterResource(id = R.drawable.ic_cancel_filled), contentDescription = "Clear")
+                        Icon(painter = painterResource(id = R.drawable.ic_cancel_filled), contentDescription = stringResource(R.string.clear))
                     }
                 }
             },

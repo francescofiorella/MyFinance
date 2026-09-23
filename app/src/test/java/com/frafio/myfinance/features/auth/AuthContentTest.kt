@@ -52,7 +52,7 @@ class AuthContentTest {
         composeTestRule.onNodeWithTag("auth_toggle_mode").assertTextEquals(string(R.string.login_signup)).performClick()
         composeTestRule.onNodeWithTag("auth_forgot_password").assertIsEnabled().performClick()
         composeTestRule.onNodeWithText(string(R.string.login_google)).performClick()
-        composeTestRule.onNodeWithContentDescription(string(R.string.back_arrow)).assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(string(R.string.back_to_login)).assertDoesNotExist()
 
         assertThat(events).containsExactly("auth", "toggle", "forgot", "google").inOrder()
     }
@@ -64,7 +64,7 @@ class AuthContentTest {
         composeTestRule.onNodeWithTag("login_button").assertTextEquals(string(R.string.signup))
         composeTestRule.onNodeWithTag("auth_toggle_mode").assertTextEquals(string(R.string.signup_login))
         composeTestRule.onNodeWithTag("auth_forgot_password").assertIsNotEnabled()
-        composeTestRule.onNodeWithContentDescription(string(R.string.back_arrow)).performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.back_to_login)).performClick()
 
         assertThat(events).containsExactly("toggle")
     }

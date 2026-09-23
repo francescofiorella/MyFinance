@@ -171,7 +171,7 @@ fun LabelsContent(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
-                        contentDescription = stringResource(id = R.string.back_arrow),
+                        contentDescription = stringResource(id = R.string.navigate_up),
                     )
                 }
 
@@ -309,7 +309,7 @@ fun NewLabelItem(
                     IconButton(onClick = { onValueChange(TextFieldValue("")) }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_cancel_filled),
-                            contentDescription = "Clear"
+                            contentDescription = stringResource(id = R.string.clear)
                         )
                     }
                     Spacer(modifier = Modifier.width(14.dp))

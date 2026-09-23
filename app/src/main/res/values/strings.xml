@@ -16,6 +16,12 @@
     <string name="undo">Undo</string>
     <string name="close">Close</string>
     <string name="duplicate">Duplicate</string>
+    <string name="clear">Clear</string>
+    <string name="logout">Log out</string>
+    <string name="navigate_up">Navigate up</string>
+    <string name="remove_item">Remove %1$s</string>
+    <string name="expanded">Expanded</string>
+    <string name="collapsed">Collapsed</string>
 
     <string name="login_successful">You are logged in as</string>
 
@@ -27,6 +33,7 @@
     <string name="labels">Labels</string>
     <string name="label">Label</string>
     <string name="create_label">Create new label</string>
+    <string name="add_label">Add label</string>
 
     <string name="total_expenses">Total expenses</string>
     <string name="on_filters">Based on filters</string>
@@ -50,6 +57,9 @@
     <string name="current_password">Enter current password</string>
     <string name="reset_password">Reset password</string>
     <string name="or">or</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="back_to_login">Back to sign in</string>
 
     <string name="warning_home">Add your first expense</string>
     <string name="warning_budget">Add your first income</string>
@@ -62,8 +72,8 @@
     <string name="monthly_expenses">Monthly expenses</string>
 
     <string name="profile_picture">Profile Picture</string>
-
-    <string name="back_arrow" translatable="false">Back Arrow</string>
+    <string name="google_profile_picture">Google profile picture</string>
+    <string name="avatar_position">Avatar %1$d of %2$d</string>
 
     <string name="use_dynamic_color">Dynamic colors</string>
 
@@ -90,6 +100,8 @@
 
     <string name="annual_budget">Annual budget</string>
     <string name="incomes">Incomes</string>
+    <string name="edit_budget">Edit budget</string>
+    <string name="delete_budget">Delete budget</string>
 
     <string name="housing">Housing</string>
     <string name="groceries">Groceries</string>
@@ -136,6 +148,20 @@
     <string name="filter">Filter</string>
     <string name="date_range">Date range</string>
     <string name="annual_balance">Annual balance</string>
+    <string name="clear_search">Clear search</string>
+    <string name="show_statistics">Show statistics</string>
+    <string name="change_category">Change category (%1$s)</string>
+    <string name="previous_month">Previous month</string>
+    <string name="next_month">Next month</string>
+    <string name="current_month">Current month</string>
+    <string name="previous_year">Previous year</string>
+    <string name="next_year">Next year</string>
+    <string name="current_year">Current year</string>
+    <string name="previous_period">Previous period</string>
+    <string name="next_period">Next period</string>
+    <string name="current_period">Current period</string>
+    <string name="chart_bar">%1$s, %2$s</string>
+    <string name="chart_slice">%1$s, %2$s</string>
 
     <string name="budget_updated">Budget updated</string>
     <string name="income_deleted">Income deleted</string>

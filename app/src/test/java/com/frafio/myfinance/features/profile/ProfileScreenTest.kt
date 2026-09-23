@@ -4,7 +4,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -14,6 +13,7 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.avatarOptions
 import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.core.utils.capitalizeWords
 import com.frafio.myfinance.testing.data.testUser
@@ -126,7 +126,7 @@ class ProfileScreenTest {
         composeTestRule.onNodeWithTag("profile_edit_profile").performClick()
         composeTestRule.onNodeWithText(string(R.string.edit_propic)).performClick()
 
-        composeTestRule.onAllNodesWithContentDescription(string(R.string.profile_picture))[2].performClickAction()
+        composeTestRule.onNodeWithContentDescription(string(R.string.avatar_position, 3, avatarOptions.size)).performClickAction()
 
         assertThat(expensesRepository.proPicChoiceCalls).containsExactly("avatar_3")
     }

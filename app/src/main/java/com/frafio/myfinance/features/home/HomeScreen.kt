@@ -388,13 +388,13 @@ private fun MainScaffold(
                                 if (currentTab == HomeTabKey.Profile) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_logout_filled),
-                                        contentDescription = "Logout"
+                                        contentDescription = stringResource(id = R.string.logout)
                                     )
                                 } else {
                                     val painter = rememberProfilePicturePainter(proPicChoice, profilePicture)
                                     Image(
                                         painter = painter,
-                                        contentDescription = stringResource(id = R.string.profile_picture),
+                                        contentDescription = stringResource(id = R.string.profile),
                                         modifier = Modifier
                                             .size(40.dp),
                                         contentScale = ContentScale.Crop

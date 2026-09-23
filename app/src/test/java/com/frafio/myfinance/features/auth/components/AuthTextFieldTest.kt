@@ -12,6 +12,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.frafio.myfinance.R
 import com.frafio.myfinance.testing.util.setThemedContent
+import com.frafio.myfinance.testing.util.string
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -61,7 +62,7 @@ class AuthTextFieldTest {
     fun clearButton_clearsTheValue() {
         composeTestRule.setThemedContent { Field() }
 
-        composeTestRule.onNodeWithContentDescription("Clear").performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.clear)).performClick()
 
         assertThat(values).containsExactly("")
     }
@@ -69,14 +70,14 @@ class AuthTextFieldTest {
     @Test
     fun clearButton_isAbsentWhenEmptyOrDisabled() {
         composeTestRule.setThemedContent { Field(value = "") }
-        composeTestRule.onNodeWithContentDescription("Clear").assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(string(R.string.clear)).assertDoesNotExist()
     }
 
     @Test
     fun disabledField_hasNoClearButton_andIsNotEnabled() {
         composeTestRule.setThemedContent { Field(enabled = false) }
 
-        composeTestRule.onNodeWithContentDescription("Clear").assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(string(R.string.clear)).assertDoesNotExist()
         composeTestRule.onNodeWithTag("field").assertIsNotEnabled()
     }
 
@@ -85,16 +86,16 @@ class AuthTextFieldTest {
         composeTestRule.setThemedContent { Field(error = "Invalid email", isPassword = true) }
 
         composeTestRule.onNodeWithText("Invalid email").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("Clear").assertDoesNotExist()
-        composeTestRule.onNodeWithContentDescription("Show password").assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(string(R.string.clear)).assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(string(R.string.show_password)).assertDoesNotExist()
     }
 
     @Test
     fun passwordField_toggleRequestsVisibility() {
         composeTestRule.setThemedContent { Field(value = "secret", isPassword = true) }
 
-        composeTestRule.onNodeWithContentDescription("Clear").assertDoesNotExist()
-        composeTestRule.onNodeWithContentDescription("Show password").performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.clear)).assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(string(R.string.show_password)).performClick()
 
         assertThat(visibility).containsExactly(true)
     }
@@ -103,7 +104,7 @@ class AuthTextFieldTest {
     fun visiblePassword_offersToHideIt() {
         composeTestRule.setThemedContent { Field(value = "secret", isPassword = true, passwordVisible = true) }
 
-        composeTestRule.onNodeWithContentDescription("Hide password").performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.hide_password)).performClick()
 
         assertThat(visibility).containsExactly(false)
         composeTestRule.onNodeWithTag("field").assert(hasText("secret"))

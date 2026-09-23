@@ -329,7 +329,7 @@ internal fun AuthContent(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
-                        contentDescription = stringResource(id = R.string.back_arrow)
+                        contentDescription = stringResource(id = R.string.back_to_login)
                     )
                 }
             }

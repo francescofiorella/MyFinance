@@ -69,6 +69,9 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -384,12 +387,19 @@ fun AddTopBar(
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_close_filled),
-                contentDescription = stringResource(id = R.string.back_arrow),
+                contentDescription = stringResource(id = R.string.close),
             )
         }
 
+        val typeSelectionState = stringResource(id = if (isTypeSelectionVisible) R.string.expanded else R.string.collapsed)
         TextButton(
-            modifier = Modifier.testTag("add_type_button"),
+            modifier = Modifier
+                .testTag("add_type_button")
+                .then(
+                    if (navKey.requestType == RootKey.RequestType.Add) {
+                        Modifier.semantics { stateDescription = typeSelectionState }
+                    } else Modifier
+                ),
             onClick = {
                 focusManager.clearFocus()
                 onToggleTypeSelection(true)
@@ -527,7 +537,7 @@ fun NameAndLabelsCard(
                                 IconButton(onClick = { nameState.edit { replace(0, length, "") } }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_cancel_filled),
-                                        contentDescription = "Clear"
+                                        contentDescription = stringResource(id = R.string.clear)
                                     )
                                 }
                             }
@@ -603,7 +613,7 @@ fun LabelChip(
         modifier = Modifier
             .clip(AssistChipDefaults.shape)
             .background(MaterialTheme.colorScheme.secondaryContainer)
-            .clickable { onClick() },
+            .clickable(onClickLabel = stringResource(id = R.string.remove), role = Role.Button) { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -619,7 +629,7 @@ fun LabelChip(
             Icon(
                 modifier = Modifier.size(16.dp),
                 painter = painterResource(id = R.drawable.ic_close_filled),
-                contentDescription = "Remove Label",
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSecondaryContainer
             )
         }
@@ -632,7 +642,7 @@ fun AddLabelChip(onClick: () -> Unit) {
         modifier = Modifier
             .clip(AssistChipDefaults.shape)
             .background(MaterialTheme.colorScheme.secondaryContainer)
-            .clickable { onClick() },
+            .clickable(role = Role.Button) { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Icon(
@@ -640,7 +650,7 @@ fun AddLabelChip(onClick: () -> Unit) {
                 .padding(horizontal = 8.dp, vertical = 4.dp)
                 .size(AssistChipDefaults.IconSize),
             painter = painterResource(id = R.drawable.ic_add_filled),
-            contentDescription = "Add Label",
+            contentDescription = stringResource(id = R.string.add_label),
             tint = MaterialTheme.colorScheme.onSecondaryContainer
         )
     }
@@ -800,7 +810,7 @@ fun AmountField(
                         IconButton(onClick = { priceState.edit { replace(0, length, "") } }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_cancel_filled),
-                                contentDescription = "Clear"
+                                contentDescription = stringResource(id = R.string.clear)
                             )
                         }
                     }

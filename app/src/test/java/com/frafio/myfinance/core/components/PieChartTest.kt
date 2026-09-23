@@ -14,7 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-/** Centre text only: the arcs use `pointerInput` without semantics, so they cannot be addressed. */
+/** Centre text; what the arcs expose to accessibility services is in `app/AccessibilityTest`. */
 @RunWith(RobolectricTestRunner::class)
 class PieChartTest {
 

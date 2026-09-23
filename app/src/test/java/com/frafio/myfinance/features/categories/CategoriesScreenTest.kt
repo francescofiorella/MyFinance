@@ -57,7 +57,7 @@ class CategoriesScreenTest {
     fun back_invokesTheCallback() {
         setScreen()
 
-        composeTestRule.onNodeWithContentDescription(string(R.string.back_arrow)).performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.navigate_up)).performClick()
 
         assertThat(backClicks).isEqualTo(1)
     }

@@ -339,7 +339,7 @@ fun ExpensesContent(
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_query_stats_filled),
-                                        contentDescription = null
+                                        contentDescription = stringResource(R.string.show_statistics)
                                     )
                                 }
                             }

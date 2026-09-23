@@ -98,7 +98,7 @@ fun MonthlyExpensesChartCard(
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_keyboard_arrow_left_filled),
-                                    contentDescription = null,
+                                    contentDescription = stringResource(R.string.previous_month),
                                 )
                             }
                         },
@@ -119,7 +119,7 @@ fun MonthlyExpensesChartCard(
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_keyboard_arrow_right_filled),
-                                    contentDescription = null
+                                    contentDescription = stringResource(R.string.next_month)
                                 )
                             }
                         },
@@ -140,7 +140,7 @@ fun MonthlyExpensesChartCard(
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_today_filled),
-                                    contentDescription = null,
+                                    contentDescription = stringResource(R.string.current_month),
                                 )
                             }
                         },

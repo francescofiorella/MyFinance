@@ -13,8 +13,8 @@ import androidx.test.core.app.ApplicationProvider
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 /** Resolves a string resource the way the component under test does. */
-fun string(@StringRes id: Int): String =
-    ApplicationProvider.getApplicationContext<Context>().getString(id)
+fun string(@StringRes id: Int, vararg formatArgs: Any): String =
+    ApplicationProvider.getApplicationContext<Context>().getString(id, *formatArgs)
 
 /**
  * Renders [content] under the app theme. With [inline] the sheets built on `AdaptiveSheet` render

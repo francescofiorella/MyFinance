@@ -128,7 +128,10 @@ fun TransactionListItem(
                         ) {
                             Icon(
                                 painter = painterResource(getCategoryIcon(transaction.category)),
-                                contentDescription = null,
+                                contentDescription = stringResource(
+                                    R.string.change_category,
+                                    stringResource(getCategoryName(transaction.category))
+                                ),
                             )
                         }
                     }

@@ -8,13 +8,13 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.avatarOptions
 import com.frafio.myfinance.core.utils.capitalizeWords
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.frafio.myfinance.testing.util.string
@@ -130,15 +130,17 @@ class ProfileSheetsTest {
         }
     }
 
-    private fun pictures() = composeTestRule.onAllNodesWithContentDescription(string(R.string.profile_picture))
+    private fun avatar(position: Int) =
+        composeTestRule.onNodeWithContentDescription(string(R.string.avatar_position, position, avatarOptions.size))
 
     @Test
     fun proPicSheet_offersTheSevenAvatars_andDisablesTheCurrentOne() {
         setProPicSheet(googlePhotoUrl = null, current = "avatar_1")
 
-        pictures().assertCountEquals(7)
-        pictures()[0].assertIsNotEnabled()
-        pictures()[2].assertIsEnabled().performClick()
+        (1..7).forEach { avatar(it).assertExists() }
+        composeTestRule.onAllNodes(hasClickAction()).assertCountEquals(7)
+        avatar(1).assertIsNotEnabled()
+        avatar(3).assertIsEnabled().performClick()
 
         assertThat(events).containsExactly("photo:avatar_3")
     }
@@ -147,9 +149,9 @@ class ProfileSheetsTest {
     fun proPicSheet_withGooglePhoto_addsItFirst() {
         setProPicSheet(googlePhotoUrl = "https://example.com/photo.jpg", current = "google")
 
-        pictures().assertCountEquals(8)
-        pictures()[0].assertIsNotEnabled()
-        pictures()[1].performClick()
+        composeTestRule.onAllNodes(hasClickAction()).assertCountEquals(8)
+        composeTestRule.onNodeWithContentDescription(string(R.string.google_profile_picture)).assertIsNotEnabled()
+        avatar(1).performClick()
 
         assertThat(events).containsExactly("photo:avatar_1")
     }

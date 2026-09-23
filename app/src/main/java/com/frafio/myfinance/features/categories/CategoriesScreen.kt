@@ -44,6 +44,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
@@ -124,7 +126,7 @@ fun CategoriesTopBar(onBackClick: () -> Unit) {
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
-                contentDescription = stringResource(id = R.string.back_arrow),
+                contentDescription = stringResource(id = R.string.navigate_up),
             )
         }
 
@@ -150,6 +152,7 @@ fun CategoryExpandableItem(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     )
 
+    val expandState = stringResource(id = if (isExpanded) R.string.expanded else R.string.collapsed)
     SegmentedListItem(
         onClick = onToggleExpand,
         colors = colors,
@@ -231,6 +234,7 @@ fun CategoryExpandableItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .padding(bottom = 2.dp)
+            .semantics { stateDescription = expandState }
     )
 }
 

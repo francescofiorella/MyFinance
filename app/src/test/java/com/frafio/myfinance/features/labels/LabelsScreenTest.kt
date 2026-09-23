@@ -61,7 +61,7 @@ class LabelsScreenTest {
         composeTestRule.onNodeWithTag("labels_list").assertIsDisplayed()
         composeTestRule.onNodeWithText("food").assertIsDisplayed()
         composeTestRule.onNodeWithText("travel").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription(string(R.string.back_arrow)).performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.navigate_up)).performClick()
         assertThat(backClicks).isEqualTo(1)
     }
 

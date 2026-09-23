@@ -16,6 +16,12 @@
     <string name="undo">Annulla</string>
     <string name="close">Chiudi</string>
     <string name="duplicate">Duplica</string>
+    <string name="clear">Cancella</string>
+    <string name="logout">Esci</string>
+    <string name="navigate_up">Torna indietro</string>
+    <string name="remove_item">Rimuovi %1$s</string>
+    <string name="expanded">Espanso</string>
+    <string name="collapsed">Compresso</string>
 
     <string name="login_successful">Hai effettuato l\'accesso come</string>
 
@@ -27,6 +33,7 @@
     <string name="labels">Etichette</string>
     <string name="label">Etichetta</string>
     <string name="create_label">Crea nuova etichetta</string>
+    <string name="add_label">Aggiungi etichetta</string>
 
     <string name="total_expenses">Totale spese</string>
     <string name="on_filters">In base ai filtri</string>
@@ -50,6 +57,9 @@
     <string name="current_password">Inserisci password attuale</string>
     <string name="reset_password">Reimposta password</string>
     <string name="or">oppure</string>
+    <string name="show_password">Mostra password</string>
+    <string name="hide_password">Nascondi password</string>
+    <string name="back_to_login">Torna all\'accesso</string>
 
     <string name="warning_home">Aggiungi la tua prima spesa</string>
     <string name="warning_budget">Aggiungi la tua prima entrata</string>
@@ -62,6 +72,8 @@
     <string name="monthly_expenses">Spese mensili</string>
 
     <string name="profile_picture">Immagine di profilo</string>
+    <string name="google_profile_picture">Immagine di profilo Google</string>
+    <string name="avatar_position">Avatar %1$d di %2$d</string>
 
     <string name="use_dynamic_color">Colori dinamici</string>
 
@@ -84,6 +96,8 @@
 
     <string name="annual_budget">Budget annuale</string>
     <string name="incomes">Entrate</string>
+    <string name="edit_budget">Modifica budget</string>
+    <string name="delete_budget">Elimina budget</string>
 
     <string name="total">Totale</string>
 
@@ -140,4 +154,18 @@
     <string name="filter">Filtro</string>
     <string name="date_range">Intervallo di date</string>
     <string name="annual_balance">Bilancio annuale</string>
+    <string name="clear_search">Cancella ricerca</string>
+    <string name="show_statistics">Mostra statistiche</string>
+    <string name="change_category">Cambia categoria (%1$s)</string>
+    <string name="previous_month">Mese precedente</string>
+    <string name="next_month">Mese successivo</string>
+    <string name="current_month">Mese corrente</string>
+    <string name="previous_year">Anno precedente</string>
+    <string name="next_year">Anno successivo</string>
+    <string name="current_year">Anno corrente</string>
+    <string name="previous_period">Periodo precedente</string>
+    <string name="next_period">Periodo successivo</string>
+    <string name="current_period">Periodo corrente</string>
+    <string name="chart_bar">%1$s, %2$s</string>
+    <string name="chart_slice">%1$s, %2$s</string>
 </resources>

@@ -60,7 +60,7 @@ fun SearchBar(
                         IconButton(onClick = { onQueryChange("") }) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_close_filled),
-                                contentDescription = null
+                                contentDescription = stringResource(R.string.clear_search)
                             )
                         }
                     }

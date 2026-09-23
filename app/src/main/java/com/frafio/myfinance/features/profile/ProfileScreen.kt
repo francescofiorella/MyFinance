@@ -41,6 +41,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -207,7 +209,7 @@ private fun ProfileHeader(user: User?, profilePicture: Bitmap?, proPicChoice: St
     val painter = rememberProfilePicturePainter(proPicChoice, profilePicture)
     Image(
         painter = painter,
-        contentDescription = stringResource(id = R.string.profile_picture),
+        contentDescription = null,
         modifier = Modifier
             .size(120.dp)
             .clip(CircleShape),
@@ -265,6 +267,7 @@ private fun ProfileCards(
     val googleLinked = user?.isGoogleLinked == true
     val emailLinked = user?.hasPassword == true
 
+    val expandState = stringResource(id = if (expanded) R.string.expanded else R.string.collapsed)
     SegmentedListItem(
         onClick = { expanded = !expanded },
         colors = colors,
@@ -323,6 +326,7 @@ private fun ProfileCards(
         modifier = Modifier
             .fillMaxWidth()
             .testTag("profile_edit_profile")
+            .semantics { stateDescription = expandState }
             .padding(horizontal = 16.dp)
             .padding(bottom = 2.dp),
     )

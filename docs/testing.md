@@ -51,6 +51,15 @@ hand-written fakes, direct ViewModel construction.
   `StateFlow.value` after collecting, as the clone does.
 - **Naming**: camelCase, `subject_condition_expectation` or a short sentence, no `test` prefix;
   `@Before fun setup()`; a repository under test is called `subject`.
+- **Content descriptions.** A control whose only label is an icon gets a `contentDescription`
+  from a string resource, translated in `values-it` (no literals, no `translatable="false"`); if
+  several share an icon, the label names what each acts on (`remove_item` → "Remove Dinner",
+  `avatar_position` → "Avatar 3 of 7"). An icon next to visible text, or inside a row that already
+  reads its text, stays `null`, or TalkBack reads it twice. A swapped icon that is the only cue for
+  a state gets a `stateDescription` (`expanded`/`collapsed`); toggles and selectable items use
+  Compose's own toggle/`selected` semantics instead. Tests find controls by these labels
+  (`string(R.string.remove_item, "Dinner")`; `string()` takes format arguments), so a wrong label
+  fails a test. `app/AccessibilityTest` pins the rules the ATF checks cannot see.
 
 ## Testing ViewModels
 
@@ -309,6 +318,7 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 | Shared Compose components (Robolectric) | `core/components/…Test` |
 | Feature components: auth form and fields, dashboard cards, filter chips and sheets, profile sheets, budget sheet, labels list | `features/*/components/…Test`, `features/auth/AuthContentTest`, `features/labels/LabelsContentTest` |
 | Screens over their ViewModels: loading / empty / populated, validation, sheets, callbacks | `features/*/…ScreenTest` |
+| What TalkBack hears: control labels, silent decorative icons, chart bars and arcs, expand state | `app/AccessibilityTest` |
 | Snackbar placement at three widths, with and without system insets | `app/Snackbar(Insets)ScreenshotTests` |
 | Screens, app shell and components as golden images (Roborazzi) | `**/*ScreenshotTests`, `app/src/test/screenshots` |
 | Utilities, models, enums | `core/utils/…`, `core/data/model/…`, `core/data/enums/…` |
@@ -318,9 +328,7 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 
 - **`HomeScreen` and the navigation entries** — the tab entries call `hiltViewModel()` and the
   entries own the snackbar/undo reactions; the shell is covered by `HomeShellScreenshotTests` and
-  the device `NavigationTest`. `PieChart` arcs and the date-picker dialogs are also uncovered: the
-  arcs have no semantics, the dialogs are Material's. Roborazzi's accessibility checks (`roborazzi-accessibility-check`) are
-  not enabled: several icons still have `contentDescription = null`.
+  the device `NavigationTest`. The date-picker dialogs are also uncovered: they are Material's.
 - **Google sign-in** — `androidx.credentials.Credential` needs an `android.os.Bundle`, which the
   JVM cannot build.
 - **The two Firebase adapters** — `FirestoreRemoteDataSource` and `FirebaseAuthDataSource` are

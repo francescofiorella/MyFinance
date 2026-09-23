@@ -346,7 +346,7 @@ private fun BudgetOverview(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_edit_filled),
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.edit_budget),
                         )
                     }
                 },
@@ -367,7 +367,7 @@ private fun BudgetOverview(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_delete_filled),
-                            contentDescription = null
+                            contentDescription = stringResource(R.string.delete_budget)
                         )
                     }
                 },
