@@ -18,6 +18,7 @@ import com.frafio.myfinance.testing.data.testUser
 import com.frafio.myfinance.testing.repository.TestUserRepository
 import com.frafio.myfinance.testing.util.MainDispatcherRule
 import com.frafio.myfinance.testing.util.performClickAction
+import com.frafio.myfinance.testing.util.FakeKeyboard
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.frafio.myfinance.testing.util.string
 import com.google.common.truth.Truth.assertThat
@@ -42,12 +43,14 @@ class ChangePasswordScreenTest {
     private var backClicks = 0
     private lateinit var appState: MyFinanceAppState
 
-    private fun setScreen(hasPassword: Boolean = true) {
+    private fun setScreen(hasPassword: Boolean = true, keyboard: FakeKeyboard = FakeKeyboard()) {
         userRepository.setUser(testUser(hasPassword = hasPassword))
         val viewModel = ChangePasswordViewModel(userRepository, LoadingRepository())
         composeTestRule.setThemedContent(inline = true) {
             appState = rememberMyFinanceAppState()
-            ChangePasswordScreen(appState = appState, viewModel = viewModel, onBackClick = { backClicks++ })
+            keyboard.Content {
+                ChangePasswordScreen(appState = appState, viewModel = viewModel, onBackClick = { backClicks++ })
+            }
         }
     }
 
@@ -138,5 +141,17 @@ class ChangePasswordScreenTest {
         save()
 
         assertThat(userRepository.changePasswordCalls).containsExactly("newpassword" to null)
+    }
+
+    @Test
+    @Config(qualifiers = "w360dp-h640dp")
+    fun confirmField_staysAboveTheKeyboard_onASmallPhone() {
+        val keyboard = FakeKeyboard()
+        setScreen(keyboard = keyboard)
+        fields()[2].performClick()
+
+        keyboard.open()
+
+        keyboard.assertAbove(composeTestRule, fields()[2])
     }
 }

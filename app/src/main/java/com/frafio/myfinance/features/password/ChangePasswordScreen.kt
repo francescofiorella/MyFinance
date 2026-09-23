@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,6 +35,7 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.SecureTextField
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
@@ -64,6 +66,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.rememberImeTargetInsets
 import com.frafio.myfinance.core.components.ConfirmationSheetDialog
 import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
@@ -234,7 +237,9 @@ fun ChangePasswordScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         snackbarHost = {
             SwipeableSnackbarHost(hostState = appState.snackbarHostState)
-        }
+        },
+        // Edge-to-edge disables adjustResize: the form must make room for the keyboard itself.
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(rememberImeTargetInsets())
     ) { paddingValues ->
         Column(
             modifier = Modifier

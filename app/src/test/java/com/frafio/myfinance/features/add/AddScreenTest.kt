@@ -25,8 +25,10 @@ import com.frafio.myfinance.testing.repository.TestIncomeRepository
 import com.frafio.myfinance.testing.repository.TestUserPreferencesRepository
 import com.frafio.myfinance.testing.util.MainDispatcherRule
 import com.frafio.myfinance.testing.util.performClickAction
+import com.frafio.myfinance.testing.util.FakeKeyboard
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.frafio.myfinance.testing.util.string
+import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -53,11 +55,13 @@ class AddScreenTest {
 
     private val addExpense = RootKey.AddEditTransaction(RootKey.RequestType.Add, REQUEST_EXPENSE_CODE)
 
-    private fun setScreen(navKey: RootKey.AddEditTransaction = addExpense) {
+    private fun setScreen(navKey: RootKey.AddEditTransaction = addExpense, keyboard: FakeKeyboard = FakeKeyboard()) {
         val viewModel = AddViewModel(expensesRepository, incomeRepository, LoadingRepository(), TestUserPreferencesRepository(), navKey)
         composeTestRule.setThemedContent(inline = true) {
             LaunchedEffect(Unit) { viewModel.uiEvents.collect { events += it } }
-            AddScreen(appState = rememberMyFinanceAppState(), viewModel = viewModel, onBackClick = { backClicks++ })
+            keyboard.Content {
+                AddScreen(appState = rememberMyFinanceAppState(), viewModel = viewModel, onBackClick = { backClicks++ })
+            }
         }
     }
 
@@ -179,5 +183,29 @@ class AddScreenTest {
         composeTestRule.onNodeWithTag("add_close_button").performClick()
 
         assertThat(backClicks).isEqualTo(1)
+    }
+
+    @Test
+    @Config(qualifiers = "w360dp-h640dp")
+    fun amountField_staysAboveTheKeyboard_onASmallPhone() {
+        val keyboard = FakeKeyboard()
+        setScreen(keyboard = keyboard)
+        composeTestRule.onNodeWithTag("add_amount_field").performClick()
+
+        keyboard.open()
+
+        keyboard.assertAbove(composeTestRule, composeTestRule.onNodeWithTag("add_amount_field"))
+    }
+
+    @Test
+    @Config(qualifiers = "w640dp-h360dp-land")
+    fun amountField_staysAboveTheKeyboard_inLandscape() {
+        val keyboard = FakeKeyboard(height = 200.dp)
+        setScreen(keyboard = keyboard)
+        composeTestRule.onNodeWithTag("add_amount_field").performClick()
+
+        keyboard.open()
+
+        keyboard.assertAbove(composeTestRule, composeTestRule.onNodeWithTag("add_amount_field"))
     }
 }
