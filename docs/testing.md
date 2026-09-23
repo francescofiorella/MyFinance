@@ -233,6 +233,25 @@ screen needs a test plus a first `recordRoborazziDebug`; `verify` fails while a 
   stable on one machine. There is no CI: the goldens are recorded on the developer's machine, and
   a different OS or font stack would render slightly differently and need a re-record.
 
+### Accessibility checks
+
+Every capture made through `captureForDevice`, `captureMultiDevice`, `capturePhoneDark` and
+`captureAfter` also runs Google's Accessibility Test Framework (`roborazzi-accessibility-check`,
+preset `LATEST`, failing on errors): missing labels on clickable nodes, touch targets under 48 dp,
+text and image contrast, duplicate labels, and the rest of the ATF set. `captureMultiTheme` is not
+checked, as in nowinandroid — a component on its own has no screen context. The checks run in
+`testDebugUnitTest`, `verifyRoborazziDebug` and `recordRoborazziDebug` alike.
+
+A failure reads `AccessibilityViewCheckException: There were N accessibility results`, with each
+offending node's bounds and the check that reported it. The golden is still captured first, and
+each failing view is written to `app/build/outputs/roborazzi/<screenshot>_<device>_<n>.png`.
+
+Fix the component rather than the test. When a failure is a design limit, suppress it through the
+helper's `accessibilitySuppressions` parameter, as narrowly as possible: one check *and* the exact
+elements (`Matchers.allOf(matchesCheck(TouchTargetSizeCheck::class.java), matchesElements(withContentDescription(…)))`),
+never `Matchers.anything()`, with a one-line reason above it. The only suppression today is in
+`DashboardScreenScreenshotTests`: the twelve month bars of the chart are about 27 dp wide on a phone.
+
 ## Instrumented tests
 
 Instrumented tests live in `app/src/androidTest` and run on a device:
@@ -320,7 +339,7 @@ every KSP configuration, so there is no `kspTest`/`kspAndroidTest` line).
 | Screens over their ViewModels: loading / empty / populated, validation, sheets, callbacks | `features/*/…ScreenTest` |
 | What TalkBack hears: control labels, silent decorative icons, chart bars and arcs, expand state | `app/AccessibilityTest` |
 | Snackbar placement at three widths, with and without system insets | `app/Snackbar(Insets)ScreenshotTests` |
-| Screens, app shell and components as golden images (Roborazzi) | `**/*ScreenshotTests`, `app/src/test/screenshots` |
+| Screens, app shell and components as golden images, with ATF accessibility checks (Roborazzi) | `**/*ScreenshotTests`, `app/src/test/screenshots` |
 | Utilities, models, enums | `core/utils/…`, `core/data/model/…`, `core/data/enums/…` |
 | Transaction wire format (`toFirestoreMap` vs Firestore's reflective mapper, plain JVM) | `core/data/model/FirestoreMappingTest` |
 
