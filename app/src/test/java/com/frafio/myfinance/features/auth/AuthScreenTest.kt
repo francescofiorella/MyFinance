@@ -4,7 +4,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasSetTextAction
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -84,6 +84,7 @@ class AuthScreenTest {
         composeTestRule.onNodeWithTag("login_button").performClick()
 
         assertThat(userRepository.loginCalls).containsExactly("ada@example.com" to "password123")
+        composeTestRule.waitForIdle()
         assertThat(events).containsExactly(AuthUiEvent.Success)
     }
 
@@ -94,6 +95,7 @@ class AuthScreenTest {
 
         composeTestRule.onNodeWithTag("login_button").performClick()
 
+        composeTestRule.waitForIdle()
         assertThat(events).containsExactly(AuthUiEvent.Error(AuthCode.WRONG_PASSWORD.message))
     }
 
@@ -118,6 +120,7 @@ class AuthScreenTest {
         composeTestRule.onNodeWithContentDescription(string(R.string.send)).performClick()
 
         assertThat(userRepository.resetPasswordCalls).containsExactly("ada@example.com")
+        composeTestRule.waitForIdle()
         assertThat(events).containsExactly(AuthUiEvent.Message(AuthCode.EMAIL_SENT.message))
     }
 }

@@ -23,7 +23,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.io.IOException
 
-/** The expense-specific behaviour: user-root fields, labels, and the root listener. */
+/** The expense-specific behavior: user-root fields, labels, and the root listener. */
 @RunWith(RobolectricTestRunner::class)
 class ExpensesSyncManagerTest : DatabaseTest() {
 
@@ -54,7 +54,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     // region user-root fields
 
     @Test
-    fun setMonthlyBudget_mergesRootField_andUpdatesPreferences() = runBlocking<Unit> {
+    fun setMonthlyBudget_mergesRootField_andUpdatesPreferences() = runBlocking {
         val result = subject.setMonthlyBudget(750.0)
 
         assertThat(result.code).isEqualTo(FinanceCode.BUDGET_UPDATE_SUCCESS.code)
@@ -63,7 +63,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun setMonthlyBudget_remoteFailure_returnsFailure_andLeavesPreferences() = runBlocking<Unit> {
+    fun setMonthlyBudget_remoteFailure_returnsFailure_andLeavesPreferences() = runBlocking {
         remote.failNext = IOException("offline")
 
         val result = subject.setMonthlyBudget(750.0)
@@ -73,7 +73,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun setCurrencyCode_mergesRootField_andUpdatesPreferences() = runBlocking<Unit> {
+    fun setCurrencyCode_mergesRootField_andUpdatesPreferences() = runBlocking {
         val result = subject.setCurrencyCode("USD")
 
         assertThat(result.code).isEqualTo(FinanceCode.BUDGET_UPDATE_SUCCESS.code)
@@ -82,7 +82,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun setProPicChoice_mergesRootField_andUpdatesPreferences() = runBlocking<Unit> {
+    fun setProPicChoice_mergesRootField_andUpdatesPreferences() = runBlocking {
         val result = subject.setProPicChoice("cuate")
 
         assertThat(result.code).isEqualTo(FinanceCode.BUDGET_UPDATE_SUCCESS.code)
@@ -91,7 +91,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun setLabels_sortsThem_mergesRootField_andUpdatesPreferences() = runBlocking<Unit> {
+    fun setLabels_sortsThem_mergesRootField_andUpdatesPreferences() = runBlocking {
         val result = subject.setLabels(listOf("Work", "Dinner", "Gift"))
 
         assertThat(result.code).isEqualTo(FinanceCode.LABELS_UPDATE_SUCCESS.code)
@@ -100,7 +100,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun setLabels_withoutUser_fails() = runBlocking<Unit> {
+    fun setLabels_withoutUser_fails() = runBlocking {
         preferences.setUser(null)
 
         val result = subject.setLabels(listOf("Gift"))
@@ -114,7 +114,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     // region labels
 
     @Test
-    fun addLabel_trimsAndAppends() = runBlocking<Unit> {
+    fun addLabel_trimsAndAppends() = runBlocking {
         val result = subject.addLabel("  Gift ")
 
         assertThat(result.code).isEqualTo(FinanceCode.LABEL_ADD_SUCCESS.code)
@@ -122,14 +122,14 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun addLabel_rejectsBlankAndDuplicates() = runBlocking<Unit> {
+    fun addLabel_rejectsBlankAndDuplicates() = runBlocking {
         assertThat(subject.addLabel("   ").code).isEqualTo(FinanceCode.LABELS_UPDATE_FAILURE.code)
         assertThat(subject.addLabel("Dinner").code).isEqualTo(FinanceCode.LABELS_UPDATE_FAILURE.code)
         assertThat(remote.mergedUserFields).isEmpty()
     }
 
     @Test
-    fun updateExpenseLabels_updatesRemoteArray_andLocalRow() = runBlocking<Unit> {
+    fun updateExpenseLabels_updatesRemoteArray_andLocalRow() = runBlocking {
         onIo { expenseDao.upsert(testExpense(name = "Pizza", id = "p", labels = listOf("Dinner"))) }
 
         val result = subject.updateExpenseLabels("p", "Work", isAddition = true)
@@ -145,7 +145,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun updateExpenseLabels_removal_dropsTheLabelLocally() = runBlocking<Unit> {
+    fun updateExpenseLabels_removal_dropsTheLabelLocally() = runBlocking {
         onIo { expenseDao.upsert(testExpense(name = "Pizza", id = "p", labels = listOf("Dinner", "Work"))) }
 
         subject.updateExpenseLabels("p", "Work", isAddition = false)
@@ -182,7 +182,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun deleteLabel_unknownLabel_fails() = runBlocking<Unit> {
+    fun deleteLabel_unknownLabel_fails() = runBlocking {
         val result = subject.deleteLabel("Gift")
 
         assertThat(result.financeResult.code).isEqualTo(FinanceCode.LABELS_UPDATE_FAILURE.code)
@@ -219,7 +219,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun editLabel_blankOrUnknown_fails() = runBlocking<Unit> {
+    fun editLabel_blankOrUnknown_fails() = runBlocking {
         assertThat(subject.editLabel("Work", " ").code).isEqualTo(FinanceCode.LABELS_UPDATE_FAILURE.code)
         assertThat(subject.editLabel("Gift", "Present").code).isEqualTo(FinanceCode.LABELS_UPDATE_FAILURE.code)
         assertThat(remote.mergedUserFields).isEmpty()
@@ -255,7 +255,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     // region root listener
 
     @Test
-    fun startRootSnapshotListener_appliesRootFields_andSortsLabels() = runBlocking<Unit> {
+    fun startRootSnapshotListener_appliesRootFields_andSortsLabels() = runBlocking {
         val initialSync = CompletableDeferred<Unit>()
         subject.startRootSnapshotListener(scope, initialSync)
         awaitUntil { remote.activeListeners == 1 }
@@ -278,7 +278,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun startRootSnapshotListener_missingFields_fallBackToDefaults() = runBlocking<Unit> {
+    fun startRootSnapshotListener_missingFields_fallBackToDefaults() = runBlocking {
         preferences.setPreferences(testPreferences(user = testUser(), monthlyBudget = 900.0, currencyCode = "USD", labels = listOf("Old"), proPicChoice = "cuate"))
         val initialSync = CompletableDeferred<Unit>()
         subject.startRootSnapshotListener(scope, initialSync)
@@ -307,7 +307,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun startRootSnapshotListener_error_completesDeferred() = runBlocking<Unit> {
+    fun startRootSnapshotListener_error_completesDeferred() = runBlocking {
         val initialSync = CompletableDeferred<Unit>()
         subject.startRootSnapshotListener(scope, initialSync)
         awaitUntil { remote.activeListeners == 1 }
@@ -318,7 +318,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun startRootSnapshotListener_withoutUser_completesDeferred() = runBlocking<Unit> {
+    fun startRootSnapshotListener_withoutUser_completesDeferred() = runBlocking {
         preferences.setUser(null)
         val initialSync = CompletableDeferred<Unit>()
 
@@ -329,7 +329,7 @@ class ExpensesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun stopSnapshotListener_removesBothListeners() = runBlocking<Unit> {
+    fun stopSnapshotListener_removesBothListeners() = runBlocking {
         subject.startSnapshotListener(scope)
         subject.startRootSnapshotListener(scope)
         awaitUntil { remote.activeListeners == 2 }

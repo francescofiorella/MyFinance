@@ -5,7 +5,7 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -19,7 +19,6 @@ import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.features.add.AddViewModel.Companion.REQUEST_EXPENSE_CODE
-import com.frafio.myfinance.features.add.AddViewModel.Companion.REQUEST_INCOME_CODE
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.repository.TestExpensesRepository
 import com.frafio.myfinance.testing.repository.TestIncomeRepository
@@ -131,6 +130,7 @@ class AddScreenTest {
         assertThat(added.name).isEqualTo("Pizza")
         assertThat(added.price).isEqualTo(8.5)
         assertThat(added.category).isEqualTo(FirestoreEnums.CATEGORIES.DINING.value)
+        composeTestRule.waitForIdle()
         assertThat(events.single()).isInstanceOf(AddUiEvent.Success::class.java)
         assertThat(backClicks).isEqualTo(0)
     }

@@ -1,7 +1,7 @@
 package com.frafio.myfinance.features.labels
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
 import com.frafio.myfinance.testing.screenshot.captureForDevice
 import com.frafio.myfinance.testing.screenshot.captureMultiDevice

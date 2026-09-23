@@ -4,7 +4,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.isToggleable
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -122,6 +122,7 @@ class BudgetScreenTest {
         composeTestRule.onNodeWithContentDescription(string(R.string.confirm)).performClickAction()
 
         assertThat(expensesRepository.budgetCalls).containsExactly(250.0)
+        composeTestRule.waitForIdle()
         assertThat(events).containsExactly(BudgetUiEvent.BudgetUpdated(100.0))
     }
 
@@ -136,6 +137,7 @@ class BudgetScreenTest {
         composeTestRule.onNodeWithText(string(R.string.delete_permanently)).performClickAction()
 
         assertThat(incomeRepository.deletedIncomes).containsExactly(salary)
+        composeTestRule.waitForIdle()
         assertThat(events).containsExactly(BudgetUiEvent.IncomeDeleted(salary))
     }
 }

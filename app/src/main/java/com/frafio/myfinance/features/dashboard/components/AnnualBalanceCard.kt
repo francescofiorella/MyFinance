@@ -45,7 +45,6 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
-import java.time.LocalDate
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3AdaptiveApi::class,

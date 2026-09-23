@@ -3,7 +3,7 @@ package com.frafio.myfinance.features.password
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
 import com.frafio.myfinance.testing.screenshot.captureForDevice

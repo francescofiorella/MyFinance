@@ -3,7 +3,7 @@ package com.frafio.myfinance.features.profile
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isToggleable
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -88,6 +88,7 @@ class ProfileScreenTest {
         composeTestRule.onNodeWithContentDescription(string(R.string.confirm)).performClickAction()
 
         assertThat(userRepository.fullNameUpdates).containsExactly("Ada King")
+        composeTestRule.waitForIdle()
         assertThat(events).containsExactly(ProfileUiEvent.FullNameUpdated("Ada Lovelace"))
     }
 

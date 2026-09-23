@@ -3,7 +3,7 @@ package com.frafio.myfinance.features.labels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasSetTextAction
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -80,6 +80,7 @@ class LabelsScreenTest {
         confirm().performClick()
 
         assertThat(expensesRepository.addedLabels).containsExactly("Gift")
+        composeTestRule.waitForIdle()
         assertThat(events).containsExactly(LabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_ADD_SUCCESS.message))
     }
 
@@ -92,6 +93,7 @@ class LabelsScreenTest {
         composeTestRule.onNodeWithText(string(R.string.delete_permanently)).performClickAction()
 
         assertThat(expensesRepository.deletedLabels).containsExactly("travel")
+        composeTestRule.waitForIdle()
         assertThat(events).containsExactly(LabelsUiEvent.LabelDeleted("travel", emptyList(), FinanceCode.LABEL_DELETE_SUCCESS.message))
     }
 

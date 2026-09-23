@@ -3,7 +3,7 @@ package com.frafio.myfinance.features.dashboard
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.testing.screenshot.captureMultiDevice

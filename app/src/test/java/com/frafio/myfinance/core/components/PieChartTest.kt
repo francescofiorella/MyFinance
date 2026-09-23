@@ -1,7 +1,7 @@
 package com.frafio.myfinance.core.components
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.utils.activeCurrencyCode

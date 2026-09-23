@@ -2,7 +2,7 @@ package com.frafio.myfinance.features.auth
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.testing.screenshot.captureMultiDevice
 import com.frafio.myfinance.testing.screenshot.capturePhoneDark

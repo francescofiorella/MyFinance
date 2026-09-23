@@ -52,7 +52,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     // region add / edit / delete
 
     @Test
-    fun add_storesRemoteIdAndUpsertsLocally() = runBlocking<Unit> {
+    fun add_storesRemoteIdAndUpsertsLocally() = runBlocking {
         val before = currentTimestampUTC()
 
         val result = subject.add(testIncome(name = "Salary", id = "local"))
@@ -68,7 +68,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun add_withoutUser_failsWithoutTouchingRemote() = runBlocking<Unit> {
+    fun add_withoutUser_failsWithoutTouchingRemote() = runBlocking {
         preferences.setUser(null)
 
         val result = subject.add(testIncome())
@@ -79,7 +79,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun add_remoteFailure_returnsFailureCodeAndLeavesLocalUntouched() = runBlocking<Unit> {
+    fun add_remoteFailure_returnsFailureCodeAndLeavesLocalUntouched() = runBlocking {
         remote.failNext = IOException("offline")
 
         val result = subject.add(testIncome())
@@ -89,7 +89,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun edit_setsRemoteAndUpsertsLocally_withNewUpdatedAt() = runBlocking<Unit> {
+    fun edit_setsRemoteAndUpsertsLocally_withNewUpdatedAt() = runBlocking {
         val stale = testIncome(name = "Old", id = "abc").copy(updatedAt = 1L)
         onIo { incomeDao.upsert(stale) }
 
@@ -104,7 +104,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun edit_remoteFailure_keepsTheLocalRow() = runBlocking<Unit> {
+    fun edit_remoteFailure_keepsTheLocalRow() = runBlocking {
         val stored = testIncome(name = "Old", id = "abc")
         onIo { incomeDao.upsert(stored) }
         remote.failNext = IOException("offline")
@@ -116,7 +116,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun delete_softDeletesRemotely_andRemovesLocally() = runBlocking<Unit> {
+    fun delete_softDeletesRemotely_andRemovesLocally() = runBlocking {
         val stored = testIncome(id = "abc")
         onIo { incomeDao.upsert(stored) }
         val before = currentTimestampUTC()
@@ -134,7 +134,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun delete_remoteFailure_keepsTheLocalRow() = runBlocking<Unit> {
+    fun delete_remoteFailure_keepsTheLocalRow() = runBlocking {
         val stored = testIncome(id = "abc")
         onIo { incomeDao.upsert(stored) }
         remote.failNext = IOException("offline")
@@ -150,7 +150,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     // region snapshot listener
 
     @Test
-    fun startSnapshotListener_withoutUser_completesDeferredAndListensToNothing() = runBlocking<Unit> {
+    fun startSnapshotListener_withoutUser_completesDeferredAndListensToNothing() = runBlocking {
         preferences.setUser(null)
         val initialSync = CompletableDeferred<Unit>()
 
@@ -161,7 +161,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun startSnapshotListener_listensSinceLastSync() = runBlocking<Unit> {
+    fun startSnapshotListener_listensSinceLastSync() = runBlocking {
         preferences.setPreferences(testPreferences(user = testUser()).copy(lastIncomesSync = 4_000L))
 
         subject.startSnapshotListener(scope)
@@ -171,7 +171,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun startSnapshotListener_firstEmptySnapshot_completesDeferred() = runBlocking<Unit> {
+    fun startSnapshotListener_firstEmptySnapshot_completesDeferred() = runBlocking {
         val initialSync = CompletableDeferred<Unit>()
         subject.startSnapshotListener(scope, initialSync)
         awaitUntil { remote.activeListeners == 1 }
@@ -183,7 +183,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun startSnapshotListener_changes_upsertsAndDeletesLocally_andAdvancesLastSync() = runBlocking<Unit> {
+    fun startSnapshotListener_changes_upsertsAndDeletesLocally_andAdvancesLastSync() = runBlocking {
         onIo { incomeDao.upsert(testIncome(name = "Gone", id = "gone")) }
         val initialSync = CompletableDeferred<Unit>()
         subject.startSnapshotListener(scope, initialSync)
@@ -202,7 +202,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun startSnapshotListener_laterChanges_keepApplying() = runBlocking<Unit> {
+    fun startSnapshotListener_laterChanges_keepApplying() = runBlocking {
         val initialSync = CompletableDeferred<Unit>()
         subject.startSnapshotListener(scope, initialSync)
         awaitUntil { remote.activeListeners == 1 }
@@ -216,7 +216,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun startSnapshotListener_documentWithNulls_isSkipped() = runBlocking<Unit> {
+    fun startSnapshotListener_documentWithNulls_isSkipped() = runBlocking {
         remote.documentData = { item -> item.toFirestoreMap() + (FirestoreEnums.FIELDS.PRICE.value to null) }
         val initialSync = CompletableDeferred<Unit>()
         subject.startSnapshotListener(scope, initialSync)
@@ -243,7 +243,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun startSnapshotListener_error_completesDeferred() = runBlocking<Unit> {
+    fun startSnapshotListener_error_completesDeferred() = runBlocking {
         val initialSync = CompletableDeferred<Unit>()
         subject.startSnapshotListener(scope, initialSync)
         awaitUntil { remote.activeListeners == 1 }
@@ -255,7 +255,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun startSnapshotListener_twice_isNoOp() = runBlocking<Unit> {
+    fun startSnapshotListener_twice_isNoOp() = runBlocking {
         subject.startSnapshotListener(scope)
         awaitUntil { remote.activeListeners == 1 }
         val second = CompletableDeferred<Unit>()
@@ -267,7 +267,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun stopSnapshotListener_removesRegistration() = runBlocking<Unit> {
+    fun stopSnapshotListener_removesRegistration() = runBlocking {
         subject.startSnapshotListener(scope)
         awaitUntil { remote.activeListeners == 1 }
 
@@ -284,7 +284,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     private val thirtyDaysAgo get() = currentTimestampUTC() - 30L * 24 * 60 * 60 * 1000
 
     @Test
-    fun fullSync_runsWhenAppSyncIsOlderThanThreshold() = runBlocking<Unit> {
+    fun fullSync_runsWhenAppSyncIsOlderThanThreshold() = runBlocking {
         preferences.setPreferences(testPreferences(user = testUser()).copy(lastIncomesSync = 100L, lastIncomesAppSync = thirtyDaysAgo))
         onIo { incomeDao.upsert(testIncome(name = "Local only", id = "local")) }
         remote.seed(
@@ -306,7 +306,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun fullSync_isSkipped_whenAppSyncIsRecent() = runBlocking<Unit> {
+    fun fullSync_isSkipped_whenAppSyncIsRecent() = runBlocking {
         preferences.setPreferences(testPreferences(user = testUser()).copy(lastIncomesSync = 100L, lastIncomesAppSync = currentTimestampUTC()))
         remote.seed(collection, testIncome(name = "Remote", id = "remote"))
 
@@ -319,7 +319,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun fullSync_isSkipped_onFirstEverStart() = runBlocking<Unit> {
+    fun fullSync_isSkipped_onFirstEverStart() = runBlocking {
         preferences.setPreferences(testPreferences(user = testUser()).copy(lastIncomesAppSync = 0L))
         remote.seed(collection, testIncome(name = "Remote", id = "remote"))
 
@@ -330,7 +330,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun fullSync_remoteFailure_keepsListeningFromTheOldTimestamp() = runBlocking<Unit> {
+    fun fullSync_remoteFailure_keepsListeningFromTheOldTimestamp() = runBlocking {
         preferences.setPreferences(testPreferences(user = testUser()).copy(lastIncomesSync = 100L, lastIncomesAppSync = thirtyDaysAgo))
         onIo { incomeDao.upsert(testIncome(name = "Local", id = "local")) }
         remote.failNext = IOException("offline")

@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * The managers get a real background dispatcher so Room's main-thread guard stays armed (a manager
@@ -14,7 +15,7 @@ import kotlinx.coroutines.withTimeout
 suspend fun <T> onIo(block: () -> T): T = withContext(Dispatchers.IO) { block() }
 
 suspend fun awaitUntil(timeoutMs: Long = 5_000, condition: suspend () -> Boolean) {
-    withTimeout(timeoutMs) {
-        while (!condition()) delay(10)
+    withTimeout(timeoutMs.milliseconds) {
+        while (!condition()) delay(10.milliseconds)
     }
 }

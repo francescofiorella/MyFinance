@@ -47,6 +47,6 @@ fun DeviceConfigurationOverride.Companion.WindowInsets(
                 }
             }
         },
-        update = { with(currentWindowInsets) { it.requestApplyInsets() } },
+        update = { it.requestApplyInsets() },
     )
 }

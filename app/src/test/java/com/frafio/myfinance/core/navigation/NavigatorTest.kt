@@ -24,8 +24,8 @@ class NavigatorTest {
         val topLevelKeys = listOf(FirstTopLevel, SecondTopLevel, ThirdTopLevel)
         state = NavigationState(
             startKey = FirstTopLevel,
-            topLevelStack = NavBackStack<NavKey>(FirstTopLevel),
-            subStacks = topLevelKeys.associateWith { key -> NavBackStack<NavKey>(key) },
+            topLevelStack = NavBackStack(FirstTopLevel),
+            subStacks = topLevelKeys.associateWith { key -> NavBackStack(key) },
         )
         navigator = Navigator(state)
     }

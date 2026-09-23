@@ -18,9 +18,9 @@ class MyFinanceAppStateTest {
 
     private val navigationState = NavigationState(
         startKey = HomeTabKey.Dashboard,
-        topLevelStack = NavBackStack<NavKey>(HomeTabKey.Dashboard),
+        topLevelStack = NavBackStack(HomeTabKey.Dashboard),
         subStacks = listOf(HomeTabKey.Dashboard, HomeTabKey.Expenses, HomeTabKey.Budget, HomeTabKey.Profile)
-            .associateWith { key -> NavBackStack<NavKey>(key) },
+            .associateWith { key -> NavBackStack(key) },
     )
 
     // A shown snackbar keeps its coroutine suspended; backgroundScope is cancelled when the test ends.

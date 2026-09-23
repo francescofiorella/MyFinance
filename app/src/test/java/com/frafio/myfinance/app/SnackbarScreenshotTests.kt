@@ -10,7 +10,7 @@ import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.window.core.layout.WindowSizeClass
 import com.frafio.myfinance.core.navigation.HomeTabKey
 import com.frafio.myfinance.core.navigation.MyFinanceAppState

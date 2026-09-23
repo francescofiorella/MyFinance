@@ -177,7 +177,10 @@ way its `*ViewModelTest` builds it — the screens take the ViewModel as a param
 plus `sendExpenses(…)` / `sendIncomes(…)` move a screen from its loading branch to empty or
 populated. Snackbars and navigation for six screens are wired in the navigation entries, so those
 tests collect `viewModel.uiEvents` themselves (`LaunchedEffect(Unit) { viewModel.uiEvents.collect { events += it } }`)
-and assert on the fakes' recordings; `ChangePasswordScreen` collects its own events, so its
+and assert on the fakes' recordings. The rules come from `androidx.compose.ui.test.junit4.v2`, whose
+`StandardTestDispatcher` queues that collector instead of running it at once, so call
+`composeTestRule.waitForIdle()` before reading `events` (the repository recordings need no wait:
+the ViewModel calls them directly). `ChangePasswordScreen` collects its own events, so its
 snackbar and `onBackClick` are asserted directly. One quirk: screens emit their sheets *before* their
 content, so under inline rendering the full-size content covers the sheet and a tap lands on the
 content. Sheet items are therefore activated with `performClickAction()` (the semantics click, as

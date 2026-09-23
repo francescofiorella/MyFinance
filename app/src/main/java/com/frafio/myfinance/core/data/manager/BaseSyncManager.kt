@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.room.withTransaction
 import com.frafio.myfinance.core.data.dao.BaseDao
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
-import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
 import com.frafio.myfinance.core.data.model.Income
