@@ -97,10 +97,9 @@ class UserRepositoryImpl @Inject constructor(
 
         try {
             val request = Request.Builder().url(photoUrl).build()
-            val response = okHttpClient.newCall(request).execute()
-            if (response.isSuccessful) {
+            okHttpClient.newCall(request).execute().use { response ->
                 val inputStream = response.body?.byteStream()
-                if (inputStream != null) {
+                if (response.isSuccessful && inputStream != null) {
                     val localPath = profileImageStorage.saveImage(inputStream)
                     if (localPath != null && user != null) {
                         userPreferencesRepository.updateUser(user.copy(localPhotoPath = localPath))

@@ -125,6 +125,20 @@ class UserRepositoryImplTest {
     }
 
     @Test
+    fun syncProfilePicture_serverError_releasesTheConnection() = runBlocking {
+        preferences.setUser(testUser(photoUrl = avatarUrl))
+        server.enqueue(MockResponse().setResponseCode(404).setBody("not found"))
+        server.enqueue(pngResponse())
+
+        subject.syncProfilePicture(avatarUrl)
+        subject.syncProfilePicture(server.url("/new-avatar.png").toString())
+
+        server.takeRequest()
+        // OkHttp reuses a connection only after the previous response on it was closed.
+        assertThat(server.takeRequest().sequenceNumber).isEqualTo(1)
+    }
+
+    @Test
     fun syncProfilePicture_undecodableBody_storesNothing() = runBlocking {
         preferences.setUser(testUser(photoUrl = avatarUrl))
         server.enqueue(MockResponse().setBody("<html>sign in to the network</html>"))

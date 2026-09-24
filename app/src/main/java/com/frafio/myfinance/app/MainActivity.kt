@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +43,6 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.frafio.myfinance.core.data.repository.LoadingRepository
-import com.frafio.myfinance.core.navigation.LocalSnackbarHostState
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -200,53 +198,51 @@ class MainActivity : ComponentActivity() {
                     entryProvider = provider
                 )
 
-                CompositionLocalProvider(LocalSnackbarHostState provides appState.snackbarHostState) {
-                    Surface(
-                        // Exposes Modifier.testTag(...) as the accessibility resource-id so that
-                        // UiAutomator (Baseline Profile / Macrobenchmark) can find nodes via By.res().
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .semantics { testTagsAsResourceId = true },
-                        color = MaterialTheme.colorScheme.surface
-                    ) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            NavDisplay(
-                                entries = rootEntries,
-                                transitionSpec = {
-                                    slideInHorizontally(initialOffsetX = { (it * 0.1).toInt() }) + fadeIn() togetherWith
-                                            slideOutHorizontally(targetOffsetX = { -(it * 0.1).toInt() }) + fadeOut()
-                                },
-                                popTransitionSpec = {
-                                    slideInHorizontally(initialOffsetX = { -(it * 0.1).toInt() }) + fadeIn() togetherWith
-                                            slideOutHorizontally(targetOffsetX = { (it * 0.1).toInt() }) + fadeOut()
-                                },
-                                predictivePopTransitionSpec = {
-                                    slideInHorizontally(initialOffsetX = { -(it * 0.1).toInt() }) + fadeIn() togetherWith
-                                            slideOutHorizontally(targetOffsetX = { (it * 0.1).toInt() }) + fadeOut()
-                                },
-                                onBack = { rootBackStack.removeAt(rootBackStack.size - 1) }
-                            )
+                Surface(
+                    // Exposes Modifier.testTag(...) as the accessibility resource-id so that
+                    // UiAutomator (Baseline Profile / Macrobenchmark) can find nodes via By.res().
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .semantics { testTagsAsResourceId = true },
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        NavDisplay(
+                            entries = rootEntries,
+                            transitionSpec = {
+                                slideInHorizontally(initialOffsetX = { (it * 0.1).toInt() }) + fadeIn() togetherWith
+                                        slideOutHorizontally(targetOffsetX = { -(it * 0.1).toInt() }) + fadeOut()
+                            },
+                            popTransitionSpec = {
+                                slideInHorizontally(initialOffsetX = { -(it * 0.1).toInt() }) + fadeIn() togetherWith
+                                        slideOutHorizontally(targetOffsetX = { (it * 0.1).toInt() }) + fadeOut()
+                            },
+                            predictivePopTransitionSpec = {
+                                slideInHorizontally(initialOffsetX = { -(it * 0.1).toInt() }) + fadeIn() togetherWith
+                                        slideOutHorizontally(targetOffsetX = { (it * 0.1).toInt() }) + fadeOut()
+                            },
+                            onBack = { rootBackStack.removeAt(rootBackStack.size - 1) }
+                        )
 
-                            if (appState.showProgress) {
-                                val density = LocalDensity.current
-                                val amplitude = with(density) { 3.dp.toPx() }
-                                val stroke = Stroke(
-                                    width = with(density) { 4.dp.toPx() },
-                                    cap = StrokeCap.Round,
-                                )
-                                val waveLength = 40.dp
-                                LinearWavyProgressIndicator(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .statusBarsPadding()
-                                        .align(Alignment.TopCenter),
-                                    stroke = stroke,
-                                    trackStroke = stroke,
-                                    amplitude = amplitude,
-                                    wavelength = waveLength,
-                                    waveSpeed = waveLength
-                                )
-                            }
+                        if (appState.showProgress) {
+                            val density = LocalDensity.current
+                            val amplitude = with(density) { 3.dp.toPx() }
+                            val stroke = Stroke(
+                                width = with(density) { 4.dp.toPx() },
+                                cap = StrokeCap.Round,
+                            )
+                            val waveLength = 40.dp
+                            LinearWavyProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .statusBarsPadding()
+                                    .align(Alignment.TopCenter),
+                                stroke = stroke,
+                                trackStroke = stroke,
+                                amplitude = amplitude,
+                                wavelength = waveLength,
+                                waveSpeed = waveLength
+                            )
                         }
                     }
                 }
