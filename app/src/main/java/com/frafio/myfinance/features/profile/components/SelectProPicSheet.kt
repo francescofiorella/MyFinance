@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.components.AdaptiveSheet
+import com.frafio.myfinance.core.components.AppBottomSheet
 import com.frafio.myfinance.core.components.ImageSelectorButton
 import com.frafio.myfinance.core.components.SheetDialog
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
@@ -35,7 +35,7 @@ fun SelectProPicSheet(
     onSelectPhoto: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    AdaptiveSheet(
+    AppBottomSheet(
         show = show,
         onDismiss = onDismiss
     ) {

@@ -30,7 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.components.AdaptiveSheet
+import com.frafio.myfinance.core.components.AppBottomSheet
 import com.frafio.myfinance.core.components.SheetDialog
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -56,7 +56,7 @@ fun LabelsSheet(
     val labelFirst = expense == null
     val endContent = expense?.getPriceString()
 
-    AdaptiveSheet(
+    AppBottomSheet(
         show = show,
         onDismiss = onDismiss
     ) {

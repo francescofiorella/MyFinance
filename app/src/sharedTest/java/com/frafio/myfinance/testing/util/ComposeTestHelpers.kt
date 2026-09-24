@@ -17,7 +17,7 @@ fun string(@StringRes id: Int, vararg formatArgs: Any): String =
     ApplicationProvider.getApplicationContext<Context>().getString(id, *formatArgs)
 
 /**
- * Renders [content] under the app theme. With [inline] the sheets built on `AdaptiveSheet` render
+ * Renders [content] under the app theme. With [inline] the sheets built on `AppBottomSheet` render
  * their content directly instead of inside a `ModalBottomSheet`, the same path previews use.
  */
 fun ComposeContentTestRule.setThemedContent(

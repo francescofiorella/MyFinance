@@ -40,72 +40,68 @@ fun EmptyView(
     @StringRes message: Int,
     contentAlignment: Alignment = Alignment.Center
 ) {
-    val isDarkTheme = isSystemInDarkTheme()
-    val configuration = LocalConfiguration.current
+    val imageRes = if (isSystemInDarkTheme()) imageDark ?: image else image
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Box(
         modifier = modifier,
         contentAlignment = contentAlignment
     ) {
-        if (image == null && !isDarkTheme || image == null && imageDark == null) {
-            Text(
-                text = stringResource(message),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center
-            )
-            return
-        }
-
-        val imageRes = if (isDarkTheme && imageDark != null) imageDark else image!!
-
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Row(
+        when {
+            imageRes == null -> EmptyMessage(message = message, textAlign = TextAlign.Center)
+            isLandscape -> Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Image(
-                    painter = painterResource(imageRes),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth(0.3f)
-                        .aspectRatio(1f)
-                )
+                EmptyImage(imageRes = imageRes, widthFraction = 0.3f)
                 Spacer(modifier = Modifier.width(32.dp))
-                Text(
-                    text = stringResource(message),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
+                EmptyMessage(
+                    message = message,
                     textAlign = TextAlign.Start,
-                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.widthIn(max = 400.dp)
                 )
             }
-        } else {
-            Column(
+            else -> Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(imageRes),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth(0.6f)
-                        .aspectRatio(1f)
-                )
+                EmptyImage(imageRes = imageRes, widthFraction = 0.6f)
                 Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    text = stringResource(message),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
+                EmptyMessage(
+                    message = message,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(horizontal = 32.dp)
                 )
             }
         }
     }
+}
+
+@Composable
+private fun EmptyImage(@DrawableRes imageRes: Int, widthFraction: Float) {
+    Image(
+        painter = painterResource(imageRes),
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxWidth(widthFraction)
+            .aspectRatio(1f)
+    )
+}
+
+@Composable
+private fun EmptyMessage(
+    @StringRes message: Int,
+    textAlign: TextAlign,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = stringResource(message),
+        style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.SemiBold,
+        textAlign = textAlign,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier
+    )
 }
 
 @Preview(showBackground = true)

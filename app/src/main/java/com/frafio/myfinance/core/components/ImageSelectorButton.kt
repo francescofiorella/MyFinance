@@ -37,14 +37,18 @@ fun ImageSelectorButton(
 ) {
     ImageSelectorButtonBase(
         modifier = modifier,
-        model = url,
-        isUrl = true,
         onClick = onClick,
-        contentDescription = contentDescription,
         containerSize = containerSize,
         contentSize = contentSize,
         isSelected = isSelected
-    )
+    ) {
+        AsyncImage(
+            modifier = Modifier.fillMaxSize(),
+            model = url,
+            contentDescription = contentDescription,
+            contentScale = ContentScale.Crop
+        )
+    }
 }
 
 @Composable
@@ -59,26 +63,29 @@ fun ImageSelectorButton(
 ) {
     ImageSelectorButtonBase(
         modifier = modifier,
-        model = drawable,
-        isUrl = false,
         onClick = onClick,
-        contentDescription = contentDescription,
         containerSize = containerSize,
         contentSize = contentSize,
         isSelected = isSelected
-    )
+    ) {
+        Image(
+            modifier = Modifier.fillMaxSize(),
+            painter = painterResource(id = drawable),
+            contentDescription = contentDescription,
+            contentScale = ContentScale.Crop
+        )
+    }
 }
 
+/** The button around [image], dimmed with a check mark while selected. */
 @Composable
 private fun ImageSelectorButtonBase(
-    modifier: Modifier = Modifier,
-    model: Any,
-    isUrl: Boolean,
+    modifier: Modifier,
     onClick: () -> Unit,
-    contentDescription: String,
-    containerSize: Dp = 82.dp,
-    contentSize: Dp = 32.dp,
-    isSelected: Boolean = false,
+    containerSize: Dp,
+    contentSize: Dp,
+    isSelected: Boolean,
+    image: @Composable () -> Unit
 ) {
     FilledTonalIconButton(
         modifier = modifier
@@ -89,21 +96,7 @@ private fun ImageSelectorButtonBase(
         shapes = IconButtonDefaults.shapes()
     ) {
         Box(contentAlignment = Alignment.Center) {
-            if (isUrl) {
-                AsyncImage(
-                    modifier = Modifier.fillMaxSize(),
-                    model = model,
-                    contentDescription = contentDescription,
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Image(
-                    modifier = Modifier.fillMaxSize(),
-                    painter = painterResource(id = model as Int),
-                    contentDescription = contentDescription,
-                    contentScale = ContentScale.Crop
-                )
-            }
+            image()
 
             if (isSelected) {
                 Box(

@@ -57,7 +57,7 @@ fun EditTransactionSheet(
         )
     }
 
-    AdaptiveSheet(
+    AppBottomSheet(
         show = show,
         onDismiss = onDismiss
     ) {

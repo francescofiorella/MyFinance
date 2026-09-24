@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.components.AdaptiveSheet
+import com.frafio.myfinance.core.components.AppBottomSheet
 import com.frafio.myfinance.core.components.GridSheetDialog
 import com.frafio.myfinance.core.components.MenuItem
 import com.frafio.myfinance.core.components.preview.PreviewTransactions
@@ -91,7 +91,7 @@ fun CategorySheet(
     val labelFirst = expense == null
     val endContent = expense?.getPriceString()
 
-    AdaptiveSheet(
+    AppBottomSheet(
         show = show,
         onDismiss = onDismiss
     ) {

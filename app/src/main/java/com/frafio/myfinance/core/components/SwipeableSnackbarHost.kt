@@ -10,7 +10,12 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+
+/** The surface a swipe dismisses; wider than the snackbar's text. */
+const val SWIPEABLE_SNACKBAR_TAG = "swipeable_snackbar"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,6 +28,7 @@ fun SwipeableSnackbarHost(hostState: SnackbarHostState) {
             }
         }
         SwipeToDismissBox(
+            modifier = Modifier.testTag(SWIPEABLE_SNACKBAR_TAG),
             state = dismissState,
             backgroundContent = {},
             content = {

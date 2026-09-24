@@ -4,13 +4,12 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.swipe
+import androidx.compose.ui.test.swipeRight
 import com.frafio.myfinance.testing.util.setThemedContent
 import org.junit.Rule
 import org.junit.Test
@@ -42,9 +41,7 @@ class SwipeableSnackbarHostTest {
     fun swipe_dismissesTheSnackbar() {
         showSnackbar("Saved")
 
-        // Drag from the snackbar to the right edge of the screen; the text node alone is too narrow for a swipe.
-        val start = composeTestRule.onNodeWithText("Saved").fetchSemanticsNode().boundsInRoot.center
-        composeTestRule.onRoot().performTouchInput { swipe(start = start, end = Offset(width - 1f, start.y)) }
+        composeTestRule.onNodeWithTag(SWIPEABLE_SNACKBAR_TAG).performTouchInput { swipeRight() }
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Saved").assertDoesNotExist()

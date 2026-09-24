@@ -31,7 +31,7 @@ fun ConfirmationSheetDialog(
     show: Boolean,
     onDismiss: () -> Unit
 ) {
-    AdaptiveSheet(
+    AppBottomSheet(
         show = show,
         onDismiss = onDismiss
     ) {

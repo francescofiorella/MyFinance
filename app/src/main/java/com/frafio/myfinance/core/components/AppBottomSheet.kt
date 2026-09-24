@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdaptiveSheet(
+fun AppBottomSheet(
     show: Boolean,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -47,6 +47,7 @@ fun AdaptiveSheet(
         }
     }
 
+    // Previews and the JVM tests (setThemedContent(inline = true)) have no window for the modal sheet.
     if (isPreview) {
         if (show) {
             content()

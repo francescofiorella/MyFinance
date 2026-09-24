@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.components.AdaptiveSheet
+import com.frafio.myfinance.core.components.AppBottomSheet
 import com.frafio.myfinance.core.components.GridSheetDialog
 import com.frafio.myfinance.core.components.MenuItem
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -96,7 +96,7 @@ fun CurrencySheet(
         }
     }
 
-    AdaptiveSheet(
+    AppBottomSheet(
         show = show,
         onDismiss = onDismiss
     ) {

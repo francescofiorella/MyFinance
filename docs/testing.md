@@ -165,7 +165,7 @@ Pass `DeviceSpec(width, height)` per case instead.
 Component tests live in `core/components/` and use two helpers from `testing/util/ComposeTestHelpers.kt`:
 `setThemedContent { … }` wraps the content in `MyFinanceTheme`, and `string(R.string.x)` resolves a
 resource the way the composable does, so assertions never hard-code UI text. Passing
-`setThemedContent(inline = true)` sets `LocalInspectionMode`, which makes `AdaptiveSheet` render its
+`setThemedContent(inline = true)` sets `LocalInspectionMode`, which makes `AppBottomSheet` render its
 content directly instead of inside `ModalBottomSheet` — the same path previews take — so the
 sheet-based components (`EditTransactionSheet`, `ConfirmationSheetDialog`) are tested through their
 header, items and callbacks; the bottom sheet itself is Material's. Two Robolectric quirks: it
@@ -224,7 +224,7 @@ or font change), record on CI only: that is the platform the goldens are verifie
   - `captureMultiTheme("Component") { description -> … }` — light/dark × dynamic/notDynamic →
     `Component/Component_light_notDynamic.png` and three siblings.
   Each helper sets the Robolectric qualifiers, turns `LocalInspectionMode` on (sheets built on
-  `AdaptiveSheet` render inline) and wraps the body in `MyFinanceTheme` plus a `Surface` painted
+  `AppBottomSheet` render inline) and wraps the body in `MyFinanceTheme` plus a `Surface` painted
   with `colorScheme.background` — the tab contents (Dashboard, Expenses, Budget, Profile) are
   transparent and get that colour from the Home scaffold in the app.
 - Dark mode goes through `DeviceConfigurationOverride.DarkMode`, not `@Config(qualifiers = "night")`:
