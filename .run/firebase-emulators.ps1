@@ -16,7 +16,7 @@ if (Test-Path (Join-Path $jbr 'bin\java.exe')) {
 $firebase = (Get-Command firebase -ErrorAction SilentlyContinue).Source
 if (-not $firebase) { $firebase = Join-Path $env:USERPROFILE 'bin\firebase.exe' }
 if (-not (Test-Path $firebase)) {
-    throw "Firebase CLI not found: download https://firebase.tools/bin/win/latest to $firebase"
+    throw "Firebase CLI not found: download firebase-tools-win.exe of the version pinned in .github/workflows/ci.yml from https://github.com/firebase/firebase-tools/releases to $firebase"
 }
 
 # Stopping a run from Android Studio ends this script but can leave the emulators running and

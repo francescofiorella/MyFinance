@@ -305,7 +305,9 @@ listener arrives oldest first, and each Firebase failure becomes the `AuthExcept
 Firebase one, and the tests run on the phone.
 
 **Setup, once.** The CLI is Google's standalone `firebase-tools-win.exe` (bundles its own Node),
-saved as `%USERPROFILE%\bin\firebase.exe`; download it from `https://firebase.tools/bin/win/latest`.
+saved as `%USERPROFILE%\bin\firebase.exe`. Take the version CI pins (`FIREBASE_TOOLS_VERSION` in
+`.github/workflows/ci.yml`) from the [releases page](https://github.com/firebase/firebase-tools/releases),
+so a run here and in CI use the same emulators; `firebase --version` shows what you have.
 The emulators need Java 21+, and the `java` on PATH may be older, so point the shell at Android
 Studio's bundled JDK. The first start downloads the emulator jars to `~/.cache/firebase`.
 
