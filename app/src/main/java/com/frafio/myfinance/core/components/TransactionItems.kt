@@ -11,13 +11,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
@@ -39,8 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -49,7 +42,6 @@ import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.model.Transaction
-import com.frafio.myfinance.core.theme.GoogleSansFlexRoundFamily
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.getCategoryIcon
 import com.frafio.myfinance.core.utils.getCategoryName
@@ -136,28 +128,11 @@ fun TransactionListItem(
                         }
                     }
                 } else {
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 12.dp)
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.secondaryContainer),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        val firstLetter =
-                            transaction.name.firstOrNull()?.uppercaseChar()?.toString() ?: ""
-                        Text(
-                            modifier = Modifier
-                                .width(24.dp)
-                                .height(32.dp),
-                            text = firstLetter,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = GoogleSansFlexRoundFamily,
-                            textAlign = TextAlign.Center,
-                            autoSize = TextAutoSize.StepBased()
-                        )
-                    }
+                    LetterAvatar(
+                        text = transaction.name,
+                        size = 40.dp,
+                        modifier = Modifier.padding(end = 12.dp)
+                    )
                 }
 
                 // Content

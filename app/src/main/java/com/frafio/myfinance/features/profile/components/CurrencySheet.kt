@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AdaptiveSheet
 import com.frafio.myfinance.core.components.GridSheetDialog
-import com.frafio.myfinance.core.data.model.MenuItem
+import com.frafio.myfinance.core.components.MenuItem
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.capitalizeWords
 import com.frafio.myfinance.core.utils.getCurrencyIcon
@@ -66,7 +66,7 @@ fun CurrencySheet(
     val currencyMenuItems = remember {
         currencies.map { pair ->
             val currency = Currency.getInstance(pair.first)
-            MenuItem(
+            MenuItem.Symbol(
                 symbol = currency.getSymbol(pair.second),
                 text = currency.displayName.capitalizeWords(),
                 onClick = { onCurrencySelected(pair.first) }
@@ -84,7 +84,7 @@ fun CurrencySheet(
                         "FRF" -> "₣"
                         else -> currency.getSymbol(getLocaleFromCurrency(currency.currencyCode))
                     }
-                    MenuItem(
+                    MenuItem.Symbol(
                         symbol = symbol,
                         text = currency.displayName.capitalizeWords(),
                         onClick = { onCurrencySelected(currency.currencyCode) }

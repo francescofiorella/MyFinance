@@ -13,30 +13,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.model.MenuItem
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 @Composable
 fun ListSheetItem(
-    item: MenuItem,
+    item: MenuItem.Resource,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier
-            .then(if (item.testTag != null) Modifier.testTag(item.testTag) else Modifier)
+            .menuItemTestTag(item)
             .alpha(if (item.enabled) 1f else 0.38f),
-        onClick = {
-            item.onClick()
-            onDismiss()
-        },
+        onClick = item.selectThenDismiss(onDismiss),
         enabled = item.enabled,
         color = MaterialTheme.colorScheme.surfaceContainerLow
     ) {
@@ -68,7 +63,7 @@ fun ListSheetItemPreview() {
     MyFinanceTheme {
         ListSheetItem(
             onDismiss = {},
-            item = MenuItem(
+            item = MenuItem.Resource(
                 iconRes = R.drawable.ic_edit_outline,
                 textRes = R.string.edit_full_name
             ) {},

@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.model.MenuItem
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 @Composable
@@ -19,7 +18,7 @@ fun ListSheetDialog(
     label: String,
     labelFirst: Boolean = true,
     endContent: String? = null,
-    items: List<MenuItem>,
+    items: List<MenuItem.Resource>,
     onDismiss: () -> Unit
 ) {
     SheetDialog(
@@ -49,12 +48,12 @@ fun ListSheetPreview() {
             label = stringResource(id = R.string.edit),
             onDismiss = {},
             items = listOf(
-                MenuItem(
+                MenuItem.Resource(
                     iconRes = R.drawable.ic_upload_filled,
                     textRes = R.string.edit_propic,
                     enabled = false
                 ) {},
-                MenuItem(
+                MenuItem.Resource(
                     iconRes = R.drawable.ic_edit_outline,
                     textRes = R.string.edit_full_name
                 ) {}

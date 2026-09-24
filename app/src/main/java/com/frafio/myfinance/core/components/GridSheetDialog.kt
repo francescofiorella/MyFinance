@@ -23,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,7 +31,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.model.MenuItem
 import com.frafio.myfinance.core.theme.GoogleSansFlexRoundFamily
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
@@ -84,13 +82,9 @@ private fun GridItem(
     onDismiss: () -> Unit
 ) {
     FilledTonalButton(
-        modifier = modifier
-            .then(if (item.testTag != null) Modifier.testTag(item.testTag) else Modifier),
+        modifier = modifier.menuItemTestTag(item),
         contentPadding = PaddingValues(0.dp),
-        onClick = {
-            item.onClick()
-            onDismiss()
-        },
+        onClick = item.selectThenDismiss(onDismiss),
         enabled = item.enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -106,30 +100,36 @@ private fun GridItem(
                 .padding(bottom = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (item.symbol != null) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(32.dp),
-                    text = item.symbol!!,
-                    autoSize = TextAutoSize.StepBased(),
-                    textAlign = TextAlign.Center,
-                    fontFamily = GoogleSansFlexRoundFamily,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-            } else {
-                Spacer(modifier = Modifier.height(16.dp))
-                Icon(
-                    painter = painterResource(id = item.iconRes),
-                    contentDescription = null,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+            when (item) {
+                is MenuItem.Symbol -> {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(32.dp),
+                        text = item.symbol,
+                        autoSize = TextAutoSize.StepBased(),
+                        textAlign = TextAlign.Center,
+                        fontFamily = GoogleSansFlexRoundFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+                is MenuItem.Resource -> {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Icon(
+                        painter = painterResource(id = item.iconRes),
+                        contentDescription = null,
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
             Text(
                 modifier = Modifier.padding(horizontal = 4.dp),
-                text = item.text ?: stringResource(id = item.textRes),
+                text = when (item) {
+                    is MenuItem.Symbol -> item.text
+                    is MenuItem.Resource -> stringResource(id = item.textRes)
+                },
                 style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
@@ -150,17 +150,17 @@ fun GridSheetPreview() {
             onDismiss = {},
             rowSize = 3,
             items = listOf(
-                MenuItem(
+                MenuItem.Resource(
                     iconRes = R.drawable.ic_home_filled,
                     textRes = R.string.housing,
                     enabled = false
                 ) {},
-                MenuItem(
+                MenuItem.Resource(
                     iconRes = R.drawable.ic_shopping_cart_filled,
                     textRes = R.string.groceries,
                     enabled = true
                 ) {},
-                MenuItem(
+                MenuItem.Symbol(
                     symbol = "€",
                     text = "Euro",
                     enabled = true

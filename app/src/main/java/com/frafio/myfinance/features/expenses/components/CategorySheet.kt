@@ -9,11 +9,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
-import com.frafio.myfinance.core.data.model.Expense
-import com.frafio.myfinance.core.data.model.MenuItem
 import com.frafio.myfinance.core.components.AdaptiveSheet
 import com.frafio.myfinance.core.components.GridSheetDialog
+import com.frafio.myfinance.core.components.MenuItem
+import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
+import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.getCategoryIcon
 
@@ -28,55 +28,55 @@ fun CategorySheet(
     disabledCategories: List<Int> = listOf(),
 ) {
     val categories = listOf(
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_home_filled,
             textRes = R.string.housing,
             enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.HOUSING.value),
             onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.HOUSING.value) }
         ),
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_shopping_cart_filled,
             textRes = R.string.groceries,
             enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.GROCERIES.value),
             onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.GROCERIES.value) }
         ),
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_self_care_filled,
             textRes = R.string.personal_care,
             enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.PERSONAL_CARE.value),
             onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.PERSONAL_CARE.value) }
         ),
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_theater_comedy_filled,
             textRes = R.string.entertainment,
             enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.ENTERTAINMENT.value),
             onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.ENTERTAINMENT.value) }
         ),
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_school_filled,
             textRes = R.string.education,
             enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.EDUCATION.value),
             onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.EDUCATION.value) }
         ),
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_restaurant_filled,
             textRes = R.string.dining,
             enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.DINING.value),
             onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.DINING.value) }
         ),
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_vaccines_filled,
             textRes = R.string.health,
             enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.HEALTH.value),
             onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.HEALTH.value) }
         ),
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_directions_subway_filled,
             textRes = R.string.transportation,
             enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.TRANSPORTATION.value),
             onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.TRANSPORTATION.value) }
         ),
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_grid_3x3_filled,
             textRes = R.string.miscellaneous,
             enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.MISCELLANEOUS.value),

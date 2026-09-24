@@ -12,7 +12,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.model.MenuItem
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.frafio.myfinance.testing.util.string
 import com.google.common.truth.Truth.assertThat
@@ -98,7 +97,7 @@ class SheetDialogTest {
     @Test
     fun listSheetItem_showsItsText() {
         composeTestRule.setThemedContent {
-            ListSheetItem(item = MenuItem(iconRes = R.drawable.ic_edit_outline, textRes = R.string.edit_full_name) {}, onDismiss = {})
+            ListSheetItem(item = MenuItem.Resource(iconRes = R.drawable.ic_edit_outline, textRes = R.string.edit_full_name) {}, onDismiss = {})
         }
 
         composeTestRule.onNodeWithText(string(R.string.edit_full_name)).assertIsDisplayed()
@@ -109,7 +108,7 @@ class SheetDialogTest {
         val events = mutableListOf<String>()
         composeTestRule.setThemedContent {
             ListSheetItem(
-                item = MenuItem(iconRes = R.drawable.ic_edit_outline, textRes = R.string.edit) { events += "click" },
+                item = MenuItem.Resource(iconRes = R.drawable.ic_edit_outline, textRes = R.string.edit) { events += "click" },
                 onDismiss = { events += "dismiss" },
             )
         }
@@ -124,7 +123,7 @@ class SheetDialogTest {
         val events = mutableListOf<String>()
         composeTestRule.setThemedContent {
             ListSheetItem(
-                item = MenuItem(iconRes = R.drawable.ic_edit_outline, textRes = R.string.edit, enabled = false, testTag = "item") { events += "click" },
+                item = MenuItem.Resource(iconRes = R.drawable.ic_edit_outline, textRes = R.string.edit, enabled = false, testTag = "item") { events += "click" },
                 onDismiss = { events += "dismiss" },
             )
         }
@@ -137,7 +136,7 @@ class SheetDialogTest {
     @Test
     fun listSheetItem_withTestTag_isFindableByTag() {
         composeTestRule.setThemedContent {
-            ListSheetItem(item = MenuItem(iconRes = R.drawable.ic_edit_outline, textRes = R.string.edit, testTag = "item") {}, onDismiss = {})
+            ListSheetItem(item = MenuItem.Resource(iconRes = R.drawable.ic_edit_outline, textRes = R.string.edit, testTag = "item") {}, onDismiss = {})
         }
 
         composeTestRule.onNodeWithTag("item").assertIsDisplayed().assertIsEnabled()
@@ -155,8 +154,8 @@ class SheetDialogTest {
                 title = "Title",
                 label = "Label",
                 items = listOf(
-                    MenuItem(iconRes = R.drawable.ic_upload_filled, textRes = R.string.edit_propic) {},
-                    MenuItem(iconRes = R.drawable.ic_edit_outline, textRes = R.string.edit_full_name) {},
+                    MenuItem.Resource(iconRes = R.drawable.ic_upload_filled, textRes = R.string.edit_propic) {},
+                    MenuItem.Resource(iconRes = R.drawable.ic_edit_outline, textRes = R.string.edit_full_name) {},
                 ),
                 onDismiss = {},
             )
@@ -179,8 +178,8 @@ class SheetDialogTest {
                 label = "Select",
                 rowSize = 3,
                 items = listOf(
-                    MenuItem(iconRes = R.drawable.ic_home_filled, textRes = R.string.housing) {},
-                    MenuItem(iconRes = R.drawable.ic_shopping_cart_filled, textRes = R.string.groceries) {},
+                    MenuItem.Resource(iconRes = R.drawable.ic_home_filled, textRes = R.string.housing) {},
+                    MenuItem.Resource(iconRes = R.drawable.ic_shopping_cart_filled, textRes = R.string.groceries) {},
                 ),
                 onDismiss = {},
                 bottomContent = { Text("Bottom") },
@@ -200,7 +199,7 @@ class SheetDialogTest {
                 title = "Category",
                 label = "Select",
                 rowSize = 3,
-                items = listOf(MenuItem(iconRes = R.drawable.ic_home_filled, textRes = R.string.housing) { events += "click" }),
+                items = listOf(MenuItem.Resource(iconRes = R.drawable.ic_home_filled, textRes = R.string.housing) { events += "click" }),
                 onDismiss = { events += "dismiss" },
             )
         }
@@ -217,7 +216,7 @@ class SheetDialogTest {
                 title = "Currency",
                 label = "Select",
                 rowSize = 3,
-                items = listOf(MenuItem(symbol = "€", text = "Euro") {}),
+                items = listOf(MenuItem.Symbol(symbol = "€", text = "Euro") {}),
                 onDismiss = {},
             )
         }
@@ -233,7 +232,7 @@ class SheetDialogTest {
                 title = "Category",
                 label = "Select",
                 rowSize = 3,
-                items = listOf(MenuItem(iconRes = R.drawable.ic_home_filled, textRes = R.string.housing, enabled = false, testTag = "housing") {}),
+                items = listOf(MenuItem.Resource(iconRes = R.drawable.ic_home_filled, textRes = R.string.housing, enabled = false, testTag = "housing") {}),
                 onDismiss = {},
             )
         }

@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.Expense
-import com.frafio.myfinance.core.data.model.MenuItem
 import com.frafio.myfinance.core.data.model.Transaction
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.getCategoryIcon
@@ -26,19 +25,19 @@ fun EditTransactionSheet(
     modifier: Modifier = Modifier,
 ) {
     val items = mutableListOf(
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_edit_outline,
             textRes = R.string.edit,
             testTag = "transaction_edit",
             onClick = onEdit
         ),
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_content_copy_outline,
             textRes = R.string.duplicate,
             testTag = "transaction_duplicate",
             onClick = onDuplicate
         ),
-        MenuItem(
+        MenuItem.Resource(
             iconRes = R.drawable.ic_delete_outline,
             textRes = R.string.delete,
             testTag = "transaction_delete",
@@ -48,7 +47,7 @@ fun EditTransactionSheet(
     if (transaction is Expense) {
         items.add(
             0,
-            MenuItem(
+            MenuItem.Resource(
                 iconRes = R.drawable.ic_sell_outline,
                 textRes = R.string.labels,
                 testTag = "transaction_labels",

@@ -8,9 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.model.MenuItem
 import com.frafio.myfinance.core.components.AdaptiveSheet
 import com.frafio.myfinance.core.components.ListSheetDialog
+import com.frafio.myfinance.core.components.MenuItem
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,21 +36,21 @@ fun FilterExpensesSheet(
             label = stringResource(id = R.string.select),
             onDismiss = onDismiss,
             items = listOf(
-                MenuItem(
+                MenuItem.Resource(
                     iconRes = R.drawable.ic_sell_outline,
                     textRes = R.string.label,
                     testTag = "filter_label",
                     enabled = labelEnabled,
                     onClick = onSelectLabel
                 ),
-                MenuItem(
+                MenuItem.Resource(
                     iconRes = R.drawable.ic_grid_3x3_filled,
                     textRes = R.string.category,
                     testTag = "filter_category",
                     enabled = categoryEnabled,
                     onClick = onSelectCategory
                 ),
-                MenuItem(
+                MenuItem.Resource(
                     iconRes = R.drawable.ic_today_outline,
                     textRes = R.string.date_range,
                     testTag = "filter_date_range",

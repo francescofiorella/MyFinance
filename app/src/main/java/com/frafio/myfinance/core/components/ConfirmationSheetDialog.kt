@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.model.MenuItem
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +49,7 @@ fun ConfirmationSheetDialog(
             )
             Spacer(modifier = Modifier.height(16.dp))
             ListSheetItem(
-                item = MenuItem(
+                item = MenuItem.Resource(
                     iconRes = actionIcon,
                     textRes = actionText,
                     onClick = onActionClick

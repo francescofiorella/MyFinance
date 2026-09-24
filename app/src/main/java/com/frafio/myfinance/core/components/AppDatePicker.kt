@@ -1,5 +1,6 @@
 package com.frafio.myfinance.core.components
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -37,25 +38,13 @@ fun AppDatePickerDialog(
             derivedStateOf { datePickerState.selectedDateMillis != null }
         }
 
-        DatePickerDialog(
+        AppPickerDialog(
             modifier = modifier,
-            onDismissRequest = onDismiss,
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        datePickerState.selectedDateMillis?.let {
-                            onDateSelected(it.toUTCLocalDateTime().toLocalDate())
-                        }
-                        onDismiss()
-                    },
-                    enabled = confirmEnabled.value
-                ) {
-                    Text(stringResource(id = android.R.string.ok))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(id = R.string.cancel))
+            onDismiss = onDismiss,
+            confirmEnabled = confirmEnabled.value,
+            onConfirm = {
+                datePickerState.selectedDateMillis?.let {
+                    onDateSelected(it.toUTCLocalDateTime().toLocalDate())
                 }
             }
         ) {
@@ -97,27 +86,15 @@ fun AppDateRangePickerDialog(
             }
         }
 
-        DatePickerDialog(
+        AppPickerDialog(
             modifier = modifier,
-            onDismissRequest = onDismiss,
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val start = dateRangePickerState.selectedStartDateMillis?.toUTCLocalDateTime()?.toLocalDate()
-                        val end = dateRangePickerState.selectedEndDateMillis?.toUTCLocalDateTime()?.toLocalDate()
-                        if (start != null && end != null) {
-                            onRangeSelected(start, end)
-                        }
-                        onDismiss()
-                    },
-                    enabled = confirmEnabled.value
-                ) {
-                    Text(stringResource(id = android.R.string.ok))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(id = R.string.cancel))
+            onDismiss = onDismiss,
+            confirmEnabled = confirmEnabled.value,
+            onConfirm = {
+                val start = dateRangePickerState.selectedStartDateMillis?.toUTCLocalDateTime()?.toLocalDate()
+                val end = dateRangePickerState.selectedEndDateMillis?.toUTCLocalDateTime()?.toLocalDate()
+                if (start != null && end != null) {
+                    onRangeSelected(start, end)
                 }
             }
         ) {
@@ -133,4 +110,37 @@ fun AppDateRangePickerDialog(
             )
         }
     }
+}
+
+/** The dialog both pickers share: OK runs [onConfirm] and closes, Cancel closes. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AppPickerDialog(
+    modifier: Modifier,
+    onDismiss: () -> Unit,
+    confirmEnabled: Boolean,
+    onConfirm: () -> Unit,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    DatePickerDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirm()
+                    onDismiss()
+                },
+                enabled = confirmEnabled
+            ) {
+                Text(stringResource(id = android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(id = R.string.cancel))
+            }
+        },
+        content = content
+    )
 }
