@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.preview.PreviewTransactions
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.Transaction
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -83,13 +84,7 @@ fun EditTransactionSheetPreview() {
     MyFinanceTheme {
         EditTransactionSheet(
             show = true,
-            transaction = Expense(
-                name = "Expense",
-                price = 0.00,
-                year = 1970,
-                month = 1,
-                day = 1
-            ),
+            transaction = PreviewTransactions.placeholderExpense,
             onDismiss = {},
             onLabels = {},
             onEdit = {},

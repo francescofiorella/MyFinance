@@ -53,6 +53,7 @@ import com.frafio.myfinance.core.components.EmptyView
 import com.frafio.myfinance.core.components.SearchBar
 import com.frafio.myfinance.core.components.TotalItem
 import com.frafio.myfinance.core.components.TransactionListItem
+import com.frafio.myfinance.core.components.preview.PreviewTransactions
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -522,74 +523,9 @@ fun ExpensesList(
 @Preview(showBackground = true)
 @Composable
 fun ExpensesPreview() {
-    val sampleExpenses = listOf(
-        Expense(
-            name = FirestoreEnums.NAMES.TOTAL.value,
-            price = 0.0,
-            year = 2023,
-            month = 10,
-            day = 28,
-            category = FirestoreEnums.CATEGORIES.TOTAL.value,
-            id = "total_28_10_2023",
-        ),
-        Expense(
-            name = "Jolly",
-            price = 0.0,
-            year = 2023,
-            month = 10,
-            day = 28,
-            category = FirestoreEnums.CATEGORIES.JOLLY.value,
-            id = "0"
-        ),
-        Expense(
-            name = FirestoreEnums.NAMES.TOTAL.value,
-            price = 45.0,
-            year = 2023,
-            month = 10,
-            day = 27,
-            category = FirestoreEnums.CATEGORIES.TOTAL.value,
-            id = "total_27_10_2023"
-        ),
-        Expense(
-            name = "Pizza Margherita",
-            price = 8.5,
-            year = 2023,
-            month = 10,
-            day = 27,
-            category = FirestoreEnums.CATEGORIES.DINING.value,
-            id = "1"
-        ),
-        Expense(
-            name = "Groceries",
-            price = 36.5,
-            year = 2023,
-            month = 10,
-            day = 27,
-            category = FirestoreEnums.CATEGORIES.GROCERIES.value,
-            id = "2"
-        ),
-        Expense(
-            name = FirestoreEnums.NAMES.TOTAL.value,
-            price = 15.0,
-            year = 2023,
-            month = 10,
-            day = 26,
-            category = FirestoreEnums.CATEGORIES.TOTAL.value,
-            id = "total_26_10_2023"
-        ),
-        Expense(
-            name = "Bus Ticket",
-            price = 1.5,
-            year = 2023,
-            month = 10,
-            day = 26,
-            category = FirestoreEnums.CATEGORIES.TRANSPORTATION.value,
-            id = "3"
-        )
-    )
     MyFinanceTheme {
         ExpensesContent(
-            expenses = sampleExpenses,
+            expenses = PreviewTransactions.expensesByDay,
             totalFilteredExpenses = 150.0,
             isExpensesEmpty = false,
             searchQuery = "",

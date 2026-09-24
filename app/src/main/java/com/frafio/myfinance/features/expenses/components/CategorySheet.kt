@@ -12,6 +12,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AdaptiveSheet
 import com.frafio.myfinance.core.components.GridSheetDialog
 import com.frafio.myfinance.core.components.MenuItem
+import com.frafio.myfinance.core.components.preview.PreviewTransactions
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -132,12 +133,7 @@ fun ExpenseCategorySheetPreview() {
         CategorySheet(
             show = true,
             onDismiss = {},
-            expense = Expense(
-                name = "Expense",
-                price = 0.0,
-                year = 1970,
-                month = 1,
-                day = 1,
+            expense = PreviewTransactions.placeholderExpense.copy(
                 category = FirestoreEnums.CATEGORIES.HOUSING.value
             ),
             onCategorySelected = {},

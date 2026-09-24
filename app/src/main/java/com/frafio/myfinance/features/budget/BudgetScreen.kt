@@ -48,6 +48,7 @@ import com.frafio.myfinance.core.components.EmptyListItem
 import com.frafio.myfinance.core.components.EmptyView
 import com.frafio.myfinance.core.components.TotalItem
 import com.frafio.myfinance.core.components.TransactionListItem
+import com.frafio.myfinance.core.components.preview.PreviewTransactions
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -426,33 +427,7 @@ private fun IncomeItem(
 fun BudgetPreview() {
     MyFinanceTheme {
         BudgetContent(
-            incomes = listOf(
-                Income(
-                    id = "2024",
-                    year = 2024,
-                    month = 0,
-                    category = FirestoreEnums.CATEGORIES.TOTAL.value,
-                    price = 12000.0,
-                ),
-                Income(
-                    id = "1",
-                    name = "Salary",
-                    price = 1000.0,
-                    day = 1,
-                    month = 1,
-                    year = 2024,
-                    category = 0,
-                ),
-                Income(
-                    id = "2",
-                    name = "Freelance",
-                    price = 500.0,
-                    day = 15,
-                    month = 1,
-                    year = 2024,
-                    category = 0,
-                )
-            ),
+            incomes = PreviewTransactions.incomesOfYear,
             isIncomesEmpty = false,
             itemMetadata = mapOf(
                 1 to Pair(0, 2),
