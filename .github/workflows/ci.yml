@@ -159,7 +159,11 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: device-test-reports
-          path: app/build/reports/androidTests
+          # firebase-debug.log has the stack trace behind the CLI's "An unexpected error has occurred";
+          # firestore-debug.log is the Firestore emulator's own log.
+          path: |
+            app/build/reports/androidTests
+            *-debug.log
 
       - name: Upload the coverage report
         if: ${{ !cancelled() }}
