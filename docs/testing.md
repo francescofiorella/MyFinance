@@ -417,28 +417,6 @@ test in `lint/src/test` that runs it on small source files (`Stubs` supplies the
 Firebase declarations it needs) and pins the exact report. `./gradlew :lint:test` runs those tests;
 after a Gradle sync the editor picks up a changed rule.
 
-## Dependency verification
-
-Every library and plugin Gradle downloads is checked against a SHA-256 checksum recorded in
-`gradle/verification-metadata.xml`. A download that does not match — a tampered or swapped
-artifact — fails the build instead of reaching the app. Sources and javadoc jars, which Android
-Studio fetches for browsing only, are trusted without a checksum.
-
-**After adding, removing or updating a library or plugin**, the build fails with *Dependency
-verification failed* until the file is refreshed. Run the **Update Dependency Verification**
-configuration in Android Studio, or:
-
-```
-./gradlew --write-verification-metadata sha256 --no-configuration-cache -I gradle/verification/resolve-all-configurations.gradle resolveAllConfigurations :app:assembleDebug :app:assembleRelease :app:assembleBenchmarkRelease :app:assembleNonMinifiedRelease :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug :app:createDebugCombinedCoverageReport :lint:test :baselineProfile:assemble -x uploadCrashlyticsMappingFileRelease
-```
-
-It runs every kind of build once so each download is seen, and
-`gradle/verification/resolve-all-configurations.gradle` resolves whatever no task touched —
-including AGP's `aapt2` binary for Linux and macOS, which a Windows build never downloads but CI
-needs. Device tests download nothing extra, so no phone is required. Review the diff before
-committing it: new entries should match the libraries you changed. Old entries are kept; delete a
-stale block by hand if you want the file tidy.
-
 ## Continuous integration
 
 GitHub Actions runs everything above on every push to `main`, every pull request, and on demand
