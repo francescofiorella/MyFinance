@@ -1,6 +1,7 @@
 package com.frafio.myfinance.core.components
 
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.core.snap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -76,7 +77,7 @@ class ComponentScreenshotTests {
                             PieChartItem(value = 36.5, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled),
                             PieChartItem(value = 10.0, label = "Transport", icon = R.drawable.ic_grid_3x3_filled),
                         ),
-                        animate = false,
+                        animationSpec = snap(),
                     )
                 }
             }

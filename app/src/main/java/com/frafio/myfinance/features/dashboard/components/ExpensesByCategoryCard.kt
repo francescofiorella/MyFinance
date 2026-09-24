@@ -23,7 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -70,7 +70,8 @@ fun ExpensesByCategoryCard(
         DateTimeFormatter.ofPattern(if (monthlyShown) "MMMM uuuu" else "uuuu")
     }
 
-    var resetPieChart by remember { mutableStateOf(false) }
+    // -1 selects no category; new data clears the selection.
+    var selectedCategory by remember(values) { mutableIntStateOf(-1) }
 
     Card(
         modifier = Modifier
@@ -163,7 +164,7 @@ fun ExpensesByCategoryCard(
                                     .animateWidth(todayInteractionSource),
                                 onClick = {
                                     onToday()
-                                    resetPieChart = !resetPieChart
+                                    selectedCategory = -1
                                 },
                                 shapes = IconButtonDefaults.shapes(),
                                 interactionSource = todayInteractionSource
@@ -237,8 +238,8 @@ fun ExpensesByCategoryCard(
                 }
                 PieChart(
                     items = chartItems,
-                    animate = true,
-                    resetSelectionHook = resetPieChart
+                    selectedIndex = selectedCategory,
+                    onSelectedIndexChange = { selectedCategory = it }
                 )
             }
         }

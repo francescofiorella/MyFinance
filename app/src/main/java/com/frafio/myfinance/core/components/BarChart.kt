@@ -60,7 +60,11 @@ object BarChartDefaults {
     val BarMaxHeight: Dp = 160.dp
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+/** How many bars of [barWidth] plus [barPadding] on each side fit in [maxWidth]; at least one. */
+internal fun maxVisibleBars(maxWidth: Dp, barWidth: Dp, barPadding: Dp): Int =
+    (maxWidth / (barWidth + barPadding * 2)).toInt().coerceAtLeast(1)
+
+/** A bar chart that keeps its own selection, starting on the latest month. */
 @Composable
 fun BarChart(
     modifier: Modifier = Modifier,
@@ -68,189 +72,219 @@ fun BarChart(
     referenceValue: Double? = null,
     onBarClick: (Int) -> Unit = {},
     onVisibleCountChanged: (Int) -> Unit = {},
-    resetIndicatorHook: Boolean = false,
+    barWidth: Dp = BarChartDefaults.BarWidth,
+    barPadding: Dp = BarChartDefaults.BarPadding,
+    barMaxHeight: Dp = BarChartDefaults.BarMaxHeight
+) {
+    var selectedIndex by rememberSaveable { mutableIntStateOf(-1) }
+    BarChart(
+        modifier = modifier,
+        entries = entries,
+        selectedIndex = selectedIndex,
+        onSelectedIndexChange = {
+            selectedIndex = it
+            onBarClick(it)
+        },
+        referenceValue = referenceValue,
+        onVisibleCountChanged = onVisibleCountChanged,
+        barWidth = barWidth,
+        barPadding = barPadding,
+        barMaxHeight = barMaxHeight
+    )
+}
+
+/**
+ * A bar chart whose selection is hoisted. A [selectedIndex] outside [entries] (e.g. -1) selects the
+ * latest month, so resetting it to -1 goes back to the default.
+ */
+@Composable
+fun BarChart(
+    modifier: Modifier = Modifier,
+    entries: List<BarChartEntry>,
+    selectedIndex: Int,
+    onSelectedIndexChange: (Int) -> Unit,
+    referenceValue: Double? = null,
+    onVisibleCountChanged: (Int) -> Unit = {},
     barWidth: Dp = BarChartDefaults.BarWidth,
     barPadding: Dp = BarChartDefaults.BarPadding,
     barMaxHeight: Dp = BarChartDefaults.BarMaxHeight
 ) {
     BoxWithConstraints(modifier = modifier) {
-        val maxWidth = maxWidth
-        val barItemWidth = barWidth + barPadding * 2
-        val maxVisibleItems = (maxWidth / barItemWidth).toInt().coerceAtLeast(1)
+        val maxVisibleItems = maxVisibleBars(maxWidth, barWidth, barPadding)
 
         LaunchedEffect(maxVisibleItems) {
             onVisibleCountChanged(maxVisibleItems)
         }
 
-        // Use rememberSaveable so that the selected index persists during screen rotation.
-        var selectedIndex by rememberSaveable(resetIndicatorHook) {
-            mutableIntStateOf(
-                if (entries.isNotEmpty()) {
-                    entries.size - 1
-                } else {
-                    -1
-                }
-            )
-        }
-
-        // Max value based on visible data for better scaling
-        val maxValue = remember(entries, referenceValue) {
-            // Ensure selectedIndex is within the visible range or valid for data
-            if (entries.isNotEmpty() && (selectedIndex < 0 || selectedIndex >= entries.size)) {
-                selectedIndex = entries.size - 1
-            }
+        val shownIndex = if (selectedIndex in entries.indices) selectedIndex else entries.lastIndex
+        val maxValue = remember(entries) {
             val max = entries.maxOfOrNull { it.value } ?: 0.0
             if (max == 0.0) 1.0 else max
-        }
-
-        val extendedLabel = remember(selectedIndex, entries) {
-            if (selectedIndex == -1) {
-                ""
-            } else {
-                val yearMonth =
-                    YearMonth.of(entries[selectedIndex].year, entries[selectedIndex].month)
-
-                val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
-
-                yearMonth.format(formatter)
-            }
         }
 
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(
-                    text = if (selectedIndex == -1)
-                        "" else doubleToPrice(entries[selectedIndex].value),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.displaySmall,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    modifier = Modifier.padding(bottom = 5.dp),
-                    text = extendedLabel,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.labelSmall
+            BarChartHeader(entry = entries.getOrNull(shownIndex))
+            Spacer(modifier = Modifier.height(16.dp))
+            BarChartBars(
+                entries = entries,
+                selectedIndex = shownIndex,
+                onBarClick = onSelectedIndexChange,
+                maxValue = maxValue,
+                referenceValue = referenceValue,
+                barWidth = barWidth,
+                barPadding = barPadding,
+                barMaxHeight = barMaxHeight
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            BarChartAxis(entries = entries, selectedIndex = shownIndex)
+        }
+    }
+}
+
+private fun BarChartEntry.monthYear(): String =
+    YearMonth.of(year, month).format(DateTimeFormatter.ofPattern("MMMM yyyy"))
+
+@Composable
+private fun BarChartHeader(entry: BarChartEntry?) {
+    Row(verticalAlignment = Alignment.Bottom) {
+        Text(
+            text = entry?.let { doubleToPrice(it.value) } ?: "",
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.displaySmall,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            modifier = Modifier.padding(bottom = 5.dp),
+            text = entry?.monthYear() ?: "",
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.labelSmall
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun BarChartBars(
+    entries: List<BarChartEntry>,
+    selectedIndex: Int,
+    onBarClick: (Int) -> Unit,
+    maxValue: Double,
+    referenceValue: Double?,
+    barWidth: Dp,
+    barPadding: Dp,
+    barMaxHeight: Dp
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(barMaxHeight),
+        contentAlignment = Alignment.BottomStart
+    ) {
+        val interactionSources = remember(entries.size) {
+            List(entries.size) { MutableInteractionSource() }
+        }
+        ButtonGroup(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.Bottom,
+            overflowIndicator = { menuState ->
+                ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+            }
+        ) {
+            entries.forEachIndexed { index, entry ->
+                val barHeightFraction =
+                    (entry.value / maxValue).toFloat().coerceIn(0.01f, 1f)
+                customItem(
+                    {
+                        ChartBar(
+                            modifier = Modifier
+                                .weight(1f)
+                                .animateWidth(interactionSources[index]),
+                            barWidth = barWidth,
+                            barPadding = barPadding,
+                            heightFraction = barHeightFraction,
+                            isSelected = selectedIndex == index,
+                            contentDescription = stringResource(
+                                R.string.chart_bar,
+                                entry.monthYear(),
+                                doubleToPrice(entry.value)
+                            ),
+                            onClick = { onBarClick(index) },
+                            interactionSource = interactionSources[index]
+                        )
+                    },
+                    {}
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(barMaxHeight),
-                contentAlignment = Alignment.BottomStart
-            ) {
-                val interactionSources = remember(entries.size) {
-                    List(entries.size) { MutableInteractionSource() }
-                }
-                ButtonGroup(
+        }
+
+        if (referenceValue != null && referenceValue > 0) {
+            val animatedHeightFraction by animateFloatAsState(
+                targetValue = (referenceValue / maxValue).toFloat(),
+                animationSpec = tween(durationMillis = 500),
+                label = "ReferenceHeight"
+            )
+            if (entries.isNotEmpty() && animatedHeightFraction in 0f..1f) {
+                HorizontalDivider(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.Bottom,
-                    overflowIndicator = { menuState ->
-                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
-                    }
-                ) {
-                    entries.forEachIndexed { index, entry ->
-                        val isSelected = selectedIndex == index
-                        val barHeightFraction =
-                            (entry.value / maxValue).toFloat().coerceIn(0.01f, 1f)
-                        customItem(
-                            {
-                                val barDescription = stringResource(
-                                    R.string.chart_bar,
-                                    YearMonth.of(entry.year, entry.month).format(DateTimeFormatter.ofPattern("MMMM yyyy")),
-                                    doubleToPrice(entry.value)
-                                )
-                                ChartBar(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .animateWidth(interactionSources[index]),
-                                    barWidth = barWidth,
-                                    barPadding = barPadding,
-                                    heightFraction = barHeightFraction,
-                                    isSelected = isSelected,
-                                    contentDescription = barDescription,
-                                    onClick = {
-                                        selectedIndex = index
-                                        onBarClick(index)
-                                    },
-                                    interactionSource = interactionSources[index]
+                        .zIndex(-1f)
+                        .fillMaxWidth()
+                        .padding(bottom = barMaxHeight * animatedHeightFraction),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                if (entries[entries.size - 1].value <= referenceValue) {
+                    Text(
+                        modifier = Modifier
+                            .zIndex(-1f)
+                            .fillMaxWidth()
+                            .offset {
+                                IntOffset(
+                                    0,
+                                    -(barMaxHeight * animatedHeightFraction).toPx()
+                                        .roundToInt()
                                 )
                             },
-                            {}
-                        )
-                    }
-                }
-
-                if (referenceValue != null && referenceValue > 0) {
-
-                    val animatedHeightFraction by animateFloatAsState(
-                        targetValue = (referenceValue / maxValue).toFloat(),
-                        animationSpec = tween(durationMillis = 500),
-                        label = "ReferenceHeight"
-                    )
-                    if (entries.isNotEmpty() && animatedHeightFraction in 0f..1f) {
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .zIndex(-1f)
-                                .fillMaxWidth()
-                                .padding(bottom = barMaxHeight * animatedHeightFraction),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        if (entries[entries.size - 1].value <= referenceValue) {
-                            Text(
-                                modifier = Modifier
-                                    .zIndex(-1f)
-                                    .fillMaxWidth()
-                                    .offset {
-                                        IntOffset(
-                                            0,
-                                            -(barMaxHeight * animatedHeightFraction).toPx()
-                                                .roundToInt()
-                                        )
-                                    },
-                                text = doubleToPriceWithoutDecimals(referenceValue),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.labelSmall,
-                                textAlign = TextAlign.End
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                entries.forEachIndexed { index, entry ->
-                    val isSelected = selectedIndex == index
-                    val shortLabel = "%02d".format(entry.month).takeLast(2)
-                    val extendedLabel = shortLabel + "/" + "%02d".format(entry.year).takeLast(2)
-                    Text(
-                        text = if (isSelected) extendedLabel else shortLabel,
+                        text = doubleToPriceWithoutDecimals(referenceValue),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                        color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier
-                            .weight(1f)
-                            .wrapContentWidth(
-                                align = Alignment.CenterHorizontally,
-                                unbounded = true
-                            ),
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        softWrap = false,
-                        overflow = TextOverflow.Visible
+                        textAlign = TextAlign.End
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun BarChartAxis(entries: List<BarChartEntry>, selectedIndex: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        entries.forEachIndexed { index, entry ->
+            val isSelected = selectedIndex == index
+            val shortLabel = "%02d".format(entry.month).takeLast(2)
+            val extendedLabel = shortLabel + "/" + "%02d".format(entry.year).takeLast(2)
+            Text(
+                text = if (isSelected) extendedLabel else shortLabel,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .weight(1f)
+                    .wrapContentWidth(
+                        align = Alignment.CenterHorizontally,
+                        unbounded = true
+                    ),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Visible
+            )
         }
     }
 }

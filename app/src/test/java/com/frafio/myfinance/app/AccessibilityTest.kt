@@ -1,5 +1,6 @@
 package com.frafio.myfinance.app
 
+import androidx.compose.animation.core.snap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -147,7 +148,7 @@ class AccessibilityTest {
                     PieChartItem(value = 30.0, label = "Dining", icon = R.drawable.ic_restaurant_filled),
                     PieChartItem(value = 45.0, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled),
                 ),
-                animate = false,
+                animationSpec = snap(),
             )
         }
 

@@ -1,9 +1,11 @@
 package com.frafio.myfinance.core.components
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -31,14 +33,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -55,9 +51,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.frafio.myfinance.R
@@ -80,6 +74,9 @@ object PieChartDefaults {
     val AnimationEasing: Easing = LinearOutSlowInEasing
     const val ChartAnimationDuration: Int = 1000
     const val ArcSelectionAnimationDuration: Int = 100
+
+    /** How the arcs grow and shrink when the values change; pass `snap()` for a static chart. */
+    val AnimationSpec: AnimationSpec<Float> = tween(ChartAnimationDuration, easing = AnimationEasing)
 }
 
 data class PieChartItem(
@@ -88,32 +85,74 @@ data class PieChartItem(
     @DrawableRes val icon: Int
 )
 
+/** Degrees taken by the gap after an arc: its width plus [offsetPx], as an angle at [radiusPx]. */
+internal fun arcGapDegrees(offsetPx: Float, arcWidthPx: Float, radiusPx: Float): Float =
+    if (radiusPx > 0) {
+        ((offsetPx + arcWidthPx) / radiusPx) * (180f / PI.toFloat())
+    } else 0f
+
+/** Sweep of each value's arc; a gap follows every positive arc unless it is the only one. */
+internal fun arcSweeps(values: List<Double>, gapDegrees: Float): List<Float> {
+    val count = values.count { it > 0.0 }
+    val gap = if (count <= 1) 0f else gapDegrees
+    val totalGap = gap * count
+    val sum = values.sum()
+    return values.map { value ->
+        if (sum > 0) (360f - totalGap) * value.toFloat() / sum.toFloat() else 0f
+    }
+}
+
+/** A pie chart that keeps its own selection, starting with none; a new set of items clears it. */
 @Composable
 fun PieChart(
     modifier: Modifier = Modifier,
     items: List<PieChartItem>,
-    animate: Boolean = true,
-    resetSelectionHook: Boolean = false,
+    animationSpec: AnimationSpec<Float> = PieChartDefaults.AnimationSpec,
     radius: Dp = PieChartDefaults.Radius,
     arcWidth: Dp = PieChartDefaults.ArcWidth,
     offsetBetweenArcs: Dp = PieChartDefaults.OffsetBetweenArcs,
     iconSize: Dp = PieChartDefaults.IconSize,
     selectedIconSize: Dp = PieChartDefaults.SelectedIconSize,
-    iconPadding: Dp = PieChartDefaults.IconPadding,
-    animDuration: Int = PieChartDefaults.ChartAnimationDuration
+    iconPadding: Dp = PieChartDefaults.IconPadding
+) {
+    var selectedIndex by remember(items) { mutableIntStateOf(-1) }
+    PieChart(
+        modifier = modifier,
+        items = items,
+        selectedIndex = selectedIndex,
+        onSelectedIndexChange = { selectedIndex = it },
+        animationSpec = animationSpec,
+        radius = radius,
+        arcWidth = arcWidth,
+        offsetBetweenArcs = offsetBetweenArcs,
+        iconSize = iconSize,
+        selectedIconSize = selectedIconSize,
+        iconPadding = iconPadding
+    )
+}
+
+/** A pie chart whose selection is hoisted; -1 selects nothing and shows the total. */
+@Composable
+fun PieChart(
+    modifier: Modifier = Modifier,
+    items: List<PieChartItem>,
+    selectedIndex: Int,
+    onSelectedIndexChange: (Int) -> Unit,
+    animationSpec: AnimationSpec<Float> = PieChartDefaults.AnimationSpec,
+    radius: Dp = PieChartDefaults.Radius,
+    arcWidth: Dp = PieChartDefaults.ArcWidth,
+    offsetBetweenArcs: Dp = PieChartDefaults.OffsetBetweenArcs,
+    iconSize: Dp = PieChartDefaults.IconSize,
+    selectedIconSize: Dp = PieChartDefaults.SelectedIconSize,
+    iconPadding: Dp = PieChartDefaults.IconPadding
 ) {
     val density = LocalDensity.current
     val chartEntryOffset = remember(offsetBetweenArcs, arcWidth, radius, density) {
-        with(density) {
-            val radiusPx = radius.toPx()
-            if (radiusPx > 0) {
-                ((offsetBetweenArcs.toPx() + arcWidth.toPx()) / radiusPx) * (180f / PI.toFloat())
-            } else 0f
-        }
+        with(density) { arcGapDegrees(offsetBetweenArcs.toPx(), arcWidth.toPx(), radius.toPx()) }
     }
 
-    var selectedArcIndex by remember(items, resetSelectionHook) { mutableIntStateOf(-1) }
-    var pressedArcIndex by remember(items, resetSelectionHook) { mutableIntStateOf(-1) }
+    val selectedArcIndex = if (selectedIndex in items.indices) selectedIndex else -1
+    var pressedArcIndex by remember(items) { mutableIntStateOf(-1) }
 
     val interactionSources = remember(items.size) { List(items.size) { MutableInteractionSource() } }
     val isDark = isSystemInDarkTheme()
@@ -125,19 +164,13 @@ fun PieChart(
     val radiusPx = with(density) { radius.toPx() }
 
     val floatValues = remember(items, chartEntryOffset) {
-        val count = items.count { it.value > 0.0 }
-        val offset = if (count <= 1) 0f else chartEntryOffset
-        val totalOffset = offset * count
-        val sum = items.sumOf { it.value }
-        items.map { item ->
-            if (sum > 0) (360f - totalOffset) * item.value.toFloat() / sum.toFloat() else 0f
-        }
+        arcSweeps(items.map { it.value }, chartEntryOffset)
     }
 
     val animatedValues = floatValues.mapIndexed { index, value ->
         animateFloatAsState(
             targetValue = value,
-            animationSpec = tween(if (animate) animDuration else 0, easing = PieChartDefaults.AnimationEasing),
+            animationSpec = animationSpec,
             label = "arc_$index"
         )
     }
@@ -146,7 +179,7 @@ fun PieChart(
         val itemOffset = if (value > 0f && floatValues.count { it > 0f } > 1) chartEntryOffset else 0f
         animateFloatAsState(
             targetValue = itemOffset,
-            animationSpec = tween(if (animate) animDuration else 0, easing = PieChartDefaults.AnimationEasing),
+            animationSpec = animationSpec,
             label = "offset_$index"
         )
     }
@@ -154,7 +187,7 @@ fun PieChart(
     val animatedAlphas = floatValues.mapIndexed { index, value ->
         animateFloatAsState(
             targetValue = if (value > 0f) 1f else 0f,
-            animationSpec = tween(if (animate) animDuration else 0, easing = PieChartDefaults.AnimationEasing),
+            animationSpec = animationSpec,
             label = "alpha_$index"
         )
     }
@@ -177,7 +210,7 @@ fun PieChart(
 
     val emptyCircleAlpha by animateFloatAsState(
         targetValue = if (items.sumOf { it.value } == 0.0) 1f else 0f,
-        animationSpec = tween(if (animate) animDuration else 0, easing = PieChartDefaults.AnimationEasing),
+        animationSpec = animationSpec,
         label = "empty_alpha"
     )
 
@@ -233,7 +266,7 @@ fun PieChart(
                     interactionSource = interactionSources[index],
                     onPress = { pressedArcIndex = index },
                     onRelease = {
-                        selectedArcIndex = index
+                        onSelectedIndexChange(index)
                         pressedArcIndex = -1
                     },
                     onCancel = { pressedArcIndex = -1 }
@@ -248,7 +281,7 @@ fun PieChart(
             modifier = Modifier.clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = { selectedArcIndex = -1 }
+                onClick = { onSelectedIndexChange(-1) }
             )
         ) {
             val title = if (selectedArcIndex != -1) items[selectedArcIndex].label else stringResource(R.string.total)
@@ -396,52 +429,6 @@ private fun PieChartArc(
     }
 }
 
-private class ArcShape(
-    private val startAngle: Float,
-    private val sweepAngle: Float,
-    private val strokeWidthPx: Float,
-    private val radiusPx: Float
-) : Shape {
-    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
-        val path = Path()
-        if (sweepAngle <= 0f) return Outline.Generic(path)
-
-        val center = Offset(size.width / 2f, size.height / 2f)
-        val outerRadius = radiusPx + strokeWidthPx / 2f
-        val innerRadius = radiusPx - strokeWidthPx / 2f
-
-        val outerRect = Rect(center.x - outerRadius, center.y - outerRadius, center.x + outerRadius, center.y + outerRadius)
-        val innerRect = Rect(center.x - innerRadius, center.y - innerRadius, center.x + innerRadius, center.y + innerRadius)
-
-        // Use a slightly less than 360 value to avoid path closing issues with rounded caps
-        val effectiveSweep = sweepAngle.coerceIn(0f, 359.99f)
-
-        val endAngle = startAngle + effectiveSweep
-        val startAngleRad = Math.toRadians(startAngle.toDouble())
-        val endAngleRad = Math.toRadians(endAngle.toDouble())
-
-        val startCapCenter = Offset(
-            center.x + radiusPx * cos(startAngleRad).toFloat(),
-            center.y + radiusPx * sin(startAngleRad).toFloat()
-        )
-        val endCapCenter = Offset(
-            center.x + radiusPx * cos(endAngleRad).toFloat(),
-            center.y + radiusPx * sin(endAngleRad).toFloat()
-        )
-        val capRadius = strokeWidthPx / 2f
-        val startCapRect = Rect(startCapCenter.x - capRadius, startCapCenter.y - capRadius, startCapCenter.x + capRadius, startCapCenter.y + capRadius)
-        val endCapRect = Rect(endCapCenter.x - capRadius, endCapCenter.y - capRadius, endCapCenter.x + capRadius, endCapCenter.y + capRadius)
-
-        path.arcTo(outerRect, startAngle, effectiveSweep, true)
-        path.arcTo(endCapRect, endAngle, 180f, false)
-        path.arcTo(innerRect, endAngle, -effectiveSweep, false)
-        path.arcTo(startCapRect, startAngle + 180f, 180f, false)
-        path.close()
-
-        return Outline.Generic(path)
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun PieChartPreview() {
@@ -465,7 +452,7 @@ fun PieChartSingleEntryPreview() {
         )
         PieChart(
             items = items,
-            animate = false
+            animationSpec = snap()
         )
     }
 }

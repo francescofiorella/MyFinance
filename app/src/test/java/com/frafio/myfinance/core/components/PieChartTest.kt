@@ -1,5 +1,6 @@
 package com.frafio.myfinance.core.components
 
+import androidx.compose.animation.core.snap
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -39,7 +40,7 @@ class PieChartTest {
     @Test
     fun nothingSelected_showsTotalAndTheSum() {
         composeTestRule.setThemedContent {
-            PieChart(items = items, animate = false)
+            PieChart(items = items, animationSpec = snap())
         }
 
         composeTestRule.onNodeWithText(string(R.string.total)).assertIsDisplayed()
@@ -50,7 +51,7 @@ class PieChartTest {
     @Test
     fun emptyItems_showsTotalAndZero() {
         composeTestRule.setThemedContent {
-            PieChart(items = emptyList(), animate = false)
+            PieChart(items = emptyList(), animationSpec = snap())
         }
 
         composeTestRule.onNodeWithText(string(R.string.total)).assertIsDisplayed()

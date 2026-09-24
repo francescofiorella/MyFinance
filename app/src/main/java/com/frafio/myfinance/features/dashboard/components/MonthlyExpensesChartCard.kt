@@ -21,8 +21,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +48,8 @@ fun MonthlyExpensesChartCard(
     isNextDateEnabled: Boolean = true,
     isPreviousDateEnabled: Boolean = true
 ) {
-    var resetBarChart by remember { mutableStateOf(false) }
+    // -1 selects the latest month.
+    var selectedMonth by rememberSaveable { mutableIntStateOf(-1) }
 
     Card(
         modifier = Modifier
@@ -133,7 +135,7 @@ fun MonthlyExpensesChartCard(
                                     .animateWidth(todayInteractionSource),
                                 onClick = {
                                     onToday()
-                                    resetBarChart = !resetBarChart
+                                    selectedMonth = -1
                                 },
                                 shapes = IconButtonDefaults.shapes(),
                                 interactionSource = todayInteractionSource
@@ -151,9 +153,10 @@ fun MonthlyExpensesChartCard(
 
             BarChart(
                 entries = barChartData,
+                selectedIndex = selectedMonth,
+                onSelectedIndexChange = { selectedMonth = it },
                 referenceValue = monthlyBudget,
-                onVisibleCountChanged = onVisibleCountChanged,
-                resetIndicatorHook = resetBarChart
+                onVisibleCountChanged = onVisibleCountChanged
             )
         }
     }
