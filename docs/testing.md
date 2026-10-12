@@ -201,6 +201,9 @@ verified on either. **Whenever you change how a screen or component looks**, run
 ./gradlew :app:recordRoborazziDebug     # 3. Yes, that is what I meant. Overwrites the goldens; commit the changed PNGs together with the UI change.
 ```
 
+In Android Studio the same three steps are the shared **Verify Goldens**, **Compare Goldens**
+and **Record Goldens** run configurations (`.run/`).
+
 Step 1 also happens inside the normal `./gradlew :app:testDebugUnitTest` (`roborazzi.test.verify=true`
 in `gradle.properties`) and in CI's *checks* job, so a red run after a UI edit means "go to step 2";
 on CI the `screenshot-diffs` artifact holds the `*_compare.png` images. Only record after looking at
