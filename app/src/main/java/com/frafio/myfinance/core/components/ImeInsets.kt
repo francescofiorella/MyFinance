@@ -1,6 +1,7 @@
 package com.frafio.myfinance.core.components
 
 import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.imeAnimationTarget
 import androidx.compose.material3.MaterialTheme
@@ -8,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalDensity
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun rememberImeTargetInsets(): WindowInsets {
     val density = LocalDensity.current
