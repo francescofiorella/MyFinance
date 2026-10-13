@@ -43,13 +43,13 @@ The long journey is capped at `maxIterations = 6` so a profile that refuses to s
 3. The sign-up form expands, then collapses.
 4. **Email and password fill themselves in, with no keyboard.** ← see below
 5. Sign-in is tapped. Wavy progress bar, then the dashboard with a "Login successful" snackbar.
-6. Straight to the Expenses tab — the dashboard is not scrolled or touched. The list flings to the bottom and back up.
-7. The letter `a` appears in the search field, the list narrows, then the query clears.
+6. Straight to the Expenses tab — the dashboard is not scrolled or touched. The list flings to the bottom and back up, then the categories and labels buttons beside the search bar each open their screen and close it.
+7. The search field is tapped: the bar widens over those buttons and the keyboard opens. The letter `a` appears, the list narrows, the query clears, then the back arrow collapses the bar and the keyboard closes.
 8. Filter sheet slides up (Label / Category / Date range). Category is tapped, the category grid opens, back dismisses it.
 9. Filter sheet opens again, Date range is tapped, the date-range picker appears, back dismisses it. *Nothing is ever selected, so no filter is left applied.*
 10. A transaction is long-pressed. Action sheet appears (Labels / Edit / Duplicate / Delete). **Edit** is tapped, the Add screen opens pre-filled, and the X closes it without saving.
 11. Budget tab. The list scrolls down and back.
-12. Profile tab. The account row expands and collapses, then Manage categories, Manage labels and Change password each open and close, then the currency sheet opens and closes.
+12. Profile tab. The account row expands and collapses, then Change password opens and closes, then the currency sheet opens and closes.
 13. Back to the dashboard, FAB tapped. The Add screen fills in with "Baseline profile" and 12.34, the expense/income switcher opens and closes, and the X closes the screen — **never the save tick**.
 14. The app dies, launcher reappears, next iteration starts at step 2.
 

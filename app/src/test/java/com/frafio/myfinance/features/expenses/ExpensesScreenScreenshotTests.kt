@@ -55,6 +55,13 @@ class ExpensesScreenScreenshotTests {
     }
 
     @Test
+    fun searchExpanded() {
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "ExpensesScreenSearchExpanded", deviceName = "phone") {
+            Expenses(screenshotExpenses, isEmpty = false, searchQuery = "Pizza", isSearchExpanded = true)
+        }
+    }
+
+    @Test
     fun empty() {
         composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "ExpensesScreenEmpty", deviceName = "phone") {
             Expenses(emptyList(), isEmpty = true)
@@ -73,6 +80,7 @@ class ExpensesScreenScreenshotTests {
         expenses: List<Expense>,
         isEmpty: Boolean?,
         searchQuery: String = "",
+        isSearchExpanded: Boolean = false,
         selectedCategories: List<Int> = emptyList(),
         selectedLabels: List<String> = emptyList(),
         dateRange: Pair<LocalDate, LocalDate>? = null,
@@ -82,12 +90,14 @@ class ExpensesScreenScreenshotTests {
             totalFilteredExpenses = 46.5,
             isExpensesEmpty = isEmpty,
             searchQuery = searchQuery,
+            isSearchExpanded = isSearchExpanded,
             selectedCategories = selectedCategories,
             selectedLabels = selectedLabels,
             dateRange = dateRange,
             scrollToIdFlow = flowOf(null),
             itemMetadata = screenshotExpensesMetadata,
             onSearchQueryChanged = {},
+            onSearchExpandedChange = {},
             onCategoryFilterChanged = {},
             onLabelFilterChanged = { _, _ -> },
             onDateFilterChanged = {},
@@ -95,6 +105,8 @@ class ExpensesScreenScreenshotTests {
             onFilterClick = {},
             onItemLongClick = { _, _ -> },
             onCategoryClick = { _, _ -> },
+            onManageCategories = {},
+            onManageLabels = {},
             getDateLabel = ::screenshotDateLabel,
         )
     }

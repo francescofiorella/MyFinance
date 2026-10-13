@@ -1,11 +1,14 @@
 package com.frafio.myfinance.core.components
 
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasTestTag
@@ -106,5 +109,67 @@ class SearchBarTest {
         }
 
         composeTestRule.onNodeWithContentDescription(string(R.string.filter)).assertIsDisplayed()
+    }
+
+    @Test
+    fun collapsed_showsNoBackButton() {
+        composeTestRule.setThemedContent {
+            SearchBar(query = "", onQueryChange = {}, onFilterClick = {})
+        }
+
+        composeTestRule.onNodeWithTag("search_back_button").assertDoesNotExist()
+    }
+
+    @Test
+    fun focusingTheField_reportsExpanded() {
+        val reported = mutableListOf<Boolean>()
+        composeTestRule.setThemedContent {
+            SearchBar(query = "", onQueryChange = {}, onFilterClick = {}, onExpandedChange = { reported += it })
+        }
+
+        composeTestRule.onNodeWithTag("search_field").performClick()
+
+        assertThat(reported).containsExactly(true)
+    }
+
+    @Test
+    fun expanded_backButton_isDescribedForAccessibility() {
+        composeTestRule.setThemedContent {
+            SearchBar(query = "", onQueryChange = {}, onFilterClick = {}, expanded = true)
+        }
+
+        composeTestRule.onNodeWithContentDescription(string(R.string.navigate_up)).assertIsDisplayed()
+    }
+
+    // Focus itself is not asserted after the tap: Robolectric hands it back to the only focusable
+    // once it is cleared, which a device does not do.
+    @Test
+    fun backButton_collapses_withoutExpandingAgain() {
+        val reported = mutableListOf<Boolean>()
+        composeTestRule.setThemedContent {
+            var expanded by remember { mutableStateOf(false) }
+            SearchBar(query = "", onQueryChange = {}, onFilterClick = {}, expanded = expanded, onExpandedChange = { reported += it; expanded = it })
+        }
+
+        composeTestRule.onNodeWithTag("search_field").performClick()
+        composeTestRule.onNodeWithTag("search_field").assertIsFocused()
+        composeTestRule.onNodeWithTag("search_back_button").performClick()
+
+        assertThat(reported).containsExactly(true, false).inOrder()
+        composeTestRule.onNodeWithTag("search_back_button").assertDoesNotExist()
+    }
+
+    @Test
+    fun systemBack_whileExpanded_reportsCollapsed() {
+        val reported = mutableListOf<Boolean>()
+        var dispatcher: OnBackPressedDispatcher? = null
+        composeTestRule.setThemedContent {
+            dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+            SearchBar(query = "", onQueryChange = {}, onFilterClick = {}, expanded = true, onExpandedChange = { reported += it })
+        }
+
+        composeTestRule.runOnIdle { dispatcher!!.onBackPressed() }
+
+        assertThat(reported).containsExactly(false)
     }
 }

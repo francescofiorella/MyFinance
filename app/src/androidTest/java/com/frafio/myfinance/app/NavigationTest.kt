@@ -151,6 +151,16 @@ class NavigationTest {
     }
 
     @Test
+    fun expenses_manageLabels_opensLabels_andBackReturns() {
+        assertExpensesSubScreen(entry = "expenses_manage_labels", content = "labels_list")
+    }
+
+    @Test
+    fun expenses_manageCategories_opensCategories_andBackReturns() {
+        assertExpensesSubScreen(entry = "expenses_manage_categories", content = "categories_scroll")
+    }
+
+    @Test
     fun profile_changePassword_opensChangePassword_andBackReturns() {
         composeTestRule.onNodeWithTag("tab_profile").performClick()
         composeTestRule.onNodeWithTag("profile_edit_profile").performClick()
@@ -186,5 +196,17 @@ class NavigationTest {
         composeTestRule.onNodeWithTag(content).assertDoesNotExist()
         composeTestRule.onNodeWithTag("profile_scroll").assertExists()
         composeTestRule.onNodeWithTag("tab_profile").assertIsSelected()
+    }
+
+    private fun assertExpensesSubScreen(entry: String, content: String) {
+        composeTestRule.onNodeWithTag("tab_expenses").performClick()
+        composeTestRule.onNodeWithTag(entry).performClick()
+        composeTestRule.onNodeWithTag(content).assertExists()
+
+        Espresso.pressBack()
+
+        composeTestRule.onNodeWithTag(content).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("expenses_list").assertExists()
+        composeTestRule.onNodeWithTag("tab_expenses").assertIsSelected()
     }
 }

@@ -1,9 +1,15 @@
 package com.frafio.myfinance.features.expenses
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +22,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -33,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -74,6 +85,8 @@ fun ExpensesScreen(
     viewModel: ExpensesViewModel,
     onEditExpense: (Expense, Int) -> Unit,
     onDuplicateExpense: (Expense) -> Unit,
+    onManageCategories: () -> Unit,
+    onManageLabels: () -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
     modifier: Modifier = Modifier,
 ) {
@@ -95,6 +108,7 @@ fun ExpensesScreen(
     var showDeletionConfirmationSheet by remember { mutableStateOf(value = false) }
     var showNewLabelInLabels by remember { mutableStateOf(value = true) }
     var showDatePickerRange by remember { mutableStateOf(value = false) }
+    var isSearchExpanded by rememberSaveable { mutableStateOf(value = false) }
 
     FilterExpensesSheet(
         show = showFilterSheet,
@@ -240,12 +254,14 @@ fun ExpensesScreen(
         totalFilteredExpenses = totalFilteredExpenses,
         isExpensesEmpty = isExpensesEmpty,
         searchQuery = searchQuery,
+        isSearchExpanded = isSearchExpanded,
         selectedCategories = selectedCategories,
         selectedLabels = selectedLabels,
         dateRange = dateRange,
         scrollToIdFlow = viewModel.scrollToId,
         itemMetadata = itemMetadata,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
+        onSearchExpandedChange = { isSearchExpanded = it },
         onCategoryFilterChanged = viewModel::onCategoryFilterChanged,
         onLabelFilterChanged = viewModel::onLabelFilterChanged,
         onDateFilterChanged = { viewModel.onDateFilterChanged(it) },
@@ -259,6 +275,8 @@ fun ExpensesScreen(
             viewModel.setEditingExpense(expense)
             showCategorySheet = true
         },
+        onManageCategories = onManageCategories,
+        onManageLabels = onManageLabels,
         getDateLabel = getDateLabel,
         modifier = modifier
     )
@@ -271,12 +289,14 @@ fun ExpensesContent(
     totalFilteredExpenses: Double,
     isExpensesEmpty: Boolean?,
     searchQuery: String,
+    isSearchExpanded: Boolean,
     selectedCategories: List<Int>,
     selectedLabels: List<String>,
     dateRange: Pair<LocalDate, LocalDate>?,
     scrollToIdFlow: Flow<String?>,
     itemMetadata: Map<Int, Pair<Int, Int>>,
     onSearchQueryChanged: (String) -> Unit,
+    onSearchExpandedChange: (Boolean) -> Unit,
     onCategoryFilterChanged: (Int) -> Unit,
     onLabelFilterChanged: (String, Boolean) -> Unit,
     onDateFilterChanged: (Pair<LocalDate, LocalDate>?) -> Unit,
@@ -284,6 +304,8 @@ fun ExpensesContent(
     onFilterClick: () -> Unit,
     onItemLongClick: (Expense, Int) -> Unit,
     onCategoryClick: (Expense, Int) -> Unit,
+    onManageCategories: () -> Unit,
+    onManageLabels: () -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
     modifier: Modifier = Modifier,
 ) {
@@ -299,12 +321,97 @@ fun ExpensesContent(
 
             false -> {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    SearchBar(
-                        query = searchQuery,
-                        onQueryChange = onSearchQueryChanged,
-                        onFilterClick = onFilterClick,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        SearchBar(
+                            query = searchQuery,
+                            onQueryChange = onSearchQueryChanged,
+                            onFilterClick = onFilterClick,
+                            expanded = isSearchExpanded,
+                            onExpandedChange = onSearchExpandedChange,
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+                        AnimatedVisibility(
+                            visible = !isSearchExpanded,
+                            enter = expandHorizontally(MaterialTheme.motionScheme.fastSpatialSpec()) +
+                                    fadeIn(MaterialTheme.motionScheme.fastEffectsSpec()),
+                            exit = shrinkHorizontally(MaterialTheme.motionScheme.fastSpatialSpec()) +
+                                    fadeOut(MaterialTheme.motionScheme.fastEffectsSpec()),
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .padding(start = 8.dp)
+                                    .background(
+                                        MaterialTheme.colorScheme.surfaceContainer,
+                                        RoundedCornerShape(40.dp)
+                                    )
+                            ) {
+                                val categoriesInteractionSource =
+                                    remember { MutableInteractionSource() }
+                                val labelsInteractionSource =
+                                    remember { MutableInteractionSource() }
+                                ButtonGroup(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    overflowIndicator = { menuState ->
+                                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+                                    },
+                                    modifier = Modifier.padding(8.dp)
+                                ) {
+                                    customItem(
+                                        {
+                                            FilledTonalIconButton(
+                                                onClick = onManageCategories,
+                                                shapes = IconButtonDefaults.shapes(
+                                                    shape = IconButtonDefaults.smallRoundShape,
+                                                    pressedShape = IconButtonDefaults.smallRoundShape
+                                                ),
+                                                interactionSource = categoriesInteractionSource,
+                                                modifier = Modifier
+                                                    .testTag("expenses_manage_categories")
+                                                    .size(IconButtonDefaults.smallContainerSize())
+                                                    .animateWidth(categoriesInteractionSource),
+                                            ) {
+                                                Icon(
+                                                    painter = painterResource(id = R.drawable.ic_grid_3x3_filled),
+                                                    contentDescription = stringResource(id = R.string.manage_categories),
+                                                )
+                                            }
+                                        },
+                                        {}
+                                    )
+                                    customItem(
+                                        {
+                                            FilledTonalIconButton(
+                                                onClick = onManageLabels,
+                                                shapes = IconButtonDefaults.shapes(
+                                                    shape = IconButtonDefaults.smallRoundShape,
+                                                    pressedShape = IconButtonDefaults.smallRoundShape
+                                                ),
+                                                interactionSource = labelsInteractionSource,
+                                                modifier = Modifier
+                                                    .testTag("expenses_manage_labels")
+                                                    .size(IconButtonDefaults.smallContainerSize())
+                                                    .animateWidth(labelsInteractionSource),
+                                            ) {
+                                                Icon(
+                                                    painter = painterResource(id = R.drawable.ic_sell_outline),
+                                                    contentDescription = stringResource(id = R.string.manage_labels),
+                                                )
+                                            }
+                                        },
+                                        {}
+                                    )
+                                }
+                            }
+                        }
+                    }
 
                     AnimatedVisibility(
                         visible = (selectedCategories.isNotEmpty()) || (selectedLabels.isNotEmpty()) || (dateRange != null),
@@ -529,11 +636,13 @@ fun ExpensesPreview() {
             totalFilteredExpenses = 150.0,
             isExpensesEmpty = false,
             searchQuery = "",
+            isSearchExpanded = false,
             selectedCategories = emptyList(),
             selectedLabels = emptyList(),
             dateRange = null,
             scrollToIdFlow = flowOf(null),
             onSearchQueryChanged = {},
+            onSearchExpandedChange = {},
             onCategoryFilterChanged = {},
             onLabelFilterChanged = { _, _ -> },
             onDateFilterChanged = {},
@@ -541,6 +650,8 @@ fun ExpensesPreview() {
             onFilterClick = {},
             onItemLongClick = { _, _ -> },
             onCategoryClick = { _, _ -> },
+            onManageCategories = {},
+            onManageLabels = {},
             getDateLabel = { _, _ -> "Oct 27, 2023" },
             itemMetadata = emptyMap(),
         )

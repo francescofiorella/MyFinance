@@ -101,12 +101,22 @@ class BaselineProfileGenerator {
             device.settle()
         }
 
+        // Before searching: the expanded search bar hides these buttons.
+        openAndClose("expenses_list", "expenses_manage_categories", "categories_scroll")
+        openAndClose("expenses_list", "expenses_manage_labels", "labels_list")
+
         device.await("search_field", 5_000)?.let {
             log("Searching.")
+            // Focusing the field expands the bar over the manage buttons.
+            it.click()
+            device.settle()
             it.typeText("a")
             device.settle()
             it.typeText("")
             device.settle()
+        }
+        if (device.tap("search_back_button")) {
+            log("Search collapsed.")
         }
 
         if (device.tap("search_filter_button")) {
@@ -168,9 +178,8 @@ class BaselineProfileGenerator {
             device.tap("profile_edit_profile")
         }
 
-        openAndClose("profile_manage_categories", "categories_scroll")
-        openAndClose("profile_manage_labels", "labels_list")
-        openAndClose("profile_change_password", "change_password_scroll")
+        // Categories and labels are opened from the Expenses tab instead.
+        openAndClose("profile_scroll", "profile_change_password", "change_password_scroll")
 
         device.scrollTo("profile_scroll", "profile_change_currency")?.let {
             log("Currency sheet.")
@@ -187,19 +196,19 @@ class BaselineProfileGenerator {
         device.settle()
     }
 
-    private fun MacrobenchmarkScope.openAndClose(rowTag: String, screenTag: String) {
-        val row = device.scrollTo("profile_scroll", rowTag) ?: run {
-            log("Profile row '$rowTag' not found, skipping.")
+    private fun MacrobenchmarkScope.openAndClose(containerTag: String, entryTag: String, screenTag: String) {
+        val entry = device.scrollTo(containerTag, entryTag) ?: run {
+            log("Entry '$entryTag' not found, skipping.")
             return
         }
-        log("Opening '$rowTag'.")
-        row.click()
+        log("Opening '$entryTag'.")
+        entry.click()
         if (!device.awaitTag(screenTag, 10_000)) {
-            log("'$screenTag' never appeared after opening '$rowTag'.")
+            log("'$screenTag' never appeared after opening '$entryTag'.")
         }
         device.settle()
         device.pressBack()
-        device.awaitTag("profile_scroll", 10_000)
+        device.awaitTag(containerTag, 10_000)
         device.settle()
     }
 

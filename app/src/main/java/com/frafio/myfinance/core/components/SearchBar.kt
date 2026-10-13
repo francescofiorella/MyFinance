@@ -1,5 +1,6 @@
 package com.frafio.myfinance.core.components
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,8 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -30,11 +33,20 @@ fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     onFilterClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    expanded: Boolean = false,
+    onExpandedChange: (Boolean) -> Unit = {},
 ) {
+    val focusManager = LocalFocusManager.current
+    val collapse = {
+        focusManager.clearFocus()
+        onExpandedChange(false)
+    }
+
+    BackHandler(enabled = expanded, onBack = collapse)
+
     Surface(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier,
         shape = RoundedCornerShape(40.dp),
         color = MaterialTheme.colorScheme.surfaceContainer
     ) {
@@ -47,13 +59,26 @@ fun SearchBar(
                 onValueChange = onQueryChange,
                 modifier = Modifier
                     .testTag("search_field")
-                    .weight(1f),
+                    .weight(1f)
+                    .onFocusChanged { if (it.isFocused && !expanded) onExpandedChange(true) },
                 placeholder = { Text(stringResource(R.string.search)) },
                 leadingIcon = {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_search_filled),
-                        contentDescription = null
-                    )
+                    if (expanded) {
+                        IconButton(
+                            onClick = collapse,
+                            modifier = Modifier.testTag("search_back_button")
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_keyboard_arrow_left_filled),
+                                contentDescription = stringResource(R.string.navigate_up)
+                            )
+                        }
+                    } else {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_search_filled),
+                            contentDescription = null
+                        )
+                    }
                 },
                 trailingIcon = if (query.isNotEmpty()) {
                     {
@@ -98,7 +123,7 @@ fun SearchBarPreview() {
             query = "Pizza",
             onQueryChange = {},
             onFilterClick = {},
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
         )
     }
 }

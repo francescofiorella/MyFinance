@@ -114,4 +114,13 @@ class ComponentScreenshotTests {
             }
         }
     }
+
+    @Test
+    fun searchBarExpanded_multipleThemes() {
+        composeTestRule.captureMultiTheme("SearchBarExpanded") {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                SearchBar(query = "Pizza", onQueryChange = {}, onFilterClick = {}, expanded = true, modifier = Modifier.fillMaxWidth().padding(16.dp))
+            }
+        }
+    }
 }

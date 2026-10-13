@@ -59,6 +59,7 @@ class ExpensesScreenTest {
     private val events = mutableListOf<ExpensesUiEvent>()
     private val edited = mutableListOf<Pair<Expense, Int>>()
     private val duplicated = mutableListOf<Expense>()
+    private val navigation = mutableListOf<String>()
 
     // Totals are computed against the real today; the fixtures stay relative to it.
     private val today: LocalDate = LocalDate.now()
@@ -84,6 +85,8 @@ class ExpensesScreenTest {
                 viewModel = viewModel,
                 onEditExpense = { expense, index -> edited += expense to index },
                 onDuplicateExpense = { duplicated += it },
+                onManageCategories = { navigation += "categories" },
+                onManageLabels = { navigation += "labels" },
                 getDateLabel = { _, _ -> "range" },
             )
         }
@@ -135,6 +138,31 @@ class ExpensesScreenTest {
         assertThat(expensesLocalRepository.filterCalls.last().name).isEqualTo("Piz")
         composeTestRule.onNodeWithText("Pizza").assertIsDisplayed()
         composeTestRule.onNodeWithText("Bus").assertDoesNotExist()
+    }
+
+    @Test
+    fun manageButtons_invokeTheirCallbacks() {
+        populated()
+
+        composeTestRule.onNodeWithTag("expenses_manage_categories").performClick()
+        composeTestRule.onNodeWithTag("expenses_manage_labels").performClick()
+
+        assertThat(navigation).containsExactly("categories", "labels").inOrder()
+    }
+
+    @Test
+    fun focusingSearch_hidesTheManageButtons_andBackArrowRestoresThem() {
+        populated()
+
+        composeTestRule.onNodeWithTag("search_field").performClick()
+
+        composeTestRule.onNodeWithTag("expenses_manage_categories").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("expenses_manage_labels").assertDoesNotExist()
+
+        composeTestRule.onNodeWithTag("search_back_button").performClick()
+
+        composeTestRule.onNodeWithTag("expenses_manage_categories").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("expenses_manage_labels").assertIsDisplayed()
     }
 
     @Test
