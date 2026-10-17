@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -20,7 +19,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -63,7 +61,6 @@ import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.components.rememberProfilePicturePainter
 import java.time.LocalDate
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun HomeScreen(
     appState: MyFinanceAppState,
@@ -168,7 +165,7 @@ fun HomeScreen(
                                 )
                             )
                         },
-                        onManageCategories = { onNavigateToRoot(RootKey.CategoriesDescription) },
+                        onManageCategories = { onNavigateToRoot(RootKey.Categories) },
                         onManageLabels = { onNavigateToRoot(RootKey.Labels) },
                         getDateLabel = getDateLabel
                     )
@@ -201,7 +198,7 @@ fun HomeScreen(
                         initialUser = user,
                         profilePicture = profilePicture,
                         onManageLabels = { onNavigateToRoot(RootKey.Labels) },
-                        onCategoriesDescriptionClick = { onNavigateToRoot(RootKey.CategoriesDescription) },
+                        onCategoriesClick = { onNavigateToRoot(RootKey.Categories) },
                         onChangePassword = { onNavigateToRoot(RootKey.ChangePassword) }
                     )
                 }
@@ -219,7 +216,6 @@ fun HomeScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 internal fun HomeScreenContent(
     appState: MyFinanceAppState,
@@ -309,7 +305,6 @@ internal fun HomeScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
@@ -337,7 +332,6 @@ fun HomeScreenPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScaffold(
     appState: MyFinanceAppState,

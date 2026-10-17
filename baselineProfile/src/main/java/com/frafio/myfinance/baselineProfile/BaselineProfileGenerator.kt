@@ -102,7 +102,7 @@ class BaselineProfileGenerator {
         }
 
         // Before searching: the expanded search bar hides these buttons.
-        openAndClose("expenses_list", "expenses_manage_categories", "categories_scroll")
+        categoriesJourney()
         openAndClose("expenses_list", "expenses_manage_labels", "labels_list")
 
         device.await("search_field", 5_000)?.let {
@@ -138,6 +138,42 @@ class BaselineProfileGenerator {
         }
 
         transactionEditJourney()
+    }
+
+    /**
+     * The Categories overview, then the detail page of its first category. "See all expenses" is left
+     * untouched: it would replace the Expenses filters the rest of the journey relies on.
+     */
+    private fun MacrobenchmarkScope.categoriesJourney() {
+        val entry = device.scrollTo("expenses_list", "expenses_manage_categories") ?: run {
+            log("Entry 'expenses_manage_categories' not found, skipping.")
+            return
+        }
+        log("Categories.")
+        entry.click()
+        if (!device.awaitTag("categories_scroll", 10_000)) {
+            log("'categories_scroll' never appeared.")
+        }
+        device.settle()
+
+        if (device.tap("category_item")) {
+            log("Category detail.")
+            if (device.awaitTag("category_detail_scroll", 10_000)) {
+                device.settle()
+                device.scrollBothWays("category_detail_scroll")
+            } else {
+                log("'category_detail_scroll' never appeared.")
+            }
+            device.pressBack()
+            device.awaitTag("categories_scroll", 10_000)
+            device.settle()
+        } else {
+            log("No category row ('category_item'), skipping the detail.")
+        }
+
+        device.pressBack()
+        device.awaitTag("expenses_list", 10_000)
+        device.settle()
     }
 
     private fun MacrobenchmarkScope.transactionEditJourney() {

@@ -1,7 +1,6 @@
 package com.frafio.myfinance.core.components
 
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -17,7 +16,6 @@ import androidx.compose.ui.unit.dp
 /** The surface a swipe dismisses; wider than the snackbar's text. */
 const val SWIPEABLE_SNACKBAR_TAG = "swipeable_snackbar"
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SwipeableSnackbarHost(hostState: SnackbarHostState) {
     SnackbarHost(hostState = hostState) { data ->

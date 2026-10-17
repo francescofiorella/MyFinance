@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -64,7 +63,7 @@ fun ProfileScreen(
     initialUser: User? = null,
     initialProfilePicture: Bitmap? = null,
     onManageLabels: () -> Unit,
-    onCategoriesDescriptionClick: () -> Unit,
+    onCategoriesClick: () -> Unit,
     onChangePassword: () -> Unit
 ) {
     val userState by viewModel.user.collectAsStateWithLifecycle()
@@ -148,7 +147,7 @@ fun ProfileScreen(
         onEditFullName = { showEditFullNameSheet = true },
         onDynamicColorChanged = { viewModel.setDynamicColor(it) },
         onManageLabels = onManageLabels,
-        onCategoriesDescriptionClick = onCategoriesDescriptionClick,
+        onCategoriesClick = onCategoriesClick,
         onSelectCurrency = { showCurrencySheet = true },
         onChangePasswordClick = onChangePassword,
         currencyCode = currencyCode
@@ -169,7 +168,7 @@ internal fun ProfileContent(
     onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
     onManageLabels: () -> Unit,
-    onCategoriesDescriptionClick: () -> Unit,
+    onCategoriesClick: () -> Unit,
     onSelectCurrency: () -> Unit,
     onChangePasswordClick: () -> Unit,
     currencyCode: String
@@ -196,7 +195,7 @@ internal fun ProfileContent(
             onEditFullName = onEditFullName,
             onDynamicColorChanged = onDynamicColorChanged,
             onManageLabels = onManageLabels,
-            onCategoriesDescriptionClick = onCategoriesDescriptionClick,
+            onCategoriesClick = onCategoriesClick,
             onSelectCurrency = onSelectCurrency,
             onChangePasswordClick = onChangePasswordClick,
             currencyCode = currencyCode
@@ -233,7 +232,6 @@ private fun ProfileHeader(user: User?, profilePicture: Bitmap?, proPicChoice: St
     )
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ProfileCards(
     user: User?,
@@ -244,7 +242,7 @@ private fun ProfileCards(
     onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
     onManageLabels: () -> Unit,
-    onCategoriesDescriptionClick: () -> Unit,
+    onCategoriesClick: () -> Unit,
     onSelectCurrency: () -> Unit,
     onChangePasswordClick: () -> Unit,
     currencyCode: String
@@ -586,7 +584,7 @@ private fun ProfileCards(
     val myFinanceItemCount = (if (isDynamicColorAvailable) 1 else 0) + 4
 
     SegmentedListItem(
-        onClick = onCategoriesDescriptionClick,
+        onClick = onCategoriesClick,
         colors = colors,
         shapes = ListItemDefaults.segmentedShapes(
             index = 0,
@@ -842,7 +840,7 @@ fun ProfilePreview() {
             onEditFullName = {},
             onDynamicColorChanged = {},
             onManageLabels = {},
-            onCategoriesDescriptionClick = {},
+            onCategoriesClick = {},
             onSelectCurrency = {},
             onChangePasswordClick = {},
             currencyCode = "EUR"

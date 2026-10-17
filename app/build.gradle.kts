@@ -24,8 +24,8 @@ android {
         applicationId = "com.frafio.myfinance"
         minSdk = 29
         targetSdk = 37
-        versionCode = 5000006
-        versionName = "5.0.6"
+        versionCode = 5001000
+        versionName = "5.1.0"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -224,8 +224,8 @@ sonar {
     }
 }
 
-// Unit-test and device-test coverage merged into one report for SonarCloud; after nowinandroid's
-// Jacoco.kt. Run it after testDebugUnitTest and connectedDebugAndroidTest.
+// Unit-test and device-test coverage merged into one report for SonarCloud
+// Run it after testDebugUnitTest and connectedDebugAndroidTest.
 androidComponents.onVariants(androidComponents.selector().withBuildType("debug")) { variant ->
     // Locals only: the configuration cache cannot store lambdas that reach back into this script.
     val exclusions = listOf(

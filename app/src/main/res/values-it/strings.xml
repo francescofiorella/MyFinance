@@ -164,4 +164,25 @@
     <string name="current_period">Periodo corrente</string>
     <string name="chart_bar">%1$s, %2$s</string>
     <string name="chart_slice">%1$s, %2$s</string>
+    <string name="category_month_spending">Questo mese</string>
+    <string name="category_month_spending_description">Ultimi 12 mesi</string>
+    <string name="no_spending_this_month">Nessuna spesa questo mese</string>
+    <string name="new_category_spending">-</string>
+    <string name="spending_up_percent">In aumento del %1$s rispetto al mese scorso</string>
+    <string name="spending_down_percent">In calo del %1$s rispetto al mese scorso</string>
+    <string name="spending_new_description">Nessuna spesa il mese scorso</string>
+    <string name="monthly_average">Media mensile</string>
+    <string name="year_to_date">Da inizio anno</string>
+    <string name="share_of_month">Quota del mese</string>
+    <string name="share_of_month_description">Di tutte le categorie</string>
+    <string name="spending_trend">Andamento annuale</string>
+    <string name="biggest_expenses">Spese maggiori</string>
+    <string name="most_frequent">Più frequenti</string>
+    <string name="by_label">Per etichetta</string>
+    <string name="see_all_expenses">Vedi tutte le spese</string>
+    <plurals name="frequent_expense_times">
+        <item quantity="one">%1$d volta</item>
+        <item quantity="many">%1$d volte</item>
+        <item quantity="other">%1$d volte</item>
+    </plurals>
 </resources>

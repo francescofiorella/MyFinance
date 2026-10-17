@@ -61,7 +61,7 @@ class ProfileScreenTest {
             ProfileScreen(
                 viewModel = viewModel,
                 onManageLabels = { navigation += "labels" },
-                onCategoriesDescriptionClick = { navigation += "categories" },
+                onCategoriesClick = { navigation += "categories" },
                 onChangePassword = { navigation += "password" },
             )
         }

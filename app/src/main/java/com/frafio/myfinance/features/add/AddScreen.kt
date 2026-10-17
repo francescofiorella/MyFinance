@@ -96,7 +96,6 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
     appState: MyFinanceAppState,
@@ -660,7 +659,6 @@ fun AddLabelChip(onClick: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TransactionForm(
     priceState: TextFieldState,

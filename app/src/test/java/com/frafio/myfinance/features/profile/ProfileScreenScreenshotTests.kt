@@ -55,7 +55,7 @@ class ProfileScreenScreenshotTests {
             onEditFullName = {},
             onDynamicColorChanged = {},
             onManageLabels = {},
-            onCategoriesDescriptionClick = {},
+            onCategoriesClick = {},
             onSelectCurrency = {},
             onChangePasswordClick = {},
             currencyCode = "EUR",

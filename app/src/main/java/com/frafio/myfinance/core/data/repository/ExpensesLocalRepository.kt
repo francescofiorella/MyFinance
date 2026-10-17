@@ -1,6 +1,7 @@
 package com.frafio.myfinance.core.data.repository
 
 import com.frafio.myfinance.core.data.model.BarChartEntry
+import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +20,8 @@ interface ExpensesLocalRepository {
 
     fun getPriceSumFromYear(year: Int): Flow<Double?>
 
+    fun getCategorySumsOfMonth(year: Int, month: Int): Flow<List<CategorySum>>
+
     fun getPriceSumAfterAndBefore(
         startYear: Int,
         startMonth: Int,
@@ -31,6 +34,9 @@ interface ExpensesLocalRepository {
     fun getExpensesOfMonth(year: Int, month: Int): Flow<List<Expense>>
 
     fun getExpensesOfYear(year: Int): Flow<List<Expense>>
+
+    /** Expenses of [category] from [startYear]/[startMonth] (inclusive) to [endYear]/[endMonth] (exclusive), newest first. */
+    fun getExpensesOfCategory(category: Int, startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<Expense>>
 
     fun getAllSync(): List<Expense>
 

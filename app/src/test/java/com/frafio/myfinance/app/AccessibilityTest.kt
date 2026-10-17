@@ -16,6 +16,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
@@ -45,7 +46,8 @@ import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.features.add.AddLabelChip
 import com.frafio.myfinance.features.add.LabelChip
 import com.frafio.myfinance.features.budget.BudgetContent
-import com.frafio.myfinance.features.categories.CategoriesScreen
+import com.frafio.myfinance.features.categories.CategoriesContent
+import com.frafio.myfinance.features.categories.sampleCategoriesUiState
 import com.frafio.myfinance.features.dashboard.components.AnnualBalanceCard
 import com.frafio.myfinance.features.dashboard.components.ExpensesByCategoryCard
 import com.frafio.myfinance.features.dashboard.components.MonthlyExpensesChartCard
@@ -82,8 +84,6 @@ class AccessibilityTest {
     private val hasAnyContentDescription = SemanticsMatcher.keyIsDefined(SemanticsProperties.ContentDescription)
 
     private fun hasRole(role: Role) = SemanticsMatcher.expectValue(SemanticsProperties.Role, role)
-
-    private fun hasStateDescription(state: String) = SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, state)
 
     private fun hasClickLabel(label: String) = SemanticsMatcher("click label is $label") {
         it.config.getOrElseNullable(SemanticsActions.OnClick) { null }?.label == label
@@ -225,13 +225,22 @@ class AccessibilityTest {
     }
 
     @Test
-    fun categoryRow_reportsWhetherItIsExpanded() {
-        composeTestRule.setThemedContent { CategoriesScreen(onBackClick = {}) }
-        val housing = composeTestRule.onNodeWithText(string(R.string.housing))
+    fun categoryRow_readsItsChangeFromLastMonthInWords() {
+        composeTestRule.setThemedContent {
+            CategoriesContent(
+                state = sampleCategoriesUiState(LocalDate.of(2024, 5, 1)),
+                onBackClick = {},
+                onPreviousMonth = {},
+                onNextMonth = {},
+                onCurrentMonth = {},
+                onCategoryClick = {}
+            )
+        }
 
-        housing.assert(hasStateDescription(string(R.string.collapsed))).performClick()
-
-        housing.assert(hasStateDescription(string(R.string.expanded)))
+        // The arrow and "3%" are replaced by one description, merged into the clickable row.
+        composeTestRule.onNodeWithText(string(R.string.housing))
+            .assert(hasContentDescription(string(R.string.spending_down_percent, "3%")))
+            .assertHasClickAction()
     }
 
     @Test

@@ -20,6 +20,7 @@ import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.repository.LoadingRepository
+import com.frafio.myfinance.core.data.repository.PendingExpensesFilter
 import com.frafio.myfinance.core.utils.activeCurrencyCode
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.repository.TestExpensesLocalRepository
@@ -70,7 +71,7 @@ class ExpensesScreenTest {
     fun setup() {
         activeCurrencyCode = "EUR"
         userPreferencesRepository.setLabels(listOf("Dinner"))
-        viewModel = ExpensesViewModel(expensesRepository, expensesLocalRepository, userPreferencesRepository, loadingRepository, UnconfinedTestDispatcher())
+        viewModel = ExpensesViewModel(expensesRepository, expensesLocalRepository, userPreferencesRepository, loadingRepository, PendingExpensesFilter(), UnconfinedTestDispatcher())
     }
 
     @After

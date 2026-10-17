@@ -340,7 +340,6 @@ fun NewLabelItem(
     )
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LabelItem(
     modifier: Modifier = Modifier,

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -21,7 +20,6 @@ import com.frafio.myfinance.core.utils.toUTCLocalDateTime
 import java.time.LocalDate
 import java.time.ZoneOffset
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppDatePickerDialog(
     show: Boolean,
@@ -61,7 +59,6 @@ fun AppDatePickerDialog(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppDateRangePickerDialog(
     show: Boolean,
@@ -113,7 +110,6 @@ fun AppDateRangePickerDialog(
 }
 
 /** The dialog both pickers share: OK runs [onConfirm] and closes, Cancel closes. */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AppPickerDialog(
     modifier: Modifier,

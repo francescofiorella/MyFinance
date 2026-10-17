@@ -10,6 +10,7 @@ import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.ExpensesRepository
 import com.frafio.myfinance.core.data.repository.LoadingRepository
+import com.frafio.myfinance.core.data.repository.PendingExpensesFilter
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
 import com.frafio.myfinance.core.utils.addTotalsToExpenses
 import com.frafio.myfinance.core.utils.addTotalsToExpensesWithoutToday
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -53,6 +55,7 @@ class ExpensesViewModel @Inject constructor(
     private val expensesLocalRepository: ExpensesLocalRepository,
     userPreferencesRepository: UserPreferencesRepository,
     private val loadingRepository: LoadingRepository,
+    private val pendingExpensesFilter: PendingExpensesFilter,
     @Dispatcher(Default) private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -180,8 +183,26 @@ class ExpensesViewModel @Inject constructor(
         .flowOn(defaultDispatcher)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
+    init {
+        viewModelScope.launch {
+            pendingExpensesFilter.categories.filterNotNull().collect { categories ->
+                showOnlyCategories(categories)
+                pendingExpensesFilter.clear()
+            }
+        }
+    }
+
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
+    }
+
+    // Replaces every filter, so the list shows exactly the requested categories.
+    private fun showOnlyCategories(categories: List<Int>) {
+        _searchQuery.value = ""
+        _selectedLabels.value = emptyList()
+        _dateRange.value = null
+        _selectedCategories.value = categories
+        _limit.value = DEFAULT_LIMIT_EXPENSES
     }
 
     fun onCategoryFilterChanged(categoryId: Int) {

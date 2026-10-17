@@ -19,7 +19,10 @@ sealed interface RootKey : NavKey {
     data object ChangePassword : RootKey
 
     @Serializable
-    data object CategoriesDescription : RootKey
+    data object Categories : RootKey
+
+    @Serializable
+    data class CategoryDetail(val categoryId: Int, val year: Int, val month: Int) : RootKey
 
     @Serializable
     sealed interface RequestType {

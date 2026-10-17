@@ -2,6 +2,7 @@ package com.frafio.myfinance.core.data.repository
 
 import com.frafio.myfinance.core.data.dao.ExpenseDao
 import com.frafio.myfinance.core.data.model.BarChartEntry
+import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +31,9 @@ class ExpensesLocalRepositoryImpl @Inject constructor(
     override fun getPriceSumFromYear(year: Int): Flow<Double?> =
         expenseDao.getPriceSumOfYear(year)
 
+    override fun getCategorySumsOfMonth(year: Int, month: Int): Flow<List<CategorySum>> =
+        expenseDao.getCategorySumsOfMonth(year, month)
+
     override fun getPriceSumAfterAndBefore(
         startYear: Int,
         startMonth: Int,
@@ -45,6 +49,9 @@ class ExpensesLocalRepositoryImpl @Inject constructor(
 
     override fun getExpensesOfYear(year: Int): Flow<List<Expense>> =
         expenseDao.getExpensesOfYear(year)
+
+    override fun getExpensesOfCategory(category: Int, startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<Expense>> =
+        expenseDao.getExpensesOfCategory(category, startYear, startMonth, endYear, endMonth)
 
     override fun getAllSync(): List<Expense> = expenseDao.getAllSync()
 

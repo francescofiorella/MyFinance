@@ -1,23 +1,16 @@
 package com.frafio.myfinance.features.dashboard.components
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilledTonalToggleButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,13 +21,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.components.PieChart
 import com.frafio.myfinance.core.components.PieChartItem
 import com.frafio.myfinance.core.data.model.ExpenseCategories
@@ -42,7 +35,6 @@ import com.frafio.myfinance.core.theme.MyFinanceTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ExpensesByCategoryCard(
     expenses: List<Expense>,
@@ -98,80 +90,19 @@ fun ExpensesByCategoryCard(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-                val previousInteractionSource = remember { MutableInteractionSource() }
-                val nextInteractionSource = remember { MutableInteractionSource() }
-                val todayInteractionSource = remember { MutableInteractionSource() }
-                ButtonGroup(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    overflowIndicator = { menuState ->
-                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
-                    }
-                ) {
-                    customItem(
-                        {
-                            FilledTonalIconButton(
-                                modifier = Modifier
-                                    .size(IconButtonDefaults.smallContainerSize())
-                                    .animateWidth(previousInteractionSource),
-                                onClick = onPreviousDate,
-                                enabled = isPreviousDateEnabled,
-                                shapes = IconButtonDefaults.shapes(
-                                    shape = IconButtonDefaults.smallSquareShape,
-                                ),
-                                interactionSource = previousInteractionSource
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_keyboard_arrow_left_filled),
-                                    contentDescription = stringResource(R.string.previous_period),
-                                )
-                            }
-                        },
-                        {}
-                    )
-                    customItem(
-                        {
-                            FilledTonalIconButton(
-                                modifier = Modifier
-                                    .size(IconButtonDefaults.smallContainerSize())
-                                    .animateWidth(nextInteractionSource),
-                                onClick = onNextDate,
-                                enabled = isNextDateEnabled,
-                                shapes = IconButtonDefaults.shapes(
-                                    shape = IconButtonDefaults.smallSquareShape,
-                                ),
-                                interactionSource = nextInteractionSource
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_keyboard_arrow_right_filled),
-                                    contentDescription = stringResource(R.string.next_period)
-                                )
-                            }
-                        },
-                        {}
-                    )
-                    customItem(
-                        {
-                            FilledTonalIconButton(
-                                modifier = Modifier
-                                    .width(52.dp)
-                                    .animateWidth(todayInteractionSource),
-                                onClick = {
-                                    onToday()
-                                    selectedCategory = -1
-                                },
-                                shapes = IconButtonDefaults.shapes(),
-                                interactionSource = todayInteractionSource
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_today_filled),
-                                    contentDescription = stringResource(R.string.current_period),
-                                )
-                            }
-                        },
-                        {}
-                    )
-                }
+                PeriodStepper(
+                    onPrevious = onPreviousDate,
+                    onNext = onNextDate,
+                    onToday = {
+                        onToday()
+                        selectedCategory = -1
+                    },
+                    previousDescription = stringResource(R.string.previous_period),
+                    nextDescription = stringResource(R.string.next_period),
+                    todayDescription = stringResource(R.string.current_period),
+                    isPreviousEnabled = isPreviousDateEnabled,
+                    isNextEnabled = isNextDateEnabled
+                )
             }
 
             ButtonGroup(

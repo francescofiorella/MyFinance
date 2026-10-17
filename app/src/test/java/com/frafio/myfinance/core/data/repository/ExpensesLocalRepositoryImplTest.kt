@@ -2,6 +2,7 @@ package com.frafio.myfinance.core.data.repository
 
 import com.frafio.myfinance.core.data.dao.ExpenseDao
 import com.frafio.myfinance.core.data.model.BarChartEntry
+import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
 import com.google.common.truth.Truth.assertThat
@@ -68,6 +69,7 @@ class ExpensesLocalRepositoryImplTest {
         override fun getPriceSumOfDay(year: Int, month: Int, day: Int): Flow<Double?> = flowOf(null)
         override fun getPriceSumOfMonth(year: Int, month: Int): Flow<Double?> = flowOf(null)
         override fun getPriceSumOfYear(year: Int): Flow<Double?> = flowOf(null)
+        override fun getCategorySumsOfMonth(year: Int, month: Int): Flow<List<CategorySum>> = flowOf(emptyList())
         override fun getEarliestYearMonth(): Flow<DatePoint?> = flowOf(null)
         override fun getPriceSumAfterAndBefore(
             startYear: Int,
@@ -77,6 +79,8 @@ class ExpensesLocalRepositoryImplTest {
         ): Flow<List<BarChartEntry>> = flowOf(emptyList())
         override fun getExpensesOfMonth(year: Int, month: Int): Flow<List<Expense>> = flowOf(emptyList())
         override fun getExpensesOfYear(year: Int): Flow<List<Expense>> = flowOf(emptyList())
+        override fun getExpensesOfCategory(category: Int, startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<Expense>> =
+            flowOf(emptyList())
         override suspend fun getById(id: String): Expense? = null
         override fun getAllSync(): List<Expense> = emptyList()
         override fun upsert(item: Expense) = Unit

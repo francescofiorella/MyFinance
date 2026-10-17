@@ -1,6 +1,7 @@
 package com.frafio.myfinance.core.data.dao
 
 import com.frafio.myfinance.core.data.model.BarChartEntry
+import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
@@ -373,6 +374,43 @@ internal class ExpenseDaoTest : DatabaseTest() {
         expenseDao.insertAll(a, b, testExpense(name = "C", date = LocalDate.of(2025, 1, 1)))
 
         assertThat(expenseDao.getExpensesOfYear(2024).first()).containsExactly(a, b)
+    }
+
+    @Test
+    fun getCategorySumsOfMonth_groupsTheMonthByCategory() = runTest {
+        expenseDao.insertAll(
+            testExpense(name = "A", price = 1.0, date = LocalDate.of(2024, 6, 1), category = 0),
+            testExpense(name = "B", price = 2.0, date = LocalDate.of(2024, 6, 30), category = 0),
+            testExpense(name = "C", price = 4.0, date = LocalDate.of(2024, 6, 15), category = 5),
+            testExpense(name = "D", price = 8.0, date = LocalDate.of(2024, 7, 1), category = 0),
+            testExpense(name = "E", price = 16.0, date = LocalDate.of(2023, 6, 15), category = 5),
+        )
+
+        val sums = expenseDao.getCategorySumsOfMonth(2024, 6).first()
+
+        assertThat(sums).containsExactly(CategorySum(0, 3.0), CategorySum(5, 4.0))
+    }
+
+    @Test
+    fun getCategorySumsOfMonth_empty_isAnEmptyList() = runTest {
+        assertThat(expenseDao.getCategorySumsOfMonth(2024, 6).first()).isEmpty()
+    }
+
+    @Test
+    fun getExpensesOfCategory_isStartInclusiveEndExclusive_acrossAYear_newestFirst() = runTest {
+        val nov = testExpense(name = "Nov", price = 1.0, date = LocalDate.of(2023, 11, 30), category = 5)
+        val jan = testExpense(name = "Jan", price = 2.0, date = LocalDate.of(2024, 1, 2), category = 5)
+        val janLater = testExpense(name = "JanLater", price = 3.0, date = LocalDate.of(2024, 1, 20), category = 5)
+        expenseDao.insertAll(
+            nov, jan, janLater,
+            testExpense(name = "Oct", date = LocalDate.of(2023, 10, 31), category = 5),
+            testExpense(name = "Feb", date = LocalDate.of(2024, 2, 1), category = 5),
+            testExpense(name = "OtherCategory", date = LocalDate.of(2024, 1, 10), category = 1),
+        )
+
+        val expenses = expenseDao.getExpensesOfCategory(5, 2023, 11, 2024, 2).first()
+
+        assertThat(expenses).containsExactly(janLater, jan, nov).inOrder()
     }
 
     // endregion

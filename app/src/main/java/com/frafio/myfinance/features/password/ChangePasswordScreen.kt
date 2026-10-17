@@ -76,7 +76,6 @@ import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChangePasswordScreen(
     appState: MyFinanceAppState,
@@ -338,7 +337,7 @@ fun ChangePasswordTopBar(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ChangePasswordForm(
     hasPassword: Boolean,

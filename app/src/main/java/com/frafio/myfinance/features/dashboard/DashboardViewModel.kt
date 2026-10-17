@@ -9,6 +9,7 @@ import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
+import com.frafio.myfinance.core.utils.fillMonthlyGaps
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -186,36 +187,7 @@ class DashboardViewModel @Inject constructor(
         expensesLocalRepository.getPriceSumAfterAndBefore(
             firstDate.year, firstDate.monthValue,
             nextMonth.year, nextMonth.monthValue
-        ).flatMapLatest { entries ->
-            val values = mutableListOf<BarChartEntry>()
-            var currentDate = date
-            var j = 0
-            repeat(visibleItems) {
-                if (j < entries.size
-                    && entries[j].year == currentDate.year
-                    && entries[j].month == currentDate.monthValue
-                ) {
-                    values.add(
-                        BarChartEntry(
-                            value = entries[j].value,
-                            year = entries[j].year,
-                            month = entries[j].month
-                        )
-                    )
-                    j++
-                } else {
-                    values.add(
-                        BarChartEntry(
-                            value = 0.0,
-                            year = currentDate.year,
-                            month = currentDate.monthValue
-                        )
-                    )
-                }
-                currentDate = currentDate.minusMonths(1)
-            }
-            flowOf(values.reversed())
-        }
+        ).map { entries -> fillMonthlyGaps(entries, lastMonth = date, count = visibleItems) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val pieChartExpenses: StateFlow<List<Expense>> = combine(

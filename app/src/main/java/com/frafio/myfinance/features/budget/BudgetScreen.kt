@@ -281,7 +281,6 @@ fun BudgetContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BudgetOverview(
     monthlyBudget: Double,

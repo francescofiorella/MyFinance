@@ -99,8 +99,7 @@ internal fun UiDevice.scrollBothWays(containerTag: String, percent: Float = 0.8f
 }
 
 internal fun UiDevice.openTab(tabTag: String, contentTag: String): Boolean {
-    if (!tap(tabTag, 5_000)) return false
-    return awaitTag(contentTag, 10_000)
+    return tap(tabTag, 5_000) && awaitTag(contentTag, 10_000)
 }
 
 /**

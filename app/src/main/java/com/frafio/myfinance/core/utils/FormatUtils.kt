@@ -11,10 +11,12 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Currency
 import java.util.Locale
 import kotlin.math.round
+import kotlin.math.roundToInt
 
 var activeCurrencyCode by mutableStateOf("EUR")
 
@@ -47,6 +49,15 @@ fun doubleToPriceWithoutDecimals(double: Double): String {
     val symbol = currency.getSymbol(getLocaleFromCurrency(activeCurrencyCode))
     return "$symbol ${doubleToStringWithoutDecimals(double)}"
 }
+
+// A fraction as a whole percentage, e.g. 0.123 -> "12%".
+fun doubleToPercent(fraction: Double): String = "${(fraction * 100).roundToInt()}%"
+
+// The month and year in the device language, capitalized, e.g. "May 2024".
+fun monthToString(month: LocalDate): String =
+    month.format(DateTimeFormatter.ofPattern("MMMM uuuu")).replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase() else it.toString()
+    }
 
 fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?): String? {
     var formattedDate: String? = null

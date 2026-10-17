@@ -40,10 +40,14 @@ fun DeviceConfigurationOverride.Companion.WindowInsets(
                     return WindowInsetsCompat.CONSUMED.toWindowInsets()!!
                 }
 
-                /** Deprecated, but intercept the `requestApplyInsets` call via the deprecated method. */
+                /**
+                 * Never called from our code: `View.requestApplyInsets()`, which `update` calls, delegates
+                 * here. Dispatching right away lets new insets (e.g. FakeKeyboard opening) reach the content
+                 * before the test asserts; without it they wait for a layout pass Robolectric hasn't run.
+                 */
                 @Deprecated("Deprecated in Java")
                 override fun requestFitSystemWindows() {
-                    dispatchApplyWindowInsets(WindowInsets(currentWindowInsets.toWindowInsets()!!))
+                    dispatchApplyWindowInsets(WindowInsets(currentWindowInsets.toWindowInsets()))
                 }
             }
         },

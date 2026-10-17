@@ -1,7 +1,6 @@
 package com.frafio.myfinance.features.dashboard.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,26 +11,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.ButtonGroup
-import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,13 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import kotlin.math.abs
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3AdaptiveApi::class,
-    ExperimentalMaterial3Api::class
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class
 )
 @Composable
 fun AnnualBalanceCard(
@@ -96,77 +88,16 @@ fun AnnualBalanceCard(
                     )
                 }
 
-                val previousInteractionSource = remember { MutableInteractionSource() }
-                val nextInteractionSource = remember { MutableInteractionSource() }
-                val todayInteractionSource = remember { MutableInteractionSource() }
-                ButtonGroup(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    overflowIndicator = { menuState ->
-                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
-                    }
-                ) {
-                    customItem(
-                        {
-                            FilledTonalIconButton(
-                                modifier = Modifier
-                                    .size(IconButtonDefaults.smallContainerSize())
-                                    .animateWidth(previousInteractionSource),
-                                onClick = onPreviousYear,
-                                enabled = isPreviousYearEnabled,
-                                shapes = IconButtonDefaults.shapes(
-                                    shape = IconButtonDefaults.smallSquareShape,
-                                ),
-                                interactionSource = previousInteractionSource
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_keyboard_arrow_left_filled),
-                                    contentDescription = stringResource(R.string.previous_year),
-                                )
-                            }
-                        },
-                        {}
-                    )
-                    customItem(
-                        {
-                            FilledTonalIconButton(
-                                modifier = Modifier
-                                    .size(IconButtonDefaults.smallContainerSize())
-                                    .animateWidth(nextInteractionSource),
-                                onClick = onNextYear,
-                                enabled = isNextYearEnabled,
-                                shapes = IconButtonDefaults.shapes(
-                                    shape = IconButtonDefaults.smallSquareShape,
-                                ),
-                                interactionSource = nextInteractionSource
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_keyboard_arrow_right_filled),
-                                    contentDescription = stringResource(R.string.next_year)
-                                )
-                            }
-                        },
-                        {}
-                    )
-                    customItem(
-                        {
-                            FilledTonalIconButton(
-                                modifier = Modifier
-                                    .width(52.dp)
-                                    .animateWidth(todayInteractionSource),
-                                onClick = onToday,
-                                shapes = IconButtonDefaults.shapes(),
-                                interactionSource = todayInteractionSource
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_today_filled),
-                                    contentDescription = stringResource(R.string.current_year),
-                                )
-                            }
-                        },
-                        {}
-                    )
-                }
+                PeriodStepper(
+                    onPrevious = onPreviousYear,
+                    onNext = onNextYear,
+                    onToday = onToday,
+                    previousDescription = stringResource(R.string.previous_year),
+                    nextDescription = stringResource(R.string.next_year),
+                    todayDescription = stringResource(R.string.current_year),
+                    isPreviousEnabled = isPreviousYearEnabled,
+                    isNextEnabled = isNextYearEnabled
+                )
             }
 
             Text(

@@ -1,6 +1,7 @@
 package com.frafio.myfinance.core.utils
 
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
+import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.testing.data.testExpense
@@ -243,6 +244,32 @@ class FinanceUtilsTest {
 
         assertThat(result[0].month).isEqualTo(0)
         assertThat(result[0].day).isEqualTo(0)
+    }
+
+    // endregion
+
+    // region fillMonthlyGaps
+
+    @Test
+    fun fillMonthlyGaps_returnsCountMonthsEndingWithLastMonth_oldestFirst() {
+        val result = fillMonthlyGaps(emptyList(), lastMonth = LocalDate.of(2024, 2, 1), count = 3)
+
+        assertThat(result).containsExactly(
+            BarChartEntry(0.0, 2023, 12),
+            BarChartEntry(0.0, 2024, 1),
+            BarChartEntry(0.0, 2024, 2),
+        ).inOrder()
+    }
+
+    @Test
+    fun fillMonthlyGaps_keepsKnownMonths_inAnyInputOrder_andDropsOnesOutsideTheWindow() {
+        val result = fillMonthlyGaps(
+            listOf(BarChartEntry(5.0, 2024, 1), BarChartEntry(9.0, 2024, 3), BarChartEntry(7.0, 2023, 1)),
+            lastMonth = LocalDate.of(2024, 3, 15),
+            count = 3
+        )
+
+        assertThat(result.map { it.value }).containsExactly(5.0, 0.0, 9.0).inOrder()
     }
 
     // endregion

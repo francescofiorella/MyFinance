@@ -1,6 +1,7 @@
 package com.frafio.myfinance.testing.repository
 
 import com.frafio.myfinance.core.data.model.BarChartEntry
+import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
@@ -68,6 +69,14 @@ class TestExpensesLocalRepository : ExpensesLocalRepository {
     override fun getPriceSumFromYear(year: Int): Flow<Double?> =
         expensesFlow.map { expenses -> expenses.filter { it.year == year }.sumOrNull() }
 
+    override fun getCategorySumsOfMonth(year: Int, month: Int): Flow<List<CategorySum>> =
+        expensesFlow.map { expenses ->
+            expenses
+                .filter { it.year == year && it.month == month }
+                .groupBy { it.category }
+                .map { (category, group) -> CategorySum(category, group.sumOf { it.price }) }
+        }
+
     override fun getPriceSumAfterAndBefore(
         startYear: Int,
         startMonth: Int,
@@ -96,6 +105,15 @@ class TestExpensesLocalRepository : ExpensesLocalRepository {
 
     override fun getExpensesOfYear(year: Int): Flow<List<Expense>> =
         expensesFlow.map { expenses -> expenses.filter { it.year == year } }
+
+    override fun getExpensesOfCategory(category: Int, startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<Expense>> =
+        expensesFlow.map { expenses ->
+            val start = startYear * 100 + startMonth
+            val end = endYear * 100 + endMonth
+            expenses
+                .filter { it.category == category && (it.year * 100 + it.month) in start until end }
+                .sortedForList()
+        }
 
     override fun getAllSync(): List<Expense> = expensesFlow.replayCache.firstOrNull() ?: emptyList()
 

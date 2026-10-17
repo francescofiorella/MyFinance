@@ -5,6 +5,7 @@ import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.FinanceResult
 import com.frafio.myfinance.core.data.repository.LoadingRepository
+import com.frafio.myfinance.core.data.repository.PendingExpensesFilter
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.repository.TestExpensesLocalRepository
@@ -40,6 +41,7 @@ class ExpensesViewModelTest {
     private val expensesLocalRepository = TestExpensesLocalRepository()
     private val userPreferencesRepository = TestUserPreferencesRepository()
     private val loadingRepository = LoadingRepository()
+    private val pendingExpensesFilter = PendingExpensesFilter()
     private lateinit var viewModel: ExpensesViewModel
 
     // The expenses flow calls addTotalsToExpenses with the real today, so fixtures are relative to it.
@@ -56,6 +58,7 @@ class ExpensesViewModelTest {
             expensesLocalRepository,
             userPreferencesRepository,
             loadingRepository,
+            pendingExpensesFilter,
             UnconfinedTestDispatcher(),
         )
     }
@@ -149,6 +152,44 @@ class ExpensesViewModelTest {
         userPreferencesRepository.setLabels(listOf("x"))
         backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.labels.collect() }
         assertThat(viewModel.labels.value).containsExactly("x")
+    }
+
+    @Test
+    fun pendingFilter_replacesEveryFilterWithTheCategory_andIsCleared() = runTest {
+        collectExpenses()
+        viewModel.onSearchQueryChanged("latte")
+        viewModel.onCategoryFilterChanged(1)
+        viewModel.onLabelFilterChanged("work", true)
+        viewModel.onDateFilterChanged(LocalDate.of(2024, 3, 1) to LocalDate.of(2024, 3, 31))
+
+        pendingExpensesFilter.request(5)
+
+        assertThat(viewModel.searchQuery.value).isEmpty()
+        assertThat(viewModel.selectedLabels.value).isEmpty()
+        assertThat(viewModel.dateRange.value).isNull()
+        assertThat(viewModel.selectedCategories.value).containsExactly(5)
+        assertThat(expensesLocalRepository.filterCalls.last()).isEqualTo(
+            TestExpensesLocalRepository.FilterCall(name = "", categories = listOf(5))
+        )
+        assertThat(pendingExpensesFilter.categories.value).isNull()
+    }
+
+    @Test
+    fun pendingFilter_requestedBeforeTheViewModelExists_isAppliedWhenItIsCreated() {
+        val filter = PendingExpensesFilter()
+        filter.request(3)
+
+        val created = ExpensesViewModel(
+            expensesRepository,
+            expensesLocalRepository,
+            userPreferencesRepository,
+            loadingRepository,
+            filter,
+            UnconfinedTestDispatcher(),
+        )
+
+        assertThat(created.selectedCategories.value).containsExactly(3)
+        assertThat(filter.categories.value).isNull()
     }
 
     // endregion

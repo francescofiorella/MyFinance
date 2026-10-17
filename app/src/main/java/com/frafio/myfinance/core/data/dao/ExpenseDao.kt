@@ -9,6 +9,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.frafio.myfinance.core.data.model.BarChartEntry
+import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
 
@@ -45,6 +46,12 @@ interface ExpenseDao : BaseDao<Expense> {
             "WHERE year=:year")
     fun getPriceSumOfYear(year: Int): Flow<Double?>
 
+    @Query("SELECT category, SUM(price) AS total " +
+            "FROM expense " +
+            "WHERE year=:year AND month=:month " +
+            "GROUP BY category")
+    fun getCategorySumsOfMonth(year: Int, month: Int): Flow<List<CategorySum>>
+
     @Query("SELECT year, month FROM expense ORDER BY year ASC, month ASC LIMIT 1")
     fun getEarliestYearMonth(): Flow<DatePoint?>
 
@@ -65,6 +72,14 @@ interface ExpenseDao : BaseDao<Expense> {
             "FROM expense " +
             "WHERE year=:year")
     fun getExpensesOfYear(year: Int): Flow<List<Expense>>
+
+    @Query("SELECT * " +
+            "FROM expense " +
+            "WHERE category=:category " +
+            "  AND (year * 100 + month) >= (:startYear * 100 + :startMonth) " +
+            "  AND (year * 100 + month) < (:endYear * 100 + :endMonth) " +
+            "ORDER BY year DESC, month DESC, day DESC, price DESC")
+    fun getExpensesOfCategory(category: Int, startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<Expense>>
 
     @Query("SELECT * FROM expense WHERE id = :id")
     override suspend fun getById(id: String): Expense?

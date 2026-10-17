@@ -23,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -43,6 +42,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.frafio.myfinance.core.data.repository.LoadingRepository
+import com.frafio.myfinance.core.navigation.HomeTabKey
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -51,7 +51,8 @@ import com.frafio.myfinance.core.utils.dateToExtendedString
 import com.frafio.myfinance.features.add.AddViewModel
 import com.frafio.myfinance.features.add.navigation.addEntry
 import com.frafio.myfinance.features.auth.navigation.authEntry
-import com.frafio.myfinance.features.categories.navigation.categoriesDescriptionEntry
+import com.frafio.myfinance.features.categories.navigation.categoriesEntry
+import com.frafio.myfinance.features.categorydetail.navigation.categoryDetailEntry
 import com.frafio.myfinance.features.home.HomeScreen
 import com.frafio.myfinance.features.labels.navigation.labelsEntry
 import com.frafio.myfinance.features.password.navigation.changePasswordEntry
@@ -71,7 +72,6 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var loadingRepository: LoadingRepository
 
-    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
 
@@ -187,8 +187,19 @@ class MainActivity : ComponentActivity() {
                             appState = appState,
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
                         )
-                        categoriesDescriptionEntry(
-                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
+                        categoriesEntry(
+                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
+                            onCategoryClick = { key -> rootBackStack.add(key) }
+                        )
+                        categoryDetailEntry(
+                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
+                            onSeeAllExpenses = {
+                                // Close Categories and the detail page, then open the Expenses tab, which applies the pending filter.
+                                while (rootBackStack.size > 1 && rootBackStack.last() != RootKey.Home) {
+                                    rootBackStack.removeAt(rootBackStack.size - 1)
+                                }
+                                viewModel.navigateTo(HomeTabKey.Expenses)
+                            }
                         )
                     }
                 }

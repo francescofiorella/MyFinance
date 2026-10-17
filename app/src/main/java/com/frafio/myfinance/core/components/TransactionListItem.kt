@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -44,7 +43,6 @@ import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.Transaction
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TransactionListItem(
     modifier: Modifier = Modifier,
@@ -53,10 +51,11 @@ fun TransactionListItem(
     countInGroup: Int,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    supportingText: String? = null,
     onIconClick: (() -> Unit) = { }
 ) {
     val expense = transaction as? Expense
-    val supportingText = if (expense != null) {
+    val secondLine = supportingText ?: if (expense != null) {
         stringResource(ExpenseCategories.get(expense.category).nameRes)
     } else {
         transaction.getDateString(extended = false)
@@ -93,7 +92,7 @@ fun TransactionListItem(
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Text(
-                        text = supportingText,
+                        text = secondLine,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -148,7 +147,6 @@ private fun CategoryIconButton(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun LabelChips(labels: List<String>) {
     // Removing the last label shrinks the row away; keep drawing the old chips until it is gone.
