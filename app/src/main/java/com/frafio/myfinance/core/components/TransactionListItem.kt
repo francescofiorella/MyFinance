@@ -40,10 +40,9 @@ import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.preview.PreviewTransactions
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.Transaction
 import com.frafio.myfinance.core.theme.MyFinanceTheme
-import com.frafio.myfinance.core.utils.getCategoryIcon
-import com.frafio.myfinance.core.utils.getCategoryName
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -58,7 +57,7 @@ fun TransactionListItem(
 ) {
     val expense = transaction as? Expense
     val supportingText = if (expense != null) {
-        stringResource(getCategoryName(expense.category))
+        stringResource(ExpenseCategories.get(expense.category).nameRes)
     } else {
         transaction.getDateString(extended = false)
     }
@@ -139,10 +138,10 @@ private fun CategoryIconButton(
             )
         ) {
             Icon(
-                painter = painterResource(getCategoryIcon(category)),
+                painter = painterResource(ExpenseCategories.get(category).iconRes),
                 contentDescription = stringResource(
                     R.string.change_category,
-                    stringResource(getCategoryName(category))
+                    stringResource(ExpenseCategories.get(category).nameRes)
                 ),
             )
         }

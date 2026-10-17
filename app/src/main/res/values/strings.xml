@@ -163,16 +163,4 @@
     <string name="income_deleted">Income deleted</string>
     <string name="full_name_updated">User full name updated</string>
     <string name="expense_deleted">Expense deleted</string>
-
-    <string-array name="categories" translatable="false">
-        <item>@string/housing</item>
-        <item>@string/groceries</item>
-        <item>@string/personal_care</item>
-        <item>@string/entertainment</item>
-        <item>@string/education</item>
-        <item>@string/dining</item>
-        <item>@string/health</item>
-        <item>@string/transportation</item>
-        <item>@string/miscellaneous</item>
-    </string-array>
 </resources>

@@ -67,6 +67,7 @@ import com.frafio.myfinance.core.components.TransactionListItem
 import com.frafio.myfinance.core.components.preview.PreviewTransactions
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.features.expenses.components.CategorySheet
@@ -117,7 +118,7 @@ fun ExpensesScreen(
                 showFilterSheet = false
             }
         },
-        categoryEnabled = selectedCategories.size != 9,
+        categoryEnabled = selectedCategories.size != ExpenseCategories.all.size,
         labelEnabled = labels.isNotEmpty(),
         dateRangeEnabled = dateRange == null,
         onSelectCategory = {

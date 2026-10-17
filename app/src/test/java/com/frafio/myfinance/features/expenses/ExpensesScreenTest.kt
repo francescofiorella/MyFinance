@@ -18,9 +18,9 @@ import androidx.compose.ui.test.performTouchInput
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.core.utils.activeCurrencyCode
-import com.frafio.myfinance.core.utils.getCategoryName
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.repository.TestExpensesLocalRepository
 import com.frafio.myfinance.testing.repository.TestExpensesRepository
@@ -225,7 +225,7 @@ class ExpensesScreenTest {
 
         // The category icon is the clickable nested inside the row.
         composeTestRule.onAllNodes(hasClickAction() and hasAnyAncestor(hasTestTag("expense_item")))[0].performClick()
-        composeTestRule.onNodeWithText(string(getCategoryName(CATEGORIES.GROCERIES.value))).performClickAction()
+        composeTestRule.onNodeWithText(string(ExpenseCategories.get(CATEGORIES.GROCERIES.value).nameRes)).performClickAction()
 
         assertThat(expensesRepository.editedExpenses.single().category).isEqualTo(CATEGORIES.GROCERIES.value)
     }

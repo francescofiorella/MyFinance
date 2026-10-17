@@ -37,8 +37,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.components.PieChart
 import com.frafio.myfinance.core.components.PieChartItem
-import com.frafio.myfinance.core.utils.getCategoryIcon
-import com.frafio.myfinance.core.utils.getCategoryName
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -57,13 +56,8 @@ fun ExpensesByCategoryCard(
     isPreviousDateEnabled: Boolean = true
 ) {
     val values = remember(expenses) {
-        val vals = MutableList(9) { 0.0 }
-        expenses.forEach { p ->
-            if (p.category in 0..8) {
-                vals[p.category] += p.price
-            }
-        }
-        vals
+        val totals = expenses.groupBy { it.category }.mapValues { (_, list) -> list.sumOf { it.price } }
+        ExpenseCategories.all.map { totals[it.id] ?: 0.0 }
     }
 
     val formatter = remember(monthlyShown) {
@@ -229,11 +223,12 @@ fun ExpensesByCategoryCard(
             }
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                val chartItems = values.mapIndexed { index, value ->
+                val chartItems = ExpenseCategories.all.mapIndexed { index, category ->
                     PieChartItem(
-                        value = value,
-                        label = stringResource(getCategoryName(index)),
-                        icon = getCategoryIcon(index)
+                        value = values[index],
+                        label = stringResource(category.nameRes),
+                        icon = category.iconRes,
+                        colors = category.colors
                     )
                 }
                 PieChart(

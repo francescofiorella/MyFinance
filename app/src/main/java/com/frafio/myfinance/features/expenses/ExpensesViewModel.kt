@@ -6,6 +6,7 @@ import com.frafio.myfinance.core.data.enums.db.FinanceCode
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.manager.BaseSyncManager.Companion.DEFAULT_LIMIT_EXPENSES
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.ExpensesRepository
 import com.frafio.myfinance.core.data.repository.LoadingRepository
@@ -103,19 +104,7 @@ class ExpensesViewModel @Inject constructor(
     ) { query, categories, labels, dateRange ->
         FilterParams(query.trim(), categories, labels, dateRange)
     }.flatMapLatest { params ->
-        val effectiveCategories = params.categories.ifEmpty {
-            listOf(
-                FirestoreEnums.CATEGORIES.HOUSING.value,
-                FirestoreEnums.CATEGORIES.GROCERIES.value,
-                FirestoreEnums.CATEGORIES.PERSONAL_CARE.value,
-                FirestoreEnums.CATEGORIES.ENTERTAINMENT.value,
-                FirestoreEnums.CATEGORIES.EDUCATION.value,
-                FirestoreEnums.CATEGORIES.DINING.value,
-                FirestoreEnums.CATEGORIES.HEALTH.value,
-                FirestoreEnums.CATEGORIES.TRANSPORTATION.value,
-                FirestoreEnums.CATEGORIES.MISCELLANEOUS.value
-            )
-        }
+        val effectiveCategories = params.categories.ifEmpty { ExpenseCategories.ids }
 
         val flow = if (params.dateRange == null) {
             expensesLocalRepository.getWithFilter(params.query, effectiveCategories)

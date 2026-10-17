@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.utils.activeCurrencyCode
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.frafio.myfinance.testing.util.string
@@ -23,8 +24,8 @@ class PieChartTest {
     val composeTestRule = createComposeRule()
 
     private val items = listOf(
-        PieChartItem(value = 30.0, label = "Dining", icon = R.drawable.ic_home_filled),
-        PieChartItem(value = 45.0, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled),
+        PieChartItem(value = 30.0, label = "Dining", icon = R.drawable.ic_home_filled, colors = ExpenseCategories.all[0].colors),
+        PieChartItem(value = 45.0, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled, colors = ExpenseCategories.all[1].colors),
     )
 
     @Before

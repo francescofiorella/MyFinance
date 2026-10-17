@@ -9,9 +9,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.preview.PreviewTransactions
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.Transaction
 import com.frafio.myfinance.core.theme.MyFinanceTheme
-import com.frafio.myfinance.core.utils.getCategoryIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +63,7 @@ fun EditTransactionSheet(
     ) {
         ListSheetDialog(
             icon = if (transaction is Expense) {
-                getCategoryIcon(transaction.category)
+                ExpenseCategories.get(transaction.category).iconRes
             } else {
                 null
             },

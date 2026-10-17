@@ -33,8 +33,8 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppBottomSheet
 import com.frafio.myfinance.core.components.SheetDialog
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.theme.MyFinanceTheme
-import com.frafio.myfinance.core.utils.getCategoryIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +48,7 @@ fun LabelsSheet(
     onLabelCheckedChanged: (String, Boolean) -> Unit,
 ) {
     @DrawableRes val icon = if (expense != null)
-        getCategoryIcon(expense.category)
+        ExpenseCategories.get(expense.category).iconRes
     else
         R.drawable.ic_sell_filled
     val title = expense?.name ?: stringResource(id = R.string.labels)

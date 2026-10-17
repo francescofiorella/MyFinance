@@ -13,8 +13,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.utils.activeCurrencyCode
-import com.frafio.myfinance.core.utils.getCategoryName
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.frafio.myfinance.testing.util.string
@@ -69,11 +69,11 @@ class ExpensesComponentsTest {
 
         composeTestRule.onNodeWithText("Dinner").assertIsDisplayed()
         composeTestRule.onNodeWithText("Last 7 days").assertIsDisplayed()
-        composeTestRule.onNodeWithText(string(getCategoryName(CATEGORIES.HOUSING.value))).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(ExpenseCategories.get(CATEGORIES.HOUSING.value).nameRes)).assertIsDisplayed()
 
         composeTestRule.onNodeWithContentDescription(string(R.string.remove_item, "Dinner")).performClick()
         composeTestRule.onNodeWithContentDescription(string(R.string.remove_item, "Last 7 days")).performClick()
-        composeTestRule.onNodeWithContentDescription(string(R.string.remove_item, string(getCategoryName(CATEGORIES.HOUSING.value)))).performClick()
+        composeTestRule.onNodeWithContentDescription(string(R.string.remove_item, string(ExpenseCategories.get(CATEGORIES.HOUSING.value).nameRes))).performClick()
 
         assertThat(events).containsExactly("label:Dinner", "date", "category:${CATEGORIES.HOUSING.value}").inOrder()
     }
@@ -134,10 +134,10 @@ class ExpensesComponentsTest {
         }
 
         CATEGORIES.entries.filter { it.value in 0..8 }.forEach {
-            composeTestRule.onNodeWithText(string(getCategoryName(it.value))).assertIsDisplayed()
+            composeTestRule.onNodeWithText(string(ExpenseCategories.get(it.value).nameRes)).assertIsDisplayed()
         }
         composeTestRule.onNodeWithText(string(R.string.category)).assertIsDisplayed()
-        composeTestRule.onNodeWithText(string(getCategoryName(CATEGORIES.GROCERIES.value))).performClick()
+        composeTestRule.onNodeWithText(string(ExpenseCategories.get(CATEGORIES.GROCERIES.value).nameRes)).performClick()
 
         assertThat(events).containsExactly("selected:${CATEGORIES.GROCERIES.value}", "dismiss").inOrder()
     }
@@ -148,8 +148,8 @@ class ExpensesComponentsTest {
             CategorySheet(show = true, onDismiss = {}, onCategorySelected = { events += "selected:$it" }, disabledCategories = listOf(CATEGORIES.HOUSING.value))
         }
 
-        composeTestRule.onNodeWithText(string(getCategoryName(CATEGORIES.HOUSING.value))).assertIsNotEnabled().performClick()
-        composeTestRule.onNodeWithText(string(getCategoryName(CATEGORIES.DINING.value))).assertIsEnabled()
+        composeTestRule.onNodeWithText(string(ExpenseCategories.get(CATEGORIES.HOUSING.value).nameRes)).assertIsNotEnabled().performClick()
+        composeTestRule.onNodeWithText(string(ExpenseCategories.get(CATEGORIES.DINING.value).nameRes)).assertIsEnabled()
 
         assertThat(events).isEmpty()
     }

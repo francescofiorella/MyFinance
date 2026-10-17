@@ -37,6 +37,7 @@ import com.frafio.myfinance.core.components.SheetDialog
 import com.frafio.myfinance.core.components.TransactionListItem
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.BarChartEntry
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.navigation.HomeTabKey
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.utils.activeCurrencyCode
@@ -145,8 +146,8 @@ class AccessibilityTest {
         composeTestRule.setThemedContent {
             PieChart(
                 items = listOf(
-                    PieChartItem(value = 30.0, label = "Dining", icon = R.drawable.ic_restaurant_filled),
-                    PieChartItem(value = 45.0, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled),
+                    PieChartItem(value = 30.0, label = "Dining", icon = R.drawable.ic_restaurant_filled, colors = ExpenseCategories.all[0].colors),
+                    PieChartItem(value = 45.0, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled, colors = ExpenseCategories.all[1].colors),
                 ),
                 animationSpec = snap(),
             )

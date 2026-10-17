@@ -23,9 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.theme.MyFinanceTheme
-import com.frafio.myfinance.core.utils.getCategoryIcon
-import com.frafio.myfinance.core.utils.getCategoryName
 import java.time.LocalDate
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -61,8 +60,8 @@ fun FilterChipBar(
         }
         categories.forEach { categoryId ->
             FilterInputChip(
-                text = stringResource(id = getCategoryName(categoryId)),
-                icon = getCategoryIcon(categoryId),
+                text = stringResource(id = ExpenseCategories.get(categoryId).nameRes),
+                icon = ExpenseCategories.get(categoryId).iconRes,
                 onDismiss = { onCategoryRemoved(categoryId) }
             )
         }

@@ -55,11 +55,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.data.model.CategoryColors
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
-import com.frafio.myfinance.core.utils.getCategoryContainerColor
-import com.frafio.myfinance.core.utils.getCategoryOnContainerColor
-import com.frafio.myfinance.core.utils.getCategoryTextColor
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -82,7 +81,8 @@ object PieChartDefaults {
 data class PieChartItem(
     val value: Double,
     val label: String,
-    @DrawableRes val icon: Int
+    @DrawableRes val icon: Int,
+    val colors: CategoryColors
 )
 
 /** Degrees taken by the gap after an arc: its width plus [offsetPx], as an angle at [radiusPx]. */
@@ -157,7 +157,6 @@ fun PieChart(
     val interactionSources = remember(items.size) { List(items.size) { MutableInteractionSource() } }
     val isDark = isSystemInDarkTheme()
 
-    val primaryColor = MaterialTheme.colorScheme.primary
     val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
 
     val arcWidthPx = with(density) { arcWidth.toPx() }
@@ -244,9 +243,9 @@ fun PieChart(
                         doubleToPriceWithoutDecimals(items[index].value)
                     ),
                     isSelected = selectedArcIndex == index,
-                    color = getCategoryContainerColor(index, default = primaryColor, isDark = isDark),
+                    color = items[index].colors.container(isDark),
                     iconPainter = painterResource(items[index].icon),
-                    iconOnColor = getCategoryOnContainerColor(index, default = MaterialTheme.colorScheme.surface, isDark = isDark),
+                    iconOnColor = items[index].colors.onContainer(isDark),
                     sweepState = animatedValues[index],
                     startAngleProvider = {
                         var start = -90f
@@ -289,7 +288,7 @@ fun PieChart(
 
             Text(
                 text = title,
-                color = getCategoryTextColor(selectedArcIndex, MaterialTheme.colorScheme.onSurface, isDark = isDark),
+                color = if (selectedArcIndex != -1) items[selectedArcIndex].colors.text(isDark) else MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
@@ -434,9 +433,9 @@ private fun PieChartArc(
 fun PieChartPreview() {
     MyFinanceTheme {
         val items = listOf(
-            PieChartItem(1.0, "Housing", R.drawable.ic_home_filled),
-            PieChartItem(1.0, "Groceries", R.drawable.ic_shopping_cart_filled),
-            PieChartItem(1.0, "Personal Care", R.drawable.ic_self_care_filled)
+            PieChartItem(1.0, "Housing", R.drawable.ic_home_filled, ExpenseCategories.all[0].colors),
+            PieChartItem(1.0, "Groceries", R.drawable.ic_shopping_cart_filled, ExpenseCategories.all[1].colors),
+            PieChartItem(1.0, "Personal Care", R.drawable.ic_self_care_filled, ExpenseCategories.all[2].colors)
         )
         PieChart(items = items)
     }
@@ -447,8 +446,8 @@ fun PieChartPreview() {
 fun PieChartSingleEntryPreview() {
     MyFinanceTheme {
         val items = listOf(
-            PieChartItem(100.0, "Total", R.drawable.ic_home_filled),
-            PieChartItem(0.0, "Other", R.drawable.ic_grid_3x3_filled)
+            PieChartItem(100.0, "Total", R.drawable.ic_home_filled, ExpenseCategories.all[0].colors),
+            PieChartItem(0.0, "Other", R.drawable.ic_grid_3x3_filled, ExpenseCategories.all[1].colors)
         )
         PieChart(
             items = items,

@@ -15,8 +15,8 @@ import com.frafio.myfinance.core.components.MenuItem
 import com.frafio.myfinance.core.components.preview.PreviewTransactions
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.theme.MyFinanceTheme
-import com.frafio.myfinance.core.utils.getCategoryIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,64 +28,16 @@ fun CategorySheet(
     expense: Expense? = null,
     disabledCategories: List<Int> = listOf(),
 ) {
-    val categories = listOf(
+    val categories = ExpenseCategories.all.map { category ->
         MenuItem.Resource(
-            iconRes = R.drawable.ic_home_filled,
-            textRes = R.string.housing,
-            enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.HOUSING.value),
-            onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.HOUSING.value) }
-        ),
-        MenuItem.Resource(
-            iconRes = R.drawable.ic_shopping_cart_filled,
-            textRes = R.string.groceries,
-            enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.GROCERIES.value),
-            onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.GROCERIES.value) }
-        ),
-        MenuItem.Resource(
-            iconRes = R.drawable.ic_self_care_filled,
-            textRes = R.string.personal_care,
-            enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.PERSONAL_CARE.value),
-            onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.PERSONAL_CARE.value) }
-        ),
-        MenuItem.Resource(
-            iconRes = R.drawable.ic_theater_comedy_filled,
-            textRes = R.string.entertainment,
-            enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.ENTERTAINMENT.value),
-            onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.ENTERTAINMENT.value) }
-        ),
-        MenuItem.Resource(
-            iconRes = R.drawable.ic_school_filled,
-            textRes = R.string.education,
-            enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.EDUCATION.value),
-            onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.EDUCATION.value) }
-        ),
-        MenuItem.Resource(
-            iconRes = R.drawable.ic_restaurant_filled,
-            textRes = R.string.dining,
-            enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.DINING.value),
-            onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.DINING.value) }
-        ),
-        MenuItem.Resource(
-            iconRes = R.drawable.ic_vaccines_filled,
-            textRes = R.string.health,
-            enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.HEALTH.value),
-            onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.HEALTH.value) }
-        ),
-        MenuItem.Resource(
-            iconRes = R.drawable.ic_directions_subway_filled,
-            textRes = R.string.transportation,
-            enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.TRANSPORTATION.value),
-            onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.TRANSPORTATION.value) }
-        ),
-        MenuItem.Resource(
-            iconRes = R.drawable.ic_grid_3x3_filled,
-            textRes = R.string.miscellaneous,
-            enabled = !disabledCategories.contains(FirestoreEnums.CATEGORIES.MISCELLANEOUS.value),
-            onClick = { onCategorySelected(FirestoreEnums.CATEGORIES.MISCELLANEOUS.value) }
+            iconRes = category.iconRes,
+            textRes = category.nameRes,
+            enabled = !disabledCategories.contains(category.id),
+            onClick = { onCategorySelected(category.id) }
         )
-    )
+    }
 
-    @DrawableRes val icon = getCategoryIcon(expense?.category)
+    @DrawableRes val icon = ExpenseCategories.get(expense?.category).iconRes
     val title = expense?.name ?: stringResource(id = R.string.category)
     val label = expense?.getDateString() ?: stringResource(id = R.string.select)
     val labelFirst = expense == null

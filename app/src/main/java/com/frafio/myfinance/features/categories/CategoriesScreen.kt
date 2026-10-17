@@ -49,6 +49,8 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.data.model.ExpenseCategories
+import com.frafio.myfinance.core.data.model.ExpenseCategory
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,17 +68,7 @@ fun CategoriesScreen(
         ) {
             CategoriesTopBar(onBackClick = onBackClick)
 
-            val categories = listOf(
-                CategoryItem(R.string.housing, R.drawable.ic_home_filled, R.string.housing_description),
-                CategoryItem(R.string.groceries, R.drawable.ic_shopping_cart_filled, R.string.groceries_description),
-                CategoryItem(R.string.personal_care, R.drawable.ic_self_care_filled, R.string.personal_care_description),
-                CategoryItem(R.string.entertainment, R.drawable.ic_theater_comedy_filled, R.string.entertainment_description),
-                CategoryItem(R.string.education, R.drawable.ic_school_filled, R.string.education_description),
-                CategoryItem(R.string.dining, R.drawable.ic_restaurant_filled, R.string.dining_description),
-                CategoryItem(R.string.health, R.drawable.ic_vaccines_filled, R.string.health_description),
-                CategoryItem(R.string.transportation, R.drawable.ic_directions_subway_filled, R.string.transportation_description),
-                CategoryItem(R.string.miscellaneous, R.drawable.ic_grid_3x3_filled, R.string.miscellaneous_description)
-            )
+            val categories = ExpenseCategories.all
 
             var expandedIndex by remember { mutableStateOf<Int?>(null) }
 
@@ -142,7 +134,7 @@ fun CategoriesTopBar(onBackClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CategoryExpandableItem(
-    category: CategoryItem,
+    category: ExpenseCategory,
     isExpanded: Boolean,
     onToggleExpand: () -> Unit,
     index: Int,
@@ -237,12 +229,6 @@ fun CategoryExpandableItem(
             .semantics { stateDescription = expandState }
     )
 }
-
-data class CategoryItem(
-    val nameRes: Int,
-    val iconRes: Int,
-    val descriptionRes: Int
-)
 
 @Preview(showBackground = true)
 @Composable

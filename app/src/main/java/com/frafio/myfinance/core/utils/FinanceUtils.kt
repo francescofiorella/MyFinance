@@ -1,46 +1,9 @@
 package com.frafio.myfinance.core.utils
 
-import androidx.compose.ui.graphics.Color
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.model.Expense
-import com.frafio.myfinance.core.theme.brownContainerDark
-import com.frafio.myfinance.core.theme.brownContainerLight
-import com.frafio.myfinance.core.theme.brownOnContainerDark
-import com.frafio.myfinance.core.theme.brownOnContainerLight
-import com.frafio.myfinance.core.theme.indigoContainerDark
-import com.frafio.myfinance.core.theme.indigoContainerLight
-import com.frafio.myfinance.core.theme.indigoOnContainerDark
-import com.frafio.myfinance.core.theme.indigoOnContainerLight
-import com.frafio.myfinance.core.theme.lightBlueContainerDark
-import com.frafio.myfinance.core.theme.lightBlueContainerLight
-import com.frafio.myfinance.core.theme.lightBlueOnContainerDark
-import com.frafio.myfinance.core.theme.lightBlueOnContainerLight
-import com.frafio.myfinance.core.theme.lightGreenContainerDark
-import com.frafio.myfinance.core.theme.lightGreenContainerLight
-import com.frafio.myfinance.core.theme.lightGreenOnContainerDark
-import com.frafio.myfinance.core.theme.lightGreenOnContainerLight
-import com.frafio.myfinance.core.theme.orangeContainerDark
-import com.frafio.myfinance.core.theme.orangeContainerLight
-import com.frafio.myfinance.core.theme.orangeOnContainerDark
-import com.frafio.myfinance.core.theme.orangeOnContainerLight
-import com.frafio.myfinance.core.theme.purpleContainerDark
-import com.frafio.myfinance.core.theme.purpleContainerLight
-import com.frafio.myfinance.core.theme.purpleOnContainerDark
-import com.frafio.myfinance.core.theme.purpleOnContainerLight
-import com.frafio.myfinance.core.theme.redContainerDark
-import com.frafio.myfinance.core.theme.redContainerLight
-import com.frafio.myfinance.core.theme.redOnContainerDark
-import com.frafio.myfinance.core.theme.redOnContainerLight
-import com.frafio.myfinance.core.theme.tealContainerDark
-import com.frafio.myfinance.core.theme.tealContainerLight
-import com.frafio.myfinance.core.theme.tealOnContainerDark
-import com.frafio.myfinance.core.theme.tealOnContainerLight
-import com.frafio.myfinance.core.theme.yellowContainerDark
-import com.frafio.myfinance.core.theme.yellowContainerLight
-import com.frafio.myfinance.core.theme.yellowOnContainerDark
-import com.frafio.myfinance.core.theme.yellowOnContainerLight
 import java.time.LocalDate
 
 fun getCurrencyIcon(currencyCode: String): Int {
@@ -53,81 +16,6 @@ fun getCurrencyIcon(currencyCode: String): Int {
         "JPY" -> R.drawable.ic_currency_yen_filled
         "CNY" -> R.drawable.ic_currency_yuan_filled
         else -> R.drawable.ic_attach_money_filled
-    }
-}
-
-fun getCategoryIcon(categoryId: Int?): Int {
-    return when (categoryId) {
-        FirestoreEnums.CATEGORIES.HOUSING.value -> R.drawable.ic_home_filled
-        FirestoreEnums.CATEGORIES.GROCERIES.value -> R.drawable.ic_shopping_cart_filled
-        FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.drawable.ic_self_care_filled
-        FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.drawable.ic_theater_comedy_filled
-        FirestoreEnums.CATEGORIES.EDUCATION.value -> R.drawable.ic_school_filled
-        FirestoreEnums.CATEGORIES.DINING.value -> R.drawable.ic_restaurant_filled
-        FirestoreEnums.CATEGORIES.HEALTH.value -> R.drawable.ic_vaccines_filled
-        FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.drawable.ic_directions_subway_filled
-        FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.drawable.ic_grid_3x3_filled
-        else -> R.drawable.ic_grid_3x3_filled
-    }
-}
-
-fun getCategoryName(categoryId: Int?): Int {
-    return when (categoryId) {
-        FirestoreEnums.CATEGORIES.HOUSING.value -> R.string.housing
-        FirestoreEnums.CATEGORIES.GROCERIES.value -> R.string.groceries
-        FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> R.string.personal_care
-        FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> R.string.entertainment
-        FirestoreEnums.CATEGORIES.EDUCATION.value -> R.string.education
-        FirestoreEnums.CATEGORIES.DINING.value -> R.string.dining
-        FirestoreEnums.CATEGORIES.HEALTH.value -> R.string.health
-        FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> R.string.transportation
-        FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> R.string.miscellaneous
-        else -> R.string.category
-    }
-}
-
-fun getCategoryContainerColor(categoryId: Int?, default: Color, isDark: Boolean): Color {
-    return when (categoryId) {
-        FirestoreEnums.CATEGORIES.HOUSING.value -> if (!isDark) redContainerLight else redContainerDark
-        FirestoreEnums.CATEGORIES.GROCERIES.value -> if (!isDark) purpleContainerLight else purpleContainerDark
-        FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> if (!isDark) indigoContainerLight else indigoContainerDark
-        FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> if (!isDark) lightBlueContainerLight else lightBlueContainerDark
-        FirestoreEnums.CATEGORIES.EDUCATION.value -> if (!isDark) tealContainerLight else tealContainerDark
-        FirestoreEnums.CATEGORIES.DINING.value -> if (!isDark) lightGreenContainerLight else lightGreenContainerDark
-        FirestoreEnums.CATEGORIES.HEALTH.value -> if (!isDark) yellowContainerLight else yellowContainerDark
-        FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> if (!isDark) orangeContainerLight else orangeContainerDark
-        FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> if (!isDark) brownContainerLight else brownContainerDark
-        else -> default
-    }
-}
-
-fun getCategoryOnContainerColor(categoryId: Int?, default: Color, isDark: Boolean): Color {
-    return when (categoryId) {
-        FirestoreEnums.CATEGORIES.HOUSING.value -> if (!isDark) redOnContainerLight else redOnContainerDark
-        FirestoreEnums.CATEGORIES.GROCERIES.value -> if (!isDark) purpleOnContainerLight else purpleOnContainerDark
-        FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> if (!isDark) indigoOnContainerLight else indigoOnContainerDark
-        FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> if (!isDark) lightBlueOnContainerLight else lightBlueOnContainerDark
-        FirestoreEnums.CATEGORIES.EDUCATION.value -> if (!isDark) tealOnContainerLight else tealOnContainerDark
-        FirestoreEnums.CATEGORIES.DINING.value -> if (!isDark) lightGreenOnContainerLight else lightGreenOnContainerDark
-        FirestoreEnums.CATEGORIES.HEALTH.value -> if (!isDark) yellowOnContainerLight else yellowOnContainerDark
-        FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> if (!isDark) orangeOnContainerLight else orangeOnContainerDark
-        FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> if (!isDark) brownOnContainerLight else brownOnContainerDark
-        else -> default
-    }
-}
-
-fun getCategoryTextColor(categoryId: Int?, default: Color, isDark: Boolean): Color {
-    return when (categoryId) {
-        FirestoreEnums.CATEGORIES.HOUSING.value -> if (!isDark) redContainerLight else redOnContainerDark
-        FirestoreEnums.CATEGORIES.GROCERIES.value -> if (!isDark) purpleContainerLight else purpleOnContainerDark
-        FirestoreEnums.CATEGORIES.PERSONAL_CARE.value -> if (!isDark) indigoContainerLight else indigoOnContainerDark
-        FirestoreEnums.CATEGORIES.ENTERTAINMENT.value -> if (!isDark) lightBlueContainerLight else lightBlueOnContainerDark
-        FirestoreEnums.CATEGORIES.EDUCATION.value -> if (!isDark) tealContainerLight else tealOnContainerDark
-        FirestoreEnums.CATEGORIES.DINING.value -> if (!isDark) lightGreenContainerLight else lightGreenOnContainerDark
-        FirestoreEnums.CATEGORIES.HEALTH.value -> if (!isDark) yellowContainerLight else yellowOnContainerDark
-        FirestoreEnums.CATEGORIES.TRANSPORTATION.value -> if (!isDark) orangeContainerLight else orangeOnContainerDark
-        FirestoreEnums.CATEGORIES.MISCELLANEOUS.value -> if (!isDark) brownContainerLight else brownOnContainerDark
-        else -> default
     }
 }
 

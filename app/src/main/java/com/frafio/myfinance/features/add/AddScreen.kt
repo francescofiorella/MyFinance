@@ -69,7 +69,6 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -84,11 +83,11 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.rememberImeTargetInsets
 import com.frafio.myfinance.core.components.AppDatePickerDialog
 import com.frafio.myfinance.core.components.SwipeableSnackbarHost
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
-import com.frafio.myfinance.core.utils.getCategoryIcon
 import com.frafio.myfinance.core.utils.getCurrencyIcon
 import com.frafio.myfinance.features.expenses.components.CategorySheet
 import com.frafio.myfinance.features.expenses.components.LabelsSheet
@@ -677,7 +676,6 @@ fun TransactionForm(
     currencyCode: String
 ) {
     val colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-    val categories = stringArrayResource(id = R.array.categories)
 
     Column {
         // Amount Field
@@ -743,7 +741,6 @@ fun TransactionForm(
                     CategoryField(
                         category = category,
                         categoryError = categoryError,
-                        categories = categories,
                         isAdding = isAdding
                     )
                 },
@@ -922,7 +919,6 @@ fun DateField(
 fun CategoryField(
     category: Int,
     categoryError: String?,
-    categories: Array<String>,
     isAdding: Boolean
 ) {
     Row(
@@ -938,17 +934,14 @@ fun CategoryField(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                painter = painterResource(
-                    id = if (category != -1) getCategoryIcon(category)
-                    else R.drawable.ic_grid_3x3_filled
-                ),
+                painter = painterResource(id = ExpenseCategories.get(category).iconRes),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Box(modifier = Modifier.fillMaxWidth()) {
             TextField(
-                value = if (category != -1) categories.getOrElse(category) { "" } else "",
+                value = if (category in ExpenseCategories.ids) stringResource(id = ExpenseCategories.get(category).nameRes) else "",
                 onValueChange = {},
                 placeholder = {
                     Text(
