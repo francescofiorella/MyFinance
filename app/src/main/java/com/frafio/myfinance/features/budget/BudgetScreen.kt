@@ -413,7 +413,6 @@ private fun IncomeItem(
                 transaction = income,
                 indexInGroup = indexInGroup,
                 countInGroup = countInGroup,
-                onClick = { },
                 onLongClick = onLongClick
             )
         }

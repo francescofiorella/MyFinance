@@ -1,10 +1,12 @@
 package com.frafio.myfinance.core.components
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.longClick
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
@@ -211,6 +213,40 @@ class TransactionItemsTest {
 
         assertThat(iconClicks).isEqualTo(1)
         assertThat(rowClicks).isEqualTo(0)
+    }
+
+    @Test
+    fun listItem_withoutCallbacks_isNotClickable_andTheIconIsNotAButton() {
+        composeTestRule.setThemedContent {
+            TransactionListItem(
+                transaction = testExpense(name = "Pizza", category = FirestoreEnums.CATEGORIES.DINING.value),
+                indexInGroup = 0, countInGroup = 1,
+            )
+        }
+
+        composeTestRule.onNodeWithText("Pizza").assertIsDisplayed()
+        composeTestRule.onAllNodes(hasClickAction()).assertCountEquals(0)
+        composeTestRule.onNodeWithContentDescription(
+            string(R.string.change_category, string(R.string.dining)),
+            useUnmergedTree = true
+        ).assertDoesNotExist()
+    }
+
+    @Test
+    fun listItem_withOnlyOnLongClick_stillReportsLongPresses() {
+        var longClicks = 0
+        composeTestRule.setThemedContent {
+            TransactionListItem(
+                transaction = testExpense(name = "Pizza"),
+                indexInGroup = 0, countInGroup = 1, onLongClick = { longClicks++ },
+            )
+        }
+
+        composeTestRule.onNodeWithText("Pizza").performTouchInput { longClick() }
+
+        assertThat(longClicks).isEqualTo(1)
+        // Without onIconClick, the row is the only clickable node.
+        composeTestRule.onAllNodes(hasClickAction()).assertCountEquals(1)
     }
 
     // endregion

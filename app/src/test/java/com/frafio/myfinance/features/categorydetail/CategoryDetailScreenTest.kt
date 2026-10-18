@@ -1,6 +1,10 @@
 package com.frafio.myfinance.features.categorydetail
 
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasNoClickAction
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -106,6 +110,21 @@ class CategoryDetailScreenTest {
         composeTestRule.onNodeWithText(string(R.string.biggest_expenses)).assertDoesNotExist()
         composeTestRule.onNodeWithContentDescription(string(R.string.spending_none_description), useUnmergedTree = true)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun biggestExpenses_areReadOnly() {
+        setScreen()
+        val biggest = stats.topExpenses.first()
+
+        // The first match is the expense row; the name also appears under Most frequent.
+        composeTestRule.onAllNodesWithText(biggest.name)[0]
+            .performScrollTo()
+            .assert(hasNoClickAction() and !hasAnyAncestor(hasClickAction()))
+        composeTestRule.onNodeWithContentDescription(
+            string(R.string.change_category, string(R.string.dining)),
+            useUnmergedTree = true
+        ).assertDoesNotExist()
     }
 
     @Test

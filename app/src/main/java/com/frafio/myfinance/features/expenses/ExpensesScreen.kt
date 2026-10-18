@@ -614,7 +614,6 @@ fun ExpensesList(
                         transaction = expense,
                         indexInGroup = metadata.first,
                         countInGroup = metadata.second,
-                        onClick = { },
                         onLongClick = { onItemLongClick(expense, index) },
                     ) {
                         onCategoryClick(expense, index)

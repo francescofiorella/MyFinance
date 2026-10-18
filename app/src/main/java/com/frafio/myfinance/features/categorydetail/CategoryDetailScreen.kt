@@ -116,8 +116,6 @@ fun CategoryDetailContent(
                                 transaction = expense,
                                 indexInGroup = index,
                                 countInGroup = stats.topExpenses.size,
-                                onClick = {},
-                                onLongClick = {},
                                 supportingText = expense.getDateString()
                             )
                         }

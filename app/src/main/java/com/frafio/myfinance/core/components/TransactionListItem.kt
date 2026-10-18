@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.FilledTonalIconButton
@@ -43,16 +44,20 @@ import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.Transaction
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
+/**
+ * A transaction row. Each interaction is off when its callback is null: without [onClick] and
+ * [onLongClick] the row can't be clicked, and without [onIconClick] the category icon isn't a button.
+ */
 @Composable
 fun TransactionListItem(
     modifier: Modifier = Modifier,
     transaction: Transaction,
     indexInGroup: Int,
     countInGroup: Int,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
     supportingText: String? = null,
-    onIconClick: (() -> Unit) = { }
+    onIconClick: (() -> Unit)? = null
 ) {
     val expense = transaction as? Expense
     val secondLine = supportingText ?: if (expense != null) {
@@ -61,65 +66,85 @@ fun TransactionListItem(
         transaction.getDateString(extended = false)
     }
 
-    SegmentedListItem(
-        onClick = onClick,
-        onLongClick = onLongClick,
-        shapes = ListItemDefaults.segmentedShapes(
-            index = indexInGroup,
-            count = countInGroup,
-            defaultShapes = ListItemDefaults.shapes()
-        ),
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        ),
-        content = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (expense != null) {
+    val shapes = ListItemDefaults.segmentedShapes(
+        index = indexInGroup,
+        count = countInGroup,
+        defaultShapes = ListItemDefaults.shapes()
+    )
+    val colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+    )
+    val itemModifier = modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp)
+        .padding(
+            bottom = if (indexInGroup == countInGroup - 1)
+                0.dp else 2.dp
+        )
+    val supportingContent: @Composable () -> Unit = {
+        key(transaction.id) {
+            LabelChips(labels = expense?.labels.orEmpty())
+        }
+    }
+    val content: @Composable () -> Unit = {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (expense != null) {
+                if (onIconClick != null) {
                     CategoryIconButton(category = expense.category, onClick = onIconClick)
                 } else {
-                    LetterAvatar(
-                        text = transaction.name,
-                        size = 40.dp,
-                        modifier = Modifier.padding(end = 12.dp)
-                    )
+                    CategoryIconPlain(category = expense.category)
                 }
+            } else {
+                LetterAvatar(
+                    text = transaction.name,
+                    size = 40.dp,
+                    modifier = Modifier.padding(end = 12.dp)
+                )
+            }
 
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = transaction.name,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        text = secondLine,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
-                    modifier = Modifier
-                        .padding(start = 12.dp),
-                    text = transaction.getPriceString(true),
-                    style = MaterialTheme.typography.bodyLarge,
+                    text = transaction.name,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = secondLine,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-        },
-        supportingContent = {
-            key(transaction.id) {
-                LabelChips(labels = expense?.labels.orEmpty())
-            }
-        },
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(
-                bottom = if (indexInGroup == countInGroup - 1)
-                    0.dp else 2.dp
+
+            Text(
+                modifier = Modifier
+                    .padding(start = 12.dp),
+                text = transaction.getPriceString(true),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-    )
+        }
+    }
+
+    if (onClick != null || onLongClick != null) {
+        SegmentedListItem(
+            onClick = onClick ?: {},
+            onLongClick = onLongClick,
+            shapes = shapes,
+            colors = colors,
+            content = content,
+            supportingContent = supportingContent,
+            modifier = itemModifier
+        )
+    } else {
+        SegmentedListItem(
+            shapes = shapes,
+            colors = colors,
+            content = content,
+            supportingContent = supportingContent,
+            modifier = itemModifier
+        )
+    }
 }
 
 @Composable
@@ -144,6 +169,26 @@ private fun CategoryIconButton(
                 ),
             )
         }
+    }
+}
+
+/** Looks like [CategoryIconButton] but isn't one: no click, and nothing to announce. */
+@Composable
+private fun CategoryIconPlain(category: Int) {
+    val colors = IconButtonDefaults.filledTonalIconButtonColors()
+    Box(
+        modifier = Modifier
+            .padding(end = 12.dp)
+            .size(IconButtonDefaults.smallContainerSize())
+            .clip(IconButtonDefaults.smallRoundShape)
+            .background(colors.containerColor),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(ExpenseCategories.get(category).iconRes),
+            contentDescription = null,
+            tint = colors.contentColor
+        )
     }
 }
 
