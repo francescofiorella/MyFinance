@@ -38,7 +38,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -80,6 +79,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.rememberImeTargetInsets
 import com.frafio.myfinance.core.components.AppDatePickerDialog
 import com.frafio.myfinance.core.components.SwipeableSnackbarHost
@@ -299,13 +299,85 @@ fun AddScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                AddTopBar(
-                    navKey = navKey,
-                    isAdding = isAdding,
-                    isTypeSelectionVisible = isTypeSelectionVisible,
-                    onBackClick = onBackClick,
-                    onToggleTypeSelection = { isTypeSelectionVisible = it },
-                    onSaveClick = onSaveClick
+                AppTopBar(
+                    title = {
+                        val focusManager = LocalFocusManager.current
+                        val typeSelectionState = stringResource(id = if (isTypeSelectionVisible) R.string.expanded else R.string.collapsed)
+                        TextButton(
+                            modifier = Modifier
+                                .testTag("add_type_button")
+                                .then(
+                                    if (navKey.requestType == RootKey.RequestType.Add) {
+                                        Modifier.semantics { stateDescription = typeSelectionState }
+                                    } else Modifier
+                                ),
+                            onClick = {
+                                focusManager.clearFocus()
+                                isTypeSelectionVisible = true
+                            },
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = TextFieldDefaults.colors().focusedTextColor,
+                                disabledContentColor = if (isAdding) {
+                                    TextFieldDefaults.colors().disabledTextColor
+                                } else {
+                                    TextFieldDefaults.colors().focusedTextColor
+                                }
+                            ),
+                            enabled = navKey.requestType == RootKey.RequestType.Add && !isAdding
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = stringResource(
+                                        id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) {
+                                            R.string.expense
+                                        } else {
+                                            R.string.income
+                                        }
+                                    ),
+                                    style = MaterialTheme.typography.titleLarge,
+                                )
+                                if (navKey.requestType == RootKey.RequestType.Add) {
+                                    Icon(
+                                        modifier = Modifier
+                                            .padding(start = 4.dp),
+                                        painter = painterResource(
+                                            id = if (isTypeSelectionVisible)
+                                                R.drawable.ic_keyboard_arrow_up_filled
+                                            else
+                                                R.drawable.ic_keyboard_arrow_down_filled
+                                        ),
+                                        contentDescription = null,
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    onNavigationClick = {
+                        if (isTypeSelectionVisible) {
+                            isTypeSelectionVisible = false
+                        } else {
+                            onBackClick()
+                        }
+                    },
+                    navigationIcon = R.drawable.ic_close_filled,
+                    navigationContentDescription = stringResource(id = R.string.close),
+                    navigationModifier = Modifier.testTag("add_close_button"),
+                    action = {
+                        FilledIconButton(
+                            modifier = Modifier
+                                .testTag("add_save_button")
+                                .padding(end = 4.dp)
+                                .width(52.dp),
+                            onClick = onSaveClick,
+                            enabled = !isAdding,
+                            shapes = IconButtonDefaults.shapes()
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_check_filled),
+                                contentDescription = stringResource(R.string.save),
+                            )
+                        }
+                    }
                 )
 
                 Column(
@@ -352,112 +424,6 @@ fun AddScreen(
                 isTypeSelectionVisible = false
             }
         )
-    }
-}
-
-@Composable
-fun AddTopBar(
-    navKey: RootKey.AddEditTransaction,
-    isAdding: Boolean,
-    isTypeSelectionVisible: Boolean,
-    onBackClick: () -> Unit,
-    onToggleTypeSelection: (Boolean) -> Unit,
-    onSaveClick: () -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp, horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        FilledTonalIconButton(
-            modifier = Modifier.testTag("add_close_button"),
-            onClick = {
-                if (isTypeSelectionVisible) {
-                    onToggleTypeSelection(false)
-                } else {
-                    onBackClick()
-                }
-            },
-            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            ),
-            shapes = IconButtonDefaults.shapes(),
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_close_filled),
-                contentDescription = stringResource(id = R.string.close),
-            )
-        }
-
-        val typeSelectionState = stringResource(id = if (isTypeSelectionVisible) R.string.expanded else R.string.collapsed)
-        TextButton(
-            modifier = Modifier
-                .testTag("add_type_button")
-                .then(
-                    if (navKey.requestType == RootKey.RequestType.Add) {
-                        Modifier.semantics { stateDescription = typeSelectionState }
-                    } else Modifier
-                ),
-            onClick = {
-                focusManager.clearFocus()
-                onToggleTypeSelection(true)
-            },
-            colors = ButtonDefaults.textButtonColors(
-                contentColor = TextFieldDefaults.colors().focusedTextColor,
-                disabledContentColor = if (isAdding) {
-                    TextFieldDefaults.colors().disabledTextColor
-                } else {
-                    TextFieldDefaults.colors().focusedTextColor
-                }
-            ),
-            enabled = navKey.requestType == RootKey.RequestType.Add && !isAdding
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(
-                        id = if (navKey.expenseCode == AddViewModel.REQUEST_EXPENSE_CODE) {
-                            R.string.expense
-                        } else {
-                            R.string.income
-                        }
-                    ),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                if (navKey.requestType == RootKey.RequestType.Add) {
-                    Icon(
-                        modifier = Modifier
-                            .padding(start = 4.dp),
-                        painter = painterResource(
-                            id = if (isTypeSelectionVisible)
-                                R.drawable.ic_keyboard_arrow_up_filled
-                            else
-                                R.drawable.ic_keyboard_arrow_down_filled
-                        ),
-                        contentDescription = null,
-                    )
-                }
-            }
-        }
-
-        FilledIconButton(
-            modifier = Modifier
-                .testTag("add_save_button")
-                .padding(end = 4.dp)
-                .width(52.dp),
-            onClick = onSaveClick,
-            enabled = !isAdding,
-            shapes = IconButtonDefaults.shapes()
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_check_filled),
-                contentDescription = stringResource(R.string.save),
-            )
-        }
     }
 }
 

@@ -28,9 +28,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -42,12 +39,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.CategoryIcon
 import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.components.ShareBar
@@ -97,7 +94,10 @@ fun CategoriesContent(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            CategoriesTopBar(onBackClick = onBackClick)
+            AppTopBar(
+                title = { Text(text = stringResource(id = R.string.categories), maxLines = 1) },
+                onNavigationClick = onBackClick
+            )
 
             val (spent, unspent) = state.spending.partition { it.total > 0.0 }
             // Keyed by position, not category: rows stay in place and their bar animates to the new category's share.
@@ -149,41 +149,6 @@ fun CategoriesContent(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun CategoriesTopBar(onBackClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp, horizontal = 16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        FilledTonalIconButton(
-            modifier = Modifier.align(Alignment.CenterStart),
-            onClick = onBackClick,
-            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            ),
-            shapes = IconButtonDefaults.shapes(),
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
-                contentDescription = stringResource(id = R.string.navigate_up),
-            )
-        }
-
-        Text(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(horizontal = 56.dp),
-            text = stringResource(id = R.string.categories),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1
-        )
     }
 }
 

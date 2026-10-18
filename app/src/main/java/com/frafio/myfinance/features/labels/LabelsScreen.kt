@@ -27,7 +27,6 @@ import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -65,6 +64,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.ConfirmationSheetDialog
 import com.frafio.myfinance.core.components.EmptyView
 import com.frafio.myfinance.core.components.rememberImeTargetInsets
@@ -159,32 +159,10 @@ fun LabelsContent(
                 .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                FilledTonalIconButton(
-                    onClick = onBackClick,
-                    modifier = Modifier.align(Alignment.CenterStart),
-                    colors = IconButtonDefaults.filledTonalIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    shapes = IconButtonDefaults.shapes(),
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
-                        contentDescription = stringResource(id = R.string.navigate_up),
-                    )
-                }
-
-                Text(
-                    text = stringResource(id = R.string.labels),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-            }
+            AppTopBar(
+                title = { Text(text = stringResource(id = R.string.labels)) },
+                onNavigationClick = onBackClick
+            )
 
             NewLabelItem(
                 modifier = Modifier.widthIn(max = BottomSheetDefaults.SheetMaxWidth),

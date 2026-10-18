@@ -2,7 +2,6 @@ package com.frafio.myfinance.features.password
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,7 +26,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -66,6 +64,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.rememberImeTargetInsets
 import com.frafio.myfinance.core.components.ConfirmationSheetDialog
 import com.frafio.myfinance.core.components.SwipeableSnackbarHost
@@ -245,10 +244,28 @@ fun ChangePasswordScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            ChangePasswordTopBar(
-                onBackClick = onBackClick,
-                onSaveClick = onSaveClick,
-                isSaveEnabled = !isLoading
+            AppTopBar(
+                title = { Text(text = stringResource(id = R.string.password)) },
+                onNavigationClick = onBackClick,
+                action = {
+                    val focusManager = LocalFocusManager.current
+                    FilledIconButton(
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .width(52.dp),
+                        onClick = {
+                            focusManager.clearFocus()
+                            onSaveClick()
+                        },
+                        enabled = !isLoading,
+                        shapes = IconButtonDefaults.shapes()
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_check_filled),
+                            contentDescription = stringResource(R.string.save),
+                        )
+                    }
+                }
             )
 
             Column(
@@ -279,60 +296,6 @@ fun ChangePasswordScreen(
                     remoteCurrentPasswordError = remoteCurrentPasswordError
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun ChangePasswordTopBar(
-    onBackClick: () -> Unit,
-    onSaveClick: () -> Unit,
-    isSaveEnabled: Boolean
-) {
-    val focusManager = LocalFocusManager.current
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp, horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        FilledTonalIconButton(
-            onClick = onBackClick,
-            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            ),
-            shapes = IconButtonDefaults.shapes(),
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
-                contentDescription = stringResource(id = R.string.navigate_up),
-            )
-        }
-
-        Text(
-            text = stringResource(id = R.string.password),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        FilledIconButton(
-            modifier = Modifier
-                .padding(end = 4.dp)
-                .width(52.dp),
-            onClick = {
-                focusManager.clearFocus()
-                onSaveClick()
-            },
-            enabled = isSaveEnabled,
-            shapes = IconButtonDefaults.shapes()
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_check_filled),
-                contentDescription = stringResource(R.string.save),
-            )
         }
     }
 }

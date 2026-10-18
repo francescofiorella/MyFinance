@@ -1,7 +1,6 @@
 package com.frafio.myfinance.features.categorydetail
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,8 +20,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialShapes
@@ -36,7 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -44,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.BarChart
 import com.frafio.myfinance.core.components.CategoryIcon
 import com.frafio.myfinance.core.components.SpendingChangeChip
@@ -93,9 +90,9 @@ fun CategoryDetailContent(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            CategoryDetailTopBar(
-                title = stringResource(id = category.nameRes),
-                onBackClick = onBackClick
+            AppTopBar(
+                title = { Text(text = stringResource(id = category.nameRes), maxLines = 1) },
+                onNavigationClick = onBackClick
             )
 
             Column(
@@ -174,41 +171,6 @@ fun CategoryDetailContent(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
-    }
-}
-
-@Composable
-fun CategoryDetailTopBar(title: String, onBackClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp, horizontal = 16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        FilledTonalIconButton(
-            modifier = Modifier.align(Alignment.CenterStart),
-            onClick = onBackClick,
-            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            ),
-            shapes = IconButtonDefaults.shapes(),
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_keyboard_arrow_left_filled),
-                contentDescription = stringResource(id = R.string.navigate_up),
-            )
-        }
-
-        Text(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(horizontal = 56.dp),
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1
-        )
     }
 }
 
