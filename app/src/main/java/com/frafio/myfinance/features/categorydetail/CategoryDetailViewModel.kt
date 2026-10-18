@@ -40,9 +40,11 @@ class CategoryDetailViewModel @AssistedInject constructor(
     /** The first day of the month the overview was showing. */
     val month: LocalDate = LocalDate.of(navKey.year, navKey.month, 1)
 
+    /** The first month of the [TREND_MONTHS] window ending with [month]. */
+    val windowStart: LocalDate = month.minusMonths(TREND_MONTHS - 1L)
+
     /** Null until loaded. */
     val stats: StateFlow<CategoryDetailStats?> = run {
-        val windowStart = month.minusMonths(TREND_MONTHS - 1L)
         val windowEnd = month.plusMonths(1)
         combine(
             expensesLocalRepository.getExpensesOfCategory(

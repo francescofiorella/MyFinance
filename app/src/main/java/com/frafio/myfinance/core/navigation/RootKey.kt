@@ -27,6 +27,17 @@ sealed interface RootKey : NavKey {
     @Serializable
     data class CategoryDetail(val categoryId: Int, val year: Int, val month: Int) : RootKey
 
+    // The expenses of a category named [name], from fromYear/fromMonth to toYear/toMonth (inclusive).
+    @Serializable
+    data class FrequentExpenses(
+        val categoryId: Int,
+        val name: String,
+        val fromYear: Int,
+        val fromMonth: Int,
+        val toYear: Int,
+        val toMonth: Int
+    ) : RootKey
+
     @Serializable
     sealed interface RequestType {
         @Serializable

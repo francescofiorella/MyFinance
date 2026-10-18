@@ -21,7 +21,9 @@ import com.frafio.myfinance.core.theme.MyFinanceTheme
 @Composable
 fun TotalItem(
     modifier: Modifier = Modifier,
-    transaction: Transaction
+    transaction: Transaction,
+    // False shows only the date, e.g. as a day header in a read-only list.
+    showPrice: Boolean = true
 ) {
     Row(
         modifier = modifier
@@ -39,7 +41,7 @@ fun TotalItem(
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.weight(1f))
-        if (transaction.price >= 0) {
+        if (showPrice && transaction.price >= 0) {
             Text(
                 text = transaction.getPriceString(true),
                 style = MaterialTheme.typography.labelMedium,

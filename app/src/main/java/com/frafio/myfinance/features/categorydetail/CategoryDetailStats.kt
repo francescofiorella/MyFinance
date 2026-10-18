@@ -4,6 +4,7 @@ import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.SpendingChange
 import com.frafio.myfinance.core.data.model.spendingChange
+import com.frafio.myfinance.core.utils.expenseNameKey
 import com.frafio.myfinance.core.utils.fillMonthlyGaps
 import java.time.LocalDate
 
@@ -74,7 +75,7 @@ fun buildCategoryDetail(month: LocalDate, windowExpenses: List<Expense>, monthTo
 internal fun frequentExpenses(expenses: List<Expense>): List<FrequentExpense> =
     expenses
         .filter { it.name.isNotBlank() }
-        .groupBy { it.name.trim().lowercase() }
+        .groupBy { expenseNameKey(it.name) }
         .values
         .filter { it.size >= 2 }
         .map { group -> FrequentExpense(group.first().name.trim(), group.size, group.sumOf { it.price }) }

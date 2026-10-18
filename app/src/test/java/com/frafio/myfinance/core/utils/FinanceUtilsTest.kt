@@ -274,6 +274,16 @@ class FinanceUtilsTest {
 
     // endregion
 
+    // region expenseNameKey
+
+    @Test
+    fun expenseNameKey_ignoresCaseAndSurroundingSpaces() {
+        assertThat(expenseNameKey("  Sushi Bar ")).isEqualTo(expenseNameKey("sushi bar"))
+        assertThat(expenseNameKey("Sushi Bar")).isNotEqualTo(expenseNameKey("Sushi  Bar"))
+    }
+
+    // endregion
+
     private fun LocalDate.id() = "${dayOfMonth}_${monthValue}_$year"
 
     private fun Expense.isTotalFor(date: LocalDate, sum: Double): Boolean =

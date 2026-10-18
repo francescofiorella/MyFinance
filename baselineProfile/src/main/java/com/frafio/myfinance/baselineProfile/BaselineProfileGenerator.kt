@@ -165,6 +165,7 @@ class BaselineProfileGenerator {
             if (device.awaitTag("category_detail_scroll", 10_000)) {
                 device.settle()
                 device.scrollBothWays("category_detail_scroll")
+                frequentExpensesJourney()
             } else {
                 log("'category_detail_scroll' never appeared.")
             }
@@ -184,6 +185,25 @@ class BaselineProfileGenerator {
     private fun MacrobenchmarkScope.closeSheet(missingTag: String) {
         log("'$missingTag' not found, closing the sheet.")
         device.pressBack()
+        device.settle()
+    }
+
+    // Needs the same expense name at least twice in the category, within the 12 months shown.
+    private fun MacrobenchmarkScope.frequentExpensesJourney() {
+        val entry = device.scrollTo("category_detail_scroll", "frequent_expense_item") ?: run {
+            log("No frequent expense ('frequent_expense_item'), skipping.")
+            return
+        }
+        log("Frequent expenses.")
+        entry.click()
+        if (device.awaitTag("frequent_expenses_list", 10_000)) {
+            device.settle()
+            device.scrollBothWays("frequent_expenses_list")
+        } else {
+            log("'frequent_expenses_list' never appeared.")
+        }
+        device.pressBack()
+        device.awaitTag("category_detail_scroll", 10_000)
         device.settle()
     }
 

@@ -263,3 +263,6 @@ fun fillMonthlyGaps(entries: List<BarChartEntry>, lastMonth: LocalDate, count: I
         byMonth[date.year * 100 + date.monthValue] ?: BarChartEntry(0.0, date.year, date.monthValue)
     }
 }
+
+/** How expense names are matched: case and surrounding spaces don't matter. */
+fun expenseNameKey(name: String): String = name.trim().lowercase()

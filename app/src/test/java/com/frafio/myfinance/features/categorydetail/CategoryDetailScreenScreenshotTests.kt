@@ -80,7 +80,8 @@ class CategoryDetailScreenScreenshotTests {
             month = month,
             stats = stats,
             onBackClick = {},
-            onSeeAllExpenses = {}
+            onSeeAllExpenses = {},
+            onFrequentExpenseClick = {}
         )
     }
 }

@@ -196,4 +196,9 @@ class FormatUtilsTest {
     fun getLocaleFromCurrency_toleratesEmptyInput() {
         assertThat(getLocaleFromCurrency("")).isNotNull()
     }
+
+    @Test
+    fun monthRangeToString_showsShortMonthsAcrossAYear() {
+        assertThat(monthRangeToString(LocalDate.of(2023, 6, 1), LocalDate.of(2024, 5, 1))).isEqualTo("Jun 2023 – May 2024")
+    }
 }

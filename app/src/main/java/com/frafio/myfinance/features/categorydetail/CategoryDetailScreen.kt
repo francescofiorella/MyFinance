@@ -48,6 +48,7 @@ import com.frafio.myfinance.core.components.TransactionListItem
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.ExpenseCategory
+import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPercent
 import com.frafio.myfinance.core.utils.doubleToPrice
@@ -58,7 +59,8 @@ import java.time.LocalDate
 fun CategoryDetailScreen(
     viewModel: CategoryDetailViewModel,
     onBackClick: () -> Unit,
-    onSeeAllExpenses: () -> Unit
+    onSeeAllExpenses: () -> Unit,
+    onFrequentExpenseClick: (RootKey.FrequentExpenses) -> Unit
 ) {
     val stats by viewModel.stats.collectAsStateWithLifecycle()
     CategoryDetailContent(
@@ -69,6 +71,18 @@ fun CategoryDetailScreen(
         onSeeAllExpenses = {
             viewModel.onSeeAllExpenses()
             onSeeAllExpenses()
+        },
+        onFrequentExpenseClick = { frequent ->
+            onFrequentExpenseClick(
+                RootKey.FrequentExpenses(
+                    categoryId = viewModel.category.id,
+                    name = frequent.name,
+                    fromYear = viewModel.windowStart.year,
+                    fromMonth = viewModel.windowStart.monthValue,
+                    toYear = viewModel.month.year,
+                    toMonth = viewModel.month.monthValue
+                )
+            )
         }
     )
 }
@@ -80,7 +94,8 @@ fun CategoryDetailContent(
     month: LocalDate,
     stats: CategoryDetailStats?,
     onBackClick: () -> Unit,
-    onSeeAllExpenses: () -> Unit
+    onSeeAllExpenses: () -> Unit,
+    onFrequentExpenseClick: (FrequentExpense) -> Unit
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -146,7 +161,9 @@ fun CategoryDetailContent(
                                 ),
                                 value = doubleToPrice(frequent.total),
                                 index = index,
-                                count = stats.frequent.size
+                                count = stats.frequent.size,
+                                modifier = Modifier.testTag("frequent_expense_item"),
+                                onClick = { onFrequentExpenseClick(frequent) }
                             )
                         }
                     }
@@ -335,44 +352,51 @@ private fun DetailRow(
     subtitle: String?,
     value: String,
     index: Int,
-    count: Int
+    count: Int,
+    modifier: Modifier = Modifier,
+    // Null keeps the row static, as for the labels.
+    onClick: (() -> Unit)? = null
 ) {
-    SegmentedListItem(
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        shapes = ListItemDefaults.segmentedShapes(
-            index = index,
-            count = count,
-            defaultShapes = ListItemDefaults.shapes()
-        ),
-        content = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    if (subtitle != null) {
-                        Text(
-                            text = subtitle,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-                Text(
-                    modifier = Modifier.padding(start = 12.dp),
-                    text = value,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = if (index == count - 1) 0.dp else 2.dp)
+    val colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+    val shapes = ListItemDefaults.segmentedShapes(
+        index = index,
+        count = count,
+        defaultShapes = ListItemDefaults.shapes()
     )
+    val rowModifier = modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp)
+        .padding(bottom = if (index == count - 1) 0.dp else 2.dp)
+    val content: @Composable () -> Unit = {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            Text(
+                modifier = Modifier.padding(start = 12.dp),
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+
+    if (onClick != null) {
+        SegmentedListItem(onClick = onClick, colors = colors, shapes = shapes, content = content, modifier = rowModifier)
+    } else {
+        SegmentedListItem(colors = colors, shapes = shapes, content = content, modifier = rowModifier)
+    }
 }
 
 /** Fixed sample data for previews and screenshots: Dining over the year up to [month]. */
@@ -446,7 +470,8 @@ fun CategoryDetailPreview() {
             month = month,
             stats = sampleCategoryDetailStats(month),
             onBackClick = {},
-            onSeeAllExpenses = {}
+            onSeeAllExpenses = {},
+            onFrequentExpenseClick = {}
         )
     }
 }

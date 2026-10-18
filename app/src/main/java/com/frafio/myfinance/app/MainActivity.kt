@@ -53,6 +53,7 @@ import com.frafio.myfinance.features.add.navigation.addEntry
 import com.frafio.myfinance.features.auth.navigation.authEntry
 import com.frafio.myfinance.features.categories.navigation.categoriesEntry
 import com.frafio.myfinance.features.categorydetail.navigation.categoryDetailEntry
+import com.frafio.myfinance.features.frequentexpenses.navigation.frequentExpensesEntry
 import com.frafio.myfinance.features.home.HomeScreen
 import com.frafio.myfinance.features.labels.navigation.labelsEntry
 import com.frafio.myfinance.features.managecategories.navigation.manageCategoriesEntry
@@ -203,7 +204,11 @@ class MainActivity : ComponentActivity() {
                                     rootBackStack.removeAt(rootBackStack.size - 1)
                                 }
                                 viewModel.navigateTo(HomeTabKey.Expenses)
-                            }
+                            },
+                            onFrequentExpenseClick = { key -> rootBackStack.add(key) }
+                        )
+                        frequentExpensesEntry(
+                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
                         )
                     }
                 }

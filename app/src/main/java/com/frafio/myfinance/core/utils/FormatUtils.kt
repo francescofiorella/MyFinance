@@ -59,6 +59,14 @@ fun monthToString(month: LocalDate): String =
         if (it.isLowerCase()) it.titlecase() else it.toString()
     }
 
+// Two months as a short range in the device language, e.g. "Jun 2023 – May 2024".
+fun monthRangeToString(from: LocalDate, to: LocalDate): String {
+    val formatter = DateTimeFormatter.ofPattern("MMM uuuu")
+    return listOf(from, to).joinToString(" – ") { month ->
+        month.format(formatter).replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+    }
+}
+
 fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?): String? {
     var formattedDate: String? = null
     dayOfMonth?.let {

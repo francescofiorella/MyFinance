@@ -6,11 +6,13 @@ import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasNoClickAction
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.frafio.myfinance.R
@@ -48,7 +50,8 @@ class CategoryDetailScreenTest {
                 month = month,
                 stats = stats,
                 onBackClick = { events += "back" },
-                onSeeAllExpenses = { events += "seeAll" }
+                onSeeAllExpenses = { events += "seeAll" },
+                onFrequentExpenseClick = { events += "frequent:${it.name}" }
             )
         }
     }
@@ -125,6 +128,26 @@ class CategoryDetailScreenTest {
             string(R.string.change_category, string(R.string.dining)),
             useUnmergedTree = true
         ).assertDoesNotExist()
+    }
+
+    @Test
+    fun tappingAMostFrequentRow_reportsThatExpense() {
+        setScreen()
+
+        // Most used first: Sushi Bar.
+        composeTestRule.onAllNodesWithTag("frequent_expense_item")[0].performScrollTo().performClick()
+
+        assertThat(events).containsExactly("frequent:Sushi Bar")
+    }
+
+    @Test
+    fun labelRows_areNotClickable() {
+        setScreen()
+
+        // The last "Friends" is the By label row; the others are label chips on expense rows.
+        composeTestRule.onAllNodesWithText("Friends").onLast()
+            .performScrollTo()
+            .assert(hasNoClickAction() and !hasAnyAncestor(hasClickAction()))
     }
 
     @Test
