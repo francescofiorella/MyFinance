@@ -171,7 +171,7 @@
     <string name="spending_up_percent">Up %1$s from last month</string>
     <string name="spending_down_percent">Down %1$s from last month</string>
     <string name="spending_new_description">Nothing spent last month</string>
-    <string name="spending_none_description">Nothing spent either months</string>
+    <string name="spending_none_description">Nothing spent in either month</string>
     <string name="monthly_average">Monthly average</string>
     <string name="year_to_date">Year to date</string>
     <string name="share_of_month">Share of the month</string>
