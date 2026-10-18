@@ -157,3 +157,6 @@ internal fun UiDevice.saveScreenshot(name: String) {
     val file = File(dir, "$name-${System.currentTimeMillis()}.png")
     log(if (takeScreenshot(file)) "Screenshot saved: ${file.name}" else "Screenshot failed: ${file.name}")
 }
+
+/** Waits until no node has [testTag], e.g. for the previous screen to leave once a new screen's transition ends. */
+internal fun UiDevice.awaitGone(testTag: String, timeoutMs: Long): Boolean = wait(Until.gone(res(testTag)), timeoutMs)

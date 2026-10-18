@@ -158,11 +158,13 @@ class BaselineProfileGenerator {
         if (!device.awaitTag("categories_scroll", 10_000)) {
             log("'categories_scroll' never appeared.")
         }
+        device.awaitGone("expenses_list", 5_000)
         device.settle()
 
         if (device.tap("category_item")) {
             log("Category detail.")
             if (device.awaitTag("category_detail_scroll", 10_000)) {
+                device.awaitGone("categories_scroll", 5_000)
                 device.settle()
                 device.scrollBothWays("category_detail_scroll")
                 frequentExpensesJourney()
@@ -195,6 +197,7 @@ class BaselineProfileGenerator {
         log("Frequent expenses.")
         entry.click()
         if (device.awaitTag("frequent_expenses_list", 10_000)) {
+            device.awaitGone("category_detail_scroll", 5_000)
             device.settle()
             device.scrollBothWays("frequent_expenses_list")
         } else {
@@ -269,6 +272,7 @@ class BaselineProfileGenerator {
         log("Manage categories.")
         entry.click()
         if (device.awaitTag("manage_categories_list", 10_000)) {
+            device.awaitGone("profile_scroll", 5_000)
             device.settle()
             if (device.tap("manage_category_item")) {
                 log("Category description expanded.")
@@ -292,6 +296,7 @@ class BaselineProfileGenerator {
         if (!device.awaitTag(screenTag, 10_000)) {
             log("'$screenTag' never appeared after opening '$entryTag'.")
         }
+        device.awaitGone(containerTag, 5_000)
         device.settle()
         device.pressBack()
         confirmBack(containerTag, screenTag)
@@ -315,9 +320,9 @@ class BaselineProfileGenerator {
         device.await("add_amount_field", 5_000)?.typeText("12.34")
         device.settle()
 
-        // Back would close the whole Add screen; its close button collapses the type selection first.
         if (device.tap("add_type_button")) {
-            device.tap("add_close_button")
+            device.pressBack()
+            device.settle()
         }
 
         closeAddScreen()
