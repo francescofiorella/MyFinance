@@ -6,6 +6,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -33,8 +34,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +53,7 @@ import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.CategoryIcon
 import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.components.ShareBar
+import com.frafio.myfinance.core.components.ShareBarDefaults
 import com.frafio.myfinance.core.components.ShareBarItem
 import com.frafio.myfinance.core.components.SpendingChangeChip
 import com.frafio.myfinance.core.data.model.CategorySum
@@ -185,10 +191,16 @@ private fun MonthHeader(
             )
         }
         val totals = state.spending.associate { it.category.id to it.total }
+        // No animation while the first month loads, like the rows; only later month changes animate.
+        var hasLoaded by remember { mutableStateOf(false) }
+        LaunchedEffect(state.spending.isNotEmpty()) {
+            if (state.spending.isNotEmpty()) hasLoaded = true
+        }
         ShareBar(
             modifier = Modifier.padding(top = 12.dp, end = 8.dp),
             // Fixed category order, so each segment grows or shrinks in place when the month changes.
-            items = ExpenseCategories.all.map { ShareBarItem(value = totals[it.id] ?: 0.0, colors = it.colors) }
+            items = ExpenseCategories.all.map { ShareBarItem(value = totals[it.id] ?: 0.0, colors = it.colors) },
+            animationSpec = if (hasLoaded) ShareBarDefaults.AnimationSpec else snap()
         )
     }
 }
