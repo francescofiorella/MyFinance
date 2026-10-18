@@ -64,7 +64,7 @@ fun FrequentExpensesContent(
             AppTopBar(
                 title = {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = stringResource(id = R.string.most_frequent), maxLines = 1)
+                        Text(text = stringResource(id = R.string.frequent_expenses_title), maxLines = 1)
                         Text(
                             text = monthRangeToString(from, to),
                             style = MaterialTheme.typography.labelMedium,

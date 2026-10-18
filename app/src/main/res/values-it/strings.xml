@@ -180,6 +180,7 @@
     <string name="spending_trend">Andamento annuale</string>
     <string name="biggest_expenses">Spese maggiori (mese)</string>
     <string name="most_frequent">Più frequenti (anno)</string>
+    <string name="frequent_expenses_title">Più frequenti</string>
     <string name="by_label">Per etichetta (mese)</string>
     <string name="see_all_expenses">Vedi tutte le spese</string>
     <plurals name="frequent_expense_times">

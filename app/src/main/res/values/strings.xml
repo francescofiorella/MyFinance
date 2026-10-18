@@ -179,6 +179,7 @@
     <string name="spending_trend">Annual trend</string>
     <string name="biggest_expenses">Biggest expenses (monthly)</string>
     <string name="most_frequent">Most frequent (yearly)</string>
+    <string name="frequent_expenses_title">Most frequent</string>
     <string name="by_label">By label (month)</string>
     <string name="see_all_expenses">See all expenses</string>
     <plurals name="frequent_expense_times">

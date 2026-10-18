@@ -49,7 +49,7 @@ class FrequentExpensesScreenTest {
     fun title_showsMostFrequentAndThePeriod() {
         setScreen()
 
-        composeTestRule.onNodeWithText(string(R.string.most_frequent)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.frequent_expenses_title)).assertIsDisplayed()
         composeTestRule.onNodeWithText("Jun 2023 – May 2024").assertIsDisplayed()
     }
 
