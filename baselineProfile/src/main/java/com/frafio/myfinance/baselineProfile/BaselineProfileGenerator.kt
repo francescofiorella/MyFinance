@@ -241,13 +241,14 @@ class BaselineProfileGenerator {
         log("Profile.")
         if (!device.openTab("tab_profile", "profile_scroll")) return
 
+        // Change password is the last row of the edit section: open it while the section is expanded, then collapse it.
         if (device.tap("profile_edit_profile")) {
+            openAndClose("profile_scroll", "profile_change_password", "change_password_scroll")
             device.tap("profile_edit_profile")
         }
 
         // Labels and the spending overview are opened from the Expenses tab; category management from here.
         manageCategoriesJourney()
-        openAndClose("profile_scroll", "profile_change_password", "change_password_scroll")
 
         device.scrollTo("profile_scroll", "profile_change_currency")?.let {
             log("Currency sheet.")
@@ -298,7 +299,12 @@ class BaselineProfileGenerator {
         }
         device.settle()
         device.pressBack()
-        device.awaitTag(containerTag, 10_000)
+        if (!device.awaitTag(containerTag, 10_000)) {
+            // A back press can occasionally get lost and leave the screen open, blocking every later step.
+            log("'$containerTag' not back after closing '$screenTag', pressing back again.")
+            device.pressBack()
+            device.awaitTag(containerTag, 10_000)
+        }
         device.settle()
     }
 
