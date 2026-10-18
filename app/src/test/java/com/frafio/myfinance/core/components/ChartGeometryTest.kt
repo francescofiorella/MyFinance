@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import kotlin.math.PI
 
-/** The pure sizing and angle maths behind BarChart and PieChart. */
+/** The pure sizing and angle maths behind BarChart, PieChart and ShareBar. */
 class ChartGeometryTest {
 
     @Test
@@ -58,5 +58,26 @@ class ChartGeometryTest {
     fun arcSweeps_nothingSpent_drawsNoArcs() {
         assertThat(arcSweeps(listOf(0.0, 0.0), gapDegrees = 10f)).containsExactly(0f, 0f).inOrder()
         assertThat(arcSweeps(emptyList(), gapDegrees = 10f)).isEmpty()
+    }
+
+    @Test
+    fun shareFractions_splitTheBarByValue() {
+        assertThat(shareFractions(listOf(1.0, 0.0, 3.0))).containsExactly(0.25f, 0f, 0.75f).inOrder()
+    }
+
+    @Test
+    fun shareFractions_nothingSpent_areAllZero() {
+        assertThat(shareFractions(listOf(0.0, 0.0))).containsExactly(0f, 0f).inOrder()
+        assertThat(shareFractions(emptyList())).isEmpty()
+    }
+
+    @Test
+    fun gapsAfter_onlyBetweenPositiveSegments() {
+        assertThat(gapsAfter(listOf(1.0, 0.0, 2.0, 3.0, 0.0))).containsExactly(true, false, true, false, false).inOrder()
+    }
+
+    @Test
+    fun gapsAfter_aSingleSegment_hasNoGap() {
+        assertThat(gapsAfter(listOf(0.0, 42.0, 0.0))).containsExactly(false, false, false).inOrder()
     }
 }

@@ -112,15 +112,8 @@ fun CategoryDetailContent(
                     StatsGrid(stats = stats, year = month.year)
                     TrendCard(stats = stats)
 
-                    SectionTitle(text = stringResource(id = R.string.biggest_expenses))
-                    if (stats.topExpenses.isEmpty()) {
-                        Text(
-                            modifier = Modifier.padding(horizontal = 32.dp),
-                            text = stringResource(id = R.string.no_spending_this_month),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    } else {
+                    if (stats.topExpenses.isNotEmpty()) {
+                        SectionTitle(text = stringResource(id = R.string.biggest_expenses))
                         stats.topExpenses.forEachIndexed { index, expense ->
                             TransactionListItem(
                                 transaction = expense,
@@ -129,6 +122,19 @@ fun CategoryDetailContent(
                                 onClick = {},
                                 onLongClick = {},
                                 supportingText = expense.getDateString()
+                            )
+                        }
+                    }
+
+                    if (stats.labels.isNotEmpty()) {
+                        SectionTitle(text = stringResource(id = R.string.by_label))
+                        stats.labels.forEachIndexed { index, label ->
+                            DetailRow(
+                                title = label.label,
+                                subtitle = null,
+                                value = doubleToPrice(label.total),
+                                index = index,
+                                count = stats.labels.size
                             )
                         }
                     }
@@ -146,19 +152,6 @@ fun CategoryDetailContent(
                                 value = doubleToPrice(frequent.total),
                                 index = index,
                                 count = stats.frequent.size
-                            )
-                        }
-                    }
-
-                    if (stats.labels.isNotEmpty()) {
-                        SectionTitle(text = stringResource(id = R.string.by_label))
-                        stats.labels.forEachIndexed { index, label ->
-                            DetailRow(
-                                title = label.label,
-                                subtitle = null,
-                                value = doubleToPrice(label.total),
-                                index = index,
-                                count = stats.labels.size
                             )
                         }
                     }
@@ -223,7 +216,9 @@ fun CategoryDetailTopBar(title: String, onBackClick: () -> Unit) {
 @Composable
 private fun Header(category: ExpenseCategory, month: LocalDate) {
     Column(
-        modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 24.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CategoryIcon(

@@ -1,21 +1,31 @@
 package com.frafio.myfinance.features.categories
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
@@ -40,8 +50,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.CategoryIcon
 import com.frafio.myfinance.core.components.PeriodStepper
+import com.frafio.myfinance.core.components.ShareBar
+import com.frafio.myfinance.core.components.ShareBarItem
 import com.frafio.myfinance.core.components.SpendingChangeChip
 import com.frafio.myfinance.core.data.model.CategorySum
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.ExpenseCategory
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPercent
@@ -86,23 +99,26 @@ fun CategoriesContent(
         ) {
             CategoriesTopBar(onBackClick = onBackClick)
 
-            Column(
+            val (spent, unspent) = state.spending.partition { it.total > 0.0 }
+            // Keyed by position, not category: rows stay in place and their bar animates to the new category's share.
+            LazyColumn(
                 modifier = Modifier
                     .testTag("categories_scroll")
                     .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
                     .fillMaxHeight()
-                    .align(Alignment.CenterHorizontally)
-                    .verticalScroll(rememberScrollState())
+                    .align(Alignment.CenterHorizontally),
+                contentPadding = PaddingValues(bottom = 16.dp)
             ) {
-                MonthHeader(
-                    state = state,
-                    onPreviousMonth = onPreviousMonth,
-                    onNextMonth = onNextMonth,
-                    onCurrentMonth = onCurrentMonth
-                )
+                item(key = "month_header") {
+                    MonthHeader(
+                        state = state,
+                        onPreviousMonth = onPreviousMonth,
+                        onNextMonth = onNextMonth,
+                        onCurrentMonth = onCurrentMonth
+                    )
+                }
 
-                val (spent, unspent) = state.spending.partition { it.total > 0.0 }
-                spent.forEachIndexed { index, spending ->
+                itemsIndexed(spent, key = { index, _ -> "row_$index" }) { index, spending ->
                     CategorySpendingItem(
                         spending = spending,
                         index = index,
@@ -112,23 +128,25 @@ fun CategoriesContent(
                 }
 
                 if (unspent.isNotEmpty()) {
-                    Text(
-                        modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 8.dp),
-                        text = stringResource(id = R.string.no_spending_this_month),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    unspent.forEachIndexed { index, spending ->
-                        CategorySpendingItem(
-                            spending = spending,
-                            index = index,
-                            count = unspent.size,
-                            onClick = { onCategoryClick(spending.category.id) }
+                    item(key = "no_spending_label") {
+                        Text(
+                            modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 8.dp),
+                            text = stringResource(id = R.string.no_spending_this_month),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                // Same keys as above, so a row crossing into this group keeps its state and fades its bar out.
+                itemsIndexed(unspent, key = { index, _ -> "row_${spent.size + index}" }) { index, spending ->
+                    CategorySpendingItem(
+                        spending = spending,
+                        index = index,
+                        count = unspent.size,
+                        onClick = { onCategoryClick(spending.category.id) }
+                    )
+                }
             }
         }
     }
@@ -201,39 +219,18 @@ private fun MonthHeader(
                 isNextEnabled = state.isNextEnabled
             )
         }
+        val totals = state.spending.associate { it.category.id to it.total }
         ShareBar(
             modifier = Modifier.padding(top = 12.dp, end = 8.dp),
-            spending = state.spending
+            // Fixed category order, so each segment grows or shrinks in place when the month changes.
+            items = ExpenseCategories.all.map { ShareBarItem(value = totals[it.id] ?: 0.0, colors = it.colors) }
         )
-    }
-}
-
-/** One bar split into a segment per category, sized by its share of the month. */
-@Composable
-private fun ShareBar(spending: List<CategorySpending>, modifier: Modifier = Modifier) {
-    val isDark = isSystemInDarkTheme()
-    val shares = spending.filter { it.share > 0.0 }
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(12.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.surfaceContainerHighest),
-        horizontalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        shares.forEach {
-            Box(
-                modifier = Modifier
-                    .weight(it.share.toFloat())
-                    .fillMaxHeight()
-                    .background(it.category.colors.container(isDark))
-            )
-        }
     }
 }
 
 @Composable
 private fun CategorySpendingItem(
+    modifier: Modifier = Modifier,
     spending: CategorySpending,
     index: Int,
     count: Int,
@@ -251,7 +248,7 @@ private fun CategorySpendingItem(
         content = {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    CategoryIcon(category = spending.category, colored = hasSpending)
+                    CategoryIcon(category = spending.category)
 
                     Column(
                         modifier = Modifier
@@ -279,16 +276,15 @@ private fun CategorySpendingItem(
                     }
                 }
 
-                if (hasSpending) {
-                    ProportionBar(
-                        modifier = Modifier.padding(start = 52.dp, top = 8.dp),
-                        fraction = spending.share,
-                        category = spending.category
-                    )
-                }
+                ProportionBar(
+                    modifier = Modifier.padding(start = 52.dp),
+                    visible = hasSpending,
+                    fraction = spending.share,
+                    category = spending.category
+                )
             }
         },
-        modifier = Modifier
+        modifier = modifier
             .testTag("category_item")
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
@@ -296,24 +292,59 @@ private fun CategorySpendingItem(
     )
 }
 
-/** A thin track filled up to [fraction] (0 to 1) in the category's color. */
+private object ProportionBarDefaults {
+    val AnimationEasing: Easing = LinearOutSlowInEasing
+    const val AnimationDuration: Int = 1000
+}
+
+/**
+ * A thin track filled up to [fraction] (0 to 1) in the category's color. The fill and its color animate;
+ * when [visible] turns false the bar fades and collapses as its fill shrinks to zero.
+ */
 @Composable
-private fun ProportionBar(fraction: Double, category: ExpenseCategory, modifier: Modifier = Modifier) {
+private fun ProportionBar(
+    modifier: Modifier = Modifier,
+    visible: Boolean,
+    fraction: Double,
+    category: ExpenseCategory,
+    animationSpec: AnimationSpec<Float> = tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing)
+) {
     val isDark = isSystemInDarkTheme()
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(4.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+    val animatedFraction by animateFloatAsState(
+        targetValue = fraction.toFloat().coerceIn(0f, 1f),
+        animationSpec = animationSpec,
+        label = "proportion"
+    )
+    // The row may show another category after a month change: blend into its color.
+    val fillColor by animateColorAsState(
+        targetValue = category.colors.container(isDark),
+        animationSpec = tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing),
+        label = "proportion_color"
+    )
+    AnimatedVisibility(
+        modifier = modifier,
+        visible = visible,
+        enter = fadeIn(tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing)) +
+            expandVertically(tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing)),
+        exit = fadeOut(tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing)) +
+            shrinkVertically(tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing))
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth(fraction.toFloat().coerceIn(0f, 1f))
-                .fillMaxHeight()
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+                .height(4.dp)
                 .clip(CircleShape)
-                .background(category.colors.container(isDark))
-        )
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(animatedFraction)
+                    .fillMaxHeight()
+                    .clip(CircleShape)
+                    .background(fillColor)
+            )
+        }
     }
 }
 

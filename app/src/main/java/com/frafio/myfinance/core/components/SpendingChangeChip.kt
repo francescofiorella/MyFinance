@@ -1,9 +1,12 @@
 package com.frafio.myfinance.core.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,11 +32,23 @@ fun SpendingChangeChip(
     textStyle: TextStyle = MaterialTheme.typography.labelLarge
 ) {
     when (change) {
-        SpendingChange.None -> Unit
+        SpendingChange.None -> {
+            val description = stringResource(id = R.string.spending_none_description)
+            Text(
+                modifier = modifier
+                    .padding(start = 4.dp)
+                    .clearAndSetSemantics { contentDescription = description },
+                text = stringResource(id = R.string.none_category_spending),
+                style = textStyle,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
         SpendingChange.New -> {
             val description = stringResource(id = R.string.spending_new_description)
             Text(
-                modifier = modifier.clearAndSetSemantics { contentDescription = description },
+                modifier = modifier
+                    .padding(start = 4.dp)
+                    .clearAndSetSemantics { contentDescription = description },
                 text = stringResource(id = R.string.new_category_spending),
                 style = textStyle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -79,10 +94,13 @@ fun SpendingChangeChip(
 @Composable
 fun SpendingChangeChipPreview() {
     MyFinanceTheme {
-        Row {
-            SpendingChangeChip(change = SpendingChange.Percent(0.12))
-            SpendingChangeChip(change = SpendingChange.Percent(-0.08))
-            SpendingChangeChip(change = SpendingChange.New)
+        Surface(modifier = Modifier.padding(16.dp)) {
+            Column {
+                SpendingChangeChip(change = SpendingChange.Percent(0.12))
+                SpendingChangeChip(change = SpendingChange.Percent(-0.08))
+                SpendingChangeChip(change = SpendingChange.New)
+                SpendingChangeChip(change = SpendingChange.None)
+            }
         }
     }
 }

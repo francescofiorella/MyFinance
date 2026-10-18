@@ -5,11 +5,13 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.utils.doubleToPrice
@@ -61,8 +63,11 @@ class CategoriesScreenTest {
 
         composeTestRule.onNodeWithText(string(R.string.housing)).assertIsDisplayed()
         composeTestRule.onNodeWithText("${doubleToPrice(450.0)} · 39%").assertIsDisplayed()
-        composeTestRule.onNodeWithText(string(R.string.no_spending_this_month)).performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText(string(R.string.education)).performScrollTo().assertIsDisplayed()
+        // A lazy list only composes what is on screen, so scroll the list to each node first.
+        composeTestRule.onNodeWithTag("categories_scroll").performScrollToNode(hasText(string(R.string.no_spending_this_month)))
+        composeTestRule.onNodeWithText(string(R.string.no_spending_this_month)).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("categories_scroll").performScrollToNode(hasText(string(R.string.education)))
+        composeTestRule.onNodeWithText(string(R.string.education)).assertIsDisplayed()
     }
 
     @Test

@@ -86,6 +86,22 @@ class ComponentScreenshotTests {
     }
 
     @Test
+    fun shareBar_multipleThemes() {
+        composeTestRule.captureMultiTheme("ShareBar") {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Box(Modifier.width(360.dp).padding(16.dp)) {
+                    ShareBar(
+                        items = listOf(45.0, 36.5, 0.0, 10.0).mapIndexed { index, value ->
+                            ShareBarItem(value = value, colors = ExpenseCategories.all[index].colors)
+                        },
+                        animationSpec = snap(),
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun emptyView_multipleThemes() {
         composeTestRule.captureMultiTheme("EmptyView") {
             Surface(color = MaterialTheme.colorScheme.background) {

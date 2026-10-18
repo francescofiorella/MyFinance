@@ -13,6 +13,7 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.utils.doubleToPrice
+import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.frafio.myfinance.testing.util.string
 import com.google.common.truth.Truth.assertThat
@@ -94,6 +95,17 @@ class CategoryDetailScreenTest {
 
         composeTestRule.onNodeWithText(string(R.string.dining_description)).assertIsDisplayed()
         composeTestRule.onNodeWithTag("category_see_all").assertDoesNotExist()
+    }
+
+    @Test
+    fun aMonthWithoutSpending_hidesBiggestExpenses_andShowsNoChange() {
+        // Spending only three months earlier: nothing this month or the one before.
+        val older = testExpense(price = 50.0, date = month.minusMonths(3), category = dining.id)
+        setScreen(stats = buildCategoryDetail(month, listOf(older), monthTotalAll = 0.0))
+
+        composeTestRule.onNodeWithText(string(R.string.biggest_expenses)).assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(string(R.string.spending_none_description), useUnmergedTree = true)
+            .assertIsDisplayed()
     }
 
     @Test
