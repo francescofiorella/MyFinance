@@ -300,10 +300,15 @@ class BaselineProfileGenerator {
         device.settle()
         device.pressBack()
         if (!device.awaitTag(containerTag, 10_000)) {
-            // A back press can occasionally get lost and leave the screen open, blocking every later step.
-            log("'$containerTag' not back after closing '$screenTag', pressing back again.")
-            device.pressBack()
-            device.awaitTag(containerTag, 10_000)
+            // Record what is on screen, then press back again only if the opened screen is really still there.
+            val stillOpen = device.hasObject(res(screenTag))
+            log("'$containerTag' not back after closing '$screenTag' ('$screenTag' still visible: $stillOpen).")
+            device.saveScreenshot("not-back-after-$screenTag")
+            if (stillOpen) {
+                log("Pressing back again.")
+                device.pressBack()
+                device.awaitTag(containerTag, 10_000)
+            }
         }
         device.settle()
     }

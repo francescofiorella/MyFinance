@@ -10,6 +10,7 @@ import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
+import java.io.File
 
 internal const val PACKAGE_NAME = "com.frafio.myfinance"
 internal const val TAG = "MyFinanceBP"
@@ -143,4 +144,16 @@ internal fun MacrobenchmarkScope.signIn() {
 
 internal fun log(message: String) {
     Log.i(TAG, message)
+}
+
+/**
+ * Saves a screenshot of the device to the test's additional output, which Gradle copies to
+ * `baselineProfile/build/outputs/connected_android_test_additional_output/` after the run.
+ */
+internal fun UiDevice.saveScreenshot(name: String) {
+    val dir = InstrumentationRegistry.getArguments().getString("additionalTestOutputDir")?.let(::File)
+        ?: InstrumentationRegistry.getInstrumentation().context.getExternalFilesDir(null)
+        ?: return
+    val file = File(dir, "$name-${System.currentTimeMillis()}.png")
+    log(if (takeScreenshot(file)) "Screenshot saved: ${file.name}" else "Screenshot failed: ${file.name}")
 }
