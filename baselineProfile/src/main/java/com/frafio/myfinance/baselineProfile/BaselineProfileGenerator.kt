@@ -125,6 +125,8 @@ class BaselineProfileGenerator {
                 device.settle()
                 device.pressBack()
                 device.settle()
+            } else {
+                closeSheet("filter_category")
             }
         }
 
@@ -134,6 +136,8 @@ class BaselineProfileGenerator {
                 device.settle()
                 device.pressBack()
                 device.settle()
+            } else {
+                closeSheet("filter_date_range")
             }
         }
 
@@ -173,6 +177,13 @@ class BaselineProfileGenerator {
 
         device.pressBack()
         device.awaitTag("expenses_list", 10_000)
+        device.settle()
+    }
+
+    // A sheet left open would cover every later step: close it when its entry is missing.
+    private fun MacrobenchmarkScope.closeSheet(missingTag: String) {
+        log("'$missingTag' not found, closing the sheet.")
+        device.pressBack()
         device.settle()
     }
 

@@ -16,6 +16,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +64,8 @@ fun AppBottomSheet(
             content = {
                 content()
             },
-            modifier = modifier
+            // The sheet has its own window, outside MainActivity's root: expose its test tags to UiAutomator here too.
+            modifier = modifier.semantics { testTagsAsResourceId = true }
         )
     }
 }
