@@ -170,15 +170,13 @@ class BaselineProfileGenerator {
                 log("'category_detail_scroll' never appeared.")
             }
             device.pressBack()
-            device.awaitTag("categories_scroll", 10_000)
-            device.settle()
+            confirmBack("categories_scroll", "category_detail_scroll")
         } else {
             log("No category row ('category_item'), skipping the detail.")
         }
 
         device.pressBack()
-        device.awaitTag("expenses_list", 10_000)
-        device.settle()
+        confirmBack("expenses_list", "categories_scroll")
     }
 
     // A sheet left open would cover every later step: close it when its entry is missing.
@@ -203,8 +201,7 @@ class BaselineProfileGenerator {
             log("'frequent_expenses_list' never appeared.")
         }
         device.pressBack()
-        device.awaitTag("category_detail_scroll", 10_000)
-        device.settle()
+        confirmBack("category_detail_scroll", "frequent_expenses_list")
     }
 
     private fun MacrobenchmarkScope.transactionEditJourney() {
@@ -227,8 +224,7 @@ class BaselineProfileGenerator {
             device.settle()
         }
         closeAddScreen()
-        device.awaitTag("expenses_list", 10_000)
-        device.settle()
+        confirmBack("expenses_list", "add_name_field") { closeAddScreen() }
     }
 
     private fun MacrobenchmarkScope.budgetJourney() {
@@ -283,8 +279,7 @@ class BaselineProfileGenerator {
             log("'manage_categories_list' never appeared.")
         }
         device.pressBack()
-        device.awaitTag("profile_scroll", 10_000)
-        device.settle()
+        confirmBack("profile_scroll", "manage_categories_list")
     }
 
     private fun MacrobenchmarkScope.openAndClose(containerTag: String, entryTag: String, screenTag: String) {
@@ -299,18 +294,7 @@ class BaselineProfileGenerator {
         }
         device.settle()
         device.pressBack()
-        if (!device.awaitTag(containerTag, 10_000)) {
-            // Record what is on screen, then press back again only if the opened screen is really still there.
-            val stillOpen = device.hasObject(res(screenTag))
-            log("'$containerTag' not back after closing '$screenTag' ('$screenTag' still visible: $stillOpen).")
-            device.saveScreenshot("not-back-after-$screenTag")
-            if (stillOpen) {
-                log("Pressing back again.")
-                device.pressBack()
-                device.awaitTag(containerTag, 10_000)
-            }
-        }
-        device.settle()
+        confirmBack(containerTag, screenTag)
     }
 
     private fun MacrobenchmarkScope.addTransactionJourney() {
@@ -331,14 +315,13 @@ class BaselineProfileGenerator {
         device.await("add_amount_field", 5_000)?.typeText("12.34")
         device.settle()
 
+        // Back would close the whole Add screen; its close button collapses the type selection first.
         if (device.tap("add_type_button")) {
-            device.pressBack()
-            device.settle()
+            device.tap("add_close_button")
         }
 
         closeAddScreen()
-        device.awaitTag("tab_dashboard", 10_000)
-        device.settle()
+        confirmBack("tab_dashboard", "add_name_field") { closeAddScreen() }
     }
 
     private fun MacrobenchmarkScope.launchShortcut(action: String) {
@@ -351,6 +334,28 @@ class BaselineProfileGenerator {
         if (!device.awaitTag("add_name_field", 15_000)) {
             log("Add screen never appeared for $action - the shortcut needs a signed-in session.")
         }
+    }
+
+    /**
+     * Waits for [expectedTag] after closing [openTag]. If it does not come back, logs whether [openTag] is
+     * still on screen, saves a screenshot, and runs [closeAgain] only when [openTag] really is still there.
+     */
+    private fun MacrobenchmarkScope.confirmBack(
+        expectedTag: String,
+        openTag: String,
+        closeAgain: () -> Unit = { device.pressBack() }
+    ) {
+        if (!device.awaitTag(expectedTag, 10_000)) {
+            val stillOpen = device.hasObject(res(openTag))
+            log("'$expectedTag' not back after closing '$openTag' ('$openTag' still visible: $stillOpen).")
+            device.saveScreenshot("not-back-after-$openTag")
+            if (stillOpen) {
+                log("Closing '$openTag' again.")
+                closeAgain()
+                device.awaitTag(expectedTag, 10_000)
+            }
+        }
+        device.settle()
     }
 
     private fun MacrobenchmarkScope.closeAddScreen() {
