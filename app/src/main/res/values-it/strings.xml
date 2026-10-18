@@ -172,7 +172,7 @@
     <string name="spending_up_percent">In aumento del %1$s rispetto al mese scorso</string>
     <string name="spending_down_percent">In calo del %1$s rispetto al mese scorso</string>
     <string name="spending_new_description">Nessuna spesa il mese scorso</string>
-    <string name="spending_none_description">Nessuna spesa nei mesi</string>
+    <string name="spending_none_description">Nessuna spesa in entrambi i mesi</string>
     <string name="monthly_average">Media mensile</string>
     <string name="year_to_date">Da inizio anno</string>
     <string name="share_of_month">Quota del mese</string>
