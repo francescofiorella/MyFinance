@@ -242,6 +242,10 @@ class BaselineProfileGenerator {
         entry.click()
         if (device.awaitTag("manage_categories_list", 10_000)) {
             device.settle()
+            if (device.tap("manage_category_item")) {
+                log("Category description expanded.")
+                device.settle()
+            }
             device.scrollBothWays("manage_categories_list")
         } else {
             log("'manage_categories_list' never appeared.")
