@@ -165,7 +165,7 @@ fun HomeScreen(
                                 )
                             )
                         },
-                        onManageCategories = { onNavigateToRoot(RootKey.Categories) },
+                        onCategoriesClick = { onNavigateToRoot(RootKey.Categories) },
                         onManageLabels = { onNavigateToRoot(RootKey.Labels) },
                         getDateLabel = getDateLabel
                     )

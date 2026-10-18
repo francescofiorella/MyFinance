@@ -145,8 +145,8 @@ class BaselineProfileGenerator {
      * untouched: it would replace the Expenses filters the rest of the journey relies on.
      */
     private fun MacrobenchmarkScope.categoriesJourney() {
-        val entry = device.scrollTo("expenses_list", "expenses_manage_categories") ?: run {
-            log("Entry 'expenses_manage_categories' not found, skipping.")
+        val entry = device.scrollTo("expenses_list", "expenses_categories") ?: run {
+            log("Entry 'expenses_categories' not found, skipping.")
             return
         }
         log("Categories.")

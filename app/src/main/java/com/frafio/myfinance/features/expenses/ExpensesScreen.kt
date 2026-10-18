@@ -86,7 +86,7 @@ fun ExpensesScreen(
     viewModel: ExpensesViewModel,
     onEditExpense: (Expense, Int) -> Unit,
     onDuplicateExpense: (Expense) -> Unit,
-    onManageCategories: () -> Unit,
+    onCategoriesClick: () -> Unit,
     onManageLabels: () -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
     modifier: Modifier = Modifier,
@@ -276,7 +276,7 @@ fun ExpensesScreen(
             viewModel.setEditingExpense(expense)
             showCategorySheet = true
         },
-        onManageCategories = onManageCategories,
+        onCategoriesClick = onCategoriesClick,
         onManageLabels = onManageLabels,
         getDateLabel = getDateLabel,
         modifier = modifier
@@ -305,7 +305,7 @@ fun ExpensesContent(
     onFilterClick: () -> Unit,
     onItemLongClick: (Expense, Int) -> Unit,
     onCategoryClick: (Expense, Int) -> Unit,
-    onManageCategories: () -> Unit,
+    onCategoriesClick: () -> Unit,
     onManageLabels: () -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
     modifier: Modifier = Modifier,
@@ -368,20 +368,20 @@ fun ExpensesContent(
                                     customItem(
                                         {
                                             FilledTonalIconButton(
-                                                onClick = onManageCategories,
+                                                onClick = onCategoriesClick,
                                                 shapes = IconButtonDefaults.shapes(
                                                     shape = IconButtonDefaults.smallRoundShape,
                                                     pressedShape = IconButtonDefaults.smallRoundShape
                                                 ),
                                                 interactionSource = categoriesInteractionSource,
                                                 modifier = Modifier
-                                                    .testTag("expenses_manage_categories")
+                                                    .testTag("expenses_categories")
                                                     .size(IconButtonDefaults.smallContainerSize())
                                                     .animateWidth(categoriesInteractionSource),
                                             ) {
                                                 Icon(
                                                     painter = painterResource(id = R.drawable.ic_grid_3x3_filled),
-                                                    contentDescription = stringResource(id = R.string.manage_categories),
+                                                    contentDescription = stringResource(id = R.string.expenses_by_category),
                                                 )
                                             }
                                         },
@@ -651,7 +651,7 @@ fun ExpensesPreview() {
             onFilterClick = {},
             onItemLongClick = { _, _ -> },
             onCategoryClick = { _, _ -> },
-            onManageCategories = {},
+            onCategoriesClick = {},
             onManageLabels = {},
             getDateLabel = { _, _ -> "Oct 27, 2023" },
             itemMetadata = emptyMap(),

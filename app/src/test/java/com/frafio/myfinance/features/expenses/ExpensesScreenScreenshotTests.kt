@@ -105,7 +105,7 @@ class ExpensesScreenScreenshotTests {
             onFilterClick = {},
             onItemLongClick = { _, _ -> },
             onCategoryClick = { _, _ -> },
-            onManageCategories = {},
+            onCategoriesClick = {},
             onManageLabels = {},
             getDateLabel = ::screenshotDateLabel,
         )

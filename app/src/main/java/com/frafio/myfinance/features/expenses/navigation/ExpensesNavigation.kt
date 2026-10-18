@@ -21,7 +21,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
     resetParentScrollEvents: () -> Unit,
     onEditExpense: (Expense, Int) -> Unit,
     onDuplicateExpense: (Expense) -> Unit,
-    onManageCategories: () -> Unit,
+    onCategoriesClick: () -> Unit,
     onManageLabels: () -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
 ) {
@@ -82,7 +82,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
             viewModel = viewModel,
             onEditExpense = onEditExpense,
             onDuplicateExpense = onDuplicateExpense,
-            onManageCategories = onManageCategories,
+            onCategoriesClick = onCategoriesClick,
             onManageLabels = onManageLabels,
             getDateLabel = getDateLabel
         )

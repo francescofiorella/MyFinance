@@ -86,7 +86,7 @@ class ExpensesScreenTest {
                 viewModel = viewModel,
                 onEditExpense = { expense, index -> edited += expense to index },
                 onDuplicateExpense = { duplicated += it },
-                onManageCategories = { navigation += "categories" },
+                onCategoriesClick = { navigation += "categories" },
                 onManageLabels = { navigation += "labels" },
                 getDateLabel = { _, _ -> "range" },
             )
@@ -145,7 +145,7 @@ class ExpensesScreenTest {
     fun manageButtons_invokeTheirCallbacks() {
         populated()
 
-        composeTestRule.onNodeWithTag("expenses_manage_categories").performClick()
+        composeTestRule.onNodeWithTag("expenses_categories").performClick()
         composeTestRule.onNodeWithTag("expenses_manage_labels").performClick()
 
         assertThat(navigation).containsExactly("categories", "labels").inOrder()
@@ -157,12 +157,12 @@ class ExpensesScreenTest {
 
         composeTestRule.onNodeWithTag("search_field").performClick()
 
-        composeTestRule.onNodeWithTag("expenses_manage_categories").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("expenses_categories").assertDoesNotExist()
         composeTestRule.onNodeWithTag("expenses_manage_labels").assertDoesNotExist()
 
         composeTestRule.onNodeWithTag("search_back_button").performClick()
 
-        composeTestRule.onNodeWithTag("expenses_manage_categories").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("expenses_categories").assertIsDisplayed()
         composeTestRule.onNodeWithTag("expenses_manage_labels").assertIsDisplayed()
     }
 

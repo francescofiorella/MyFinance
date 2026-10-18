@@ -156,8 +156,8 @@ class NavigationTest {
     }
 
     @Test
-    fun expenses_manageCategories_opensCategories_andBackReturns() {
-        assertExpensesSubScreen(entry = "expenses_manage_categories", content = "categories_scroll")
+    fun expenses_categories_opensCategories_andBackReturns() {
+        assertExpensesSubScreen(entry = "expenses_categories", content = "categories_scroll")
     }
 
     @Test
