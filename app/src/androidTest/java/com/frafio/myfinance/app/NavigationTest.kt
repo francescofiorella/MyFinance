@@ -146,8 +146,8 @@ class NavigationTest {
     }
 
     @Test
-    fun profile_manageCategories_opensCategories_andBackReturns() {
-        assertProfileSubScreen(entry = "profile_manage_categories", content = "categories_scroll")
+    fun profile_manageCategories_opensManageCategories_andBackReturns() {
+        assertProfileSubScreen(entry = "profile_manage_categories", content = "manage_categories_list")
     }
 
     @Test

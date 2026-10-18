@@ -63,7 +63,7 @@ fun ProfileScreen(
     initialUser: User? = null,
     initialProfilePicture: Bitmap? = null,
     onManageLabels: () -> Unit,
-    onCategoriesClick: () -> Unit,
+    onManageCategories: () -> Unit,
     onChangePassword: () -> Unit
 ) {
     val userState by viewModel.user.collectAsStateWithLifecycle()
@@ -147,7 +147,7 @@ fun ProfileScreen(
         onEditFullName = { showEditFullNameSheet = true },
         onDynamicColorChanged = { viewModel.setDynamicColor(it) },
         onManageLabels = onManageLabels,
-        onCategoriesClick = onCategoriesClick,
+        onManageCategories = onManageCategories,
         onSelectCurrency = { showCurrencySheet = true },
         onChangePasswordClick = onChangePassword,
         currencyCode = currencyCode
@@ -168,7 +168,7 @@ internal fun ProfileContent(
     onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
     onManageLabels: () -> Unit,
-    onCategoriesClick: () -> Unit,
+    onManageCategories: () -> Unit,
     onSelectCurrency: () -> Unit,
     onChangePasswordClick: () -> Unit,
     currencyCode: String
@@ -195,7 +195,7 @@ internal fun ProfileContent(
             onEditFullName = onEditFullName,
             onDynamicColorChanged = onDynamicColorChanged,
             onManageLabels = onManageLabels,
-            onCategoriesClick = onCategoriesClick,
+            onManageCategories = onManageCategories,
             onSelectCurrency = onSelectCurrency,
             onChangePasswordClick = onChangePasswordClick,
             currencyCode = currencyCode
@@ -242,7 +242,7 @@ private fun ProfileCards(
     onEditFullName: () -> Unit,
     onDynamicColorChanged: (Boolean) -> Unit,
     onManageLabels: () -> Unit,
-    onCategoriesClick: () -> Unit,
+    onManageCategories: () -> Unit,
     onSelectCurrency: () -> Unit,
     onChangePasswordClick: () -> Unit,
     currencyCode: String
@@ -584,7 +584,7 @@ private fun ProfileCards(
     val myFinanceItemCount = (if (isDynamicColorAvailable) 1 else 0) + 4
 
     SegmentedListItem(
-        onClick = onCategoriesClick,
+        onClick = onManageCategories,
         colors = colors,
         shapes = ListItemDefaults.segmentedShapes(
             index = 0,
@@ -840,7 +840,7 @@ fun ProfilePreview() {
             onEditFullName = {},
             onDynamicColorChanged = {},
             onManageLabels = {},
-            onCategoriesClick = {},
+            onManageCategories = {},
             onSelectCurrency = {},
             onChangePasswordClick = {},
             currencyCode = "EUR"

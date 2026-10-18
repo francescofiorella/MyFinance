@@ -55,6 +55,7 @@ import com.frafio.myfinance.features.categories.navigation.categoriesEntry
 import com.frafio.myfinance.features.categorydetail.navigation.categoryDetailEntry
 import com.frafio.myfinance.features.home.HomeScreen
 import com.frafio.myfinance.features.labels.navigation.labelsEntry
+import com.frafio.myfinance.features.managecategories.navigation.manageCategoriesEntry
 import com.frafio.myfinance.features.password.navigation.changePasswordEntry
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
@@ -185,6 +186,9 @@ class MainActivity : ComponentActivity() {
                         )
                         changePasswordEntry(
                             appState = appState,
+                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
+                        )
+                        manageCategoriesEntry(
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
                         )
                         categoriesEntry(

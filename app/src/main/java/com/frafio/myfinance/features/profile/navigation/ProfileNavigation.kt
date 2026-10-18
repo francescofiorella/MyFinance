@@ -21,7 +21,7 @@ fun EntryProviderScope<NavKey>.profileEntry(
     initialUser: User? = null,
     profilePicture: Bitmap? = null,
     onManageLabels: () -> Unit,
-    onCategoriesClick: () -> Unit,
+    onManageCategories: () -> Unit,
     onChangePassword: () -> Unit
 ) {
     entry<HomeTabKey.Profile> {
@@ -73,7 +73,7 @@ fun EntryProviderScope<NavKey>.profileEntry(
             initialUser = initialUser,
             initialProfilePicture = profilePicture,
             onManageLabels = onManageLabels,
-            onCategoriesClick = onCategoriesClick,
+            onManageCategories = onManageCategories,
             onChangePassword = onChangePassword
         )
     }

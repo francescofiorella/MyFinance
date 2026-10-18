@@ -22,6 +22,9 @@ sealed interface RootKey : NavKey {
     data object Categories : RootKey
 
     @Serializable
+    data object ManageCategories : RootKey
+
+    @Serializable
     data class CategoryDetail(val categoryId: Int, val year: Int, val month: Int) : RootKey
 
     @Serializable

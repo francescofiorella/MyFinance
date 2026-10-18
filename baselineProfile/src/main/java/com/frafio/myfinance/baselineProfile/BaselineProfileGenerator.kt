@@ -214,7 +214,8 @@ class BaselineProfileGenerator {
             device.tap("profile_edit_profile")
         }
 
-        // Categories and labels are opened from the Expenses tab instead.
+        // Labels and the spending overview are opened from the Expenses tab; category management from here.
+        manageCategoriesJourney()
         openAndClose("profile_scroll", "profile_change_password", "change_password_scroll")
 
         device.scrollTo("profile_scroll", "profile_change_currency")?.let {
@@ -229,6 +230,24 @@ class BaselineProfileGenerator {
             it.setGestureMargin(device.displayWidth / 10)
             it.scroll(Direction.UP, 1.0f)
         }
+        device.settle()
+    }
+
+    private fun MacrobenchmarkScope.manageCategoriesJourney() {
+        val entry = device.scrollTo("profile_scroll", "profile_manage_categories") ?: run {
+            log("Entry 'profile_manage_categories' not found, skipping.")
+            return
+        }
+        log("Manage categories.")
+        entry.click()
+        if (device.awaitTag("manage_categories_list", 10_000)) {
+            device.settle()
+            device.scrollBothWays("manage_categories_list")
+        } else {
+            log("'manage_categories_list' never appeared.")
+        }
+        device.pressBack()
+        device.awaitTag("profile_scroll", 10_000)
         device.settle()
     }
 
