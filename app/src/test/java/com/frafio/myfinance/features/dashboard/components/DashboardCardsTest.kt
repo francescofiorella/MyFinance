@@ -1,11 +1,16 @@
 package com.frafio.myfinance.features.dashboard.components
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.frafio.myfinance.R
@@ -133,6 +138,65 @@ class DashboardCardsTest {
         navButtons()[1].assertIsEnabled().performClick()
 
         assertThat(events).containsExactly("next")
+    }
+
+    // January 2023 to December 2024, as loaded for the longest range.
+    private val twoYears = (0 until 24).map { BarChartEntry(value = 100.0 + it, year = 2023 + it / 12, month = it % 12 + 1) }
+
+    private fun showRangedChart() {
+        var range by mutableIntStateOf(0)
+        composeTestRule.setThemedContent {
+            MonthlyExpensesChartCard(
+                barChartData = twoYears, monthlyBudget = 0.0,
+                onPreviousDate = {}, onNextDate = {}, onToday = {},
+                selectedRange = range, onSelectedRangeChange = { range = it; events += "range:$it" },
+            )
+        }
+    }
+
+    private fun bar(monthYear: String) = composeTestRule.onNodeWithContentDescription(monthYear, substring = true)
+
+    @Test
+    fun monthlyChart_rangeButtons_showTheLatestMonthsOfTheSelectedRange() {
+        showRangedChart()
+
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_6_months)).assertIsOn()
+        bar("July 2024").assertExists()
+        bar("June 2024").assertDoesNotExist()
+
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_1_year)).performClick()
+        bar("January 2024").assertExists()
+        bar("December 2023").assertDoesNotExist()
+
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_2_years)).performClick()
+        bar("January 2023").assertExists()
+
+        assertThat(events).containsExactly("range:1", "range:2").inOrder()
+    }
+
+    @Test
+    fun monthlyChart_rangeChange_keepsTheSelectedMonthWhileItIsShown() {
+        showRangedChart()
+        bar("September 2024").performClick()
+
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_1_year)).performClick()
+        composeTestRule.onNodeWithText("September 2024").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_6_months)).performClick()
+        composeTestRule.onNodeWithText("September 2024").assertIsDisplayed()
+    }
+
+    @Test
+    fun monthlyChart_rangeChange_selectsTheLatestMonth_whenTheSelectedOneIsNoLongerShown() {
+        showRangedChart()
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_2_years)).performClick()
+        bar("February 2023").performClick()
+        composeTestRule.onNodeWithText("February 2023").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_6_months)).performClick()
+
+        composeTestRule.onNodeWithText("December 2024").assertIsDisplayed()
+        composeTestRule.onNodeWithText("February 2023").assertDoesNotExist()
     }
 
     // endregion

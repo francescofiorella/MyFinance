@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.dashboard.components
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,8 +24,10 @@ import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.components.BarChart
+import com.frafio.myfinance.core.components.ConnectedToggleRow
 import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.features.dashboard.DashboardViewModel
 
 @Composable
 fun MonthlyExpensesChartCard(
@@ -33,12 +36,17 @@ fun MonthlyExpensesChartCard(
     onPreviousDate: () -> Unit,
     onNextDate: () -> Unit,
     onToday: () -> Unit,
-    onVisibleCountChanged: (Int) -> Unit = {},
+    selectedRange: Int = 0,
+    onSelectedRangeChange: (Int) -> Unit = {},
     isNextDateEnabled: Boolean = true,
     isPreviousDateEnabled: Boolean = true
 ) {
-    // -1 selects the latest month.
+    // Index into barChartData; -1 selects the latest month.
     var selectedMonth by rememberSaveable { mutableIntStateOf(-1) }
+    val rangeCounts = DashboardViewModel.BAR_CHART_RANGE_COUNTS
+    val shownCount = rangeCounts[selectedRange.coerceIn(rangeCounts.indices)]
+    val shownData = barChartData.takeLast(shownCount)
+    val firstShown = barChartData.size - shownData.size
 
     Card(
         modifier = Modifier
@@ -79,12 +87,28 @@ fun MonthlyExpensesChartCard(
                 )
             }
 
+            ConnectedToggleRow(
+                modifier = Modifier.padding(bottom = 16.dp),
+                options = listOf(
+                    stringResource(R.string.bar_chart_range_6_months),
+                    stringResource(R.string.bar_chart_range_1_year),
+                    stringResource(R.string.bar_chart_range_2_years)
+                ),
+                selectedIndex = selectedRange,
+                onSelect = { range ->
+                    // Keep the selected month only if the new range still shows it.
+                    val newFirstShown = barChartData.size - minOf(rangeCounts[range], barChartData.size)
+                    if (selectedMonth < newFirstShown) selectedMonth = -1
+                    onSelectedRangeChange(range)
+                }
+            )
+
             BarChart(
-                entries = barChartData,
-                selectedIndex = selectedMonth,
-                onSelectedIndexChange = { selectedMonth = it },
+                entries = shownData,
+                selectedIndex = if (selectedMonth >= firstShown) selectedMonth - firstShown else -1,
+                onSelectedIndexChange = { selectedMonth = it + firstShown },
                 referenceValue = monthlyBudget,
-                onVisibleCountChanged = onVisibleCountChanged
+                entryAnimationSpec = tween(durationMillis = 500)
             )
         }
     }

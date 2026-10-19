@@ -160,15 +160,16 @@ class DashboardViewModel @Inject constructor(
         .map { it.isBefore(today.with(TemporalAdjusters.firstDayOfMonth())) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    private val _barChartVisibleItems = MutableStateFlow(6)
+    private val _barChartRange = MutableStateFlow(0)
+    val barChartRange: StateFlow<Int> = _barChartRange.asStateFlow()
 
     val isPreviousBarChartDateEnabled: StateFlow<Boolean> = combine(
         _lastDateForBarChart,
-        _barChartVisibleItems,
+        _barChartRange,
         earliestExpenseDate
-    ) { date, visibleItems, earliest ->
+    ) { date, range, earliest ->
         earliest?.let {
-            val oldestShown = date.minusMonths(visibleItems.toLong() - 1)
+            val oldestShown = date.minusMonths(BAR_CHART_RANGE_COUNTS[range].toLong() - 1)
             (oldestShown.year > it.year) || (oldestShown.year == it.year && oldestShown.monthValue > it.month)
         } ?: false
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -176,18 +177,15 @@ class DashboardViewModel @Inject constructor(
     private val _scrollToTop = MutableSharedFlow<Unit>(replay = 0)
     val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()
 
-    val barChartData: StateFlow<List<BarChartEntry>> = combine(
-        _lastDateForBarChart,
-        _barChartVisibleItems
-    ) { date, visibleItems ->
-        date to visibleItems
-    }.flatMapLatest { (date, visibleItems) ->
+    /** The months of the longest range, so switching range only changes how many the chart shows. */
+    val barChartData: StateFlow<List<BarChartEntry>> = _lastDateForBarChart.flatMapLatest { date ->
+        val count = BAR_CHART_RANGE_COUNTS.last()
         val nextMonth = date.plusMonths(1)
-        val firstDate = nextMonth.minusMonths(visibleItems.toLong())
+        val firstDate = nextMonth.minusMonths(count.toLong())
         expensesLocalRepository.getPriceSumAfterAndBefore(
             firstDate.year, firstDate.monthValue,
             nextMonth.year, nextMonth.monthValue
-        ).map { entries -> fillMonthlyGaps(entries, lastMonth = date, count = visibleItems) }
+        ).map { entries -> fillMonthlyGaps(entries, lastMonth = date, count = count) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val pieChartExpenses: StateFlow<List<Expense>> = combine(
@@ -241,8 +239,8 @@ class DashboardViewModel @Inject constructor(
         _lastDateForBarChart.value = today.with(TemporalAdjusters.firstDayOfMonth())
     }
 
-    fun setBarChartVisibleItems(count: Int) {
-        _barChartVisibleItems.value = count
+    fun selectBarChartRange(index: Int) {
+        _barChartRange.value = index.coerceIn(BAR_CHART_RANGE_COUNTS.indices)
     }
 
     fun switchPieChartData(setMonthly: Boolean) {
@@ -292,5 +290,10 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             _scrollToTop.emit(Unit)
         }
+    }
+
+    companion object {
+        /** Months shown by each range of the monthly expenses chart, shortest first. */
+        val BAR_CHART_RANGE_COUNTS = listOf(6, 12, 24)
     }
 }

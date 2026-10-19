@@ -79,6 +79,7 @@ fun DashboardContent(
     val todaySum by viewModel.todaySum.collectAsStateWithLifecycle()
     val annualBalanceData by viewModel.annualBalanceData.collectAsStateWithLifecycle()
     val barChartData by viewModel.barChartData.collectAsStateWithLifecycle()
+    val barChartRange by viewModel.barChartRange.collectAsStateWithLifecycle()
     val isNextBarDateEnabled by viewModel.isNextBarChartDateEnabled.collectAsStateWithLifecycle()
     val isPreviousBarDateEnabled by viewModel.isPreviousBarChartDateEnabled.collectAsStateWithLifecycle()
     val pieExpenses by viewModel.pieChartExpenses.collectAsStateWithLifecycle()
@@ -115,7 +116,8 @@ fun DashboardContent(
             onPreviousDate = { viewModel.previousBarChartDate() },
             onNextDate = { viewModel.nextBarChartDate() },
             onToday = { viewModel.todayBarChartDate() },
-            onVisibleCountChanged = { viewModel.setBarChartVisibleItems(it) },
+            selectedRange = barChartRange,
+            onSelectedRangeChange = viewModel::selectBarChartRange,
             isNextDateEnabled = isNextBarDateEnabled,
             isPreviousDateEnabled = isPreviousBarDateEnabled
         )
@@ -184,7 +186,6 @@ fun DashboardPreview() {
                 onPreviousBarDate = {},
                 onTodayBarDate = {},
                 onNextBarDate = {},
-                onVisibleCountChangedBarChart = {},
                 onSwitchPieData = {},
                 onPreviousPieDate = {},
                 onNextPieDate = {},
@@ -217,7 +218,8 @@ internal fun DashboardContent(
     onPreviousBarDate: () -> Unit,
     onNextBarDate: () -> Unit,
     onTodayBarDate: () -> Unit,
-    onVisibleCountChangedBarChart: (Int) -> Unit = {},
+    barChartRange: Int = 0,
+    onSelectBarChartRange: (Int) -> Unit = {},
     isNextBarDateEnabled: Boolean = true,
     isPreviousBarDateEnabled: Boolean = true,
     onSwitchPieData: (Boolean) -> Unit,
@@ -255,7 +257,8 @@ internal fun DashboardContent(
             onPreviousDate = onPreviousBarDate,
             onNextDate = onNextBarDate,
             onToday = onTodayBarDate,
-            onVisibleCountChanged = onVisibleCountChangedBarChart,
+            selectedRange = barChartRange,
+            onSelectedRangeChange = onSelectBarChartRange,
             isNextDateEnabled = isNextBarDateEnabled,
             isPreviousDateEnabled = isPreviousBarDateEnabled
         )

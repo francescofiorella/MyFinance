@@ -247,7 +247,7 @@ class DashboardViewModelTest {
             testExpense(name = "B", price = 50.0, date = fiveMonthsAgo),
         )
 
-        val expected = (5 downTo 0).map { back ->
+        val expected = (23 downTo 0).map { back ->
             val month = thisMonth.minusMonths(back.toLong())
             val value = when (back) {
                 2 -> 20.0
@@ -260,34 +260,57 @@ class DashboardViewModelTest {
     }
 
     @Test
-    fun barChartData_queriesASixMonthWindowEndingNextMonth() = runTest {
+    fun barChartData_queriesTheLongestRangeEndingNextMonth() = runTest {
         collect(viewModel.barChartData)
         expensesLocalRepository.sendExpenses(emptyList())
 
-        // The window is [thisMonth - 5, thisMonth + 1); expenses outside it are ignored.
+        // The window is [thisMonth - 23, thisMonth + 1); expenses outside it are ignored.
         expensesLocalRepository.sendExpenses(
-            testExpense(name = "In", price = 1.0, date = thisMonth.minusMonths(5)),
-            testExpense(name = "Out", price = 99.0, date = thisMonth.minusMonths(6)),
+            testExpense(name = "In", price = 1.0, date = thisMonth.minusMonths(23)),
+            testExpense(name = "Out", price = 99.0, date = thisMonth.minusMonths(24)),
         )
 
         val entries = viewModel.barChartData.value
-        assertThat(entries).hasSize(6)
+        assertThat(entries).hasSize(24)
         assertThat(entries.first().value).isEqualTo(1.0)
         assertThat(entries.sumOf { it.value }).isEqualTo(1.0)
     }
 
     @Test
-    fun setBarChartVisibleItems_widensTheWindow() = runTest {
-        collect(viewModel.barChartData)
+    fun selectBarChartRange_doesNotChangeTheLoadedMonths() = runTest {
+        collect(viewModel.barChartData, viewModel.barChartRange)
         expensesLocalRepository.sendExpenses(
-            testExpense(name = "Old", price = 7.0, date = thisMonth.minusMonths(9)),
+            testExpense(name = "Old", price = 7.0, date = thisMonth.minusMonths(20)),
         )
-        assertThat(viewModel.barChartData.value.sumOf { it.value }).isEqualTo(0.0)
 
-        viewModel.setBarChartVisibleItems(12)
+        viewModel.selectBarChartRange(1)
 
-        assertThat(viewModel.barChartData.value).hasSize(12)
+        assertThat(viewModel.barChartRange.value).isEqualTo(1)
+        assertThat(viewModel.barChartData.value).hasSize(24)
         assertThat(viewModel.barChartData.value.sumOf { it.value }).isEqualTo(7.0)
+    }
+
+    @Test
+    fun selectBarChartRange_movesTheOldestShownMonth() = runTest {
+        collect(viewModel.isPreviousBarChartDateEnabled, viewModel.earliestExpenseDate)
+        expensesLocalRepository.sendExpenses(testExpense(date = thisMonth.minusMonths(6)))
+        assertThat(viewModel.isPreviousBarChartDateEnabled.value).isTrue()
+
+        // Twelve months reach back to the earliest expense.
+        viewModel.selectBarChartRange(1)
+        assertThat(viewModel.isPreviousBarChartDateEnabled.value).isFalse()
+
+        expensesLocalRepository.sendExpenses(testExpense(date = thisMonth.minusMonths(12)))
+        assertThat(viewModel.isPreviousBarChartDateEnabled.value).isTrue()
+    }
+
+    @Test
+    fun selectBarChartRange_outOfBounds_isClamped() = runTest {
+        collect(viewModel.barChartRange)
+
+        viewModel.selectBarChartRange(7)
+
+        assertThat(viewModel.barChartRange.value).isEqualTo(2)
     }
 
     @Test
