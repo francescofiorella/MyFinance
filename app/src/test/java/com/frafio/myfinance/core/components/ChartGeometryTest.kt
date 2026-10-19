@@ -23,6 +23,52 @@ class ChartGeometryTest {
     }
 
     @Test
+    fun axisLabelStep_isOne_whileSlotsFitALabel() {
+        assertThat(axisLabelStep(50.dp)).isEqualTo(1)
+        assertThat(axisLabelStep(20.dp)).isEqualTo(1)
+    }
+
+    @Test
+    fun axisLabelStep_skipsEnoughBars_toFitALabelOnNarrowSlots() {
+        // 20 / 12.5 = 1.6 → 2
+        assertThat(axisLabelStep(12.5.dp)).isEqualTo(2)
+        // 20 / 7 = 2.86 → 3
+        assertThat(axisLabelStep(7.dp)).isEqualTo(3)
+    }
+
+    @Test
+    fun axisLabelStep_withoutWidth_isOne() {
+        assertThat(axisLabelStep(0.dp)).isEqualTo(1)
+    }
+
+    @Test
+    fun isAxisLabelShown_stepOne_labelsEveryBar() {
+        assertThat((0..5).all { isAxisLabelShown(it, latestPosition = 5, selectedPosition = 2, step = 1) }).isTrue()
+    }
+
+    @Test
+    fun isAxisLabelShown_countsBackFromTheLatest() {
+        val shown = (0..7).filter { isAxisLabelShown(it, latestPosition = 7, selectedPosition = 7, step = 2) }
+
+        assertThat(shown).containsExactly(1, 3, 5, 7).inOrder()
+    }
+
+    @Test
+    fun isAxisLabelShown_labelsTheSelected_andHidesItsCloseNeighbours() {
+        val shown = (0..7).filter { isAxisLabelShown(it, latestPosition = 7, selectedPosition = 4, step = 2) }
+
+        // 3 and 5 are on the step but next to the selected 4.
+        assertThat(shown).containsExactly(1, 4, 7).inOrder()
+    }
+
+    @Test
+    fun isAxisLabelShown_handlesBarsAfterTheLatest() {
+        // A bar animating out after the latest one sits at a negative distance from it.
+        assertThat(isAxisLabelShown(9, latestPosition = 7, selectedPosition = 3, step = 2)).isTrue()
+        assertThat(isAxisLabelShown(8, latestPosition = 7, selectedPosition = 3, step = 2)).isFalse()
+    }
+
+    @Test
     fun arcGapDegrees_isTheArcWidthPlusOffset_asAnAngleOnTheRadius() {
         val expected = (18f / 80f) * (180f / PI.toFloat())
 
