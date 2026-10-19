@@ -12,10 +12,14 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.width
 import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.utils.activeCurrencyCode
 import com.frafio.myfinance.testing.util.setThemedContent
@@ -181,6 +185,8 @@ class BarChartTest {
         assertThat(reported).containsExactly(10)
     }
 
+    private fun bar(monthYear: String) = composeTestRule.onNodeWithContentDescription(monthYear, substring = true)
+
     // January 2023 to December 2024, oldest first.
     private val twoYears = (0 until 24).map { BarChartEntry(value = 10.0 + it, year = 2023 + it / 12, month = it % 12 + 1) }
 
@@ -216,7 +222,7 @@ class BarChartTest {
     }
 
     @Test
-    fun withEntryAnimation_removedBarsShrinkOutBeforeDisappearing() {
+    fun withEntryAnimation_removedBarsSlideOutAtTheSameWidthAsTheOthers() {
         var shown by mutableStateOf(twoYears.takeLast(12))
         composeTestRule.setThemedContent {
             Box(Modifier.requiredWidth(300.dp)) {
@@ -229,11 +235,36 @@ class BarChartTest {
         Snapshot.withMutableSnapshot { shown = twoYears.takeLast(6) }
         composeTestRule.mainClock.advanceTimeBy(100)
         composeTestRule.onAllNodes(isToggleable()).assertCountEquals(12)
+        val leaving = bar("January 2024").getUnclippedBoundsInRoot().width
+        val staying = bar("December 2024").getUnclippedBoundsInRoot().width
+        assertThat(leaving.value).isWithin(1f).of(staying.value)
 
         composeTestRule.mainClock.advanceTimeBy(1_000)
         composeTestRule.onAllNodes(isToggleable()).assertCountEquals(6)
         composeTestRule.onNodeWithText("07").assertIsDisplayed()
         composeTestRule.onNodeWithText("06").assertDoesNotExist()
+    }
+
+    @Test
+    fun withEntryAnimation_remainingBarsKeepTheirHeight_whenRemovedBarsAreDropped() {
+        var shown by mutableStateOf(twoYears.takeLast(12))
+        composeTestRule.setThemedContent {
+            Box(Modifier.requiredWidth(300.dp)) {
+                BarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
+            }
+        }
+        composeTestRule.mainClock.autoAdvance = false
+
+        Snapshot.withMutableSnapshot { shown = twoYears.takeLast(6) }
+        var frames = 0
+        while (composeTestRule.onAllNodes(isToggleable()).fetchSemanticsNodes().size != 6 && frames++ < 200) {
+            composeTestRule.mainClock.advanceTimeByFrame()
+        }
+
+        // On the first frame without the removed bars, December 2024 (the tallest) is still full height.
+        composeTestRule.onAllNodes(isToggleable()).assertCountEquals(6)
+        val height = bar("December 2024").getUnclippedBoundsInRoot().height
+        assertThat(height.value).isWithin(1f).of(BarChartDefaults.BarMaxHeight.value)
     }
 
     @Test

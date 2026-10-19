@@ -69,6 +69,33 @@ class ChartGeometryTest {
     }
 
     @Test
+    fun stripIndexAt_onConsecutiveMonths_isTheMonthOffset() {
+        val keys = listOf(10, 11, 12, 13)
+
+        assertThat(stripIndexAt(keys, 10f)).isEqualTo(0f)
+        assertThat(stripIndexAt(keys, 12.5f)).isEqualTo(2.5f)
+    }
+
+    @Test
+    fun stripIndexAt_outsideTheBars_countsOneBarPerMonth() {
+        val keys = listOf(10, 11, 12)
+
+        assertThat(stripIndexAt(keys, 7f)).isEqualTo(-3f)
+        assertThat(stripIndexAt(keys, 14f)).isEqualTo(4f)
+    }
+
+    @Test
+    fun stripIndexAt_acrossAGap_spreadsTheMonthsOverOneBar() {
+        // Bars for months 10 and 14 only: month 12 is halfway between them.
+        assertThat(stripIndexAt(listOf(10, 14), 12f)).isEqualTo(0.5f)
+    }
+
+    @Test
+    fun stripIndexAt_withoutBars_isZero() {
+        assertThat(stripIndexAt(emptyList(), 5f)).isEqualTo(0f)
+    }
+
+    @Test
     fun arcGapDegrees_isTheArcWidthPlusOffset_asAnAngleOnTheRadius() {
         val expected = (18f / 80f) * (180f / PI.toFloat())
 

@@ -4,7 +4,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -30,7 +30,9 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,6 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -45,7 +49,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -89,8 +92,20 @@ internal fun isAxisLabelShown(position: Int, latestPosition: Int, selectedPositi
         (Math.floorMod(latestPosition - position, step) == 0 && abs(position - selectedPosition) >= step)
 
 /**
+ * Where [key] falls among the sorted bar [keys], as a fractional bar index: between two bars it is
+ * proportional to the months in between, outside them one bar per month.
+ */
+internal fun stripIndexAt(keys: List<Int>, key: Float): Float {
+    if (keys.isEmpty()) return 0f
+    if (key <= keys.first()) return key - keys.first()
+    if (key >= keys.last()) return keys.lastIndex + (key - keys.last())
+    val i = keys.indexOfLast { it <= key }
+    return i + (key - keys[i]) / (keys[i + 1] - keys[i])
+}
+
+/**
  * A bar chart that keeps its own selection, starting on the latest month. With an
- * [entryAnimationSpec], bars added or removed between entry changes grow in and shrink out.
+ * [entryAnimationSpec], entry changes animate as one strip of equal bars, matched by month.
  */
 @Composable
 fun BarChart(
@@ -124,8 +139,9 @@ fun BarChart(
 
 /**
  * A bar chart whose selection is hoisted. A [selectedIndex] outside [entries] (e.g. -1) selects the
- * latest month, so resetting it to -1 goes back to the default. With an [entryAnimationSpec], bars
- * added or removed between entry changes grow in and shrink out, matched by month.
+ * latest month, so resetting it to -1 goes back to the default. With an [entryAnimationSpec], entry
+ * changes animate as one strip of equal bars, matched by month: the shown months scroll and zoom to
+ * the new ones, so added bars slide in and removed ones slide out at the edges.
  */
 @Composable
 fun BarChart(
@@ -152,9 +168,8 @@ fun BarChart(
             val max = entries.maxOfOrNull { it.value } ?: 0.0
             if (max == 0.0) 1.0 else max
         }
-        val bars = rememberDrawnBars(entries, maxValue, entryAnimationSpec)
-        val minWeight = minBarWeight(bars.size, constraints.maxWidth)
-        val labelStep = axisLabelStep(if (entries.isEmpty()) maxWidth else maxWidth / entries.size)
+        val strip = rememberBarStrip(entries, maxValue, entryAnimationSpec)
+        val viewportWidth = maxWidth
 
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -162,33 +177,22 @@ fun BarChart(
             BarChartHeader(entry = entries.getOrNull(shownIndex))
             Spacer(modifier = Modifier.height(16.dp))
             BarChartBars(
-                bars = bars,
+                strip = strip,
                 selectedIndex = shownIndex,
                 onBarClick = onSelectedIndexChange,
                 maxValue = maxValue,
                 referenceValue = referenceValue,
                 latestValue = entries.lastOrNull()?.value,
-                animateHeights = entryAnimationSpec == null,
-                minWeight = minWeight,
+                isAnimated = entryAnimationSpec != null,
                 barWidth = barWidth,
                 barPadding = barPadding,
                 barMaxHeight = barMaxHeight
             )
             Spacer(modifier = Modifier.height(4.dp))
-            BarChartAxis(bars = bars, selectedIndex = shownIndex, labelStep = labelStep, minWeight = minWeight)
+            BarChartAxis(strip = strip, selectedIndex = shownIndex, viewportWidth = viewportWidth)
         }
     }
 }
-
-/**
- * The weight of a fully shrunk bar: enough for about 2 px, as the ButtonGroup loses its rounding
- * remainder on zero-width items, overflows and fails to measure.
- */
-private fun minBarWeight(barCount: Int, maxWidthPx: Int): Float =
-    if (maxWidthPx in 1 until Constraints.Infinity) 2f * barCount / maxWidthPx else 0.001f
-
-/** Bars fade only while nearly shrunk, so the minimum weight leaves no visible sliver. */
-private fun barAlpha(presence: Float): Float = (presence * 5f).coerceAtMost(1f)
 
 private fun BarChartEntry.monthYear(): String =
     YearMonth.of(year, month).format(DateTimeFormatter.ofPattern("MMMM yyyy"))
@@ -200,79 +204,112 @@ private val BarChartEntry.monthKey: Int
 private fun BarChartEntry.heightFraction(maxValue: Double): Float =
     (value / maxValue).toFloat().coerceIn(0.01f, 1f)
 
-/** A bar as drawn: [index] points into the entries, or is -1 while the bar animates out. */
+/** A bar as drawn: [index] points into the entries, or is -1 while the bar slides out. */
 private class DrawnBar(
     val entry: BarChartEntry,
     val index: Int,
-    val presence: () -> Float,
     val heightFraction: () -> Float
 )
+
+/**
+ * Equal bars side by side, of which the ones from [start] to [end] (fractional bar indices) fill the
+ * chart width; the others lie outside it.
+ */
+private class BarStrip(
+    val bars: List<DrawnBar>,
+    val start: () -> Float,
+    val end: () -> Float
+)
+
+/** Lays the content out as the whole [strip], scaled and shifted so its visible window fills the width. */
+private fun Modifier.stripWindow(strip: BarStrip): Modifier = layout { measurable, constraints ->
+    val width = constraints.maxWidth
+    val start = strip.start()
+    val slot = width / (strip.end() - start + 1f).coerceAtLeast(1f)
+    val stripWidth = (slot * strip.bars.size).roundToInt()
+    val placeable = measurable.measure(constraints.copy(minWidth = stripWidth, maxWidth = stripWidth))
+    layout(width, placeable.height) {
+        placeable.place((-start * slot).roundToInt(), 0)
+    }
+}
 
 /**
  * Animation state keyed by month rather than position, since bars are added and removed on either
  * side and the [ButtonGroup] composes its items by position.
  */
 private class BarTransitions {
-    private val presence = HashMap<Int, Animatable<Float, AnimationVector1D>>()
     private val heights = HashMap<Int, Animatable<Float, AnimationVector1D>>()
+    // Month keys of the first and last bar filling the width.
+    private var first: Animatable<Float, AnimationVector1D>? = null
+    private var last: Animatable<Float, AnimationVector1D>? = null
     private var drawn: List<DrawnBar> = emptyList()
 
-    /** The bars for [entries], plus the removed ones that haven't finished shrinking out. */
-    fun update(entries: List<BarChartEntry>, maxValue: Double): List<DrawnBar> {
-        // Bars shown first appear at once; later ones grow in.
-        val initialPresence = if (drawn.isEmpty()) 1f else 0f
+    /** The strip for [entries], keeping the removed bars until they have slid out. */
+    fun update(entries: List<BarChartEntry>, maxValue: Double): BarStrip {
+        if (entries.isEmpty()) {
+            heights.clear()
+            first = null
+            last = null
+            drawn = emptyList()
+            return BarStrip(emptyList(), { 0f }, { 0f })
+        }
+        // The first entries are shown at once, without sliding in.
+        val first = first ?: Animatable(entries.first().monthKey.toFloat()).also { first = it }
+        val last = last ?: Animatable(entries.last().monthKey.toFloat()).also { last = it }
         val current = entries.mapIndexed { index, entry ->
-            val p = presence.getOrPut(entry.monthKey) { Animatable(initialPresence) }
             val h = heights.getOrPut(entry.monthKey) { Animatable(entry.heightFraction(maxValue)) }
-            DrawnBar(entry, index, { p.value }, { h.value })
+            DrawnBar(entry, index) { h.value }
         }
         val currentKeys = entries.mapTo(HashSet()) { it.monthKey }
         val leaving = drawn
-            .filter { it.entry.monthKey !in currentKeys && it.entry.monthKey in presence }
-            .map { DrawnBar(it.entry, -1, it.presence, it.heightFraction) }
+            .filter { it.entry.monthKey !in currentKeys && it.entry.monthKey in heights }
+            .map { DrawnBar(it.entry, -1, it.heightFraction) }
         drawn = (current + leaving).sortedBy { it.entry.monthKey }
-        return drawn
+        val keys = drawn.map { it.entry.monthKey }
+        return BarStrip(drawn, { stripIndexAt(keys, first.value) }, { stripIndexAt(keys, last.value) })
     }
 
-    /** Grows [entries] in, shrinks the others out and rescales heights, then forgets the removed bars. */
+    /** Moves the window onto [entries] and rescales every drawn bar, then forgets the removed ones. */
     suspend fun animateTo(entries: List<BarChartEntry>, maxValue: Double, spec: FiniteAnimationSpec<Float>) {
-        val targets = entries.associate { it.monthKey to it.heightFraction(maxValue) }
+        val first = first ?: return
+        val last = last ?: return
+        val bars = drawn
         coroutineScope {
-            presence.toList().forEach { (key, p) ->
-                launch { p.animateTo(if (key in targets) 1f else 0f, spec) }
-            }
-            targets.forEach { (key, target) ->
-                heights[key]?.let { h -> launch { h.animateTo(target, spec) } }
+            launch { first.animateTo(entries.first().monthKey.toFloat(), spec) }
+            launch { last.animateTo(entries.last().monthKey.toFloat(), spec) }
+            bars.forEach { bar ->
+                val h = heights[bar.entry.monthKey] ?: return@forEach
+                launch { h.animateTo(bar.entry.heightFraction(maxValue), spec) }
             }
         }
-        presence.keys.retainAll(targets.keys)
-        heights.keys.retainAll(targets.keys)
+        heights.keys.retainAll(entries.mapTo(HashSet()) { it.monthKey })
     }
 }
 
 @Composable
-private fun rememberDrawnBars(
+private fun rememberBarStrip(
     entries: List<BarChartEntry>,
     maxValue: Double,
     animationSpec: FiniteAnimationSpec<Float>?
-): List<DrawnBar> {
+): BarStrip {
     if (animationSpec == null) {
         return remember(entries, maxValue) {
-            entries.mapIndexed { index, entry ->
+            val bars = entries.mapIndexed { index, entry ->
                 val fraction = entry.heightFraction(maxValue)
-                DrawnBar(entry, index, { 1f }, { fraction })
+                DrawnBar(entry, index) { fraction }
             }
+            BarStrip(bars, { 0f }, { (bars.size - 1).toFloat() })
         }
     }
     val transitions = remember { BarTransitions() }
-    // Bumped once removed bars are gone, so they are dropped from the drawn list.
+    // Bumped once removed bars have slid out, so they are dropped from the strip.
     var settled by remember { mutableIntStateOf(0) }
-    val bars = remember(entries, maxValue, settled) { transitions.update(entries, maxValue) }
+    val strip = remember(entries, maxValue, settled) { transitions.update(entries, maxValue) }
     LaunchedEffect(entries, maxValue) {
         transitions.animateTo(entries, maxValue, animationSpec)
         settled++
     }
-    return bars
+    return strip
 }
 
 @Composable
@@ -294,16 +331,28 @@ private fun BarChartHeader(entry: BarChartEntry?) {
     }
 }
 
+/** What a bar shows, passed as one value so an animated bar can move between positions with its state. */
+private class ChartBarState(
+    val modifier: Modifier,
+    val entry: BarChartEntry,
+    val heightFraction: Float,
+    val animateHeight: Boolean,
+    val isSelected: Boolean,
+    val onClick: () -> Unit,
+    val interactionSource: MutableInteractionSource,
+    val barWidth: Dp,
+    val barPadding: Dp
+)
+
 @Composable
 private fun BarChartBars(
-    bars: List<DrawnBar>,
+    strip: BarStrip,
     selectedIndex: Int,
     onBarClick: (Int) -> Unit,
     maxValue: Double,
     referenceValue: Double?,
     latestValue: Double?,
-    animateHeights: Boolean,
-    minWeight: Float,
+    isAnimated: Boolean,
     barWidth: Dp,
     barPadding: Dp,
     barMaxHeight: Dp
@@ -315,41 +364,57 @@ private fun BarChartBars(
         contentAlignment = Alignment.BottomStart
     ) {
         val interactionSources = remember { HashMap<Int, MutableInteractionSource>() }
-        ButtonGroup(
+        // The ButtonGroup composes by position, while animated bars shift position as others slide
+        // in and out: movable content keeps each bar's state with its month.
+        val movableBars = remember { HashMap<Int, @Composable (ChartBarState) -> Unit>() }
+        SideEffect {
+            val keys = strip.bars.mapTo(HashSet()) { it.entry.monthKey }
+            movableBars.keys.retainAll(keys)
+            interactionSources.keys.retainAll(keys)
+        }
+        Box(
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.Bottom,
-            overflowIndicator = { menuState ->
-                ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
-            }
+                .fillMaxSize()
+                .then(if (isAnimated) Modifier.clipToBounds() else Modifier),
+            contentAlignment = Alignment.BottomStart
         ) {
-            bars.forEach { bar ->
-                val interactionSource = interactionSources.getOrPut(bar.entry.monthKey) { MutableInteractionSource() }
-                customItem(
-                    {
-                        val presence = bar.presence()
-                        ChartBar(
-                            modifier = Modifier
-                                .weight(presence.coerceAtLeast(minWeight))
-                                .animateWidth(interactionSource)
-                                .alpha(barAlpha(presence)),
-                            barWidth = barWidth,
-                            barPadding = barPadding * presence,
-                            heightFraction = bar.heightFraction(),
-                            animateHeight = animateHeights,
-                            isSelected = bar.index >= 0 && selectedIndex == bar.index,
-                            contentDescription = stringResource(
-                                R.string.chart_bar,
-                                bar.entry.monthYear(),
-                                doubleToPrice(bar.entry.value)
-                            ),
-                            onClick = { if (bar.index >= 0) onBarClick(bar.index) },
-                            interactionSource = interactionSource
-                        )
-                    },
-                    {}
-                )
+            ButtonGroup(
+                modifier = Modifier
+                    .stripWindow(strip)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.Bottom,
+                overflowIndicator = { menuState ->
+                    ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+                }
+            ) {
+                strip.bars.forEach { bar ->
+                    val key = bar.entry.monthKey
+                    val interactionSource = interactionSources.getOrPut(key) { MutableInteractionSource() }
+                    customItem(
+                        {
+                            val state = ChartBarState(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .animateWidth(interactionSource),
+                                entry = bar.entry,
+                                heightFraction = bar.heightFraction(),
+                                animateHeight = !isAnimated,
+                                isSelected = bar.index >= 0 && selectedIndex == bar.index,
+                                onClick = { if (bar.index >= 0) onBarClick(bar.index) },
+                                interactionSource = interactionSource,
+                                barWidth = barWidth,
+                                barPadding = barPadding
+                            )
+                            if (isAnimated) {
+                                movableBars.getOrPut(key) { movableContentOf { s: ChartBarState -> ChartBar(s) } }(state)
+                            } else {
+                                ChartBar(state)
+                            }
+                        },
+                        {}
+                    )
+                }
             }
         }
 
@@ -391,20 +456,28 @@ private fun BarChartBars(
 }
 
 @Composable
-private fun BarChartAxis(bars: List<DrawnBar>, selectedIndex: Int, labelStep: Int, minWeight: Float) {
+private fun BarChartAxis(strip: BarStrip, selectedIndex: Int, viewportWidth: Dp) {
+    val bars = strip.bars
     val latestPosition = bars.indexOfLast { it.index >= 0 }
     val selectedPosition = bars.indexOfFirst { it.index >= 0 && it.index == selectedIndex }
+    // Read while composing, so labels thin out progressively as the bars narrow.
+    val start = strip.start()
+    val visibleBars = (strip.end() - start + 1f).coerceAtLeast(1f)
+    val labelStep = axisLabelStep(viewportWidth / visibleBars)
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .stripWindow(strip)
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         bars.forEachIndexed { position, bar ->
-            val presence = bar.presence()
-            val weightModifier = Modifier.weight(presence.coerceAtLeast(minWeight))
             if (!isAxisLabelShown(position, latestPosition, selectedPosition, labelStep)) {
-                Spacer(modifier = weightModifier)
+                Spacer(modifier = Modifier.weight(1f))
                 return@forEachIndexed
             }
+            // Labels of bars outside the width are hidden rather than clipped, so edge labels can overflow.
+            val center = position - start + 0.5f
+            val isInside = center in 0f..visibleBars
             val isSelected = position == selectedPosition
             val shortLabel = "%02d".format(bar.entry.month).takeLast(2)
             val extendedLabel = shortLabel + "/" + "%02d".format(bar.entry.year).takeLast(2)
@@ -413,8 +486,9 @@ private fun BarChartAxis(bars: List<DrawnBar>, selectedIndex: Int, labelStep: In
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                 color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = weightModifier
-                    .alpha(barAlpha(presence))
+                modifier = Modifier
+                    .weight(1f)
+                    .alpha(if (isInside) 1f else 0f)
                     .wrapContentWidth(
                         align = Alignment.CenterHorizontally,
                         unbounded = true
@@ -429,38 +503,34 @@ private fun BarChartAxis(bars: List<DrawnBar>, selectedIndex: Int, labelStep: In
 }
 
 @Composable
-private fun ChartBar(
-    modifier: Modifier = Modifier,
-    barWidth: Dp = 40.dp,
-    barPadding: Dp = 3.dp,
-    heightFraction: Float,
-    animateHeight: Boolean,
-    isSelected: Boolean,
-    contentDescription: String,
-    onClick: () -> Unit,
-    interactionSource: MutableInteractionSource
-) {
+private fun ChartBar(state: ChartBarState) {
     val animatedHeightFraction by animateFloatAsState(
-        targetValue = heightFraction,
-        animationSpec = if (animateHeight) tween(durationMillis = 500) else snap(),
+        targetValue = state.heightFraction,
+        animationSpec = tween(durationMillis = 500),
         label = "BarHeight"
     )
+    val contentDescription = stringResource(
+        R.string.chart_bar,
+        state.entry.monthYear(),
+        doubleToPrice(state.entry.value)
+    )
     ToggleButton(
-        checked = isSelected,
+        checked = state.isSelected,
         onCheckedChange = {
-            if (it) onClick()
+            if (it) state.onClick()
         },
         content = {},
         colors = ToggleButtonDefaults.colors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             checkedContainerColor = MaterialTheme.colorScheme.primary
         ),
-        modifier = modifier
+        modifier = state.modifier
             .semantics { this.contentDescription = contentDescription }
-            .fillMaxHeight(animatedHeightFraction)
-            .padding(horizontal = barPadding)
-            .width(barWidth),
-        interactionSource = interactionSource
+            // Animated strips drive heights themselves, keyed by month.
+            .fillMaxHeight(if (state.animateHeight) animatedHeightFraction else state.heightFraction)
+            .padding(horizontal = state.barPadding)
+            .width(state.barWidth),
+        interactionSource = state.interactionSource
     )
 }
 
