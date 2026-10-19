@@ -164,6 +164,34 @@ class HomeViewModelTest {
         assertThat(loadingRepository.isFirstSync.value).isFalse()
     }
 
+    @Test
+    fun mainEvents_emittedBeforeTheUiCollects_areDeliveredWhenItStarts() = runTest {
+        userRepository.isUserLoggedResult = AuthResult(AuthCode.USER_NOT_LOGGED)
+
+        // The startup check runs before setContent starts collecting.
+        viewModel.checkUser(notify = false)
+        val mainEvents = collectMainEvents()
+
+        assertThat(mainEvents).containsExactly(MainEvent.UserNotLogged)
+    }
+
+    @Test
+    fun mainEvents_alreadyDelivered_areNotDeliveredAgainAfterTheUiIsRecreated() = runTest {
+        userRepository.isUserLoggedResult = AuthResult(AuthCode.USER_NOT_LOGGED)
+        val firstUi = mutableListOf<MainEvent>()
+        val firstCollector = backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.mainEvents.toList(firstUi) }
+        viewModel.checkUser(notify = false)
+        userRepository.isUserLoggedResult = AuthResult(AuthCode.USER_LOGGED)
+        viewModel.checkUser(notify = true)
+
+        // A rotation recreates the activity, which collects again from the same ViewModel.
+        firstCollector.cancel()
+        val recreatedUi = collectMainEvents()
+
+        assertThat(firstUi).containsExactly(MainEvent.UserNotLogged)
+        assertThat(recreatedUi).isEmpty()
+    }
+
     // endregion
 
     // region navigation and scroll events

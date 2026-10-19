@@ -101,8 +101,9 @@ class HomeViewModel @Inject constructor(
     private val _uiEvents = MutableSharedFlow<HomeUiEvent>()
     val uiEvents: SharedFlow<HomeUiEvent> = _uiEvents.asSharedFlow()
 
-    private val _mainEvents = MutableSharedFlow<MainEvent>(replay = 1)
-    val mainEvents: SharedFlow<MainEvent> = _mainEvents.asSharedFlow()
+    // Buffered until collected, then consumed: a recreated activity must not receive them again.
+    private val _mainEvents = Channel<MainEvent>(Channel.BUFFERED)
+    val mainEvents: Flow<MainEvent> = _mainEvents.receiveAsFlow()
 
     fun navigateTo(key: NavKey) {
         viewModelScope.launch { _navEvents.send(key) }
@@ -144,7 +145,7 @@ class HomeViewModel @Inject constructor(
 
                     AuthCode.USER_NOT_LOGGED.code -> {
                         _uiState.value = HomeUiState.Complete
-                        _mainEvents.emit(MainEvent.UserNotLogged)
+                        _mainEvents.send(MainEvent.UserNotLogged)
                         loadingRepository.stopLoading()
                         loadingRepository.stopFirstSync()
                     }
@@ -200,7 +201,7 @@ class HomeViewModel @Inject constructor(
             if (logoutResult.code == AuthCode.LOGOUT_SUCCESS.code) {
                 expensesRepository.stopSnapshotListener()
                 incomeRepository.stopSnapshotListener()
-                _mainEvents.emit(MainEvent.LogoutSuccess)
+                _mainEvents.send(MainEvent.LogoutSuccess)
             }
         }
     }
