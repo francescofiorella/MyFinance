@@ -80,6 +80,7 @@ fun DashboardContent(
     val annualBalanceData by viewModel.annualBalanceData.collectAsStateWithLifecycle()
     val barChartData by viewModel.barChartData.collectAsStateWithLifecycle()
     val barChartRange by viewModel.barChartRange.collectAsStateWithLifecycle()
+    val barChartShownCount by viewModel.barChartShownCount.collectAsStateWithLifecycle()
     val isNextBarDateEnabled by viewModel.isNextBarChartDateEnabled.collectAsStateWithLifecycle()
     val isPreviousBarDateEnabled by viewModel.isPreviousBarChartDateEnabled.collectAsStateWithLifecycle()
     val pieExpenses by viewModel.pieChartExpenses.collectAsStateWithLifecycle()
@@ -118,6 +119,8 @@ fun DashboardContent(
             onToday = { viewModel.todayBarChartDate() },
             selectedRange = barChartRange,
             onSelectedRangeChange = viewModel::selectBarChartRange,
+            shownCount = barChartShownCount,
+            onVisibleCountChanged = viewModel::setBarChartVisibleItems,
             isNextDateEnabled = isNextBarDateEnabled,
             isPreviousDateEnabled = isPreviousBarDateEnabled
         )
@@ -220,6 +223,8 @@ internal fun DashboardContent(
     onTodayBarDate: () -> Unit,
     barChartRange: Int = 0,
     onSelectBarChartRange: (Int) -> Unit = {},
+    barChartShownCount: Int = barChartData.size,
+    onVisibleCountChangedBarChart: (Int) -> Unit = {},
     isNextBarDateEnabled: Boolean = true,
     isPreviousBarDateEnabled: Boolean = true,
     onSwitchPieData: (Boolean) -> Unit,
@@ -259,6 +264,8 @@ internal fun DashboardContent(
             onToday = onTodayBarDate,
             selectedRange = barChartRange,
             onSelectedRangeChange = onSelectBarChartRange,
+            shownCount = barChartShownCount,
+            onVisibleCountChanged = onVisibleCountChangedBarChart,
             isNextDateEnabled = isNextBarDateEnabled,
             isPreviousDateEnabled = isPreviousBarDateEnabled
         )

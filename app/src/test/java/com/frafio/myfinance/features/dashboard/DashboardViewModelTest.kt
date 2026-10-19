@@ -297,7 +297,7 @@ class DashboardViewModelTest {
         assertThat(viewModel.isPreviousBarChartDateEnabled.value).isTrue()
 
         // Twelve months reach back to the earliest expense.
-        viewModel.selectBarChartRange(1)
+        viewModel.selectBarChartRange(2)
         assertThat(viewModel.isPreviousBarChartDateEnabled.value).isFalse()
 
         expensesLocalRepository.sendExpenses(testExpense(date = thisMonth.minusMonths(12)))
@@ -310,7 +310,46 @@ class DashboardViewModelTest {
 
         viewModel.selectBarChartRange(7)
 
-        assertThat(viewModel.barChartRange.value).isEqualTo(2)
+        assertThat(viewModel.barChartRange.value).isEqualTo(3)
+    }
+
+    @Test
+    fun barChartShownCount_dynamicRange_followsTheBarsThatFit() = runTest {
+        collect(viewModel.barChartShownCount)
+        assertThat(viewModel.barChartRange.value).isEqualTo(0)
+        assertThat(viewModel.barChartShownCount.value).isEqualTo(6)
+
+        viewModel.setBarChartVisibleItems(9)
+        assertThat(viewModel.barChartShownCount.value).isEqualTo(9)
+
+        viewModel.selectBarChartRange(3)
+        assertThat(viewModel.barChartShownCount.value).isEqualTo(24)
+    }
+
+    @Test
+    fun isPreviousBarChartDateEnabled_dynamicRange_usesTheBarsThatFit() = runTest {
+        collect(viewModel.isPreviousBarChartDateEnabled, viewModel.earliestExpenseDate)
+        expensesLocalRepository.sendExpenses(testExpense(date = thisMonth.minusMonths(8)))
+        assertThat(viewModel.isPreviousBarChartDateEnabled.value).isTrue()
+
+        // Nine bars reach back to the earliest expense.
+        viewModel.setBarChartVisibleItems(9)
+
+        assertThat(viewModel.isPreviousBarChartDateEnabled.value).isFalse()
+    }
+
+    @Test
+    fun barChartData_loadsMoreThanTheLongestRange_whenMoreBarsFit() = runTest {
+        collect(viewModel.barChartData)
+        expensesLocalRepository.sendExpenses(
+            testExpense(name = "Old", price = 7.0, date = thisMonth.minusMonths(29)),
+        )
+        assertThat(viewModel.barChartData.value).hasSize(24)
+
+        viewModel.setBarChartVisibleItems(30)
+
+        assertThat(viewModel.barChartData.value).hasSize(30)
+        assertThat(viewModel.barChartData.value.sumOf { it.value }).isEqualTo(7.0)
     }
 
     @Test

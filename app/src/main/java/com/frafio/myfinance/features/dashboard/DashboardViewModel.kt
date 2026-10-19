@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -163,13 +164,20 @@ class DashboardViewModel @Inject constructor(
     private val _barChartRange = MutableStateFlow(0)
     val barChartRange: StateFlow<Int> = _barChartRange.asStateFlow()
 
+    // How many bars fit the chart width, used by the dynamic range.
+    private val _barChartVisibleItems = MutableStateFlow(6)
+
+    val barChartShownCount: StateFlow<Int> = combine(_barChartRange, _barChartVisibleItems) { range, visibleItems ->
+        BAR_CHART_RANGE_COUNTS[range] ?: visibleItems
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _barChartVisibleItems.value)
+
     val isPreviousBarChartDateEnabled: StateFlow<Boolean> = combine(
         _lastDateForBarChart,
-        _barChartRange,
+        barChartShownCount,
         earliestExpenseDate
-    ) { date, range, earliest ->
+    ) { date, shownCount, earliest ->
         earliest?.let {
-            val oldestShown = date.minusMonths(BAR_CHART_RANGE_COUNTS[range].toLong() - 1)
+            val oldestShown = date.minusMonths(shownCount.toLong() - 1)
             (oldestShown.year > it.year) || (oldestShown.year == it.year && oldestShown.monthValue > it.month)
         } ?: false
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -177,9 +185,13 @@ class DashboardViewModel @Inject constructor(
     private val _scrollToTop = MutableSharedFlow<Unit>(replay = 0)
     val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()
 
-    /** The months of the longest range, so switching range only changes how many the chart shows. */
-    val barChartData: StateFlow<List<BarChartEntry>> = _lastDateForBarChart.flatMapLatest { date ->
-        val count = BAR_CHART_RANGE_COUNTS.last()
+    /** The months of the longest range, or more if more fit the width, so switching range only changes how many the chart shows. */
+    val barChartData: StateFlow<List<BarChartEntry>> = combine(
+        _lastDateForBarChart,
+        _barChartVisibleItems.map { maxOf(it, BAR_CHART_RANGE_COUNTS.maxOf { count -> count ?: 0 }) }.distinctUntilChanged()
+    ) { date, count ->
+        date to count
+    }.flatMapLatest { (date, count) ->
         val nextMonth = date.plusMonths(1)
         val firstDate = nextMonth.minusMonths(count.toLong())
         expensesLocalRepository.getPriceSumAfterAndBefore(
@@ -243,6 +255,10 @@ class DashboardViewModel @Inject constructor(
         _barChartRange.value = index.coerceIn(BAR_CHART_RANGE_COUNTS.indices)
     }
 
+    fun setBarChartVisibleItems(count: Int) {
+        _barChartVisibleItems.value = count
+    }
+
     fun switchPieChartData(setMonthly: Boolean) {
         _monthlyShownInPieChart.value = setMonthly
         if (setMonthly) {
@@ -293,7 +309,7 @@ class DashboardViewModel @Inject constructor(
     }
 
     companion object {
-        /** Months shown by each range of the monthly expenses chart, shortest first. */
-        val BAR_CHART_RANGE_COUNTS = listOf(6, 12, 24)
+        /** Months shown by each range of the monthly expenses chart; null is dynamic, as many as fit the width. */
+        val BAR_CHART_RANGE_COUNTS: List<Int?> = listOf(null, 6, 12, 24)
     }
 }

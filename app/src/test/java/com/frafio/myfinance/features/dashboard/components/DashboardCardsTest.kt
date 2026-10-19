@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.isToggleable
@@ -143,6 +144,9 @@ class DashboardCardsTest {
     // January 2023 to December 2024, as loaded for the longest range.
     private val twoYears = (0 until 24).map { BarChartEntry(value = 100.0 + it, year = 2023 + it / 12, month = it % 12 + 1) }
 
+    // Months per range as the ViewModel would report them, with the dynamic range fitting 6.
+    private val rangeCounts = listOf(6, 6, 12, 24)
+
     private fun showRangedChart() {
         var range by mutableIntStateOf(0)
         composeTestRule.setThemedContent {
@@ -150,6 +154,7 @@ class DashboardCardsTest {
                 barChartData = twoYears, monthlyBudget = 0.0,
                 onPreviousDate = {}, onNextDate = {}, onToday = {},
                 selectedRange = range, onSelectedRangeChange = { range = it; events += "range:$it" },
+                shownCount = rangeCounts[range], onVisibleCountChanged = { events += "visible:$it" },
             )
         }
     }
@@ -160,7 +165,8 @@ class DashboardCardsTest {
     fun monthlyChart_rangeButtons_showTheLatestMonthsOfTheSelectedRange() {
         showRangedChart()
 
-        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_6_months)).assertIsOn()
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_dynamic)).assertIsOn()
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_6_months)).assertIsOff()
         bar("July 2024").assertExists()
         bar("June 2024").assertDoesNotExist()
 
@@ -171,7 +177,15 @@ class DashboardCardsTest {
         composeTestRule.onNodeWithText(string(R.string.bar_chart_range_2_years)).performClick()
         bar("January 2023").assertExists()
 
-        assertThat(events).containsExactly("range:1", "range:2").inOrder()
+        assertThat(events.filter { it.startsWith("range") }).containsExactly("range:2", "range:3").inOrder()
+    }
+
+    @Test
+    fun monthlyChart_reportsHowManyBarsFitTheCard() {
+        showRangedChart()
+
+        // 411 dp minus the card's 2 * 16 and 2 * 24 dp padding, over 40 + 2 * 3 dp per bar.
+        assertThat(events).contains("visible:7")
     }
 
     @Test
