@@ -68,7 +68,7 @@
     <string name="this_month">Spese questo mese</string>
     <string name="this_year_next">Spese quest\'anno</string>
     <string name="monthly_expenses">Spese mensili</string>
-    <string name="bar_chart_range_dynamic">Dinamico</string>
+    <string name="bar_chart_range_dynamic">Auto</string>
     <string name="bar_chart_range_6_months">6M</string>
     <string name="bar_chart_range_1_year">1A</string>
     <string name="bar_chart_range_2_years">2A</string>
