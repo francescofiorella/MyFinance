@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
-/** Connected toggle buttons where exactly one of [options] is selected. */
+/** Connected toggle buttons of equal width, filling the available width, where exactly one of [options] is selected. */
 @Composable
 fun ConnectedToggleRow(
     options: List<String>,
@@ -32,6 +32,7 @@ fun ConnectedToggleRow(
             customItem(
                 {
                     FilledTonalToggleButton(
+                        modifier = Modifier.weight(1f),
                         checked = index == selectedIndex,
                         onCheckedChange = {
                             if (index != selectedIndex) onSelect(index)

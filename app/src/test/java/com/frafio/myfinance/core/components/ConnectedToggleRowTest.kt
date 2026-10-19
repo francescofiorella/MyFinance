@@ -1,11 +1,17 @@
 package com.frafio.myfinance.core.components
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.width
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -24,8 +30,21 @@ class ConnectedToggleRowTest {
 
     private fun showRow(selectedIndex: Int) {
         composeTestRule.setThemedContent {
-            ConnectedToggleRow(options = options, selectedIndex = selectedIndex, onSelect = { selected += it })
+            Box(Modifier.requiredWidth(300.dp)) {
+                ConnectedToggleRow(options = options, selectedIndex = selectedIndex, onSelect = { selected += it })
+            }
         }
+    }
+
+    @Test
+    fun buttons_shareTheFullWidthEqually() {
+        showRow(selectedIndex = 0)
+
+        val bounds = options.map { composeTestRule.onNodeWithText(it).getUnclippedBoundsInRoot() }
+
+        bounds.forEach { assertThat(it.width.value).isWithin(1f).of(bounds.first().width.value) }
+        assertThat(bounds.first().left.value).isWithin(1f).of(0f)
+        assertThat(bounds.last().right.value).isWithin(1f).of(300f)
     }
 
     @Test
