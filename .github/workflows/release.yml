@@ -248,7 +248,7 @@ jobs:
       TAG: ${{ needs.prepare.outputs.tag }}
       PREVIOUS_TAG: ${{ needs.prepare.outputs.previous_tag }}
       TARGET_BRANCH: ${{ needs.prepare.outputs.target_branch }}
-      APK: MyFinance-${{ needs.prepare.outputs.version }}.apk
+      APK: MyFinance ${{ needs.prepare.outputs.version }}.apk
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -325,14 +325,14 @@ jobs:
           if [ "$DRY_RUN" = "true" ]; then
             flags+=(--prerelease)
           fi
-          gh release create "$TAG" "$APK" --title "MyFinance $VERSION" --notes-file notes.md --verify-tag "${flags[@]}"
+          gh release create "$TAG" "$APK#$APK" --title "MyFinance $VERSION" --notes-file notes.md --verify-tag "${flags[@]}"
 
       - name: Upload the APK and notes
         uses: actions/upload-artifact@v7
         with:
           name: release
           path: |
-            MyFinance-*.apk
+            MyFinance *.apk
             notes.md
 
   # Its own job, so a failed post is retried with `gh run rerun <id> --failed` without releasing again.
@@ -344,7 +344,7 @@ jobs:
     timeout-minutes: 10
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
-      APK: MyFinance-${{ needs.prepare.outputs.version }}.apk
+      APK: MyFinance ${{ needs.prepare.outputs.version }}.apk
       RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.prepare.outputs.tag }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
