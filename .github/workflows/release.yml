@@ -1,0 +1,178 @@
+name: Release
+
+# Started by hand: gh workflow run release.yml -f version=X.Y.Z (docs/releasing.md).
+# Commits the version as "Release X.Y.Z", tags that commit, builds the signed APK and publishes the
+# GitHub Release. A dry run does the same on a throwaway branch, tag and pre-release.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release, MAJOR.MINOR.PATCH
+        required: true
+        type: string
+      dry_run:
+        description: Publish to a throwaway branch and pre-release, leaving main alone
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  prepare:
+    name: Check the version
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      tag: ${{ steps.check.outputs.tag }}
+      previous_tag: ${{ steps.check.outputs.previous_tag }}
+      target_branch: ${{ steps.check.outputs.target_branch }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check the version
+        id: check
+        env:
+          VERSION: ${{ inputs.version }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          if [ "$DRY_RUN" != "true" ] && [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "::error::A release runs from main, not $GITHUB_REF."
+            exit 1
+          fi
+          if ! [[ "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "::error::The version must be MAJOR.MINOR.PATCH, was '$VERSION'."
+            exit 1
+          fi
+          if [ "${BASH_REMATCH[2]}" -ge 1000 ] || [ "${BASH_REMATCH[3]}" -ge 1000 ]; then
+            echo "::error::MINOR and PATCH must be below 1000, was '$VERSION'."
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null; then
+            echo "::error::v$VERSION already exists."
+            exit 1
+          fi
+          # Only release tags count: dry-run tags never block a real release.
+          previous_tag=$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1 || true)
+          if [ -n "$previous_tag" ] && [ "$(printf '%s\n%s\n' "${previous_tag#v}" "$VERSION" | sort -V | tail -n 1)" != "$VERSION" ]; then
+            echo "::error::$VERSION is not newer than the last release, $previous_tag."
+            exit 1
+          fi
+          if [ "$DRY_RUN" = "true" ]; then
+            tag="v$VERSION-dry.$RUN_NUMBER"
+            target_branch="release-dry/$VERSION"
+          else
+            tag="v$VERSION"
+            target_branch="main"
+          fi
+          {
+            echo "version=$VERSION"
+            echo "tag=$tag"
+            echo "previous_tag=$previous_tag"
+            echo "target_branch=$target_branch"
+          } >> "$GITHUB_OUTPUT"
+          echo "Releasing $VERSION as $tag on $target_branch, after ${previous_tag:-no earlier release}."
+
+  release:
+    name: Build and publish
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      TAG: ${{ needs.prepare.outputs.tag }}
+      PREVIOUS_TAG: ${{ needs.prepare.outputs.previous_tag }}
+      TARGET_BRANCH: ${{ needs.prepare.outputs.target_branch }}
+      APK: MyFinance-${{ needs.prepare.outputs.version }}.apk
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Use the CI Gradle properties
+        run: mkdir -p ~/.gradle && cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      - name: Commit and tag the version
+        run: |
+          sed -i "s/^versionName=.*/versionName=$VERSION/" app/version.properties
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/version.properties
+          git commit -m "Release $VERSION"
+          git tag -a "$TAG" -m "MyFinance $VERSION"
+
+      - name: Build the signed APK
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          RELEASE_KEYSTORE_FILE: ${{ runner.temp }}/release.jks
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::The KEYSTORE_BASE64 secret is missing (docs/releasing.md)."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RELEASE_KEYSTORE_FILE"
+          ./gradlew :app:assembleRelease
+          apksigner="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n 1)/apksigner"
+          "$apksigner" verify --print-certs app/build/outputs/apk/release/app-release.apk
+          cp app/build/outputs/apk/release/app-release.apk "$APK"
+
+      # Atomic: if main moved since the run started, neither the commit nor the tag lands.
+      - name: Push the release commit and tag
+        run: git push --atomic origin "HEAD:refs/heads/$TARGET_BRANCH" "refs/tags/$TAG"
+
+      - name: Write the release notes
+        run: |
+          range="HEAD"
+          if [ -n "$PREVIOUS_TAG" ]; then
+            range="$PREVIOUS_TAG..HEAD"
+          fi
+          git log --no-merges --format='- %s' "$range" | { grep -v -E '^- Release [0-9]+\.[0-9]+\.[0-9]+$' || true; } > notes.md
+          if [ ! -s notes.md ]; then
+            echo "- No changes since $PREVIOUS_TAG" > notes.md
+          fi
+          cat notes.md
+
+      - name: Publish the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          flags=()
+          if [ "$DRY_RUN" = "true" ]; then
+            flags+=(--prerelease)
+          fi
+          gh release create "$TAG" "$APK" --title "MyFinance $VERSION" --notes-file notes.md --verify-tag "${flags[@]}"
+
+      - name: Upload the APK and notes
+        uses: actions/upload-artifact@v7
+        with:
+          name: release
+          path: |
+            MyFinance-*.apk
+            notes.md
