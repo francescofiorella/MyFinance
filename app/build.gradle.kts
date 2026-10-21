@@ -1,5 +1,6 @@
 import com.android.build.api.artifact.ScopedArtifact
 import com.android.build.api.variant.ScopedArtifacts
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -16,6 +17,18 @@ plugins {
     alias(libs.plugins.roborazzi)
 }
 
+// MAJOR.MINOR.PATCH from version.properties; the code is MAJOR * 1_000_000 + MINOR * 1_000 + PATCH.
+val appVersionName: String = Properties().apply {
+    load(providers.fileContents(layout.projectDirectory.file("version.properties")).asText.get().reader())
+}.getProperty("versionName").orEmpty()
+val appVersionCode: Int = run {
+    val (major, minor, patch) = Regex("""(\d+)\.(\d+)\.(\d+)""").matchEntire(appVersionName)
+        ?.destructured?.toList()?.map(String::toInt)
+        ?: error("version.properties: versionName must be MAJOR.MINOR.PATCH, was '$appVersionName'")
+    require(minor < 1000 && patch < 1000) { "version.properties: MINOR and PATCH must be below 1000, was '$appVersionName'" }
+    major * 1_000_000 + minor * 1_000 + patch
+}
+
 android {
     namespace = "com.frafio.myfinance"
     compileSdk = 37
@@ -24,8 +37,8 @@ android {
         applicationId = "com.frafio.myfinance"
         minSdk = 29
         targetSdk = 37
-        versionCode = 5001004
-        versionName = "5.1.4"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         vectorDrawables {
             useSupportLibrary = true
