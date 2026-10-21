@@ -2,8 +2,8 @@ name: Release
 
 # Started by hand: gh workflow run release.yml -f version=X.Y.Z (docs/releasing.md).
 # Generates the baseline profile on an emulator, commits it with the version as "Release X.Y.Z", tags
-# that commit, builds the signed APK and publishes the GitHub Release. A dry run does the same on a
-# throwaway branch, tag and pre-release.
+# that commit, builds the signed APK, publishes the GitHub Release and posts it to Telegram. A dry run
+# does the same on a throwaway branch, tag and pre-release, without the Telegram post.
 on:
   workflow_dispatch:
     inputs:
@@ -292,3 +292,51 @@ jobs:
           path: |
             MyFinance-*.apk
             notes.md
+
+  # Its own job, so a failed post is retried with `gh run rerun <id> --failed` without releasing again.
+  telegram:
+    name: Post to Telegram
+    needs: [prepare, release]
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      APK: MyFinance-${{ needs.prepare.outputs.version }}.apk
+      RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.prepare.outputs.tag }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - name: Download the APK and notes
+        uses: actions/download-artifact@v7
+        with:
+          name: release
+
+      # Plain text (no parse_mode), so characters in commit subjects can never make Telegram reject it.
+      - name: Post the release notes
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "::error::The TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID secret is missing (docs/releasing.md)."
+            exit 1
+          fi
+          header="MyFinance $VERSION"
+          notes=$(cat notes.md)
+          # A message holds 4096 characters: the notes are trimmed, the title and the link always fit.
+          room=$((4096 - ${#header} - ${#RELEASE_URL} - 5))
+          if [ "${#notes}" -gt "$room" ]; then
+            notes="${notes:0:$((room - 3))}..."
+          fi
+          printf '%s\n\n%s\n\n%s' "$header" "$notes" "$RELEASE_URL" > message.txt
+          if ! curl --fail-with-body -sS -o response.json "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+              --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" --data-urlencode "text@message.txt"; then
+            cat response.json
+            exit 1
+          fi
+
+      - name: Post the APK
+        run: |
+          if ! curl --fail-with-body -sS -o response.json "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument" \
+              -F "chat_id=$TELEGRAM_CHAT_ID" -F "document=@$APK" -F "caption=MyFinance $VERSION"; then
+            cat response.json
+            exit 1
+          fi
