@@ -202,7 +202,7 @@ class IncomesSyncManagerTest : DatabaseTest() {
     }
 
     @Test
-    fun startSnapshotListener_laterChanges_keepApplying() = runBlocking {
+    fun startSnapshotListener_laterChanges_keepApplying() = runBlocking<Unit> {
         val initialSync = CompletableDeferred<Unit>()
         subject.startSnapshotListener(scope, initialSync)
         awaitUntil { remote.activeListeners == 1 }
@@ -211,8 +211,9 @@ class IncomesSyncManagerTest : DatabaseTest() {
 
         remote.sendChanges(collection, testIncome(name = "Second", id = "2").copy(updatedAt = 200L))
 
-        awaitUntil { onIo { incomeDao.getAllSync() }.size == 2 }
-        assertThat(preferences.userPreferencesFlow.value.lastIncomesSync).isEqualTo(200L)
+        // The timestamp is saved after the rows are committed, so waiting on it covers both.
+        awaitUntil { preferences.userPreferencesFlow.value.lastIncomesSync == 200L }
+        assertThat(onIo { incomeDao.getAllSync() }.map { it.name }).containsExactly("First", "Second")
     }
 
     @Test
