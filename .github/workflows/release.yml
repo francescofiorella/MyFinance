@@ -1,8 +1,9 @@
 name: Release
 
 # Started by hand: gh workflow run release.yml -f version=X.Y.Z (docs/releasing.md).
-# Commits the version as "Release X.Y.Z", tags that commit, builds the signed APK and publishes the
-# GitHub Release. A dry run does the same on a throwaway branch, tag and pre-release.
+# Generates the baseline profile on an emulator, commits it with the version as "Release X.Y.Z", tags
+# that commit, builds the signed APK and publishes the GitHub Release. A dry run does the same on a
+# throwaway branch, tag and pre-release.
 on:
   workflow_dispatch:
     inputs:
@@ -86,9 +87,118 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "Releasing $VERSION as $tag on $target_branch, after ${previous_tag:-no earlier release}."
 
+  profile:
+    name: Generate the baseline profile
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Free disk space for the emulator image
+        uses: jlumbroso/free-disk-space@ceedf095f4ec1a097402bc6bd80831f2e1a6fde6 # v2.0.0
+        with:
+          android: false
+          tool-cache: true
+          dotnet: true
+          haskell: true
+          swap-storage: true
+          docker-images: false
+          large-packages: false
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Use the CI Gradle properties
+        run: mkdir -p ~/.gradle && cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      # The profiled build is signed like the release, so Firebase sees the same app.
+      - name: Decode the release key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::The KEYSTORE_BASE64 secret is missing (docs/releasing.md)."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+
+      # Removed first, so the check below proves this run wrote them.
+      - name: Remove the committed profile
+        run: rm -f app/src/main/generated/baselineProfiles/*.txt
+
+      - name: Generate on an emulator
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        env:
+          RELEASE_KEYSTORE_FILE: ${{ runner.temp }}/release.jks
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          BP_EMAIL: ${{ secrets.BP_EMAIL }}
+          BP_PASSWORD: ${{ secrets.BP_PASSWORD }}
+        with:
+          # Same device as ci.yml's device tests.
+          api-level: 36
+          target: google_atd
+          arch: x86_64
+          cores: 4
+          ram-size: 4096M
+          emulator-boot-timeout: 900
+          disable-animations: true
+          disk-size: 6000M
+          heap-size: 600M
+          # Only the generator: the benchmarks skip themselves here and would be reported as failures.
+          script: ./gradlew :app:generateBaselineProfile "-Pandroid.testInstrumentationRunnerArguments.class=com.frafio.myfinance.baselineProfile.BaselineProfileGenerator" "-Pandroid.testInstrumentationRunnerArguments.bpEmail=$BP_EMAIL" "-Pandroid.testInstrumentationRunnerArguments.bpPassword=$BP_PASSWORD"
+
+      # The success criterion of baselineProfile/README.md: both files, the startup one clearly smaller.
+      - name: Check the profile
+        run: |
+          dir=app/src/main/generated/baselineProfiles
+          for file in baseline-prof.txt startup-prof.txt; do
+            if [ ! -s "$dir/$file" ]; then
+              echo "::error::$dir/$file was not generated."
+              exit 1
+            fi
+          done
+          baseline=$(wc -l < "$dir/baseline-prof.txt")
+          startup=$(wc -l < "$dir/startup-prof.txt")
+          echo "baseline-prof.txt: $baseline lines, startup-prof.txt: $startup lines"
+          if [ "$startup" -ge "$baseline" ]; then
+            echo "::error::startup-prof.txt is not smaller than baseline-prof.txt: the startup flags did not take effect."
+            exit 1
+          fi
+
+      - name: Upload the profile
+        uses: actions/upload-artifact@v7
+        with:
+          name: baseline-profile
+          path: app/src/main/generated/baselineProfiles/*.txt
+
+      - name: Upload the generator reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: baseline-profile-reports
+          path: |
+            baselineProfile/build/reports/androidTests
+            baselineProfile/build/outputs/androidTest-results
+
   release:
     name: Build and publish
-    needs: prepare
+    needs: [prepare, profile]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -115,12 +225,18 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
-      - name: Commit and tag the version
+      - name: Download the baseline profile
+        uses: actions/download-artifact@v7
+        with:
+          name: baseline-profile
+          path: app/src/main/generated/baselineProfiles
+
+      - name: Commit and tag the version and profile
         run: |
           sed -i "s/^versionName=.*/versionName=$VERSION/" app/version.properties
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/version.properties
+          git add app/version.properties app/src/main/generated/baselineProfiles
           git commit -m "Release $VERSION"
           git tag -a "$TAG" -m "MyFinance $VERSION"
 
