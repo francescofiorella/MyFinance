@@ -47,6 +47,21 @@ android {
         testInstrumentationRunner = "com.frafio.myfinance.testing.MyFinanceTestRunner"
     }
 
+    // Release builds are signed only when the key comes from the environment (the release workflow);
+    // without it they stay unsigned, as built locally before.
+    signingConfigs {
+        providers.environmentVariable("RELEASE_KEYSTORE_FILE").orNull?.let { keystore ->
+            fun requireEnv(name: String): String = providers.environmentVariable(name).orNull
+                ?: error("$name must be set when RELEASE_KEYSTORE_FILE is")
+            create("release") {
+                storeFile = file(keystore)
+                storePassword = requireEnv("RELEASE_KEYSTORE_PASSWORD")
+                keyAlias = requireEnv("RELEASE_KEY_ALIAS")
+                keyPassword = requireEnv("RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         // Coverage for both suites; only debug, so release stays non-debuggable.
         debug {
@@ -54,6 +69,7 @@ android {
             enableAndroidTestCoverage = true
         }
         release {
+            signingConfigs.findByName("release")?.let { signingConfig = it }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
