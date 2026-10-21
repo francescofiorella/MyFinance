@@ -2,6 +2,8 @@
 
 What to expect on screen during a `:app:generateBaselineProfile` run, and how to tell it worked.
 
+Releases generate the profile on CI, on an emulator ([docs/releasing.md](../docs/releasing.md)). A local run is for working on the generator or checking a profile before a release.
+
 ## Before you start
 
 - One **physical device** on ADB, and only one — the plugin uses `useConnectedDevices = true`, so a second device or a running emulator makes the run ambiguous.

@@ -92,6 +92,8 @@ replace it with the file from your Firebase console.
 integration with coverage on SonarCloud. How to run each of them is in
 [docs/testing.md](docs/testing.md).
 
+**Releases** — a single `gh workflow run release.yml -f version=X.Y.Z` generates the baseline profile on CI, tags the release commit, publishes the signed APK on GitHub and posts it to Telegram; see [docs/releasing.md](docs/releasing.md).
+
 ## History
 
 MyFinance has grown through several versions:
