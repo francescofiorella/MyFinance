@@ -1,6 +1,6 @@
 # Releasing
 
-A release is one command. The [Release workflow](../.github/workflows/release.yml) generates the baseline profile on an emulator, commits it with the new version as "Release X.Y.Z" on `main`, tags that commit `vX.Y.Z`, builds the signed APK, publishes the GitHub Release and posts it to Telegram.
+A release is one command. Once CI has passed on the commit, the [Release workflow](../.github/workflows/release.yml) generates the baseline profile on an emulator, commits it with the new version as "Release X.Y.Z" on `main`, tags that commit `vX.Y.Z`, builds the signed APK, publishes the GitHub Release and posts it to Telegram.
 
 ```
 git push                                        # GitHub's main must have everything you want to ship
@@ -16,6 +16,7 @@ Don't edit the version by hand: the workflow writes it to `app/version.propertie
 | Job | What it does | Typical time |
 | --- | --- | --- |
 | Check the version | Fails unless the version is `MAJOR.MINOR.PATCH`, newer than the last release tag, not tagged yet, and the run is on `main` | under a minute |
+| Wait for CI | Fails unless the CI run of the same commit (lint, JVM and screenshot tests, device tests) passed; waits for it while it's still running, so a release can be started right after the push | seconds, or until CI finishes |
 | Generate the baseline profile | Runs `BaselineProfileGenerator` on an API 36 emulator, signed in with the test account, and checks that both profile files came out with `startup-prof.txt` smaller than `baseline-prof.txt` | 20–40 minutes |
 | Build and publish | Commits the version and the profile, tags the commit, builds and verifies the signed APK, pushes commit and tag together, then creates the GitHub Release | about 10 minutes |
 | Post to Telegram | Sends the release notes as a message, then the APK as a file | under a minute |
@@ -43,6 +44,7 @@ git push origin --delete release-dry/5.2.0
 
 | Where it failed | What's already done | What to do |
 | --- | --- | --- |
+| Wait for CI | Nothing | Fix what CI reported, push, and run the same command again; for a flaky test, `gh run rerun <CI run id> --failed`, then start the release again |
 | Check the version, Generate the baseline profile, or Build and publish before the push | Nothing | Read the error, fix it, run the same command again |
 | Build and publish after the push, or Post to Telegram | Commit and tag are on GitHub | `gh run rerun <run id> --failed` re-runs only what failed |
 | You want to see why | — | `gh run view <run id> --log-failed`; the generator's reports are in the run's `baseline-profile-reports` artifact |
