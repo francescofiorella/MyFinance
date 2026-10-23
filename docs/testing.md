@@ -208,11 +208,9 @@ Step 1 also happens inside the normal `./gradlew :app:testDebugUnitTest` (`robor
 in `gradle.properties`) and in CI's *checks* job, so a red run after a UI edit means "go to step 2";
 on CI the `screenshot-diffs` artifact holds the `*_compare.png` images. Only record after looking at
 the diff: recording over an unintended change hides a regression. A brand-new screen needs a test
-plus a first recording; `verify` fails while a golden is missing. Step 3 can also run on CI: the
-**Record screenshots** workflow (GitHub → Actions → Record screenshots → Run workflow) records on
-Linux and commits the goldens to the chosen branch — then `git pull`, and re-run CI, since a commit
-made by a workflow does not start a new run. If the two platforms ever stop matching (a Robolectric
-or font change), record on CI only: that is the platform the goldens are verified on.
+plus a first recording; `verify` fails while a golden is missing. If the two platforms ever stop
+matching (a Robolectric or font change), every screen fails on CI at once: the goldens then have to
+be recorded on the platform they are verified on.
 
 ### How the tests are written
 
@@ -437,8 +435,6 @@ GitHub Actions runs everything above on every push to `main`, every pull request
   suite again for coverage, the combined coverage report, the lint report, and the SonarCloud
   analysis. Uploads `device-test-reports` and `coverage-report`.
 
-`.github/workflows/record-screenshots.yml` (Actions → Record screenshots → Run workflow) records the
-goldens on Linux and commits them to the chosen branch; see [Screenshot tests](#screenshot-tests-roborazzi).
 `.github/ci-gradle.properties` replaces the local Gradle settings on the runner (no daemon, three
 workers). The runner uses JDK 21, the same as the project's daemon JDK.
 
