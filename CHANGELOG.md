@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 5.1.5
 - Baseline profile generation and release automated via GitHub workflow
 - record-screenshots github workflow removed
 
