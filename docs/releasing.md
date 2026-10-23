@@ -1,8 +1,9 @@
 # Releasing
 
-A release is one command. Once CI has passed on the commit, the [Release workflow](../.github/workflows/release.yml) generates the baseline profile on an emulator, commits it with the new version as "Release X.Y.Z" on `main`, tags that commit `vX.Y.Z`, builds the signed APK, publishes the GitHub Release and posts it to Telegram.
+A release is one command. Once CI has passed on the commit, the [Release workflow](../.github/workflows/release.yml) generates the baseline profile on an emulator, commits it with the new version and the updated changelog as "Release X.Y.Z" on `main`, tags that commit `vX.Y.Z`, builds the signed APK, publishes the GitHub Release and posts it to Telegram.
 
 ```
+# the release notes are under "## Unreleased" in CHANGELOG.md
 git push                                        # GitHub's main must have everything you want to ship
 gh workflow run release.yml -f version=5.2.0
 gh run watch                                    # pick the run; shows each step live
@@ -15,15 +16,15 @@ Don't edit the version by hand: the workflow writes it to `app/version.propertie
 
 | Job | What it does | Typical time |
 | --- | --- | --- |
-| Check the version | Fails unless the version is `MAJOR.MINOR.PATCH`, newer than the last release tag, not tagged yet, and the run is on `main` | under a minute |
+| Check the version | Fails unless the version is `MAJOR.MINOR.PATCH`, newer than the last release tag, not tagged yet, the run is on `main`, and `CHANGELOG.md` has release notes under `## Unreleased`, at most 1009 characters | under a minute |
 | Wait for CI | Fails unless the CI run of the same commit (lint, JVM and screenshot tests, device tests) passed; waits for it while it's still running, so a release can be started right after the push | seconds, or until CI finishes |
 | Generate the baseline profile | Runs `BaselineProfileGenerator` on an API 36 emulator, signed in with the test account, and checks that both profile files came out with `startup-prof.txt` smaller than `baseline-prof.txt` | 20–40 minutes |
-| Build and publish | Commits the version and the profile, tags the commit, builds and verifies the signed APK, pushes commit and tag together, then creates the GitHub Release | about 10 minutes |
-| Post to Telegram | Sends the release notes as a message, then the APK as a file | under a minute |
+| Build and publish | Commits the version, the profile and the changelog with `## Unreleased` renamed to `## X.Y.Z`, tags the commit, builds and verifies the signed APK, pushes commit and tag together, then creates the GitHub Release | about 10 minutes |
+| Post to Telegram | Sends one message: the APK as a file, with "Release notes:" and the notes as its caption | under a minute |
 
 Nothing is pushed or published until the APK is built and signed, and the commit and tag are pushed in one atomic step: if `main` moved since the run started, neither lands.
 
-**Release notes** are the subjects of the commits since the previous release tag, one per line, without the "Release X.Y.Z" commits. Write commit subjects with that in mind.
+**Release notes** are what you write under `## Unreleased` in [CHANGELOG.md](../CHANGELOG.md), added as you go and pushed before the release starts. The release commit renames that heading to `## X.Y.Z` and adds a new empty `## Unreleased` above it, so the version is never typed by hand. The notes are used as they are for the GitHub Release (rendered as Markdown) and as the caption of the APK on Telegram (shown as plain text, so keep to simple `- ` lists). Telegram's caption limit of 1024 characters, less the "Release notes:" line, makes 1009 characters the maximum.
 
 **Version rules:** always `MAJOR.MINOR.PATCH`, always newer than the last release, MINOR and PATCH below 1000. The version code is MAJOR × 1,000,000 + MINOR × 1,000 + PATCH (5.2.0 → 5002000).
 

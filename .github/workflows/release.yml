@@ -1,9 +1,11 @@
 name: Release
 
 # Started by hand: gh workflow run release.yml -f version=X.Y.Z (docs/releasing.md).
-# Generates the baseline profile on an emulator, commits it with the version as "Release X.Y.Z", tags
-# that commit, builds the signed APK, publishes the GitHub Release and posts it to Telegram. A dry run
-# does the same on a throwaway branch, tag and pre-release, without the Telegram post.
+# Takes the release notes from CHANGELOG.md's Unreleased section and generates the baseline profile on
+# an emulator. Commits the profile, the version and the changelog (Unreleased renamed to X.Y.Z) as
+# "Release X.Y.Z", tags that commit, builds the signed APK, publishes the GitHub Release and posts it
+# to Telegram. A dry run does the same on a throwaway branch, tag and pre-release, without the
+# Telegram post.
 on:
   workflow_dispatch:
     inputs:
@@ -37,7 +39,6 @@ jobs:
     outputs:
       version: ${{ steps.check.outputs.version }}
       tag: ${{ steps.check.outputs.tag }}
-      previous_tag: ${{ steps.check.outputs.previous_tag }}
       target_branch: ${{ steps.check.outputs.target_branch }}
     steps:
       - name: Checkout
@@ -74,6 +75,19 @@ jobs:
             echo "::error::$VERSION is not newer than the last release, $previous_tag."
             exit 1
           fi
+          # The notes are the "## Unreleased" section of CHANGELOG.md, without its leading blank lines.
+          # Written by hand, so they are checked here rather than trimmed later.
+          notes=$(awk '{ sub(/\r$/, "") } /^## / { if (found) exit; if ($0 == "## Unreleased") { found = 1; next } } found' CHANGELOG.md | sed '/./,$!d')
+          if [ -z "$notes" ]; then
+            echo "::error::CHANGELOG.md has nothing under '## Unreleased': write the release notes there and push them first (docs/releasing.md)."
+            exit 1
+          fi
+          # A Telegram caption holds 1024 characters, 15 of them taken by the "Release notes:" line.
+          if [ "${#notes}" -gt 1009 ]; then
+            echo "::error::The release notes have ${#notes} characters; the Telegram caption leaves room for 1009."
+            exit 1
+          fi
+          printf '%s\n' "$notes" > notes.md
           if [ "$DRY_RUN" = "true" ]; then
             tag="v$VERSION-dry.$RUN_NUMBER"
             target_branch="release-dry/$VERSION"
@@ -84,10 +98,16 @@ jobs:
           {
             echo "version=$VERSION"
             echo "tag=$tag"
-            echo "previous_tag=$previous_tag"
             echo "target_branch=$target_branch"
           } >> "$GITHUB_OUTPUT"
           echo "Releasing $VERSION as $tag on $target_branch, after ${previous_tag:-no earlier release}."
+          cat notes.md
+
+      - name: Upload the release notes
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-notes
+          path: notes.md
 
   # Nothing is generated or released unless ci.yml (lint, JVM and screenshot tests, device tests)
   # passed on this exact commit; a run still in progress is waited for.
@@ -246,7 +266,6 @@ jobs:
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
       TAG: ${{ needs.prepare.outputs.tag }}
-      PREVIOUS_TAG: ${{ needs.prepare.outputs.previous_tag }}
       TARGET_BRANCH: ${{ needs.prepare.outputs.target_branch }}
       APK: MyFinance ${{ needs.prepare.outputs.version }}.apk
     steps:
@@ -273,12 +292,19 @@ jobs:
           name: baseline-profile
           path: app/src/main/generated/baselineProfiles
 
-      - name: Commit and tag the version and profile
+      - name: Download the release notes
+        uses: actions/download-artifact@v7
+        with:
+          name: release-notes
+
+      # The changelog's Unreleased entries become this version's, under a new empty Unreleased heading.
+      - name: Commit and tag the version, profile and changelog
         run: |
           sed -i "s/^versionName=.*/versionName=$VERSION/" app/version.properties
+          sed -i "s/^## Unreleased\r\?$/## Unreleased\n\n## $VERSION/" CHANGELOG.md
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/version.properties app/src/main/generated/baselineProfiles
+          git add app/version.properties app/src/main/generated/baselineProfiles CHANGELOG.md
           git commit -m "Release $VERSION"
           git tag -a "$TAG" -m "MyFinance $VERSION"
 
@@ -303,18 +329,6 @@ jobs:
       # Atomic: if main moved since the run started, neither the commit nor the tag lands.
       - name: Push the release commit and tag
         run: git push --atomic origin "HEAD:refs/heads/$TARGET_BRANCH" "refs/tags/$TAG"
-
-      - name: Write the release notes
-        run: |
-          range="HEAD"
-          if [ -n "$PREVIOUS_TAG" ]; then
-            range="$PREVIOUS_TAG..HEAD"
-          fi
-          git log --no-merges --format='- %s' "$range" | { grep -v -E '^- Release [0-9]+\.[0-9]+\.[0-9]+$' || true; } > notes.md
-          if [ ! -s notes.md ]; then
-            echo "- No changes since $PREVIOUS_TAG" > notes.md
-          fi
-          cat notes.md
 
       - name: Publish the GitHub Release
         env:
@@ -343,9 +357,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      VERSION: ${{ needs.prepare.outputs.version }}
       APK: MyFinance ${{ needs.prepare.outputs.version }}.apk
-      RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.prepare.outputs.tag }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
     steps:
@@ -354,31 +366,18 @@ jobs:
         with:
           name: release
 
-      # Plain text (no parse_mode), so characters in commit subjects can never make Telegram reject it.
-      - name: Post the release notes
+      # One message: the APK, with the release notes as its caption. Plain text (no parse_mode) and
+      # --form-string, so characters in the notes can never make curl or Telegram misread them.
+      - name: Post the APK with the release notes
         run: |
           if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
             echo "::error::The TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID secret is missing (docs/releasing.md)."
             exit 1
           fi
-          header="MyFinance $VERSION"
-          notes=$(cat notes.md)
-          # A message holds 4096 characters: the notes are trimmed, the title and the link always fit.
-          room=$((4096 - ${#header} - ${#RELEASE_URL} - 5))
-          if [ "${#notes}" -gt "$room" ]; then
-            notes="${notes:0:$((room - 3))}..."
-          fi
-          printf '%s\n\n%s\n\n%s' "$header" "$notes" "$RELEASE_URL" > message.txt
-          if ! curl --fail-with-body -sS -o response.json "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-              --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" --data-urlencode "text@message.txt"; then
-            cat response.json
-            exit 1
-          fi
-
-      - name: Post the APK
-        run: |
+          # Within the 1024 characters a caption holds: the prepare job checked it.
+          caption="Release notes:"$'\n'"$(cat notes.md)"
           if ! curl --fail-with-body -sS -o response.json "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument" \
-              -F "chat_id=$TELEGRAM_CHAT_ID" -F "document=@$APK" -F "caption=MyFinance $VERSION"; then
+              --form-string "chat_id=$TELEGRAM_CHAT_ID" -F "document=@$APK" --form-string "caption=$caption"; then
             cat response.json
             exit 1
           fi
