@@ -145,10 +145,10 @@ jobs:
 
       - name: JVM tests for coverage
         # The goldens are verified by the other job.
-        run: ./gradlew :app:testDebugUnitTest -Proborazzi.test.verify=false
+        run: ./gradlew :app:testDebugUnitTest :charts:testDebugUnitTest -Proborazzi.test.verify=false
 
       - name: Combined coverage report and lint report
-        run: ./gradlew :app:createDebugCombinedCoverageReport :app:lintDebug
+        run: ./gradlew :app:createDebugCombinedCoverageReport :app:lintDebug :charts:createDebugUnitTestCoverageReport :charts:lintDebug
 
       - name: SonarCloud analysis
         if: ${{ env.SONAR_TOKEN != '' }}

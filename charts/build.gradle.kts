@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 // Generic Compose charts (bar chart, pie chart, share bar) with no dependency on the app.
 plugins {
+    jacoco
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
 }
@@ -14,6 +15,12 @@ android {
         minSdk = 29
     }
 
+    buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -21,6 +28,10 @@ android {
 
     testOptions {
         unitTests.isIncludeAndroidResources = true
+    }
+
+    testCoverage {
+        jacocoVersion = libs.versions.jacoco.get()
     }
 
     lint {
@@ -53,4 +64,30 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.compose.ui.test)
     debugImplementation(libs.androidx.compose.ui.testManifest)
+}
+
+// Robolectric loads the classes through its own class loader; JaCoCo must follow them.
+tasks.withType<Test>().configureEach {
+    extensions.configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
+// A plugin resets Gradle's JaCoCo to its bundled default in its own afterEvaluate; this one runs later.
+afterEvaluate {
+    jacoco {
+        toolVersion = libs.versions.jacoco.get()
+    }
+}
+
+// The module's unit-test coverage (createDebugUnitTestCoverageReport) and lint report for SonarCloud.
+sonar {
+    properties {
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            layout.buildDirectory.file("reports/coverage/test/debug/report.xml").get().asFile.path,
+        )
+        property("sonar.androidLint.reportPaths", layout.buildDirectory.file("reports/lint-results-debug.xml").get().asFile.path)
+    }
 }

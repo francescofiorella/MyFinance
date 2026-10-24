@@ -446,9 +446,10 @@ workers). The runner uses JDK 21, the same as the project's daemon JDK.
 exclusions do not reach, but they contain no lines and do not change the figures. It works locally
 too: after both suites it reported about 90 % of lines and 73 % of branches.
 
+The `:charts` module has unit tests only, so its report comes from AGP's own `./gradlew :charts:createDebugUnitTestCoverageReport`, run after `:charts:testDebugUnitTest`, into `charts/build/reports/coverage/test/debug/`. SonarCloud reads each module's report for that module's sources, so chart code exercised only by app tests (screenshots, `AccessibilityTest`) does not count toward it.
+
 **SonarCloud.** The *device* job runs `./gradlew sonar` (plugin `org.sonarqube`, configured in the
-root `build.gradle.kts`), which uploads the code, the JUnit results, the combined coverage and the
-lint findings to `francescofiorella_MyFinance`. The token is the repository secret `SONAR_TOKEN`;
+root `build.gradle.kts`), which uploads the code, the JUnit results, the coverage and the lint findings of `:app` and `:charts` to `francescofiorella_MyFinance`. The token is the repository secret `SONAR_TOKEN`;
 without it (a fork) the step is skipped. The project's Automatic Analysis is switched off — CI
 analysis and Automatic Analysis cannot both be on. The quality gate is the default "Sonar way",
 whose "≥ 80 % coverage on new code" condition shows on SonarCloud but does not fail CI.
