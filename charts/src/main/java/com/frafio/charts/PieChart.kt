@@ -1,4 +1,4 @@
-package com.frafio.myfinance.core.components
+package com.frafio.charts
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.AnimationSpec
@@ -53,7 +53,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
-import com.frafio.myfinance.R
 import java.text.NumberFormat
 import kotlin.math.PI
 import kotlin.math.cos

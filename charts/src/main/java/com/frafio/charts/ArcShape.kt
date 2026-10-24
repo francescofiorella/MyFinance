@@ -1,4 +1,4 @@
-package com.frafio.myfinance.core.components
+package com.frafio.charts
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect

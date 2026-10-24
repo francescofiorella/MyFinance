@@ -40,9 +40,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.frafio.charts.BarChart
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
-import com.frafio.myfinance.core.components.BarChart
 import com.frafio.myfinance.core.components.CategoryIcon
 import com.frafio.myfinance.core.components.SpendingChangeChip
 import com.frafio.myfinance.core.components.TransactionListItem

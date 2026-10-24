@@ -15,6 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
+import com.frafio.charts.BarChart
+import com.frafio.charts.PieChart
+import com.frafio.charts.ShareBar
+import com.frafio.charts.ShareBarItem
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.ExpenseCategories

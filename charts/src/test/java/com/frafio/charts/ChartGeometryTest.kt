@@ -1,4 +1,4 @@
-package com.frafio.myfinance.core.components
+package com.frafio.charts
 
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat

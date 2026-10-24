@@ -1,9 +1,10 @@
-package com.frafio.myfinance.core.components
+package com.frafio.charts
 
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,7 +24,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
-import com.frafio.myfinance.testing.util.setThemedContent
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -56,6 +56,8 @@ class BarChartTest {
         selectedAxisLabel = "%02d/%02d".format(month, year % 100)
     )
 
+    private fun setChart(content: @Composable () -> Unit) = composeTestRule.setContent { MaterialTheme(content = content) }
+
     /** The chart with euro amounts: two decimals in the header, none on the reference line. */
     @Composable
     private fun TestBarChart(
@@ -80,7 +82,7 @@ class BarChartTest {
 
     @Test
     fun header_showsTheLastEntryByDefault() {
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries) }
         }
 
@@ -90,7 +92,7 @@ class BarChartTest {
 
     @Test
     fun axis_showsTwoDigitMonths_andTheSelectedOneAsMonthYear() {
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries) }
         }
 
@@ -104,7 +106,7 @@ class BarChartTest {
     @Test
     fun barClick_selectsItAndReportsTheIndex() {
         val clicked = mutableListOf<Int>()
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries, onBarClick = { clicked += it }) }
         }
 
@@ -120,7 +122,7 @@ class BarChartTest {
     @Test
     fun clickingTheSelectedBar_doesNotReportAgain() {
         val clicked = mutableListOf<Int>()
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries, onBarClick = { clicked += it }) }
         }
 
@@ -140,7 +142,7 @@ class BarChartTest {
 
     @Test
     fun referenceValue_showsTheBudgetLabel_whenTheLastEntryIsWithinIt() {
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = unevenEntries, referenceValue = 120.0) }
         }
 
@@ -149,7 +151,7 @@ class BarChartTest {
 
     @Test
     fun referenceValue_hidesTheBudgetLabel_whenTheLastEntryExceedsIt() {
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = unevenEntries, referenceValue = 95.0) }
         }
 
@@ -158,7 +160,7 @@ class BarChartTest {
 
     @Test
     fun referenceValue_aboveTheTallestBar_isNotDrawn() {
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = unevenEntries, referenceValue = 200.0) }
         }
 
@@ -167,7 +169,7 @@ class BarChartTest {
 
     @Test
     fun noReferenceValue_showsNoBudgetLabel() {
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = unevenEntries) }
         }
 
@@ -176,7 +178,7 @@ class BarChartTest {
 
     @Test
     fun emptyEntries_rendersWithoutBars() {
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = emptyList()) }
         }
 
@@ -187,7 +189,7 @@ class BarChartTest {
     @Test
     fun visibleCount_isReportedFromTheAvailableWidth() {
         val reported = mutableListOf<Int>()
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries, onVisibleCountChanged = { reported += it }) }
         }
 
@@ -198,7 +200,7 @@ class BarChartTest {
     @Test
     fun visibleCount_honoursCustomBarSizes() {
         val reported = mutableListOf<Int>()
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) {
                 TestBarChart(entries = entries, barWidth = 20.dp, barPadding = 5.dp, onVisibleCountChanged = { reported += it })
             }
@@ -215,7 +217,7 @@ class BarChartTest {
 
     @Test
     fun manyEntries_areAllShown_withTheAxisThinnedOut() {
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = twoYears) }
         }
 
@@ -231,7 +233,7 @@ class BarChartTest {
     @Test
     fun withoutEntryAnimation_entryChangesApplyAtOnce() {
         var shown by mutableStateOf(twoYears.takeLast(12))
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = shown) }
         }
         composeTestRule.mainClock.autoAdvance = false
@@ -247,7 +249,7 @@ class BarChartTest {
     @Test
     fun withEntryAnimation_removedBarsSlideOutAtTheSameWidthAsTheOthers() {
         var shown by mutableStateOf(twoYears.takeLast(12))
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) {
                 TestBarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
             }
@@ -271,7 +273,7 @@ class BarChartTest {
     @Test
     fun withEntryAnimation_remainingBarsKeepTheirHeight_whenRemovedBarsAreDropped() {
         var shown by mutableStateOf(twoYears.takeLast(12))
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) {
                 TestBarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
             }
@@ -294,7 +296,7 @@ class BarChartTest {
     fun withEntryAnimation_growingToManyBars_measuresWithoutOverflowing() {
         var shown by mutableStateOf(twoYears.takeLast(6))
         // The dashboard card's chart width on a 411 dp phone, where new bars used to overflow.
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(331.dp)) {
                 TestBarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
             }
@@ -311,7 +313,7 @@ class BarChartTest {
     @Test
     fun withEntryAnimation_addedBarsAreShown_andTheLatestStaysSelected() {
         var shown by mutableStateOf(twoYears.takeLast(6))
-        composeTestRule.setThemedContent {
+        setChart {
             Box(Modifier.requiredWidth(300.dp)) {
                 TestBarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
             }

@@ -35,13 +35,13 @@ jobs:
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
       - name: Lint and the custom lint rules
-        run: ./gradlew :app:lintDebug :lint:test
+        run: ./gradlew :app:lintDebug :charts:lintDebug :lint:test
 
       - name: Build the debug APK
         run: ./gradlew :app:assembleDebug
 
       - name: JVM tests, verifying the screenshot goldens
-        run: ./gradlew :app:testDebugUnitTest -Proborazzi.test.verify=true
+        run: ./gradlew :app:testDebugUnitTest :charts:testDebugUnitTest -Proborazzi.test.verify=true
 
       - name: Upload JVM test reports
         if: ${{ !cancelled() }}

@@ -1,0 +1,4 @@
+<resources>
+    <!-- A chart bar or slice for accessibility services: its label, then its value. -->
+    <string name="charts_item_description" translatable="false">%1$s, %2$s</string>
+</resources>

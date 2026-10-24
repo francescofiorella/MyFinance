@@ -3,6 +3,7 @@ package com.frafio.myfinance.features.categorydetail
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import com.frafio.charts.R as ChartsR
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.data.model.ExpenseCategories
@@ -46,7 +47,7 @@ class CategoryDetailScreenScreenshotTests {
                 Matchers.isIn(
                     stats.trend.map {
                         string(
-                            R.string.charts_item_description,
+                            ChartsR.string.charts_item_description,
                             YearMonth.of(it.year, it.month).format(DateTimeFormatter.ofPattern("MMMM yyyy")),
                             doubleToPrice(it.value),
                         )

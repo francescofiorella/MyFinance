@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.frafio.charts.BarChart
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.components.BarChart
 import com.frafio.myfinance.core.components.ConnectedToggleRow
 import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.components.toBarChartEntry

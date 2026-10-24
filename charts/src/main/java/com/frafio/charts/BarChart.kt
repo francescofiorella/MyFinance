@@ -1,4 +1,4 @@
-package com.frafio.myfinance.core.components
+package com.frafio.charts
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
@@ -55,7 +55,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.frafio.myfinance.R
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.text.NumberFormat

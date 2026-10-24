@@ -29,9 +29,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.window.core.layout.WindowSizeClass
+import com.frafio.charts.BarChart
+import com.frafio.charts.PieChart
+import com.frafio.charts.R as ChartsR
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.components.BarChart
-import com.frafio.myfinance.core.components.PieChart
 import com.frafio.myfinance.core.components.SearchBar
 import com.frafio.myfinance.core.components.SheetDialog
 import com.frafio.myfinance.core.components.TransactionListItem
@@ -142,8 +143,8 @@ class AccessibilityTest {
             )
         }
 
-        composeTestRule.onNodeWithContentDescription(string(R.string.charts_item_description, "January 2024", doubleToPrice(100.0))).assertExists()
-        composeTestRule.onNodeWithContentDescription(string(R.string.charts_item_description, "February 2024", doubleToPrice(250.5))).assertIsOn()
+        composeTestRule.onNodeWithContentDescription(string(ChartsR.string.charts_item_description, "January 2024", doubleToPrice(100.0))).assertExists()
+        composeTestRule.onNodeWithContentDescription(string(ChartsR.string.charts_item_description, "February 2024", doubleToPrice(250.5))).assertIsOn()
     }
 
     @Test
@@ -160,12 +161,12 @@ class AccessibilityTest {
             )
         }
 
-        val dining = composeTestRule.onNodeWithContentDescription(string(R.string.charts_item_description, "Dining", "€ 30"))
+        val dining = composeTestRule.onNodeWithContentDescription(string(ChartsR.string.charts_item_description, "Dining", "€ 30"))
         dining.assert(hasRole(Role.Button)).performClickAction()
 
         dining.assertIsSelected()
         composeTestRule.onNodeWithText("Dining").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription(string(R.string.charts_item_description, "Groceries", "€ 45")).assertExists()
+        composeTestRule.onNodeWithContentDescription(string(ChartsR.string.charts_item_description, "Groceries", "€ 45")).assertExists()
     }
 
     @Test

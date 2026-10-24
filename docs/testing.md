@@ -1,14 +1,12 @@
 # Testing
 
-Unit tests live in `app/src/test` and run on the JVM; no device or emulator is needed.
+Unit tests live in `app/src/test`, and those of the charts in `charts/src/test`; they run on the JVM, so no device or emulator is needed.
 
 ```
-./gradlew :app:testDebugUnitTest
+./gradlew :app:testDebugUnitTest :charts:testDebugUnitTest
 ```
 
-The HTML report lands in `app/build/reports/tests/testDebugUnitTest/index.html`. Use the `:app:`
-task, not a bare `./gradlew test`: the `:baselineProfile` module has no unit tests and needs a
-connected device for everything else. From Android Studio, the gutter ▶ next to a test class or
+The HTML reports land in `app/build/reports/tests/testDebugUnitTest/index.html` and `charts/build/reports/tests/testDebugUnitTest/index.html`. Use the modules' tasks, not a bare `./gradlew test`: the `:baselineProfile` module has no unit tests and needs a connected device for everything else. From Android Studio, the gutter ▶ next to a test class or
 method runs it as an *Android JUnit* configuration; an *Android App* configuration only launches
 the app. The run also verifies the screenshot goldens — if it goes red right after a UI change,
 see [Screenshot tests](#screenshot-tests-roborazzi).
@@ -172,6 +170,8 @@ header, items and callbacks; the bottom sheet itself is Material's. Two Robolect
 measures text a few pixels wide, so a swipe has to be aimed at the container (`onRoot()` with explicit
 coordinates) rather than at a `Text` node; and an `Image` with a null `contentDescription` has no
 semantics node, so `EmptyViewTest` reads the illustration's presence from where the message lands.
+
+The charts (`BarChart`, `PieChart`, `ShareBar`) live in the `:charts` module, which knows nothing about money, months or categories. Their tests in `charts/src/test` render inside a plain `MaterialTheme` and pass their own labels, colors and value formatters, so they cannot use the app's helpers. How the app feeds and themes the charts is tested in the app: `ChartItemsTest` for the mapping from `MonthlyTotal` to bars, `ComponentScreenshotTests` for their look, and `AccessibilityTest` for what TalkBack hears.
 
 Screen tests (`features/<feature>/<Screen>Test`) render the stateful screen with a ViewModel built the
 way its `*ViewModelTest` builds it — the screens take the ViewModel as a parameter; only the
@@ -395,18 +395,17 @@ Android Lint reads the code without running it: the built-in checks plus four of
 Studio highlights both in the open file; for the whole project run
 
 ```
-./gradlew :app:lintDebug      # or the "Run Lint" configuration
+./gradlew :app:lintDebug :charts:lintDebug      # or the "Run Lint" configuration
 ```
 
-Report: `app/build/reports/lint-results-debug.html`. A new **error** fails the task (and, through
+Reports: `app/build/reports/lint-results-debug.html` and `charts/build/reports/lint-results-debug.html`. A new **error** fails the task (and, through
 `lintVitalRelease`, a release build); warnings are listed but do not fail. The project is clean:
 there is no baseline file. Fix a new issue rather than hiding it; when a warning is a deliberate
 choice, suppress it where it happens with `tools:ignore` (XML) or `@Suppress` (Kotlin) and a
 comment saying why — as `image_consulting_cuate.xml` does for its long vector paths, kept because
 simplifying them would change the empty-state goldens.
 
-The custom rules live in the `:lint` module (the nowinandroid pattern), wired into the app with
-`lintChecks(project(":lint"))`. Each one enforces a convention from this document:
+The custom rules live in the `:lint` module (the nowinandroid pattern), wired into the app and the `:charts` module with `lintChecks(project(":lint"))`. Each one enforces a convention from this document:
 
 | Issue id | Severity | Rule | Why |
 |---|---|---|---|
@@ -469,6 +468,7 @@ whose "≥ 80 % coverage on new code" condition shows on SonarCloud but does not
 | Navigation (`Navigator`, `NavigationState`, `MyFinanceAppState`) | `core/navigation/…` |
 | Theme resolution (Robolectric) | `core/theme/ThemeTest` |
 | Shared Compose components (Robolectric) | `core/components/…Test` |
+| Charts: header, axis labels, selection, reference line, entry animation, geometry (Robolectric) | `charts/src/test/…` |
 | Feature components: auth form and fields, dashboard cards, filter chips and sheets, profile sheets, budget sheet, labels list | `features/*/components/…Test`, `features/auth/AuthContentTest`, `features/labels/LabelsContentTest` |
 | Screens over their ViewModels: loading / empty / populated, validation, sheets, callbacks | `features/*/…ScreenTest` |
 | What TalkBack hears: control labels, silent decorative icons, chart bars and arcs, expand state | `app/AccessibilityTest` |

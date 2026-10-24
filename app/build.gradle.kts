@@ -123,6 +123,7 @@ kotlin {
 
 dependencies {
     lintChecks(project(":lint"))
+    implementation(project(":charts"))
 
     // AndroidX
     implementation(libs.androidx.core.ktx)

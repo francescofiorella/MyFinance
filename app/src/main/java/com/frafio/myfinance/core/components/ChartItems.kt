@@ -4,6 +4,8 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
+import com.frafio.charts.BarChartEntry
+import com.frafio.charts.PieChartItem
 import com.frafio.myfinance.core.data.model.CategoryColors
 import com.frafio.myfinance.core.data.model.MonthlyTotal
 import java.time.YearMonth

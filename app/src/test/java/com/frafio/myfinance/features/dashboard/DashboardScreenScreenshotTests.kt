@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import com.frafio.charts.R as ChartsR
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.testing.screenshot.captureMultiDevice
@@ -42,7 +43,7 @@ class DashboardScreenScreenshotTests {
                 Matchers.isIn(
                     screenshotBarChart.map {
                         string(
-                            R.string.charts_item_description,
+                            ChartsR.string.charts_item_description,
                             YearMonth.of(it.year, it.month).format(DateTimeFormatter.ofPattern("MMMM yyyy")),
                             doubleToPrice(it.value),
                         )

@@ -48,13 +48,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.frafio.charts.ShareBar
+import com.frafio.charts.ShareBarDefaults
+import com.frafio.charts.ShareBarItem
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.CategoryIcon
 import com.frafio.myfinance.core.components.PeriodStepper
-import com.frafio.myfinance.core.components.ShareBar
-import com.frafio.myfinance.core.components.ShareBarDefaults
-import com.frafio.myfinance.core.components.ShareBarItem
 import com.frafio.myfinance.core.components.SpendingChangeChip
 import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.ExpenseCategories
