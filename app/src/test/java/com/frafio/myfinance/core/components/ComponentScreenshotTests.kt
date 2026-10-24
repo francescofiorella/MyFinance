@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.ExpenseCategories
+import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.data.testIncome
 import com.frafio.myfinance.testing.screenshot.captureMultiTheme
@@ -75,10 +77,12 @@ class ComponentScreenshotTests {
                 Box(Modifier.size(360.dp)) {
                     PieChart(
                         items = listOf(
-                            PieChartItem(value = 45.0, label = "Dining", icon = R.drawable.ic_home_filled, colors = ExpenseCategories.all[0].colors),
-                            PieChartItem(value = 36.5, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled, colors = ExpenseCategories.all[1].colors),
-                            PieChartItem(value = 10.0, label = "Transport", icon = R.drawable.ic_grid_3x3_filled, colors = ExpenseCategories.all[2].colors),
+                            categoryPieChartItem(value = 45.0, label = "Dining", icon = R.drawable.ic_home_filled, colors = ExpenseCategories.all[0].colors),
+                            categoryPieChartItem(value = 36.5, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled, colors = ExpenseCategories.all[1].colors),
+                            categoryPieChartItem(value = 10.0, label = "Transport", icon = R.drawable.ic_grid_3x3_filled, colors = ExpenseCategories.all[2].colors),
                         ),
+                        totalLabel = stringResource(R.string.total),
+                        valueFormatter = ::doubleToPriceWithoutDecimals,
                         animationSpec = snap(),
                     )
                 }

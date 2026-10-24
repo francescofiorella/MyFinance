@@ -1,12 +1,15 @@
 package com.frafio.myfinance.core.components
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.snap
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.utils.activeCurrencyCode
+import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.frafio.myfinance.testing.util.string
 import org.junit.After
@@ -23,10 +26,20 @@ class PieChartTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val items = listOf(
-        PieChartItem(value = 30.0, label = "Dining", icon = R.drawable.ic_home_filled, colors = ExpenseCategories.all[0].colors),
-        PieChartItem(value = 45.0, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled, colors = ExpenseCategories.all[1].colors),
-    )
+    private val items
+        @Composable get() = listOf(
+            categoryPieChartItem(value = 30.0, label = "Dining", icon = R.drawable.ic_home_filled, colors = ExpenseCategories.all[0].colors),
+            categoryPieChartItem(value = 45.0, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled, colors = ExpenseCategories.all[1].colors),
+        )
+
+    @Composable
+    private fun TestPieChart(items: List<PieChartItem>, animationSpec: AnimationSpec<Float> = PieChartDefaults.AnimationSpec) =
+        PieChart(
+            items = items,
+            totalLabel = string(R.string.total),
+            valueFormatter = ::doubleToPriceWithoutDecimals,
+            animationSpec = animationSpec
+        )
 
     @Before
     fun setup() {
@@ -41,7 +54,7 @@ class PieChartTest {
     @Test
     fun nothingSelected_showsTotalAndTheSum() {
         composeTestRule.setThemedContent {
-            PieChart(items = items, animationSpec = snap())
+            TestPieChart(items = items, animationSpec = snap())
         }
 
         composeTestRule.onNodeWithText(string(R.string.total)).assertIsDisplayed()
@@ -52,7 +65,7 @@ class PieChartTest {
     @Test
     fun emptyItems_showsTotalAndZero() {
         composeTestRule.setThemedContent {
-            PieChart(items = emptyList(), animationSpec = snap())
+            TestPieChart(items = emptyList(), animationSpec = snap())
         }
 
         composeTestRule.onNodeWithText(string(R.string.total)).assertIsDisplayed()
@@ -62,7 +75,7 @@ class PieChartTest {
     @Test
     fun animated_showsTheSameCentreText() {
         composeTestRule.setThemedContent {
-            PieChart(items = items)
+            TestPieChart(items = items)
         }
 
         composeTestRule.onNodeWithText(string(R.string.total)).assertIsDisplayed()

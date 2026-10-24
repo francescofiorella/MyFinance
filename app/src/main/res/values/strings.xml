@@ -161,7 +161,8 @@
     <string name="next_period">Next period</string>
     <string name="current_period">Current period</string>
     <string name="chart_bar">%1$s, %2$s</string>
-    <string name="chart_slice">%1$s, %2$s</string>
+    <!-- A chart bar or slice for accessibility services: its label, then its value. -->
+    <string name="charts_item_description" translatable="false">%1$s, %2$s</string>
 
     <string name="budget_updated">Budget updated</string>
     <string name="income_deleted">Income deleted</string>

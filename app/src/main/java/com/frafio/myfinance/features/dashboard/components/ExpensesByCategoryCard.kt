@@ -29,9 +29,10 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.components.PieChart
-import com.frafio.myfinance.core.components.PieChartItem
+import com.frafio.myfinance.core.components.categoryPieChartItem
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -155,7 +156,7 @@ fun ExpensesByCategoryCard(
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 val chartItems = ExpenseCategories.all.mapIndexed { index, category ->
-                    PieChartItem(
+                    categoryPieChartItem(
                         value = values[index],
                         label = stringResource(category.nameRes),
                         icon = category.iconRes,
@@ -165,7 +166,9 @@ fun ExpensesByCategoryCard(
                 PieChart(
                     items = chartItems,
                     selectedIndex = selectedCategory,
-                    onSelectedIndexChange = { selectedCategory = it }
+                    onSelectedIndexChange = { selectedCategory = it },
+                    totalLabel = stringResource(R.string.total),
+                    valueFormatter = ::doubleToPriceWithoutDecimals
                 )
             }
         }

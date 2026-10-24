@@ -32,10 +32,10 @@ import androidx.window.core.layout.WindowSizeClass
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.BarChart
 import com.frafio.myfinance.core.components.PieChart
-import com.frafio.myfinance.core.components.PieChartItem
 import com.frafio.myfinance.core.components.SearchBar
 import com.frafio.myfinance.core.components.SheetDialog
 import com.frafio.myfinance.core.components.TransactionListItem
+import com.frafio.myfinance.core.components.categoryPieChartItem
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.ExpenseCategories
@@ -43,6 +43,7 @@ import com.frafio.myfinance.core.navigation.HomeTabKey
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.utils.activeCurrencyCode
 import com.frafio.myfinance.core.utils.doubleToPrice
+import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.features.add.AddLabelChip
 import com.frafio.myfinance.features.add.LabelChip
 import com.frafio.myfinance.features.budget.BudgetContent
@@ -146,19 +147,21 @@ class AccessibilityTest {
         composeTestRule.setThemedContent {
             PieChart(
                 items = listOf(
-                    PieChartItem(value = 30.0, label = "Dining", icon = R.drawable.ic_restaurant_filled, colors = ExpenseCategories.all[0].colors),
-                    PieChartItem(value = 45.0, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled, colors = ExpenseCategories.all[1].colors),
+                    categoryPieChartItem(value = 30.0, label = "Dining", icon = R.drawable.ic_restaurant_filled, colors = ExpenseCategories.all[0].colors),
+                    categoryPieChartItem(value = 45.0, label = "Groceries", icon = R.drawable.ic_shopping_cart_filled, colors = ExpenseCategories.all[1].colors),
                 ),
+                totalLabel = string(R.string.total),
+                valueFormatter = ::doubleToPriceWithoutDecimals,
                 animationSpec = snap(),
             )
         }
 
-        val dining = composeTestRule.onNodeWithContentDescription(string(R.string.chart_slice, "Dining", "€ 30"))
+        val dining = composeTestRule.onNodeWithContentDescription(string(R.string.charts_item_description, "Dining", "€ 30"))
         dining.assert(hasRole(Role.Button)).performClickAction()
 
         dining.assertIsSelected()
         composeTestRule.onNodeWithText("Dining").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription(string(R.string.chart_slice, "Groceries", "€ 45")).assertExists()
+        composeTestRule.onNodeWithContentDescription(string(R.string.charts_item_description, "Groceries", "€ 45")).assertExists()
     }
 
     @Test

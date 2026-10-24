@@ -167,7 +167,6 @@
     <string name="next_period">Periodo successivo</string>
     <string name="current_period">Periodo corrente</string>
     <string name="chart_bar">%1$s, %2$s</string>
-    <string name="chart_slice">%1$s, %2$s</string>
     <string name="category_month_spending">Totale mese</string>
     <string name="category_month_spending_description">Ultimi 12 mesi</string>
     <string name="no_spending_this_month">Nessuna spesa questo mese</string>

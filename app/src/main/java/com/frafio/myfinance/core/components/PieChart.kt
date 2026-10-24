@@ -14,7 +14,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,10 +54,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.model.CategoryColors
-import com.frafio.myfinance.core.data.model.ExpenseCategories
-import com.frafio.myfinance.core.theme.MyFinanceTheme
-import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
+import java.text.NumberFormat
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -76,13 +72,19 @@ object PieChartDefaults {
 
     /** How the arcs grow and shrink when the values change; pass `snap()` for a static chart. */
     val AnimationSpec: AnimationSpec<Float> = tween(ChartAnimationDuration, easing = AnimationEasing)
+
+    /** Formats the values in the centre and in the arcs' descriptions, in the default locale. */
+    val ValueFormatter: (Double) -> String = { NumberFormat.getInstance().format(it) }
 }
 
+/** An arc of [color], with [icon] tinted [iconColor] beside it; [labelColor] is used for [label] in the centre. */
 data class PieChartItem(
     val value: Double,
     val label: String,
-    @DrawableRes val icon: Int,
-    val colors: CategoryColors
+    val icon: Painter,
+    val color: Color,
+    val iconColor: Color,
+    val labelColor: Color = color
 )
 
 /** Degrees taken by the gap after an arc: its width plus [offsetPx], as an angle at [radiusPx]. */
@@ -102,11 +104,18 @@ internal fun arcSweeps(values: List<Double>, gapDegrees: Float): List<Float> {
     }
 }
 
-/** A pie chart that keeps its own selection, starting with none; a new set of items clears it. */
+/**
+ * A pie chart that keeps its own selection, starting with none; a new set of items clears it.
+ * With nothing selected the centre shows [totalLabel] and the sum of the values.
+ */
 @Composable
 fun PieChart(
     modifier: Modifier = Modifier,
     items: List<PieChartItem>,
+    totalLabel: String,
+    valueFormatter: (Double) -> String = PieChartDefaults.ValueFormatter,
+    emptyColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
     animationSpec: AnimationSpec<Float> = PieChartDefaults.AnimationSpec,
     radius: Dp = PieChartDefaults.Radius,
     arcWidth: Dp = PieChartDefaults.ArcWidth,
@@ -121,6 +130,10 @@ fun PieChart(
         items = items,
         selectedIndex = selectedIndex,
         onSelectedIndexChange = { selectedIndex = it },
+        totalLabel = totalLabel,
+        valueFormatter = valueFormatter,
+        emptyColor = emptyColor,
+        contentColor = contentColor,
         animationSpec = animationSpec,
         radius = radius,
         arcWidth = arcWidth,
@@ -131,13 +144,17 @@ fun PieChart(
     )
 }
 
-/** A pie chart whose selection is hoisted; -1 selects nothing and shows the total. */
+/** A pie chart whose selection is hoisted; -1 selects nothing and shows [totalLabel] with the sum. */
 @Composable
 fun PieChart(
     modifier: Modifier = Modifier,
     items: List<PieChartItem>,
     selectedIndex: Int,
     onSelectedIndexChange: (Int) -> Unit,
+    totalLabel: String,
+    valueFormatter: (Double) -> String = PieChartDefaults.ValueFormatter,
+    emptyColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
     animationSpec: AnimationSpec<Float> = PieChartDefaults.AnimationSpec,
     radius: Dp = PieChartDefaults.Radius,
     arcWidth: Dp = PieChartDefaults.ArcWidth,
@@ -155,9 +172,6 @@ fun PieChart(
     var pressedArcIndex by remember(items) { mutableIntStateOf(-1) }
 
     val interactionSources = remember(items.size) { List(items.size) { MutableInteractionSource() } }
-    val isDark = isSystemInDarkTheme()
-
-    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
 
     val arcWidthPx = with(density) { arcWidth.toPx() }
     val radiusPx = with(density) { radius.toPx() }
@@ -224,7 +238,7 @@ fun PieChart(
         if (emptyCircleAlpha > 0.001f) {
             Canvas(modifier = Modifier.size(radius * 2f)) {
                 drawArc(
-                    color = surfaceVariant.copy(alpha = emptyCircleAlpha),
+                    color = emptyColor.copy(alpha = emptyCircleAlpha),
                     startAngle = 0f,
                     sweepAngle = 360f,
                     useCenter = false,
@@ -238,14 +252,14 @@ fun PieChart(
             if (floatValues[index] > 0f || animatedValues[index].value > 0.01f) {
                 PieChartArc(
                     contentDescription = stringResource(
-                        R.string.chart_slice,
+                        R.string.charts_item_description,
                         items[index].label,
-                        doubleToPriceWithoutDecimals(items[index].value)
+                        valueFormatter(items[index].value)
                     ),
                     isSelected = selectedArcIndex == index,
-                    color = items[index].colors.container(isDark),
-                    iconPainter = painterResource(items[index].icon),
-                    iconOnColor = items[index].colors.onContainer(isDark),
+                    color = items[index].color,
+                    iconPainter = items[index].icon,
+                    iconOnColor = items[index].iconColor,
                     sweepState = animatedValues[index],
                     startAngleProvider = {
                         var start = -90f
@@ -283,19 +297,19 @@ fun PieChart(
                 onClick = { onSelectedIndexChange(-1) }
             )
         ) {
-            val title = if (selectedArcIndex != -1) items[selectedArcIndex].label else stringResource(R.string.total)
+            val title = if (selectedArcIndex != -1) items[selectedArcIndex].label else totalLabel
             val valueText = if (selectedArcIndex != -1) items[selectedArcIndex].value else items.sumOf { it.value }
 
             Text(
                 text = title,
-                color = if (selectedArcIndex != -1) items[selectedArcIndex].colors.text(isDark) else MaterialTheme.colorScheme.onSurface,
+                color = if (selectedArcIndex != -1) items[selectedArcIndex].labelColor else contentColor,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
             Text(
-                text = doubleToPriceWithoutDecimals(valueText),
-                color = MaterialTheme.colorScheme.onSurface,
+                text = valueFormatter(valueText),
+                color = contentColor,
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
@@ -428,29 +442,34 @@ private fun PieChartArc(
     }
 }
 
+@Composable
+private fun previewItem(value: Double, label: String, @DrawableRes icon: Int, color: Color) =
+    PieChartItem(value, label, painterResource(icon), color, iconColor = Color.White)
+
 @Preview(showBackground = true)
 @Composable
 fun PieChartPreview() {
-    MyFinanceTheme {
+    MaterialTheme {
         val items = listOf(
-            PieChartItem(1.0, "Housing", R.drawable.ic_home_filled, ExpenseCategories.all[0].colors),
-            PieChartItem(1.0, "Groceries", R.drawable.ic_shopping_cart_filled, ExpenseCategories.all[1].colors),
-            PieChartItem(1.0, "Personal Care", R.drawable.ic_self_care_filled, ExpenseCategories.all[2].colors)
+            previewItem(1.0, "Housing", android.R.drawable.ic_menu_compass, Color(0xFF6750A4)),
+            previewItem(1.0, "Groceries", android.R.drawable.ic_menu_gallery, Color(0xFF00897B)),
+            previewItem(1.0, "Personal Care", android.R.drawable.ic_menu_call, Color(0xFFD32F2F))
         )
-        PieChart(items = items)
+        PieChart(items = items, totalLabel = "Total")
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PieChartSingleEntryPreview() {
-    MyFinanceTheme {
+    MaterialTheme {
         val items = listOf(
-            PieChartItem(100.0, "Total", R.drawable.ic_home_filled, ExpenseCategories.all[0].colors),
-            PieChartItem(0.0, "Other", R.drawable.ic_grid_3x3_filled, ExpenseCategories.all[1].colors)
+            previewItem(100.0, "Housing", android.R.drawable.ic_menu_compass, Color(0xFF6750A4)),
+            previewItem(0.0, "Other", android.R.drawable.ic_menu_gallery, Color(0xFF00897B))
         )
         PieChart(
             items = items,
+            totalLabel = "Total",
             animationSpec = snap()
         )
     }
