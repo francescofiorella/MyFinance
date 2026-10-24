@@ -1,10 +1,10 @@
 package com.frafio.myfinance.core.data.repository
 
 import com.frafio.myfinance.core.data.dao.ExpenseDao
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,7 +39,7 @@ class ExpensesLocalRepositoryImpl @Inject constructor(
         startMonth: Int,
         endYear: Int,
         endMonth: Int
-    ): Flow<List<BarChartEntry>> =
+    ): Flow<List<MonthlyTotal>> =
         expenseDao.getPriceSumAfterAndBefore(startYear, startMonth, endYear, endMonth)
 
     override fun getEarliestYearMonth(): Flow<DatePoint?> = expenseDao.getEarliestYearMonth()

@@ -1,7 +1,7 @@
 package com.frafio.myfinance.features.categorydetail
 
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.data.model.SpendingChange
 import com.frafio.myfinance.core.data.model.spendingChange
 import com.frafio.myfinance.core.utils.expenseNameKey
@@ -33,7 +33,7 @@ data class CategoryDetailStats(
     /** Fraction of everything spent in the month, from 0 to 1. */
     val share: Double,
     /** [TREND_MONTHS] entries, oldest first. */
-    val trend: List<BarChartEntry>,
+    val trend: List<MonthlyTotal>,
     val topExpenses: List<Expense>,
     val frequent: List<FrequentExpense>,
     val labels: List<LabelSpending>
@@ -49,7 +49,7 @@ data class CategoryDetailStats(
 fun buildCategoryDetail(month: LocalDate, windowExpenses: List<Expense>, monthTotalAll: Double): CategoryDetailStats {
     val monthlySums = windowExpenses
         .groupBy { it.year to it.month }
-        .map { (yearMonth, expenses) -> BarChartEntry(expenses.sumOf { it.price }, yearMonth.first, yearMonth.second) }
+        .map { (yearMonth, expenses) -> MonthlyTotal(expenses.sumOf { it.price }, yearMonth.first, yearMonth.second) }
     val trend = fillMonthlyGaps(monthlySums, lastMonth = month, count = TREND_MONTHS)
     val monthTotal = trend.last().value
     val previousTotal = trend[trend.size - 2].value

@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.ExpenseCategories
+import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.data.testIncome
@@ -64,7 +65,12 @@ class ComponentScreenshotTests {
         composeTestRule.captureMultiTheme("BarChart") {
             Surface(color = MaterialTheme.colorScheme.background) {
                 Box(Modifier.width(360.dp).padding(16.dp)) {
-                    BarChart(entries = screenshotBarChart.takeLast(6), referenceValue = 300.0)
+                    BarChart(
+                        entries = screenshotBarChart.takeLast(6).map { it.toBarChartEntry() },
+                        referenceValue = 300.0,
+                        valueFormatter = ::doubleToPrice,
+                        referenceValueFormatter = ::doubleToPriceWithoutDecimals,
+                    )
                 }
             }
         }

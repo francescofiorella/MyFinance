@@ -1,9 +1,9 @@
 package com.frafio.myfinance.testing.repository
 
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -82,16 +82,16 @@ class TestExpensesLocalRepository : ExpensesLocalRepository {
         startMonth: Int,
         endYear: Int,
         endMonth: Int
-    ): Flow<List<BarChartEntry>> = expensesFlow.map { expenses ->
+    ): Flow<List<MonthlyTotal>> = expensesFlow.map { expenses ->
         val start = startYear * 100 + startMonth
         val end = endYear * 100 + endMonth
         expenses
             .filter { (it.year * 100 + it.month) in start until end }
             .groupBy { it.year to it.month }
             .map { (yearMonth, group) ->
-                BarChartEntry(group.sumOf { it.price }, yearMonth.first, yearMonth.second)
+                MonthlyTotal(group.sumOf { it.price }, yearMonth.first, yearMonth.second)
             }
-            .sortedWith(compareByDescending<BarChartEntry> { it.year }.thenByDescending { it.month })
+            .sortedWith(compareByDescending<MonthlyTotal> { it.year }.thenByDescending { it.month })
     }
 
     override fun getEarliestYearMonth(): Flow<DatePoint?> = expensesFlow.map { expenses ->

@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -41,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -54,22 +56,53 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.model.BarChartEntry
-import com.frafio.myfinance.core.theme.MyFinanceTheme
-import com.frafio.myfinance.core.utils.doubleToPrice
-import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import java.time.YearMonth
-import java.time.format.DateTimeFormatter
+import java.text.NumberFormat
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.roundToInt
+
+/**
+ * A bar of a [BarChart]. [key] orders the bars and identifies one across entry changes; keys need
+ * not be consecutive (e.g. months since year zero, with gaps). [label] is shown in the header and
+ * read by accessibility services, [axisLabel] under the bar, and [selectedAxisLabel] under it once selected.
+ */
+data class BarChartEntry(
+    val key: Int,
+    val value: Double,
+    val label: String,
+    val axisLabel: String,
+    val selectedAxisLabel: String = axisLabel
+)
+
+/**
+ * The colors of a [BarChart]: [contentColor] for the header and the selected axis label,
+ * [secondaryContentColor] for the other axis labels and the reference line.
+ */
+@Immutable
+data class BarChartColors(
+    val barColor: Color,
+    val selectedBarColor: Color,
+    val contentColor: Color,
+    val secondaryContentColor: Color
+)
 
 object BarChartDefaults {
     val BarWidth: Dp = 40.dp
     val BarPadding: Dp = 3.dp
     val BarMaxHeight: Dp = 160.dp
+
+    /** Formats the header value, the reference label and the bars' descriptions, in the default locale. */
+    val ValueFormatter: (Double) -> String = { NumberFormat.getInstance().format(it) }
+
+    @Composable
+    fun colors(
+        barColor: Color = MaterialTheme.colorScheme.secondaryContainer,
+        selectedBarColor: Color = MaterialTheme.colorScheme.primary,
+        contentColor: Color = MaterialTheme.colorScheme.onSurface,
+        secondaryContentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant
+    ): BarChartColors = BarChartColors(barColor, selectedBarColor, contentColor, secondaryContentColor)
 }
 
 /** How many bars of [barWidth] plus [barPadding] on each side fit in [maxWidth]; at least one. */
@@ -93,7 +126,7 @@ internal fun isAxisLabelShown(position: Int, latestPosition: Int, selectedPositi
 
 /**
  * Where [key] falls among the sorted bar [keys], as a fractional bar index: between two bars it is
- * proportional to the months in between, outside them one bar per month.
+ * proportional to the keys in between, outside them one bar per key.
  */
 internal fun stripIndexAt(keys: List<Int>, key: Float): Float {
     if (keys.isEmpty()) return 0f
@@ -104,8 +137,8 @@ internal fun stripIndexAt(keys: List<Int>, key: Float): Float {
 }
 
 /**
- * A bar chart that keeps its own selection, starting on the latest month. With an
- * [entryAnimationSpec], entry changes animate as one strip of equal bars, matched by month.
+ * A bar chart that keeps its own selection, starting on the latest entry. With an
+ * [entryAnimationSpec], entry changes animate as one strip of equal bars, matched by key.
  */
 @Composable
 fun BarChart(
@@ -114,6 +147,9 @@ fun BarChart(
     referenceValue: Double? = null,
     onBarClick: (Int) -> Unit = {},
     onVisibleCountChanged: (Int) -> Unit = {},
+    valueFormatter: (Double) -> String = BarChartDefaults.ValueFormatter,
+    referenceValueFormatter: (Double) -> String = valueFormatter,
+    colors: BarChartColors = BarChartDefaults.colors(),
     barWidth: Dp = BarChartDefaults.BarWidth,
     barPadding: Dp = BarChartDefaults.BarPadding,
     barMaxHeight: Dp = BarChartDefaults.BarMaxHeight,
@@ -130,6 +166,9 @@ fun BarChart(
         },
         referenceValue = referenceValue,
         onVisibleCountChanged = onVisibleCountChanged,
+        valueFormatter = valueFormatter,
+        referenceValueFormatter = referenceValueFormatter,
+        colors = colors,
         barWidth = barWidth,
         barPadding = barPadding,
         barMaxHeight = barMaxHeight,
@@ -139,8 +178,8 @@ fun BarChart(
 
 /**
  * A bar chart whose selection is hoisted. A [selectedIndex] outside [entries] (e.g. -1) selects the
- * latest month, so resetting it to -1 goes back to the default. With an [entryAnimationSpec], entry
- * changes animate as one strip of equal bars, matched by month: the shown months scroll and zoom to
+ * latest entry, so resetting it to -1 goes back to the default. With an [entryAnimationSpec], entry
+ * changes animate as one strip of equal bars, matched by key: the shown keys scroll and zoom to
  * the new ones, so added bars slide in and removed ones slide out at the edges.
  */
 @Composable
@@ -151,6 +190,9 @@ fun BarChart(
     onSelectedIndexChange: (Int) -> Unit,
     referenceValue: Double? = null,
     onVisibleCountChanged: (Int) -> Unit = {},
+    valueFormatter: (Double) -> String = BarChartDefaults.ValueFormatter,
+    referenceValueFormatter: (Double) -> String = valueFormatter,
+    colors: BarChartColors = BarChartDefaults.colors(),
     barWidth: Dp = BarChartDefaults.BarWidth,
     barPadding: Dp = BarChartDefaults.BarPadding,
     barMaxHeight: Dp = BarChartDefaults.BarMaxHeight,
@@ -174,7 +216,7 @@ fun BarChart(
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            BarChartHeader(entry = entries.getOrNull(shownIndex))
+            BarChartHeader(entry = entries.getOrNull(shownIndex), valueFormatter = valueFormatter, colors = colors)
             Spacer(modifier = Modifier.height(16.dp))
             BarChartBars(
                 strip = strip,
@@ -184,22 +226,18 @@ fun BarChart(
                 referenceValue = referenceValue,
                 latestValue = entries.lastOrNull()?.value,
                 isAnimated = entryAnimationSpec != null,
+                valueFormatter = valueFormatter,
+                referenceValueFormatter = referenceValueFormatter,
+                colors = colors,
                 barWidth = barWidth,
                 barPadding = barPadding,
                 barMaxHeight = barMaxHeight
             )
             Spacer(modifier = Modifier.height(4.dp))
-            BarChartAxis(strip = strip, selectedIndex = shownIndex, viewportWidth = viewportWidth)
+            BarChartAxis(strip = strip, selectedIndex = shownIndex, viewportWidth = viewportWidth, colors = colors)
         }
     }
 }
-
-private fun BarChartEntry.monthYear(): String =
-    YearMonth.of(year, month).format(DateTimeFormatter.ofPattern("MMMM yyyy"))
-
-/** Months since year zero: identifies a bar across entry changes and sorts it chronologically. */
-private val BarChartEntry.monthKey: Int
-    get() = year * 12 + month - 1
 
 private fun BarChartEntry.heightFraction(maxValue: Double): Float =
     (value / maxValue).toFloat().coerceIn(0.01f, 1f)
@@ -234,12 +272,12 @@ private fun Modifier.stripWindow(strip: BarStrip): Modifier = layout { measurabl
 }
 
 /**
- * Animation state keyed by month rather than position, since bars are added and removed on either
- * side and the [ButtonGroup] composes its items by position.
+ * Animation state keyed by entry key rather than position, since bars are added and removed on
+ * either side and the [ButtonGroup] composes its items by position.
  */
 private class BarTransitions {
     private val heights = HashMap<Int, Animatable<Float, AnimationVector1D>>()
-    // Month keys of the first and last bar filling the width.
+    // Keys of the first and last bar filling the width.
     private var first: Animatable<Float, AnimationVector1D>? = null
     private var last: Animatable<Float, AnimationVector1D>? = null
     private var drawn: List<DrawnBar> = emptyList()
@@ -254,18 +292,18 @@ private class BarTransitions {
             return BarStrip(emptyList(), { 0f }, { 0f })
         }
         // The first entries are shown at once, without sliding in.
-        val first = first ?: Animatable(entries.first().monthKey.toFloat()).also { first = it }
-        val last = last ?: Animatable(entries.last().monthKey.toFloat()).also { last = it }
+        val first = first ?: Animatable(entries.first().key.toFloat()).also { first = it }
+        val last = last ?: Animatable(entries.last().key.toFloat()).also { last = it }
         val current = entries.mapIndexed { index, entry ->
-            val h = heights.getOrPut(entry.monthKey) { Animatable(entry.heightFraction(maxValue)) }
+            val h = heights.getOrPut(entry.key) { Animatable(entry.heightFraction(maxValue)) }
             DrawnBar(entry, index) { h.value }
         }
-        val currentKeys = entries.mapTo(HashSet()) { it.monthKey }
+        val currentKeys = entries.mapTo(HashSet()) { it.key }
         val leaving = drawn
-            .filter { it.entry.monthKey !in currentKeys && it.entry.monthKey in heights }
+            .filter { it.entry.key !in currentKeys && it.entry.key in heights }
             .map { DrawnBar(it.entry, -1, it.heightFraction) }
-        drawn = (current + leaving).sortedBy { it.entry.monthKey }
-        val keys = drawn.map { it.entry.monthKey }
+        drawn = (current + leaving).sortedBy { it.entry.key }
+        val keys = drawn.map { it.entry.key }
         return BarStrip(drawn, { stripIndexAt(keys, first.value) }, { stripIndexAt(keys, last.value) })
     }
 
@@ -275,14 +313,14 @@ private class BarTransitions {
         val last = last ?: return
         val bars = drawn
         coroutineScope {
-            launch { first.animateTo(entries.first().monthKey.toFloat(), spec) }
-            launch { last.animateTo(entries.last().monthKey.toFloat(), spec) }
+            launch { first.animateTo(entries.first().key.toFloat(), spec) }
+            launch { last.animateTo(entries.last().key.toFloat(), spec) }
             bars.forEach { bar ->
-                val h = heights[bar.entry.monthKey] ?: return@forEach
+                val h = heights[bar.entry.key] ?: return@forEach
                 launch { h.animateTo(bar.entry.heightFraction(maxValue), spec) }
             }
         }
-        heights.keys.retainAll(entries.mapTo(HashSet()) { it.monthKey })
+        heights.keys.retainAll(entries.mapTo(HashSet()) { it.key })
     }
 }
 
@@ -313,19 +351,19 @@ private fun rememberBarStrip(
 }
 
 @Composable
-private fun BarChartHeader(entry: BarChartEntry?) {
+private fun BarChartHeader(entry: BarChartEntry?, valueFormatter: (Double) -> String, colors: BarChartColors) {
     Row(verticalAlignment = Alignment.Bottom) {
         Text(
-            text = entry?.let { doubleToPrice(it.value) } ?: "",
-            color = MaterialTheme.colorScheme.onSurface,
+            text = entry?.let { valueFormatter(it.value) } ?: "",
+            color = colors.contentColor,
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.SemiBold
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             modifier = Modifier.padding(bottom = 5.dp),
-            text = entry?.monthYear() ?: "",
-            color = MaterialTheme.colorScheme.onSurface,
+            text = entry?.label ?: "",
+            color = colors.contentColor,
             style = MaterialTheme.typography.labelSmall
         )
     }
@@ -334,12 +372,13 @@ private fun BarChartHeader(entry: BarChartEntry?) {
 /** What a bar shows, passed as one value so an animated bar can move between positions with its state. */
 private class ChartBarState(
     val modifier: Modifier,
-    val entry: BarChartEntry,
+    val contentDescription: String,
     val heightFraction: Float,
     val animateHeight: Boolean,
     val isSelected: Boolean,
     val onClick: () -> Unit,
     val interactionSource: MutableInteractionSource,
+    val colors: BarChartColors,
     val barWidth: Dp,
     val barPadding: Dp
 )
@@ -353,6 +392,9 @@ private fun BarChartBars(
     referenceValue: Double?,
     latestValue: Double?,
     isAnimated: Boolean,
+    valueFormatter: (Double) -> String,
+    referenceValueFormatter: (Double) -> String,
+    colors: BarChartColors,
     barWidth: Dp,
     barPadding: Dp,
     barMaxHeight: Dp
@@ -365,10 +407,10 @@ private fun BarChartBars(
     ) {
         val interactionSources = remember { HashMap<Int, MutableInteractionSource>() }
         // The ButtonGroup composes by position, while animated bars shift position as others slide
-        // in and out: movable content keeps each bar's state with its month.
+        // in and out: movable content keeps each bar's state with its key.
         val movableBars = remember { HashMap<Int, @Composable (ChartBarState) -> Unit>() }
         SideEffect {
-            val keys = strip.bars.mapTo(HashSet()) { it.entry.monthKey }
+            val keys = strip.bars.mapTo(HashSet()) { it.entry.key }
             movableBars.keys.retainAll(keys)
             interactionSources.keys.retainAll(keys)
         }
@@ -389,7 +431,7 @@ private fun BarChartBars(
                 }
             ) {
                 strip.bars.forEach { bar ->
-                    val key = bar.entry.monthKey
+                    val key = bar.entry.key
                     val interactionSource = interactionSources.getOrPut(key) { MutableInteractionSource() }
                     customItem(
                         {
@@ -397,12 +439,17 @@ private fun BarChartBars(
                                 modifier = Modifier
                                     .weight(1f)
                                     .animateWidth(interactionSource),
-                                entry = bar.entry,
+                                contentDescription = stringResource(
+                                    R.string.charts_item_description,
+                                    bar.entry.label,
+                                    valueFormatter(bar.entry.value)
+                                ),
                                 heightFraction = bar.heightFraction(),
                                 animateHeight = !isAnimated,
                                 isSelected = bar.index >= 0 && selectedIndex == bar.index,
                                 onClick = { if (bar.index >= 0) onBarClick(bar.index) },
                                 interactionSource = interactionSource,
+                                colors = colors,
                                 barWidth = barWidth,
                                 barPadding = barPadding
                             )
@@ -430,7 +477,7 @@ private fun BarChartBars(
                         .zIndex(-1f)
                         .fillMaxWidth()
                         .padding(bottom = barMaxHeight * animatedHeightFraction),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = colors.secondaryContentColor
                 )
                 if (latestValue <= referenceValue) {
                     Text(
@@ -444,8 +491,8 @@ private fun BarChartBars(
                                         .roundToInt()
                                 )
                             },
-                        text = doubleToPriceWithoutDecimals(referenceValue),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = referenceValueFormatter(referenceValue),
+                        color = colors.secondaryContentColor,
                         style = MaterialTheme.typography.labelSmall,
                         textAlign = TextAlign.End
                     )
@@ -456,7 +503,7 @@ private fun BarChartBars(
 }
 
 @Composable
-private fun BarChartAxis(strip: BarStrip, selectedIndex: Int, viewportWidth: Dp) {
+private fun BarChartAxis(strip: BarStrip, selectedIndex: Int, viewportWidth: Dp, colors: BarChartColors) {
     val bars = strip.bars
     val latestPosition = bars.indexOfLast { it.index >= 0 }
     val selectedPosition = bars.indexOfFirst { it.index >= 0 && it.index == selectedIndex }
@@ -479,13 +526,11 @@ private fun BarChartAxis(strip: BarStrip, selectedIndex: Int, viewportWidth: Dp)
             val center = position - start + 0.5f
             val isInside = center in 0f..visibleBars
             val isSelected = position == selectedPosition
-            val shortLabel = "%02d".format(bar.entry.month).takeLast(2)
-            val extendedLabel = shortLabel + "/" + "%02d".format(bar.entry.year).takeLast(2)
             Text(
-                text = if (isSelected) extendedLabel else shortLabel,
+                text = if (isSelected) bar.entry.selectedAxisLabel else bar.entry.axisLabel,
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (isSelected) colors.contentColor else colors.secondaryContentColor,
                 modifier = Modifier
                     .weight(1f)
                     .alpha(if (isInside) 1f else 0f)
@@ -509,11 +554,6 @@ private fun ChartBar(state: ChartBarState) {
         animationSpec = tween(durationMillis = 500),
         label = "BarHeight"
     )
-    val contentDescription = stringResource(
-        R.string.chart_bar,
-        state.entry.monthYear(),
-        doubleToPrice(state.entry.value)
-    )
     ToggleButton(
         checked = state.isSelected,
         onCheckedChange = {
@@ -521,12 +561,12 @@ private fun ChartBar(state: ChartBarState) {
         },
         content = {},
         colors = ToggleButtonDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            checkedContainerColor = MaterialTheme.colorScheme.primary
+            containerColor = state.colors.barColor,
+            checkedContainerColor = state.colors.selectedBarColor
         ),
         modifier = state.modifier
-            .semantics { this.contentDescription = contentDescription }
-            // Animated strips drive heights themselves, keyed by month.
+            .semantics { this.contentDescription = state.contentDescription }
+            // Animated strips drive heights themselves, keyed by entry key.
             .fillMaxHeight(if (state.animateHeight) animatedHeightFraction else state.heightFraction)
             .padding(horizontal = state.barPadding)
             .width(state.barWidth),
@@ -534,27 +574,24 @@ private fun ChartBar(state: ChartBarState) {
     )
 }
 
+private fun previewEntries(count: Int): List<BarChartEntry> = (0 until count).map {
+    val month = "%02d".format(it % 12 + 1)
+    val year = 2023 + it / 12
+    BarChartEntry(
+        key = it,
+        value = 60.0 + (it * 37) % 190,
+        label = "$month/$year",
+        axisLabel = month,
+        selectedAxisLabel = "$month/${year % 100}"
+    )
+}
+
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 fun BarChartPreview() {
-    val entries = listOf(
-        BarChartEntry(100.0, 2024, 1),
-        BarChartEntry(150.0, 2024, 2),
-        BarChartEntry(80.0, 2024, 3),
-        BarChartEntry(200.0, 2024, 4),
-        BarChartEntry(120.0, 2024, 5),
-        BarChartEntry(90.0, 2024, 6),
-        BarChartEntry(180.0, 2024, 7),
-        BarChartEntry(250.0, 2024, 8),
-        BarChartEntry(60.0, 2024, 9),
-        BarChartEntry(140.0, 2024, 10),
-        BarChartEntry(110.0, 2024, 11),
-        BarChartEntry(170.0, 2024, 12)
-    )
-
-    MyFinanceTheme {
+    MaterialTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
-            BarChart(entries = entries, referenceValue = 190.0)
+            BarChart(entries = previewEntries(12), referenceValue = 190.0)
         }
     }
 }
@@ -562,11 +599,9 @@ fun BarChartPreview() {
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 fun BarChartManyEntriesPreview() {
-    val entries = (0 until 24).map { BarChartEntry(60.0 + (it * 37) % 190, 2023 + it / 12, it % 12 + 1) }
-
-    MyFinanceTheme {
+    MaterialTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
-            BarChart(entries = entries, referenceValue = 190.0, entryAnimationSpec = tween(durationMillis = 500))
+            BarChart(entries = previewEntries(24), referenceValue = 190.0, entryAnimationSpec = tween(durationMillis = 500))
         }
     }
 }

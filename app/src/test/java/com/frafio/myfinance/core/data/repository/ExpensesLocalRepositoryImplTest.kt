@@ -1,10 +1,10 @@
 package com.frafio.myfinance.core.data.repository
 
 import com.frafio.myfinance.core.data.dao.ExpenseDao
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -76,7 +76,7 @@ class ExpensesLocalRepositoryImplTest {
             startMonth: Int,
             endYear: Int,
             endMonth: Int
-        ): Flow<List<BarChartEntry>> = flowOf(emptyList())
+        ): Flow<List<MonthlyTotal>> = flowOf(emptyList())
         override fun getExpensesOfMonth(year: Int, month: Int): Flow<List<Expense>> = flowOf(emptyList())
         override fun getExpensesOfYear(year: Int): Flow<List<Expense>> = flowOf(emptyList())
         override fun getExpensesOfCategory(category: Int, startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<Expense>> =

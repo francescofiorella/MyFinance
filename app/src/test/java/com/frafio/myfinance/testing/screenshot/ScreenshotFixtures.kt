@@ -1,9 +1,9 @@
 package com.frafio.myfinance.testing.screenshot
 
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.Income
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.data.testIncome
 import java.time.LocalDate
@@ -40,9 +40,9 @@ val screenshotIncomes: List<Income> = listOf(
 
 val screenshotIncomesMetadata: Map<Int, Pair<Int, Int>> = mapOf(1 to (0 to 2), 2 to (1 to 2))
 
-val screenshotBarChart: List<BarChartEntry> = listOf(
+val screenshotBarChart: List<MonthlyTotal> = listOf(
     120.0, 340.0, 210.0, 480.0, 150.0, 390.0, 260.0, 310.0, 430.0, 180.0, 290.0, 450.0,
-).mapIndexed { index, value -> BarChartEntry(value = value, year = 2024, month = index + 1) }
+).mapIndexed { index, value -> MonthlyTotal(value = value, year = 2024, month = index + 1) }
 
 val screenshotLabels: List<String> = listOf("Dinner", "Cheat Meal", "Work", "Holiday", "Gift")
 

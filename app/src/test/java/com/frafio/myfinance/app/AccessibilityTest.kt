@@ -36,9 +36,10 @@ import com.frafio.myfinance.core.components.SearchBar
 import com.frafio.myfinance.core.components.SheetDialog
 import com.frafio.myfinance.core.components.TransactionListItem
 import com.frafio.myfinance.core.components.categoryPieChartItem
+import com.frafio.myfinance.core.components.toBarChartEntry
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.ExpenseCategories
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.navigation.HomeTabKey
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.utils.activeCurrencyCode
@@ -135,11 +136,14 @@ class AccessibilityTest {
     @Test
     fun barChart_eachBarNamesItsMonthAndAmount() {
         composeTestRule.setThemedContent {
-            BarChart(entries = listOf(BarChartEntry(100.0, 2024, 1), BarChartEntry(250.5, 2024, 2)))
+            BarChart(
+                entries = listOf(MonthlyTotal(100.0, 2024, 1), MonthlyTotal(250.5, 2024, 2)).map { it.toBarChartEntry() },
+                valueFormatter = ::doubleToPrice,
+            )
         }
 
-        composeTestRule.onNodeWithContentDescription(string(R.string.chart_bar, "January 2024", doubleToPrice(100.0))).assertExists()
-        composeTestRule.onNodeWithContentDescription(string(R.string.chart_bar, "February 2024", doubleToPrice(250.5))).assertIsOn()
+        composeTestRule.onNodeWithContentDescription(string(R.string.charts_item_description, "January 2024", doubleToPrice(100.0))).assertExists()
+        composeTestRule.onNodeWithContentDescription(string(R.string.charts_item_description, "February 2024", doubleToPrice(250.5))).assertIsOn()
     }
 
     @Test
@@ -167,7 +171,7 @@ class AccessibilityTest {
     @Test
     fun monthlyChartCard_navigationButtonsAreLabelled() {
         composeTestRule.setThemedContent {
-            MonthlyExpensesChartCard(barChartData = listOf(BarChartEntry(1.0, 2024, 5)), monthlyBudget = 0.0, onPreviousDate = {}, onNextDate = {}, onToday = {})
+            MonthlyExpensesChartCard(barChartData = listOf(MonthlyTotal(1.0, 2024, 5)), monthlyBudget = 0.0, onPreviousDate = {}, onNextDate = {}, onToday = {})
         }
 
         listOf(R.string.previous_month, R.string.next_month, R.string.current_month).forEach {

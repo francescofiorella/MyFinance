@@ -15,7 +15,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.model.BarChartEntry
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.utils.activeCurrencyCode
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.util.setThemedContent
@@ -109,7 +109,7 @@ class DashboardCardsTest {
 
     // region MonthlyExpensesChartCard
 
-    private val entries = (9..12).map { BarChartEntry(value = it * 10.0, year = 2024, month = it) }
+    private val entries = (9..12).map { MonthlyTotal(value = it * 10.0, year = 2024, month = it) }
 
     @Test
     fun monthlyChart_navigationButtons_honourFlagsAndInvokeCallbacks() {
@@ -142,7 +142,7 @@ class DashboardCardsTest {
     }
 
     // January 2023 to December 2024, as loaded for the longest range.
-    private val twoYears = (0 until 24).map { BarChartEntry(value = 100.0 + it, year = 2023 + it / 12, month = it % 12 + 1) }
+    private val twoYears = (0 until 24).map { MonthlyTotal(value = 100.0 + it, year = 2023 + it / 12, month = it % 12 + 1) }
 
     // Months per range as the ViewModel would report them, with the dynamic range fitting 6.
     private val rangeCounts = listOf(6, 6, 12, 24)

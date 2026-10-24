@@ -1,8 +1,10 @@
 package com.frafio.myfinance.core.components
 
+import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,19 +19,19 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
-import com.frafio.myfinance.core.data.model.BarChartEntry
-import com.frafio.myfinance.core.utils.activeCurrencyCode
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.google.common.truth.Truth.assertThat
-import org.junit.After
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @RunWith(RobolectricTestRunner::class)
 class BarChartTest {
@@ -39,26 +41,47 @@ class BarChartTest {
 
     // Four bars at 40 + 2 * 3 dp each fit the 300 dp box used below without overflowing the ButtonGroup.
     private val entries = listOf(
-        BarChartEntry(value = 90.0, year = 2024, month = 9),
-        BarChartEntry(value = 100.0, year = 2024, month = 10),
-        BarChartEntry(value = 110.0, year = 2024, month = 11),
-        BarChartEntry(value = 120.0, year = 2024, month = 12),
+        entry(value = 90.0, year = 2024, month = 9),
+        entry(value = 100.0, year = 2024, month = 10),
+        entry(value = 110.0, year = 2024, month = 11),
+        entry(value = 120.0, year = 2024, month = 12),
     )
 
-    @Before
-    fun setup() {
-        activeCurrencyCode = "EUR"
-    }
+    /** A monthly bar, keyed and labelled the way the app builds them. */
+    private fun entry(value: Double, year: Int, month: Int) = BarChartEntry(
+        key = year * 12 + month - 1,
+        value = value,
+        label = YearMonth.of(year, month).format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.US)),
+        axisLabel = "%02d".format(month),
+        selectedAxisLabel = "%02d/%02d".format(month, year % 100)
+    )
 
-    @After
-    fun teardown() {
-        activeCurrencyCode = "EUR"
-    }
+    /** The chart with euro amounts: two decimals in the header, none on the reference line. */
+    @Composable
+    private fun TestBarChart(
+        entries: List<BarChartEntry>,
+        referenceValue: Double? = null,
+        onBarClick: (Int) -> Unit = {},
+        onVisibleCountChanged: (Int) -> Unit = {},
+        barWidth: Dp = BarChartDefaults.BarWidth,
+        barPadding: Dp = BarChartDefaults.BarPadding,
+        entryAnimationSpec: FiniteAnimationSpec<Float>? = null
+    ) = BarChart(
+        entries = entries,
+        referenceValue = referenceValue,
+        onBarClick = onBarClick,
+        onVisibleCountChanged = onVisibleCountChanged,
+        valueFormatter = { "€ %.2f".format(Locale.US, it) },
+        referenceValueFormatter = { "€ %.0f".format(Locale.US, it) },
+        barWidth = barWidth,
+        barPadding = barPadding,
+        entryAnimationSpec = entryAnimationSpec
+    )
 
     @Test
     fun header_showsTheLastEntryByDefault() {
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = entries) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries) }
         }
 
         composeTestRule.onNodeWithText("€ 120.00").assertIsDisplayed()
@@ -68,7 +91,7 @@ class BarChartTest {
     @Test
     fun axis_showsTwoDigitMonths_andTheSelectedOneAsMonthYear() {
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = entries) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries) }
         }
 
         composeTestRule.onNodeWithText("09").assertIsDisplayed()
@@ -82,7 +105,7 @@ class BarChartTest {
     fun barClick_selectsItAndReportsTheIndex() {
         val clicked = mutableListOf<Int>()
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = entries, onBarClick = { clicked += it }) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries, onBarClick = { clicked += it }) }
         }
 
         composeTestRule.onAllNodes(isToggleable())[1].performClick()
@@ -98,7 +121,7 @@ class BarChartTest {
     fun clickingTheSelectedBar_doesNotReportAgain() {
         val clicked = mutableListOf<Int>()
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = entries, onBarClick = { clicked += it }) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries, onBarClick = { clicked += it }) }
         }
 
         composeTestRule.onAllNodes(isToggleable())[3].performClick()
@@ -109,16 +132,16 @@ class BarChartTest {
     // The scale comes from the tallest bar, so the reference line only exists at or below it; the
     // label is added when the last bar is within the reference.
     private val unevenEntries = listOf(
-        BarChartEntry(value = 90.0, year = 2024, month = 9),
-        BarChartEntry(value = 150.0, year = 2024, month = 10),
-        BarChartEntry(value = 110.0, year = 2024, month = 11),
-        BarChartEntry(value = 100.0, year = 2024, month = 12),
+        entry(value = 90.0, year = 2024, month = 9),
+        entry(value = 150.0, year = 2024, month = 10),
+        entry(value = 110.0, year = 2024, month = 11),
+        entry(value = 100.0, year = 2024, month = 12),
     )
 
     @Test
     fun referenceValue_showsTheBudgetLabel_whenTheLastEntryIsWithinIt() {
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = unevenEntries, referenceValue = 120.0) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = unevenEntries, referenceValue = 120.0) }
         }
 
         composeTestRule.onNodeWithText("€ 120").assertIsDisplayed()
@@ -127,7 +150,7 @@ class BarChartTest {
     @Test
     fun referenceValue_hidesTheBudgetLabel_whenTheLastEntryExceedsIt() {
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = unevenEntries, referenceValue = 95.0) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = unevenEntries, referenceValue = 95.0) }
         }
 
         composeTestRule.onNodeWithText("€ 95").assertDoesNotExist()
@@ -136,7 +159,7 @@ class BarChartTest {
     @Test
     fun referenceValue_aboveTheTallestBar_isNotDrawn() {
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = unevenEntries, referenceValue = 200.0) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = unevenEntries, referenceValue = 200.0) }
         }
 
         composeTestRule.onNodeWithText("€ 200").assertDoesNotExist()
@@ -145,7 +168,7 @@ class BarChartTest {
     @Test
     fun noReferenceValue_showsNoBudgetLabel() {
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = unevenEntries) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = unevenEntries) }
         }
 
         composeTestRule.onNodeWithText("€ 120").assertDoesNotExist()
@@ -154,7 +177,7 @@ class BarChartTest {
     @Test
     fun emptyEntries_rendersWithoutBars() {
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = emptyList()) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = emptyList()) }
         }
 
         composeTestRule.onAllNodes(isToggleable()).assertCountEquals(0)
@@ -165,7 +188,7 @@ class BarChartTest {
     fun visibleCount_isReportedFromTheAvailableWidth() {
         val reported = mutableListOf<Int>()
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = entries, onVisibleCountChanged = { reported += it }) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries, onVisibleCountChanged = { reported += it }) }
         }
 
         // 300 dp / (40 + 2 * 3) dp = 6.5 → 6
@@ -177,7 +200,7 @@ class BarChartTest {
         val reported = mutableListOf<Int>()
         composeTestRule.setThemedContent {
             Box(Modifier.requiredWidth(300.dp)) {
-                BarChart(entries = entries, barWidth = 20.dp, barPadding = 5.dp, onVisibleCountChanged = { reported += it })
+                TestBarChart(entries = entries, barWidth = 20.dp, barPadding = 5.dp, onVisibleCountChanged = { reported += it })
             }
         }
 
@@ -188,12 +211,12 @@ class BarChartTest {
     private fun bar(monthYear: String) = composeTestRule.onNodeWithContentDescription(monthYear, substring = true)
 
     // January 2023 to December 2024, oldest first.
-    private val twoYears = (0 until 24).map { BarChartEntry(value = 10.0 + it, year = 2023 + it / 12, month = it % 12 + 1) }
+    private val twoYears = (0 until 24).map { entry(value = 10.0 + it, year = 2023 + it / 12, month = it % 12 + 1) }
 
     @Test
     fun manyEntries_areAllShown_withTheAxisThinnedOut() {
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = twoYears) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = twoYears) }
         }
 
         // 300 dp / 24 = 12.5 dp per bar → a label every 2 bars, counting back from December 2024.
@@ -209,7 +232,7 @@ class BarChartTest {
     fun withoutEntryAnimation_entryChangesApplyAtOnce() {
         var shown by mutableStateOf(twoYears.takeLast(12))
         composeTestRule.setThemedContent {
-            Box(Modifier.requiredWidth(300.dp)) { BarChart(entries = shown) }
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = shown) }
         }
         composeTestRule.mainClock.autoAdvance = false
 
@@ -226,7 +249,7 @@ class BarChartTest {
         var shown by mutableStateOf(twoYears.takeLast(12))
         composeTestRule.setThemedContent {
             Box(Modifier.requiredWidth(300.dp)) {
-                BarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
+                TestBarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
             }
         }
         composeTestRule.mainClock.autoAdvance = false
@@ -250,7 +273,7 @@ class BarChartTest {
         var shown by mutableStateOf(twoYears.takeLast(12))
         composeTestRule.setThemedContent {
             Box(Modifier.requiredWidth(300.dp)) {
-                BarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
+                TestBarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
             }
         }
         composeTestRule.mainClock.autoAdvance = false
@@ -273,7 +296,7 @@ class BarChartTest {
         // The dashboard card's chart width on a 411 dp phone, where new bars used to overflow.
         composeTestRule.setThemedContent {
             Box(Modifier.requiredWidth(331.dp)) {
-                BarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
+                TestBarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
             }
         }
 
@@ -290,7 +313,7 @@ class BarChartTest {
         var shown by mutableStateOf(twoYears.takeLast(6))
         composeTestRule.setThemedContent {
             Box(Modifier.requiredWidth(300.dp)) {
-                BarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
+                TestBarChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500))
             }
         }
 

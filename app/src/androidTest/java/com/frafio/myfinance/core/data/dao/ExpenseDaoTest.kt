@@ -1,9 +1,9 @@
 package com.frafio.myfinance.core.data.dao
 
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.utils.dateToUTCTimestamp
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.util.DatabaseTest
@@ -301,9 +301,9 @@ internal class ExpenseDaoTest : DatabaseTest() {
         val entries = expenseDao.getPriceSumAfterAndBefore(2024, 4, 2024, 7).first()
 
         assertThat(entries).containsExactly(
-            BarChartEntry(100.0, 2024, 6),
-            BarChartEntry(10.0, 2024, 5),
-            BarChartEntry(3.0, 2024, 4),
+            MonthlyTotal(100.0, 2024, 6),
+            MonthlyTotal(10.0, 2024, 5),
+            MonthlyTotal(3.0, 2024, 4),
         ).inOrder()
     }
 
@@ -321,9 +321,9 @@ internal class ExpenseDaoTest : DatabaseTest() {
         val entries = expenseDao.getPriceSumAfterAndBefore(2023, 11, 2024, 2).first()
 
         assertThat(entries).containsExactly(
-            BarChartEntry(8.0, 2024, 1),
-            BarChartEntry(4.0, 2023, 12),
-            BarChartEntry(2.0, 2023, 11),
+            MonthlyTotal(8.0, 2024, 1),
+            MonthlyTotal(4.0, 2023, 12),
+            MonthlyTotal(2.0, 2023, 11),
         ).inOrder()
     }
 

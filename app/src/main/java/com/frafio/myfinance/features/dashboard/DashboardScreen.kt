@@ -17,8 +17,8 @@ import com.frafio.myfinance.core.data.model.Expense
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import androidx.compose.ui.tooling.preview.Preview
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.components.EmptyView
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.features.dashboard.components.AnnualBalanceCard
 import com.frafio.myfinance.features.dashboard.components.BudgetIndicatorCard
@@ -165,18 +165,18 @@ fun DashboardPreview() {
                 incomesSum = 2000.0,
                 expensesSum = 1500.0,
                 barChartData = listOf(
-                    BarChartEntry(100.0, 2024, 1),
-                    BarChartEntry(150.0, 2024, 2),
-                    BarChartEntry(80.0, 2024, 3),
-                    BarChartEntry(200.0, 2024, 4),
-                    BarChartEntry(120.0, 2024, 5),
-                    BarChartEntry(90.0, 2024, 6),
-                    BarChartEntry(180.0, 2024, 7),
-                    BarChartEntry(250.0, 2024, 8),
-                    BarChartEntry(60.0, 2024, 9),
-                    BarChartEntry(140.0, 2024, 10),
-                    BarChartEntry(110.0, 2024, 11),
-                    BarChartEntry(170.0, 2024, 12)
+                    MonthlyTotal(100.0, 2024, 1),
+                    MonthlyTotal(150.0, 2024, 2),
+                    MonthlyTotal(80.0, 2024, 3),
+                    MonthlyTotal(200.0, 2024, 4),
+                    MonthlyTotal(120.0, 2024, 5),
+                    MonthlyTotal(90.0, 2024, 6),
+                    MonthlyTotal(180.0, 2024, 7),
+                    MonthlyTotal(250.0, 2024, 8),
+                    MonthlyTotal(60.0, 2024, 9),
+                    MonthlyTotal(140.0, 2024, 10),
+                    MonthlyTotal(110.0, 2024, 11),
+                    MonthlyTotal(170.0, 2024, 12)
                 ),
                 pieExpenses = emptyList(),
                 pieDate = LocalDate.of(2024, 5, 29),
@@ -209,7 +209,7 @@ internal fun DashboardContent(
     balanceYear: Int,
     incomesSum: Double,
     expensesSum: Double,
-    barChartData: List<BarChartEntry>,
+    barChartData: List<MonthlyTotal>,
     pieExpenses: List<Expense>,
     pieDate: LocalDate,
     monthlyShownInPie: Boolean,

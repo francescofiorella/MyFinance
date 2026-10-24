@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -23,15 +24,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.components.BarChart
 import com.frafio.myfinance.core.components.ConnectedToggleRow
 import com.frafio.myfinance.core.components.PeriodStepper
+import com.frafio.myfinance.core.components.toBarChartEntry
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.core.utils.doubleToPrice
+import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 
 @Composable
 fun MonthlyExpensesChartCard(
-    barChartData: List<BarChartEntry>,
+    barChartData: List<MonthlyTotal>,
     monthlyBudget: Double,
     onPreviousDate: () -> Unit,
     onNextDate: () -> Unit,
@@ -105,11 +109,13 @@ fun MonthlyExpensesChartCard(
             )
 
             BarChart(
-                entries = shownData,
+                entries = remember(shownData) { shownData.map { it.toBarChartEntry() } },
                 selectedIndex = if (selectedMonth >= firstShown) selectedMonth - firstShown else -1,
                 onSelectedIndexChange = { selectedMonth = it + firstShown },
                 referenceValue = monthlyBudget,
                 onVisibleCountChanged = onVisibleCountChanged,
+                valueFormatter = ::doubleToPrice,
+                referenceValueFormatter = ::doubleToPriceWithoutDecimals,
                 entryAnimationSpec = tween(durationMillis = 500)
             )
         }
@@ -122,18 +128,18 @@ fun MonthlyExpensesChartCardPreview() {
     MyFinanceTheme {
         MonthlyExpensesChartCard(
             barChartData = listOf(
-                BarChartEntry(100.0, 2024, 1),
-                BarChartEntry(150.0, 2024, 2),
-                BarChartEntry(80.0, 2024, 3),
-                BarChartEntry(200.0, 2024, 4),
-                BarChartEntry(120.0, 2024, 5),
-                BarChartEntry(90.0, 2024, 6),
-                BarChartEntry(180.0, 2024, 7),
-                BarChartEntry(250.0, 2024, 8),
-                BarChartEntry(60.0, 2024, 9),
-                BarChartEntry(140.0, 2024, 10),
-                BarChartEntry(110.0, 2024, 11),
-                BarChartEntry(170.0, 2024, 12)
+                MonthlyTotal(100.0, 2024, 1),
+                MonthlyTotal(150.0, 2024, 2),
+                MonthlyTotal(80.0, 2024, 3),
+                MonthlyTotal(200.0, 2024, 4),
+                MonthlyTotal(120.0, 2024, 5),
+                MonthlyTotal(90.0, 2024, 6),
+                MonthlyTotal(180.0, 2024, 7),
+                MonthlyTotal(250.0, 2024, 8),
+                MonthlyTotal(60.0, 2024, 9),
+                MonthlyTotal(140.0, 2024, 10),
+                MonthlyTotal(110.0, 2024, 11),
+                MonthlyTotal(170.0, 2024, 12)
             ),
             monthlyBudget = 1000.0,
             onPreviousDate = {},

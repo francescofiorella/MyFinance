@@ -2,9 +2,9 @@ package com.frafio.myfinance.core.utils
 
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.Income
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import java.time.LocalDate
 
 fun getCurrencyIcon(currencyCode: String): Int {
@@ -256,11 +256,11 @@ fun addTotalsToIncomes(incomes: List<Income>, today: LocalDate = LocalDate.now()
  * One entry per month for the [count] months ending with [lastMonth], oldest first.
  * Months missing from [entries] get a zero entry, so a chart shows gaps as empty bars.
  */
-fun fillMonthlyGaps(entries: List<BarChartEntry>, lastMonth: LocalDate, count: Int): List<BarChartEntry> {
+fun fillMonthlyGaps(entries: List<MonthlyTotal>, lastMonth: LocalDate, count: Int): List<MonthlyTotal> {
     val byMonth = entries.associateBy { it.year * 100 + it.month }
     return (count - 1 downTo 0).map { offset ->
         val date = lastMonth.minusMonths(offset.toLong())
-        byMonth[date.year * 100 + date.monthValue] ?: BarChartEntry(0.0, date.year, date.monthValue)
+        byMonth[date.year * 100 + date.monthValue] ?: MonthlyTotal(0.0, date.year, date.monthValue)
     }
 }
 

@@ -1,9 +1,9 @@
 package com.frafio.myfinance.core.data.repository
 
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import kotlinx.coroutines.flow.Flow
 
 interface ExpensesLocalRepository {
@@ -27,7 +27,7 @@ interface ExpensesLocalRepository {
         startMonth: Int,
         endYear: Int,
         endMonth: Int
-    ): Flow<List<BarChartEntry>>
+    ): Flow<List<MonthlyTotal>>
 
     fun getEarliestYearMonth(): Flow<DatePoint?>
 

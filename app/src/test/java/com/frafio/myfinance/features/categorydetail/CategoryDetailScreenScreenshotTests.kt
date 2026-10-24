@@ -46,7 +46,7 @@ class CategoryDetailScreenScreenshotTests {
                 Matchers.isIn(
                     stats.trend.map {
                         string(
-                            R.string.chart_bar,
+                            R.string.charts_item_description,
                             YearMonth.of(it.year, it.month).format(DateTimeFormatter.ofPattern("MMMM yyyy")),
                             doubleToPrice(it.value),
                         )

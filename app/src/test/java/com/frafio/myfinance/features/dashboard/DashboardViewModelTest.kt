@@ -1,7 +1,7 @@
 package com.frafio.myfinance.features.dashboard
 
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.DatePoint
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.data.testIncome
@@ -254,7 +254,7 @@ class DashboardViewModelTest {
                 5 -> 50.0
                 else -> 0.0
             }
-            BarChartEntry(value, month.year, month.monthValue)
+            MonthlyTotal(value, month.year, month.monthValue)
         }
         assertThat(viewModel.barChartData.value).containsExactlyElementsIn(expected).inOrder()
     }
@@ -365,7 +365,7 @@ class DashboardViewModelTest {
         assertThat(viewModel.isNextBarChartDateEnabled.value).isTrue()
         val lastShown = thisMonth.minusMonths(1)
         assertThat(viewModel.barChartData.value.last())
-            .isEqualTo(BarChartEntry(0.0, lastShown.year, lastShown.monthValue))
+            .isEqualTo(MonthlyTotal(0.0, lastShown.year, lastShown.monthValue))
 
         viewModel.todayBarChartDate()
         assertThat(viewModel.isNextBarChartDateEnabled.value).isFalse()

@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -45,6 +46,7 @@ import com.frafio.myfinance.core.components.BarChart
 import com.frafio.myfinance.core.components.CategoryIcon
 import com.frafio.myfinance.core.components.SpendingChangeChip
 import com.frafio.myfinance.core.components.TransactionListItem
+import com.frafio.myfinance.core.components.toBarChartEntry
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.ExpenseCategory
@@ -330,7 +332,8 @@ private fun TrendCard(stats: CategoryDetailStats) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             BarChart(
-                entries = stats.trend
+                entries = remember(stats.trend) { stats.trend.map { it.toBarChartEntry() } },
+                valueFormatter = ::doubleToPrice
             )
         }
     }

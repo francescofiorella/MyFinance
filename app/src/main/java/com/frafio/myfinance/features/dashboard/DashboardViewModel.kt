@@ -2,9 +2,9 @@ package com.frafio.myfinance.features.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.core.data.repository.LoadingRepository
@@ -186,7 +186,7 @@ class DashboardViewModel @Inject constructor(
     val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()
 
     /** The months of the longest range, or more if more fit the width, so switching range only changes how many the chart shows. */
-    val barChartData: StateFlow<List<BarChartEntry>> = combine(
+    val barChartData: StateFlow<List<MonthlyTotal>> = combine(
         _lastDateForBarChart,
         _barChartVisibleItems.map { maxOf(it, BAR_CHART_RANGE_COUNTS.maxOf { count -> count ?: 0 }) }.distinctUntilChanged()
     ) { date, count ->

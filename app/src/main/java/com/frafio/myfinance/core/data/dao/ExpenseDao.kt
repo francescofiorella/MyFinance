@@ -8,10 +8,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.frafio.myfinance.core.data.model.BarChartEntry
 import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.DatePoint
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 
 @Dao
 interface ExpenseDao : BaseDao<Expense> {
@@ -61,7 +61,7 @@ interface ExpenseDao : BaseDao<Expense> {
             "  AND (year * 100 + month) < (:endYear * 100 + :endMonth) " +
             "GROUP BY year, month " +
             "ORDER BY year DESC, month DESC")
-    fun getPriceSumAfterAndBefore(startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<BarChartEntry>>
+    fun getPriceSumAfterAndBefore(startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<MonthlyTotal>>
 
     @Query("SELECT * " +
             "FROM expense " +
