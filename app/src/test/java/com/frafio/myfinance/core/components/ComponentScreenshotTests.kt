@@ -2,6 +2,7 @@ package com.frafio.myfinance.core.components
 
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.snap
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -90,9 +91,10 @@ class ComponentScreenshotTests {
         composeTestRule.captureMultiTheme("ShareBar") {
             Surface(color = MaterialTheme.colorScheme.background) {
                 Box(Modifier.width(360.dp).padding(16.dp)) {
+                    val isDark = isSystemInDarkTheme()
                     ShareBar(
                         items = listOf(45.0, 36.5, 0.0, 10.0).mapIndexed { index, value ->
-                            ShareBarItem(value = value, colors = ExpenseCategories.all[index].colors)
+                            ShareBarItem(value = value, color = ExpenseCategories.all[index].colors.container(isDark))
                         },
                         animationSpec = snap(),
                     )

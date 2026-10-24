@@ -7,7 +7,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,13 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.frafio.myfinance.core.data.model.CategoryColors
-import com.frafio.myfinance.core.data.model.ExpenseCategories
-import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 object ShareBarDefaults {
     val Height: Dp = 12.dp
@@ -43,7 +40,7 @@ object ShareBarDefaults {
 
 data class ShareBarItem(
     val value: Double,
-    val colors: CategoryColors
+    val color: Color
 )
 
 /** Each value's fraction of the width left after the gaps. */
@@ -66,10 +63,9 @@ fun ShareBar(
     items: List<ShareBarItem>,
     animationSpec: AnimationSpec<Float> = ShareBarDefaults.AnimationSpec,
     height: Dp = ShareBarDefaults.Height,
-    gap: Dp = ShareBarDefaults.Gap
+    gap: Dp = ShareBarDefaults.Gap,
+    emptyColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest
 ) {
-    val isDark = isSystemInDarkTheme()
-    val emptyColor = MaterialTheme.colorScheme.surfaceContainerHighest
     val gapPx = with(LocalDensity.current) { gap.toPx() }
 
     val values = items.map { it.value }
@@ -90,7 +86,6 @@ fun ShareBar(
         animationSpec = animationSpec,
         label = "empty_alpha"
     )
-    val colors = items.map { it.colors.container(isDark) }
 
     Canvas(
         modifier = modifier
@@ -107,7 +102,7 @@ fun ShareBar(
             val width = animatedFractions[index].value * available
             if (fractions[index] > 0f || animatedFractions[index].value > 0.001f) {
                 drawRect(
-                    color = colors[index],
+                    color = items[index].color,
                     topLeft = Offset(x, 0f),
                     size = Size(width, size.height),
                     alpha = animatedAlphas[index].value
@@ -121,12 +116,11 @@ fun ShareBar(
 @Preview(showBackground = true)
 @Composable
 fun ShareBarPreview() {
-    MyFinanceTheme {
+    MaterialTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
             ShareBar(
-                items = ExpenseCategories.all.take(4).mapIndexed { index, category ->
-                    ShareBarItem(value = (index + 1) * 10.0, colors = category.colors)
-                },
+                items = listOf(Color(0xFF6750A4), Color(0xFF00897B), Color(0xFFF9A825), Color(0xFFD32F2F))
+                    .mapIndexed { index, color -> ShareBarItem(value = (index + 1) * 10.0, color = color) },
                 animationSpec = snap()
             )
         }

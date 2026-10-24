@@ -196,10 +196,11 @@ private fun MonthHeader(
         LaunchedEffect(state.spending.isNotEmpty()) {
             if (state.spending.isNotEmpty()) hasLoaded = true
         }
+        val isDark = isSystemInDarkTheme()
         ShareBar(
             modifier = Modifier.padding(top = 12.dp, end = 8.dp),
             // Fixed category order, so each segment grows or shrinks in place when the month changes.
-            items = ExpenseCategories.all.map { ShareBarItem(value = totals[it.id] ?: 0.0, colors = it.colors) },
+            items = ExpenseCategories.all.map { ShareBarItem(value = totals[it.id] ?: 0.0, color = it.colors.container(isDark)) },
             animationSpec = if (hasLoaded) ShareBarDefaults.AnimationSpec else snap()
         )
     }
