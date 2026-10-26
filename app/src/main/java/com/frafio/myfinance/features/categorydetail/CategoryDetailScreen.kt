@@ -54,6 +54,7 @@ import com.frafio.myfinance.core.data.model.ExpenseCategory
 import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
 import com.frafio.myfinance.core.utils.doubleToPercent
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.core.utils.monthToString
@@ -71,6 +72,7 @@ fun CategoryDetailScreen(
     val trendRange by viewModel.trendRange.collectAsStateWithLifecycle()
     val trendShownCount by viewModel.trendShownCount.collectAsStateWithLifecycle()
     val trendTrackingStart by viewModel.trendTrackingStart.collectAsStateWithLifecycle()
+    val trendAvailableRanges by viewModel.trendAvailableRanges.collectAsStateWithLifecycle()
     CategoryDetailContent(
         category = viewModel.category,
         month = viewModel.month,
@@ -80,6 +82,7 @@ fun CategoryDetailScreen(
         onTrendRangeChange = viewModel::selectTrendRange,
         trendShownCount = trendShownCount,
         onTrendVisibleCountChanged = viewModel::setTrendVisibleItems,
+        trendAvailableRanges = trendAvailableRanges,
         trendTrackingStart = trendTrackingStart,
         onBackClick = onBackClick,
         onSeeAllExpenses = {
@@ -115,6 +118,7 @@ fun CategoryDetailContent(
     onTrendRangeChange: (Int) -> Unit = {},
     trendShownCount: Int = trend.size,
     onTrendVisibleCountChanged: (Int) -> Unit = {},
+    trendAvailableRanges: List<Int> = ALL_MONTH_RANGES,
     trendTrackingStart: LocalDate? = null
 ) {
     Scaffold(
@@ -148,6 +152,7 @@ fun CategoryDetailContent(
                         onRangeChange = onTrendRangeChange,
                         shownCount = trendShownCount,
                         onVisibleCountChanged = onTrendVisibleCountChanged,
+                        availableRanges = trendAvailableRanges,
                         trackingStart = trendTrackingStart
                     )
 
@@ -347,6 +352,7 @@ private fun TrendCard(
     onRangeChange: (Int) -> Unit,
     shownCount: Int,
     onVisibleCountChanged: (Int) -> Unit,
+    availableRanges: List<Int>,
     trackingStart: LocalDate?
 ) {
     // Index into trend; -1 selects the latest month.
@@ -372,6 +378,7 @@ private fun TrendCard(
                 onSelectedRangeChange = onRangeChange,
                 selectedMonth = selectedMonth,
                 onSelectedMonthChange = { selectedMonth = it },
+                availableRanges = availableRanges,
                 trackingStart = trackingStart,
                 onVisibleCountChanged = onVisibleCountChanged
             )

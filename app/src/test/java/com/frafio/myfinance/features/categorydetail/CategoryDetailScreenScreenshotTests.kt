@@ -7,6 +7,7 @@ import com.frafio.charts.R as ChartsR
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.data.model.ExpenseCategories
+import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
 import com.frafio.myfinance.testing.screenshot.captureForDevice
@@ -25,6 +26,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
+import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
@@ -74,15 +76,34 @@ class CategoryDetailScreenScreenshotTests {
         }
     }
 
+    @Test
+    fun detail_shortHistory() {
+        // Three tracked months on Auto's seven bars: older months have no data and no range buttons are offered.
+        composeTestRule.captureForDevice(
+            DefaultTestDevices.PHONE.spec, "CategoryDetailScreenShortHistory", deviceName = "phone",
+            accessibilitySuppressions = narrowChartBars,
+        ) {
+            Detail(stats, shownCount = 7, availableRanges = listOf(0), trackingStart = month.minusMonths(2))
+        }
+    }
+
     @Composable
-    private fun Detail(stats: CategoryDetailStats?) {
+    private fun Detail(
+        stats: CategoryDetailStats?,
+        shownCount: Int = stats?.trend.orEmpty().size,
+        availableRanges: List<Int> = ALL_MONTH_RANGES,
+        trackingStart: LocalDate? = null
+    ) {
         CategoryDetailContent(
             category = ExpenseCategories.get(CATEGORIES.DINING.value),
             month = month,
             stats = stats,
             onBackClick = {},
             onSeeAllExpenses = {},
-            onFrequentExpenseClick = {}
+            onFrequentExpenseClick = {},
+            trendShownCount = shownCount,
+            trendAvailableRanges = availableRanges,
+            trendTrackingStart = trackingStart
         )
     }
 }

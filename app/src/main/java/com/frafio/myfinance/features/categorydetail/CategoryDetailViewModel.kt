@@ -11,9 +11,13 @@ import com.frafio.myfinance.core.data.repository.PendingExpensesFilter
 import com.frafio.myfinance.core.di.Dispatcher
 import com.frafio.myfinance.core.di.MyFinanceDispatchers.Default
 import com.frafio.myfinance.core.navigation.RootKey
+import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
 import com.frafio.myfinance.core.utils.MONTH_RANGE_COUNTS
+import com.frafio.myfinance.core.utils.availableMonthRanges
 import com.frafio.myfinance.core.utils.monthRangeCount
 import com.frafio.myfinance.core.utils.monthsToLoad
+import com.frafio.myfinance.core.utils.shownMonthRange
+import com.frafio.myfinance.core.utils.trackedMonths
 import com.frafio.myfinance.core.utils.trackingStart
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -78,9 +82,26 @@ class CategoryDetailViewModel @AssistedInject constructor(
     // How many bars fit the trend chart's width, used by the Auto range.
     private val _trendVisibleItems = MutableStateFlow(6)
 
+    /**
+     * The first month the trend has data for: the earliest expense of any category, so a category's
+     * empty months after it are real zeros. Older months show as no data. Null until loaded.
+     */
+    val trendTrackingStart: StateFlow<LocalDate?> = expensesLocalRepository.getEarliestYearMonth()
+        .map { trackingStart(it, month) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    /** The ranges worth offering for the months tracked up to [month]. */
+    val trendAvailableRanges: StateFlow<List<Int>> = combine(trendTrackingStart, _trendVisibleItems) { start, visibleItems ->
+        start?.let { availableMonthRanges(trackedMonths(it, month), visibleItems) } ?: ALL_MONTH_RANGES
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ALL_MONTH_RANGES)
+
     /** How many months the trend chart shows. */
-    val trendShownCount: StateFlow<Int> = combine(_trendRange, _trendVisibleItems) { range, visibleItems ->
-        monthRangeCount(range, visibleItems)
+    val trendShownCount: StateFlow<Int> = combine(
+        _trendRange,
+        _trendVisibleItems,
+        trendAvailableRanges
+    ) { range, visibleItems, available ->
+        monthRangeCount(shownMonthRange(range, available), visibleItems)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _trendVisibleItems.value)
 
     /** The category's monthly totals up to [month], enough for every range, oldest first. */
@@ -95,14 +116,6 @@ class CategoryDetailViewModel @AssistedInject constructor(
         }
         .flowOn(defaultDispatcher)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    /**
-     * The first month the trend has data for: the earliest expense of any category, so a category's
-     * empty months after it are real zeros. Older months show as no data. Null until loaded.
-     */
-    val trendTrackingStart: StateFlow<LocalDate?> = expensesLocalRepository.getEarliestYearMonth()
-        .map { trackingStart(it, month) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun selectTrendRange(index: Int) {
         _trendRange.value = index.coerceIn(MONTH_RANGE_COUNTS.indices)

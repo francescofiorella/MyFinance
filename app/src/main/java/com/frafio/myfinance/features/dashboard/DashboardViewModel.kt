@@ -9,10 +9,14 @@ import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
+import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
 import com.frafio.myfinance.core.utils.MONTH_RANGE_COUNTS
+import com.frafio.myfinance.core.utils.availableMonthRanges
 import com.frafio.myfinance.core.utils.fillMonthlyGaps
 import com.frafio.myfinance.core.utils.monthRangeCount
 import com.frafio.myfinance.core.utils.monthsToLoad
+import com.frafio.myfinance.core.utils.shownMonthRange
+import com.frafio.myfinance.core.utils.trackedMonths
 import com.frafio.myfinance.core.utils.trackingStart
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -50,6 +54,8 @@ class DashboardViewModel @Inject constructor(
 ) : ViewModel() {
 
     val today: LocalDate = LocalDate.now()
+
+    private val thisMonth: LocalDate = today.with(TemporalAdjusters.firstDayOfMonth())
 
     private val _monthShown = MutableStateFlow(true)
     val monthShown: StateFlow<Boolean> = _monthShown.asStateFlow()
@@ -171,8 +177,22 @@ class DashboardViewModel @Inject constructor(
     // How many bars fit the chart width, used by the dynamic range.
     private val _barChartVisibleItems = MutableStateFlow(6)
 
-    val barChartShownCount: StateFlow<Int> = combine(_barChartRange, _barChartVisibleItems) { range, visibleItems ->
-        monthRangeCount(range, visibleItems)
+    /** The first month the bar chart has data for, counted up to this month; older months show as no data. Null until loaded. */
+    val barChartTrackingStart: StateFlow<LocalDate?> = expensesLocalRepository.getEarliestYearMonth()
+        .map { trackingStart(it, thisMonth) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    /** The ranges worth offering for the months tracked up to this month, so they don't change while stepping back. */
+    val barChartAvailableRanges: StateFlow<List<Int>> = combine(barChartTrackingStart, _barChartVisibleItems) { start, visibleItems ->
+        start?.let { availableMonthRanges(trackedMonths(it, thisMonth), visibleItems) } ?: ALL_MONTH_RANGES
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ALL_MONTH_RANGES)
+
+    val barChartShownCount: StateFlow<Int> = combine(
+        _barChartRange,
+        _barChartVisibleItems,
+        barChartAvailableRanges
+    ) { range, visibleItems, available ->
+        monthRangeCount(shownMonthRange(range, available), visibleItems)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _barChartVisibleItems.value)
 
     val isPreviousBarChartDateEnabled: StateFlow<Boolean> = combine(
@@ -185,11 +205,6 @@ class DashboardViewModel @Inject constructor(
             (oldestShown.year > it.year) || (oldestShown.year == it.year && oldestShown.monthValue > it.month)
         } ?: false
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
-
-    /** The first month the bar chart has data for, counted up to this month; older months show as no data. Null until loaded. */
-    val barChartTrackingStart: StateFlow<LocalDate?> = expensesLocalRepository.getEarliestYearMonth()
-        .map { trackingStart(it, today.with(TemporalAdjusters.firstDayOfMonth())) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     private val _scrollToTop = MutableSharedFlow<Unit>(replay = 0)
     val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()

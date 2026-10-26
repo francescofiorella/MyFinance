@@ -194,6 +194,25 @@ class CategoryDetailScreenTest {
         bar("May 2024").assertExists()
     }
 
+    @Test
+    fun trendCard_onlyAuto_hidesTheRangeButtons() {
+        composeTestRule.setThemedContent {
+            CategoryDetailContent(
+                category = dining,
+                month = month,
+                stats = stats,
+                onBackClick = {},
+                onSeeAllExpenses = {},
+                onFrequentExpenseClick = {},
+                trendAvailableRanges = listOf(0)
+            )
+        }
+
+        composeTestRule.onNodeWithText(string(R.string.spending_trend)).performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_dynamic)).assertDoesNotExist()
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_1_year)).assertDoesNotExist()
+    }
+
     private fun bar(monthYear: String) = composeTestRule.onNodeWithContentDescription(monthYear, substring = true)
 
     @Test

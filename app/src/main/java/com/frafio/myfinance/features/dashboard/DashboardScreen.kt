@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.frafio.myfinance.core.components.EmptyView
 import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
 import com.frafio.myfinance.features.dashboard.components.AnnualBalanceCard
 import com.frafio.myfinance.features.dashboard.components.BudgetIndicatorCard
 import com.frafio.myfinance.features.dashboard.components.ExpensesByCategoryCard
@@ -82,6 +83,7 @@ fun DashboardContent(
     val barChartRange by viewModel.barChartRange.collectAsStateWithLifecycle()
     val barChartShownCount by viewModel.barChartShownCount.collectAsStateWithLifecycle()
     val barChartTrackingStart by viewModel.barChartTrackingStart.collectAsStateWithLifecycle()
+    val barChartAvailableRanges by viewModel.barChartAvailableRanges.collectAsStateWithLifecycle()
     val isNextBarDateEnabled by viewModel.isNextBarChartDateEnabled.collectAsStateWithLifecycle()
     val isPreviousBarDateEnabled by viewModel.isPreviousBarChartDateEnabled.collectAsStateWithLifecycle()
     val pieExpenses by viewModel.pieChartExpenses.collectAsStateWithLifecycle()
@@ -122,6 +124,7 @@ fun DashboardContent(
             onSelectedRangeChange = viewModel::selectBarChartRange,
             shownCount = barChartShownCount,
             onVisibleCountChanged = viewModel::setBarChartVisibleItems,
+            availableRanges = barChartAvailableRanges,
             trackingStart = barChartTrackingStart,
             isNextDateEnabled = isNextBarDateEnabled,
             isPreviousDateEnabled = isPreviousBarDateEnabled
@@ -227,6 +230,7 @@ internal fun DashboardContent(
     onSelectBarChartRange: (Int) -> Unit = {},
     barChartShownCount: Int = barChartData.size,
     onVisibleCountChangedBarChart: (Int) -> Unit = {},
+    barChartAvailableRanges: List<Int> = ALL_MONTH_RANGES,
     barChartTrackingStart: LocalDate? = null,
     isNextBarDateEnabled: Boolean = true,
     isPreviousBarDateEnabled: Boolean = true,
@@ -269,6 +273,7 @@ internal fun DashboardContent(
             onSelectedRangeChange = onSelectBarChartRange,
             shownCount = barChartShownCount,
             onVisibleCountChanged = onVisibleCountChangedBarChart,
+            availableRanges = barChartAvailableRanges,
             trackingStart = barChartTrackingStart,
             isNextDateEnabled = isNextBarDateEnabled,
             isPreviousDateEnabled = isPreviousBarDateEnabled

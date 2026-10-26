@@ -149,15 +149,19 @@ class DashboardCardsTest {
     // Months per range as the ViewModel would report them, with the dynamic range fitting 6.
     private val rangeCounts = listOf(6, 6, 12, 24)
 
-    private fun showRangedChart(trackingStart: LocalDate? = null) {
-        var range by mutableIntStateOf(0)
+    private fun showRangedChart(
+        trackingStart: LocalDate? = null,
+        availableRanges: List<Int> = listOf(0, 1, 2, 3),
+        initialRange: Int = 0
+    ) {
+        var range by mutableIntStateOf(initialRange)
         composeTestRule.setThemedContent {
             MonthlyExpensesChartCard(
                 barChartData = twoYears, monthlyBudget = 0.0,
                 onPreviousDate = {}, onNextDate = {}, onToday = {},
                 selectedRange = range, onSelectedRangeChange = { range = it; events += "range:$it" },
-                shownCount = rangeCounts[range], onVisibleCountChanged = { events += "visible:$it" },
-                trackingStart = trackingStart,
+                shownCount = rangeCounts[if (range in availableRanges) range else 0], onVisibleCountChanged = { events += "visible:$it" },
+                availableRanges = availableRanges, trackingStart = trackingStart,
             )
         }
     }
@@ -193,6 +197,35 @@ class DashboardCardsTest {
         bar("July 2024").assertExists()
         composeTestRule.onAllNodes(isToggleable() and hasContentDescription("2024", substring = true)).assertCountEquals(6)
         composeTestRule.onNodeWithText("01").assertExists()
+    }
+
+    @Test
+    fun monthlyChart_onlyShowsTheAvailableRanges_andReportsTheirRangeIndex() {
+        showRangedChart(availableRanges = listOf(0, 1, 2))
+
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_2_years)).assertDoesNotExist()
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_6_months)).assertExists()
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_1_year)).performClick()
+
+        bar("January 2024").assertExists()
+        assertThat(events.filter { it.startsWith("range") }).containsExactly("range:2")
+    }
+
+    @Test
+    fun monthlyChart_unavailableSelectedRange_showsAutoAsSelected() {
+        showRangedChart(availableRanges = listOf(0, 1, 2), initialRange = 3)
+
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_dynamic)).assertIsOn()
+        bar("June 2024").assertDoesNotExist()
+    }
+
+    @Test
+    fun monthlyChart_onlyAuto_hidesTheRangeButtons() {
+        showRangedChart(availableRanges = listOf(0))
+
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_dynamic)).assertDoesNotExist()
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_6_months)).assertDoesNotExist()
+        bar("December 2024").assertExists()
     }
 
     @Test

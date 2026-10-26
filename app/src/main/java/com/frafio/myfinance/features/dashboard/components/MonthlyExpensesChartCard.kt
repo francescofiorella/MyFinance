@@ -25,6 +25,7 @@ import com.frafio.myfinance.core.components.MonthlyRangeBarChart
 import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.theme.MyFinanceTheme
+import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
 import java.time.LocalDate
 
 @Composable
@@ -38,6 +39,7 @@ fun MonthlyExpensesChartCard(
     onSelectedRangeChange: (Int) -> Unit = {},
     shownCount: Int = barChartData.size,
     onVisibleCountChanged: (Int) -> Unit = {},
+    availableRanges: List<Int> = ALL_MONTH_RANGES,
     trackingStart: LocalDate? = null,
     isNextDateEnabled: Boolean = true,
     isPreviousDateEnabled: Boolean = true
@@ -91,6 +93,7 @@ fun MonthlyExpensesChartCard(
                 onSelectedRangeChange = onSelectedRangeChange,
                 selectedMonth = selectedMonth,
                 onSelectedMonthChange = { selectedMonth = it },
+                availableRanges = availableRanges,
                 trackingStart = trackingStart,
                 referenceValue = monthlyBudget,
                 onVisibleCountChanged = onVisibleCountChanged

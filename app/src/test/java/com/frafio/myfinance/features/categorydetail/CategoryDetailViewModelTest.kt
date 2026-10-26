@@ -146,6 +146,30 @@ class CategoryDetailViewModelTest {
     }
 
     @Test
+    fun trendAvailableRanges_countTheMonthsTrackedUpToTheMonth() = runTest {
+        collect(viewModel.trendAvailableRanges)
+        assertThat(viewModel.trendAvailableRanges.value).containsExactly(0, 1, 2, 3).inOrder()
+
+        // August 2023 to May 2024 is ten months, whatever the category; later expenses don't count.
+        expensesLocalRepository.sendExpenses(
+            testExpense(date = LocalDate.of(2023, 8, 4), category = groceries),
+            testExpense(date = LocalDate.of(2025, 1, 4), category = dining),
+        )
+
+        assertThat(viewModel.trendAvailableRanges.value).containsExactly(0, 1, 2).inOrder()
+    }
+
+    @Test
+    fun trendShownCount_unavailableRange_showsAuto() = runTest {
+        collect(viewModel.trendShownCount, viewModel.trendAvailableRanges)
+        expensesLocalRepository.sendExpenses(testExpense(date = LocalDate.of(2024, 3, 4), category = dining))
+
+        viewModel.selectTrendRange(2)
+
+        assertThat(viewModel.trendShownCount.value).isEqualTo(6)
+    }
+
+    @Test
     fun selectTrendRange_outOfBounds_isClamped() {
         viewModel.selectTrendRange(7)
 
@@ -156,7 +180,9 @@ class CategoryDetailViewModelTest {
         backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.stats.collect() }
     }
 
-    private fun TestScope.collect(flow: StateFlow<*>) {
-        backgroundScope.launch(UnconfinedTestDispatcher()) { flow.collect() }
+    private fun TestScope.collect(vararg flows: StateFlow<*>) {
+        flows.forEach { flow ->
+            backgroundScope.launch(UnconfinedTestDispatcher()) { flow.collect() }
+        }
     }
 }

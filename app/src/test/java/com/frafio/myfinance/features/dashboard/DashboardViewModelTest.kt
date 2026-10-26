@@ -409,6 +409,48 @@ class DashboardViewModelTest {
         assertThat(viewModel.barChartTrackingStart.value).isEqualTo(thisMonth)
     }
 
+    @Test
+    fun barChartAvailableRanges_areAllUntilLoaded_thenFollowTheTrackedMonths() = runTest {
+        collect(viewModel.barChartAvailableRanges)
+        assertThat(viewModel.barChartAvailableRanges.value).containsExactly(0, 1, 2, 3).inOrder()
+
+        // Ten months tracked: 1Y already shows them all.
+        expensesLocalRepository.sendExpenses(testExpense(date = thisMonth.minusMonths(9)))
+        assertThat(viewModel.barChartAvailableRanges.value).containsExactly(0, 1, 2).inOrder()
+
+        // Three months, all within the six bars that fit.
+        expensesLocalRepository.sendExpenses(testExpense(date = thisMonth.minusMonths(2)))
+        assertThat(viewModel.barChartAvailableRanges.value).containsExactly(0)
+
+        viewModel.setBarChartVisibleItems(2)
+        assertThat(viewModel.barChartAvailableRanges.value).containsExactly(0, 1).inOrder()
+    }
+
+    @Test
+    fun barChartAvailableRanges_countUpToThisMonth_whileSteppingBack() = runTest {
+        collect(viewModel.barChartAvailableRanges, viewModel.barChartData)
+        expensesLocalRepository.sendExpenses(testExpense(date = thisMonth.minusMonths(12)))
+        assertThat(viewModel.barChartAvailableRanges.value).containsExactly(0, 1, 2, 3).inOrder()
+
+        repeat(3) { viewModel.previousBarChartDate() }
+
+        assertThat(viewModel.barChartAvailableRanges.value).containsExactly(0, 1, 2, 3).inOrder()
+    }
+
+    @Test
+    fun barChartShownCount_unavailableRange_showsAuto() = runTest {
+        collect(viewModel.barChartShownCount, viewModel.barChartAvailableRanges)
+        expensesLocalRepository.sendExpenses(testExpense(date = thisMonth.minusMonths(20)))
+        viewModel.selectBarChartRange(3)
+        assertThat(viewModel.barChartShownCount.value).isEqualTo(24)
+
+        // Only ten months left: 2Y is no longer offered, and the stored choice is kept.
+        expensesLocalRepository.sendExpenses(testExpense(date = thisMonth.minusMonths(9)))
+
+        assertThat(viewModel.barChartShownCount.value).isEqualTo(6)
+        assertThat(viewModel.barChartRange.value).isEqualTo(3)
+    }
+
     // endregion
 
     // region pie chart

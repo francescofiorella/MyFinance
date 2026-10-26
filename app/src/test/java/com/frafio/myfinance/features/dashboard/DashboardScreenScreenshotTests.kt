@@ -6,7 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.charts.R as ChartsR
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
 import com.frafio.myfinance.core.utils.doubleToPrice
+import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
+import com.frafio.myfinance.testing.screenshot.captureForDevice
 import com.frafio.myfinance.testing.screenshot.captureMultiDevice
 import com.frafio.myfinance.testing.screenshot.capturePhoneDark
 import com.frafio.myfinance.testing.screenshot.screenshotBarChart
@@ -24,6 +27,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
+import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
@@ -68,8 +72,24 @@ class DashboardScreenScreenshotTests {
         composeTestRule.captureMultiDevice("DashboardScreenNoBudget", narrowChartBars) { Dashboard(monthlyBudget = 0.0) }
     }
 
+    @Test
+    fun shortHistory() {
+        // Three tracked months on Auto's seven bars: older months have no data and no range buttons are offered.
+        composeTestRule.captureForDevice(
+            DefaultTestDevices.PHONE.spec, "DashboardScreenShortHistory", deviceName = "phone",
+            accessibilitySuppressions = narrowChartBars,
+        ) {
+            Dashboard(monthlyBudget = 500.0, shownCount = 7, availableRanges = listOf(0), trackingStart = LocalDate.of(2024, 10, 1))
+        }
+    }
+
     @Composable
-    private fun Dashboard(monthlyBudget: Double) {
+    private fun Dashboard(
+        monthlyBudget: Double,
+        shownCount: Int = screenshotBarChart.size,
+        availableRanges: List<Int> = ALL_MONTH_RANGES,
+        trackingStart: LocalDate? = null
+    ) {
         DashboardContent(
             today = screenshotToday,
             monthShown = true,
@@ -92,6 +112,9 @@ class DashboardScreenScreenshotTests {
             onPreviousBarDate = {},
             onNextBarDate = {},
             onTodayBarDate = {},
+            barChartShownCount = shownCount,
+            barChartAvailableRanges = availableRanges,
+            barChartTrackingStart = trackingStart,
             onSwitchPieData = {},
             onPreviousPieDate = {},
             onNextPieDate = {},
