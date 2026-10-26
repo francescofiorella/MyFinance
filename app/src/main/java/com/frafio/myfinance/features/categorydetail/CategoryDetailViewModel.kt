@@ -4,21 +4,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.ExpenseCategory
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.data.model.categoriesTotal
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.PendingExpensesFilter
 import com.frafio.myfinance.core.di.Dispatcher
 import com.frafio.myfinance.core.di.MyFinanceDispatchers.Default
 import com.frafio.myfinance.core.navigation.RootKey
+import com.frafio.myfinance.core.utils.MONTH_RANGE_COUNTS
+import com.frafio.myfinance.core.utils.monthRangeCount
+import com.frafio.myfinance.core.utils.monthsToLoad
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 
@@ -58,6 +67,40 @@ class CategoryDetailViewModel @AssistedInject constructor(
         }
             .flowOn(defaultDispatcher)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+    }
+
+    private val _trendRange = MutableStateFlow(0)
+
+    /** The trend chart's range: an index into [MONTH_RANGE_COUNTS], Auto first. */
+    val trendRange: StateFlow<Int> = _trendRange.asStateFlow()
+
+    // How many bars fit the trend chart's width, used by the Auto range.
+    private val _trendVisibleItems = MutableStateFlow(6)
+
+    /** How many months the trend chart shows. */
+    val trendShownCount: StateFlow<Int> = combine(_trendRange, _trendVisibleItems) { range, visibleItems ->
+        monthRangeCount(range, visibleItems)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _trendVisibleItems.value)
+
+    /** The category's monthly totals up to [month], enough for every range, oldest first. */
+    val trend: StateFlow<List<MonthlyTotal>> = _trendVisibleItems
+        .map(::monthsToLoad)
+        .distinctUntilChanged()
+        .flatMapLatest { count ->
+            val start = month.minusMonths(count - 1L)
+            val end = month.plusMonths(1)
+            expensesLocalRepository.getExpensesOfCategory(category.id, start.year, start.monthValue, end.year, end.monthValue)
+                .map { expenses -> monthlyTotals(expenses, lastMonth = month, count = count) }
+        }
+        .flowOn(defaultDispatcher)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun selectTrendRange(index: Int) {
+        _trendRange.value = index.coerceIn(MONTH_RANGE_COUNTS.indices)
+    }
+
+    fun setTrendVisibleItems(count: Int) {
+        _trendVisibleItems.value = count
     }
 
     /** Asks the Expenses tab to show only this category; the caller then navigates there. */

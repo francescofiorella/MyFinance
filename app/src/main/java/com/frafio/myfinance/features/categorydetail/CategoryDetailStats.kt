@@ -8,7 +8,7 @@ import com.frafio.myfinance.core.utils.expenseNameKey
 import com.frafio.myfinance.core.utils.fillMonthlyGaps
 import java.time.LocalDate
 
-/** Months covered by a category's trend chart and monthly average, ending with the selected month. */
+/** Months covered by a category's stats (monthly average, frequent expenses), ending with the selected month. */
 const val TREND_MONTHS = 12
 const val TOP_EXPENSES_COUNT = 5
 const val FREQUENT_EXPENSES_COUNT = 3
@@ -32,7 +32,7 @@ data class CategoryDetailStats(
     val yearToDate: Double,
     /** Fraction of everything spent in the month, from 0 to 1. */
     val share: Double,
-    /** [TREND_MONTHS] entries, oldest first. */
+    /** [TREND_MONTHS] entries, oldest first; the trend chart loads its own, longer run of months. */
     val trend: List<MonthlyTotal>,
     val topExpenses: List<Expense>,
     val frequent: List<FrequentExpense>,
@@ -47,10 +47,7 @@ data class CategoryDetailStats(
  * @param monthTotalAll everything spent in [month] across all categories.
  */
 fun buildCategoryDetail(month: LocalDate, windowExpenses: List<Expense>, monthTotalAll: Double): CategoryDetailStats {
-    val monthlySums = windowExpenses
-        .groupBy { it.year to it.month }
-        .map { (yearMonth, expenses) -> MonthlyTotal(expenses.sumOf { it.price }, yearMonth.first, yearMonth.second) }
-    val trend = fillMonthlyGaps(monthlySums, lastMonth = month, count = TREND_MONTHS)
+    val trend = monthlyTotals(windowExpenses, lastMonth = month, count = TREND_MONTHS)
     val monthTotal = trend.last().value
     val previousTotal = trend[trend.size - 2].value
     val monthExpenses = windowExpenses.filter { it.year == month.year && it.month == month.monthValue }
@@ -66,6 +63,14 @@ fun buildCategoryDetail(month: LocalDate, windowExpenses: List<Expense>, monthTo
         frequent = frequentExpenses(windowExpenses),
         labels = labelSpending(monthExpenses)
     )
+}
+
+/** What [expenses] add up to in each of the [count] months ending with [lastMonth], oldest first; months without any are zero. */
+internal fun monthlyTotals(expenses: List<Expense>, lastMonth: LocalDate, count: Int): List<MonthlyTotal> {
+    val monthlySums = expenses
+        .groupBy { it.year to it.month }
+        .map { (yearMonth, monthExpenses) -> MonthlyTotal(monthExpenses.sumOf { it.price }, yearMonth.first, yearMonth.second) }
+    return fillMonthlyGaps(monthlySums, lastMonth = lastMonth, count = count)
 }
 
 /**

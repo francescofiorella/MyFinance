@@ -30,7 +30,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -40,16 +42,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.frafio.charts.BarChart
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.CategoryIcon
+import com.frafio.myfinance.core.components.MonthlyRangeBarChart
 import com.frafio.myfinance.core.components.SpendingChangeChip
 import com.frafio.myfinance.core.components.TransactionListItem
-import com.frafio.myfinance.core.components.toBarChartEntry
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.ExpenseCategory
+import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPercent
@@ -65,10 +67,18 @@ fun CategoryDetailScreen(
     onFrequentExpenseClick: (RootKey.FrequentExpenses) -> Unit
 ) {
     val stats by viewModel.stats.collectAsStateWithLifecycle()
+    val trend by viewModel.trend.collectAsStateWithLifecycle()
+    val trendRange by viewModel.trendRange.collectAsStateWithLifecycle()
+    val trendShownCount by viewModel.trendShownCount.collectAsStateWithLifecycle()
     CategoryDetailContent(
         category = viewModel.category,
         month = viewModel.month,
         stats = stats,
+        trend = trend,
+        trendRange = trendRange,
+        onTrendRangeChange = viewModel::selectTrendRange,
+        trendShownCount = trendShownCount,
+        onTrendVisibleCountChanged = viewModel::setTrendVisibleItems,
         onBackClick = onBackClick,
         onSeeAllExpenses = {
             viewModel.onSeeAllExpenses()
@@ -97,7 +107,12 @@ fun CategoryDetailContent(
     stats: CategoryDetailStats?,
     onBackClick: () -> Unit,
     onSeeAllExpenses: () -> Unit,
-    onFrequentExpenseClick: (FrequentExpense) -> Unit
+    onFrequentExpenseClick: (FrequentExpense) -> Unit,
+    trend: List<MonthlyTotal> = stats?.trend.orEmpty(),
+    trendRange: Int = 0,
+    onTrendRangeChange: (Int) -> Unit = {},
+    trendShownCount: Int = trend.size,
+    onTrendVisibleCountChanged: (Int) -> Unit = {}
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -124,7 +139,13 @@ fun CategoryDetailContent(
 
                 if (stats != null) {
                     StatsGrid(stats = stats, year = month.year)
-                    TrendCard(stats = stats)
+                    TrendCard(
+                        trend = trend,
+                        range = trendRange,
+                        onRangeChange = onTrendRangeChange,
+                        shownCount = trendShownCount,
+                        onVisibleCountChanged = onTrendVisibleCountChanged
+                    )
 
                     if (stats.topExpenses.isNotEmpty()) {
                         SectionTitle(text = stringResource(id = R.string.biggest_expenses))
@@ -316,7 +337,15 @@ private fun StatCard(
 }
 
 @Composable
-private fun TrendCard(stats: CategoryDetailStats) {
+private fun TrendCard(
+    trend: List<MonthlyTotal>,
+    range: Int,
+    onRangeChange: (Int) -> Unit,
+    shownCount: Int,
+    onVisibleCountChanged: (Int) -> Unit
+) {
+    // Index into trend; -1 selects the latest month.
+    var selectedMonth by rememberSaveable { mutableIntStateOf(-1) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -331,9 +360,14 @@ private fun TrendCard(stats: CategoryDetailStats) {
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            BarChart(
-                entries = remember(stats.trend) { stats.trend.map { it.toBarChartEntry() } },
-                valueFormatter = ::doubleToPrice
+            MonthlyRangeBarChart(
+                totals = trend,
+                shownCount = shownCount,
+                selectedRange = range,
+                onSelectedRangeChange = onRangeChange,
+                selectedMonth = selectedMonth,
+                onSelectedMonthChange = { selectedMonth = it },
+                onVisibleCountChanged = onVisibleCountChanged
             )
         }
     }

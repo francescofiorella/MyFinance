@@ -8,6 +8,7 @@ import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.repository.TestExpensesLocalRepository
 import com.frafio.myfinance.testing.util.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -76,7 +77,62 @@ class CategoryDetailViewModelTest {
         assertThat(pendingExpensesFilter.categories.value).containsExactly(dining)
     }
 
+    @Test
+    fun trend_coversTheLongestRange_endingWithTheMonth() = runTest {
+        collect(viewModel.trend)
+
+        expensesLocalRepository.sendExpenses(
+            testExpense(name = "Sushi", price = 30.0, date = may2024, category = dining),
+            // June 2022 is the first of the 24 months.
+            testExpense(name = "Sushi", price = 5.0, date = LocalDate.of(2022, 6, 10), category = dining),
+            testExpense(name = "Sushi", price = 1000.0, date = LocalDate.of(2022, 5, 31), category = dining),
+            testExpense(name = "Market", price = 90.0, date = may2024, category = groceries),
+        )
+
+        val trend = viewModel.trend.value
+        assertThat(trend).hasSize(24)
+        assertThat(trend.first().year to trend.first().month).isEqualTo(2022 to 6)
+        assertThat(trend.last().year to trend.last().month).isEqualTo(2024 to 5)
+        assertThat(trend.first().value).isEqualTo(5.0)
+        assertThat(trend.last().value).isEqualTo(30.0)
+        assertThat(trend.sumOf { it.value }).isEqualTo(35.0)
+    }
+
+    @Test
+    fun trend_loadsMoreMonths_whenMoreBarsFit() = runTest {
+        collect(viewModel.trend)
+        expensesLocalRepository.sendExpenses(emptyList())
+
+        viewModel.setTrendVisibleItems(30)
+
+        assertThat(viewModel.trend.value).hasSize(30)
+    }
+
+    @Test
+    fun trendShownCount_isWhatFits_onAuto_andTheRangeOtherwise() = runTest {
+        collect(viewModel.trendShownCount)
+        assertThat(viewModel.trendRange.value).isEqualTo(0)
+        assertThat(viewModel.trendShownCount.value).isEqualTo(6)
+
+        viewModel.setTrendVisibleItems(9)
+        assertThat(viewModel.trendShownCount.value).isEqualTo(9)
+
+        viewModel.selectTrendRange(2)
+        assertThat(viewModel.trendShownCount.value).isEqualTo(12)
+    }
+
+    @Test
+    fun selectTrendRange_outOfBounds_isClamped() {
+        viewModel.selectTrendRange(7)
+
+        assertThat(viewModel.trendRange.value).isEqualTo(3)
+    }
+
     private fun TestScope.collectStats() {
         backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.stats.collect() }
+    }
+
+    private fun TestScope.collect(flow: StateFlow<*>) {
+        backgroundScope.launch(UnconfinedTestDispatcher()) { flow.collect() }
     }
 }

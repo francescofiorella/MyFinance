@@ -2,6 +2,8 @@ package com.frafio.myfinance.features.categorydetail
 
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasNoClickAction
@@ -148,6 +150,27 @@ class CategoryDetailScreenTest {
         composeTestRule.onAllNodesWithText("Friends").onLast()
             .performScrollTo()
             .assert(hasNoClickAction() and !hasAnyAncestor(hasClickAction()))
+    }
+
+    @Test
+    fun trendCard_showsTheRangeButtons_andReportsTheChosenRange() {
+        composeTestRule.setThemedContent {
+            CategoryDetailContent(
+                category = dining,
+                month = month,
+                stats = stats,
+                onBackClick = {},
+                onSeeAllExpenses = {},
+                onFrequentExpenseClick = {},
+                onTrendRangeChange = { events += "range:$it" }
+            )
+        }
+
+        composeTestRule.onNodeWithText(string(R.string.spending_trend)).performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_dynamic)).performScrollTo().assertIsOn()
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_1_year)).performScrollTo().assertIsOff().performClick()
+
+        assertThat(events).containsExactly("range:2")
     }
 
     @Test
