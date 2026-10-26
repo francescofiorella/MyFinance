@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Chart library added
+- Bar chart paddings updated
+- Missing data in bar chart produces no bar
+- Bar chart button group dynamically shown
+- Category Details bar chart updated
+- Golden registration updated (full screen + sheets)
+
 ## 5.1.5
 - Baseline profile generation and release automated via GitHub workflow
 - record-screenshots github workflow removed
