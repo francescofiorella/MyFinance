@@ -88,7 +88,5 @@ class TestUserPreferencesRepository : UserPreferencesRepository {
 
     fun setMonthlyBudget(budget: Double) = preferences.update { it.copy(monthlyBudget = budget) }
 
-    fun setCurrencyCode(currencyCode: String) = preferences.update { it.copy(currencyCode = currencyCode) }
-
     fun setUser(user: User?) = preferences.update { it.copy(user = user) }
 }
