@@ -66,10 +66,11 @@ import kotlin.math.roundToInt
  * A bar of a [BarChart]. [key] orders the bars and identifies one across entry changes; keys need
  * not be consecutive (e.g. months since year zero, with gaps). [label] is shown in the header and
  * read by accessibility services, [axisLabel] under the bar, and [selectedAxisLabel] under it once selected.
+ * A null [value] means no data: the slot and its axis label stay, but no bar is drawn and it can't be selected.
  */
 data class BarChartEntry(
     val key: Int,
-    val value: Double,
+    val value: Double?,
     val label: String,
     val axisLabel: String,
     val selectedAxisLabel: String = axisLabel
@@ -135,6 +136,10 @@ internal fun stripIndexAt(keys: List<Int>, key: Float): Float {
     return i + (key - keys[i]) / (keys[i + 1] - keys[i])
 }
 
+/** The entry shown as selected: [selectedIndex] if it has data, else the latest entry with data; -1 if none has. */
+internal fun shownSelection(entries: List<BarChartEntry>, selectedIndex: Int): Int =
+    if (entries.getOrNull(selectedIndex)?.value != null) selectedIndex else entries.indexOfLast { it.value != null }
+
 /**
  * A bar chart that keeps its own selection, starting on the latest entry. With an
  * [entryAnimationSpec], entry changes animate as one strip of equal bars, matched by key.
@@ -176,8 +181,8 @@ fun BarChart(
 }
 
 /**
- * A bar chart whose selection is hoisted. A [selectedIndex] outside [entries] (e.g. -1) selects the
- * latest entry, so resetting it to -1 goes back to the default. With an [entryAnimationSpec], entry
+ * A bar chart whose selection is hoisted. A [selectedIndex] outside [entries] (e.g. -1) or on an entry
+ * without data selects the latest entry with data, so resetting it to -1 goes back to the default. With an [entryAnimationSpec], entry
  * changes animate as one strip of equal bars, matched by key: the shown keys scroll and zoom to
  * the new ones, so added bars slide in and removed ones slide out at the edges.
  */
@@ -204,9 +209,9 @@ fun BarChart(
             onVisibleCountChanged(maxVisibleItems)
         }
 
-        val shownIndex = if (selectedIndex in entries.indices) selectedIndex else entries.lastIndex
+        val shownIndex = shownSelection(entries, selectedIndex)
         val maxValue = remember(entries) {
-            val max = entries.maxOfOrNull { it.value } ?: 0.0
+            val max = entries.mapNotNull { it.value }.maxOrNull() ?: 0.0
             if (max == 0.0) 1.0 else max
         }
         val strip = rememberBarStrip(entries, maxValue, entryAnimationSpec)
@@ -223,7 +228,7 @@ fun BarChart(
                 onBarClick = onSelectedIndexChange,
                 maxValue = maxValue,
                 referenceValue = referenceValue,
-                latestValue = entries.lastOrNull()?.value,
+                latestValue = entries.lastOrNull { it.value != null }?.value,
                 isAnimated = entryAnimationSpec != null,
                 valueFormatter = valueFormatter,
                 referenceValueFormatter = referenceValueFormatter,
@@ -239,7 +244,7 @@ fun BarChart(
 }
 
 private fun BarChartEntry.heightFraction(maxValue: Double): Float =
-    (value / maxValue).toFloat().coerceIn(0.01f, 1f)
+    value?.let { (it / maxValue).toFloat().coerceIn(0.01f, 1f) } ?: 0f
 
 /** A bar as drawn: [index] points into the entries, or is -1 while the bar slides out. */
 private class DrawnBar(
@@ -353,7 +358,7 @@ private fun rememberBarStrip(
 private fun BarChartHeader(entry: BarChartEntry?, valueFormatter: (Double) -> String, colors: BarChartColors) {
     Row(verticalAlignment = Alignment.Bottom) {
         Text(
-            text = entry?.let { valueFormatter(it.value) } ?: "",
+            text = entry?.value?.let(valueFormatter) ?: "",
             color = colors.contentColor,
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.SemiBold
@@ -371,6 +376,7 @@ private fun BarChartHeader(entry: BarChartEntry?, valueFormatter: (Double) -> St
 /** What a bar shows, passed as one value so an animated bar can move between positions with its state. */
 private class ChartBarState(
     val modifier: Modifier,
+    val hasValue: Boolean,
     val contentDescription: String,
     val heightFraction: Float,
     val animateHeight: Boolean,
@@ -431,6 +437,7 @@ private fun BarChartBars(
             ) {
                 strip.bars.forEach { bar ->
                     val key = bar.entry.key
+                    val value = bar.entry.value
                     val interactionSource = interactionSources.getOrPut(key) { MutableInteractionSource() }
                     customItem(
                         {
@@ -438,11 +445,10 @@ private fun BarChartBars(
                                 modifier = Modifier
                                     .weight(1f)
                                     .animateWidth(interactionSource),
-                                contentDescription = stringResource(
-                                    R.string.charts_item_description,
-                                    bar.entry.label,
-                                    valueFormatter(bar.entry.value)
-                                ),
+                                hasValue = value != null,
+                                contentDescription = value?.let {
+                                    stringResource(R.string.charts_item_description, bar.entry.label, valueFormatter(it))
+                                } ?: "",
                                 heightFraction = bar.heightFraction(),
                                 animateHeight = !isAnimated,
                                 isSelected = bar.index >= 0 && selectedIndex == bar.index,
@@ -548,6 +554,11 @@ private fun BarChartAxis(strip: BarStrip, selectedIndex: Int, viewportWidth: Dp,
 
 @Composable
 private fun ChartBar(state: ChartBarState) {
+    // Without data the slot stays empty: nothing to draw, select or announce.
+    if (!state.hasValue) {
+        Spacer(modifier = state.modifier.padding(horizontal = state.barPadding).width(state.barWidth))
+        return
+    }
     val animatedHeightFraction by animateFloatAsState(
         targetValue = state.heightFraction,
         animationSpec = tween(durationMillis = 500),

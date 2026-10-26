@@ -95,6 +95,31 @@ class ChartGeometryTest {
         assertThat(stripIndexAt(emptyList(), 5f)).isEqualTo(0f)
     }
 
+    private fun bar(value: Double?) = BarChartEntry(key = 0, value = value, label = "", axisLabel = "")
+
+    @Test
+    fun shownSelection_keepsASelectedEntryWithData() {
+        assertThat(shownSelection(listOf(bar(1.0), bar(2.0), bar(3.0)), selectedIndex = 1)).isEqualTo(1)
+    }
+
+    @Test
+    fun shownSelection_outsideTheEntries_isTheLatestWithData() {
+        val entries = listOf(bar(1.0), bar(2.0), bar(null))
+        assertThat(shownSelection(entries, selectedIndex = -1)).isEqualTo(1)
+        assertThat(shownSelection(entries, selectedIndex = 5)).isEqualTo(1)
+    }
+
+    @Test
+    fun shownSelection_onAnEntryWithoutData_isTheLatestWithData() {
+        assertThat(shownSelection(listOf(bar(null), bar(null), bar(3.0)), selectedIndex = 0)).isEqualTo(2)
+    }
+
+    @Test
+    fun shownSelection_withoutData_isNone() {
+        assertThat(shownSelection(listOf(bar(null), bar(null)), selectedIndex = -1)).isEqualTo(-1)
+        assertThat(shownSelection(emptyList(), selectedIndex = -1)).isEqualTo(-1)
+    }
+
     @Test
     fun arcGapDegrees_isTheArcWidthPlusOffset_asAnAngleOnTheRadius() {
         val expected = (18f / 80f) * (180f / PI.toFloat())

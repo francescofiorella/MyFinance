@@ -47,8 +47,8 @@ class BarChartTest {
         entry(value = 120.0, year = 2024, month = 12),
     )
 
-    /** A monthly bar, keyed and labelled the way the app builds them. */
-    private fun entry(value: Double, year: Int, month: Int) = BarChartEntry(
+    /** A monthly bar, keyed and labelled the way the app builds them; a null [value] is a month without data. */
+    private fun entry(value: Double?, year: Int, month: Int) = BarChartEntry(
         key = year * 12 + month - 1,
         value = value,
         label = YearMonth.of(year, month).format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.US)),
@@ -184,6 +184,91 @@ class BarChartTest {
 
         composeTestRule.onAllNodes(isToggleable()).assertCountEquals(0)
         composeTestRule.onNodeWithText("December 2024").assertDoesNotExist()
+    }
+
+    // September and October have no data; November is a real zero.
+    private val partlyTracked = listOf(
+        entry(value = null, year = 2024, month = 9),
+        entry(value = null, year = 2024, month = 10),
+        entry(value = 0.0, year = 2024, month = 11),
+        entry(value = 120.0, year = 2024, month = 12),
+    )
+
+    @Test
+    fun entriesWithoutData_drawNoBar_butKeepTheirAxisLabel() {
+        setChart {
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = partlyTracked) }
+        }
+
+        composeTestRule.onAllNodes(isToggleable()).assertCountEquals(2)
+        bar("September 2024").assertDoesNotExist()
+        bar("October 2024").assertDoesNotExist()
+        bar("November 2024").assertExists()
+        composeTestRule.onNodeWithText("09").assertIsDisplayed()
+        composeTestRule.onNodeWithText("10").assertIsDisplayed()
+        composeTestRule.onNodeWithText("11").assertIsDisplayed()
+    }
+
+    @Test
+    fun entriesWithoutData_keepTheSlotWidthOfTheOthers() {
+        setChart {
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = partlyTracked) }
+        }
+
+        // Four slots share the width, as with four bars: each bar fills its slot minus the padding.
+        val width = bar("December 2024").getUnclippedBoundsInRoot().width
+        assertThat(width.value).isWithin(1f).of(300f / 4 - 2 * BarChartDefaults.BarPadding.value)
+        val september = composeTestRule.onNodeWithText("09").getUnclippedBoundsInRoot()
+        val december = composeTestRule.onNodeWithText("12/24").getUnclippedBoundsInRoot()
+        assertThat((december.left + december.right).value / 2 - (september.left + september.right).value / 2)
+            .isWithin(1f).of(3 * 300f / 4)
+    }
+
+    @Test
+    fun entriesWithoutData_doNotChangeTheScale() {
+        setChart {
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = partlyTracked) }
+        }
+
+        val height = bar("December 2024").getUnclippedBoundsInRoot().height
+        assertThat(height.value).isWithin(1f).of(BarChartDefaults.BarMaxHeight.value)
+    }
+
+    @Test
+    fun hoistedSelection_onAnEntryWithoutData_showsTheLatestWithData() {
+        setChart {
+            Box(Modifier.requiredWidth(300.dp)) {
+                BarChart(entries = partlyTracked, selectedIndex = 0, onSelectedIndexChange = {}, valueFormatter = { "€ %.2f".format(Locale.US, it) })
+            }
+        }
+
+        composeTestRule.onNodeWithText("€ 120.00").assertIsDisplayed()
+        composeTestRule.onNodeWithText("December 2024").assertIsDisplayed()
+        composeTestRule.onNodeWithText("12/24").assertIsDisplayed()
+        composeTestRule.onNodeWithText("09/24").assertDoesNotExist()
+    }
+
+    @Test
+    fun latestEntryWithoutData_headerShowsTheLatestWithData() {
+        setChart {
+            Box(Modifier.requiredWidth(300.dp)) {
+                TestBarChart(entries = entries.dropLast(1) + entry(value = null, year = 2024, month = 12))
+            }
+        }
+
+        composeTestRule.onNodeWithText("€ 110.00").assertIsDisplayed()
+        composeTestRule.onNodeWithText("November 2024").assertIsDisplayed()
+    }
+
+    @Test
+    fun noEntryWithData_showsAnEmptyHeader() {
+        setChart {
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = partlyTracked.take(2)) }
+        }
+
+        composeTestRule.onAllNodes(isToggleable()).assertCountEquals(0)
+        composeTestRule.onNodeWithText("September 2024").assertDoesNotExist()
+        composeTestRule.onNodeWithText("09").assertIsDisplayed()
     }
 
     @Test
