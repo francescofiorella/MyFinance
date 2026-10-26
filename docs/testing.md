@@ -244,10 +244,20 @@ be recorded on the platform they are verified on.
   (`changeThreshold = 0f`). Fonts are bundled and the illustrations are vectors, so the output is
   stable — identical on Windows and on CI's Linux runner.
 
+### Full pages, sheets and dialogs
+
+A golden shows the whole page, not only the first screen. `captureForDevice`, and so `captureMultiDevice` and `capturePhoneDark`, starts at the device size and grows the window until no vertical scroll container has anything left to scroll: a page that fits keeps the device size, a longer one is exactly as tall as its content. A plain scroll container reports exactly what is left, so the window grows by that; a lazy list only reports that something is left, so the window doubles and is then narrowed to the smallest height that fits. Horizontal rows are not followed.
+
+After 24 renders or 8000 dp the capture fails with `<screenshot> is still scrollable after …`: a scroll container never fits the window, for example a list inside a fixed-height box.
+
+Two captures keep the device size. `HomeShellScreenshotTests` passes `fullPage = false`, because it checks the navigation bar or rail at given window sizes. `captureAfter` never grows, because snackbars and other transient states belong at the bottom of the visible screen.
+
+Every bottom sheet has its own phone golden, rendered open on its own next to its feature's screen tests (`EditBudgetSheet`, `CategorySheet`, `FilterExpensesSheet`, `LabelsSheet`, `CurrencySheet`, `EditFullNameSheet`, `SelectProPicSheet`, `ResetPasswordSheet`, `ConfirmationSheetDialog`), and `EditTransactionSheet` has a multi-theme one. A new sheet or dialog gets one too. The date pickers open in their own dialog window, outside the root, so their tests pass `capture = { composeTestRule.onNode(isDialog()) }`; they also pass fixed dates, because a picker shows the month of its initial date, or the current month without one.
+
 ### Accessibility checks
 
 Every capture made through `captureForDevice`, `captureMultiDevice`, `capturePhoneDark` and
-`captureAfter` also runs Google's Accessibility Test Framework (`roborazzi-accessibility-check`,
+`captureAfter` also runs Google's Accessibility Test Framework, over the whole page (`roborazzi-accessibility-check`,
 preset `LATEST`, failing on errors): missing labels on clickable nodes, touch targets under 48 dp,
 text and image contrast, duplicate labels, and the rest of the ATF set. `captureMultiTheme` is not
 checked, as in nowinandroid — a component on its own has no screen context. The checks run in
@@ -260,8 +270,12 @@ each failing view is written to `app/build/outputs/roborazzi/<screenshot>_<devic
 Fix the component rather than the test. When a failure is a design limit, suppress it through the
 helper's `accessibilitySuppressions` parameter, as narrowly as possible: one check *and* the exact
 elements (`Matchers.allOf(matchesCheck(TouchTargetSizeCheck::class.java), matchesElements(withContentDescription(…)))`),
-never `Matchers.anything()`, with a one-line reason above it. The only suppression today is in
-`DashboardScreenScreenshotTests`: the twelve month bars of the chart are about 27 dp wide on a phone.
+never `Matchers.anything()`, with a one-line reason above it. A node that shows text instead of a content description is matched with `withText(…)`.
+
+There are two suppressions today:
+
+- `DashboardScreenScreenshotTests`: the twelve month bars of the chart are about 27 dp wide on a phone.
+- `ComponentScreenshotTests.dateRangePickerDialog`: the months scroll inside the dialog, and its bottom edge cuts the next month's first day ("June 1, 2024") to 2 dp.
 
 ## Instrumented tests
 
@@ -474,7 +488,7 @@ whose "≥ 80 % coverage on new code" condition shows on SonarCloud but does not
 | Screens over their ViewModels: loading / empty / populated, validation, sheets, callbacks | `features/*/…ScreenTest` |
 | What TalkBack hears: control labels, silent decorative icons, chart bars and arcs, expand state | `app/AccessibilityTest` |
 | Snackbar placement at three widths, with and without system insets | `app/Snackbar(Insets)ScreenshotTests` |
-| Screens, app shell and components as golden images, with ATF accessibility checks (Roborazzi) | `**/*ScreenshotTests`, `app/src/test/screenshots` |
+| Whole screens, sheets, dialogs, app shell and components as golden images, with ATF accessibility checks (Roborazzi) | `**/*ScreenshotTests`, `app/src/test/screenshots` |
 | Utilities, models, enums | `core/utils/…`, `core/data/model/…`, `core/data/enums/…` |
 | Transaction wire format (`toFirestoreMap` vs Firestore's reflective mapper, plain JVM) | `core/data/model/FirestoreMappingTest` |
 | The custom lint rules on sample sources | `lint/src/test/…/lint/…DetectorTest` |
