@@ -21,6 +21,10 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
 import java.time.LocalDate
+import com.frafio.myfinance.features.expenses.components.CategorySheet
+import com.frafio.myfinance.features.expenses.components.FilterExpensesSheet
+import com.frafio.myfinance.features.expenses.components.LabelsSheet
+import com.frafio.myfinance.testing.screenshot.screenshotLabels
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -29,6 +33,35 @@ class ExpensesScreenScreenshotTests {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    @Test
+    fun categorySheet() {
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "CategorySheet", deviceName = "phone") {
+            CategorySheet(show = true, onDismiss = {}, onCategorySelected = {}, expense = screenshotExpenses[1])
+        }
+    }
+
+    @Test
+    fun filterExpensesSheet() {
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "FilterExpensesSheet", deviceName = "phone") {
+            FilterExpensesSheet(
+                show = true, onDismiss = {},
+                categoryEnabled = true, labelEnabled = true, dateRangeEnabled = false,
+                onSelectCategory = {}, onSelectLabel = {}, onSelectDateRange = {},
+            )
+        }
+    }
+
+    @Test
+    fun labelsSheet() {
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "LabelsSheet", deviceName = "phone") {
+            LabelsSheet(
+                show = true, onDismiss = {}, expense = screenshotExpenses[1],
+                labels = screenshotLabels, selectedLabels = screenshotExpenses[1].labels,
+                onLabelCheckedChanged = { _, _ -> },
+            )
+        }
+    }
 
     @Test
     fun populated() {

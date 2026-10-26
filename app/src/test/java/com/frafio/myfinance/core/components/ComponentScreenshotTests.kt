@@ -37,6 +37,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
+import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
+import com.frafio.myfinance.testing.screenshot.captureForDevice
 
 /** Light/dark × dynamic/notDynamic captures of the shared components, as nowinandroid's designsystem tests. */
 @RunWith(RobolectricTestRunner::class)
@@ -47,6 +49,18 @@ class ComponentScreenshotTests {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    @Test
+    fun confirmationSheetDialog() {
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "ConfirmationSheetDialog", deviceName = "phone") {
+            ConfirmationSheetDialog(
+                headerText = R.string.delete_confirmation,
+                actionIcon = R.drawable.ic_delete_outline,
+                actionText = R.string.delete_permanently,
+                onActionClick = {}, show = true, onDismiss = {},
+            )
+        }
+    }
 
     @Test
     fun transactionItems_multipleThemes() {

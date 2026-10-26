@@ -14,6 +14,11 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
+import com.frafio.myfinance.features.profile.components.CurrencySheet
+import com.frafio.myfinance.features.profile.components.EditFullNameSheet
+import com.frafio.myfinance.features.profile.components.SelectProPicSheet
+import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
+import com.frafio.myfinance.testing.screenshot.captureForDevice
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -22,6 +27,27 @@ class ProfileScreenScreenshotTests {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    @Test
+    fun currencySheet() {
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "CurrencySheet", deviceName = "phone") {
+            CurrencySheet(show = true, onDismiss = {}, onCurrencySelected = {}, currencyCode = "EUR")
+        }
+    }
+
+    @Test
+    fun editFullNameSheet() {
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "EditFullNameSheet", deviceName = "phone") {
+            EditFullNameSheet(show = true, fullName = "Ada Lovelace", onDismiss = {}, onEditFullName = {})
+        }
+    }
+
+    @Test
+    fun selectProPicSheet() {
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "SelectProPicSheet", deviceName = "phone") {
+            SelectProPicSheet(show = true, googlePhotoUrl = null, currentProPic = null, onDismiss = {}, onSelectPhoto = {})
+        }
+    }
 
     private val emailUser = testUser(fullName = "Ada Lovelace", hasPassword = true)
     private val googleUser = testUser(fullName = "Ada Lovelace", provider = User.GOOGLE_PROVIDER, providers = listOf("google.com"), hasPassword = false, isGoogleLinked = true)

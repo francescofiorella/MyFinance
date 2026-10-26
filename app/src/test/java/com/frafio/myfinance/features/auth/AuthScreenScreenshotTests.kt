@@ -12,6 +12,9 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
+import com.frafio.myfinance.features.auth.components.ResetPasswordSheet
+import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
+import com.frafio.myfinance.testing.screenshot.captureForDevice
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -20,6 +23,13 @@ class AuthScreenScreenshotTests {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    @Test
+    fun resetPasswordSheet() {
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "ResetPasswordSheet", deviceName = "phone") {
+            ResetPasswordSheet(show = true, initialEmail = "ada@example.com", onDismiss = {}, onSend = {})
+        }
+    }
 
     @Test
     fun login() {

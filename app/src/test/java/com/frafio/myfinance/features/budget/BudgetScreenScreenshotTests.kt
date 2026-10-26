@@ -17,6 +17,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
+import com.frafio.myfinance.features.budget.components.EditBudgetSheet
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -25,6 +26,13 @@ class BudgetScreenScreenshotTests {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    @Test
+    fun editBudgetSheet() {
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "EditBudgetSheet", deviceName = "phone") {
+            EditBudgetSheet(show = true, budget = 1200.0, onDismiss = {}, onEditBudget = {})
+        }
+    }
 
     @Test
     fun populated() {
