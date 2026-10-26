@@ -1,6 +1,5 @@
 package com.frafio.myfinance.features.dashboard.components
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,10 +11,8 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -23,15 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.frafio.charts.BarChart
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.components.ConnectedToggleRow
+import com.frafio.myfinance.core.components.MonthlyRangeBarChart
 import com.frafio.myfinance.core.components.PeriodStepper
-import com.frafio.myfinance.core.components.toBarChartEntry
 import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.theme.MyFinanceTheme
-import com.frafio.myfinance.core.utils.doubleToPrice
-import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 
 @Composable
 fun MonthlyExpensesChartCard(
@@ -49,13 +42,6 @@ fun MonthlyExpensesChartCard(
 ) {
     // Index into barChartData; -1 selects the latest month.
     var selectedMonth by rememberSaveable { mutableIntStateOf(-1) }
-    val shownData = barChartData.takeLast(shownCount)
-    val firstShown = barChartData.size - shownData.size
-
-    // Keep the selected month only while it is shown.
-    LaunchedEffect(firstShown) {
-        if (selectedMonth in 0 until firstShown) selectedMonth = -1
-    }
 
     Card(
         modifier = Modifier
@@ -96,27 +82,15 @@ fun MonthlyExpensesChartCard(
                 )
             }
 
-            ConnectedToggleRow(
-                modifier = Modifier.padding(bottom = 16.dp),
-                options = listOf(
-                    stringResource(R.string.bar_chart_range_dynamic),
-                    stringResource(R.string.bar_chart_range_6_months),
-                    stringResource(R.string.bar_chart_range_1_year),
-                    stringResource(R.string.bar_chart_range_2_years)
-                ),
-                selectedIndex = selectedRange,
-                onSelect = onSelectedRangeChange
-            )
-
-            BarChart(
-                entries = remember(shownData) { shownData.map { it.toBarChartEntry() } },
-                selectedIndex = if (selectedMonth >= firstShown) selectedMonth - firstShown else -1,
-                onSelectedIndexChange = { selectedMonth = it + firstShown },
+            MonthlyRangeBarChart(
+                totals = barChartData,
+                shownCount = shownCount,
+                selectedRange = selectedRange,
+                onSelectedRangeChange = onSelectedRangeChange,
+                selectedMonth = selectedMonth,
+                onSelectedMonthChange = { selectedMonth = it },
                 referenceValue = monthlyBudget,
-                onVisibleCountChanged = onVisibleCountChanged,
-                valueFormatter = ::doubleToPrice,
-                referenceValueFormatter = ::doubleToPriceWithoutDecimals,
-                entryAnimationSpec = tween(durationMillis = 500)
+                onVisibleCountChanged = onVisibleCountChanged
             )
         }
     }

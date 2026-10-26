@@ -9,7 +9,10 @@ import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.data.repository.IncomesLocalRepository
 import com.frafio.myfinance.core.data.repository.LoadingRepository
 import com.frafio.myfinance.core.data.repository.UserPreferencesRepository
+import com.frafio.myfinance.core.utils.MONTH_RANGE_COUNTS
 import com.frafio.myfinance.core.utils.fillMonthlyGaps
+import com.frafio.myfinance.core.utils.monthRangeCount
+import com.frafio.myfinance.core.utils.monthsToLoad
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -168,7 +171,7 @@ class DashboardViewModel @Inject constructor(
     private val _barChartVisibleItems = MutableStateFlow(6)
 
     val barChartShownCount: StateFlow<Int> = combine(_barChartRange, _barChartVisibleItems) { range, visibleItems ->
-        BAR_CHART_RANGE_COUNTS[range] ?: visibleItems
+        monthRangeCount(range, visibleItems)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _barChartVisibleItems.value)
 
     val isPreviousBarChartDateEnabled: StateFlow<Boolean> = combine(
@@ -188,7 +191,7 @@ class DashboardViewModel @Inject constructor(
     /** The months of the longest range, or more if more fit the width, so switching range only changes how many the chart shows. */
     val barChartData: StateFlow<List<MonthlyTotal>> = combine(
         _lastDateForBarChart,
-        _barChartVisibleItems.map { maxOf(it, BAR_CHART_RANGE_COUNTS.maxOf { count -> count ?: 0 }) }.distinctUntilChanged()
+        _barChartVisibleItems.map(::monthsToLoad).distinctUntilChanged()
     ) { date, count ->
         date to count
     }.flatMapLatest { (date, count) ->
@@ -252,7 +255,7 @@ class DashboardViewModel @Inject constructor(
     }
 
     fun selectBarChartRange(index: Int) {
-        _barChartRange.value = index.coerceIn(BAR_CHART_RANGE_COUNTS.indices)
+        _barChartRange.value = index.coerceIn(MONTH_RANGE_COUNTS.indices)
     }
 
     fun setBarChartVisibleItems(count: Int) {
@@ -306,10 +309,5 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             _scrollToTop.emit(Unit)
         }
-    }
-
-    companion object {
-        /** Months shown by each range of the monthly expenses chart; null is dynamic, as many as fit the width. */
-        val BAR_CHART_RANGE_COUNTS: List<Int?> = listOf(null, 6, 12, 24)
     }
 }
