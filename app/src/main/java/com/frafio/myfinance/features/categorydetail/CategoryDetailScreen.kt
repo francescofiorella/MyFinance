@@ -366,7 +366,7 @@ private fun TrendCard(
     ) {
         Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
             Text(
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier.padding(bottom = 8.dp),
                 text = stringResource(id = R.string.spending_trend),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant

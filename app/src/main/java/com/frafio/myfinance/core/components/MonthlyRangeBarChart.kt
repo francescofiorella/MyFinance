@@ -55,7 +55,7 @@ fun MonthlyRangeBarChart(
                 stringResource(R.string.bar_chart_range_2_years)
             )
             ConnectedToggleRow(
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier.padding(bottom = 24.dp),
                 options = availableRanges.map { labels[it] },
                 selectedIndex = availableRanges.indexOf(shownMonthRange(selectedRange, availableRanges)),
                 onSelect = { onSelectedRangeChange(availableRanges[it]) }

@@ -60,8 +60,7 @@ fun MonthlyExpensesChartCard(
         Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
