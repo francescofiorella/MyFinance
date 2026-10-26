@@ -46,7 +46,7 @@ class HomeShellScreenshotTests {
 
     private fun shell(name: String, widthDp: Int, heightDp: Int, tab: HomeTabKey = HomeTabKey.Dashboard) {
         // The device size is the layout size: `ForcedSize` only rescales density, it does not constrain.
-        composeTestRule.captureForDevice(DeviceSpec(widthDp, heightDp), name, deviceName = "shell") {
+        composeTestRule.captureForDevice(DeviceSpec(widthDp, heightDp), name, deviceName = "shell", fullPage = false) {
             HomeShell(widthDp, heightDp, tab)
         }
     }

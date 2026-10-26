@@ -3,6 +3,7 @@
 package com.frafio.myfinance.testing.screenshot
 
 import android.graphics.Bitmap.CompressFormat.PNG
+import android.util.DisplayMetrics
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,8 +18,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.DarkMode
 import androidx.compose.ui.test.DeviceConfigurationOverride
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onRoot
@@ -43,6 +46,7 @@ import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.robolectric.RuntimeEnvironment
 import java.io.File
+import kotlin.math.ceil
 
 /** Pixel-perfect comparison; goldens stored at half size. */
 val DefaultRoborazziOptions = RoborazziOptions(
@@ -91,19 +95,22 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.c
  * [LocalInspectionMode] on (sheets render inline), runs the ATF accessibility checks and captures
  * the root. Dark mode goes through [DeviceConfigurationOverride] so both `MyFinanceTheme`'s default
  * and the components that read `isSystemInDarkTheme()` directly follow it.
+ *
+ * With [fullPage] the window grows until nothing is left to scroll, so the golden and the checks
+ * cover the whole page; it is never smaller than the device. Off for tests about the window size itself.
  */
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.captureForDevice(
     device: DeviceSpec,
     screenshotName: String,
     deviceName: String,
     darkMode: Boolean = false,
+    fullPage: Boolean = true,
     roborazziOptions: RoborazziOptions = DefaultRoborazziOptions,
     accessibilitySuppressions: Matcher<in AccessibilityViewCheckResult> = NoAccessibilitySuppressions,
     body: @Composable () -> Unit,
 ) {
-    RuntimeEnvironment.setQualifiers("w${device.widthDp}dp-h${device.heightDp}dp-${device.dpi}dpi")
-
-    activity.setContent {
+    val fileName = "${screenshotName}_$deviceName"
+    val content: @Composable () -> Unit = {
         CompositionLocalProvider(LocalInspectionMode provides true) {
             DeviceConfigurationOverride(DeviceConfigurationOverride.DarkMode(darkMode)) {
                 MyFinanceTheme(darkTheme = darkMode, dynamicColor = false) {
@@ -115,9 +122,85 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.c
             }
         }
     }
-    waitForIdle()
+    if (fullPage) renderFullPage(device, fileName, content) else render(device, device.heightDp, content)
 
-    checkAccessibilityAndCapture(onRoot(), "${screenshotName}_$deviceName", roborazziOptions, accessibilitySuppressions)
+    checkAccessibilityAndCapture(onRoot(), fileName, roborazziOptions, accessibilitySuppressions)
+}
+
+private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.render(
+    device: DeviceSpec,
+    heightDp: Int,
+    content: @Composable () -> Unit,
+) {
+    RuntimeEnvironment.setQualifiers("w${device.widthDp}dp-h${heightDp}dp-${device.dpi}dpi")
+    activity.setContent(content = content)
+    waitForIdle()
+}
+
+/** Beyond either limit a page is taken to never stop scrolling (e.g. a list in a fixed-height box). */
+private const val FULL_PAGE_MAX_RENDERS = 24
+private const val FULL_PAGE_MAX_HEIGHT_DP = 8000
+
+/**
+ * Renders [content] at the device size, then grows the window until no vertical scroll container
+ * has anything left beyond it. A plain scroll container reports exactly what is left, so the window
+ * grows by that; a lazy list only reports that something is, so the window doubles and is then
+ * narrowed to the smallest height that fits, leaving no blank band below the page.
+ */
+private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.renderFullPage(
+    device: DeviceSpec,
+    fileName: String,
+    content: @Composable () -> Unit,
+) {
+    var renders = 0
+    var renderedHeight = 0
+    fun scrollLeftAt(heightDp: Int): ScrollLeft {
+        check(renders < FULL_PAGE_MAX_RENDERS && heightDp <= FULL_PAGE_MAX_HEIGHT_DP) {
+            "$fileName is still scrollable after $renders renders at ${renderedHeight}dp: a scroll container never fits the window"
+        }
+        render(device, heightDp, content)
+        renders++
+        renderedHeight = heightDp
+        return scrollLeft(device.dpi)
+    }
+
+    var height = device.heightDp
+    var left = scrollLeftAt(height)
+    var scrollingHeight = 0
+    var estimated = false
+    while (left.dp > 0f) {
+        scrollingHeight = height
+        if (left.isEstimate) {
+            estimated = true
+            height *= 2
+        } else {
+            height += ceil(left.dp).toInt()
+        }
+        left = scrollLeftAt(height)
+    }
+    if (estimated) {
+        // scrollingHeight still scrolls and height fits: find the smallest height that fits.
+        var low = scrollingHeight
+        while (height - low > 1) {
+            val mid = (low + height) / 2
+            if (scrollLeftAt(mid).dp > 0f) low = mid else height = mid
+        }
+        if (renderedHeight != height) scrollLeftAt(height)
+    }
+}
+
+/** How far the most scrollable vertical container can still scroll, and whether that is only a lazy list's estimate. */
+private class ScrollLeft(val dp: Float, val isEstimate: Boolean)
+
+private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.scrollLeft(dpi: Int): ScrollLeft {
+    val scrolling = onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange), useUnmergedTree = true)
+        .fetchSemanticsNodes()
+        .map { node -> node to node.config[SemanticsProperties.VerticalScrollAxisRange].let { it.maxValue() - it.value() } }
+        .filter { (_, leftPx) -> leftPx > 0.5f }
+    val leftPx = scrolling.maxOfOrNull { (_, leftPx) -> leftPx } ?: 0f
+    // Lazy lists describe their items as a collection; plain scroll containers don't.
+    val isEstimate = scrolling.any { (node, _) -> SemanticsProperties.CollectionInfo in node.config }
+    return ScrollLeft(leftPx * DisplayMetrics.DENSITY_DEFAULT / dpi, isEstimate)
 }
 
 /**
