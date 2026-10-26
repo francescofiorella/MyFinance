@@ -70,6 +70,7 @@ fun CategoryDetailScreen(
     val trend by viewModel.trend.collectAsStateWithLifecycle()
     val trendRange by viewModel.trendRange.collectAsStateWithLifecycle()
     val trendShownCount by viewModel.trendShownCount.collectAsStateWithLifecycle()
+    val trendTrackingStart by viewModel.trendTrackingStart.collectAsStateWithLifecycle()
     CategoryDetailContent(
         category = viewModel.category,
         month = viewModel.month,
@@ -79,6 +80,7 @@ fun CategoryDetailScreen(
         onTrendRangeChange = viewModel::selectTrendRange,
         trendShownCount = trendShownCount,
         onTrendVisibleCountChanged = viewModel::setTrendVisibleItems,
+        trendTrackingStart = trendTrackingStart,
         onBackClick = onBackClick,
         onSeeAllExpenses = {
             viewModel.onSeeAllExpenses()
@@ -112,7 +114,8 @@ fun CategoryDetailContent(
     trendRange: Int = 0,
     onTrendRangeChange: (Int) -> Unit = {},
     trendShownCount: Int = trend.size,
-    onTrendVisibleCountChanged: (Int) -> Unit = {}
+    onTrendVisibleCountChanged: (Int) -> Unit = {},
+    trendTrackingStart: LocalDate? = null
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -144,7 +147,8 @@ fun CategoryDetailContent(
                         range = trendRange,
                         onRangeChange = onTrendRangeChange,
                         shownCount = trendShownCount,
-                        onVisibleCountChanged = onTrendVisibleCountChanged
+                        onVisibleCountChanged = onTrendVisibleCountChanged,
+                        trackingStart = trendTrackingStart
                     )
 
                     if (stats.topExpenses.isNotEmpty()) {
@@ -342,7 +346,8 @@ private fun TrendCard(
     range: Int,
     onRangeChange: (Int) -> Unit,
     shownCount: Int,
-    onVisibleCountChanged: (Int) -> Unit
+    onVisibleCountChanged: (Int) -> Unit,
+    trackingStart: LocalDate?
 ) {
     // Index into trend; -1 selects the latest month.
     var selectedMonth by rememberSaveable { mutableIntStateOf(-1) }
@@ -367,6 +372,7 @@ private fun TrendCard(
                 onSelectedRangeChange = onRangeChange,
                 selectedMonth = selectedMonth,
                 onSelectedMonthChange = { selectedMonth = it },
+                trackingStart = trackingStart,
                 onVisibleCountChanged = onVisibleCountChanged
             )
         }

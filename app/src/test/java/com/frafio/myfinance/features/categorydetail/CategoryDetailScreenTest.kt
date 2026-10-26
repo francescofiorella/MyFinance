@@ -174,6 +174,29 @@ class CategoryDetailScreenTest {
     }
 
     @Test
+    fun trendCard_monthsBeforeTheTrackingStart_haveNoBar_whileTrackedZeroMonthsDo() {
+        composeTestRule.setThemedContent {
+            CategoryDetailContent(
+                category = dining,
+                month = month,
+                stats = stats,
+                onBackClick = {},
+                onSeeAllExpenses = {},
+                onFrequentExpenseClick = {},
+                trendTrackingStart = LocalDate.of(2024, 4, 1)
+            )
+        }
+
+        bar("March 2024").assertDoesNotExist()
+        bar("June 2023").assertDoesNotExist()
+        // Nothing was spent on dining in April 2024, after tracking started.
+        bar("April 2024").assertExists()
+        bar("May 2024").assertExists()
+    }
+
+    private fun bar(monthYear: String) = composeTestRule.onNodeWithContentDescription(monthYear, substring = true)
+
+    @Test
     fun back_invokesTheCallback() {
         setScreen()
 

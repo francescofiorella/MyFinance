@@ -18,6 +18,15 @@ class ChartItemsTest {
     }
 
     @Test
+    fun toBarChartEntry_withoutData_hasNoValue_butKeepsItsLabels() {
+        val entry = MonthlyTotal(value = 0.0, year = 2024, month = 12).toBarChartEntry(hasData = false)
+
+        assertThat(entry.value).isNull()
+        assertThat(entry.label).isEqualTo("December 2024")
+        assertThat(entry.axisLabel).isEqualTo("12")
+    }
+
+    @Test
     fun toBarChartEntry_padsSingleDigitMonthsAndYears() {
         val entry = MonthlyTotal(value = 1.0, year = 2005, month = 3).toBarChartEntry()
 

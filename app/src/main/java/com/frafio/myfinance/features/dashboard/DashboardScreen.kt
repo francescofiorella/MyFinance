@@ -81,6 +81,7 @@ fun DashboardContent(
     val barChartData by viewModel.barChartData.collectAsStateWithLifecycle()
     val barChartRange by viewModel.barChartRange.collectAsStateWithLifecycle()
     val barChartShownCount by viewModel.barChartShownCount.collectAsStateWithLifecycle()
+    val barChartTrackingStart by viewModel.barChartTrackingStart.collectAsStateWithLifecycle()
     val isNextBarDateEnabled by viewModel.isNextBarChartDateEnabled.collectAsStateWithLifecycle()
     val isPreviousBarDateEnabled by viewModel.isPreviousBarChartDateEnabled.collectAsStateWithLifecycle()
     val pieExpenses by viewModel.pieChartExpenses.collectAsStateWithLifecycle()
@@ -121,6 +122,7 @@ fun DashboardContent(
             onSelectedRangeChange = viewModel::selectBarChartRange,
             shownCount = barChartShownCount,
             onVisibleCountChanged = viewModel::setBarChartVisibleItems,
+            trackingStart = barChartTrackingStart,
             isNextDateEnabled = isNextBarDateEnabled,
             isPreviousDateEnabled = isPreviousBarDateEnabled
         )
@@ -225,6 +227,7 @@ internal fun DashboardContent(
     onSelectBarChartRange: (Int) -> Unit = {},
     barChartShownCount: Int = barChartData.size,
     onVisibleCountChangedBarChart: (Int) -> Unit = {},
+    barChartTrackingStart: LocalDate? = null,
     isNextBarDateEnabled: Boolean = true,
     isPreviousBarDateEnabled: Boolean = true,
     onSwitchPieData: (Boolean) -> Unit,
@@ -266,6 +269,7 @@ internal fun DashboardContent(
             onSelectedRangeChange = onSelectBarChartRange,
             shownCount = barChartShownCount,
             onVisibleCountChanged = onVisibleCountChangedBarChart,
+            trackingStart = barChartTrackingStart,
             isNextDateEnabled = isNextBarDateEnabled,
             isPreviousDateEnabled = isPreviousBarDateEnabled
         )

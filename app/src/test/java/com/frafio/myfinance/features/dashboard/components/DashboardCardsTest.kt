@@ -3,12 +3,14 @@ package com.frafio.myfinance.features.dashboard.components
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -147,7 +149,7 @@ class DashboardCardsTest {
     // Months per range as the ViewModel would report them, with the dynamic range fitting 6.
     private val rangeCounts = listOf(6, 6, 12, 24)
 
-    private fun showRangedChart() {
+    private fun showRangedChart(trackingStart: LocalDate? = null) {
         var range by mutableIntStateOf(0)
         composeTestRule.setThemedContent {
             MonthlyExpensesChartCard(
@@ -155,6 +157,7 @@ class DashboardCardsTest {
                 onPreviousDate = {}, onNextDate = {}, onToday = {},
                 selectedRange = range, onSelectedRangeChange = { range = it; events += "range:$it" },
                 shownCount = rangeCounts[range], onVisibleCountChanged = { events += "visible:$it" },
+                trackingStart = trackingStart,
             )
         }
     }
@@ -178,6 +181,18 @@ class DashboardCardsTest {
         bar("January 2023").assertExists()
 
         assertThat(events.filter { it.startsWith("range") }).containsExactly("range:2", "range:3").inOrder()
+    }
+
+    @Test
+    fun monthlyChart_monthsBeforeTheTrackingStart_haveNoBar_butKeepTheirAxisLabel() {
+        showRangedChart(trackingStart = LocalDate.of(2024, 7, 1))
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_1_year)).performClick()
+
+        bar("June 2024").assertDoesNotExist()
+        bar("January 2024").assertDoesNotExist()
+        bar("July 2024").assertExists()
+        composeTestRule.onAllNodes(isToggleable() and hasContentDescription("2024", substring = true)).assertCountEquals(6)
+        composeTestRule.onNodeWithText("01").assertExists()
     }
 
     @Test

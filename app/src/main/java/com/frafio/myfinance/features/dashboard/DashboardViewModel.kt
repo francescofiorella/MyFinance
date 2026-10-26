@@ -13,6 +13,7 @@ import com.frafio.myfinance.core.utils.MONTH_RANGE_COUNTS
 import com.frafio.myfinance.core.utils.fillMonthlyGaps
 import com.frafio.myfinance.core.utils.monthRangeCount
 import com.frafio.myfinance.core.utils.monthsToLoad
+import com.frafio.myfinance.core.utils.trackingStart
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -184,6 +185,11 @@ class DashboardViewModel @Inject constructor(
             (oldestShown.year > it.year) || (oldestShown.year == it.year && oldestShown.monthValue > it.month)
         } ?: false
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    /** The first month the bar chart has data for, counted up to this month; older months show as no data. Null until loaded. */
+    val barChartTrackingStart: StateFlow<LocalDate?> = expensesLocalRepository.getEarliestYearMonth()
+        .map { trackingStart(it, today.with(TemporalAdjusters.firstDayOfMonth())) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     private val _scrollToTop = MutableSharedFlow<Unit>(replay = 0)
     val scrollToTop: SharedFlow<Unit> = _scrollToTop.asSharedFlow()

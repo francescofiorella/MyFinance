@@ -25,12 +25,15 @@ fun categoryPieChartItem(value: Double, label: String, @DrawableRes icon: Int, c
     )
 }
 
-/** The month's bar: keyed by months since year zero, labelled "MMMM yyyy", "MM" on the axis and "MM/yy" once selected. */
-fun MonthlyTotal.toBarChartEntry(): BarChartEntry {
+/**
+ * The month's bar: keyed by months since year zero, labelled "MMMM yyyy", "MM" on the axis and "MM/yy" once selected.
+ * Without [hasData] it has no value, so the chart leaves its slot empty.
+ */
+fun MonthlyTotal.toBarChartEntry(hasData: Boolean = true): BarChartEntry {
     val axisLabel = "%02d".format(month).takeLast(2)
     return BarChartEntry(
         key = year * 12 + month - 1,
-        value = value,
+        value = value.takeIf { hasData },
         label = YearMonth.of(year, month).format(DateTimeFormatter.ofPattern("MMMM yyyy")),
         axisLabel = axisLabel,
         selectedAxisLabel = axisLabel + "/" + "%02d".format(year).takeLast(2)

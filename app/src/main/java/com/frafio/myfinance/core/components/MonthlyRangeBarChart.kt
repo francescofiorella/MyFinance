@@ -15,11 +15,12 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
+import java.time.LocalDate
 
 /**
  * The Auto / 6M / 1Y / 2Y buttons over a bar chart of the last [shownCount] of [totals]; changing range
  * slides the bars. [selectedMonth] indexes [totals], -1 being the latest, and goes back to -1 once the
- * range no longer shows it.
+ * range no longer shows it. Months before [trackingStart] are shown as no data; null treats every month as data.
  */
 @Composable
 fun MonthlyRangeBarChart(
@@ -30,6 +31,7 @@ fun MonthlyRangeBarChart(
     selectedMonth: Int,
     onSelectedMonthChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    trackingStart: LocalDate? = null,
     referenceValue: Double? = null,
     onVisibleCountChanged: (Int) -> Unit = {}
 ) {
@@ -54,7 +56,9 @@ fun MonthlyRangeBarChart(
         )
 
         BarChart(
-            entries = remember(shown) { shown.map { it.toBarChartEntry() } },
+            entries = remember(shown, trackingStart) {
+                shown.map { it.toBarChartEntry(hasData = trackingStart == null || !LocalDate.of(it.year, it.month, 1).isBefore(trackingStart)) }
+            },
             selectedIndex = if (selectedMonth >= firstShown) selectedMonth - firstShown else -1,
             onSelectedIndexChange = { onSelectedMonthChange(it + firstShown) },
             referenceValue = referenceValue,

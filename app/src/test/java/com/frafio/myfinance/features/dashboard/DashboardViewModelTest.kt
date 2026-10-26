@@ -385,6 +385,30 @@ class DashboardViewModelTest {
         assertThat(viewModel.isPreviousBarChartDateEnabled.value).isTrue()
     }
 
+    @Test
+    fun barChartTrackingStart_isNullUntilLoaded_thenTheEarliestExpensesMonth() = runTest {
+        collect(viewModel.barChartTrackingStart)
+        assertThat(viewModel.barChartTrackingStart.value).isNull()
+
+        expensesLocalRepository.sendExpenses(
+            testExpense(date = thisMonth.minusMonths(3).plusDays(10)),
+            testExpense(date = thisMonth.minusMonths(1)),
+        )
+
+        assertThat(viewModel.barChartTrackingStart.value).isEqualTo(thisMonth.minusMonths(3))
+    }
+
+    @Test
+    fun barChartTrackingStart_withoutPastExpenses_isThisMonth() = runTest {
+        collect(viewModel.barChartTrackingStart)
+
+        expensesLocalRepository.sendExpenses(emptyList())
+        assertThat(viewModel.barChartTrackingStart.value).isEqualTo(thisMonth)
+
+        expensesLocalRepository.sendExpenses(testExpense(date = thisMonth.plusMonths(2)))
+        assertThat(viewModel.barChartTrackingStart.value).isEqualTo(thisMonth)
+    }
+
     // endregion
 
     // region pie chart

@@ -14,6 +14,7 @@ import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.utils.MONTH_RANGE_COUNTS
 import com.frafio.myfinance.core.utils.monthRangeCount
 import com.frafio.myfinance.core.utils.monthsToLoad
+import com.frafio.myfinance.core.utils.trackingStart
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -94,6 +95,14 @@ class CategoryDetailViewModel @AssistedInject constructor(
         }
         .flowOn(defaultDispatcher)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /**
+     * The first month the trend has data for: the earliest expense of any category, so a category's
+     * empty months after it are real zeros. Older months show as no data. Null until loaded.
+     */
+    val trendTrackingStart: StateFlow<LocalDate?> = expensesLocalRepository.getEarliestYearMonth()
+        .map { trackingStart(it, month) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun selectTrendRange(index: Int) {
         _trendRange.value = index.coerceIn(MONTH_RANGE_COUNTS.indices)

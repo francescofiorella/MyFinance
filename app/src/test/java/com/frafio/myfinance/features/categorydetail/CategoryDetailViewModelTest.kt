@@ -122,6 +122,30 @@ class CategoryDetailViewModelTest {
     }
 
     @Test
+    fun trendTrackingStart_isTheEarliestExpenseOfAnyCategory() = runTest {
+        collect(viewModel.trendTrackingStart)
+        assertThat(viewModel.trendTrackingStart.value).isNull()
+
+        expensesLocalRepository.sendExpenses(
+            testExpense(date = LocalDate.of(2024, 3, 2), category = dining),
+            testExpense(date = LocalDate.of(2023, 10, 20), category = groceries),
+        )
+
+        assertThat(viewModel.trendTrackingStart.value).isEqualTo(LocalDate.of(2023, 10, 1))
+    }
+
+    @Test
+    fun trendTrackingStart_isNeverAfterTheMonth() = runTest {
+        collect(viewModel.trendTrackingStart)
+
+        expensesLocalRepository.sendExpenses(emptyList())
+        assertThat(viewModel.trendTrackingStart.value).isEqualTo(may2024)
+
+        expensesLocalRepository.sendExpenses(testExpense(date = LocalDate.of(2024, 9, 1), category = dining))
+        assertThat(viewModel.trendTrackingStart.value).isEqualTo(may2024)
+    }
+
+    @Test
     fun selectTrendRange_outOfBounds_isClamped() {
         viewModel.selectTrendRange(7)
 
