@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.6
+
 - Chart library added
 - Bar chart paddings updated
 - Missing data in bar chart produces no bar
