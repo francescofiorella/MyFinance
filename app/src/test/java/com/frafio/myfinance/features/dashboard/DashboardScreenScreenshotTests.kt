@@ -5,7 +5,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.charts.R as ChartsR
-import com.frafio.myfinance.R
 import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
