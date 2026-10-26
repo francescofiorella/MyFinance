@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
 import com.frafio.charts.BarChart
@@ -30,6 +31,11 @@ import com.frafio.myfinance.testing.screenshot.captureMultiTheme
 import com.frafio.myfinance.testing.screenshot.screenshotBarChart
 import com.frafio.myfinance.testing.screenshot.screenshotExpenses
 import com.frafio.myfinance.testing.screenshot.screenshotToday
+import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesCheck
+import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesElements
+import com.google.android.apps.common.testing.accessibility.framework.checks.TouchTargetSizeCheck
+import com.google.android.apps.common.testing.accessibility.framework.matcher.ElementMatchers.withText
+import org.hamcrest.Matchers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,6 +55,35 @@ class ComponentScreenshotTests {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    // The pickers open in their own dialog window: its node is checked and captured, not the root.
+    @Test
+    fun datePickerDialog() {
+        composeTestRule.captureForDevice(
+            DefaultTestDevices.PHONE.spec, "DatePickerDialog", deviceName = "phone",
+            fullPage = false, capture = { composeTestRule.onNode(isDialog()) },
+        ) {
+            AppDatePickerDialog(show = true, onDismiss = {}, onDateSelected = {}, initialDate = screenshotToday)
+        }
+    }
+
+    @Test
+    fun dateRangePickerDialog() {
+        composeTestRule.captureForDevice(
+            DefaultTestDevices.PHONE.spec, "DateRangePickerDialog", deviceName = "phone",
+            fullPage = false, capture = { composeTestRule.onNode(isDialog()) },
+            // The months scroll inside the dialog: the next month's first day is cut to 2 dp by its bottom edge.
+            accessibilitySuppressions = Matchers.allOf(
+                matchesCheck(TouchTargetSizeCheck::class.java),
+                matchesElements(withText(Matchers.containsString("June 1, 2024"))),
+            ),
+        ) {
+            AppDateRangePickerDialog(
+                show = true, onDismiss = {}, onRangeSelected = { _, _ -> },
+                initialStartDate = screenshotToday.minusDays(6), initialEndDate = screenshotToday,
+            )
+        }
+    }
 
     @Test
     fun confirmationSheetDialog() {

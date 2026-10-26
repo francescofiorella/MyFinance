@@ -98,6 +98,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.c
  *
  * With [fullPage] the window grows until nothing is left to scroll, so the golden and the checks
  * cover the whole page; it is never smaller than the device. Off for tests about the window size itself.
+ * [capture] names the node to check and photograph: a dialog, in its own window, is not under the root.
  */
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.captureForDevice(
     device: DeviceSpec,
@@ -105,6 +106,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.c
     deviceName: String,
     darkMode: Boolean = false,
     fullPage: Boolean = true,
+    capture: () -> SemanticsNodeInteraction = { onRoot() },
     roborazziOptions: RoborazziOptions = DefaultRoborazziOptions,
     accessibilitySuppressions: Matcher<in AccessibilityViewCheckResult> = NoAccessibilitySuppressions,
     body: @Composable () -> Unit,
@@ -124,7 +126,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.c
     }
     if (fullPage) renderFullPage(device, fileName, content) else render(device, device.heightDp, content)
 
-    checkAccessibilityAndCapture(onRoot(), fileName, roborazziOptions, accessibilitySuppressions)
+    checkAccessibilityAndCapture(capture(), fileName, roborazziOptions, accessibilitySuppressions)
 }
 
 private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.render(
