@@ -31,7 +31,9 @@ import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
+import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -240,6 +242,24 @@ class PieChartTest {
 
         arc("Dining", "€ 30").assertIsNotSelected()
         composeTestRule.onNodeWithText("Total").assertIsDisplayed()
+    }
+
+    @Test
+    fun selectedLabel_endsInTheArcLabelColor() {
+        setChart {
+            TestPieChart(items = items, animationSpec = snap())
+        }
+
+        arc("Dining", "€ 30").performSemanticsAction(SemanticsActions.OnClick)
+
+        assertThat(labelColor("Dining")).isEqualTo(items[0].labelColor)
+    }
+
+    /** The colour [text] is drawn with. */
+    private fun labelColor(text: String): Color {
+        val results = mutableListOf<TextLayoutResult>()
+        composeTestRule.onNodeWithText(text).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(results) }
+        return results.single().layoutInput.style.color
     }
 
     @OptIn(ExperimentalTestApi::class)

@@ -1,6 +1,7 @@
 package com.frafio.charts
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -309,10 +310,15 @@ fun PieChart(
         ) {
             val title = if (selectedArcIndex != -1) items[selectedArcIndex].label else totalLabel
             val valueText = if (selectedArcIndex != -1) items[selectedArcIndex].value else items.sumOf { it.value }
+            val labelColor by animateColorAsState(
+                targetValue = if (selectedArcIndex != -1) items[selectedArcIndex].labelColor else contentColor,
+                animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
+                label = "label_color"
+            )
 
             Text(
                 text = title,
-                color = if (selectedArcIndex != -1) items[selectedArcIndex].labelColor else contentColor,
+                color = labelColor,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
