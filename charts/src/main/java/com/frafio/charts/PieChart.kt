@@ -64,7 +64,6 @@ object PieChartDefaults {
     val IconPadding: Dp = 6.dp
     val AnimationEasing: Easing = LinearOutSlowInEasing
     const val ChartAnimationDuration: Int = 1000
-    const val ArcSelectionAnimationDuration: Int = 100
 
     /** How the arcs grow and shrink when the values change; pass `snap()` for a static chart. */
     val AnimationSpec: AnimationSpec<Float> = tween(ChartAnimationDuration, easing = AnimationEasing)
@@ -82,6 +81,9 @@ data class PieChartItem(
     val iconColor: Color,
     val labelColor: Color = color
 )
+
+/** How far a pressed, unselected arc and its icon grow towards their selected size. */
+private const val PressedFactor = 0.5f
 
 /** Degrees taken by the gap after an arc: its width plus [offsetPx], as an angle at [radiusPx]. */
 internal fun arcGapDegrees(offsetPx: Float, arcWidthPx: Float, radiusPx: Float): Float =
@@ -201,19 +203,16 @@ fun PieChart(
         )
     }
 
+    val selectionSpec = MaterialTheme.motionScheme.fastSpatialSpec<Float>()
     val selectionFactors = items.indices.map { index ->
         animateFloatAsState(
-            targetValue = if (selectedArcIndex == index || pressedStates[index].value) 1f else 0f,
-            animationSpec = tween(PieChartDefaults.ArcSelectionAnimationDuration, easing = PieChartDefaults.AnimationEasing),
+            targetValue = when {
+                selectedArcIndex == index -> 1f
+                pressedStates[index].value -> PressedFactor
+                else -> 0f
+            },
+            animationSpec = selectionSpec,
             label = "selection_factor_$index"
-        )
-    }
-
-    val iconSelectionFactors = items.indices.map { index ->
-        animateFloatAsState(
-            targetValue = if (selectedArcIndex == index) 1f else 0f,
-            animationSpec = tween(PieChartDefaults.ArcSelectionAnimationDuration, easing = PieChartDefaults.AnimationEasing),
-            label = "icon_selection_factor_$index"
         )
     }
 
@@ -268,7 +267,6 @@ fun PieChart(
                     },
                     alphaState = animatedAlphas[index],
                     selectionFactorState = selectionFactors[index],
-                    iconSelectionFactorState = iconSelectionFactors[index],
                     radiusPx = radiusPx,
                     arcWidthPx = arcWidthPx,
                     iconSize = iconSize,
@@ -321,7 +319,6 @@ private fun PieChartArc(
     startAngleProvider: () -> Float,
     alphaState: State<Float>,
     selectionFactorState: State<Float>,
-    iconSelectionFactorState: State<Float>,
     radiusPx: Float,
     arcWidthPx: Float,
     iconSize: Dp,
@@ -391,18 +388,20 @@ private fun PieChartArc(
 
                     val start = startAngleProvider()
                     val factor = selectionFactorState.value
-                    val iconFactor = iconSelectionFactorState.value
                     val strokePx = arcWidthPx * (1f + 0.2f * factor)
                     val radPx = radiusPx + (arcWidthPx * 0.15f * factor)
-                    val actualIconSizePx = with(density) { (iconSize + (selectedIconSize - iconSize) * iconFactor).toPx() }
-                    val iconRadiusPx = radPx + strokePx / 2 + with(density) { iconPadding.toPx() } + actualIconSizePx / 2
+                    val actualIconSize = lerp(iconSize, selectedIconSize, factor)
+                    val iconRadiusPx = radPx + strokePx / 2 + (iconPadding + actualIconSize / 2).toPx()
 
                     val angleInRadians = ((start + sweep / 2) * PI / 180).toFloat()
                     translationX = iconRadiusPx * cos(angleInRadians)
                     translationY = iconRadiusPx * sin(angleInRadians)
+                    // Scaled while drawing, so the size animation doesn't recompose.
+                    scaleX = actualIconSize / iconSize
+                    scaleY = scaleX
                     alpha = alphaValue
                 }
-                .size(lerp(iconSize, selectedIconSize, iconSelectionFactorState.value))
+                .size(iconSize)
                 .align(Alignment.Center)
                 .background(color, shape = CircleShape)
                 .padding(6.dp)
