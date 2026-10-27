@@ -34,7 +34,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.components.FadingText
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPrice
 
@@ -61,7 +60,7 @@ fun BudgetIndicatorCard(
                 .fillMaxWidth(0.7f)
                 .padding(top = 48.dp, bottom = 64.dp),
         ) {
-            FadingText(
+            Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = doubleToPrice(amount),
                 style = MaterialTheme.typography.displaySmall,
@@ -114,7 +113,7 @@ fun BudgetIndicatorCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    FadingText(
+                    Text(
                         text = doubleToPrice(totalBudget),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,

@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.components.FadingText
 import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPrice
@@ -84,7 +83,7 @@ fun AnnualBalanceCard(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    FadingText(
+                    Text(
                         text = balanceYear.toString(),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -108,7 +107,7 @@ fun AnnualBalanceCard(
                 animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
                 label = "balance_color"
             )
-            FadingText(
+            Text(
                 text = doubleToPrice(abs(balance)),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -162,7 +161,7 @@ fun AnnualBalanceCard(
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    FadingText(
+                    Text(
                         text = if (incomesSum < 1000)
                             doubleToPrice(incomesSum)
                         else
@@ -209,7 +208,7 @@ fun AnnualBalanceCard(
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    FadingText(
+                    Text(
                         text = if (expensesSum < 1000)
                             doubleToPrice(expensesSum)
                         else
