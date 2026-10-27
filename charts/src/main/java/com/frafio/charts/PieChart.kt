@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -84,6 +85,9 @@ data class PieChartItem(
 
 /** How far a pressed, unselected arc and its icon grow towards their selected size. */
 private const val PressedFactor = 0.5f
+
+/** Added to an arc's width for its touch area, half on each side. */
+private val ArcTouchExtension = 24.dp
 
 /** Degrees taken by the gap after an arc: its width plus [offsetPx], as an angle at [radiusPx]. */
 internal fun arcGapDegrees(offsetPx: Float, arcWidthPx: Float, radiusPx: Float): Float =
@@ -278,15 +282,29 @@ fun PieChart(
             }
         }
 
-        // Center Content
+        // Deselect target: the hole inside the arcs' touch areas, circular so it doesn't overlap them.
+        Box(
+            modifier = Modifier
+                .size(radius * 2f - arcWidth - ArcTouchExtension)
+                .clip(CircleShape)
+                .then(
+                    if (selectedArcIndex != -1) {
+                        Modifier
+                            .semantics { contentDescription = totalLabel }
+                            .clickable(
+                                interactionSource = null,
+                                indication = null,
+                                role = Role.Button,
+                                onClick = { onSelectedIndexChange(-1) }
+                            )
+                    } else Modifier
+                )
+        )
+
+        // Center Content, letting touches through to the deselect target
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = { onSelectedIndexChange(-1) }
-            )
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val title = if (selectedArcIndex != -1) items[selectedArcIndex].label else totalLabel
             val valueText = if (selectedArcIndex != -1) items[selectedArcIndex].value else items.sumOf { it.value }
@@ -328,7 +346,7 @@ private fun PieChartArc(
     onClick: () -> Unit
 ) {
     val density = LocalDensity.current
-    val tapExtraPx = with(density) { 24.dp.toPx() }
+    val tapExtraPx = with(density) { ArcTouchExtension.toPx() }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Hitbox Layer (Larger for easier interaction)
