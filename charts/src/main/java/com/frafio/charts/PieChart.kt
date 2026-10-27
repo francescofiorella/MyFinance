@@ -10,16 +10,17 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,15 +38,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.onClick
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -168,9 +165,9 @@ fun PieChart(
     }
 
     val selectedArcIndex = if (selectedIndex in items.indices) selectedIndex else -1
-    var pressedArcIndex by remember(items) { mutableIntStateOf(-1) }
 
     val interactionSources = remember(items.size) { List(items.size) { MutableInteractionSource() } }
+    val pressedStates = interactionSources.map { it.collectIsPressedAsState() }
 
     val arcWidthPx = with(density) { arcWidth.toPx() }
     val radiusPx = with(density) { radius.toPx() }
@@ -206,7 +203,7 @@ fun PieChart(
 
     val selectionFactors = items.indices.map { index ->
         animateFloatAsState(
-            targetValue = if (selectedArcIndex == index || pressedArcIndex == index) 1f else 0f,
+            targetValue = if (selectedArcIndex == index || pressedStates[index].value) 1f else 0f,
             animationSpec = tween(PieChartDefaults.ArcSelectionAnimationDuration, easing = PieChartDefaults.AnimationEasing),
             label = "selection_factor_$index"
         )
@@ -230,7 +227,9 @@ fun PieChart(
     val totalChartSize = radius * 2f + chartPadding * 2f
 
     Box(
-        modifier = modifier.size(totalChartSize),
+        modifier = modifier
+            .size(totalChartSize)
+            .selectableGroup(),
         contentAlignment = Alignment.Center
     ) {
         // Empty State Background
@@ -276,12 +275,7 @@ fun PieChart(
                     selectedIconSize = selectedIconSize,
                     iconPadding = iconPadding,
                     interactionSource = interactionSources[index],
-                    onPress = { pressedArcIndex = index },
-                    onRelease = {
-                        onSelectedIndexChange(index)
-                        pressedArcIndex = -1
-                    },
-                    onCancel = { pressedArcIndex = -1 }
+                    onClick = { onSelectedIndexChange(index) }
                 )
             }
         }
@@ -334,9 +328,7 @@ private fun PieChartArc(
     selectedIconSize: Dp,
     iconPadding: Dp,
     interactionSource: MutableInteractionSource,
-    onPress: () -> Unit,
-    onRelease: () -> Unit,
-    onCancel: () -> Unit
+    onClick: () -> Unit
 ) {
     val density = LocalDensity.current
     val tapExtraPx = with(density) { 24.dp.toPx() }
@@ -357,32 +349,15 @@ private fun PieChartArc(
                     clip = true
                     alpha = alphaState.value
                 }
-                .semantics {
-                    this.contentDescription = contentDescription
-                    role = Role.Button
-                    selected = isSelected
-                    onClick {
-                        onRelease()
-                        true
-                    }
-                }
-                .pointerInput(onPress, onRelease, onCancel) {
-                    detectTapGestures(
-                        onPress = { offset ->
-                            val press = PressInteraction.Press(offset)
-                            interactionSource.emit(press)
-                            onPress()
-                            val released = tryAwaitRelease()
-                            if (released) {
-                                onRelease()
-                                interactionSource.emit(PressInteraction.Release(press))
-                            } else {
-                                onCancel()
-                                interactionSource.emit(PressInteraction.Cancel(press))
-                            }
-                        }
-                    )
-                }
+                .semantics { this.contentDescription = contentDescription }
+                // The ripple is drawn by the visual arc below, from the same interaction source.
+                .selectable(
+                    selected = isSelected,
+                    interactionSource = interactionSource,
+                    indication = null,
+                    role = Role.Button,
+                    onClick = onClick
+                )
         ) {
             // Visual Arc & Ripple (Clipped to visible segment)
             Box(
