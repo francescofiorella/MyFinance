@@ -11,12 +11,13 @@ import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.cos
 import kotlin.math.sin
 
-/** A ring segment with rounded ends, centred in the layout, for clipping a pie chart arc. */
+/** A ring segment centred in the layout, for clipping a pie chart arc; [roundedEnds] false gives straight radial ends. */
 internal class ArcShape(
     private val startAngle: Float,
     private val sweepAngle: Float,
     private val strokeWidthPx: Float,
-    private val radiusPx: Float
+    private val radiusPx: Float,
+    private val roundedEnds: Boolean = true
 ) : Shape {
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val path = Path()
@@ -33,6 +34,14 @@ internal class ArcShape(
         val effectiveSweep = sweepAngle.coerceIn(0f, 359.99f)
 
         val endAngle = startAngle + effectiveSweep
+        if (!roundedEnds) {
+            // arcTo joins the two arcs with the radial edges.
+            path.arcTo(outerRect, startAngle, effectiveSweep, true)
+            path.arcTo(innerRect, endAngle, -effectiveSweep, false)
+            path.close()
+            return Outline.Generic(path)
+        }
+
         val startAngleRad = Math.toRadians(startAngle.toDouble())
         val endAngleRad = Math.toRadians(endAngle.toDouble())
 

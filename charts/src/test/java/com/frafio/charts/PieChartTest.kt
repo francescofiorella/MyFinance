@@ -67,18 +67,30 @@ class PieChartTest {
     private fun arc(label: String, value: String) =
         composeTestRule.onNodeWithContentDescription("$label, $value")
 
-    /** The middle of [items]' arc at [index], in the chart's coordinates. */
-    private fun TouchInjectionScope.arcMiddle(index: Int): Offset {
-        val gap = arcGapDegrees(
-            PieChartDefaults.OffsetBetweenArcs.value,
-            PieChartDefaults.ArcWidth.value,
-            PieChartDefaults.Radius.value
-        )
+    private val gap = arcGapDegrees(
+        PieChartDefaults.OffsetBetweenArcs.value,
+        PieChartDefaults.ArcWidth.value,
+        PieChartDefaults.Radius.value
+    )
+
+    /** Start and end angle, in degrees, of [items]' arc at [index]. */
+    private fun arcAngles(index: Int): Pair<Float, Float> {
         val sweeps = arcSweeps(items.map { it.value }, gap)
         val start = -90f + (0 until index).sumOf { (sweeps[it] + gap).toDouble() }.toFloat()
-        val angle = Math.toRadians((start + sweeps[index] / 2).toDouble())
+        return start to start + sweeps[index]
+    }
+
+    /** The point at [degrees] on the arcs' centre line, in the chart's coordinates. */
+    private fun TouchInjectionScope.pointAt(degrees: Float): Offset {
+        val angle = Math.toRadians(degrees.toDouble())
         val radius = PieChartDefaults.Radius.toPx()
         return center + Offset(radius * cos(angle).toFloat(), radius * sin(angle).toFloat())
+    }
+
+    /** The middle of [items]' arc at [index], in the chart's coordinates. */
+    private fun TouchInjectionScope.arcMiddle(index: Int): Offset {
+        val (start, end) = arcAngles(index)
+        return pointAt((start + end) / 2)
     }
 
     @Test
@@ -156,6 +168,42 @@ class PieChartTest {
 
         arc("Dining", "€ 30").assertIsNotSelected()
         composeTestRule.onNodeWithText("Total").assertIsDisplayed()
+    }
+
+    @Test
+    fun tapInAGap_nearerTheEarlierArc_selectsIt() {
+        setChart {
+            TestPieChart(items = items, animationSpec = snap())
+        }
+
+        arc("Dining", "€ 30").performTouchInput { click(pointAt(arcAngles(0).second + gap / 4)) }
+
+        arc("Dining", "€ 30").assertIsSelected()
+        arc("Groceries", "€ 45").assertIsNotSelected()
+    }
+
+    @Test
+    fun tapInAGap_nearerTheLaterArc_selectsIt() {
+        setChart {
+            TestPieChart(items = items, animationSpec = snap())
+        }
+
+        arc("Dining", "€ 30").performTouchInput { click(pointAt(arcAngles(0).second + gap * 3 / 4)) }
+
+        arc("Groceries", "€ 45").assertIsSelected()
+        arc("Dining", "€ 30").assertIsNotSelected()
+    }
+
+    @Test
+    fun tapInTheTopGap_nearerTheFirstArc_selectsIt() {
+        setChart {
+            TestPieChart(items = items, animationSpec = snap())
+        }
+
+        arc("Dining", "€ 30").performTouchInput { click(pointAt(arcAngles(0).first - gap / 4)) }
+
+        arc("Dining", "€ 30").assertIsSelected()
+        arc("Groceries", "€ 45").assertIsNotSelected()
     }
 
     @Test

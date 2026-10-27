@@ -269,6 +269,7 @@ fun PieChart(
                         }
                         start
                     },
+                    offsetState = animatedOffsets[index],
                     alphaState = animatedAlphas[index],
                     selectionFactorState = selectionFactors[index],
                     radiusPx = radiusPx,
@@ -335,6 +336,7 @@ private fun PieChartArc(
     iconOnColor: Color,
     sweepState: State<Float>,
     startAngleProvider: () -> Float,
+    offsetState: State<Float>,
     alphaState: State<Float>,
     selectionFactorState: State<Float>,
     radiusPx: Float,
@@ -360,7 +362,9 @@ private fun PieChartArc(
                     val strokePx = arcWidthPx * (1f + 0.2f * factor)
                     val radPx = radiusPx + (arcWidthPx * 0.15f * factor)
 
-                    shape = ArcShape(start, sweep, strokePx + tapExtraPx, radPx)
+                    // Reaches halfway into the gaps on both sides, so neighbouring touch areas meet without overlapping.
+                    val offset = offsetState.value
+                    shape = ArcShape(start - offset / 2, sweep + offset, strokePx + tapExtraPx, radPx, roundedEnds = false)
                     clip = true
                     alpha = alphaState.value
                 }
