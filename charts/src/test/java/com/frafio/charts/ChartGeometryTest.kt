@@ -4,6 +4,8 @@ import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sqrt
 
 /** The pure sizing and angle maths behind BarChart, PieChart and ShareBar. */
 class ChartGeometryTest {
@@ -156,6 +158,78 @@ class ChartGeometryTest {
     fun arcSweeps_nothingSpent_drawsNoArcs() {
         assertThat(arcSweeps(listOf(0.0, 0.0), gapDegrees = 10f)).containsExactly(0f, 0f).inOrder()
         assertThat(arcSweeps(emptyList(), gapDegrees = 10f)).isEmpty()
+    }
+
+    @Test
+    fun selectedEndInset_idle_isZero() {
+        assertThat(selectedEndInset(arcWidthPx = 14f, radiusPx = 80f, factor = 0f)).isEqualTo(0f)
+    }
+
+    /** Space between two facing rounded ends: semicircles of radius [cap1] and [cap2], centred [angle] apart on radii [r1] and [r2]. */
+    private fun gapBetweenEnds(r1: Double, cap1: Double, r2: Double, cap2: Double, angle: Double): Double =
+        sqrt(r1 * r1 + r2 * r2 - 2 * r1 * r2 * cos(angle)) - cap1 - cap2
+
+    @Test
+    fun selectedEndInset_keepsTheGapToTheNeighbourAsWideAsWhenIdle() {
+        val gap = Math.toRadians(arcGapDegrees(offsetPx = 4f, arcWidthPx = 14f, radiusPx = 80f).toDouble())
+        val inset = Math.toRadians(selectedEndInset(arcWidthPx = 14f, radiusPx = 80f, factor = 1f).toDouble())
+        val idle = gapBetweenEnds(80.0, 7.0, 80.0, 7.0, gap)
+        // Selected: 20% thicker (end radius 8.4) and 15% of the width further out (82.1); the neighbour pulls back by the inset.
+        val withInset = gapBetweenEnds(82.1, 8.4, 80.0, 7.0, gap + inset)
+        val withoutInset = gapBetweenEnds(82.1, 8.4, 80.0, 7.0, gap)
+
+        assertThat(withInset).isWithin(0.2).of(idle)
+        assertThat(idle - withoutInset).isGreaterThan(0.5)
+    }
+
+    @Test
+    fun insetArcSpan_pullsEachEndBackByItsOwnInset() {
+        val (start, sweep) = insetArcSpan(start = 10f, sweep = 100f, halfGap = 6f, startInset = 1f, endInset = 2f)
+
+        assertThat(start).isEqualTo(11f)
+        assertThat(start + sweep).isEqualTo(108f)
+    }
+
+    @Test
+    fun insetArcSpan_neverPullsAnEndPastHalfTheGap() {
+        val (start, sweep) = insetArcSpan(start = 10f, sweep = 100f, halfGap = 6f, startInset = 9f, endInset = 9f)
+
+        assertThat(start).isEqualTo(16f)
+        assertThat(start + sweep).isEqualTo(104f)
+    }
+
+    @Test
+    fun insetArcSpan_tinyArc_keepsADotInItsMiddle() {
+        val (start, sweep) = insetArcSpan(start = 10f, sweep = 1f, halfGap = 6f, startInset = 2f, endInset = 2f)
+
+        assertThat(sweep).isWithin(1e-5f).of(0.01f)
+        assertThat(start + sweep / 2).isWithin(1e-5f).of(10.5f)
+    }
+
+    @Test
+    fun insetArcSpan_zeroArc_staysEmpty() {
+        assertThat(insetArcSpan(start = 10f, sweep = 0f, halfGap = 6f, startInset = 2f, endInset = 2f)).isEqualTo(10f to 0f)
+    }
+
+    @Test
+    fun selectedEndInset_withoutARadius_isZero() {
+        assertThat(selectedEndInset(arcWidthPx = 14f, radiusPx = 0f, factor = 1f)).isEqualTo(0f)
+    }
+
+    @Test
+    fun arcNeighbours_wrapAround_andSkipZeroArcs() {
+        assertThat(arcNeighbours(listOf(10f, 0f, 20f, 30f)))
+            .containsExactly(3 to 2, null, 0 to 3, 2 to 0).inOrder()
+    }
+
+    @Test
+    fun arcNeighbours_twoArcs_areEachOthersNeighbourOnBothSides() {
+        assertThat(arcNeighbours(listOf(10f, 20f))).containsExactly(1 to 1, 0 to 0).inOrder()
+    }
+
+    @Test
+    fun arcNeighbours_aSingleArc_hasNone() {
+        assertThat(arcNeighbours(listOf(0f, 360f))).containsExactly(null, null).inOrder()
     }
 
     @Test

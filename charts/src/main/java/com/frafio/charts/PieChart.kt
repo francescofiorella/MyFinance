@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import java.text.NumberFormat
 import kotlin.math.PI
+import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -82,6 +83,10 @@ data class PieChartItem(
 /** How far a pressed, unselected arc and its icon grow towards their selected size. */
 private const val PressedFactor = 0.5f
 
+/** A selected arc's extra width, and how far it moves out, as fractions of its width. */
+private const val SelectedStrokeGrowth = 0.2f
+private const val SelectedRadiusShift = 0.15f
+
 /** Added to an arc's width for its touch area, half on each side. */
 private val ArcTouchExtension = 24.dp
 
@@ -99,6 +104,42 @@ internal fun arcSweeps(values: List<Double>, gapDegrees: Float): List<Float> {
     val sum = values.sum()
     return values.map { value ->
         if (sum > 0) (360f - totalGap) * value.toFloat() / sum.toFloat() else 0f
+    }
+}
+
+/** Degrees a rounded end reaches past its arc's end, for an arc grown by [factor] (0 idle, 1 selected). */
+private fun endReachDegrees(arcWidthPx: Float, radiusPx: Float, factor: Float): Float {
+    val strokePx = arcWidthPx * (1f + SelectedStrokeGrowth * factor)
+    val radPx = radiusPx + arcWidthPx * SelectedRadiusShift * factor
+    return Math.toDegrees(asin((strokePx / 2 / radPx).coerceAtMost(1f).toDouble())).toFloat()
+}
+
+/** How much further than when idle an arc grown by [factor] reaches into each gap, in degrees. */
+internal fun selectedEndInset(arcWidthPx: Float, radiusPx: Float, factor: Float): Float =
+    if (radiusPx > 0) {
+        endReachDegrees(arcWidthPx, radiusPx, factor) - endReachDegrees(arcWidthPx, radiusPx, 0f)
+    } else 0f
+
+/**
+ * Start and sweep of an arc drawn with its ends pulled back by [startInset] and [endInset], each at most
+ * [halfGap]; a tiny arc squeezed past its length keeps a dot.
+ */
+internal fun insetArcSpan(start: Float, sweep: Float, halfGap: Float, startInset: Float, endInset: Float): Pair<Float, Float> {
+    val startPull = startInset.coerceAtMost(halfGap)
+    val endPull = endInset.coerceAtMost(halfGap)
+    val room = sweep - minOf(sweep, 0.01f)
+    val scale = if (startPull + endPull > room) room / (startPull + endPull) else 1f
+    return start + startPull * scale to sweep - (startPull + endPull) * scale
+}
+
+/** Each positive arc's previous and next positive arc, wrapping around; null for the others, or with fewer than two. */
+internal fun arcNeighbours(sweeps: List<Float>): List<Pair<Int, Int>?> {
+    val positive = sweeps.indices.filter { sweeps[it] > 0f }
+    if (positive.size < 2) return sweeps.map { null }
+    return sweeps.indices.map { index ->
+        val position = positive.indexOf(index)
+        if (position == -1) null
+        else positive[(position - 1 + positive.size) % positive.size] to positive[(position + 1) % positive.size]
     }
 }
 
@@ -216,6 +257,11 @@ fun PieChart(
         )
     }
 
+    // A selected or pressed arc's neighbours pull back their facing ends, so its gaps keep their width.
+    val neighbours = remember(floatValues) { arcNeighbours(floatValues) }
+    fun insetFrom(neighbour: Int?): () -> Float =
+        if (neighbour == null) { { 0f } } else { { selectedEndInset(arcWidthPx, radiusPx, selectionFactors[neighbour].value) } }
+
     val emptyCircleAlpha by animateFloatAsState(
         targetValue = if (items.sumOf { it.value } == 0.0) 1f else 0f,
         animationSpec = animationSpec,
@@ -266,6 +312,8 @@ fun PieChart(
                         start
                     },
                     offsetState = animatedOffsets[index],
+                    startInsetProvider = insetFrom(neighbours[index]?.first),
+                    endInsetProvider = insetFrom(neighbours[index]?.second),
                     alphaState = animatedAlphas[index],
                     selectionFactorState = selectionFactors[index],
                     radiusPx = radiusPx,
@@ -338,6 +386,8 @@ private fun PieChartArc(
     sweepState: State<Float>,
     startAngleProvider: () -> Float,
     offsetState: State<Float>,
+    startInsetProvider: () -> Float,
+    endInsetProvider: () -> Float,
     alphaState: State<Float>,
     selectionFactorState: State<Float>,
     radiusPx: Float,
@@ -360,8 +410,8 @@ private fun PieChartArc(
                     val sweep = sweepState.value
                     val start = startAngleProvider()
                     val factor = selectionFactorState.value
-                    val strokePx = arcWidthPx * (1f + 0.2f * factor)
-                    val radPx = radiusPx + (arcWidthPx * 0.15f * factor)
+                    val strokePx = arcWidthPx * (1f + SelectedStrokeGrowth * factor)
+                    val radPx = radiusPx + (arcWidthPx * SelectedRadiusShift * factor)
 
                     // Reaches halfway into the gaps on both sides, so neighbouring touch areas meet without overlapping.
                     val offset = offsetState.value
@@ -387,10 +437,14 @@ private fun PieChartArc(
                         val sweep = sweepState.value
                         val start = startAngleProvider()
                         val factor = selectionFactorState.value
-                        val strokePx = arcWidthPx * (1f + 0.2f * factor)
-                        val radPx = radiusPx + (arcWidthPx * 0.15f * factor)
+                        val strokePx = arcWidthPx * (1f + SelectedStrokeGrowth * factor)
+                        val radPx = radiusPx + (arcWidthPx * SelectedRadiusShift * factor)
 
-                        shape = ArcShape(start, sweep, strokePx, radPx)
+                        // Ends pulled back for grown neighbours.
+                        val (drawnStart, drawnSweep) = insetArcSpan(
+                            start, sweep, offsetState.value / 2, startInsetProvider(), endInsetProvider()
+                        )
+                        shape = ArcShape(drawnStart, drawnSweep, strokePx, radPx)
                         clip = true
                     }
                     .background(color)
@@ -411,8 +465,8 @@ private fun PieChartArc(
 
                     val start = startAngleProvider()
                     val factor = selectionFactorState.value
-                    val strokePx = arcWidthPx * (1f + 0.2f * factor)
-                    val radPx = radiusPx + (arcWidthPx * 0.15f * factor)
+                    val strokePx = arcWidthPx * (1f + SelectedStrokeGrowth * factor)
+                    val radPx = radiusPx + (arcWidthPx * SelectedRadiusShift * factor)
                     val actualIconSize = lerp(iconSize, selectedIconSize, factor)
                     val iconRadiusPx = radPx + strokePx / 2 + (iconPadding + actualIconSize / 2).toPx()
 
