@@ -444,6 +444,25 @@ private fun PieChartArc(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // Visual Arc & Ripple, beside the hitbox rather than in it, so a pressed arc growing past its touch area isn't clipped.
+        // Same size and position as the hitbox, so the ripple starts where the press is.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    val factor = selectionFactorState.value
+                    val strokePx = arcWidthPx * (1f + SelectedStrokeGrowth * factor)
+                    val radPx = radiusPx + (arcWidthPx * SelectedRadiusShift * factor)
+
+                    val (drawnStart, drawnSweep) = drawnSpan()
+                    shape = ArcShape(drawnStart, drawnSweep, strokePx, radPx, cornerFraction = cornerFractionState.value)
+                    clip = true
+                    alpha = alphaState.value
+                }
+                .background(color)
+                .indication(interactionSource, ripple(color = iconOnColor))
+        )
+
         // Hitbox Layer (Larger for easier interaction)
         Box(
             modifier = Modifier
@@ -459,10 +478,9 @@ private fun PieChartArc(
                     val offset = offsetState.value
                     shape = ArcShape(start - offset / 2, sweep + offset, strokePx + tapExtraPx, radPx, roundedEnds = false)
                     clip = true
-                    alpha = alphaState.value
                 }
                 .semantics { this.contentDescription = contentDescription }
-                // The ripple is drawn by the visual arc below, from the same interaction source.
+                // The ripple is drawn by the visual arc above, from the same interaction source.
                 .selectable(
                     selected = isSelected,
                     interactionSource = interactionSource,
@@ -470,24 +488,7 @@ private fun PieChartArc(
                     role = Role.Button,
                     onClick = onClick
                 )
-        ) {
-            // Visual Arc & Ripple (Clipped to visible segment)
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        val factor = selectionFactorState.value
-                        val strokePx = arcWidthPx * (1f + SelectedStrokeGrowth * factor)
-                        val radPx = radiusPx + (arcWidthPx * SelectedRadiusShift * factor)
-
-                        val (drawnStart, drawnSweep) = drawnSpan()
-                        shape = ArcShape(drawnStart, drawnSweep, strokePx, radPx, cornerFraction = cornerFractionState.value)
-                        clip = true
-                    }
-                    .background(color)
-                    .indication(interactionSource, ripple(color = iconOnColor))
-            )
-        }
+        )
 
         // Icon Layer
         Box(

@@ -25,6 +25,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -35,14 +36,17 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.GraphicsMode
 import java.util.Locale
 import kotlin.math.cos
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 /** Centre text and arc selection; what the arcs expose to accessibility services is in the app's `AccessibilityTest`. */
@@ -209,6 +213,35 @@ class PieChartTest {
 
         arc("Dining", "€ 30").assertIsSelected()
         arc("Groceries", "€ 45").assertIsNotSelected()
+    }
+
+    // Drawing is only rendered with native graphics.
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    @Test
+    fun pressedArc_drawsPastTheEdgeOfItsTouchArea() {
+        setChart {
+            TestPieChart(items = items, animationSpec = snap())
+        }
+        // Groceries' touch area starts half a gap before it; pressed, it grows about 15° that way.
+        val probeAngle = arcAngles(1).first - 10f
+        assertThat(10f).isGreaterThan(gap / 2)
+
+        arc("Groceries", "€ 45").performTouchInput { down(arcMiddle(1)) }
+        composeTestRule.waitForIdle()
+        val pixels = arc("Groceries", "€ 45").captureToImage().toPixelMap()
+        arc("Groceries", "€ 45").performTouchInput { up() }
+
+        // On the pressed arc's centre line, which moves out by 15% of the arc width.
+        val radius = with(composeTestRule.density) { (PieChartDefaults.Radius + PieChartDefaults.ArcWidth * 0.15f).toPx() }
+        val angle = Math.toRadians(probeAngle.toDouble())
+        val probe = pixels[
+            (pixels.width / 2 + radius * cos(angle)).roundToInt(),
+            (pixels.height / 2 + radius * sin(angle)).roundToInt()
+        ]
+        // Groceries is blue; the ripple tints it slightly.
+        assertThat(probe.blue).isGreaterThan(0.8f)
+        assertThat(probe.red).isLessThan(0.5f)
+        assertThat(probe.green).isLessThan(0.5f)
     }
 
     @Test
