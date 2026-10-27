@@ -4,6 +4,9 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.snap
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -229,6 +232,30 @@ class PieChartTest {
         arc("Dining", "€ 30").assertIsNotSelected()
         composeTestRule.onNodeWithText("Total").assertIsDisplayed()
         composeTestRule.onNodeWithText("€ 75").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Dining").assertDoesNotExist()
+        composeTestRule.onNodeWithText("€ 30").assertDoesNotExist()
+    }
+
+    @Test
+    fun selectedItemRemoved_showsTheTotal() {
+        var shown by mutableStateOf(items)
+        setChart {
+            PieChart(
+                items = shown,
+                selectedIndex = 1,
+                onSelectedIndexChange = {},
+                totalLabel = "Total",
+                valueFormatter = { "€ %.0f".format(Locale.US, it) },
+                animationSpec = snap()
+            )
+        }
+        composeTestRule.onNodeWithText("Groceries").assertIsDisplayed()
+
+        shown = items.take(1)
+
+        composeTestRule.onNodeWithText("Total").assertIsDisplayed()
+        composeTestRule.onNodeWithText("€ 30").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Groceries").assertDoesNotExist()
     }
 
     @Test
