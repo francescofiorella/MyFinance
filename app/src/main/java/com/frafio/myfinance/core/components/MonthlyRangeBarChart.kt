@@ -1,6 +1,5 @@
 package com.frafio.myfinance.core.components
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.frafio.charts.BarChart
+import com.frafio.charts.BarChartDefaults
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
@@ -72,7 +72,7 @@ fun MonthlyRangeBarChart(
             onVisibleCountChanged = onVisibleCountChanged,
             valueFormatter = ::doubleToPrice,
             referenceValueFormatter = ::doubleToPriceWithoutDecimals,
-            entryAnimationSpec = tween(durationMillis = 500)
+            entryAnimationSpec = BarChartDefaults.EntryAnimationSpec
         )
     }
 }

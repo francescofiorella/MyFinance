@@ -1,10 +1,14 @@
 package com.frafio.charts
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -95,6 +99,10 @@ object BarChartDefaults {
 
     /** Formats the header value, the reference label and the bars' descriptions, in the default locale. */
     val ValueFormatter: (Double) -> String = { NumberFormat.getInstance().format(it) }
+
+    /** How the strip scrolls, zooms and rescales when the entries change; pass it as `entryAnimationSpec`. */
+    val EntryAnimationSpec: FiniteAnimationSpec<Float>
+        @Composable get() = MaterialTheme.motionScheme.slowSpatialSpec()
 
     @Composable
     fun colors(
@@ -356,22 +364,33 @@ private fun rememberBarStrip(
 
 @Composable
 private fun BarChartHeader(entry: BarChartEntry?, valueFormatter: (Double) -> String, colors: BarChartColors) {
-    Row(verticalAlignment = Alignment.Bottom) {
-        Text(
-            text = entry?.value?.let(valueFormatter) ?: "",
-            color = colors.contentColor,
-            style = MaterialTheme.typography.displaySmall,
-            fontWeight = FontWeight.SemiBold
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            modifier = Modifier.padding(bottom = 5.dp),
-            text = entry?.label ?: "",
-            color = colors.contentColor,
-            style = MaterialTheme.typography.labelSmall
-        )
+    val fadeSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
+    AnimatedContent(
+        targetState = HeaderText(entry?.value?.let(valueFormatter) ?: "", entry?.label ?: ""),
+        transitionSpec = { fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec) using SizeTransform(clip = false) },
+        contentAlignment = Alignment.BottomStart,
+        label = "header_text"
+    ) { text ->
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(
+                text = text.value,
+                color = colors.contentColor,
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                modifier = Modifier.padding(bottom = 5.dp),
+                text = text.label,
+                color = colors.contentColor,
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
     }
 }
+
+/** What the header shows: the selected entry's value and label. */
+private data class HeaderText(val value: String, val label: String)
 
 /** What a bar shows, passed as one value so an animated bar can move between positions with its state. */
 private class ChartBarState(
@@ -471,12 +490,15 @@ private fun BarChartBars(
         }
 
         if (referenceValue != null && referenceValue > 0) {
-            val animatedHeightFraction by animateFloatAsState(
-                targetValue = (referenceValue / maxValue).toFloat(),
-                animationSpec = tween(durationMillis = 500),
+            val heightFraction = (referenceValue / maxValue).toFloat()
+            val animatedFraction by animateFloatAsState(
+                targetValue = heightFraction,
+                animationSpec = MaterialTheme.motionScheme.slowSpatialSpec(),
                 label = "ReferenceHeight"
             )
-            if (latestValue != null && animatedHeightFraction in 0f..1f) {
+            // Shown by its target, so a spring overshooting past the top doesn't make it flicker.
+            val animatedHeightFraction = animatedFraction.coerceIn(0f, 1f)
+            if (latestValue != null && heightFraction <= 1f) {
                 HorizontalDivider(
                     modifier = Modifier
                         .zIndex(-1f)
@@ -561,7 +583,7 @@ private fun ChartBar(state: ChartBarState) {
     }
     val animatedHeightFraction by animateFloatAsState(
         targetValue = state.heightFraction,
-        animationSpec = tween(durationMillis = 500),
+        animationSpec = MaterialTheme.motionScheme.slowSpatialSpec(),
         label = "BarHeight"
     )
     ToggleButton(
@@ -611,7 +633,7 @@ fun BarChartPreview() {
 fun BarChartManyEntriesPreview() {
     MaterialTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
-            BarChart(entries = previewEntries(24), referenceValue = 190.0, entryAnimationSpec = tween(durationMillis = 500))
+            BarChart(entries = previewEntries(24), referenceValue = 190.0, entryAnimationSpec = BarChartDefaults.EntryAnimationSpec)
         }
     }
 }
