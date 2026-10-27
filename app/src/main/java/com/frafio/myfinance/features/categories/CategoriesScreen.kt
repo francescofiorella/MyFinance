@@ -3,11 +3,8 @@ package com.frafio.myfinance.features.categories
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -270,11 +267,6 @@ private fun CategorySpendingItem(
     )
 }
 
-private object ProportionBarDefaults {
-    val AnimationEasing: Easing = LinearOutSlowInEasing
-    const val AnimationDuration: Int = 1000
-}
-
 /**
  * A thin track filled up to [fraction] (0 to 1) in the category's color. The fill and its color animate;
  * when [visible] turns false the bar fades and collapses as its fill shrinks to zero.
@@ -285,7 +277,7 @@ private fun ProportionBar(
     visible: Boolean,
     fraction: Double,
     category: ExpenseCategory,
-    animationSpec: AnimationSpec<Float> = tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing)
+    animationSpec: AnimationSpec<Float> = MaterialTheme.motionScheme.slowSpatialSpec()
 ) {
     val isDark = isSystemInDarkTheme()
     val animatedFraction by animateFloatAsState(
@@ -296,16 +288,16 @@ private fun ProportionBar(
     // The row may show another category after a month change: blend into its color.
     val fillColor by animateColorAsState(
         targetValue = category.colors.container(isDark),
-        animationSpec = tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing),
+        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
         label = "proportion_color"
     )
     AnimatedVisibility(
         modifier = modifier,
         visible = visible,
-        enter = fadeIn(tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing)) +
-            expandVertically(tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing)),
-        exit = fadeOut(tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing)) +
-            shrinkVertically(tween(ProportionBarDefaults.AnimationDuration, easing = ProportionBarDefaults.AnimationEasing))
+        enter = fadeIn(MaterialTheme.motionScheme.slowEffectsSpec()) +
+            expandVertically(MaterialTheme.motionScheme.slowSpatialSpec()),
+        exit = fadeOut(MaterialTheme.motionScheme.slowEffectsSpec()) +
+            shrinkVertically(MaterialTheme.motionScheme.slowSpatialSpec())
     ) {
         Box(
             modifier = Modifier

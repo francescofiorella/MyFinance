@@ -2,9 +2,6 @@ package com.frafio.myfinance.core.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -31,11 +28,9 @@ import com.frafio.myfinance.core.data.model.ExpenseCategory
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 object CategoryIconDefaults {
-    val AnimationEasing: Easing = LinearOutSlowInEasing
-    const val ColorAnimationDuration: Int = 1000
-
     /** How the colors blend when the category changes; pass `snap()` to switch at once. */
-    val ColorAnimationSpec: AnimationSpec<Color> = tween(ColorAnimationDuration, easing = AnimationEasing)
+    val ColorAnimationSpec: AnimationSpec<Color>
+        @Composable get() = MaterialTheme.motionScheme.slowEffectsSpec()
 }
 
 /**
