@@ -83,6 +83,13 @@ data class PieChartItem(
 /** How far a pressed, unselected arc and its icon grow towards their selected size. */
 private const val PressedFactor = 0.5f
 
+/**
+ * How round a pressed and a selected arc's ends stay, from fully round (1): the ToggleButton's 6 dp pressed and
+ * 12 dp selected corners on its 20 dp half-width, scaled to the arc.
+ */
+private const val PressedCornerFraction = 0.3f
+private const val SelectedCornerFraction = 0.6f
+
 /** A selected arc's extra width, and how far it moves out, as fractions of its width. */
 private const val SelectedStrokeGrowth = 0.2f
 private const val SelectedRadiusShift = 0.15f
@@ -257,6 +264,19 @@ fun PieChart(
         )
     }
 
+    // Pressed wins over selected, as in ToggleButton.
+    val cornerFractions = items.indices.map { index ->
+        animateFloatAsState(
+            targetValue = when {
+                pressedStates[index].value -> PressedCornerFraction
+                selectedArcIndex == index -> SelectedCornerFraction
+                else -> 1f
+            },
+            animationSpec = selectionSpec,
+            label = "corner_fraction_$index"
+        )
+    }
+
     // A selected or pressed arc's neighbours pull back their facing ends, so its gaps keep their width.
     val neighbours = remember(floatValues) { arcNeighbours(floatValues) }
     fun insetFrom(neighbour: Int?): () -> Float =
@@ -316,6 +336,7 @@ fun PieChart(
                     endInsetProvider = insetFrom(neighbours[index]?.second),
                     alphaState = animatedAlphas[index],
                     selectionFactorState = selectionFactors[index],
+                    cornerFractionState = cornerFractions[index],
                     radiusPx = radiusPx,
                     arcWidthPx = arcWidthPx,
                     iconSize = iconSize,
@@ -390,6 +411,7 @@ private fun PieChartArc(
     endInsetProvider: () -> Float,
     alphaState: State<Float>,
     selectionFactorState: State<Float>,
+    cornerFractionState: State<Float>,
     radiusPx: Float,
     arcWidthPx: Float,
     iconSize: Dp,
@@ -444,7 +466,7 @@ private fun PieChartArc(
                         val (drawnStart, drawnSweep) = insetArcSpan(
                             start, sweep, offsetState.value / 2, startInsetProvider(), endInsetProvider()
                         )
-                        shape = ArcShape(drawnStart, drawnSweep, strokePx, radPx)
+                        shape = ArcShape(drawnStart, drawnSweep, strokePx, radPx, cornerFraction = cornerFractionState.value)
                         clip = true
                     }
                     .background(color)

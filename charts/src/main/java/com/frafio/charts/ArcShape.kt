@@ -8,16 +8,21 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.sin
 
-/** A ring segment centred in the layout, for clipping a pie chart arc; [roundedEnds] false gives straight radial ends. */
+/**
+ * A ring segment centred in the layout, for clipping a pie chart arc; [roundedEnds] false gives straight radial ends.
+ * Rounded ends below a [cornerFraction] of 1 square off, keeping their tip, with corners that fraction of fully round.
+ */
 internal class ArcShape(
     private val startAngle: Float,
     private val sweepAngle: Float,
     private val strokeWidthPx: Float,
     private val radiusPx: Float,
-    private val roundedEnds: Boolean = true
+    private val roundedEnds: Boolean = true,
+    private val cornerFraction: Float = 1f
 ) : Shape {
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val path = Path()
@@ -39,6 +44,12 @@ internal class ArcShape(
             path.arcTo(outerRect, startAngle, effectiveSweep, true)
             path.arcTo(innerRect, endAngle, -effectiveSweep, false)
             path.close()
+            return Outline.Generic(path)
+        }
+
+        // A full ring shows no ends, and its corner arcs would sweep past 360°.
+        if (cornerFraction < 1f && effectiveSweep < 359f) {
+            addCorneredSegment(path, center, outerRect, innerRect, effectiveSweep)
             return Outline.Generic(path)
         }
 
@@ -65,4 +76,36 @@ internal class ArcShape(
 
         return Outline.Generic(path)
     }
+
+    /**
+     * Each end is a radial edge at the round end's tip, joined to the outer and inner arcs by corners of radius c,
+     * each tangent to its arc and to the edge. At c equal to half the stroke both corners meet the round end.
+     */
+    private fun addCorneredSegment(path: Path, center: Offset, outerRect: Rect, innerRect: Rect, sweep: Float) {
+        val outerRadius = radiusPx + strokeWidthPx / 2f
+        val innerRadius = radiusPx - strokeWidthPx / 2f
+        val capRadius = strokeWidthPx / 2f
+        val c = (capRadius * cornerFraction).coerceIn(0.01f, capRadius)
+
+        val tip = degreesAsin(capRadius / radiusPx)
+        val outerTurn = degreesAsin(c / (outerRadius - c))
+        val innerTurn = degreesAsin(c / (innerRadius + c))
+        val endEdge = startAngle + sweep + tip
+        val startEdge = startAngle - tip
+
+        path.arcTo(outerRect, startEdge + outerTurn, sweep + 2 * (tip - outerTurn), true)
+        path.arcTo(Rect(center.polar(outerRadius - c, endEdge - outerTurn), c), endEdge - outerTurn, 90f + outerTurn, false)
+        path.arcTo(Rect(center.polar(innerRadius + c, endEdge - innerTurn), c), endEdge + 90f, 90f - innerTurn, false)
+        path.arcTo(innerRect, endEdge - innerTurn, -(sweep + 2 * (tip - innerTurn)), false)
+        path.arcTo(Rect(center.polar(innerRadius + c, startEdge + innerTurn), c), startEdge + innerTurn + 180f, 90f - innerTurn, false)
+        path.arcTo(Rect(center.polar(outerRadius - c, startEdge + outerTurn), c), startEdge - 90f, 90f + outerTurn, false)
+        path.close()
+    }
+}
+
+private fun degreesAsin(x: Float): Float = Math.toDegrees(asin(x.coerceIn(-1f, 1f).toDouble())).toFloat()
+
+private fun Offset.polar(radius: Float, degrees: Float): Offset {
+    val radians = Math.toRadians(degrees.toDouble())
+    return Offset(x + radius * cos(radians).toFloat(), y + radius * sin(radians).toFloat())
 }

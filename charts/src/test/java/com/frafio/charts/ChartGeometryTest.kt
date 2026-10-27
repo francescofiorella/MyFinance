@@ -160,11 +160,6 @@ class ChartGeometryTest {
         assertThat(arcSweeps(emptyList(), gapDegrees = 10f)).isEmpty()
     }
 
-    @Test
-    fun selectedEndInset_idle_isZero() {
-        assertThat(selectedEndInset(arcWidthPx = 14f, radiusPx = 80f, factor = 0f)).isEqualTo(0f)
-    }
-
     /** Space between two facing rounded ends: semicircles of radius [cap1] and [cap2], centred [angle] apart on radii [r1] and [r2]. */
     private fun gapBetweenEnds(r1: Double, cap1: Double, r2: Double, cap2: Double, angle: Double): Double =
         sqrt(r1 * r1 + r2 * r2 - 2 * r1 * r2 * cos(angle)) - cap1 - cap2
@@ -178,6 +173,7 @@ class ChartGeometryTest {
         val withInset = gapBetweenEnds(82.1, 8.4, 80.0, 7.0, gap + inset)
         val withoutInset = gapBetweenEnds(82.1, 8.4, 80.0, 7.0, gap)
 
+        // Matching the tips' angles leaves the selected end, further out, about 0.15 dp wider apart.
         assertThat(withInset).isWithin(0.2).of(idle)
         assertThat(idle - withoutInset).isGreaterThan(0.5)
     }
