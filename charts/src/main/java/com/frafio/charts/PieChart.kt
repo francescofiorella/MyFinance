@@ -371,7 +371,7 @@ private fun PieChartArc(
                         clip = true
                     }
                     .background(color)
-                    .indication(interactionSource, ripple())
+                    .indication(interactionSource, ripple(color = iconOnColor))
             )
         }
 
