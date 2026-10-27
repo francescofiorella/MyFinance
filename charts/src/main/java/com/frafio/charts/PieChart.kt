@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -80,9 +81,6 @@ data class PieChartItem(
     val labelColor: Color = color
 )
 
-/** How far a pressed, unselected arc and its icon grow towards their selected size. */
-private const val PressedFactor = 0.5f
-
 /** How round a pressed arc's ends stay, from fully round (1); idle and selected ends are fully round. */
 private const val PressedCornerFraction = 0.6f
 
@@ -124,16 +122,24 @@ internal fun selectedEndInset(arcWidthPx: Float, radiusPx: Float, factor: Float)
     } else 0f
 
 /**
- * Start and sweep of an arc drawn with its ends pulled back by [startInset] and [endInset], each at most
- * [halfGap]; a tiny arc squeezed past its length keeps a dot.
+ * Start and sweep of an arc with its ends pulled back by [startPullBack] and [endPullBack]; negative values extend them.
+ * A tiny arc squeezed past its length keeps a dot where its ends meet.
  */
-internal fun insetArcSpan(start: Float, sweep: Float, halfGap: Float, startInset: Float, endInset: Float): Pair<Float, Float> {
-    val startPull = startInset.coerceAtMost(halfGap)
-    val endPull = endInset.coerceAtMost(halfGap)
-    val room = sweep - minOf(sweep, 0.01f)
-    val scale = if (startPull + endPull > room) room / (startPull + endPull) else 1f
-    return start + startPull * scale to sweep - (startPull + endPull) * scale
+internal fun shiftedArcSpan(start: Float, sweep: Float, startPullBack: Float, endPullBack: Float): Pair<Float, Float> {
+    val drawnStart = start + startPullBack
+    val drawnSweep = sweep - startPullBack - endPullBack
+    val minSweep = minOf(sweep, 0.01f)
+    if (drawnSweep >= minSweep) return drawnStart to drawnSweep
+    val middle = drawnStart + drawnSweep / 2
+    return middle - minSweep / 2 to minSweep
 }
+
+/**
+ * How far a pressed arc of [sweep] grows past each end, like a ButtonGroup's pressed button; each neighbour
+ * gives up at most half of itself.
+ */
+internal fun pressExpansion(sweep: Float, previousSweep: Float, nextSweep: Float): Float =
+    minOf(ButtonGroupDefaults.ExpandedRatio * sweep / 2, previousSweep / 2, nextSweep / 2)
 
 /** Each positive arc's previous and next positive arc, wrapping around; null for the others, or with fewer than two. */
 internal fun arcNeighbours(sweeps: List<Float>): List<Pair<Int, Int>?> {
@@ -250,11 +256,7 @@ fun PieChart(
     val selectionSpec = MaterialTheme.motionScheme.fastSpatialSpec<Float>()
     val selectionFactors = items.indices.map { index ->
         animateFloatAsState(
-            targetValue = when {
-                selectedArcIndex == index -> 1f
-                pressedStates[index].value -> PressedFactor
-                else -> 0f
-            },
+            targetValue = if (selectedArcIndex == index || pressedStates[index].value) 1f else 0f,
             animationSpec = selectionSpec,
             label = "selection_factor_$index"
         )
@@ -268,10 +270,23 @@ fun PieChart(
         )
     }
 
-    // A selected or pressed arc's neighbours pull back their facing ends, so its gaps keep their width.
+    val pressFractions = items.indices.map { index ->
+        animateFloatAsState(
+            targetValue = if (pressedStates[index].value) 1f else 0f,
+            animationSpec = selectionSpec,
+            label = "press_fraction_$index"
+        )
+    }
+
+    // A pressed arc grows along the circle and its neighbours make room, as in a ButtonGroup.
     val neighbours = remember(floatValues) { arcNeighbours(floatValues) }
-    fun insetFrom(neighbour: Int?): () -> Float =
-        if (neighbour == null) { { 0f } } else { { selectedEndInset(arcWidthPx, radiusPx, selectionFactors[neighbour].value) } }
+    fun expansionOf(index: Int?): () -> Float {
+        val (previous, next) = index?.let { neighbours[it] } ?: return { 0f }
+        return {
+            pressFractions[index].value *
+                pressExpansion(animatedValues[index].value, animatedValues[previous].value, animatedValues[next].value)
+        }
+    }
 
     val emptyCircleAlpha by animateFloatAsState(
         targetValue = if (items.sumOf { it.value } == 0.0) 1f else 0f,
@@ -323,8 +338,9 @@ fun PieChart(
                         start
                     },
                     offsetState = animatedOffsets[index],
-                    startInsetProvider = insetFrom(neighbours[index]?.first),
-                    endInsetProvider = insetFrom(neighbours[index]?.second),
+                    ownExpansionProvider = expansionOf(index),
+                    previousExpansionProvider = expansionOf(neighbours[index]?.first),
+                    nextExpansionProvider = expansionOf(neighbours[index]?.second),
                     alphaState = animatedAlphas[index],
                     selectionFactorState = selectionFactors[index],
                     cornerFractionState = cornerFractions[index],
@@ -398,8 +414,9 @@ private fun PieChartArc(
     sweepState: State<Float>,
     startAngleProvider: () -> Float,
     offsetState: State<Float>,
-    startInsetProvider: () -> Float,
-    endInsetProvider: () -> Float,
+    ownExpansionProvider: () -> Float,
+    previousExpansionProvider: () -> Float,
+    nextExpansionProvider: () -> Float,
     alphaState: State<Float>,
     selectionFactorState: State<Float>,
     cornerFractionState: State<Float>,
@@ -413,6 +430,18 @@ private fun PieChartArc(
 ) {
     val density = LocalDensity.current
     val tapExtraPx = with(density) { ArcTouchExtension.toPx() }
+
+    // Thicker but not longer when grown, extended while pressed, pulled back for a pressed neighbour.
+    val drawnSpan: () -> Pair<Float, Float> = {
+        val inset = selectedEndInset(arcWidthPx, radiusPx, selectionFactorState.value).coerceAtMost(offsetState.value / 2)
+        val own = ownExpansionProvider()
+        shiftedArcSpan(
+            startAngleProvider(),
+            sweepState.value,
+            startPullBack = inset - own + previousExpansionProvider(),
+            endPullBack = inset - own + nextExpansionProvider()
+        )
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Hitbox Layer (Larger for easier interaction)
@@ -447,16 +476,11 @@ private fun PieChartArc(
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
-                        val sweep = sweepState.value
-                        val start = startAngleProvider()
                         val factor = selectionFactorState.value
                         val strokePx = arcWidthPx * (1f + SelectedStrokeGrowth * factor)
                         val radPx = radiusPx + (arcWidthPx * SelectedRadiusShift * factor)
 
-                        // Ends pulled back for grown neighbours.
-                        val (drawnStart, drawnSweep) = insetArcSpan(
-                            start, sweep, offsetState.value / 2, startInsetProvider(), endInsetProvider()
-                        )
+                        val (drawnStart, drawnSweep) = drawnSpan()
                         shape = ArcShape(drawnStart, drawnSweep, strokePx, radPx, cornerFraction = cornerFractionState.value)
                         clip = true
                     }
@@ -476,14 +500,15 @@ private fun PieChartArc(
                         return@graphicsLayer
                     }
 
-                    val start = startAngleProvider()
                     val factor = selectionFactorState.value
                     val strokePx = arcWidthPx * (1f + SelectedStrokeGrowth * factor)
                     val radPx = radiusPx + (arcWidthPx * SelectedRadiusShift * factor)
                     val actualIconSize = lerp(iconSize, selectedIconSize, factor)
                     val iconRadiusPx = radPx + strokePx / 2 + (iconPadding + actualIconSize / 2).toPx()
 
-                    val angleInRadians = ((start + sweep / 2) * PI / 180).toFloat()
+                    // Centred on the drawn arc, as a ButtonGroup keeps a resized button's content centred.
+                    val (drawnStart, drawnSweep) = drawnSpan()
+                    val angleInRadians = ((drawnStart + drawnSweep / 2) * PI / 180).toFloat()
                     translationX = iconRadiusPx * cos(angleInRadians)
                     translationY = iconRadiusPx * sin(angleInRadians)
                     // Scaled while drawing, so the size animation doesn't recompose.

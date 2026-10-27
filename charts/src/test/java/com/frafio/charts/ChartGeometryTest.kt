@@ -165,11 +165,11 @@ class ChartGeometryTest {
         sqrt(r1 * r1 + r2 * r2 - 2 * r1 * r2 * cos(angle)) - cap1 - cap2
 
     @Test
-    fun selectedEndInset_keepsTheGapToTheNeighbourAsWideAsWhenIdle() {
+    fun selectedEndInset_keepsTheGapToAnIdleNeighbourAsWideAsWhenIdle() {
         val gap = Math.toRadians(arcGapDegrees(offsetPx = 4f, arcWidthPx = 14f, radiusPx = 80f).toDouble())
         val inset = Math.toRadians(selectedEndInset(arcWidthPx = 14f, radiusPx = 80f, factor = 1f).toDouble())
         val idle = gapBetweenEnds(80.0, 7.0, 80.0, 7.0, gap)
-        // Selected: 20% thicker (end radius 8.4) and 15% of the width further out (82.1); the neighbour pulls back by the inset.
+        // Selected: 20% thicker (end radius 8.4) and 15% of the width further out (82.1); it pulls its own end back by the inset.
         val withInset = gapBetweenEnds(82.1, 8.4, 80.0, 7.0, gap + inset)
         val withoutInset = gapBetweenEnds(82.1, 8.4, 80.0, 7.0, gap)
 
@@ -179,32 +179,43 @@ class ChartGeometryTest {
     }
 
     @Test
-    fun insetArcSpan_pullsEachEndBackByItsOwnInset() {
-        val (start, sweep) = insetArcSpan(start = 10f, sweep = 100f, halfGap = 6f, startInset = 1f, endInset = 2f)
+    fun shiftedArcSpan_pullsEachEndBackByItsOwnAmount() {
+        val (start, sweep) = shiftedArcSpan(start = 10f, sweep = 100f, startPullBack = 1f, endPullBack = 2f)
 
         assertThat(start).isEqualTo(11f)
         assertThat(start + sweep).isEqualTo(108f)
     }
 
     @Test
-    fun insetArcSpan_neverPullsAnEndPastHalfTheGap() {
-        val (start, sweep) = insetArcSpan(start = 10f, sweep = 100f, halfGap = 6f, startInset = 9f, endInset = 9f)
+    fun shiftedArcSpan_negativePullBack_extendsThatEnd() {
+        val (start, sweep) = shiftedArcSpan(start = 10f, sweep = 100f, startPullBack = -3f, endPullBack = 0f)
 
-        assertThat(start).isEqualTo(16f)
-        assertThat(start + sweep).isEqualTo(104f)
+        assertThat(start).isEqualTo(7f)
+        assertThat(start + sweep).isEqualTo(110f)
     }
 
     @Test
-    fun insetArcSpan_tinyArc_keepsADotInItsMiddle() {
-        val (start, sweep) = insetArcSpan(start = 10f, sweep = 1f, halfGap = 6f, startInset = 2f, endInset = 2f)
+    fun shiftedArcSpan_tinyArc_keepsADotWhereItsEndsMeet() {
+        val (start, sweep) = shiftedArcSpan(start = 10f, sweep = 1f, startPullBack = 2f, endPullBack = 2f)
 
         assertThat(sweep).isWithin(1e-5f).of(0.01f)
         assertThat(start + sweep / 2).isWithin(1e-5f).of(10.5f)
     }
 
     @Test
-    fun insetArcSpan_zeroArc_staysEmpty() {
-        assertThat(insetArcSpan(start = 10f, sweep = 0f, halfGap = 6f, startInset = 2f, endInset = 2f)).isEqualTo(10f to 0f)
+    fun shiftedArcSpan_zeroArc_staysEmpty() {
+        assertThat(shiftedArcSpan(start = 10f, sweep = 0f, startPullBack = 2f, endPullBack = 2f).second).isEqualTo(0f)
+    }
+
+    @Test
+    fun pressExpansion_isHalfTheButtonGroupRatioOfTheSweep_perSide() {
+        // ButtonGroup grows a pressed button by 15% of its width, half on each side.
+        assertThat(pressExpansion(sweep = 100f, previousSweep = 100f, nextSweep = 100f)).isWithin(1e-4f).of(7.5f)
+    }
+
+    @Test
+    fun pressExpansion_aSmallNeighbour_givesUpAtMostHalfOfItself() {
+        assertThat(pressExpansion(sweep = 200f, previousSweep = 100f, nextSweep = 6f)).isEqualTo(3f)
     }
 
     @Test
