@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.7
+
 - Pie chart selection reworked: keyboard support, no flash while scrolling, distinct press feedback
 - Pie chart taps in the gaps select the nearest arc
 - Pie chart inner circle deselects the arc
