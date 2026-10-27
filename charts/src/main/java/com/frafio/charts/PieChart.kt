@@ -8,11 +8,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -69,11 +66,9 @@ object PieChartDefaults {
     val IconSize: Dp = 32.dp
     val SelectedIconSize: Dp = 36.dp
     val IconPadding: Dp = 6.dp
-    val AnimationEasing: Easing = LinearOutSlowInEasing
-    const val ChartAnimationDuration: Int = 1000
-
     /** How the arcs grow and shrink when the values change; pass `snap()` for a static chart. */
-    val AnimationSpec: AnimationSpec<Float> = tween(ChartAnimationDuration, easing = AnimationEasing)
+    val AnimationSpec: AnimationSpec<Float>
+        @Composable get() = MaterialTheme.motionScheme.slowSpatialSpec()
 
     /** Formats the values in the centre and in the arcs' descriptions, in the default locale. */
     val ValueFormatter: (Double) -> String = { NumberFormat.getInstance().format(it) }
