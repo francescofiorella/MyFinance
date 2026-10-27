@@ -38,9 +38,9 @@ profileinstaller = "1.4.1"
 truth = "1.4.5"
 androidxTestCore = "1.7.0"
 androidxTestRunner = "1.7.0"
-okhttp = "5.5.0"
+okhttp = "5.5.1"
 robolectric = "4.17"
-roborazzi = "1.76.0"
+roborazzi = "1.77.0"
 turbine = "1.2.1"
 
 [libraries]

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Pie chart selection reworked: keyboard support, no flash while scrolling, distinct press feedback
+- Pie chart taps in the gaps select the nearest arc
+- Pie chart inner circle deselects the arc
+- Pie chart centre label and value animated
+- Bar chart header animated
+- Chart and category animations aligned to the Material motion scheme
+- Annual balance and budget card values animated
+- Google picture in the profile picture sheet shown from the local copy
+- Coil removed
+
 ## 5.1.6
 
 - Chart library added
