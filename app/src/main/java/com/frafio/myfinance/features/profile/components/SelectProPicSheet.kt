@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.profile.components
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -24,12 +25,13 @@ import com.frafio.myfinance.core.components.SheetDialog
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.components.avatarOptions
+import com.frafio.myfinance.core.components.rememberProfilePicturePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectProPicSheet(
     show: Boolean,
-    googlePhotoUrl: String?,
+    googlePicture: Bitmap?,
     currentProPic: String?,
     onDismiss: () -> Unit,
     onSelectPhoto: (String) -> Unit,
@@ -57,10 +59,11 @@ fun SelectProPicSheet(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                if (!googlePhotoUrl.isNullOrEmpty()) {
+                // The same downloaded copy the profile header shows; offered once it exists.
+                if (googlePicture != null) {
                     ImageSelectorButton(
                         modifier = Modifier.size(imageSize),
-                        url = googlePhotoUrl,
+                        painter = rememberProfilePicturePainter(FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value, googlePicture),
                         onClick = { onSelectPhoto(FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value) },
                         contentDescription = stringResource(id = R.string.google_profile_picture),
                         containerSize = imageSize,
@@ -93,7 +96,7 @@ fun SelectProPicSheetPreview() {
     MyFinanceTheme {
         SelectProPicSheet(
             show = true,
-            googlePhotoUrl = null,
+            googlePicture = null,
             currentProPic = FirestoreEnums.PRO_PIC_TYPES.AVATAR_1.value,
             onDismiss = {},
             onSelectPhoto = {},

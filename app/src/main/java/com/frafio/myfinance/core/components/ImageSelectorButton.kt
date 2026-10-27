@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.selected
@@ -21,40 +22,34 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 @Composable
 fun ImageSelectorButton(
     modifier: Modifier = Modifier,
-    url: String,
+    @DrawableRes drawable: Int,
     onClick: () -> Unit,
     contentDescription: String,
-    containerSize: Dp = IconButtonDefaults.smallContainerSize().height,
-    contentSize: Dp = IconButtonDefaults.smallIconSize,
+    containerSize: Dp = 82.dp,
+    contentSize: Dp = 32.dp,
     isSelected: Boolean = false,
 ) {
-    ImageSelectorButtonBase(
+    ImageSelectorButton(
         modifier = modifier,
+        painter = painterResource(id = drawable),
         onClick = onClick,
+        contentDescription = contentDescription,
         containerSize = containerSize,
         contentSize = contentSize,
         isSelected = isSelected
-    ) {
-        AsyncImage(
-            modifier = Modifier.fillMaxSize(),
-            model = url,
-            contentDescription = contentDescription,
-            contentScale = ContentScale.Crop
-        )
-    }
+    )
 }
 
 @Composable
 fun ImageSelectorButton(
     modifier: Modifier = Modifier,
-    @DrawableRes drawable: Int,
+    painter: Painter,
     onClick: () -> Unit,
     contentDescription: String,
     containerSize: Dp = 82.dp,
@@ -70,7 +65,7 @@ fun ImageSelectorButton(
     ) {
         Image(
             modifier = Modifier.fillMaxSize(),
-            painter = painterResource(id = drawable),
+            painter = painter,
             contentDescription = contentDescription,
             contentScale = ContentScale.Crop
         )

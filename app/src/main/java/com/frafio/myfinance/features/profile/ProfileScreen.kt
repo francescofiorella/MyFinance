@@ -105,7 +105,7 @@ fun ProfileScreen(
 
     SelectProPicSheet(
         show = showSelectProPicSheet,
-        googlePhotoUrl = user?.photoUrl,
+        googlePicture = profilePicture,
         currentProPic = userPreferences?.proPicChoice,
         onDismiss = {
             if (showSelectProPicSheet) {

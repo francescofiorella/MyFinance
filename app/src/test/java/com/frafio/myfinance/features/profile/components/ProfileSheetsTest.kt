@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.profile.components
 
+import android.graphics.Bitmap
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
@@ -124,9 +125,9 @@ class ProfileSheetsTest {
 
     // region SelectProPicSheet
 
-    private fun setProPicSheet(googlePhotoUrl: String?, current: String?) {
+    private fun setProPicSheet(googlePicture: Bitmap?, current: String?) {
         composeTestRule.setThemedContent(inline = true) {
-            SelectProPicSheet(show = true, googlePhotoUrl = googlePhotoUrl, currentProPic = current, onDismiss = {}, onSelectPhoto = { events += "photo:$it" })
+            SelectProPicSheet(show = true, googlePicture = googlePicture, currentProPic = current, onDismiss = {}, onSelectPhoto = { events += "photo:$it" })
         }
     }
 
@@ -135,7 +136,7 @@ class ProfileSheetsTest {
 
     @Test
     fun proPicSheet_offersTheSevenAvatars_andDisablesTheCurrentOne() {
-        setProPicSheet(googlePhotoUrl = null, current = "avatar_1")
+        setProPicSheet(googlePicture = null, current = "avatar_1")
 
         (1..7).forEach { avatar(it).assertExists() }
         composeTestRule.onAllNodes(hasClickAction()).assertCountEquals(7)
@@ -147,7 +148,7 @@ class ProfileSheetsTest {
 
     @Test
     fun proPicSheet_withGooglePhoto_addsItFirst() {
-        setProPicSheet(googlePhotoUrl = "https://example.com/photo.jpg", current = "google")
+        setProPicSheet(googlePicture = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888), current = "google")
 
         composeTestRule.onAllNodes(hasClickAction()).assertCountEquals(8)
         composeTestRule.onNodeWithContentDescription(string(R.string.google_profile_picture)).assertIsNotEnabled()
@@ -158,7 +159,7 @@ class ProfileSheetsTest {
 
     @Test
     fun proPicSheet_allClickable() {
-        setProPicSheet(googlePhotoUrl = null, current = null)
+        setProPicSheet(googlePicture = null, current = null)
 
         composeTestRule.onAllNodes(hasClickAction()).assertCountEquals(7)
     }

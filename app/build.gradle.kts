@@ -173,9 +173,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
-    // Image Loading
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
+    // Networking
+    implementation(libs.okhttp)
 
     // Kotlinx
     implementation(libs.kotlinx.coroutines.core)

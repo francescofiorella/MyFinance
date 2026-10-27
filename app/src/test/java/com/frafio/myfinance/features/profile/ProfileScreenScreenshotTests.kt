@@ -45,7 +45,7 @@ class ProfileScreenScreenshotTests {
     @Test
     fun selectProPicSheet() {
         composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "SelectProPicSheet", deviceName = "phone") {
-            SelectProPicSheet(show = true, googlePhotoUrl = null, currentProPic = null, onDismiss = {}, onSelectPhoto = {})
+            SelectProPicSheet(show = true, googlePicture = null, currentProPic = null, onDismiss = {}, onSelectPhoto = {})
         }
     }
 
