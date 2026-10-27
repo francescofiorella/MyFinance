@@ -1,10 +1,5 @@
 package com.frafio.charts
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FiniteAnimationSpec
@@ -364,33 +359,22 @@ private fun rememberBarStrip(
 
 @Composable
 private fun BarChartHeader(entry: BarChartEntry?, valueFormatter: (Double) -> String, colors: BarChartColors) {
-    val fadeSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
-    AnimatedContent(
-        targetState = HeaderText(entry?.value?.let(valueFormatter) ?: "", entry?.label ?: ""),
-        transitionSpec = { fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec) using SizeTransform(clip = false) },
-        contentAlignment = Alignment.BottomStart,
-        label = "header_text"
-    ) { text ->
-        Row(verticalAlignment = Alignment.Bottom) {
-            Text(
-                text = text.value,
-                color = colors.contentColor,
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                modifier = Modifier.padding(bottom = 5.dp),
-                text = text.label,
-                color = colors.contentColor,
-                style = MaterialTheme.typography.labelSmall
-            )
-        }
+    Row(verticalAlignment = Alignment.Bottom) {
+        Text(
+            text = entry?.value?.let(valueFormatter) ?: "",
+            color = colors.contentColor,
+            style = MaterialTheme.typography.displaySmall,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            modifier = Modifier.padding(bottom = 5.dp),
+            text = entry?.label ?: "",
+            color = colors.contentColor,
+            style = MaterialTheme.typography.labelSmall
+        )
     }
 }
-
-/** What the header shows: the selected entry's value and label. */
-private data class HeaderText(val value: String, val label: String)
 
 /** What a bar shows, passed as one value so an animated bar can move between positions with its state. */
 private class ChartBarState(

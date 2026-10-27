@@ -1,12 +1,7 @@
 package com.frafio.charts
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
@@ -89,9 +84,6 @@ private const val PressedFactor = 0.5f
 
 /** Added to an arc's width for its touch area, half on each side. */
 private val ArcTouchExtension = 24.dp
-
-/** What the centre shows: the selected arc's label and value, or the total. */
-private data class CentreText(val title: String, val value: String)
 
 /** Degrees taken by the gap after an arc: its width plus [offsetPx], as an angle at [radiusPx]. */
 internal fun arcGapDegrees(offsetPx: Float, arcWidthPx: Float, radiusPx: Float): Float =
@@ -307,40 +299,31 @@ fun PieChart(
         )
 
         // Center Content, letting touches through to the deselect target
-        val title = if (selectedArcIndex != -1) items[selectedArcIndex].label else totalLabel
-        val valueText = if (selectedArcIndex != -1) items[selectedArcIndex].value else items.sumOf { it.value }
-        val labelColor by animateColorAsState(
-            targetValue = if (selectedArcIndex != -1) items[selectedArcIndex].labelColor else contentColor,
-            animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
-            label = "label_color"
-        )
-        val fadeSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
-        // Keyed on the texts, so the leaving content never reads items by an index they may have lost.
-        AnimatedContent(
-            targetState = CentreText(title, valueFormatter(valueText)),
-            transitionSpec = { fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec) using SizeTransform(clip = false) },
-            contentAlignment = Alignment.Center,
-            label = "centre_text"
-        ) { text ->
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Both labels take the shared colour, blending towards it as they cross-fade.
-                Text(
-                    text = text.title,
-                    color = labelColor,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = text.value,
-                    color = contentColor,
-                    style = MaterialTheme.typography.headlineSmall,
-                    textAlign = TextAlign.Center
-                )
-            }
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            val title = if (selectedArcIndex != -1) items[selectedArcIndex].label else totalLabel
+            val valueText = if (selectedArcIndex != -1) items[selectedArcIndex].value else items.sumOf { it.value }
+            val labelColor by animateColorAsState(
+                targetValue = if (selectedArcIndex != -1) items[selectedArcIndex].labelColor else contentColor,
+                animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
+                label = "label_color"
+            )
+
+            Text(
+                text = title,
+                color = labelColor,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = valueFormatter(valueText),
+                color = contentColor,
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
