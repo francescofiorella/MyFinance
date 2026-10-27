@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.dashboard.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.FadingText
 import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPrice
@@ -81,7 +84,7 @@ fun AnnualBalanceCard(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text(
+                    FadingText(
                         text = balanceYear.toString(),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -100,13 +103,18 @@ fun AnnualBalanceCard(
                 )
             }
 
-            Text(
+            val balanceColor by animateColorAsState(
+                targetValue = if (balance < 0.0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
+                label = "balance_color"
+            )
+            FadingText(
                 text = doubleToPrice(abs(balance)),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.SemiBold,
-                color = if (balance < 0.0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                color = balanceColor
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -154,7 +162,7 @@ fun AnnualBalanceCard(
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text(
+                    FadingText(
                         text = if (incomesSum < 1000)
                             doubleToPrice(incomesSum)
                         else
@@ -201,7 +209,7 @@ fun AnnualBalanceCard(
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text(
+                    FadingText(
                         text = if (expensesSum < 1000)
                             doubleToPrice(expensesSum)
                         else

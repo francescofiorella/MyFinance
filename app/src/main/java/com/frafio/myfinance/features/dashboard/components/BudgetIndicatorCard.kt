@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.dashboard.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.FadingText
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPrice
 
@@ -59,7 +61,7 @@ fun BudgetIndicatorCard(
                 .fillMaxWidth(0.7f)
                 .padding(top = 48.dp, bottom = 64.dp),
         ) {
-            Text(
+            FadingText(
                 modifier = Modifier.fillMaxWidth(),
                 text = doubleToPrice(amount),
                 style = MaterialTheme.typography.displaySmall,
@@ -84,12 +86,15 @@ fun BudgetIndicatorCard(
                     animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
                     label = "progressAnimation"
                 )
+                // Slow, as it follows the bar's slow progress animation.
+                val progressColor by animateColorAsState(
+                    targetValue = if (progress <= 1f) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                    animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+                    label = "progressColor"
+                )
 
                 LinearWavyProgressIndicator(
-                    color = if (progress <= 1f)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.error,
+                    color = progressColor,
                     stopSize = 8.dp,
                     amplitude = { 0.93f },
                     waveSpeed = 0.dp,
@@ -109,8 +114,7 @@ fun BudgetIndicatorCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text(
-                        modifier = Modifier,
+                    FadingText(
                         text = doubleToPrice(totalBudget),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
