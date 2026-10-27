@@ -1,11 +1,8 @@
 package com.frafio.charts
 
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,12 +27,9 @@ object ShareBarDefaults {
     val Height: Dp = 12.dp
     val Gap: Dp = 2.dp
 
-    val AnimationEasing: Easing = LinearOutSlowInEasing
-
-    const val BarAnimationDuration: Int = 1000
-
     /** How the arcs grow and shrink when the values change; pass `snap()` for a static chart. */
-    val AnimationSpec: AnimationSpec<Float> = tween(BarAnimationDuration, easing = AnimationEasing)
+    val AnimationSpec: AnimationSpec<Float>
+        @Composable get() = MaterialTheme.motionScheme.slowSpatialSpec()
 }
 
 data class ShareBarItem(
