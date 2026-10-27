@@ -83,12 +83,8 @@ data class PieChartItem(
 /** How far a pressed, unselected arc and its icon grow towards their selected size. */
 private const val PressedFactor = 0.5f
 
-/**
- * How round a pressed and a selected arc's ends stay, from fully round (1): the ToggleButton's 6 dp pressed and
- * 12 dp selected corners on its 20 dp half-width, scaled to the arc.
- */
-private const val PressedCornerFraction = 0.3f
-private const val SelectedCornerFraction = 0.6f
+/** How round a pressed arc's ends stay, from fully round (1); idle and selected ends are fully round. */
+private const val PressedCornerFraction = 0.6f
 
 /** A selected arc's extra width, and how far it moves out, as fractions of its width. */
 private const val SelectedStrokeGrowth = 0.2f
@@ -264,14 +260,9 @@ fun PieChart(
         )
     }
 
-    // Pressed wins over selected, as in ToggleButton.
     val cornerFractions = items.indices.map { index ->
         animateFloatAsState(
-            targetValue = when {
-                pressedStates[index].value -> PressedCornerFraction
-                selectedArcIndex == index -> SelectedCornerFraction
-                else -> 1f
-            },
+            targetValue = if (pressedStates[index].value) PressedCornerFraction else 1f,
             animationSpec = selectionSpec,
             label = "corner_fraction_$index"
         )
