@@ -3,6 +3,8 @@ package com.frafio.charts
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.Canvas
@@ -10,7 +12,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,11 +28,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,7 +60,15 @@ import java.text.NumberFormat
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.sin
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 object PieChartDefaults {
     val Radius: Dp = 80.dp
@@ -141,6 +155,35 @@ internal fun shiftedArcSpan(start: Float, sweep: Float, startPullBack: Float, en
 internal fun pressExpansion(sweep: Float, previousSweep: Float, nextSweep: Float): Float =
     minOf(ButtonGroupDefaults.ExpandedRatio * sweep / 2, previousSweep / 2, nextSweep / 2)
 
+/** How far a press pulse grows before a release may shrink it, as in ButtonGroup: even a quick tap shows it. */
+private const val PressPulsePeak = 0.75f
+
+/** Animates to 1 while [interactions] hold a press and back to 0 after, only once past [PressPulsePeak], like ButtonGroup. */
+private suspend fun Animatable<Float, AnimationVector1D>.followPresses(
+    interactions: Flow<Interaction>,
+    spec: AnimationSpec<Float>
+) = coroutineScope {
+    val presses = mutableListOf<PressInteraction.Press>()
+    interactions
+        .map { interaction ->
+            when (interaction) {
+                is PressInteraction.Press -> presses.add(interaction)
+                is PressInteraction.Release -> presses.remove(interaction.press)
+                is PressInteraction.Cancel -> presses.remove(interaction.press)
+            }
+            presses.isNotEmpty()
+        }
+        .distinctUntilChanged()
+        .collectLatest { pressed ->
+            if (pressed) {
+                launch { animateTo(1f, spec) }
+            } else {
+                snapshotFlow { value }.first { it > PressPulsePeak }
+                animateTo(0f, spec)
+            }
+        }
+}
+
 /** Each positive arc's previous and next positive arc, wrapping around; null for the others, or with fewer than two. */
 internal fun arcNeighbours(sweeps: List<Float>): List<Pair<Int, Int>?> {
     val positive = sweeps.indices.filter { sweeps[it] > 0f }
@@ -219,7 +262,6 @@ fun PieChart(
     val selectedArcIndex = if (selectedIndex in items.indices) selectedIndex else -1
 
     val interactionSources = remember(items.size) { List(items.size) { MutableInteractionSource() } }
-    val pressedStates = interactionSources.map { it.collectIsPressedAsState() }
 
     val arcWidthPx = with(density) { arcWidth.toPx() }
     val radiusPx = with(density) { radius.toPx() }
@@ -254,28 +296,29 @@ fun PieChart(
     }
 
     val selectionSpec = MaterialTheme.motionScheme.fastSpatialSpec<Float>()
+
+    // One pulse per press drives the growth, the squarer corners and the press thickness.
+    val pressPulses = remember(items.size) { List(items.size) { Animatable(0f) } }
+    pressPulses.forEachIndexed { index, pulse ->
+        LaunchedEffect(interactionSources[index], pulse, selectionSpec) {
+            pulse.followPresses(interactionSources[index].interactions, selectionSpec)
+        }
+    }
+
+    val selections = items.indices.map { index ->
+        animateFloatAsState(
+            targetValue = if (selectedArcIndex == index) 1f else 0f,
+            animationSpec = selectionSpec,
+            label = "selection_$index"
+        )
+    }
     val selectionFactors = items.indices.map { index ->
-        animateFloatAsState(
-            targetValue = if (selectedArcIndex == index || pressedStates[index].value) 1f else 0f,
-            animationSpec = selectionSpec,
-            label = "selection_factor_$index"
-        )
+        val selection = selections[index]
+        val pulse = pressPulses[index]
+        remember(selection, pulse) { derivedStateOf { max(selection.value, pulse.value) } }
     }
-
-    val cornerFractions = items.indices.map { index ->
-        animateFloatAsState(
-            targetValue = if (pressedStates[index].value) PressedCornerFraction else 1f,
-            animationSpec = selectionSpec,
-            label = "corner_fraction_$index"
-        )
-    }
-
-    val pressFractions = items.indices.map { index ->
-        animateFloatAsState(
-            targetValue = if (pressedStates[index].value) 1f else 0f,
-            animationSpec = selectionSpec,
-            label = "press_fraction_$index"
-        )
+    val cornerFractions = pressPulses.map { pulse ->
+        remember(pulse) { derivedStateOf { 1f - (1f - PressedCornerFraction) * pulse.value } }
     }
 
     // A pressed arc grows along the circle and its neighbours make room, as in a ButtonGroup.
@@ -283,7 +326,7 @@ fun PieChart(
     fun expansionOf(index: Int?): () -> Float {
         val (previous, next) = index?.let { neighbours[it] } ?: return { 0f }
         return {
-            pressFractions[index].value *
+            pressPulses[index].value *
                 pressExpansion(animatedValues[index].value, animatedValues[previous].value, animatedValues[next].value)
         }
     }
