@@ -13,7 +13,7 @@ look at when you want to understand your habits.
 
 | Dashboard | Expenses | Budget | Profile |
 |:---:|:---:|:---:|:---:|
-| <img src="app/src/test/screenshots/DashboardScreenPopulated_phone.png" width="200" alt="Dashboard"> | <img src="app/src/test/screenshots/ExpensesScreenPopulated_phone.png" width="200" alt="Expenses"> | <img src="app/src/test/screenshots/BudgetScreenPopulated_phone.png" width="200" alt="Budget"> | <img src="app/src/test/screenshots/ProfileScreenEmailAccount_phone.png" width="200" alt="Profile"> |
+| <img src="app/src/test/screenshots/ReadmeDashboard_phone.png" width="200" alt="Dashboard"> | <img src="app/src/test/screenshots/ReadmeExpenses_phone.png" width="200" alt="Expenses"> | <img src="app/src/test/screenshots/ReadmeBudget_phone.png" width="200" alt="Budget"> | <img src="app/src/test/screenshots/ReadmeProfile_phone.png" width="200" alt="Profile"> |
 
 ## What you can do
 
