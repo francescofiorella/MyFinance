@@ -7,6 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.BySelector
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.StaleObjectException
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
@@ -19,6 +20,7 @@ private const val IDLE_BUDGET_MS = 600L
 private const val FRAME_MS = 120L
 private const val FIND_MS = 2_000L
 private const val MAX_SCROLL_STEPS = 5
+private const val STALE_ATTEMPTS = 3
 
 /** Read from the `bpEmail` / `bpPassword` instrumentation arguments; never hardcoded. */
 internal object Credentials {
@@ -58,32 +60,72 @@ internal fun UiDevice.settle() {
     SystemClock.sleep(FRAME_MS)
 }
 
+/**
+ * Runs [block], retrying when a node it holds is redrawn under it (StaleObjectException). [block] must
+ * look its nodes up itself, so each attempt gets live ones; the last failure is rethrown.
+ */
+internal fun <T> UiDevice.retryIfStale(what: String, attempts: Int = STALE_ATTEMPTS, block: () -> T): T {
+    repeat(attempts - 1) {
+        try {
+            return block()
+        } catch (e: StaleObjectException) {
+            log("'$what' went stale, retrying.")
+            settle()
+        }
+    }
+    return block()
+}
+
+/** Finds [testTag] and runs [action] on it, looking it up again if it goes stale; false if it never appears. */
+internal fun UiDevice.withObject(testTag: String, timeoutMs: Long = FIND_MS, action: (UiObject2) -> Unit): Boolean =
+    retryIfStale(testTag) {
+        val target = await(testTag, timeoutMs) ?: return@retryIfStale false
+        action(target)
+        true
+    }
+
 internal fun UiDevice.tap(testTag: String, timeoutMs: Long = FIND_MS): Boolean {
-    val target = await(testTag, timeoutMs) ?: return false
-    target.click()
+    if (!withObject(testTag, timeoutMs) { it.click() }) return false
     settle()
     return true
 }
 
 internal fun UiDevice.longTap(testTag: String, timeoutMs: Long = FIND_MS): Boolean {
-    val target = await(testTag, timeoutMs) ?: return false
-    target.longClick()
+    if (!withObject(testTag, timeoutMs) { it.longClick() }) return false
     settle()
     return true
 }
 
-/** Off-screen Compose nodes exist in the tree with empty bounds; a click on one is a no-op. */
-internal fun UiDevice.scrollTo(containerTag: String, testTag: String): UiObject2? {
+/**
+ * Scrolls [containerTag] until [testTag] is on screen, then taps it; false if it never shows. Off-screen
+ * Compose nodes exist in the tree with empty bounds, and a click on one is a no-op.
+ */
+internal fun UiDevice.scrollToAndTap(containerTag: String, testTag: String): Boolean {
     repeat(MAX_SCROLL_STEPS) {
-        val target = findObject(res(testTag))
-        if (target != null && target.visibleBounds.height() > 0) return target
-        val container = findObject(res(containerTag)) ?: return target
-        container.setGestureMargin(displayWidth / 10)
-        if (!container.scroll(Direction.DOWN, 0.6f)) return findObject(res(testTag))
-        settle()
+        val step = retryIfStale(testTag) {
+            val target = findObject(res(testTag))
+            when {
+                target != null && target.visibleBounds.height() > 0 -> ScrollStep.VISIBLE
+                else -> {
+                    val container = findObject(res(containerTag)) ?: return@retryIfStale ScrollStep.STUCK
+                    container.setGestureMargin(displayWidth / 10)
+                    if (container.scroll(Direction.DOWN, 0.6f)) ScrollStep.SCROLLED else ScrollStep.STUCK
+                }
+            }
+        }
+        when (step) {
+            ScrollStep.VISIBLE -> return tap(testTag)
+            ScrollStep.STUCK -> return isOnScreen(testTag) && tap(testTag)
+            ScrollStep.SCROLLED -> settle()
+        }
     }
-    return findObject(res(testTag))
+    return isOnScreen(testTag) && tap(testTag)
 }
+
+private enum class ScrollStep { VISIBLE, SCROLLED, STUCK }
+
+private fun UiDevice.isOnScreen(testTag: String): Boolean =
+    retryIfStale(testTag) { (findObject(res(testTag))?.visibleBounds?.height() ?: 0) > 0 }
 
 internal fun UiObject2.typeText(value: String) {
     text = value
@@ -91,11 +133,16 @@ internal fun UiObject2.typeText(value: String) {
 }
 
 internal fun UiDevice.scrollBothWays(containerTag: String, percent: Float = 0.8f) {
-    val container = await(containerTag, 5_000) ?: return
-    container.setGestureMargin(displayWidth / 10)
-    container.scroll(Direction.DOWN, percent)
+    val found = withObject(containerTag, 5_000) {
+        it.setGestureMargin(displayWidth / 10)
+        it.scroll(Direction.DOWN, percent)
+    }
+    if (!found) return
     settle()
-    container.scroll(Direction.UP, 1.0f)
+    withObject(containerTag, 5_000) {
+        it.setGestureMargin(displayWidth / 10)
+        it.scroll(Direction.UP, 1.0f)
+    }
     settle()
 }
 
@@ -114,26 +161,29 @@ internal fun MacrobenchmarkScope.signIn() {
         return
     }
 
-    val emailField = device.await("email_field", 5_000)
-        ?: error(
-            "Auth screen not found: no node with resource-id 'email_field'. Check that " +
-                "MainActivity's root Surface sets Modifier.semantics { testTagsAsResourceId = true }."
-        )
+    check(device.awaitTag("email_field", 5_000)) {
+        "Auth screen not found: no node with resource-id 'email_field'. Check that " +
+            "MainActivity's root Surface sets Modifier.semantics { testTagsAsResourceId = true }."
+    }
     check(Credentials.areAvailable) { Credentials.MISSING_MESSAGE }
 
     log("Filling in the credentials.")
     // Set text without tapping the fields first, or the keyboard covers the sign-in button.
-    emailField.typeText(Credentials.email)
-    device.await("password_field", 5_000)?.typeText(Credentials.password)
-        ?: error("Password field ('password_field') not found.")
+    check(device.withObject("email_field", 5_000) { it.typeText(Credentials.email) }) {
+        "Email field ('email_field') not found."
+    }
+    check(device.withObject("password_field", 5_000) { it.typeText(Credentials.password) }) {
+        "Password field ('password_field') not found."
+    }
 
     log("Signing in.")
-    device.await("login_button", 5_000)?.click()
-        ?: error("Sign-in button ('login_button') not found.")
+    check(device.withObject("login_button", 5_000) { it.click() }) {
+        "Sign-in button ('login_button') not found."
+    }
 
     if (!device.awaitTag("tab_dashboard", 45_000)) {
         log("Dashboard not reached, retrying the sign-in tap.")
-        device.await("login_button", 2_000)?.click()
+        device.withObject("login_button", 2_000) { it.click() }
         check(device.awaitTag("tab_dashboard", 45_000)) {
             "Sign-in failed: the dashboard never appeared. Check the credentials, the network " +
                 "connection, and logcat for Firebase auth errors."

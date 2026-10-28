@@ -93,11 +93,13 @@ class BaselineProfileGenerator {
         log("Expenses.")
         if (!device.openTab("tab_expenses", "expenses_list")) return
 
-        device.await("expenses_list", 5_000)?.let {
-            it.setGestureMargin(device.displayWidth / 10)
-            it.fling(Direction.DOWN)
+        if (device.withObject("expenses_list", 5_000) {
+                it.setGestureMargin(device.displayWidth / 10)
+                it.fling(Direction.DOWN)
+            }
+        ) {
             device.settle()
-            it.fling(Direction.UP)
+            device.withObject("expenses_list", 5_000) { it.fling(Direction.UP) }
             device.settle()
         }
 
@@ -105,14 +107,13 @@ class BaselineProfileGenerator {
         categoriesJourney()
         openAndClose("expenses_list", "expenses_manage_labels", "labels_list")
 
-        device.await("search_field", 5_000)?.let {
+        // Focusing the field expands the bar over the manage buttons.
+        if (device.withObject("search_field", 5_000) { it.click() }) {
             log("Searching.")
-            // Focusing the field expands the bar over the manage buttons.
-            it.click()
             device.settle()
-            it.typeText("a")
+            device.withObject("search_field", 5_000) { it.typeText("a") }
             device.settle()
-            it.typeText("")
+            device.withObject("search_field", 5_000) { it.typeText("") }
             device.settle()
         }
         if (device.tap("search_back_button")) {
@@ -149,12 +150,11 @@ class BaselineProfileGenerator {
      * untouched: it would replace the Expenses filters the rest of the journey relies on.
      */
     private fun MacrobenchmarkScope.categoriesJourney() {
-        val entry = device.scrollTo("expenses_list", "expenses_categories") ?: run {
+        if (!device.scrollToAndTap("expenses_list", "expenses_categories")) {
             log("Entry 'expenses_categories' not found, skipping.")
             return
         }
         log("Categories.")
-        entry.click()
         if (!device.awaitTag("categories_scroll", 10_000)) {
             log("'categories_scroll' never appeared.")
         }
@@ -190,12 +190,11 @@ class BaselineProfileGenerator {
 
     // Needs the same expense name at least twice in the category, within the 12 months shown.
     private fun MacrobenchmarkScope.frequentExpensesJourney() {
-        val entry = device.scrollTo("category_detail_scroll", "frequent_expense_item") ?: run {
+        if (!device.scrollToAndTap("category_detail_scroll", "frequent_expense_item")) {
             log("No frequent expense ('frequent_expense_item'), skipping.")
             return
         }
         log("Frequent expenses.")
-        entry.click()
         if (device.awaitTag("frequent_expenses_list", 10_000)) {
             device.awaitGone("category_detail_scroll", 5_000)
             device.settle()
@@ -249,15 +248,13 @@ class BaselineProfileGenerator {
         // Labels and the spending overview are opened from the Expenses tab; category management from here.
         manageCategoriesJourney()
 
-        device.scrollTo("profile_scroll", "profile_change_currency")?.let {
+        if (device.scrollToAndTap("profile_scroll", "profile_change_currency")) {
             log("Currency sheet.")
-            it.click()
-            device.settle()
             device.pressBack()
             device.settle()
         }
 
-        device.await("profile_scroll", 5_000)?.let {
+        device.withObject("profile_scroll", 5_000) {
             it.setGestureMargin(device.displayWidth / 10)
             it.scroll(Direction.UP, 1.0f)
         }
@@ -265,12 +262,11 @@ class BaselineProfileGenerator {
     }
 
     private fun MacrobenchmarkScope.manageCategoriesJourney() {
-        val entry = device.scrollTo("profile_scroll", "profile_manage_categories") ?: run {
+        if (!device.scrollToAndTap("profile_scroll", "profile_manage_categories")) {
             log("Entry 'profile_manage_categories' not found, skipping.")
             return
         }
         log("Manage categories.")
-        entry.click()
         if (device.awaitTag("manage_categories_list", 10_000)) {
             device.awaitGone("profile_scroll", 5_000)
             device.settle()
@@ -287,12 +283,11 @@ class BaselineProfileGenerator {
     }
 
     private fun MacrobenchmarkScope.openAndClose(containerTag: String, entryTag: String, screenTag: String) {
-        val entry = device.scrollTo(containerTag, entryTag) ?: run {
+        if (!device.scrollToAndTap(containerTag, entryTag)) {
             log("Entry '$entryTag' not found, skipping.")
             return
         }
         log("Opening '$entryTag'.")
-        entry.click()
         if (!device.awaitTag(screenTag, 10_000)) {
             log("'$screenTag' never appeared after opening '$entryTag'.")
         }
@@ -311,13 +306,12 @@ class BaselineProfileGenerator {
             return
         }
 
-        val nameField = device.await("add_name_field", 10_000) ?: run {
+        if (!device.withObject("add_name_field", 10_000) { it.typeText("Baseline profile") }) {
             log("Add screen never appeared.")
             return
         }
-        nameField.typeText("Baseline profile")
         device.settle()
-        device.await("add_amount_field", 5_000)?.typeText("12.34")
+        device.withObject("add_amount_field", 5_000) { it.typeText("12.34") }
         device.settle()
 
         if (device.tap("add_type_button")) {
