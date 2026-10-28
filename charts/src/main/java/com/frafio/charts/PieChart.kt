@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -76,6 +77,8 @@ object PieChartDefaults {
     val OffsetBetweenArcs: Dp = 4.dp
     val IconSize: Dp = 32.dp
     val SelectedIconSize: Dp = 36.dp
+    val IconShape: Shape = CircleShape
+    val SelectedIconShape: Shape = CircleShape
     val IconPadding: Dp = 6.dp
     /** How the arcs grow and shrink when the values change; pass `snap()` for a static chart. */
     val AnimationSpec: AnimationSpec<Float>
@@ -213,6 +216,8 @@ fun PieChart(
     offsetBetweenArcs: Dp = PieChartDefaults.OffsetBetweenArcs,
     iconSize: Dp = PieChartDefaults.IconSize,
     selectedIconSize: Dp = PieChartDefaults.SelectedIconSize,
+    iconShape: Shape = PieChartDefaults.IconShape,
+    selectedIconShape: Shape = PieChartDefaults.SelectedIconShape,
     iconPadding: Dp = PieChartDefaults.IconPadding
 ) {
     var selectedIndex by remember(items) { mutableIntStateOf(-1) }
@@ -231,6 +236,8 @@ fun PieChart(
         offsetBetweenArcs = offsetBetweenArcs,
         iconSize = iconSize,
         selectedIconSize = selectedIconSize,
+        iconShape = iconShape,
+        selectedIconShape = selectedIconShape,
         iconPadding = iconPadding
     )
 }
@@ -252,6 +259,8 @@ fun PieChart(
     offsetBetweenArcs: Dp = PieChartDefaults.OffsetBetweenArcs,
     iconSize: Dp = PieChartDefaults.IconSize,
     selectedIconSize: Dp = PieChartDefaults.SelectedIconSize,
+    iconShape: Shape = PieChartDefaults.IconShape,
+    selectedIconShape: Shape = PieChartDefaults.SelectedIconShape,
     iconPadding: Dp = PieChartDefaults.IconPadding
 ) {
     val density = LocalDensity.current
@@ -391,6 +400,8 @@ fun PieChart(
                     arcWidthPx = arcWidthPx,
                     iconSize = iconSize,
                     selectedIconSize = selectedIconSize,
+                    iconShape = iconShape,
+                    selectedIconShape = selectedIconShape,
                     iconPadding = iconPadding,
                     interactionSource = interactionSources[index],
                     onClick = { onSelectedIndexChange(index) }
@@ -467,6 +478,8 @@ private fun PieChartArc(
     arcWidthPx: Float,
     iconSize: Dp,
     selectedIconSize: Dp,
+    iconShape: Shape,
+    selectedIconShape: Shape,
     iconPadding: Dp,
     interactionSource: MutableInteractionSource,
     onClick: () -> Unit
@@ -562,7 +575,7 @@ private fun PieChartArc(
                 }
                 .size(iconSize)
                 .align(Alignment.Center)
-                .background(color, shape = CircleShape)
+                .background(color, shape = if (isSelected) selectedIconShape else iconShape)
                 .padding(6.dp)
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
