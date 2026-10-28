@@ -75,7 +75,6 @@ object PieChartDefaults {
     val ArcWidth: Dp = 14.dp
     val OffsetBetweenArcs: Dp = 4.dp
     val IconSize: Dp = 32.dp
-    val SelectedIconSize: Dp = 36.dp
     val IconShape: Shape = CircleShape
     val SelectedIconShape: Shape = CircleShape
     val IconPadding: Dp = 6.dp
@@ -178,7 +177,7 @@ private suspend fun Animatable<Float, AnimationVector1D>.followPresses(
         .distinctUntilChanged()
         .collectLatest { pressed ->
             if (pressed) {
-                launch { animateTo(1f, spec) }
+                this@coroutineScope.launch { animateTo(1f, spec) }
             } else {
                 snapshotFlow { value }.first { it > PressPulsePeak }
                 animateTo(0f, spec)
@@ -214,7 +213,6 @@ fun PieChart(
     arcWidth: Dp = PieChartDefaults.ArcWidth,
     offsetBetweenArcs: Dp = PieChartDefaults.OffsetBetweenArcs,
     iconSize: Dp = PieChartDefaults.IconSize,
-    selectedIconSize: Dp = PieChartDefaults.SelectedIconSize,
     iconShape: Shape = PieChartDefaults.IconShape,
     selectedIconShape: Shape = PieChartDefaults.SelectedIconShape,
     iconPadding: Dp = PieChartDefaults.IconPadding
@@ -234,7 +232,6 @@ fun PieChart(
         arcWidth = arcWidth,
         offsetBetweenArcs = offsetBetweenArcs,
         iconSize = iconSize,
-        selectedIconSize = selectedIconSize,
         iconShape = iconShape,
         selectedIconShape = selectedIconShape,
         iconPadding = iconPadding
@@ -257,7 +254,6 @@ fun PieChart(
     arcWidth: Dp = PieChartDefaults.ArcWidth,
     offsetBetweenArcs: Dp = PieChartDefaults.OffsetBetweenArcs,
     iconSize: Dp = PieChartDefaults.IconSize,
-    selectedIconSize: Dp = PieChartDefaults.SelectedIconSize,
     iconShape: Shape = PieChartDefaults.IconShape,
     selectedIconShape: Shape = PieChartDefaults.SelectedIconShape,
     iconPadding: Dp = PieChartDefaults.IconPadding
@@ -341,6 +337,7 @@ fun PieChart(
         label = "empty_alpha"
     )
 
+    val selectedIconSize = iconSize * (1f + SelectedStrokeGrowth)
     val chartPadding = selectedIconSize + iconPadding + (arcWidth * 0.6f) + 4.dp
     val totalChartSize = radius * 2f + chartPadding * 2f
 
