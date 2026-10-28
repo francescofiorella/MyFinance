@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.8
+
 - Text fade removed from the dashboard cards, the pie chart centre and the bar chart header
 - Pie chart selected arc only thickens, without getting longer
 - Pie chart pressed arc grows and squares its ends while its neighbours make room, like a button group
