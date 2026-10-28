@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Text fade removed from the dashboard cards, the pie chart centre and the bar chart header
+- Pie chart selected arc only thickens, without getting longer
+- Pie chart pressed arc grows and squares its ends while its neighbours make room, like a button group
+- README screenshots show the app at phone size, with its navigation
+- Baseline profile generation no longer fails when the app redraws an element mid-step
+
 ## 5.1.7
 
 - Pie chart selection reworked: keyboard support, no flash while scrolling, distinct press feedback
