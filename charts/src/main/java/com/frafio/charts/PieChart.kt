@@ -24,9 +24,12 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
+import androidx.compose.material3.toPath
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -39,9 +42,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -57,6 +63,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.graphics.shapes.Morph
+import androidx.graphics.shapes.RoundedPolygon
 import java.text.NumberFormat
 import kotlin.math.PI
 import kotlin.math.asin
@@ -75,8 +83,10 @@ object PieChartDefaults {
     val ArcWidth: Dp = 14.dp
     val OffsetBetweenArcs: Dp = 4.dp
     val IconSize: Dp = 32.dp
-    val IconShape: Shape = CircleShape
-    val SelectedIconShape: Shape = CircleShape
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    val IconShape: RoundedPolygon = MaterialShapes.Circle
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    val SelectedIconShape: RoundedPolygon = MaterialShapes.Circle
     val IconPadding: Dp = 6.dp
     /** How the arcs grow and shrink when the values change; pass `snap()` for a static chart. */
     val AnimationSpec: AnimationSpec<Float>
@@ -213,8 +223,8 @@ fun PieChart(
     arcWidth: Dp = PieChartDefaults.ArcWidth,
     offsetBetweenArcs: Dp = PieChartDefaults.OffsetBetweenArcs,
     iconSize: Dp = PieChartDefaults.IconSize,
-    iconShape: Shape = PieChartDefaults.IconShape,
-    selectedIconShape: Shape = PieChartDefaults.SelectedIconShape,
+    iconShape: RoundedPolygon = PieChartDefaults.IconShape,
+    selectedIconShape: RoundedPolygon = PieChartDefaults.SelectedIconShape,
     iconPadding: Dp = PieChartDefaults.IconPadding
 ) {
     var selectedIndex by remember(items) { mutableIntStateOf(-1) }
@@ -254,8 +264,8 @@ fun PieChart(
     arcWidth: Dp = PieChartDefaults.ArcWidth,
     offsetBetweenArcs: Dp = PieChartDefaults.OffsetBetweenArcs,
     iconSize: Dp = PieChartDefaults.IconSize,
-    iconShape: Shape = PieChartDefaults.IconShape,
-    selectedIconShape: Shape = PieChartDefaults.SelectedIconShape,
+    iconShape: RoundedPolygon = PieChartDefaults.IconShape,
+    selectedIconShape: RoundedPolygon = PieChartDefaults.SelectedIconShape,
     iconPadding: Dp = PieChartDefaults.IconPadding
 ) {
     val density = LocalDensity.current
@@ -450,6 +460,7 @@ fun PieChart(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun PieChartArc(
     contentDescription: String,
@@ -470,14 +481,19 @@ private fun PieChartArc(
     arcWidthPx: Float,
     iconSize: Dp,
     selectedIconSize: Dp,
-    iconShape: Shape,
-    selectedIconShape: Shape,
+    iconShape: RoundedPolygon,
+    selectedIconShape: RoundedPolygon,
     iconPadding: Dp,
     interactionSource: MutableInteractionSource,
     onClick: () -> Unit
 ) {
     val density = LocalDensity.current
     val tapExtraPx = with(density) { ArcTouchExtension.toPx() }
+
+    // The icon's background morphs between the two shapes with the selection, in step with its size.
+    val morph = remember(iconShape, selectedIconShape) { Morph(iconShape, selectedIconShape) }
+    val morphPath = remember { Path() }
+    val morphMatrix = remember { Matrix() }
 
     // Thicker but not longer when grown, extended while pressed, pulled back for a pressed neighbour.
     val drawnSpan: () -> Pair<Float, Float> = {
@@ -567,7 +583,15 @@ private fun PieChartArc(
                 }
                 .size(iconSize)
                 .align(Alignment.Center)
-                .background(color, shape = if (isSelected) selectedIconShape else iconShape)
+                .drawBehind {
+                    // Unit-sized polygons, scaled to the icon and centred, as Material's RoundedPolygon.toShape() does.
+                    morph.toPath(progress = selectionFactorState.value.coerceIn(0f, 1f), path = morphPath)
+                    morphMatrix.reset()
+                    morphMatrix.scale(size.width, size.height)
+                    morphPath.transform(morphMatrix)
+                    morphPath.translate(size.center - morphPath.getBounds().center)
+                    drawPath(morphPath, color)
+                }
                 .padding(6.dp)
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
