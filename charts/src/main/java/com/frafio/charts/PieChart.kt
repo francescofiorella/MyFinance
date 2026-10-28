@@ -61,7 +61,6 @@ import java.text.NumberFormat
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.cos
-import kotlin.math.max
 import kotlin.math.sin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -306,7 +305,7 @@ fun PieChart(
 
     val selectionSpec = MaterialTheme.motionScheme.fastSpatialSpec<Float>()
 
-    // One pulse per press drives the growth, the squarer corners and the press thickness.
+    // One pulse per press drives the growth and the squarer corners.
     val pressPulses = remember(items.size) { List(items.size) { Animatable(0f) } }
     pressPulses.forEachIndexed { index, pulse ->
         LaunchedEffect(interactionSources[index], pulse, selectionSpec) {
@@ -314,17 +313,13 @@ fun PieChart(
         }
     }
 
-    val selections = items.indices.map { index ->
-        animateFloatAsState(
-            targetValue = if (selectedArcIndex == index) 1f else 0f,
-            animationSpec = selectionSpec,
-            label = "selection_$index"
-        )
-    }
+    // Thick while selected or while the pulse rises: one animation, so a press that selects stays thick throughout.
     val selectionFactors = items.indices.map { index ->
-        val selection = selections[index]
-        val pulse = pressPulses[index]
-        remember(selection, pulse) { derivedStateOf { max(selection.value, pulse.value) } }
+        animateFloatAsState(
+            targetValue = if (selectedArcIndex == index || pressPulses[index].targetValue == 1f) 1f else 0f,
+            animationSpec = selectionSpec,
+            label = "selection_factor_$index"
+        )
     }
     val cornerFractions = pressPulses.map { pulse ->
         remember(pulse) { derivedStateOf { 1f - (1f - PressedCornerFraction) * pulse.value } }
