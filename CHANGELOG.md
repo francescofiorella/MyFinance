@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Pie chart click animation follows the button group guidelines
+- Pie chart selected icon configurable and morphs from base icon
+- Dashboard pie chart selected category icon takes a VerySunny shape
+
+
 ## 5.1.8
 
 - Text fade removed from the dashboard cards, the pie chart centre and the bar chart header
