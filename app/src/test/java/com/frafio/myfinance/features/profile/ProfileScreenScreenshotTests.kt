@@ -1,12 +1,11 @@
 package com.frafio.myfinance.features.profile
 
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.myfinance.core.data.model.User
 import com.frafio.myfinance.testing.data.testUser
 import com.frafio.myfinance.testing.screenshot.captureMultiDevice
+import com.frafio.myfinance.testing.screenshot.ScreenshotProfile
 import com.frafio.myfinance.testing.screenshot.capturePhoneDark
 import org.junit.Rule
 import org.junit.Test
@@ -54,37 +53,16 @@ class ProfileScreenScreenshotTests {
 
     @Test
     fun emailAccount() {
-        composeTestRule.captureMultiDevice("ProfileScreenEmailAccount") { Profile(emailUser) }
+        composeTestRule.captureMultiDevice("ProfileScreenEmailAccount") { ScreenshotProfile(emailUser) }
     }
 
     @Test
     fun emailAccount_dark() {
-        composeTestRule.capturePhoneDark("ProfileScreenEmailAccount") { Profile(emailUser) }
+        composeTestRule.capturePhoneDark("ProfileScreenEmailAccount") { ScreenshotProfile(emailUser) }
     }
 
     @Test
     fun googleAccount() {
-        composeTestRule.captureMultiDevice("ProfileScreenGoogleAccount") { Profile(googleUser) }
-    }
-
-    @Composable
-    private fun Profile(user: User) {
-        ProfileContent(
-            user = user,
-            profilePicture = null,
-            proPicChoice = null,
-            versionName = "MyFinance 5.0.3",
-            isDynamicColorAvailable = true,
-            isDynamicColorChecked = false,
-            scrollState = rememberScrollState(),
-            onSelectProPic = {},
-            onEditFullName = {},
-            onDynamicColorChanged = {},
-            onManageLabels = {},
-            onManageCategories = {},
-            onSelectCurrency = {},
-            onChangePasswordClick = {},
-            currencyCode = "EUR",
-        )
+        composeTestRule.captureMultiDevice("ProfileScreenGoogleAccount") { ScreenshotProfile(googleUser) }
     }
 }

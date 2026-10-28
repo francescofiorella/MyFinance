@@ -1,26 +1,21 @@
 package com.frafio.myfinance.features.expenses
 
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
-import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
+import com.frafio.myfinance.testing.screenshot.ScreenshotExpenses
 import com.frafio.myfinance.testing.screenshot.captureForDevice
 import com.frafio.myfinance.testing.screenshot.captureMultiDevice
 import com.frafio.myfinance.testing.screenshot.capturePhoneDark
-import com.frafio.myfinance.testing.screenshot.screenshotDateLabel
 import com.frafio.myfinance.testing.screenshot.screenshotExpenses
-import com.frafio.myfinance.testing.screenshot.screenshotExpensesMetadata
 import com.frafio.myfinance.testing.screenshot.screenshotToday
-import kotlinx.coroutines.flow.flowOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
-import java.time.LocalDate
 import com.frafio.myfinance.features.expenses.components.CategorySheet
 import com.frafio.myfinance.features.expenses.components.FilterExpensesSheet
 import com.frafio.myfinance.features.expenses.components.LabelsSheet
@@ -65,18 +60,18 @@ class ExpensesScreenScreenshotTests {
 
     @Test
     fun populated() {
-        composeTestRule.captureMultiDevice("ExpensesScreenPopulated") { Expenses(screenshotExpenses, isEmpty = false) }
+        composeTestRule.captureMultiDevice("ExpensesScreenPopulated") { ScreenshotExpenses(screenshotExpenses, isEmpty = false) }
     }
 
     @Test
     fun populated_dark() {
-        composeTestRule.capturePhoneDark("ExpensesScreenPopulated") { Expenses(screenshotExpenses, isEmpty = false) }
+        composeTestRule.capturePhoneDark("ExpensesScreenPopulated") { ScreenshotExpenses(screenshotExpenses, isEmpty = false) }
     }
 
     @Test
     fun filtered() {
         composeTestRule.captureMultiDevice("ExpensesScreenFiltered") {
-            Expenses(
+            ScreenshotExpenses(
                 screenshotExpenses.take(3),
                 isEmpty = false,
                 searchQuery = "Pizza",
@@ -90,57 +85,21 @@ class ExpensesScreenScreenshotTests {
     @Test
     fun searchExpanded() {
         composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "ExpensesScreenSearchExpanded", deviceName = "phone") {
-            Expenses(screenshotExpenses, isEmpty = false, searchQuery = "Pizza", isSearchExpanded = true)
+            ScreenshotExpenses(screenshotExpenses, isEmpty = false, searchQuery = "Pizza", isSearchExpanded = true)
         }
     }
 
     @Test
     fun empty() {
         composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "ExpensesScreenEmpty", deviceName = "phone") {
-            Expenses(emptyList(), isEmpty = true)
+            ScreenshotExpenses(emptyList(), isEmpty = true)
         }
     }
 
     @Test
     fun loading() {
         composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "ExpensesScreenLoading", deviceName = "phone") {
-            Expenses(emptyList(), isEmpty = null)
+            ScreenshotExpenses(emptyList(), isEmpty = null)
         }
-    }
-
-    @Composable
-    private fun Expenses(
-        expenses: List<Expense>,
-        isEmpty: Boolean?,
-        searchQuery: String = "",
-        isSearchExpanded: Boolean = false,
-        selectedCategories: List<Int> = emptyList(),
-        selectedLabels: List<String> = emptyList(),
-        dateRange: Pair<LocalDate, LocalDate>? = null,
-    ) {
-        ExpensesContent(
-            expenses = expenses,
-            totalFilteredExpenses = 46.5,
-            isExpensesEmpty = isEmpty,
-            searchQuery = searchQuery,
-            isSearchExpanded = isSearchExpanded,
-            selectedCategories = selectedCategories,
-            selectedLabels = selectedLabels,
-            dateRange = dateRange,
-            scrollToIdFlow = flowOf(null),
-            itemMetadata = screenshotExpensesMetadata,
-            onSearchQueryChanged = {},
-            onSearchExpandedChange = {},
-            onCategoryFilterChanged = {},
-            onLabelFilterChanged = { _, _ -> },
-            onDateFilterChanged = {},
-            onLoadMore = {},
-            onFilterClick = {},
-            onItemLongClick = { _, _ -> },
-            onCategoryClick = { _, _ -> },
-            onCategoriesClick = {},
-            onManageLabels = {},
-            getDateLabel = ::screenshotDateLabel,
-        )
     }
 }

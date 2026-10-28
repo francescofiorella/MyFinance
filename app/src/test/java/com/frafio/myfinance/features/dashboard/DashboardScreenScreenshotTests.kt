@@ -1,19 +1,15 @@
 package com.frafio.myfinance.features.dashboard
 
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.charts.R as ChartsR
-import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
+import com.frafio.myfinance.testing.screenshot.ScreenshotDashboard
 import com.frafio.myfinance.testing.screenshot.captureForDevice
 import com.frafio.myfinance.testing.screenshot.captureMultiDevice
 import com.frafio.myfinance.testing.screenshot.capturePhoneDark
 import com.frafio.myfinance.testing.screenshot.screenshotBarChart
-import com.frafio.myfinance.testing.screenshot.screenshotExpenses
-import com.frafio.myfinance.testing.screenshot.screenshotToday
 import com.frafio.myfinance.testing.util.string
 import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesCheck
 import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesElements
@@ -58,17 +54,17 @@ class DashboardScreenScreenshotTests {
 
     @Test
     fun populated() {
-        composeTestRule.captureMultiDevice("DashboardScreenPopulated", narrowChartBars) { Dashboard(monthlyBudget = 500.0) }
+        composeTestRule.captureMultiDevice("DashboardScreenPopulated", narrowChartBars) { ScreenshotDashboard(monthlyBudget = 500.0) }
     }
 
     @Test
     fun populated_dark() {
-        composeTestRule.capturePhoneDark("DashboardScreenPopulated", narrowChartBars) { Dashboard(monthlyBudget = 500.0) }
+        composeTestRule.capturePhoneDark("DashboardScreenPopulated", narrowChartBars) { ScreenshotDashboard(monthlyBudget = 500.0) }
     }
 
     @Test
     fun withoutBudget() {
-        composeTestRule.captureMultiDevice("DashboardScreenNoBudget", narrowChartBars) { Dashboard(monthlyBudget = 0.0) }
+        composeTestRule.captureMultiDevice("DashboardScreenNoBudget", narrowChartBars) { ScreenshotDashboard(monthlyBudget = 0.0) }
     }
 
     @Test
@@ -78,46 +74,7 @@ class DashboardScreenScreenshotTests {
             DefaultTestDevices.PHONE.spec, "DashboardScreenShortHistory", deviceName = "phone",
             accessibilitySuppressions = narrowChartBars,
         ) {
-            Dashboard(monthlyBudget = 500.0, shownCount = 7, availableRanges = listOf(0), trackingStart = LocalDate.of(2024, 10, 1))
+            ScreenshotDashboard(monthlyBudget = 500.0, shownCount = 7, availableRanges = listOf(0), trackingStart = LocalDate.of(2024, 10, 1))
         }
-    }
-
-    @Composable
-    private fun Dashboard(
-        monthlyBudget: Double,
-        shownCount: Int = screenshotBarChart.size,
-        availableRanges: List<Int> = ALL_MONTH_RANGES,
-        trackingStart: LocalDate? = null
-    ) {
-        DashboardContent(
-            today = screenshotToday,
-            monthShown = true,
-            thisMonthSum = 450.0,
-            thisYearSum = 3350.0,
-            monthlyBudget = monthlyBudget,
-            todaySum = 45.0,
-            balanceYear = 2024,
-            incomesSum = 12000.0,
-            expensesSum = 3350.0,
-            barChartData = screenshotBarChart,
-            pieExpenses = screenshotExpenses,
-            pieDate = screenshotToday,
-            monthlyShownInPie = true,
-            scrollState = rememberScrollState(),
-            onToggleMonthShown = {},
-            onPreviousYear = {},
-            onNextYear = {},
-            onTodayAnnualBalance = {},
-            onPreviousBarDate = {},
-            onNextBarDate = {},
-            onTodayBarDate = {},
-            barChartShownCount = shownCount,
-            barChartAvailableRanges = availableRanges,
-            barChartTrackingStart = trackingStart,
-            onSwitchPieData = {},
-            onPreviousPieDate = {},
-            onNextPieDate = {},
-            onTodayPieData = {},
-        )
     }
 }
