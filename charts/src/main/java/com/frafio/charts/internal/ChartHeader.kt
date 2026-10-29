@@ -1,4 +1,4 @@
-package com.frafio.charts
+package com.frafio.charts.internal
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

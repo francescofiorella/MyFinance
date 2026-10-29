@@ -48,10 +48,20 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.graphics.shapes.RoundedPolygon
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import com.frafio.charts.internal.EntryStrip
+import com.frafio.charts.internal.SelectionHeader
+import com.frafio.charts.internal.ShapeMorph
+import com.frafio.charts.internal.StripAxis
+import com.frafio.charts.internal.StripItem
+import com.frafio.charts.internal.averageOf
+import com.frafio.charts.internal.maxVisibleBars
+import com.frafio.charts.internal.rememberEntryStrip
+import com.frafio.charts.internal.shownSelection
+import com.frafio.charts.internal.stripWindow
 import java.text.NumberFormat
 import kotlin.math.roundToInt
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * A point of a [LineChart]. [key] orders the points and identifies one across entry changes; keys need

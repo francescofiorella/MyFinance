@@ -1,4 +1,4 @@
-package com.frafio.charts
+package com.frafio.charts.internal
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect

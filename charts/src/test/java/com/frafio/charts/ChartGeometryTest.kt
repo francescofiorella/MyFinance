@@ -1,6 +1,12 @@
 package com.frafio.charts
 
 import androidx.compose.ui.unit.dp
+import com.frafio.charts.internal.averageOf
+import com.frafio.charts.internal.axisLabelStep
+import com.frafio.charts.internal.isAxisLabelShown
+import com.frafio.charts.internal.maxVisibleBars
+import com.frafio.charts.internal.shownSelection
+import com.frafio.charts.internal.stripIndexAt
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import kotlin.math.PI

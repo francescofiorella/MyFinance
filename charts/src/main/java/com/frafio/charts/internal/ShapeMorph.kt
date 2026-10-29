@@ -1,4 +1,4 @@
-package com.frafio.charts
+package com.frafio.charts.internal
 
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.toPath

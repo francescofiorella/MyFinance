@@ -1,4 +1,4 @@
-package com.frafio.charts
+package com.frafio.charts.internal
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D

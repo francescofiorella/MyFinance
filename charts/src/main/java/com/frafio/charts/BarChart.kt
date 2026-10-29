@@ -46,6 +46,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.frafio.charts.internal.EntryStrip
+import com.frafio.charts.internal.SelectionHeader
+import com.frafio.charts.internal.StripAxis
+import com.frafio.charts.internal.averageOf
+import com.frafio.charts.internal.maxVisibleBars
+import com.frafio.charts.internal.rememberEntryStrip
+import com.frafio.charts.internal.shownSelection
+import com.frafio.charts.internal.stripWindow
 import java.text.NumberFormat
 import kotlin.math.roundToInt
 
