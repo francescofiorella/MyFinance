@@ -31,6 +31,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -346,6 +349,7 @@ private fun StatCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TrendCard(
     colors: CategoryColors,
@@ -357,6 +361,8 @@ private fun TrendCard(
     availableRanges: List<Int>,
     trackingStart: LocalDate?
 ) {
+    // Index into trend; -1 selects none, showing the average.
+    var selectedMonth by rememberSaveable { mutableIntStateOf(-1) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -376,10 +382,13 @@ private fun TrendCard(
                 shownCount = shownCount,
                 selectedRange = range,
                 onSelectedRangeChange = onRangeChange,
+                selectedMonth = selectedMonth,
+                onSelectedMonthChange = { selectedMonth = it },
                 availableRanges = availableRanges,
                 trackingStart = trackingStart,
                 onVisibleCountChanged = onVisibleCountChanged,
-                colors = colors.text(isSystemInDarkTheme()).let { LineChartDefaults.colors(lineColor = it, pointColor = it) }
+                colors = colors.text(isSystemInDarkTheme()).let { LineChartDefaults.colors(lineColor = it, pointColor = it) },
+                selectedPointShape = MaterialShapes.SoftBurst
             )
         }
     }

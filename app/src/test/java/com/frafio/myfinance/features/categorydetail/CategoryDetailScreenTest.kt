@@ -1,6 +1,9 @@
 package com.frafio.myfinance.features.categorydetail
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
@@ -210,9 +213,64 @@ class CategoryDetailScreenTest {
         }
 
         // April (nothing spent) and May (320); the months before tracking started are left out.
-        val label = ApplicationProvider.getApplicationContext<Context>().resources.getQuantityString(R.plurals.trend_average_months, 2, 2)
-        composeTestRule.onNodeWithText(label).performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText(averageLabel(2)).performScrollTo().assertIsDisplayed()
         composeTestRule.onNodeWithText(doubleToPrice(160.0)).assertIsDisplayed()
+    }
+
+    private fun averageLabel(months: Int) =
+        ApplicationProvider.getApplicationContext<Context>().resources.getQuantityString(R.plurals.trend_average_months, months, months)
+
+    private fun setTrend(shownCount: () -> Int) {
+        composeTestRule.setThemedContent {
+            CategoryDetailContent(
+                category = dining,
+                month = month,
+                stats = stats,
+                onBackClick = {},
+                onSeeAllExpenses = {},
+                onFrequentExpenseClick = {},
+                trendShownCount = shownCount()
+            )
+        }
+    }
+
+    @Test
+    fun trendCard_tappingAMonth_showsItInTheHeader_andTappingItAgainShowsTheAverage() {
+        setTrend { 12 }
+
+        point("March 2024").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("March 2024").assertIsDisplayed()
+        composeTestRule.onNodeWithText(doubleToPrice(285.0)).assertIsDisplayed()
+
+        point("March 2024").performClick()
+        composeTestRule.onNodeWithText("March 2024").assertDoesNotExist()
+        composeTestRule.onNodeWithText(averageLabel(12)).assertIsDisplayed()
+    }
+
+    @Test
+    fun trendCard_selectedMonth_isClearedOnceTheRangeNoLongerShowsIt() {
+        var shownCount by mutableIntStateOf(12)
+        setTrend { shownCount }
+        point("June 2023").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("June 2023").assertIsDisplayed()
+
+        shownCount = 6
+
+        // December 2023 to May 2024: (270 + 250 + 310 + 285 + 0 + 320) / 6.
+        composeTestRule.onNodeWithText(doubleToPrice(1435.0 / 6)).assertIsDisplayed()
+        composeTestRule.onNodeWithText("June 2023").assertDoesNotExist()
+    }
+
+    @Test
+    fun trendCard_clearedSelection_staysClearedWhenTheRangeShowsOlderMonths() {
+        var shownCount by mutableIntStateOf(6)
+        setTrend { shownCount }
+        point("March 2024").performScrollTo().performClick()
+        point("March 2024").performClick()
+
+        shownCount = 12
+
+        composeTestRule.onNodeWithText(averageLabel(12)).performScrollTo().assertIsDisplayed()
     }
 
     @Test
