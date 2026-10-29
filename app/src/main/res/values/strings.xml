@@ -180,9 +180,9 @@
     <string name="share_of_month_description">Of all categories</string>
     <string name="spending_trend">Monthly trend</string>
     <plurals name="trend_average_months">
-        <item quantity="one">Monthly average over %1$d month</item>
-        <item quantity="many">Monthly average over %1$d months</item>
-        <item quantity="other">Monthly average over %1$d months</item>
+        <item quantity="one">average over %1$d month</item>
+        <item quantity="many">average over %1$d months</item>
+        <item quantity="other">average over %1$d months</item>
     </plurals>
     <string name="biggest_expenses">Biggest expenses (monthly)</string>
     <string name="most_frequent">Most frequent (yearly)</string>
