@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.9
+
 - Pie chart click animation follows the button group guidelines
 - Pie chart selected icon configurable and morphs from base icon
 - Dashboard pie chart selected category icon takes a VerySunny shape
