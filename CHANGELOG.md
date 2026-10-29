@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.1
+
 - Line chart added to the chart library
 - Category Details trend shown as a line chart
 - Bar and line charts show the average of the shown months when nothing is selected
