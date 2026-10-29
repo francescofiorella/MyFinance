@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Line chart added to the chart library
+- Category Details trend shown as a line chart
+- Bar and line charts show the average of the shown months when nothing is selected
+- Bar chart starts with nothing selected; tapping the selected bar shows the average again
+- Chart library code re-arranged in packages
+
 ## 5.1.9
 
 - Pie chart click animation follows the button group guidelines
