@@ -44,7 +44,7 @@ fun MonthlyExpensesChartCard(
     isNextDateEnabled: Boolean = true,
     isPreviousDateEnabled: Boolean = true
 ) {
-    // Index into barChartData; -1 selects the latest month.
+    // Index into barChartData; -1 selects none, showing the average.
     var selectedMonth by rememberSaveable { mutableIntStateOf(-1) }
 
     Card(

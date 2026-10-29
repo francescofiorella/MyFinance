@@ -51,8 +51,8 @@ import kotlin.math.roundToInt
 
 /**
  * A bar of a [BarChart]. [key] orders the bars and identifies one across entry changes; keys need
- * not be consecutive (e.g. months since year zero, with gaps). [label] is shown in the header and
- * read by accessibility services, [axisLabel] under the bar, and [selectedAxisLabel] under it once selected.
+ * not be consecutive (e.g. months since year zero, with gaps). [label] is shown in the header once selected
+ * and read by accessibility services, [axisLabel] under the bar, and [selectedAxisLabel] under it once selected.
  * A null [value] means no data: the slot and its axis label stay, but no bar is drawn and it can't be selected.
  */
 data class BarChartEntry(
@@ -80,7 +80,7 @@ object BarChartDefaults {
     val BarPadding: Dp = 3.dp
     val BarMaxHeight: Dp = 160.dp
 
-    /** Formats the header value, the reference label and the bars' descriptions, in the default locale. */
+    /** Formats the header value or average, the reference label and the bars' descriptions, in the default locale. */
     val ValueFormatter: (Double) -> String = { NumberFormat.getInstance().format(it) }
 
     /** How the strip scrolls, zooms and rescales when the entries change; pass it as `entryAnimationSpec`. */
@@ -96,18 +96,20 @@ object BarChartDefaults {
     ): BarChartColors = BarChartColors(barColor, selectedBarColor, contentColor, secondaryContentColor)
 }
 
-/** The entry shown as selected: [selectedIndex] if it has data, else the latest entry with data; -1 if none has. */
+/** The entry shown as selected: [selectedIndex] if it has data, else -1 for none. */
 internal fun shownSelection(entries: List<BarChartEntry>, selectedIndex: Int): Int =
-    if (entries.getOrNull(selectedIndex)?.value != null) selectedIndex else entries.indexOfLast { it.value != null }
+    if (entries.getOrNull(selectedIndex)?.value != null) selectedIndex else -1
 
 /**
- * A bar chart that keeps its own selection, starting on the latest entry. With an
- * [entryAnimationSpec], entry changes animate as one strip of equal bars, matched by key.
+ * A bar chart that keeps its own selection, starting with none. [onBarClick] reports the selected bar,
+ * or -1 once tapping it again clears the selection. With an [entryAnimationSpec], entry changes animate
+ * as one strip of equal bars, matched by key.
  */
 @Composable
 fun BarChart(
     modifier: Modifier = Modifier,
     entries: List<BarChartEntry>,
+    averageLabel: String = "",
     referenceValue: Double? = null,
     onBarClick: (Int) -> Unit = {},
     onVisibleCountChanged: (Int) -> Unit = {},
@@ -128,6 +130,7 @@ fun BarChart(
             selectedIndex = it
             onBarClick(it)
         },
+        averageLabel = averageLabel,
         referenceValue = referenceValue,
         onVisibleCountChanged = onVisibleCountChanged,
         valueFormatter = valueFormatter,
@@ -141,10 +144,11 @@ fun BarChart(
 }
 
 /**
- * A bar chart whose selection is hoisted. A [selectedIndex] outside [entries] (e.g. -1) or on an entry
- * without data selects the latest entry with data, so resetting it to -1 goes back to the default. With an [entryAnimationSpec], entry
- * changes animate as one strip of equal bars, matched by key: the shown keys scroll and zoom to
- * the new ones, so added bars slide in and removed ones slide out at the edges.
+ * A bar chart whose selection is hoisted. The header shows the selected entry, or with nothing selected the
+ * average of the entries with data, labelled [averageLabel]. A [selectedIndex] outside [entries] (e.g. -1) or
+ * on an entry without data selects nothing; tapping the selected bar clears the selection, reporting -1.
+ * With an [entryAnimationSpec], entry changes animate as one strip of equal bars, matched by key: the shown
+ * keys scroll and zoom to the new ones, so added bars slide in and removed ones slide out at the edges.
  */
 @Composable
 fun BarChart(
@@ -152,6 +156,7 @@ fun BarChart(
     entries: List<BarChartEntry>,
     selectedIndex: Int,
     onSelectedIndexChange: (Int) -> Unit,
+    averageLabel: String = "",
     referenceValue: Double? = null,
     onVisibleCountChanged: (Int) -> Unit = {},
     valueFormatter: (Double) -> String = BarChartDefaults.ValueFormatter,
@@ -181,7 +186,12 @@ fun BarChart(
             modifier = Modifier.fillMaxWidth()
         ) {
             val entry = entries.getOrNull(shownIndex)
-            ChartHeader(value = entry?.value?.let(valueFormatter) ?: "", label = entry?.label ?: "", color = colors.contentColor)
+            if (entry != null) {
+                ChartHeader(value = entry.value?.let(valueFormatter) ?: "", label = entry.label, color = colors.contentColor)
+            } else {
+                val average = remember(entries) { averageOf(entries.map { it.value }) }
+                ChartHeader(value = average?.let(valueFormatter) ?: "", label = averageLabel, color = colors.contentColor)
+            }
             Spacer(modifier = Modifier.height(16.dp))
             BarChartBars(
                 strip = strip,
@@ -219,7 +229,7 @@ private class ChartBarState(
     val heightFraction: Float,
     val animateHeight: Boolean,
     val isSelected: Boolean,
-    val onClick: () -> Unit,
+    val onCheckedChange: (Boolean) -> Unit,
     val interactionSource: MutableInteractionSource,
     val colors: BarChartColors,
     val barWidth: Dp,
@@ -291,7 +301,7 @@ private fun BarChartBars(
                                 heightFraction = if (value != null) bar.fraction().coerceAtLeast(0.01f) else 0f,
                                 animateHeight = !isAnimated,
                                 isSelected = bar.index >= 0 && selectedIndex == bar.index,
-                                onClick = { if (bar.index >= 0) onBarClick(bar.index) },
+                                onCheckedChange = { checked -> if (bar.index >= 0) onBarClick(if (checked) bar.index else -1) },
                                 interactionSource = interactionSource,
                                 colors = colors,
                                 barWidth = barWidth,
@@ -363,9 +373,7 @@ private fun ChartBar(state: ChartBarState) {
     )
     ToggleButton(
         checked = state.isSelected,
-        onCheckedChange = {
-            if (it) state.onClick()
-        },
+        onCheckedChange = state.onCheckedChange,
         content = {},
         colors = ToggleButtonDefaults.colors(
             containerColor = state.colors.barColor,
@@ -398,7 +406,7 @@ private fun previewEntries(count: Int): List<BarChartEntry> = (0 until count).ma
 fun BarChartPreview() {
     MaterialTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
-            BarChart(entries = previewEntries(12), referenceValue = 190.0)
+            BarChart(entries = previewEntries(12), averageLabel = "average", referenceValue = 190.0)
         }
     }
 }
@@ -408,7 +416,7 @@ fun BarChartPreview() {
 fun BarChartManyEntriesPreview() {
     MaterialTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
-            BarChart(entries = previewEntries(24), referenceValue = 190.0, entryAnimationSpec = BarChartDefaults.EntryAnimationSpec)
+            BarChart(entries = previewEntries(24), averageLabel = "average", referenceValue = 190.0, entryAnimationSpec = BarChartDefaults.EntryAnimationSpec)
         }
     }
 }

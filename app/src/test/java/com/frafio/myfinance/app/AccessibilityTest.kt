@@ -18,6 +18,7 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasClickAction
@@ -144,7 +145,11 @@ class AccessibilityTest {
         }
 
         composeTestRule.onNodeWithContentDescription(string(ChartsR.string.charts_item_description, "January 2024", doubleToPrice(100.0))).assertExists()
-        composeTestRule.onNodeWithContentDescription(string(ChartsR.string.charts_item_description, "February 2024", doubleToPrice(250.5))).assertIsOn()
+        // Nothing is selected until a bar is tapped.
+        composeTestRule.onNodeWithContentDescription(string(ChartsR.string.charts_item_description, "February 2024", doubleToPrice(250.5)))
+            .assertIsOff()
+            .performClick()
+            .assertIsOn()
     }
 
     @Test

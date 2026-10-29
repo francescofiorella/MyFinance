@@ -119,7 +119,7 @@ fun LineChart(
 
         Column(modifier = Modifier.fillMaxWidth()) {
             if (averageLabel != null) {
-                val average = remember(entries) { entries.mapNotNull { it.value }.takeIf { it.isNotEmpty() }?.average() }
+                val average = remember(entries) { averageOf(entries.map { it.value }) }
                 ChartHeader(value = average?.let(valueFormatter) ?: "", label = averageLabel, color = colors.contentColor)
                 Spacer(modifier = Modifier.height(16.dp))
             }

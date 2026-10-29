@@ -13,6 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+/** The average of the [values] with data, null if none has. */
+internal fun averageOf(values: List<Double?>): Double? = values.filterNotNull().takeIf { it.isNotEmpty() }?.average()
+
 /** A large [value] with a small [label] beside it, above a chart. */
 @Composable
 internal fun ChartHeader(value: String, label: String, color: Color) {

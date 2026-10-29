@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.dashboard.components
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
@@ -16,6 +17,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.test.core.app.ApplicationProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.utils.activeCurrencyCode
@@ -249,7 +251,7 @@ class DashboardCardsTest {
     }
 
     @Test
-    fun monthlyChart_rangeChange_selectsTheLatestMonth_whenTheSelectedOneIsNoLongerShown() {
+    fun monthlyChart_rangeChange_clearsTheSelection_whenTheSelectedOneIsNoLongerShown() {
         showRangedChart()
         composeTestRule.onNodeWithText(string(R.string.bar_chart_range_2_years)).performClick()
         bar("February 2023").performClick()
@@ -257,8 +259,36 @@ class DashboardCardsTest {
 
         composeTestRule.onNodeWithText(string(R.string.bar_chart_range_6_months)).performClick()
 
-        composeTestRule.onNodeWithText("December 2024").assertIsDisplayed()
+        // July to December 2024: 118 to 123.
+        composeTestRule.onNodeWithText("€ 120.50").assertIsDisplayed()
         composeTestRule.onNodeWithText("February 2023").assertDoesNotExist()
+    }
+
+    private fun averageLabel(months: Int) =
+        ApplicationProvider.getApplicationContext<Context>().resources.getQuantityString(R.plurals.trend_average_months, months, months)
+
+    @Test
+    fun monthlyChart_showsTheAverageByDefault_withTheMonthsItCovers() {
+        showRangedChart(trackingStart = LocalDate.of(2024, 9, 1))
+
+        // September to December 2024 of the six shown: 120 to 123.
+        composeTestRule.onNodeWithText("€ 121.50").assertIsDisplayed()
+        composeTestRule.onNodeWithText(averageLabel(4)).assertIsDisplayed()
+    }
+
+    @Test
+    fun monthlyChart_tappingTheSelectedBarAgain_goesBackToTheAverage_acrossRangeChanges() {
+        showRangedChart()
+        bar("September 2024").performClick()
+        bar("September 2024").performClick()
+
+        composeTestRule.onNodeWithText("€ 120.50").assertIsDisplayed()
+        composeTestRule.onNodeWithText("September 2024").assertDoesNotExist()
+
+        // Still nothing selected on a range showing older months: 2024's 112 to 123.
+        composeTestRule.onNodeWithText(string(R.string.bar_chart_range_1_year)).performClick()
+        composeTestRule.onNodeWithText("€ 117.50").assertIsDisplayed()
+        composeTestRule.onNodeWithText(averageLabel(12)).assertIsDisplayed()
     }
 
     // endregion

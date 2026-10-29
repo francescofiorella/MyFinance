@@ -113,15 +113,26 @@ class ChartGeometryTest {
     }
 
     @Test
-    fun shownSelection_outsideTheEntries_isTheLatestWithData() {
+    fun shownSelection_outsideTheEntries_isNone() {
         val entries = listOf(bar(1.0), bar(2.0), bar(null))
-        assertThat(shownSelection(entries, selectedIndex = -1)).isEqualTo(1)
-        assertThat(shownSelection(entries, selectedIndex = 5)).isEqualTo(1)
+        assertThat(shownSelection(entries, selectedIndex = -1)).isEqualTo(-1)
+        assertThat(shownSelection(entries, selectedIndex = 5)).isEqualTo(-1)
     }
 
     @Test
-    fun shownSelection_onAnEntryWithoutData_isTheLatestWithData() {
-        assertThat(shownSelection(listOf(bar(null), bar(null), bar(3.0)), selectedIndex = 0)).isEqualTo(2)
+    fun shownSelection_onAnEntryWithoutData_isNone() {
+        assertThat(shownSelection(listOf(bar(null), bar(null), bar(3.0)), selectedIndex = 0)).isEqualTo(-1)
+    }
+
+    @Test
+    fun averageOf_leavesEntriesWithoutDataOut_butCountsZeros() {
+        assertThat(averageOf(listOf(null, 0.0, 120.0))).isEqualTo(60.0)
+    }
+
+    @Test
+    fun averageOf_withoutData_isNull() {
+        assertThat(averageOf(listOf(null, null))).isNull()
+        assertThat(averageOf(emptyList())).isNull()
     }
 
     @Test
