@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
@@ -19,7 +22,9 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.dp
@@ -62,7 +67,7 @@ class LineChartTest {
         onVisibleCountChanged: (Int) -> Unit = {},
         pointSpacing: Dp = LineChartDefaults.PointSpacing,
         entryAnimationSpec: FiniteAnimationSpec<Float>? = null
-    ) = Box(Modifier.requiredWidth(300.dp)) {
+    ) = Box(Modifier.requiredWidth(300.dp).testTag("chart")) {
         LineChart(
             entries = entries,
             onVisibleCountChanged = onVisibleCountChanged,
@@ -154,6 +159,33 @@ class LineChartTest {
         // Four slots share the width, entries without data included.
         assertThat(december.centerX()).isWithin(1f).of(300f * 7 / 8)
         assertThat(decemberLabel.centerX() - septemberLabel.centerX()).isWithin(1f).of(3 * 300f / 4)
+    }
+
+    @Test
+    fun points_sitExactlyWhereTheLineIsDrawn_onFractionalPixels() {
+        // Seven slots of 300 dp at a phone density don't split into whole pixels.
+        val density = Density(2.625f)
+        val values = listOf(10.0, 70.0, 20.0, 55.0, 35.0, 90.0, 5.0)
+        val sevenMonths = values.mapIndexed { i, value -> entry(value = value, year = 2024, month = i + 1) }
+        setChart {
+            CompositionLocalProvider(LocalDensity provides density) { TestLineChart(entries = sevenMonths) }
+        }
+
+        // The line joins (i + 0.5) slots across and r + (1 - f) * (height - 2r) down, in the plot's whole pixels.
+        val width = with(density) { 300.dp.roundToPx() }.toFloat()
+        val height = with(density) { LineChartDefaults.PlotHeight.roundToPx() }.toFloat()
+        val radius = with(density) { LineChartDefaults.PointSize.toPx() } / 2
+        // The chart is wider than the screen, so it is centred off its left edge.
+        val chart = composeTestRule.onNodeWithTag("chart").getUnclippedBoundsInRoot()
+        // A node is placed on whole pixels, so its centre can be half a pixel off.
+        val tolerance = 0.51f
+        sevenMonths.forEachIndexed { i, entry ->
+            val bounds = point(entry.label).getUnclippedBoundsInRoot()
+            val x = (bounds.centerX() - chart.left.value) * density.density
+            val y = (bounds.centerY() - chart.top.value) * density.density
+            assertThat(x).isWithin(tolerance).of((i + 0.5f) * width / values.size)
+            assertThat(y).isWithin(tolerance).of(radius + (1f - (values[i] / 90.0).toFloat()) * (height - 2 * radius))
+        }
     }
 
     @Test

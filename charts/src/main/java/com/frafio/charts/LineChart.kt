@@ -2,38 +2,34 @@ package com.frafio.charts
 
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import java.text.NumberFormat
 import kotlin.math.roundToInt
@@ -161,32 +157,49 @@ private fun LineChartPlot(
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val items = strip.items
                 if (items.isEmpty()) return@Canvas
-                val slot = size.width / items.size
                 val radius = pointSize.toPx() / 2
-                fun center(i: Int) = Offset((i + 0.5f) * slot, radius + (1f - items[i].fraction()) * (size.height - 2 * radius))
+                val centers = items.indices.map { pointCenter(it, items.size, items[it].fraction(), size, radius) }
                 for (i in 1 until items.size) {
                     // Entries without data break the line.
                     if (items[i - 1].entry.value == null || items[i].entry.value == null) continue
-                    drawLine(colors.lineColor, center(i - 1), center(i), lineWidth.toPx(), StrokeCap.Round)
+                    drawLine(colors.lineColor, centers[i - 1], centers[i], lineWidth.toPx(), StrokeCap.Round)
+                }
+                items.forEachIndexed { i, item ->
+                    if (item.entry.value != null) drawCircle(colors.pointColor, radius, centers[i])
                 }
             }
-            Row(modifier = Modifier.fillMaxSize()) {
-                strip.items.forEach { item ->
-                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                        val value = item.entry.value
-                        if (value != null) {
-                            val description = stringResource(R.string.charts_item_description, item.entry.label, valueFormatter(value))
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    .offset { IntOffset(0, ((1f - item.fraction()) * (plotHeight - pointSize).toPx()).roundToInt()) }
-                                    .size(pointSize)
-                                    .background(colors.pointColor, CircleShape)
-                                    .semantics { contentDescription = description }
-                            )
-                        }
-                    }
-                }
+            PointNodes(strip = strip, valueFormatter = valueFormatter, pointSize = pointSize)
+        }
+    }
+}
+
+/** Where the point of the [index]-th of [count] slots sits in a plot of [size], keeping a point of [radius] inside it. */
+private fun pointCenter(index: Int, count: Int, fraction: Float, size: Size, radius: Float): Offset =
+    Offset((index + 0.5f) * size.width / count, radius + (1f - fraction) * (size.height - 2 * radius))
+
+/** An invisible node over each drawn point, for accessibility services. */
+@Composable
+private fun PointNodes(strip: EntryStrip<LineChartEntry>, valueFormatter: (Double) -> String, pointSize: Dp) {
+    val items = strip.items
+    val withData = items.indices.filter { items[it].entry.value != null }
+    Layout(
+        modifier = Modifier.fillMaxSize(),
+        content = {
+            withData.forEach { i ->
+                val entry = items[i].entry
+                val description = stringResource(R.string.charts_item_description, entry.label, valueFormatter(entry.value!!))
+                Box(modifier = Modifier.size(pointSize).semantics { contentDescription = description })
+            }
+        }
+    ) { measurables, constraints ->
+        val placeables = measurables.map { it.measure(Constraints()) }
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            val size = Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat())
+            val radius = pointSize.toPx() / 2
+            placeables.forEachIndexed { j, placeable ->
+                val i = withData[j]
+                val center = pointCenter(i, items.size, items[i].fraction(), size, radius)
+                placeable.place((center.x - placeable.width / 2f).roundToInt(), (center.y - placeable.height / 2f).roundToInt())
             }
         }
     }
