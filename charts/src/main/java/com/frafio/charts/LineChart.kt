@@ -58,6 +58,9 @@ object LineChartDefaults {
     val PointSize: Dp = 8.dp
     val LineWidth: Dp = 2.dp
 
+    /** The space left between a point and the line reaching it. */
+    val PointGap: Dp = 2.dp
+
     /** The narrowest slot a point gets, used to report how many entries fit. */
     val PointSpacing: Dp = 46.dp
     val PlotHeight: Dp = 160.dp
@@ -91,6 +94,7 @@ fun LineChart(
     colors: LineChartColors = LineChartDefaults.colors(),
     pointSize: Dp = LineChartDefaults.PointSize,
     lineWidth: Dp = LineChartDefaults.LineWidth,
+    pointGap: Dp = LineChartDefaults.PointGap,
     pointSpacing: Dp = LineChartDefaults.PointSpacing,
     plotHeight: Dp = LineChartDefaults.PlotHeight,
     entryAnimationSpec: FiniteAnimationSpec<Float>? = null
@@ -117,6 +121,7 @@ fun LineChart(
                 colors = colors,
                 pointSize = pointSize,
                 lineWidth = lineWidth,
+                pointGap = pointGap,
                 plotHeight = plotHeight
             )
             Spacer(modifier = Modifier.height(4.dp))
@@ -140,6 +145,7 @@ private fun LineChartPlot(
     colors: LineChartColors,
     pointSize: Dp,
     lineWidth: Dp,
+    pointGap: Dp,
     plotHeight: Dp
 ) {
     Box(
@@ -159,10 +165,17 @@ private fun LineChartPlot(
                 if (items.isEmpty()) return@Canvas
                 val radius = pointSize.toPx() / 2
                 val centers = items.indices.map { pointCenter(it, items.size, items[it].fraction(), size, radius) }
+                // Each segment stops short of its points, its round caps included.
+                val inset = radius + pointGap.toPx() + lineWidth.toPx() / 2
                 for (i in 1 until items.size) {
                     // Entries without data break the line.
                     if (items[i - 1].entry.value == null || items[i].entry.value == null) continue
-                    drawLine(colors.lineColor, centers[i - 1], centers[i], lineWidth.toPx(), StrokeCap.Round)
+                    val start = centers[i - 1]
+                    val end = centers[i]
+                    val length = (end - start).getDistance()
+                    if (length <= 2 * inset) continue
+                    val shift = (end - start) * (inset / length)
+                    drawLine(colors.lineColor, start + shift, end - shift, lineWidth.toPx(), StrokeCap.Round)
                 }
                 items.forEachIndexed { i, item ->
                     if (item.entry.value != null) drawCircle(colors.pointColor, radius, centers[i])
