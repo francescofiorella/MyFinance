@@ -64,6 +64,14 @@ class ChartGeometryTest {
     }
 
     @Test
+    fun isAxisLabelShown_withoutSelection_hidesNoStepLabel() {
+        // The first bar is on the step, next to the -1 standing for no selection.
+        val shown = (0..6).filter { isAxisLabelShown(it, latestPosition = 6, selectedPosition = -1, step = 2) }
+
+        assertThat(shown).containsExactly(0, 2, 4, 6).inOrder()
+    }
+
+    @Test
     fun isAxisLabelShown_handlesBarsAfterTheLatest() {
         // A bar animating out after the latest one sits at a negative distance from it.
         assertThat(isAxisLabelShown(9, latestPosition = 7, selectedPosition = 3, step = 2)).isTrue()
