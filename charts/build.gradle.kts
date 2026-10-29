@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-// Generic Compose charts (bar chart, pie chart, share bar) with no dependency on the app.
+// Generic Compose charts (bar chart, line chart, pie chart, share bar) with no dependency on the app.
 plugins {
     jacoco
     alias(libs.plugins.android.library)
