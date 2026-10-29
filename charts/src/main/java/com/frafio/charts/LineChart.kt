@@ -67,13 +67,17 @@ data class LineChartEntry(
     val selectedAxisLabel: String = axisLabel
 )
 
-/** The colors of a [LineChart]: [labelColor] for the axis labels, [contentColor] for the header and the selected axis label. */
+/**
+ * The colors of a [LineChart]: [labelColor] for the axis labels, [contentColor] for the header and the selected
+ * axis label, [guideColor] for the line from the selected point down to its label.
+ */
 @Immutable
 data class LineChartColors(
     val lineColor: Color,
     val pointColor: Color,
     val labelColor: Color,
-    val contentColor: Color
+    val contentColor: Color,
+    val guideColor: Color
 )
 
 object LineChartDefaults {
@@ -105,8 +109,9 @@ object LineChartDefaults {
         lineColor: Color = MaterialTheme.colorScheme.primary,
         pointColor: Color = MaterialTheme.colorScheme.primary,
         labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-        contentColor: Color = MaterialTheme.colorScheme.onSurface
-    ): LineChartColors = LineChartColors(lineColor, pointColor, labelColor, contentColor)
+        contentColor: Color = MaterialTheme.colorScheme.onSurface,
+        guideColor: Color = MaterialTheme.colorScheme.outlineVariant
+    ): LineChartColors = LineChartColors(lineColor, pointColor, labelColor, contentColor, guideColor)
 }
 
 /**
@@ -164,7 +169,7 @@ fun LineChart(
  * data, labelled [averageLabel]. A [selectedIndex] outside [entries] (e.g. -1) or on an entry without data
  * selects nothing; tapping anywhere in a point's slot selects it, and tapping the selected one clears the
  * selection, reporting -1. The selected point grows to [selectedPointSize] and morphs from [pointShape] into
- * [selectedPointShape]. With an [entryAnimationSpec], entry changes animate as one strip matched by key:
+ * [selectedPointShape], and a guide line drops from it to its axis label. With an [entryAnimationSpec], entry changes animate as one strip matched by key:
  * the shown keys scroll and zoom to the new ones, so added points slide in and removed ones slide out at the edges.
  */
 @Composable
@@ -304,6 +309,20 @@ private fun LineChartPlot(
                 if (items.isEmpty()) return@Canvas
                 val centers = items.indices.map { pointCenter(it, items.size, items[it].fraction(), size, insetRadius.toPx()) }
                 val radii = items.map { sizeOf(it).toPx() / 2 }
+                // The selected point's guide, fading in and out with it, keeps the same gap below it as the line.
+                items.forEachIndexed { i, item ->
+                    val progress = progressOf(item).coerceIn(0f, 1f)
+                    if (item.entry.value == null || progress == 0f) return@forEachIndexed
+                    val top = centers[i].y + radii[i] + pointGap.toPx()
+                    if (top >= size.height) return@forEachIndexed
+                    drawLine(
+                        color = colors.guideColor,
+                        start = Offset(centers[i].x, top),
+                        end = Offset(centers[i].x, size.height),
+                        strokeWidth = GuideWidth.toPx(),
+                        alpha = progress
+                    )
+                }
                 // Each segment stops short of its two points, as they are now, its round caps included.
                 val clearance = pointGap.toPx() + lineWidth.toPx() / 2
                 for (i in 1 until items.size) {
@@ -334,6 +353,8 @@ private fun LineChartPlot(
         }
     }
 }
+
+private val GuideWidth: Dp = 1.dp
 
 /** Each point's selection progress by entry key, from 0 to 1 once selected. */
 private class PointSelection {
