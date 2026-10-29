@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import com.frafio.charts.LineChart
 import com.frafio.charts.LineChartColors
 import com.frafio.charts.LineChartDefaults
+import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
 import com.frafio.myfinance.core.utils.doubleToPrice
@@ -16,6 +18,7 @@ import java.time.LocalDate
 /**
  * The Auto / 6M / 1Y / 2Y buttons over a line chart of the last [shownCount] of [totals]; changing range
  * slides the points. Months before [trackingStart] are shown as no data; null treats every month as data.
+ * The header shows the average of the shown months with data.
  */
 @Composable
 fun MonthlyRangeLineChart(
@@ -34,10 +37,14 @@ fun MonthlyRangeLineChart(
     Column(modifier = modifier.fillMaxWidth()) {
         MonthRangeButtons(selectedRange = selectedRange, onSelectedRangeChange = onSelectedRangeChange, availableRanges = availableRanges)
 
+        val entries = remember(shown, trackingStart) {
+            shown.map { it.toLineChartEntry(hasData = trackingStart == null || !LocalDate.of(it.year, it.month, 1).isBefore(trackingStart)) }
+        }
+        // The average covers only the months with data.
+        val trackedMonths = entries.count { it.value != null }
         LineChart(
-            entries = remember(shown, trackingStart) {
-                shown.map { it.toLineChartEntry(hasData = trackingStart == null || !LocalDate.of(it.year, it.month, 1).isBefore(trackingStart)) }
-            },
+            entries = entries,
+            averageLabel = pluralStringResource(R.plurals.trend_average_months, trackedMonths, trackedMonths),
             onVisibleCountChanged = onVisibleCountChanged,
             valueFormatter = ::doubleToPrice,
             colors = colors,

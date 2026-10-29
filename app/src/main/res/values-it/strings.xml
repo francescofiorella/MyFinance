@@ -180,6 +180,11 @@
     <string name="share_of_month">Quota del mese</string>
     <string name="share_of_month_description">Di tutte le categorie</string>
     <string name="spending_trend">Andamento mensile</string>
+    <plurals name="trend_average_months">
+        <item quantity="one">Media mensile su %1$d mese</item>
+        <item quantity="many">Media mensile su %1$d mesi</item>
+        <item quantity="other">Media mensile su %1$d mesi</item>
+    </plurals>
     <string name="biggest_expenses">Spese maggiori (mese)</string>
     <string name="most_frequent">Più frequenti (anno)</string>
     <string name="frequent_expenses_title">Più frequenti</string>

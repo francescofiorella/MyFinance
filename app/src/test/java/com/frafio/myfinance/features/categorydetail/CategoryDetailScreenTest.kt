@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.categorydetail
 
+import android.content.Context
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
@@ -13,9 +14,11 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.test.core.app.ApplicationProvider
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.data.model.ExpenseCategories
@@ -71,7 +74,8 @@ class CategoryDetailScreenTest {
         setScreen()
 
         composeTestRule.onNodeWithText(doubleToPrice(stats.monthTotal)).assertIsDisplayed()
-        composeTestRule.onNodeWithText(doubleToPrice(stats.average)).assertIsDisplayed()
+        // The trend chart's average covers the same twelve months; the stat card comes first.
+        composeTestRule.onAllNodesWithText(doubleToPrice(stats.average)).onFirst().assertIsDisplayed()
         composeTestRule.onNodeWithText(doubleToPrice(stats.yearToDate)).assertIsDisplayed()
         composeTestRule.onNodeWithText("2024").assertIsDisplayed()
         // 320 of 1140.
@@ -189,6 +193,26 @@ class CategoryDetailScreenTest {
         // Nothing was spent on dining in April 2024, after tracking started.
         point("April 2024").assertExists()
         point("May 2024").assertExists()
+    }
+
+    @Test
+    fun trendCard_showsTheAverageOfTheShownMonthsWithData() {
+        composeTestRule.setThemedContent {
+            CategoryDetailContent(
+                category = dining,
+                month = month,
+                stats = stats,
+                onBackClick = {},
+                onSeeAllExpenses = {},
+                onFrequentExpenseClick = {},
+                trendTrackingStart = LocalDate.of(2024, 4, 1)
+            )
+        }
+
+        // April (nothing spent) and May (320); the months before tracking started are left out.
+        val label = ApplicationProvider.getApplicationContext<Context>().resources.getQuantityString(R.plurals.trend_average_months, 2, 2)
+        composeTestRule.onNodeWithText(label).performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText(doubleToPrice(160.0)).assertIsDisplayed()
     }
 
     @Test
