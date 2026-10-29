@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -182,7 +180,8 @@ fun BarChart(
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            BarChartHeader(entry = entries.getOrNull(shownIndex), valueFormatter = valueFormatter, colors = colors)
+            val entry = entries.getOrNull(shownIndex)
+            ChartHeader(value = entry?.value?.let(valueFormatter) ?: "", label = entry?.label ?: "", color = colors.contentColor)
             Spacer(modifier = Modifier.height(16.dp))
             BarChartBars(
                 strip = strip,
@@ -209,25 +208,6 @@ fun BarChart(
                 selectedColor = colors.contentColor
             )
         }
-    }
-}
-
-@Composable
-private fun BarChartHeader(entry: BarChartEntry?, valueFormatter: (Double) -> String, colors: BarChartColors) {
-    Row(verticalAlignment = Alignment.Bottom) {
-        Text(
-            text = entry?.value?.let(valueFormatter) ?: "",
-            color = colors.contentColor,
-            style = MaterialTheme.typography.displaySmall,
-            fontWeight = FontWeight.SemiBold
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            modifier = Modifier.padding(bottom = 5.dp),
-            text = entry?.label ?: "",
-            color = colors.contentColor,
-            style = MaterialTheme.typography.labelSmall
-        )
     }
 }
 

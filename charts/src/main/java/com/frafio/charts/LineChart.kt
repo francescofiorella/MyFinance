@@ -46,12 +46,13 @@ data class LineChartEntry(
     val axisLabel: String
 )
 
-/** The colors of a [LineChart]: [labelColor] for the axis labels. */
+/** The colors of a [LineChart]: [labelColor] for the axis labels, [contentColor] for the header. */
 @Immutable
 data class LineChartColors(
     val lineColor: Color,
     val pointColor: Color,
-    val labelColor: Color
+    val labelColor: Color,
+    val contentColor: Color
 )
 
 object LineChartDefaults {
@@ -65,7 +66,7 @@ object LineChartDefaults {
     val PointSpacing: Dp = 46.dp
     val PlotHeight: Dp = 160.dp
 
-    /** Formats the points' descriptions, in the default locale. */
+    /** Formats the header average and the points' descriptions, in the default locale. */
     val ValueFormatter: (Double) -> String = { NumberFormat.getInstance().format(it) }
 
     /** How the strip scrolls, zooms and rescales when the entries change; pass it as `entryAnimationSpec`. */
@@ -76,19 +77,22 @@ object LineChartDefaults {
     fun colors(
         lineColor: Color = MaterialTheme.colorScheme.primary,
         pointColor: Color = MaterialTheme.colorScheme.primary,
-        labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant
-    ): LineChartColors = LineChartColors(lineColor, pointColor, labelColor)
+        labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+        contentColor: Color = MaterialTheme.colorScheme.onSurface
+    ): LineChartColors = LineChartColors(lineColor, pointColor, labelColor, contentColor)
 }
 
 /**
  * Each entry as a point, scaled on the largest value, joined to its neighbours by a line. With an
  * [entryAnimationSpec], entry changes animate as one strip matched by key: the shown keys scroll and
- * zoom to the new ones, so added points slide in and removed ones slide out at the edges.
+ * zoom to the new ones, so added points slide in and removed ones slide out at the edges. With an
+ * [averageLabel], a header shows the average of the entries with data, labelled with it.
  */
 @Composable
 fun LineChart(
     modifier: Modifier = Modifier,
     entries: List<LineChartEntry>,
+    averageLabel: String? = null,
     onVisibleCountChanged: (Int) -> Unit = {},
     valueFormatter: (Double) -> String = LineChartDefaults.ValueFormatter,
     colors: LineChartColors = LineChartDefaults.colors(),
@@ -114,6 +118,11 @@ fun LineChart(
         val viewportWidth = maxWidth
 
         Column(modifier = Modifier.fillMaxWidth()) {
+            if (averageLabel != null) {
+                val average = remember(entries) { entries.mapNotNull { it.value }.takeIf { it.isNotEmpty() }?.average() }
+                ChartHeader(value = average?.let(valueFormatter) ?: "", label = averageLabel, color = colors.contentColor)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             LineChartPlot(
                 strip = strip,
                 isAnimated = entryAnimationSpec != null,
@@ -239,7 +248,7 @@ private fun previewEntries(count: Int): List<LineChartEntry> = (0 until count).m
 fun LineChartPreview() {
     MaterialTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
-            LineChart(entries = previewEntries(12))
+            LineChart(entries = previewEntries(12), averageLabel = "Monthly average")
         }
     }
 }
@@ -249,7 +258,7 @@ fun LineChartPreview() {
 fun LineChartManyEntriesPreview() {
     MaterialTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
-            LineChart(entries = previewEntries(24), entryAnimationSpec = LineChartDefaults.EntryAnimationSpec)
+            LineChart(entries = previewEntries(24), averageLabel = "Monthly average", entryAnimationSpec = LineChartDefaults.EntryAnimationSpec)
         }
     }
 }

@@ -64,12 +64,14 @@ class LineChartTest {
     @Composable
     private fun TestLineChart(
         entries: List<LineChartEntry>,
+        averageLabel: String? = null,
         onVisibleCountChanged: (Int) -> Unit = {},
         pointSpacing: Dp = LineChartDefaults.PointSpacing,
         entryAnimationSpec: FiniteAnimationSpec<Float>? = null
     ) = Box(Modifier.requiredWidth(300.dp).testTag("chart")) {
         LineChart(
             entries = entries,
+            averageLabel = averageLabel,
             onVisibleCountChanged = onVisibleCountChanged,
             valueFormatter = { "€ %.2f".format(Locale.US, it) },
             pointSpacing = pointSpacing,
@@ -186,6 +188,52 @@ class LineChartTest {
             assertThat(x).isWithin(tolerance).of((i + 0.5f) * width / values.size)
             assertThat(y).isWithin(tolerance).of(radius + (1f - (values[i] / 90.0).toFloat()) * (height - 2 * radius))
         }
+    }
+
+    @Test
+    fun header_showsTheAverageOfTheEntries_withItsLabel() {
+        setChart { TestLineChart(entries = entries, averageLabel = "Average") }
+
+        // (90 + 100 + 110 + 120) / 4
+        composeTestRule.onNodeWithText("€ 105.00").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Average").assertIsDisplayed()
+    }
+
+    @Test
+    fun header_leavesEntriesWithoutDataOutOfTheAverage_butCountsZeros() {
+        setChart { TestLineChart(entries = partlyTracked, averageLabel = "Average") }
+
+        // (0 + 120) / 2
+        composeTestRule.onNodeWithText("€ 60.00").assertIsDisplayed()
+    }
+
+    @Test
+    fun withoutAverageLabel_noHeaderIsShown() {
+        setChart { TestLineChart(entries = entries) }
+
+        composeTestRule.onNodeWithText("€ 105.00").assertDoesNotExist()
+    }
+
+    @Test
+    fun noEntryWithData_headerShowsTheLabelWithoutAValue() {
+        setChart { TestLineChart(entries = partlyTracked.take(2), averageLabel = "Average") }
+
+        composeTestRule.onNodeWithText("Average").assertIsDisplayed()
+        composeTestRule.onNodeWithText("€", substring = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun withEntryAnimation_headerShowsTheAverageOfTheNewEntries() {
+        var shown by mutableStateOf(twoYears.takeLast(12))
+        setChart { TestLineChart(entries = shown, averageLabel = "Average", entryAnimationSpec = tween(durationMillis = 500)) }
+        // 22 to 33.
+        composeTestRule.onNodeWithText("€ 27.50").assertIsDisplayed()
+
+        shown = twoYears.takeLast(6)
+        composeTestRule.waitForIdle()
+
+        // 28 to 33.
+        composeTestRule.onNodeWithText("€ 30.50").assertIsDisplayed()
     }
 
     @Test
