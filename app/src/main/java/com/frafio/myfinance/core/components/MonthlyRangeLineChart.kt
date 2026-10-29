@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.frafio.charts.LineChart
+import com.frafio.charts.LineChartColors
 import com.frafio.charts.LineChartDefaults
 import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
@@ -25,7 +26,8 @@ fun MonthlyRangeLineChart(
     modifier: Modifier = Modifier,
     availableRanges: List<Int> = ALL_MONTH_RANGES,
     trackingStart: LocalDate? = null,
-    onVisibleCountChanged: (Int) -> Unit = {}
+    onVisibleCountChanged: (Int) -> Unit = {},
+    colors: LineChartColors = LineChartDefaults.colors()
 ) {
     val shown = totals.takeLast(shownCount)
 
@@ -38,6 +40,7 @@ fun MonthlyRangeLineChart(
             },
             onVisibleCountChanged = onVisibleCountChanged,
             valueFormatter = ::doubleToPrice,
+            colors = colors,
             entryAnimationSpec = LineChartDefaults.EntryAnimationSpec
         )
     }

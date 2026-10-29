@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.categorydetail
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Column
@@ -39,12 +40,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.frafio.charts.LineChartDefaults
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.CategoryIcon
 import com.frafio.myfinance.core.components.MonthlyRangeLineChart
 import com.frafio.myfinance.core.components.SpendingChangeChip
 import com.frafio.myfinance.core.components.TransactionListItem
+import com.frafio.myfinance.core.data.model.CategoryColors
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.ExpenseCategory
@@ -144,6 +147,7 @@ fun CategoryDetailContent(
                 if (stats != null) {
                     StatsGrid(stats = stats, year = month.year)
                     TrendCard(
+                        colors = category.colors,
                         trend = trend,
                         range = trendRange,
                         onRangeChange = onTrendRangeChange,
@@ -344,6 +348,7 @@ private fun StatCard(
 
 @Composable
 private fun TrendCard(
+    colors: CategoryColors,
     trend: List<MonthlyTotal>,
     range: Int,
     onRangeChange: (Int) -> Unit,
@@ -373,7 +378,8 @@ private fun TrendCard(
                 onSelectedRangeChange = onRangeChange,
                 availableRanges = availableRanges,
                 trackingStart = trackingStart,
-                onVisibleCountChanged = onVisibleCountChanged
+                onVisibleCountChanged = onVisibleCountChanged,
+                colors = colors.text(isSystemInDarkTheme()).let { LineChartDefaults.colors(lineColor = it, pointColor = it) }
             )
         }
     }
