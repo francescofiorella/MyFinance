@@ -42,12 +42,8 @@ fun MonthlyTotal.toBarChartEntry(hasData: Boolean = true): BarChartEntry {
 }
 
 /**
- * The month's point: keyed by months since year zero, labelled "MMMM yyyy" and "MM" on the axis.
- * Without [hasData] it has no value, so the chart draws no point and breaks the line there.
+ * The month's point, keyed and labelled like its bar. Without [hasData] it has no value, so the chart
+ * draws no point and breaks the line there.
  */
-fun MonthlyTotal.toLineChartEntry(hasData: Boolean = true): LineChartEntry = LineChartEntry(
-    key = year * 12 + month - 1,
-    value = value.takeIf { hasData },
-    label = YearMonth.of(year, month).format(DateTimeFormatter.ofPattern("MMMM yyyy")),
-    axisLabel = "%02d".format(month).takeLast(2)
-)
+fun MonthlyTotal.toLineChartEntry(hasData: Boolean = true): LineChartEntry =
+    toBarChartEntry(hasData).let { LineChartEntry(it.key, it.value, it.label, it.axisLabel, it.selectedAxisLabel) }

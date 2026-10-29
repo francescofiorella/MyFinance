@@ -56,7 +56,8 @@ class LineChartTest {
         key = year * 12 + month - 1,
         value = value,
         label = YearMonth.of(year, month).format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.US)),
-        axisLabel = "%02d".format(month)
+        axisLabel = "%02d".format(month),
+        selectedAxisLabel = "%02d/%02d".format(month, year % 100)
     )
 
     private fun setChart(content: @Composable () -> Unit) = composeTestRule.setContent { MaterialTheme(content = content) }
@@ -88,13 +89,14 @@ class LineChartTest {
     private fun DpRect.centerY() = (top + bottom).value / 2
 
     @Test
-    fun axis_showsEveryEntryLabel() {
+    fun axis_showsEveryEntryLabel_withTheLatestAsMonthYear() {
         setChart { TestLineChart(entries = entries) }
 
         composeTestRule.onNodeWithText("09").assertIsDisplayed()
         composeTestRule.onNodeWithText("10").assertIsDisplayed()
         composeTestRule.onNodeWithText("11").assertIsDisplayed()
-        composeTestRule.onNodeWithText("12").assertIsDisplayed()
+        composeTestRule.onNodeWithText("12/24").assertIsDisplayed()
+        composeTestRule.onNodeWithText("12").assertDoesNotExist()
     }
 
     @Test
@@ -155,7 +157,7 @@ class LineChartTest {
         setChart { TestLineChart(entries = partlyTracked) }
 
         val december = point("December 2024").getUnclippedBoundsInRoot()
-        val decemberLabel = composeTestRule.onNodeWithText("12").getUnclippedBoundsInRoot()
+        val decemberLabel = composeTestRule.onNodeWithText("12/24").getUnclippedBoundsInRoot()
         val septemberLabel = composeTestRule.onNodeWithText("09").getUnclippedBoundsInRoot()
         assertThat(december.centerX()).isWithin(1f).of(decemberLabel.centerX())
         // Four slots share the width, entries without data included.
@@ -270,7 +272,9 @@ class LineChartTest {
 
         // 300 dp / 24 = 12.5 dp per point → a label every 2 points, counting back from December 2024.
         composeTestRule.onAllNodes(points).assertCountEquals(24)
-        composeTestRule.onAllNodesWithText("12").assertCountEquals(2)
+        // December 2023, and December 2024 with its year.
+        composeTestRule.onAllNodesWithText("12").assertCountEquals(1)
+        composeTestRule.onNodeWithText("12/24").assertIsDisplayed()
         composeTestRule.onAllNodesWithText("11").assertCountEquals(0)
         composeTestRule.onAllNodesWithText("10").assertCountEquals(2)
     }

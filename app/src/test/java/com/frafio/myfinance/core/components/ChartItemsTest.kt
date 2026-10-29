@@ -35,6 +35,7 @@ class ChartItemsTest {
         assertThat(entry.value).isEqualTo(120.0)
         assertThat(entry.label).isEqualTo("March 2024")
         assertThat(entry.axisLabel).isEqualTo("03")
+        assertThat(entry.selectedAxisLabel).isEqualTo("03/24")
     }
 
     @Test

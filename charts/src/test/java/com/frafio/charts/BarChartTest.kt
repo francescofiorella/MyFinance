@@ -97,7 +97,7 @@ class BarChartTest {
     }
 
     @Test
-    fun axis_showsTwoDigitMonths_withNothingSelectedByDefault() {
+    fun axis_showsTwoDigitMonths_andTheLatestAsMonthYear_withNothingSelected() {
         setChart {
             Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries) }
         }
@@ -105,8 +105,8 @@ class BarChartTest {
         composeTestRule.onNodeWithText("09").assertIsDisplayed()
         composeTestRule.onNodeWithText("10").assertIsDisplayed()
         composeTestRule.onNodeWithText("11").assertIsDisplayed()
-        composeTestRule.onNodeWithText("12").assertIsDisplayed()
-        composeTestRule.onNodeWithText("12/24").assertDoesNotExist()
+        composeTestRule.onNodeWithText("12/24").assertIsDisplayed()
+        composeTestRule.onNodeWithText("12").assertDoesNotExist()
     }
 
     @Test
@@ -123,6 +123,7 @@ class BarChartTest {
         composeTestRule.onNodeWithText("October 2024").assertIsDisplayed()
         composeTestRule.onNodeWithText("10/24").assertIsDisplayed()
         composeTestRule.onNodeWithText("12").assertIsDisplayed()
+        composeTestRule.onNodeWithText("12/24").assertDoesNotExist()
     }
 
     @Test
@@ -139,6 +140,7 @@ class BarChartTest {
         composeTestRule.onNodeWithText("€ 105.00").assertIsDisplayed()
         composeTestRule.onNodeWithText("October 2024").assertDoesNotExist()
         composeTestRule.onNodeWithText("10").assertIsDisplayed()
+        composeTestRule.onNodeWithText("12/24").assertIsDisplayed()
         composeTestRule.onAllNodes(isToggleable() and isOn()).assertCountEquals(0)
     }
 
@@ -230,7 +232,7 @@ class BarChartTest {
         val width = bar("December 2024").getUnclippedBoundsInRoot().width
         assertThat(width.value).isWithin(1f).of(300f / 4 - 2 * BarChartDefaults.BarPadding.value)
         val september = composeTestRule.onNodeWithText("09").getUnclippedBoundsInRoot()
-        val december = composeTestRule.onNodeWithText("12").getUnclippedBoundsInRoot()
+        val december = composeTestRule.onNodeWithText("12/24").getUnclippedBoundsInRoot()
         assertThat((december.left + december.right).value / 2 - (september.left + september.right).value / 2)
             .isWithin(1f).of(3 * 300f / 4)
     }
@@ -270,7 +272,8 @@ class BarChartTest {
         composeTestRule.onNodeWithText("€ 60.00").assertIsDisplayed()
         composeTestRule.onNodeWithText("December 2024").assertDoesNotExist()
         composeTestRule.onNodeWithText("09/24").assertDoesNotExist()
-        composeTestRule.onNodeWithText("12/24").assertDoesNotExist()
+        // The latest still shows its year, as nothing is selected.
+        composeTestRule.onNodeWithText("12/24").assertIsDisplayed()
     }
 
     @Test
@@ -337,7 +340,9 @@ class BarChartTest {
         composeTestRule.onAllNodes(isToggleable()).assertCountEquals(24)
         composeTestRule.onAllNodesWithText("11").assertCountEquals(0)
         composeTestRule.onAllNodesWithText("10").assertCountEquals(2)
-        composeTestRule.onAllNodesWithText("12").assertCountEquals(2)
+        // December 2023, and December 2024 with its year.
+        composeTestRule.onAllNodesWithText("12").assertCountEquals(1)
+        composeTestRule.onNodeWithText("12/24").assertIsDisplayed()
     }
 
     @Test
@@ -434,7 +439,7 @@ class BarChartTest {
 
         composeTestRule.onAllNodes(isToggleable()).assertCountEquals(12)
         composeTestRule.onNodeWithText("01").assertIsDisplayed()
-        composeTestRule.onNodeWithText("12").assertIsDisplayed()
+        composeTestRule.onNodeWithText("12/24").assertIsDisplayed()
         composeTestRule.onAllNodes(isToggleable() and isOn()).assertCountEquals(0)
         // The average of 2024's 22 to 33.
         composeTestRule.onNodeWithText("€ 27.50").assertIsDisplayed()

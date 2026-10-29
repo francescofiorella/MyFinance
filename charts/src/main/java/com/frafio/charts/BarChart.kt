@@ -52,7 +52,8 @@ import kotlin.math.roundToInt
 /**
  * A bar of a [BarChart]. [key] orders the bars and identifies one across entry changes; keys need
  * not be consecutive (e.g. months since year zero, with gaps). [label] is shown in the header once selected
- * and read by accessibility services, [axisLabel] under the bar, and [selectedAxisLabel] under it once selected.
+ * and read by accessibility services, [axisLabel] under the bar, and [selectedAxisLabel] under it once selected
+ * or, with nothing selected, under the latest bar.
  * A null [value] means no data: the slot and its axis label stay, but no bar is drawn and it can't be selected.
  */
 data class BarChartEntry(
@@ -213,7 +214,7 @@ fun BarChart(
                 strip = strip,
                 selectedIndex = shownIndex,
                 viewportWidth = viewportWidth,
-                label = { entry, isSelected -> if (isSelected) entry.selectedAxisLabel else entry.axisLabel },
+                label = { entry, isExtended -> if (isExtended) entry.selectedAxisLabel else entry.axisLabel },
                 color = colors.secondaryContentColor,
                 selectedColor = colors.contentColor
             )

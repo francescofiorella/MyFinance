@@ -184,7 +184,8 @@ internal fun <E> rememberEntryStrip(
 
 /**
  * A label under each slot of [strip], thinned out on narrow slots. [selectedIndex] points into the
- * entries, -1 for no selection; [label] gets whether the entry is the selected one.
+ * entries, -1 for no selection; [label] gets whether the entry shows its extended label: the selected one,
+ * or with none the latest, so the period stays readable.
  */
 @Composable
 internal fun <E> StripAxis(
@@ -217,8 +218,9 @@ internal fun <E> StripAxis(
             val center = position - start + 0.5f
             val isInside = center in 0f..visibleSlots
             val isSelected = position == selectedPosition
+            val isExtended = isSelected || (selectedPosition < 0 && position == latestPosition)
             Text(
-                text = label(item.entry, isSelected),
+                text = label(item.entry, isExtended),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                 color = if (isSelected) selectedColor else color,

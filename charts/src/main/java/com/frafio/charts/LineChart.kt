@@ -36,14 +36,16 @@ import kotlin.math.roundToInt
 
 /**
  * A point of a [LineChart]. [key] orders the points and identifies one across entry changes; keys need
- * not be consecutive. [label] is read by accessibility services and [axisLabel] is shown under the point.
+ * not be consecutive. [label] is read by accessibility services, [axisLabel] is shown under the point and
+ * [selectedAxisLabel] under the latest one.
  * A null [value] means no data: the slot and its axis label stay, but no point is drawn and the line breaks.
  */
 data class LineChartEntry(
     val key: Int,
     val value: Double?,
     val label: String,
-    val axisLabel: String
+    val axisLabel: String,
+    val selectedAxisLabel: String = axisLabel
 )
 
 /** The colors of a [LineChart]: [labelColor] for the axis labels, [contentColor] for the header. */
@@ -138,7 +140,7 @@ fun LineChart(
                 strip = strip,
                 selectedIndex = -1,
                 viewportWidth = viewportWidth,
-                label = { entry, _ -> entry.axisLabel },
+                label = { entry, isExtended -> if (isExtended) entry.selectedAxisLabel else entry.axisLabel },
                 color = colors.labelColor,
                 selectedColor = colors.labelColor
             )
@@ -239,7 +241,8 @@ private fun previewEntries(count: Int): List<LineChartEntry> = (0 until count).m
             else -> 60.0 + (it * 37) % 190
         },
         label = "$month/$year",
-        axisLabel = month
+        axisLabel = month,
+        selectedAxisLabel = "$month/${year % 100}"
     )
 }
 
