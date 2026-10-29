@@ -1,5 +1,7 @@
 package com.frafio.charts
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -11,12 +13,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +46,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
+import androidx.graphics.shapes.RoundedPolygon
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import kotlin.math.roundToInt
 
@@ -70,6 +78,12 @@ data class LineChartColors(
 
 object LineChartDefaults {
     val PointSize: Dp = 8.dp
+    val SelectedPointSize: Dp = 16.dp
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    val PointShape: RoundedPolygon = MaterialShapes.Circle
+    /** The shape the selected point morphs into, e.g. `MaterialShapes.SoftBurst`. */
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    val SelectedPointShape: RoundedPolygon = MaterialShapes.Circle
     val LineWidth: Dp = 2.dp
 
     /** The space left between a point and the line reaching it. */
@@ -110,6 +124,9 @@ fun LineChart(
     valueFormatter: (Double) -> String = LineChartDefaults.ValueFormatter,
     colors: LineChartColors = LineChartDefaults.colors(),
     pointSize: Dp = LineChartDefaults.PointSize,
+    selectedPointSize: Dp = LineChartDefaults.SelectedPointSize,
+    pointShape: RoundedPolygon = LineChartDefaults.PointShape,
+    selectedPointShape: RoundedPolygon = LineChartDefaults.SelectedPointShape,
     lineWidth: Dp = LineChartDefaults.LineWidth,
     pointGap: Dp = LineChartDefaults.PointGap,
     pointSpacing: Dp = LineChartDefaults.PointSpacing,
@@ -130,6 +147,9 @@ fun LineChart(
         valueFormatter = valueFormatter,
         colors = colors,
         pointSize = pointSize,
+        selectedPointSize = selectedPointSize,
+        pointShape = pointShape,
+        selectedPointShape = selectedPointShape,
         lineWidth = lineWidth,
         pointGap = pointGap,
         pointSpacing = pointSpacing,
@@ -143,7 +163,8 @@ fun LineChart(
  * selection. The header shows the selected entry, or with nothing selected the average of the entries with
  * data, labelled [averageLabel]. A [selectedIndex] outside [entries] (e.g. -1) or on an entry without data
  * selects nothing; tapping anywhere in a point's slot selects it, and tapping the selected one clears the
- * selection, reporting -1. With an [entryAnimationSpec], entry changes animate as one strip matched by key:
+ * selection, reporting -1. The selected point grows to [selectedPointSize] and morphs from [pointShape] into
+ * [selectedPointShape]. With an [entryAnimationSpec], entry changes animate as one strip matched by key:
  * the shown keys scroll and zoom to the new ones, so added points slide in and removed ones slide out at the edges.
  */
 @Composable
@@ -157,6 +178,9 @@ fun LineChart(
     valueFormatter: (Double) -> String = LineChartDefaults.ValueFormatter,
     colors: LineChartColors = LineChartDefaults.colors(),
     pointSize: Dp = LineChartDefaults.PointSize,
+    selectedPointSize: Dp = LineChartDefaults.SelectedPointSize,
+    pointShape: RoundedPolygon = LineChartDefaults.PointShape,
+    selectedPointShape: RoundedPolygon = LineChartDefaults.SelectedPointShape,
     lineWidth: Dp = LineChartDefaults.LineWidth,
     pointGap: Dp = LineChartDefaults.PointGap,
     pointSpacing: Dp = LineChartDefaults.PointSpacing,
@@ -197,6 +221,9 @@ fun LineChart(
                 valueFormatter = valueFormatter,
                 colors = colors,
                 pointSize = pointSize,
+                selectedPointSize = selectedPointSize,
+                pointShape = pointShape,
+                selectedPointShape = selectedPointShape,
                 lineWidth = lineWidth,
                 pointGap = pointGap,
                 plotHeight = plotHeight
@@ -223,10 +250,30 @@ private fun LineChartPlot(
     valueFormatter: (Double) -> String,
     colors: LineChartColors,
     pointSize: Dp,
+    selectedPointSize: Dp,
+    pointShape: RoundedPolygon,
+    selectedPointShape: RoundedPolygon,
     lineWidth: Dp,
     pointGap: Dp,
     plotHeight: Dp
 ) {
+    // One progress per entry key: the selected point grows and morphs while the previous one shrinks back.
+    val selectionSpec = MaterialTheme.motionScheme.fastSpatialSpec<Float>()
+    val selectedKey = strip.items.firstOrNull { it.index >= 0 && it.index == selectedIndex }?.entry?.key
+    val selection = remember { PointSelection() }
+    selection.add(strip.items.map { it.entry.key }, selectedKey)
+    LaunchedEffect(selectedKey) {
+        selection.animateTo(selectedKey, selectionSpec)
+    }
+    SideEffect {
+        selection.retain(strip.items.mapTo(HashSet()) { it.entry.key })
+    }
+    val progressOf: (StripItem<LineChartEntry>) -> Float = { selection.progressOf(it.entry.key) }
+    val sizeOf: (StripItem<LineChartEntry>) -> Dp = { lerp(pointSize, selectedPointSize, progressOf(it)) }
+    // Points keep clear of the plot's edges at their largest.
+    val insetRadius = maxOf(pointSize, selectedPointSize) / 2
+    val morph = remember(pointShape, selectedPointShape) { ShapeMorph(pointShape, selectedPointShape) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -251,29 +298,61 @@ private fun LineChartPlot(
                     }
                 }
         ) {
-            // Fractions are read while drawing and placing, so animation frames don't recompose.
+            // Fractions and selection progress are read while drawing and placing, so animation frames don't recompose.
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val items = strip.items
                 if (items.isEmpty()) return@Canvas
-                val radius = pointSize.toPx() / 2
-                val centers = items.indices.map { pointCenter(it, items.size, items[it].fraction(), size, radius) }
-                // Each segment stops short of its points, its round caps included.
-                val inset = radius + pointGap.toPx() + lineWidth.toPx() / 2
+                val centers = items.indices.map { pointCenter(it, items.size, items[it].fraction(), size, insetRadius.toPx()) }
+                val radii = items.map { sizeOf(it).toPx() / 2 }
+                // Each segment stops short of its two points, as they are now, its round caps included.
+                val clearance = pointGap.toPx() + lineWidth.toPx() / 2
                 for (i in 1 until items.size) {
                     // Entries without data break the line.
                     if (items[i - 1].entry.value == null || items[i].entry.value == null) continue
                     val start = centers[i - 1]
                     val end = centers[i]
                     val length = (end - start).getDistance()
-                    if (length <= 2 * inset) continue
-                    val shift = (end - start) * (inset / length)
-                    drawLine(colors.lineColor, start + shift, end - shift, lineWidth.toPx(), StrokeCap.Round)
+                    val startInset = radii[i - 1] + clearance
+                    val endInset = radii[i] + clearance
+                    if (length <= startInset + endInset) continue
+                    val direction = (end - start) / length
+                    drawLine(colors.lineColor, start + direction * startInset, end - direction * endInset, lineWidth.toPx(), StrokeCap.Round)
                 }
                 items.forEachIndexed { i, item ->
-                    if (item.entry.value != null) drawCircle(colors.pointColor, radius, centers[i])
+                    if (item.entry.value == null) return@forEachIndexed
+                    morph.draw(this, progressOf(item), Size(radii[i] * 2, radii[i] * 2), centers[i], colors.pointColor)
                 }
             }
-            PointNodes(strip = strip, selectedIndex = selectedIndex, onToggle = toggle, valueFormatter = valueFormatter, pointSize = pointSize)
+            PointNodes(
+                strip = strip,
+                selectedIndex = selectedIndex,
+                onToggle = toggle,
+                valueFormatter = valueFormatter,
+                sizeOf = sizeOf,
+                insetRadius = insetRadius
+            )
+        }
+    }
+}
+
+/** Each point's selection progress by entry key, from 0 to 1 once selected. */
+private class PointSelection {
+    private val progresses = HashMap<Int, Animatable<Float, AnimationVector1D>>()
+
+    /** Points not seen yet start where they belong, so they don't animate in. */
+    fun add(keys: List<Int>, selectedKey: Int?) {
+        keys.forEach { key -> progresses.getOrPut(key) { Animatable(if (key == selectedKey) 1f else 0f) } }
+    }
+
+    fun retain(keys: Set<Int>) {
+        progresses.keys.retainAll(keys)
+    }
+
+    fun progressOf(key: Int): Float = progresses[key]?.value ?: 0f
+
+    suspend fun animateTo(selectedKey: Int?, spec: FiniteAnimationSpec<Float>) = coroutineScope {
+        progresses.toList().forEach { (key, progress) ->
+            launch { progress.animateTo(if (key == selectedKey) 1f else 0f, spec) }
         }
     }
 }
@@ -282,14 +361,18 @@ private fun LineChartPlot(
 private fun pointCenter(index: Int, count: Int, fraction: Float, size: Size, radius: Float): Offset =
     Offset((index + 0.5f) * size.width / count, radius + (1f - fraction) * (size.height - 2 * radius))
 
-/** An invisible node over each drawn point, for accessibility services, which select it through [onToggle]. */
+/**
+ * An invisible node over each drawn point, sized as it is drawn ([sizeOf]), for accessibility services,
+ * which select it through [onToggle].
+ */
 @Composable
 private fun PointNodes(
     strip: EntryStrip<LineChartEntry>,
     selectedIndex: Int,
     onToggle: (StripItem<LineChartEntry>) -> Unit,
     valueFormatter: (Double) -> String,
-    pointSize: Dp
+    sizeOf: (StripItem<LineChartEntry>) -> Dp,
+    insetRadius: Dp
 ) {
     val items = strip.items
     val withData = items.indices.filter { items[it].entry.value != null }
@@ -300,30 +383,30 @@ private fun PointNodes(
                 val item = items[i]
                 val description = stringResource(R.string.charts_item_description, item.entry.label, valueFormatter(item.entry.value!!))
                 Box(
-                    modifier = Modifier
-                        .size(pointSize)
-                        .semantics {
-                            contentDescription = description
-                            role = Role.Button
-                            selected = item.index >= 0 && item.index == selectedIndex
-                            if (item.index >= 0) {
-                                onClick {
-                                    onToggle(item)
-                                    true
-                                }
+                    modifier = Modifier.semantics {
+                        contentDescription = description
+                        role = Role.Button
+                        selected = item.index >= 0 && item.index == selectedIndex
+                        if (item.index >= 0) {
+                            onClick {
+                                onToggle(item)
+                                true
                             }
                         }
+                    }
                 )
             }
         }
     ) { measurables, constraints ->
-        val placeables = measurables.map { it.measure(Constraints()) }
+        val placeables = measurables.mapIndexed { j, measurable ->
+            val size = sizeOf(items[withData[j]]).roundToPx().coerceAtLeast(0)
+            measurable.measure(Constraints.fixed(size, size))
+        }
         layout(constraints.maxWidth, constraints.maxHeight) {
             val size = Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat())
-            val radius = pointSize.toPx() / 2
             placeables.forEachIndexed { j, placeable ->
                 val i = withData[j]
-                val center = pointCenter(i, items.size, items[i].fraction(), size, radius)
+                val center = pointCenter(i, items.size, items[i].fraction(), size, insetRadius.toPx())
                 placeable.place((center.x - placeable.width / 2f).roundToInt(), (center.y - placeable.height / 2f).roundToInt())
             }
         }

@@ -29,7 +29,6 @@ import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
-import androidx.compose.material3.toPath
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -46,8 +45,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.Matrix
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -63,7 +60,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
-import androidx.graphics.shapes.Morph
 import androidx.graphics.shapes.RoundedPolygon
 import java.text.NumberFormat
 import kotlin.math.PI
@@ -460,7 +456,6 @@ fun PieChart(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun PieChartArc(
     contentDescription: String,
@@ -491,9 +486,7 @@ private fun PieChartArc(
     val tapExtraPx = with(density) { ArcTouchExtension.toPx() }
 
     // The icon's background morphs between the two shapes with the selection, in step with its size.
-    val morph = remember(iconShape, selectedIconShape) { Morph(iconShape, selectedIconShape) }
-    val morphPath = remember { Path() }
-    val morphMatrix = remember { Matrix() }
+    val morph = remember(iconShape, selectedIconShape) { ShapeMorph(iconShape, selectedIconShape) }
 
     // Thicker but not longer when grown, extended while pressed, pulled back for a pressed neighbour.
     val drawnSpan: () -> Pair<Float, Float> = {
@@ -584,13 +577,7 @@ private fun PieChartArc(
                 .size(iconSize)
                 .align(Alignment.Center)
                 .drawBehind {
-                    // Unit-sized polygons, scaled to the icon and centred, as Material's RoundedPolygon.toShape() does.
-                    morph.toPath(progress = selectionFactorState.value.coerceIn(0f, 1f), path = morphPath)
-                    morphMatrix.reset()
-                    morphMatrix.scale(size.width, size.height)
-                    morphPath.transform(morphMatrix)
-                    morphPath.translate(size.center - morphPath.getBounds().center)
-                    drawPath(morphPath, color)
+                    morph.draw(this, selectionFactorState.value, size, size.center, color)
                 }
                 .padding(6.dp)
         ) {

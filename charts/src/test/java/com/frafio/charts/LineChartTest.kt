@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.width
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -78,6 +79,7 @@ class LineChartTest {
         onPointClick: (Int) -> Unit = {},
         onVisibleCountChanged: (Int) -> Unit = {},
         pointSpacing: Dp = LineChartDefaults.PointSpacing,
+        selectedPointSize: Dp = LineChartDefaults.SelectedPointSize,
         entryAnimationSpec: FiniteAnimationSpec<Float>? = null
     ) = Box(Modifier.requiredWidth(300.dp).testTag("chart")) {
         LineChart(
@@ -87,6 +89,7 @@ class LineChartTest {
             onVisibleCountChanged = onVisibleCountChanged,
             valueFormatter = { "€ %.2f".format(Locale.US, it) },
             pointSpacing = pointSpacing,
+            selectedPointSize = selectedPointSize,
             entryAnimationSpec = entryAnimationSpec
         )
     }
@@ -142,9 +145,11 @@ class LineChartTest {
     fun points_spanThePlotHeight_fromZeroToTheLargestValue() {
         setChart { TestLineChart(entries = partlyTracked) }
 
+        // Points keep half the selected size clear of the plot's edges.
         val zero = point("November 2024").getUnclippedBoundsInRoot()
         val largest = point("December 2024").getUnclippedBoundsInRoot()
-        assertThat((zero.bottom - largest.top).value).isWithin(1f).of(LineChartDefaults.PlotHeight.value)
+        assertThat(zero.centerY() - largest.centerY())
+            .isWithin(1f).of(LineChartDefaults.PlotHeight.value - LineChartDefaults.SelectedPointSize.value)
         assertThat(largest.height.value).isWithin(0.5f).of(LineChartDefaults.PointSize.value)
     }
 
@@ -184,8 +189,11 @@ class LineChartTest {
         val density = Density(2.625f)
         val values = listOf(10.0, 70.0, 20.0, 55.0, 35.0, 90.0, 5.0)
         val sevenMonths = values.mapIndexed { i, value -> entry(value = value, year = 2024, month = i + 1) }
+        // A selected size equal to the point's keeps points at the plot's edges, so the largest sits on a whole pixel.
         setChart {
-            CompositionLocalProvider(LocalDensity provides density) { TestLineChart(entries = sevenMonths) }
+            CompositionLocalProvider(LocalDensity provides density) {
+                TestLineChart(entries = sevenMonths, selectedPointSize = LineChartDefaults.PointSize)
+            }
         }
 
         // The line joins (i + 0.5) slots across and r + (1 - f) * (height - 2r) down, in the plot's whole pixels.
@@ -276,6 +284,22 @@ class LineChartTest {
 
         point("October 2024").assertIsSelected()
         composeTestRule.onNodeWithText("October 2024").assertIsDisplayed()
+    }
+
+    @Test
+    fun selectedPoint_growsToTheSelectedSize_andShrinksBackOnceCleared() {
+        setChart { TestLineChart(entries = entries) }
+
+        point("October 2024").performClick()
+        composeTestRule.waitForIdle()
+
+        assertThat(point("October 2024").getUnclippedBoundsInRoot().width.value).isWithin(0.5f).of(LineChartDefaults.SelectedPointSize.value)
+        assertThat(point("September 2024").getUnclippedBoundsInRoot().width.value).isWithin(0.5f).of(LineChartDefaults.PointSize.value)
+
+        point("October 2024").performClick()
+        composeTestRule.waitForIdle()
+
+        assertThat(point("October 2024").getUnclippedBoundsInRoot().width.value).isWithin(0.5f).of(LineChartDefaults.PointSize.value)
     }
 
     @Test
@@ -416,7 +440,7 @@ class LineChartTest {
 
         val july = point("July 2024").getUnclippedBoundsInRoot()
         val december = point("December 2024").getUnclippedBoundsInRoot()
-        val travel = LineChartDefaults.PlotHeight.value - LineChartDefaults.PointSize.value
+        val travel = LineChartDefaults.PlotHeight.value - LineChartDefaults.SelectedPointSize.value
         assertThat((july.top - december.top).value).isWithin(1f).of(travel / 2)
     }
 }

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
@@ -17,6 +19,7 @@ import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
 import com.frafio.charts.BarChart
+import com.frafio.charts.LineChart
 import com.frafio.charts.PieChart
 import com.frafio.charts.ShareBar
 import com.frafio.charts.ShareBarItem
@@ -123,6 +126,25 @@ class ComponentScreenshotTests {
                         referenceValue = 300.0,
                         valueFormatter = ::doubleToPrice,
                         referenceValueFormatter = ::doubleToPriceWithoutDecimals,
+                    )
+                }
+            }
+        }
+    }
+
+    // A month selected, so its point shows as a soft burst.
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    @Test
+    fun lineChart_multipleThemes() {
+        composeTestRule.captureMultiTheme("LineChart") {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Box(Modifier.width(360.dp).padding(16.dp)) {
+                    LineChart(
+                        entries = screenshotBarChart.takeLast(6).map { it.toLineChartEntry() },
+                        selectedIndex = 3,
+                        onSelectedIndexChange = {},
+                        valueFormatter = ::doubleToPrice,
+                        selectedPointShape = MaterialShapes.SoftBurst,
                     )
                 }
             }
