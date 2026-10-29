@@ -97,10 +97,6 @@ object BarChartDefaults {
     ): BarChartColors = BarChartColors(barColor, selectedBarColor, contentColor, secondaryContentColor)
 }
 
-/** The entry shown as selected: [selectedIndex] if it has data, else -1 for none. */
-internal fun shownSelection(entries: List<BarChartEntry>, selectedIndex: Int): Int =
-    if (entries.getOrNull(selectedIndex)?.value != null) selectedIndex else -1
-
 /**
  * A bar chart that keeps its own selection, starting with none. [onBarClick] reports the selected bar,
  * or -1 once tapping it again clears the selection. With an [entryAnimationSpec], entry changes animate
@@ -175,7 +171,7 @@ fun BarChart(
             onVisibleCountChanged(maxVisibleItems)
         }
 
-        val shownIndex = shownSelection(entries, selectedIndex)
+        val shownIndex = shownSelection(entries.map { it.value }, selectedIndex)
         val maxValue = remember(entries) {
             val max = entries.mapNotNull { it.value }.maxOrNull() ?: 0.0
             if (max == 0.0) 1.0 else max
@@ -187,12 +183,14 @@ fun BarChart(
             modifier = Modifier.fillMaxWidth()
         ) {
             val entry = entries.getOrNull(shownIndex)
-            if (entry != null) {
-                ChartHeader(value = entry.value?.let(valueFormatter) ?: "", label = entry.label, color = colors.contentColor)
-            } else {
-                val average = remember(entries) { averageOf(entries.map { it.value }) }
-                ChartHeader(value = average?.let(valueFormatter) ?: "", label = averageLabel, color = colors.contentColor)
-            }
+            SelectionHeader(
+                selectedValue = entry?.value,
+                selectedLabel = entry?.label,
+                average = remember(entries) { averageOf(entries.map { it.value }) },
+                averageLabel = averageLabel,
+                valueFormatter = valueFormatter,
+                color = colors.contentColor
+            )
             Spacer(modifier = Modifier.height(16.dp))
             BarChartBars(
                 strip = strip,

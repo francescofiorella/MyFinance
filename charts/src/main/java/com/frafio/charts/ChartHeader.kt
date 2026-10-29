@@ -16,6 +16,26 @@ import androidx.compose.ui.unit.dp
 /** The average of the [values] with data, null if none has. */
 internal fun averageOf(values: List<Double?>): Double? = values.filterNotNull().takeIf { it.isNotEmpty() }?.average()
 
+/**
+ * The header of a chart with a selection: the selected entry's [selectedValue] and [selectedLabel], or with
+ * nothing selected ([selectedLabel] null) the [average], labelled [averageLabel].
+ */
+@Composable
+internal fun SelectionHeader(
+    selectedValue: Double?,
+    selectedLabel: String?,
+    average: Double?,
+    averageLabel: String,
+    valueFormatter: (Double) -> String,
+    color: Color
+) {
+    if (selectedLabel != null) {
+        ChartHeader(value = selectedValue?.let(valueFormatter) ?: "", label = selectedLabel, color = color)
+    } else {
+        ChartHeader(value = average?.let(valueFormatter) ?: "", label = averageLabel, color = color)
+    }
+}
+
 /** A large [value] with a small [label] beside it, above a chart. */
 @Composable
 internal fun ChartHeader(value: String, label: String, color: Color) {

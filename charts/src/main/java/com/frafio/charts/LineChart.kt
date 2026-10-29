@@ -2,6 +2,7 @@ package com.frafio.charts
 
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -16,16 +17,26 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
@@ -48,7 +59,7 @@ data class LineChartEntry(
     val selectedAxisLabel: String = axisLabel
 )
 
-/** The colors of a [LineChart]: [labelColor] for the axis labels, [contentColor] for the header. */
+/** The colors of a [LineChart]: [labelColor] for the axis labels, [contentColor] for the header and the selected axis label. */
 @Immutable
 data class LineChartColors(
     val lineColor: Color,
@@ -68,7 +79,7 @@ object LineChartDefaults {
     val PointSpacing: Dp = 46.dp
     val PlotHeight: Dp = 160.dp
 
-    /** Formats the header average and the points' descriptions, in the default locale. */
+    /** Formats the header value or average and the points' descriptions, in the default locale. */
     val ValueFormatter: (Double) -> String = { NumberFormat.getInstance().format(it) }
 
     /** How the strip scrolls, zooms and rescales when the entries change; pass it as `entryAnimationSpec`. */
@@ -85,16 +96,63 @@ object LineChartDefaults {
 }
 
 /**
- * Each entry as a point, scaled on the largest value, joined to its neighbours by a line. With an
- * [entryAnimationSpec], entry changes animate as one strip matched by key: the shown keys scroll and
- * zoom to the new ones, so added points slide in and removed ones slide out at the edges. With an
- * [averageLabel], a header shows the average of the entries with data, labelled with it.
+ * A line chart that keeps its own selection, starting with none. [onPointClick] reports the selected point,
+ * or -1 once tapping it again clears the selection. With an [entryAnimationSpec], entry changes animate as
+ * one strip matched by key.
  */
 @Composable
 fun LineChart(
     modifier: Modifier = Modifier,
     entries: List<LineChartEntry>,
-    averageLabel: String? = null,
+    averageLabel: String = "",
+    onPointClick: (Int) -> Unit = {},
+    onVisibleCountChanged: (Int) -> Unit = {},
+    valueFormatter: (Double) -> String = LineChartDefaults.ValueFormatter,
+    colors: LineChartColors = LineChartDefaults.colors(),
+    pointSize: Dp = LineChartDefaults.PointSize,
+    lineWidth: Dp = LineChartDefaults.LineWidth,
+    pointGap: Dp = LineChartDefaults.PointGap,
+    pointSpacing: Dp = LineChartDefaults.PointSpacing,
+    plotHeight: Dp = LineChartDefaults.PlotHeight,
+    entryAnimationSpec: FiniteAnimationSpec<Float>? = null
+) {
+    var selectedIndex by rememberSaveable { mutableIntStateOf(-1) }
+    LineChart(
+        modifier = modifier,
+        entries = entries,
+        selectedIndex = selectedIndex,
+        onSelectedIndexChange = {
+            selectedIndex = it
+            onPointClick(it)
+        },
+        averageLabel = averageLabel,
+        onVisibleCountChanged = onVisibleCountChanged,
+        valueFormatter = valueFormatter,
+        colors = colors,
+        pointSize = pointSize,
+        lineWidth = lineWidth,
+        pointGap = pointGap,
+        pointSpacing = pointSpacing,
+        plotHeight = plotHeight,
+        entryAnimationSpec = entryAnimationSpec
+    )
+}
+
+/**
+ * Each entry as a point, scaled on the largest value, joined to its neighbours by a line, with a hoisted
+ * selection. The header shows the selected entry, or with nothing selected the average of the entries with
+ * data, labelled [averageLabel]. A [selectedIndex] outside [entries] (e.g. -1) or on an entry without data
+ * selects nothing; tapping anywhere in a point's slot selects it, and tapping the selected one clears the
+ * selection, reporting -1. With an [entryAnimationSpec], entry changes animate as one strip matched by key:
+ * the shown keys scroll and zoom to the new ones, so added points slide in and removed ones slide out at the edges.
+ */
+@Composable
+fun LineChart(
+    modifier: Modifier = Modifier,
+    entries: List<LineChartEntry>,
+    selectedIndex: Int,
+    onSelectedIndexChange: (Int) -> Unit,
+    averageLabel: String = "",
     onVisibleCountChanged: (Int) -> Unit = {},
     valueFormatter: (Double) -> String = LineChartDefaults.ValueFormatter,
     colors: LineChartColors = LineChartDefaults.colors(),
@@ -116,17 +174,25 @@ fun LineChart(
             val max = entries.mapNotNull { it.value }.maxOrNull() ?: 0.0
             if (max == 0.0) 1.0 else max
         }
+        val shownIndex = shownSelection(entries.map { it.value }, selectedIndex)
         val strip = rememberEntryStrip(entries, maxValue, LineChartEntry::key, LineChartEntry::value, entryAnimationSpec)
         val viewportWidth = maxWidth
 
         Column(modifier = Modifier.fillMaxWidth()) {
-            if (averageLabel != null) {
-                val average = remember(entries) { averageOf(entries.map { it.value }) }
-                ChartHeader(value = average?.let(valueFormatter) ?: "", label = averageLabel, color = colors.contentColor)
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            val entry = entries.getOrNull(shownIndex)
+            SelectionHeader(
+                selectedValue = entry?.value,
+                selectedLabel = entry?.label,
+                average = remember(entries) { averageOf(entries.map { it.value }) },
+                averageLabel = averageLabel,
+                valueFormatter = valueFormatter,
+                color = colors.contentColor
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             LineChartPlot(
                 strip = strip,
+                selectedIndex = shownIndex,
+                onPointClick = onSelectedIndexChange,
                 isAnimated = entryAnimationSpec != null,
                 valueFormatter = valueFormatter,
                 colors = colors,
@@ -138,11 +204,11 @@ fun LineChart(
             Spacer(modifier = Modifier.height(4.dp))
             StripAxis(
                 strip = strip,
-                selectedIndex = -1,
+                selectedIndex = shownIndex,
                 viewportWidth = viewportWidth,
                 label = { entry, isExtended -> if (isExtended) entry.selectedAxisLabel else entry.axisLabel },
                 color = colors.labelColor,
-                selectedColor = colors.labelColor
+                selectedColor = colors.contentColor
             )
         }
     }
@@ -151,6 +217,8 @@ fun LineChart(
 @Composable
 private fun LineChartPlot(
     strip: EntryStrip<LineChartEntry>,
+    selectedIndex: Int,
+    onPointClick: (Int) -> Unit,
     isAnimated: Boolean,
     valueFormatter: (Double) -> String,
     colors: LineChartColors,
@@ -165,10 +233,23 @@ private fun LineChartPlot(
             .height(plotHeight)
             .then(if (isAnimated) Modifier.clipToBounds() else Modifier)
     ) {
+        // Selecting an entry, or clearing the selection when it's the selected one; entries sliding out can't be.
+        val toggle: (StripItem<LineChartEntry>) -> Unit = { item ->
+            if (item.index >= 0 && item.entry.value != null) onPointClick(if (item.index == selectedIndex) -1 else item.index)
+        }
+        val currentStrip by rememberUpdatedState(strip)
+        val currentToggle by rememberUpdatedState(toggle)
         Box(
             modifier = Modifier
                 .stripWindow(strip)
                 .fillMaxSize()
+                // A tap anywhere in a slot picks its entry, so points are easy to hit.
+                .pointerInput(Unit) {
+                    detectTapGestures { position ->
+                        val items = currentStrip.items
+                        items.getOrNull((position.x / size.width * items.size).toInt())?.let(currentToggle)
+                    }
+                }
         ) {
             // Fractions are read while drawing and placing, so animation frames don't recompose.
             Canvas(modifier = Modifier.fillMaxSize()) {
@@ -192,7 +273,7 @@ private fun LineChartPlot(
                     if (item.entry.value != null) drawCircle(colors.pointColor, radius, centers[i])
                 }
             }
-            PointNodes(strip = strip, valueFormatter = valueFormatter, pointSize = pointSize)
+            PointNodes(strip = strip, selectedIndex = selectedIndex, onToggle = toggle, valueFormatter = valueFormatter, pointSize = pointSize)
         }
     }
 }
@@ -201,18 +282,38 @@ private fun LineChartPlot(
 private fun pointCenter(index: Int, count: Int, fraction: Float, size: Size, radius: Float): Offset =
     Offset((index + 0.5f) * size.width / count, radius + (1f - fraction) * (size.height - 2 * radius))
 
-/** An invisible node over each drawn point, for accessibility services. */
+/** An invisible node over each drawn point, for accessibility services, which select it through [onToggle]. */
 @Composable
-private fun PointNodes(strip: EntryStrip<LineChartEntry>, valueFormatter: (Double) -> String, pointSize: Dp) {
+private fun PointNodes(
+    strip: EntryStrip<LineChartEntry>,
+    selectedIndex: Int,
+    onToggle: (StripItem<LineChartEntry>) -> Unit,
+    valueFormatter: (Double) -> String,
+    pointSize: Dp
+) {
     val items = strip.items
     val withData = items.indices.filter { items[it].entry.value != null }
     Layout(
         modifier = Modifier.fillMaxSize(),
         content = {
             withData.forEach { i ->
-                val entry = items[i].entry
-                val description = stringResource(R.string.charts_item_description, entry.label, valueFormatter(entry.value!!))
-                Box(modifier = Modifier.size(pointSize).semantics { contentDescription = description })
+                val item = items[i]
+                val description = stringResource(R.string.charts_item_description, item.entry.label, valueFormatter(item.entry.value!!))
+                Box(
+                    modifier = Modifier
+                        .size(pointSize)
+                        .semantics {
+                            contentDescription = description
+                            role = Role.Button
+                            selected = item.index >= 0 && item.index == selectedIndex
+                            if (item.index >= 0) {
+                                onClick {
+                                    onToggle(item)
+                                    true
+                                }
+                            }
+                        }
+                )
             }
         }
     ) { measurables, constraints ->
@@ -251,7 +352,7 @@ private fun previewEntries(count: Int): List<LineChartEntry> = (0 until count).m
 fun LineChartPreview() {
     MaterialTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
-            LineChart(entries = previewEntries(12), averageLabel = "Monthly average")
+            LineChart(entries = previewEntries(12), averageLabel = "average")
         }
     }
 }
@@ -261,7 +362,7 @@ fun LineChartPreview() {
 fun LineChartManyEntriesPreview() {
     MaterialTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
-            LineChart(entries = previewEntries(24), averageLabel = "Monthly average", entryAnimationSpec = LineChartDefaults.EntryAnimationSpec)
+            LineChart(entries = previewEntries(24), averageLabel = "average", entryAnimationSpec = LineChartDefaults.EntryAnimationSpec)
         }
     }
 }

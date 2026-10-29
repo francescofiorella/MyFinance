@@ -105,23 +105,21 @@ class ChartGeometryTest {
         assertThat(stripIndexAt(emptyList(), 5f)).isEqualTo(0f)
     }
 
-    private fun bar(value: Double?) = BarChartEntry(key = 0, value = value, label = "", axisLabel = "")
-
     @Test
     fun shownSelection_keepsASelectedEntryWithData() {
-        assertThat(shownSelection(listOf(bar(1.0), bar(2.0), bar(3.0)), selectedIndex = 1)).isEqualTo(1)
+        assertThat(shownSelection(listOf(1.0, 2.0, 3.0), selectedIndex = 1)).isEqualTo(1)
     }
 
     @Test
     fun shownSelection_outsideTheEntries_isNone() {
-        val entries = listOf(bar(1.0), bar(2.0), bar(null))
-        assertThat(shownSelection(entries, selectedIndex = -1)).isEqualTo(-1)
-        assertThat(shownSelection(entries, selectedIndex = 5)).isEqualTo(-1)
+        val values = listOf(1.0, 2.0, null)
+        assertThat(shownSelection(values, selectedIndex = -1)).isEqualTo(-1)
+        assertThat(shownSelection(values, selectedIndex = 5)).isEqualTo(-1)
     }
 
     @Test
     fun shownSelection_onAnEntryWithoutData_isNone() {
-        assertThat(shownSelection(listOf(bar(null), bar(null), bar(3.0)), selectedIndex = 0)).isEqualTo(-1)
+        assertThat(shownSelection(listOf(null, null, 3.0), selectedIndex = 0)).isEqualTo(-1)
     }
 
     @Test
@@ -137,7 +135,7 @@ class ChartGeometryTest {
 
     @Test
     fun shownSelection_withoutData_isNone() {
-        assertThat(shownSelection(listOf(bar(null), bar(null)), selectedIndex = -1)).isEqualTo(-1)
+        assertThat(shownSelection(listOf(null, null), selectedIndex = -1)).isEqualTo(-1)
         assertThat(shownSelection(emptyList(), selectedIndex = -1)).isEqualTo(-1)
     }
 

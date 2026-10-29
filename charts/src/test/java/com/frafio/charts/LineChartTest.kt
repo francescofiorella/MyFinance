@@ -12,18 +12,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpRect
@@ -34,6 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -65,7 +74,8 @@ class LineChartTest {
     @Composable
     private fun TestLineChart(
         entries: List<LineChartEntry>,
-        averageLabel: String? = null,
+        averageLabel: String = "Average",
+        onPointClick: (Int) -> Unit = {},
         onVisibleCountChanged: (Int) -> Unit = {},
         pointSpacing: Dp = LineChartDefaults.PointSpacing,
         entryAnimationSpec: FiniteAnimationSpec<Float>? = null
@@ -73,6 +83,7 @@ class LineChartTest {
         LineChart(
             entries = entries,
             averageLabel = averageLabel,
+            onPointClick = onPointClick,
             onVisibleCountChanged = onVisibleCountChanged,
             valueFormatter = { "€ %.2f".format(Locale.US, it) },
             pointSpacing = pointSpacing,
@@ -166,6 +177,8 @@ class LineChartTest {
     }
 
     @Test
+    // Tall enough for the whole chart at this density, so the plot keeps its height.
+    @Config(qualifiers = "h1000dp")
     fun points_sitExactlyWhereTheLineIsDrawn_onFractionalPixels() {
         // Seven slots of 300 dp at a phone density don't split into whole pixels.
         val density = Density(2.625f)
@@ -181,12 +194,14 @@ class LineChartTest {
         val radius = with(density) { LineChartDefaults.PointSize.toPx() } / 2
         // The chart is wider than the screen, so it is centred off its left edge.
         val chart = composeTestRule.onNodeWithTag("chart").getUnclippedBoundsInRoot()
+        // The largest point touches the top of the plot on a whole pixel, below the header.
+        val plotTop = point("June 2024").getUnclippedBoundsInRoot().top
         // A node is placed on whole pixels, so its centre can be half a pixel off.
         val tolerance = 0.51f
         sevenMonths.forEachIndexed { i, entry ->
             val bounds = point(entry.label).getUnclippedBoundsInRoot()
             val x = (bounds.centerX() - chart.left.value) * density.density
-            val y = (bounds.centerY() - chart.top.value) * density.density
+            val y = (bounds.centerY() - plotTop.value) * density.density
             assertThat(x).isWithin(tolerance).of((i + 0.5f) * width / values.size)
             assertThat(y).isWithin(tolerance).of(radius + (1f - (values[i] / 90.0).toFloat()) * (height - 2 * radius))
         }
@@ -194,7 +209,7 @@ class LineChartTest {
 
     @Test
     fun header_showsTheAverageOfTheEntries_withItsLabel() {
-        setChart { TestLineChart(entries = entries, averageLabel = "Average") }
+        setChart { TestLineChart(entries = entries) }
 
         // (90 + 100 + 110 + 120) / 4
         composeTestRule.onNodeWithText("€ 105.00").assertIsDisplayed()
@@ -203,22 +218,93 @@ class LineChartTest {
 
     @Test
     fun header_leavesEntriesWithoutDataOutOfTheAverage_butCountsZeros() {
-        setChart { TestLineChart(entries = partlyTracked, averageLabel = "Average") }
+        setChart { TestLineChart(entries = partlyTracked) }
 
         // (0 + 120) / 2
         composeTestRule.onNodeWithText("€ 60.00").assertIsDisplayed()
     }
 
     @Test
-    fun withoutAverageLabel_noHeaderIsShown() {
+    fun nothingIsSelectedByDefault() {
         setChart { TestLineChart(entries = entries) }
 
-        composeTestRule.onNodeWithText("€ 105.00").assertDoesNotExist()
+        composeTestRule.onAllNodes(isSelected()).assertCountEquals(0)
+        composeTestRule.onNodeWithText("Average").assertIsDisplayed()
+    }
+
+    @Test
+    fun tappingAPoint_selectsIt_andShowsItsMonth() {
+        val clicked = mutableListOf<Int>()
+        setChart { TestLineChart(entries = entries, onPointClick = { clicked += it }) }
+
+        point("October 2024").performClick()
+
+        assertThat(clicked).containsExactly(1)
+        point("October 2024").assertIsSelected()
+        composeTestRule.onNodeWithText("€ 100.00").assertIsDisplayed()
+        composeTestRule.onNodeWithText("October 2024").assertIsDisplayed()
+        composeTestRule.onNodeWithText("10/24").assertIsDisplayed()
+        // The latest goes back to its month alone.
+        composeTestRule.onNodeWithText("12").assertIsDisplayed()
+    }
+
+    @Test
+    fun tappingTheSelectedPointAgain_clearsTheSelection_andShowsTheAverage() {
+        val clicked = mutableListOf<Int>()
+        setChart { TestLineChart(entries = entries, onPointClick = { clicked += it }) }
+
+        point("October 2024").performClick()
+        point("October 2024").performClick()
+
+        assertThat(clicked).containsExactly(1, -1).inOrder()
+        composeTestRule.onAllNodes(isSelected()).assertCountEquals(0)
+        composeTestRule.onNodeWithText("€ 105.00").assertIsDisplayed()
+        composeTestRule.onNodeWithText("October 2024").assertDoesNotExist()
+        composeTestRule.onNodeWithText("12/24").assertIsDisplayed()
+    }
+
+    @Test
+    fun tappingNearTheEdgeOfASlot_selectsItsPoint() {
+        setChart { TestLineChart(entries = entries) }
+
+        // 2 dp into October's 75 dp slot, at September's height: far from October's point.
+        val chart = composeTestRule.onNodeWithTag("chart").getUnclippedBoundsInRoot()
+        val september = point("September 2024").getUnclippedBoundsInRoot()
+        composeTestRule.onNodeWithTag("chart").performTouchInput {
+            click(Offset(77.dp.toPx(), (september.centerY() - chart.top.value).dp.toPx()))
+        }
+
+        point("October 2024").assertIsSelected()
+        composeTestRule.onNodeWithText("October 2024").assertIsDisplayed()
+    }
+
+    @Test
+    fun accessibilityClick_selectsThePoint() {
+        setChart { TestLineChart(entries = entries) }
+
+        point("November 2024").performSemanticsAction(SemanticsActions.OnClick)
+
+        point("November 2024").assertIsSelected()
+        composeTestRule.onNodeWithText("November 2024").assertIsDisplayed()
+    }
+
+    @Test
+    fun hoistedSelection_onAnEntryWithoutData_selectsNothing_andShowsTheAverage() {
+        setChart {
+            Box(Modifier.requiredWidth(300.dp)) {
+                LineChart(entries = partlyTracked, selectedIndex = 0, onSelectedIndexChange = {}, valueFormatter = { "€ %.2f".format(Locale.US, it) })
+            }
+        }
+
+        // (0 + 120) / 2
+        composeTestRule.onNodeWithText("€ 60.00").assertIsDisplayed()
+        composeTestRule.onAllNodes(isSelected()).assertCountEquals(0)
+        composeTestRule.onNodeWithText("09/24").assertDoesNotExist()
     }
 
     @Test
     fun noEntryWithData_headerShowsTheLabelWithoutAValue() {
-        setChart { TestLineChart(entries = partlyTracked.take(2), averageLabel = "Average") }
+        setChart { TestLineChart(entries = partlyTracked.take(2)) }
 
         composeTestRule.onNodeWithText("Average").assertIsDisplayed()
         composeTestRule.onNodeWithText("€", substring = true).assertDoesNotExist()
@@ -227,7 +313,7 @@ class LineChartTest {
     @Test
     fun withEntryAnimation_headerShowsTheAverageOfTheNewEntries() {
         var shown by mutableStateOf(twoYears.takeLast(12))
-        setChart { TestLineChart(entries = shown, averageLabel = "Average", entryAnimationSpec = tween(durationMillis = 500)) }
+        setChart { TestLineChart(entries = shown, entryAnimationSpec = tween(durationMillis = 500)) }
         // 22 to 33.
         composeTestRule.onNodeWithText("€ 27.50").assertIsDisplayed()
 

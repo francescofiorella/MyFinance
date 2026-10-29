@@ -64,6 +64,10 @@ internal fun stripIndexAt(keys: List<Int>, key: Float): Float {
     return i + (key - keys[i]) / (keys[i + 1] - keys[i])
 }
 
+/** The entry shown as selected: [selectedIndex] if its value isn't null, else -1 for none. */
+internal fun shownSelection(values: List<Double?>, selectedIndex: Int): Int =
+    if (values.getOrNull(selectedIndex) != null) selectedIndex else -1
+
 /** The fraction of [maxValue] reached by [value], 0 without data. */
 private fun valueFraction(value: Double?, maxValue: Double): Float =
     value?.let { (it / maxValue).toFloat().coerceIn(0f, 1f) } ?: 0f
