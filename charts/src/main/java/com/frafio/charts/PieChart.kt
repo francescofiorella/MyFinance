@@ -4,16 +4,13 @@ import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
-import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +34,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,18 +59,12 @@ import androidx.compose.ui.unit.lerp
 import androidx.graphics.shapes.RoundedPolygon
 import com.frafio.charts.internal.ArcShape
 import com.frafio.charts.internal.ShapeMorph
+import com.frafio.charts.internal.followPresses
 import java.text.NumberFormat
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 object PieChartDefaults {
     val Radius: Dp = 80.dp
@@ -163,35 +153,6 @@ internal fun shiftedArcSpan(start: Float, sweep: Float, startPullBack: Float, en
  */
 internal fun pressExpansion(sweep: Float, previousSweep: Float, nextSweep: Float): Float =
     minOf(ButtonGroupDefaults.ExpandedRatio * sweep / 2, previousSweep / 2, nextSweep / 2)
-
-/** How far a press pulse grows before a release may shrink it, as in ButtonGroup: even a quick tap shows it. */
-private const val PressPulsePeak = 0.75f
-
-/** Animates to 1 while [interactions] hold a press and back to 0 after, only once past [PressPulsePeak], like ButtonGroup. */
-private suspend fun Animatable<Float, AnimationVector1D>.followPresses(
-    interactions: Flow<Interaction>,
-    spec: AnimationSpec<Float>
-) = coroutineScope {
-    val presses = mutableListOf<PressInteraction.Press>()
-    interactions
-        .map { interaction ->
-            when (interaction) {
-                is PressInteraction.Press -> presses.add(interaction)
-                is PressInteraction.Release -> presses.remove(interaction.press)
-                is PressInteraction.Cancel -> presses.remove(interaction.press)
-            }
-            presses.isNotEmpty()
-        }
-        .distinctUntilChanged()
-        .collectLatest { pressed ->
-            if (pressed) {
-                this@coroutineScope.launch { animateTo(1f, spec) }
-            } else {
-                snapshotFlow { value }.first { it > PressPulsePeak }
-                animateTo(0f, spec)
-            }
-        }
-}
 
 /** Each positive arc's previous and next positive arc, wrapping around; null for the others, or with fewer than two. */
 internal fun arcNeighbours(sweeps: List<Float>): List<Pair<Int, Int>?> {

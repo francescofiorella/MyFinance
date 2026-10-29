@@ -302,6 +302,50 @@ class LineChartTest {
         assertThat(point("October 2024").getUnclippedBoundsInRoot().width.value).isWithin(0.5f).of(LineChartDefaults.PointSize.value)
     }
 
+    /** Where [monthYear]'s point is, inside the chart. */
+    private fun pointOffset(monthYear: String): Offset {
+        val chart = composeTestRule.onNodeWithTag("chart").getUnclippedBoundsInRoot()
+        val point = point(monthYear).getUnclippedBoundsInRoot()
+        return with(composeTestRule.density) { Offset((point.centerX() - chart.left.value).dp.toPx(), (point.centerY() - chart.top.value).dp.toPx()) }
+    }
+
+    private fun pointWidth(monthYear: String) = point(monthYear).getUnclippedBoundsInRoot().width.value
+
+    @Test
+    fun pressingAPoint_growsItWhileHeld_andReleasingSelectsIt() {
+        setChart { TestLineChart(entries = entries) }
+        val october = pointOffset("October 2024")
+
+        composeTestRule.onNodeWithTag("chart").performTouchInput { down(october) }
+        composeTestRule.waitForIdle()
+
+        assertThat(pointWidth("October 2024")).isWithin(0.5f).of(LineChartDefaults.SelectedPointSize.value)
+        composeTestRule.onAllNodes(isSelected()).assertCountEquals(0)
+        composeTestRule.onNodeWithText("€ 105.00").assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("chart").performTouchInput { up() }
+        composeTestRule.waitForIdle()
+
+        point("October 2024").assertIsSelected()
+        assertThat(pointWidth("October 2024")).isWithin(0.5f).of(LineChartDefaults.SelectedPointSize.value)
+    }
+
+    @Test
+    fun pressDraggedOutOfTheChart_selectsNothing_andThePointShrinksBack() {
+        setChart { TestLineChart(entries = entries) }
+        val october = pointOffset("October 2024")
+
+        composeTestRule.onNodeWithTag("chart").performTouchInput {
+            down(october)
+            moveTo(Offset(october.x, height * 3f))
+            up()
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(isSelected()).assertCountEquals(0)
+        assertThat(pointWidth("October 2024")).isWithin(0.5f).of(LineChartDefaults.PointSize.value)
+    }
+
     @Test
     fun accessibilityClick_selectsThePoint() {
         setChart { TestLineChart(entries = entries) }

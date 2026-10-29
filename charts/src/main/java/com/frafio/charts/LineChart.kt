@@ -1,10 +1,12 @@
 package com.frafio.charts
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -20,8 +22,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -54,14 +57,13 @@ import com.frafio.charts.internal.ShapeMorph
 import com.frafio.charts.internal.StripAxis
 import com.frafio.charts.internal.StripItem
 import com.frafio.charts.internal.averageOf
+import com.frafio.charts.internal.followPresses
 import com.frafio.charts.internal.maxVisibleBars
 import com.frafio.charts.internal.rememberEntryStrip
 import com.frafio.charts.internal.shownSelection
 import com.frafio.charts.internal.stripWindow
 import java.text.NumberFormat
 import kotlin.math.roundToInt
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 /**
  * A point of a [LineChart]. [key] orders the points and identifies one across entry changes; keys need
@@ -272,19 +274,33 @@ private fun LineChartPlot(
     pointGap: Dp,
     plotHeight: Dp
 ) {
-    // One progress per entry key: the selected point grows and morphs while the previous one shrinks back.
     val selectionSpec = MaterialTheme.motionScheme.fastSpatialSpec<Float>()
-    val selectedKey = strip.items.firstOrNull { it.index >= 0 && it.index == selectedIndex }?.entry?.key
-    val selection = remember { PointSelection() }
-    selection.add(strip.items.map { it.entry.key }, selectedKey)
-    LaunchedEffect(selectedKey) {
-        selection.animateTo(selectedKey, selectionSpec)
+    // Keyed by entry, so a point keeps its state while it slides along the strip.
+    val points = strip.items.associate { item ->
+        key(item.entry.key) {
+            val interactionSource = remember { MutableInteractionSource() }
+            val pulse = remember { Animatable(0f) }
+            LaunchedEffect(interactionSource, pulse, selectionSpec) {
+                pulse.followPresses(interactionSource.interactions, selectionSpec)
+            }
+            val isSelected = item.isSelectable && item.index == selectedIndex
+            // Grown while selected or while a press pulse rises: one animation, so a press that selects stays grown throughout.
+            val growth = animateFloatAsState(
+                targetValue = if (isSelected || pulse.targetValue == 1f) 1f else 0f,
+                animationSpec = selectionSpec,
+                label = "point_growth"
+            )
+            val selection = animateFloatAsState(
+                targetValue = if (isSelected) 1f else 0f,
+                animationSpec = selectionSpec,
+                label = "point_selection"
+            )
+            item.entry.key to PointState(interactionSource, growth, selection)
+        }
     }
-    SideEffect {
-        selection.retain(strip.items.mapTo(HashSet()) { it.entry.key })
-    }
-    val progressOf: (StripItem<LineChartEntry>) -> Float = { selection.progressOf(it.entry.key) }
-    val sizeOf: (StripItem<LineChartEntry>) -> Dp = { lerp(pointSize, selectedPointSize, progressOf(it)) }
+    val growthOf: (StripItem<LineChartEntry>) -> Float = { points[it.entry.key]?.growth?.value ?: 0f }
+    val selectionOf: (StripItem<LineChartEntry>) -> Float = { points[it.entry.key]?.selection?.value ?: 0f }
+    val sizeOf: (StripItem<LineChartEntry>) -> Dp = { lerp(pointSize, selectedPointSize, growthOf(it)) }
     // Points keep clear of the plot's edges at their largest.
     val insetRadius = maxOf(pointSize, selectedPointSize) / 2
     val morph = remember(pointShape, selectedPointShape) { ShapeMorph(pointShape, selectedPointShape) }
@@ -295,33 +311,42 @@ private fun LineChartPlot(
             .height(plotHeight)
             .then(if (isAnimated) Modifier.clipToBounds() else Modifier)
     ) {
-        // Selecting an entry, or clearing the selection when it's the selected one; entries sliding out can't be.
+        // Selecting an entry, or clearing the selection when it's the selected one.
         val toggle: (StripItem<LineChartEntry>) -> Unit = { item ->
-            if (item.index >= 0 && item.entry.value != null) onPointClick(if (item.index == selectedIndex) -1 else item.index)
+            if (item.isSelectable) onPointClick(if (item.index == selectedIndex) -1 else item.index)
         }
         val currentStrip by rememberUpdatedState(strip)
         val currentToggle by rememberUpdatedState(toggle)
+        val currentPoints by rememberUpdatedState(points)
         Box(
             modifier = Modifier
                 .stripWindow(strip)
                 .fillMaxSize()
-                // A tap anywhere in a slot picks its entry, so points are easy to hit.
+                // A touch anywhere in a slot picks its entry, so points are easy to hit.
                 .pointerInput(Unit) {
-                    detectTapGestures { position ->
-                        val items = currentStrip.items
-                        items.getOrNull((position.x / size.width * items.size).toInt())?.let(currentToggle)
-                    }
+                    fun itemAt(position: Offset): StripItem<LineChartEntry>? =
+                        currentStrip.items.let { it.getOrNull((position.x / size.width * it.size).toInt()) }
+                    detectTapGestures(
+                        onPress = press@{ position ->
+                            val item = itemAt(position)?.takeIf { it.isSelectable } ?: return@press
+                            val source = currentPoints[item.entry.key]?.interactionSource ?: return@press
+                            val press = PressInteraction.Press(position)
+                            source.emit(press)
+                            source.emit(if (tryAwaitRelease()) PressInteraction.Release(press) else PressInteraction.Cancel(press))
+                        },
+                        onTap = { position -> itemAt(position)?.let(currentToggle) }
+                    )
                 }
         ) {
-            // Fractions and selection progress are read while drawing and placing, so animation frames don't recompose.
+            // Fractions and progresses are read while drawing and placing, so animation frames don't recompose.
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val items = strip.items
                 if (items.isEmpty()) return@Canvas
                 val centers = items.indices.map { pointCenter(it, items.size, items[it].fraction(), size, insetRadius.toPx()) }
                 val radii = items.map { sizeOf(it).toPx() / 2 }
-                // The selected point's guide, fading in and out with it, keeps the same gap below it as the line.
+                // The selected point's guide, fading in and out with the selection but not with presses, keeps the same gap below it as the line.
                 items.forEachIndexed { i, item ->
-                    val progress = progressOf(item).coerceIn(0f, 1f)
+                    val progress = selectionOf(item).coerceIn(0f, 1f)
                     if (item.entry.value == null || progress == 0f) return@forEachIndexed
                     val top = centers[i].y + radii[i] + pointGap.toPx()
                     if (top >= size.height) return@forEachIndexed
@@ -349,7 +374,7 @@ private fun LineChartPlot(
                 }
                 items.forEachIndexed { i, item ->
                     if (item.entry.value == null) return@forEachIndexed
-                    morph.draw(this, progressOf(item), Size(radii[i] * 2, radii[i] * 2), centers[i], colors.pointColor)
+                    morph.draw(this, growthOf(item), Size(radii[i] * 2, radii[i] * 2), centers[i], colors.pointColor)
                 }
             }
             PointNodes(
@@ -366,27 +391,16 @@ private fun LineChartPlot(
 
 private val GuideWidth: Dp = 1.dp
 
-/** Each point's selection progress by entry key, from 0 to 1 once selected. */
-private class PointSelection {
-    private val progresses = HashMap<Int, Animatable<Float, AnimationVector1D>>()
+/** A point's press source and progresses: [growth] while selected or pressed, [selection] while selected. */
+private class PointState(
+    val interactionSource: MutableInteractionSource,
+    val growth: State<Float>,
+    val selection: State<Float>
+)
 
-    /** Points not seen yet start where they belong, so they don't animate in. */
-    fun add(keys: List<Int>, selectedKey: Int?) {
-        keys.forEach { key -> progresses.getOrPut(key) { Animatable(if (key == selectedKey) 1f else 0f) } }
-    }
-
-    fun retain(keys: Set<Int>) {
-        progresses.keys.retainAll(keys)
-    }
-
-    fun progressOf(key: Int): Float = progresses[key]?.value ?: 0f
-
-    suspend fun animateTo(selectedKey: Int?, spec: FiniteAnimationSpec<Float>) = coroutineScope {
-        progresses.toList().forEach { (key, progress) ->
-            launch { progress.animateTo(if (key == selectedKey) 1f else 0f, spec) }
-        }
-    }
-}
+/** Entries sliding out (index -1) and entries without data can't be selected. */
+private val StripItem<LineChartEntry>.isSelectable: Boolean
+    get() = index >= 0 && entry.value != null
 
 /** Where the point of the [index]-th of [count] slots sits in a plot of [size], keeping a point of [radius] inside it. */
 private fun pointCenter(index: Int, count: Int, fraction: Float, size: Size, radius: Float): Offset =
@@ -417,8 +431,8 @@ private fun PointNodes(
                     modifier = Modifier.semantics {
                         contentDescription = description
                         role = Role.Button
-                        selected = item.index >= 0 && item.index == selectedIndex
-                        if (item.index >= 0) {
+                        selected = item.isSelectable && item.index == selectedIndex
+                        if (item.isSelectable) {
                             onClick {
                                 onToggle(item)
                                 true
