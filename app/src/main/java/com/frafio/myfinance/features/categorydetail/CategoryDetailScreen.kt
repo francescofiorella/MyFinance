@@ -30,9 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -45,7 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.CategoryIcon
-import com.frafio.myfinance.core.components.MonthlyRangeBarChart
+import com.frafio.myfinance.core.components.MonthlyRangeLineChart
 import com.frafio.myfinance.core.components.SpendingChangeChip
 import com.frafio.myfinance.core.components.TransactionListItem
 import com.frafio.myfinance.core.data.model.Expense
@@ -355,8 +352,6 @@ private fun TrendCard(
     availableRanges: List<Int>,
     trackingStart: LocalDate?
 ) {
-    // Index into trend; -1 selects the latest month.
-    var selectedMonth by rememberSaveable { mutableIntStateOf(-1) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -371,13 +366,11 @@ private fun TrendCard(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            MonthlyRangeBarChart(
+            MonthlyRangeLineChart(
                 totals = trend,
                 shownCount = shownCount,
                 selectedRange = range,
                 onSelectedRangeChange = onRangeChange,
-                selectedMonth = selectedMonth,
-                onSelectedMonthChange = { selectedMonth = it },
                 availableRanges = availableRanges,
                 trackingStart = trackingStart,
                 onVisibleCountChanged = onVisibleCountChanged

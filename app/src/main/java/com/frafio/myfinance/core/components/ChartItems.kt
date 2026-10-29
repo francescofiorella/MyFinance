@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import com.frafio.charts.BarChartEntry
+import com.frafio.charts.LineChartEntry
 import com.frafio.charts.PieChartItem
 import com.frafio.myfinance.core.data.model.CategoryColors
 import com.frafio.myfinance.core.data.model.MonthlyTotal
@@ -39,3 +40,14 @@ fun MonthlyTotal.toBarChartEntry(hasData: Boolean = true): BarChartEntry {
         selectedAxisLabel = axisLabel + "/" + "%02d".format(year).takeLast(2)
     )
 }
+
+/**
+ * The month's point: keyed by months since year zero, labelled "MMMM yyyy" and "MM" on the axis.
+ * Without [hasData] it has no value, so the chart draws no point and breaks the line there.
+ */
+fun MonthlyTotal.toLineChartEntry(hasData: Boolean = true): LineChartEntry = LineChartEntry(
+    key = year * 12 + month - 1,
+    value = value.takeIf { hasData },
+    label = YearMonth.of(year, month).format(DateTimeFormatter.ofPattern("MMMM yyyy")),
+    axisLabel = "%02d".format(month).takeLast(2)
+)

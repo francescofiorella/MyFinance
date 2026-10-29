@@ -13,7 +13,6 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -63,8 +62,7 @@ class CategoryDetailScreenTest {
         setScreen()
 
         composeTestRule.onNodeWithText(string(R.string.dining)).assertIsDisplayed()
-        // The trend chart also labels its selected bar "May 2024"; the header comes first.
-        composeTestRule.onAllNodesWithText("May 2024").onFirst().assertIsDisplayed()
+        composeTestRule.onNodeWithText("May 2024").assertIsDisplayed()
         composeTestRule.onNodeWithText(string(R.string.dining_description)).assertIsDisplayed()
     }
 
@@ -72,8 +70,7 @@ class CategoryDetailScreenTest {
     fun stats_showTheMonthAverageYearToDateAndShare() {
         setScreen()
 
-        // The trend chart repeats the selected month's total; the stat card comes first.
-        composeTestRule.onAllNodesWithText(doubleToPrice(stats.monthTotal)).onFirst().assertIsDisplayed()
+        composeTestRule.onNodeWithText(doubleToPrice(stats.monthTotal)).assertIsDisplayed()
         composeTestRule.onNodeWithText(doubleToPrice(stats.average)).assertIsDisplayed()
         composeTestRule.onNodeWithText(doubleToPrice(stats.yearToDate)).assertIsDisplayed()
         composeTestRule.onNodeWithText("2024").assertIsDisplayed()
@@ -174,7 +171,7 @@ class CategoryDetailScreenTest {
     }
 
     @Test
-    fun trendCard_monthsBeforeTheTrackingStart_haveNoBar_whileTrackedZeroMonthsDo() {
+    fun trendCard_monthsBeforeTheTrackingStart_haveNoPoint_whileTrackedZeroMonthsDo() {
         composeTestRule.setThemedContent {
             CategoryDetailContent(
                 category = dining,
@@ -187,11 +184,11 @@ class CategoryDetailScreenTest {
             )
         }
 
-        bar("March 2024").assertDoesNotExist()
-        bar("June 2023").assertDoesNotExist()
+        point("March 2024").assertDoesNotExist()
+        point("June 2023").assertDoesNotExist()
         // Nothing was spent on dining in April 2024, after tracking started.
-        bar("April 2024").assertExists()
-        bar("May 2024").assertExists()
+        point("April 2024").assertExists()
+        point("May 2024").assertExists()
     }
 
     @Test
@@ -213,7 +210,7 @@ class CategoryDetailScreenTest {
         composeTestRule.onNodeWithText(string(R.string.bar_chart_range_1_year)).assertDoesNotExist()
     }
 
-    private fun bar(monthYear: String) = composeTestRule.onNodeWithContentDescription(monthYear, substring = true)
+    private fun point(monthYear: String) = composeTestRule.onNodeWithContentDescription(monthYear, substring = true)
 
     @Test
     fun back_invokesTheCallback() {
