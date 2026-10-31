@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
@@ -25,6 +26,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalDate
 import javax.inject.Inject
 
 /**
@@ -180,6 +182,23 @@ class NavigationTest {
 
         composeTestRule.onNodeWithTag("label_detail_scroll").assertDoesNotExist()
         composeTestRule.onNodeWithTag("labels_list").assertExists()
+    }
+
+    @Test
+    fun categoryDetail_labelRow_opensTheLabelDetail_andBackReturns() {
+        // Today, so the Categories screen's current month shows it.
+        runBlocking { expenseDao.upsert(testExpense(name = "Pasta", date = LocalDate.now(), labels = listOf("Dinner"))) }
+        composeTestRule.onNodeWithTag("tab_expenses").performClick()
+        composeTestRule.onNodeWithTag("expenses_categories").performClick()
+        composeTestRule.onAllNodesWithTag("category_item").onFirst().performClick()
+        composeTestRule.onNodeWithTag("category_detail_scroll").performScrollToNode(hasTestTag("category_label_item"))
+        composeTestRule.onNodeWithTag("category_label_item").performClick()
+        composeTestRule.onNodeWithTag("label_detail_scroll").assertExists()
+
+        Espresso.pressBack()
+
+        composeTestRule.onNodeWithTag("label_detail_scroll").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("category_detail_scroll").assertExists()
     }
 
     @Test

@@ -71,6 +71,7 @@ class CategoryDetailScreenScreenshotTests {
             onBackClick = {},
             onSeeAllExpenses = {},
             onFrequentExpenseClick = {},
+            onLabelClick = {},
             trendShownCount = shownCount,
             trendAvailableRanges = availableRanges,
             trendTrackingStart = trackingStart

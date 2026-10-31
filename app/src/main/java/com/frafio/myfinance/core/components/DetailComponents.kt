@@ -64,7 +64,7 @@ fun DetailRow(
     index: Int,
     count: Int,
     modifier: Modifier = Modifier,
-    // Null keeps the row static, as for the labels.
+    // Null keeps the row static.
     onClick: (() -> Unit)? = null
 ) {
     val colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)

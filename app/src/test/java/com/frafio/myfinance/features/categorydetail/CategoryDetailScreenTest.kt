@@ -58,7 +58,8 @@ class CategoryDetailScreenTest {
                 stats = stats,
                 onBackClick = { events += "back" },
                 onSeeAllExpenses = { events += "seeAll" },
-                onFrequentExpenseClick = { events += "frequent:${it.name}" }
+                onFrequentExpenseClick = { events += "frequent:${it.name}" },
+                onLabelClick = { events += "label:$it" }
             )
         }
     }
@@ -147,13 +148,13 @@ class CategoryDetailScreenTest {
     }
 
     @Test
-    fun labelRows_areNotClickable() {
+    fun labelRows_openTheirLabel() {
         setScreen()
 
         // The last "Friends" is the By label row; the others are label chips on expense rows.
-        composeTestRule.onAllNodesWithText("Friends").onLast()
-            .performScrollTo()
-            .assert(hasNoClickAction() and !hasAnyAncestor(hasClickAction()))
+        composeTestRule.onAllNodesWithText("Friends").onLast().performScrollTo().performClick()
+
+        assertThat(events).containsExactly("label:Friends")
     }
 
     @Test
@@ -166,6 +167,7 @@ class CategoryDetailScreenTest {
                 onBackClick = {},
                 onSeeAllExpenses = {},
                 onFrequentExpenseClick = {},
+                onLabelClick = {},
                 onTrendRangeChange = { events += "range:$it" }
             )
         }
@@ -187,6 +189,7 @@ class CategoryDetailScreenTest {
                 onBackClick = {},
                 onSeeAllExpenses = {},
                 onFrequentExpenseClick = {},
+                onLabelClick = {},
                 trendTrackingStart = LocalDate.of(2024, 4, 1)
             )
         }
@@ -208,6 +211,7 @@ class CategoryDetailScreenTest {
                 onBackClick = {},
                 onSeeAllExpenses = {},
                 onFrequentExpenseClick = {},
+                onLabelClick = {},
                 trendTrackingStart = LocalDate.of(2024, 4, 1)
             )
         }
@@ -229,6 +233,7 @@ class CategoryDetailScreenTest {
                 onBackClick = {},
                 onSeeAllExpenses = {},
                 onFrequentExpenseClick = {},
+                onLabelClick = {},
                 trendShownCount = shownCount()
             )
         }
@@ -283,6 +288,7 @@ class CategoryDetailScreenTest {
                 onBackClick = {},
                 onSeeAllExpenses = {},
                 onFrequentExpenseClick = {},
+                onLabelClick = {},
                 trendAvailableRanges = listOf(0)
             )
         }

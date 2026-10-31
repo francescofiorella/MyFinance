@@ -10,7 +10,8 @@ import com.frafio.myfinance.features.categorydetail.CategoryDetailViewModel
 fun EntryProviderScope<NavKey>.categoryDetailEntry(
     onBackClick: () -> Unit,
     onSeeAllExpenses: () -> Unit,
-    onFrequentExpenseClick: (RootKey.FrequentExpenses) -> Unit
+    onFrequentExpenseClick: (RootKey.FrequentExpenses) -> Unit,
+    onLabelClick: (RootKey.LabelDetail) -> Unit
 ) {
     entry<RootKey.CategoryDetail> { key ->
         val viewModel: CategoryDetailViewModel = hiltViewModel(
@@ -22,7 +23,8 @@ fun EntryProviderScope<NavKey>.categoryDetailEntry(
             viewModel = viewModel,
             onBackClick = onBackClick,
             onSeeAllExpenses = onSeeAllExpenses,
-            onFrequentExpenseClick = onFrequentExpenseClick
+            onFrequentExpenseClick = onFrequentExpenseClick,
+            onLabelClick = onLabelClick
         )
     }
 }

@@ -70,7 +70,8 @@ fun CategoryDetailScreen(
     viewModel: CategoryDetailViewModel,
     onBackClick: () -> Unit,
     onSeeAllExpenses: () -> Unit,
-    onFrequentExpenseClick: (RootKey.FrequentExpenses) -> Unit
+    onFrequentExpenseClick: (RootKey.FrequentExpenses) -> Unit,
+    onLabelClick: (RootKey.LabelDetail) -> Unit
 ) {
     val stats by viewModel.stats.collectAsStateWithLifecycle()
     val trend by viewModel.trend.collectAsStateWithLifecycle()
@@ -105,7 +106,8 @@ fun CategoryDetailScreen(
                     toMonth = viewModel.month.monthValue
                 )
             )
-        }
+        },
+        onLabelClick = { label -> onLabelClick(RootKey.LabelDetail(label)) }
     )
 }
 
@@ -118,6 +120,7 @@ fun CategoryDetailContent(
     onBackClick: () -> Unit,
     onSeeAllExpenses: () -> Unit,
     onFrequentExpenseClick: (FrequentExpense) -> Unit,
+    onLabelClick: (String) -> Unit,
     trend: List<MonthlyTotal> = stats?.trend.orEmpty(),
     trendRange: Int = 0,
     onTrendRangeChange: (Int) -> Unit = {},
@@ -182,7 +185,9 @@ fun CategoryDetailContent(
                                 subtitle = null,
                                 value = doubleToPrice(label.total),
                                 index = index,
-                                count = stats.labels.size
+                                count = stats.labels.size,
+                                modifier = Modifier.testTag("category_label_item"),
+                                onClick = { onLabelClick(label.label) }
                             )
                         }
                     }
@@ -440,7 +445,8 @@ fun CategoryDetailPreview() {
             stats = sampleCategoryDetailStats(month),
             onBackClick = {},
             onSeeAllExpenses = {},
-            onFrequentExpenseClick = {}
+            onFrequentExpenseClick = {},
+            onLabelClick = {}
         )
     }
 }

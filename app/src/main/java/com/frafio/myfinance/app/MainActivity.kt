@@ -217,7 +217,8 @@ class MainActivity : ComponentActivity() {
                         categoryDetailEntry(
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
                             onSeeAllExpenses = ::openFilteredExpenses,
-                            onFrequentExpenseClick = { key -> rootBackStack.add(key) }
+                            onFrequentExpenseClick = { key -> rootBackStack.add(key) },
+                            onLabelClick = { key -> rootBackStack.add(key) }
                         )
                         frequentExpensesEntry(
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
