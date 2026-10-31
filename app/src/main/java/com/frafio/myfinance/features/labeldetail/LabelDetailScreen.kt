@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.labeldetail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,10 +21,13 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -31,7 +35,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -199,7 +205,8 @@ fun LabelDetailContent(
     }
 }
 
-/** The total in big, as BudgetScreen's overview, with the date range below. */
+/** The label icon over the total in big, as BudgetScreen's overview, with the date range below. */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun Overview(stats: LabelDetailStats) {
     Column(
@@ -209,6 +216,23 @@ private fun Overview(stats: LabelDetailStats) {
             .padding(horizontal = 24.dp)
             .padding(top = 48.dp, bottom = 64.dp)
     ) {
+        Box(
+            modifier = Modifier
+                .size(IconButtonDefaults.largeContainerSize().height)
+                .clip(MaterialShapes.Cookie12Sided.toShape())
+                .background(MaterialTheme.colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_sell_filled),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.size(IconButtonDefaults.largeIconSize)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = doubleToPrice(stats.total),
             textAlign = TextAlign.Center,
