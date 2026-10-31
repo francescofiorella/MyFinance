@@ -18,14 +18,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -43,6 +40,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -85,15 +83,29 @@ fun LabelDetailScreen(
             onSeeAllExpenses()
         },
         onFrequentExpenseClick = { frequent ->
-            onExpensesClick(RootKey.FrequentExpenses(RootKey.FrequentExpenses.Scope.NameInLabel(frequent.name, viewModel.label)))
+            onExpensesClick(
+                RootKey.FrequentExpenses(
+                    RootKey.FrequentExpenses.Scope.NameInLabel(
+                        frequent.name,
+                        viewModel.label
+                    )
+                )
+            )
         },
         onCategoryClick = { category ->
-            onExpensesClick(RootKey.FrequentExpenses(RootKey.FrequentExpenses.Scope.CategoryInLabel(category.id, viewModel.label)))
+            onExpensesClick(
+                RootKey.FrequentExpenses(
+                    RootKey.FrequentExpenses.Scope.CategoryInLabel(
+                        category.id,
+                        viewModel.label
+                    )
+                )
+            )
         }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LabelDetailContent(
     label: String,
@@ -136,7 +148,10 @@ fun LabelDetailContent(
                         val stats = state.stats
                         Header(dateRange = dateRangeToString(stats.first, stats.last))
                         StatsGrid(stats = stats)
-                        CategoriesCard(categories = stats.categories, onCategoryClick = onCategoryClick)
+                        CategoriesCard(
+                            categories = stats.categories,
+                            onCategoryClick = onCategoryClick
+                        )
 
                         if (stats.topExpenses.isNotEmpty()) {
                             SectionTitle(text = stringResource(id = R.string.biggest_expenses_overall))
@@ -234,10 +249,18 @@ private fun StatsGrid(stats: LabelDetailStats) {
     ) {
         StatRow(
             start = { modifier ->
-                StatCard(modifier = modifier, label = stringResource(id = R.string.total), value = doubleToPrice(stats.total))
+                StatCard(
+                    modifier = modifier,
+                    label = stringResource(id = R.string.total),
+                    value = doubleToPrice(stats.total)
+                )
             },
             end = { modifier ->
-                StatCard(modifier = modifier, label = stringResource(id = R.string.expenses), value = stats.count.toString())
+                StatCard(
+                    modifier = modifier,
+                    label = stringResource(id = R.string.expenses),
+                    value = stats.count.toString()
+                )
             }
         )
         StatRow(
@@ -246,7 +269,15 @@ private fun StatsGrid(stats: LabelDetailStats) {
                     modifier = modifier,
                     label = stringResource(id = R.string.average),
                     value = doubleToPrice(stats.averagePerExpense),
-                    extra = { StatExtra(text = pluralStringResource(R.plurals.out_of_expenses, stats.count, stats.count)) }
+                    extra = {
+                        StatExtra(
+                            text = pluralStringResource(
+                                R.plurals.out_of_expenses,
+                                stats.count,
+                                stats.count
+                            )
+                        )
+                    }
                 )
             },
             end = { modifier ->
@@ -254,7 +285,15 @@ private fun StatsGrid(stats: LabelDetailStats) {
                     modifier = modifier,
                     label = stringResource(id = R.string.average),
                     value = doubleToPrice(stats.averagePerActiveDay),
-                    extra = { StatExtra(text = pluralStringResource(R.plurals.out_of_active_days, stats.activeDays, stats.activeDays)) }
+                    extra = {
+                        StatExtra(
+                            text = pluralStringResource(
+                                R.plurals.out_of_active_days,
+                                stats.activeDays,
+                                stats.activeDays
+                            )
+                        )
+                    }
                 )
             }
         )
@@ -276,55 +315,55 @@ private fun StatExtra(text: String) {
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun CategoriesCard(categories: List<CategoryShare>, onCategoryClick: (ExpenseCategory) -> Unit) {
+private fun CategoriesCard(
+    categories: List<CategoryShare>,
+    onCategoryClick: (ExpenseCategory) -> Unit
+) {
     // Index into ExpenseCategories.all; -1 selects none, showing the total.
     var selectedCategory by rememberSaveable { mutableIntStateOf(-1) }
     val totals = categories.associate { it.category.id to it.total }
-    Card(
-        modifier = Modifier
-            .testTag("label_categories")
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-        shape = ListItemDefaults.shapes().selectedShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-    ) {
-        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
-            Text(
-                modifier = Modifier.padding(bottom = 16.dp),
-                text = stringResource(id = R.string.expenses_by_category),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                PieChart(
-                    items = ExpenseCategories.all.map { category ->
-                        categoryPieChartItem(
-                            value = totals[category.id] ?: 0.0,
-                            label = stringResource(category.nameRes),
-                            icon = category.iconRes,
-                            colors = category.colors
-                        )
-                    },
-                    selectedIndex = selectedCategory,
-                    onSelectedIndexChange = { selectedCategory = it },
-                    totalLabel = stringResource(id = R.string.total),
-                    valueFormatter = ::doubleToPriceWithoutDecimals,
-                    selectedIconShape = MaterialShapes.VerySunny
-                )
-            }
-        }
-    }
-    Spacer(modifier = Modifier.height(8.dp))
-    categories.forEachIndexed { index, share ->
-        CategoryShareItem(
-            category = share.category,
-            total = share.total,
-            share = share.share,
-            index = index,
-            count = categories.size,
-            onClick = { onCategoryClick(share.category) },
-            modifier = Modifier.testTag("label_category_item")
+    Column {
+        Text(
+            modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 32.dp),
+            text = stringResource(id = R.string.expenses_by_category),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
         )
+        Spacer(modifier = Modifier.height(16.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            PieChart(
+                items = ExpenseCategories.all.map { category ->
+                    categoryPieChartItem(
+                        value = totals[category.id] ?: 0.0,
+                        label = stringResource(category.nameRes),
+                        icon = category.iconRes,
+                        colors = category.colors
+                    )
+                },
+                selectedIndex = selectedCategory,
+                onSelectedIndexChange = { selectedCategory = it },
+                totalLabel = stringResource(id = R.string.total),
+                valueFormatter = ::doubleToPriceWithoutDecimals,
+                selectedIconShape = MaterialShapes.VerySunny
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        categories.forEachIndexed { index, share ->
+            CategoryShareItem(
+                category = share.category,
+                total = share.total,
+                share = share.share,
+                index = index,
+                count = categories.size,
+                onClick = { onCategoryClick(share.category) },
+                modifier = Modifier.testTag("label_category_item")
+            )
+        }
     }
 }
 
