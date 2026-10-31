@@ -1,8 +1,10 @@
 package com.frafio.myfinance.features.labels
 
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyDescendant
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -36,7 +38,8 @@ class LabelsScreenTest {
             LabelsContent(
                 groups = groups,
                 onBackClick = { events += "back" },
-                onManageClick = { events += "manage" }
+                onManageClick = { events += "manage" },
+                onLabelClick = { events += "label:$it" }
             )
         }
     }
@@ -102,5 +105,26 @@ class LabelsScreenTest {
         composeTestRule.onNodeWithContentDescription(string(R.string.navigate_up)).performClick()
 
         assertThat(events).containsExactly("manage", "back").inOrder()
+    }
+
+    @Test
+    fun tappingALabelWithExpenses_opensIt() {
+        setScreen()
+
+        composeTestRule.onNodeWithText("Japan 2025").performClick()
+
+        assertThat(events).containsExactly("label:Japan 2025")
+    }
+
+    @Test
+    fun aLabelWithoutExpenses_cannotBeOpened() {
+        setScreen()
+        composeTestRule.onNodeWithTag("labels_list").performScrollToNode(hasText("Paris 2026"))
+
+        composeTestRule.onNode(hasTestTag("label_item") and hasAnyDescendant(hasText("Paris 2026")), useUnmergedTree = true)
+            .assertHasNoClickAction()
+        composeTestRule.onNodeWithText("Paris 2026").performClick()
+
+        assertThat(events).isEmpty()
     }
 }

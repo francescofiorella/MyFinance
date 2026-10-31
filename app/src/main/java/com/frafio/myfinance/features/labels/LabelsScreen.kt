@@ -42,13 +42,15 @@ import java.time.LocalDate
 fun LabelsScreen(
     viewModel: LabelsViewModel,
     onBackClick: () -> Unit,
-    onManageClick: () -> Unit
+    onManageClick: () -> Unit,
+    onLabelClick: (String) -> Unit
 ) {
     val groups by viewModel.groups.collectAsStateWithLifecycle()
     LabelsContent(
         groups = groups,
         onBackClick = onBackClick,
-        onManageClick = onManageClick
+        onManageClick = onManageClick,
+        onLabelClick = onLabelClick
     )
 }
 
@@ -58,7 +60,8 @@ fun LabelsScreen(
 fun LabelsContent(
     groups: List<LabelGroup>?,
     onBackClick: () -> Unit,
-    onManageClick: () -> Unit
+    onManageClick: () -> Unit,
+    onLabelClick: (String) -> Unit
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -110,7 +113,12 @@ fun LabelsContent(
                             SectionTitle(text = group.year?.toString() ?: stringResource(id = R.string.no_expenses))
                         }
                         itemsIndexed(group.summaries, key = { _, summary -> "label_${summary.label}" }) { index, summary ->
-                            LabelRow(summary = summary, index = index, count = group.summaries.size)
+                            LabelRow(
+                                summary = summary,
+                                index = index,
+                                count = group.summaries.size,
+                                onClick = { onLabelClick(summary.label) }
+                            )
                         }
                     }
                 }
@@ -120,7 +128,7 @@ fun LabelsContent(
 }
 
 @Composable
-private fun LabelRow(summary: LabelSummary, index: Int, count: Int) {
+private fun LabelRow(summary: LabelSummary, index: Int, count: Int, onClick: () -> Unit) {
     val first = summary.first
     val last = summary.last
     DetailRow(
@@ -134,7 +142,9 @@ private fun LabelRow(summary: LabelSummary, index: Int, count: Int) {
         value = doubleToPrice(summary.total),
         index = index,
         count = count,
-        modifier = Modifier.testTag("label_item")
+        modifier = Modifier.testTag("label_item"),
+        // A label without expenses has no detail to show.
+        onClick = if (summary.count > 0) onClick else null
     )
 }
 
@@ -168,7 +178,8 @@ fun LabelsPreview() {
         LabelsContent(
             groups = sampleLabelGroups(),
             onBackClick = {},
-            onManageClick = {}
+            onManageClick = {},
+            onLabelClick = {}
         )
     }
 }

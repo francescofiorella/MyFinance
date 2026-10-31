@@ -55,6 +55,7 @@ import com.frafio.myfinance.features.categories.navigation.categoriesEntry
 import com.frafio.myfinance.features.categorydetail.navigation.categoryDetailEntry
 import com.frafio.myfinance.features.frequentexpenses.navigation.frequentExpensesEntry
 import com.frafio.myfinance.features.home.HomeScreen
+import com.frafio.myfinance.features.labeldetail.navigation.labelDetailEntry
 import com.frafio.myfinance.features.labels.navigation.labelsEntry
 import com.frafio.myfinance.features.managecategories.navigation.manageCategoriesEntry
 import com.frafio.myfinance.features.managelabels.navigation.manageLabelsEntry
@@ -184,7 +185,11 @@ class MainActivity : ComponentActivity() {
                         )
                         labelsEntry(
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
-                            onManageClick = { rootBackStack.add(RootKey.ManageLabels) }
+                            onManageClick = { rootBackStack.add(RootKey.ManageLabels) },
+                            onLabelClick = { key -> rootBackStack.add(key) }
+                        )
+                        labelDetailEntry(
+                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
                         )
                         manageLabelsEntry(
                             appState = appState,

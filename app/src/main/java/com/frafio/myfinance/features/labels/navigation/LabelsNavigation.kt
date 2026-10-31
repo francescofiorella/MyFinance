@@ -9,14 +9,16 @@ import com.frafio.myfinance.features.labels.LabelsViewModel
 
 fun EntryProviderScope<NavKey>.labelsEntry(
     onBackClick: () -> Unit,
-    onManageClick: () -> Unit
+    onManageClick: () -> Unit,
+    onLabelClick: (RootKey.LabelDetail) -> Unit
 ) {
     entry<RootKey.Labels> {
         val viewModel: LabelsViewModel = hiltViewModel()
         LabelsScreen(
             viewModel = viewModel,
             onBackClick = onBackClick,
-            onManageClick = onManageClick
+            onManageClick = onManageClick,
+            onLabelClick = { label -> onLabelClick(RootKey.LabelDetail(label)) }
         )
     }
 }

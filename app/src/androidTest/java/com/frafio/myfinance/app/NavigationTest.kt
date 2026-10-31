@@ -169,6 +169,20 @@ class NavigationTest {
     }
 
     @Test
+    fun labels_row_opensItsDetail_andBackReturnsToLabels() {
+        runBlocking { expenseDao.upsert(testExpense(name = "Pasta", labels = listOf("Dinner"))) }
+        composeTestRule.onNodeWithTag("tab_expenses").performClick()
+        composeTestRule.onNodeWithTag("expenses_labels").performClick()
+        composeTestRule.onNodeWithTag("label_item").performClick()
+        composeTestRule.onNodeWithTag("label_detail_scroll").assertExists()
+
+        Espresso.pressBack()
+
+        composeTestRule.onNodeWithTag("label_detail_scroll").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("labels_list").assertExists()
+    }
+
+    @Test
     fun expenses_categories_opensCategories_andBackReturns() {
         assertExpensesSubScreen(entry = "expenses_categories", content = "categories_scroll")
     }

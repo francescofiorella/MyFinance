@@ -44,7 +44,8 @@ class LabelsScreenScreenshotTests {
         LabelsContent(
             groups = groups,
             onBackClick = {},
-            onManageClick = {}
+            onManageClick = {},
+            onLabelClick = {}
         )
     }
 }

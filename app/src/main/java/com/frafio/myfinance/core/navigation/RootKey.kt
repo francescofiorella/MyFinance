@@ -16,6 +16,9 @@ sealed interface RootKey : NavKey {
     data object Labels : RootKey
 
     @Serializable
+    data class LabelDetail(val label: String) : RootKey
+
+    @Serializable
     data object ManageLabels : RootKey
 
     @Serializable
