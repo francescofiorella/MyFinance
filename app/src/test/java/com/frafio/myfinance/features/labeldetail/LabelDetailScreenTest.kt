@@ -57,7 +57,7 @@ class LabelDetailScreenTest {
         setScreen()
 
         composeTestRule.onNodeWithText("Japan 2025").assertIsDisplayed()
-        assertStat(string(R.string.total) + " ", "3 Feb – 19 Aug 2025")
+        composeTestRule.onNodeWithText("3 Feb – 19 Aug 2025").assertIsDisplayed()
     }
 
     @Test
