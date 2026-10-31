@@ -13,7 +13,7 @@ sealed interface RootKey : NavKey {
     data object Home : RootKey
 
     @Serializable
-    data object Labels : RootKey
+    data object ManageLabels : RootKey
 
     @Serializable
     data object ChangePassword : RootKey

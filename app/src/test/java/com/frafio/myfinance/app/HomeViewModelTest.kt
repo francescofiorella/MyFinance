@@ -200,9 +200,9 @@ class HomeViewModelTest {
     fun navigateTo_deliversTheKey() = runTest {
         val navEvents = collectNavEvents()
 
-        viewModel.navigateTo(RootKey.Labels)
+        viewModel.navigateTo(RootKey.ManageLabels)
 
-        assertThat(navEvents).containsExactly(RootKey.Labels)
+        assertThat(navEvents).containsExactly(RootKey.ManageLabels)
     }
 
     @Test

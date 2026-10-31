@@ -1,4 +1,4 @@
-package com.frafio.myfinance.features.labels
+package com.frafio.myfinance.features.managelabels
 
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(qualifiers = "w411dp-h891dp")
-class LabelsContentTest {
+class ManageLabelsContentTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -37,7 +37,7 @@ class LabelsContentTest {
 
     private fun setLabels(labels: List<String>) {
         composeTestRule.setThemedContent {
-            LabelsContent(
+            ManageLabelsContent(
                 allLabels = labels,
                 onBackClick = { events += "back" },
                 onAddLabel = { events += "add:$it" },
@@ -57,7 +57,7 @@ class LabelsContentTest {
     fun withLabels_showsTheList_andBack() {
         setLabels(listOf("Food", "Rent"))
 
-        composeTestRule.onNodeWithTag("labels_list").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("manage_labels_list").assertIsDisplayed()
         composeTestRule.onNodeWithText("Food").assertIsDisplayed()
         composeTestRule.onNodeWithText("Rent").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription(string(R.string.navigate_up)).performClick()
@@ -70,7 +70,7 @@ class LabelsContentTest {
         setLabels(emptyList())
 
         composeTestRule.onNodeWithText(string(R.string.warning_labels)).assertIsDisplayed()
-        composeTestRule.onNodeWithTag("labels_list").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("manage_labels_list").assertDoesNotExist()
     }
 
     @Test
@@ -146,7 +146,7 @@ class LabelsContentTest {
         val keyboard = FakeKeyboard()
         composeTestRule.setThemedContent {
             keyboard.Content {
-                LabelsContent(
+                ManageLabelsContent(
                     allLabels = (1..20).map { "Label $it" },
                     onBackClick = {},
                     onAddLabel = {},
@@ -156,7 +156,7 @@ class LabelsContentTest {
                 )
             }
         }
-        composeTestRule.onNodeWithTag("labels_list").performScrollToNode(hasText("Label 20"))
+        composeTestRule.onNodeWithTag("manage_labels_list").performScrollToNode(hasText("Label 20"))
         // A lazy list's semantics order is not its visual order: take the Edit button in Label 20's row.
         val row = composeTestRule.onNodeWithText("Label 20").fetchSemanticsNode().boundsInRoot
         val editButtons = composeTestRule.onAllNodesWithContentDescription(string(R.string.edit))

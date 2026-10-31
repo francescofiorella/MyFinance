@@ -1,4 +1,4 @@
-package com.frafio.myfinance.features.labels
+package com.frafio.myfinance.features.managelabels
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -73,9 +73,9 @@ import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 @Composable
-fun LabelsScreen(
+fun ManageLabelsScreen(
     appState: MyFinanceAppState,
-    viewModel: LabelsViewModel,
+    viewModel: ManageLabelsViewModel,
     onBackClick: () -> Unit
 ) {
     val allLabels by viewModel.allLabels.collectAsStateWithLifecycle()
@@ -103,7 +103,7 @@ fun LabelsScreen(
         }
     )
 
-    LabelsContent(
+    ManageLabelsContent(
         allLabels = allLabels,
         onBackClick = onBackClick,
         onAddLabel = { viewModel.addLabel(it) },
@@ -118,7 +118,7 @@ fun LabelsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LabelsContent(
+fun ManageLabelsContent(
     allLabels: List<String>,
     onBackClick: () -> Unit,
     onAddLabel: (String) -> Unit,
@@ -185,7 +185,7 @@ fun LabelsContent(
             } else {
                 LazyColumn(
                     modifier = Modifier
-                        .testTag("labels_list")
+                        .testTag("manage_labels_list")
                         .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
                 ) {
                     itemsIndexed(
@@ -511,9 +511,9 @@ fun LabelItem(
 
 @Preview(showBackground = true)
 @Composable
-fun LabelsPreview() {
+fun ManageLabelsPreview() {
     MyFinanceTheme {
-        LabelsContent(
+        ManageLabelsContent(
             allLabels = listOf("Food", "Transport", "Rent", "Health", "Entertainment"),
             onBackClick = {},
             onAddLabel = {},
@@ -526,9 +526,9 @@ fun LabelsPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun EmptyLabelsPreview() {
+fun EmptyManageLabelsPreview() {
     MyFinanceTheme {
-        LabelsContent(
+        ManageLabelsContent(
             allLabels = listOf(),
             onBackClick = {},
             onAddLabel = {},

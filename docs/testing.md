@@ -88,7 +88,7 @@ Three things trip up every new ViewModel test.
    the collector runs. Those tests call `Dispatchers.setMain(StandardTestDispatcher(testScheduler))`
    and `runCurrent()` after the action; see `useStandardMain()` in `AuthViewModelTest`.
 
-Two smaller ones: a method that launches on a caller-supplied scope (`LabelsViewModel.undoDeleteLabel`)
+Two smaller ones: a method that launches on a caller-supplied scope (`ManageLabelsViewModel.undoDeleteLabel`)
 needs `advanceUntilIdle()` when given `backgroundScope`; and `HomeViewModel.checkUser` awaits the
 first local count of each table, so its tests seed both local fakes with an empty list, as Room
 would emit one immediately.
@@ -233,7 +233,7 @@ be recorded on the platform they are verified on.
   `isSystemInDarkTheme()` directly (`EmptyView`, `PieChart`, `AnnualBalanceCard`) read.
 - Screens are rendered through their stateless content composables (`AuthContent`,
   `HomeScreenContent`, `DashboardContent`, `ExpensesContent`, `BudgetContent`, `ProfileContent`,
-  the stateless `AddScreen`/`ChangePasswordScreen` overloads, `LabelsContent`, `CategoriesScreen`),
+  the stateless `AddScreen`/`ChangePasswordScreen` overloads, `ManageLabelsContent`, `CategoriesScreen`),
   with fixtures from `testing/screenshot/ScreenshotFixtures.kt`. Nothing may depend on the real
   clock: `screenshotToday` is fixed, and `ExpensesCard`/`AnnualBalanceCard` take `today` /
   `isNextYearEnabled` from the caller instead of reading `LocalDate.now()`.
@@ -391,7 +391,7 @@ Firebase. The pieces, all ported from nowinandroid:
 - **Splash.** `MainActivity` keeps the splash until `checkUser()` completes, so the first thing a
   test does is `waitUntilExactlyOneExists(hasTestTag("tab_dashboard"))` (or `login_button`).
 - **Empty states.** Dashboard, Expenses and Labels render `EmptyView` without data, so their content
-  tags (`dashboard_scroll`, `expenses_list`, `labels_list`) only exist once something is seeded;
+  tags (`dashboard_scroll`, `expenses_list`, `manage_labels_list`) only exist once something is seeded;
   `LaunchTest.freshStart_withoutData_showsTheEmptyDashboard` pins the empty case.
 - **The phone must be unlocked.** The DAO tests pass on a locked phone; anything that launches an
   activity is paused immediately (`wm_pause_activity … sleep`) and fails with "No compose
@@ -484,7 +484,7 @@ whose "≥ 80 % coverage on new code" condition shows on SonarCloud but does not
 | Theme resolution (Robolectric) | `core/theme/ThemeTest` |
 | Shared Compose components (Robolectric) | `core/components/…Test` |
 | Charts: header, axis labels, selection, reference line, entry animation, geometry (Robolectric) | `charts/src/test/…` |
-| Feature components: auth form and fields, dashboard cards, filter chips and sheets, profile sheets, budget sheet, labels list | `features/*/components/…Test`, `features/auth/AuthContentTest`, `features/labels/LabelsContentTest` |
+| Feature components: auth form and fields, dashboard cards, filter chips and sheets, profile sheets, budget sheet, labels list | `features/*/components/…Test`, `features/auth/AuthContentTest`, `features/managelabels/ManageLabelsContentTest` |
 | Screens over their ViewModels: loading / empty / populated, validation, sheets, callbacks | `features/*/…ScreenTest` |
 | What TalkBack hears: control labels, silent decorative icons, chart bars and arcs, expand state | `app/AccessibilityTest` |
 | Snackbar placement at three widths, with and without system insets | `app/Snackbar(Insets)ScreenshotTests` |

@@ -142,7 +142,7 @@ class NavigationTest {
 
     @Test
     fun profile_manageLabels_opensLabels_andBackReturns() {
-        assertProfileSubScreen(entry = "profile_manage_labels", content = "labels_list")
+        assertProfileSubScreen(entry = "profile_manage_labels", content = "manage_labels_list")
     }
 
     @Test
@@ -152,7 +152,7 @@ class NavigationTest {
 
     @Test
     fun expenses_manageLabels_opensLabels_andBackReturns() {
-        assertExpensesSubScreen(entry = "expenses_manage_labels", content = "labels_list")
+        assertExpensesSubScreen(entry = "expenses_manage_labels", content = "manage_labels_list")
     }
 
     @Test

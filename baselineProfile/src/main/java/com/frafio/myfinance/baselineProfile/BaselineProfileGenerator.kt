@@ -105,7 +105,7 @@ class BaselineProfileGenerator {
 
         // Before searching: the expanded search bar hides these buttons.
         categoriesJourney()
-        openAndClose("expenses_list", "expenses_manage_labels", "labels_list")
+        openAndClose("expenses_list", "expenses_manage_labels", "manage_labels_list")
 
         // Focusing the field expands the bar over the manage buttons.
         if (device.withObject("search_field", 5_000) { it.click() }) {

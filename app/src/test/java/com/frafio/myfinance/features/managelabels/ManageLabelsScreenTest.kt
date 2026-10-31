@@ -1,4 +1,4 @@
-package com.frafio.myfinance.features.labels
+package com.frafio.myfinance.features.managelabels
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.test.assertIsDisplayed
@@ -30,7 +30,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(qualifiers = "w411dp-h891dp")
-class LabelsScreenTest {
+class ManageLabelsScreenTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -40,15 +40,15 @@ class LabelsScreenTest {
 
     private val expensesRepository = TestExpensesRepository()
     private val userPreferencesRepository = TestUserPreferencesRepository()
-    private val events = mutableListOf<LabelsUiEvent>()
+    private val events = mutableListOf<ManageLabelsUiEvent>()
     private var backClicks = 0
 
     private fun setScreen(labels: List<String> = listOf("food", "travel")) {
         userPreferencesRepository.setLabels(labels)
-        val viewModel = LabelsViewModel(expensesRepository, LoadingRepository(), userPreferencesRepository)
+        val viewModel = ManageLabelsViewModel(expensesRepository, LoadingRepository(), userPreferencesRepository)
         composeTestRule.setThemedContent(inline = true) {
             LaunchedEffect(Unit) { viewModel.uiEvents.collect { events += it } }
-            LabelsScreen(appState = rememberMyFinanceAppState(), viewModel = viewModel, onBackClick = { backClicks++ })
+            ManageLabelsScreen(appState = rememberMyFinanceAppState(), viewModel = viewModel, onBackClick = { backClicks++ })
         }
     }
 
@@ -58,7 +58,7 @@ class LabelsScreenTest {
     fun showsTheLabels_fromPreferences_andBack() {
         setScreen()
 
-        composeTestRule.onNodeWithTag("labels_list").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("manage_labels_list").assertIsDisplayed()
         composeTestRule.onNodeWithText("food").assertIsDisplayed()
         composeTestRule.onNodeWithText("travel").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription(string(R.string.navigate_up)).performClick()
@@ -81,7 +81,7 @@ class LabelsScreenTest {
 
         assertThat(expensesRepository.addedLabels).containsExactly("Gift")
         composeTestRule.waitForIdle()
-        assertThat(events).containsExactly(LabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_ADD_SUCCESS.message))
+        assertThat(events).containsExactly(ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_ADD_SUCCESS.message))
     }
 
     @Test
@@ -94,7 +94,7 @@ class LabelsScreenTest {
 
         assertThat(expensesRepository.deletedLabels).containsExactly("travel")
         composeTestRule.waitForIdle()
-        assertThat(events).containsExactly(LabelsUiEvent.LabelDeleted("travel", emptyList(), FinanceCode.LABEL_DELETE_SUCCESS.message))
+        assertThat(events).containsExactly(ManageLabelsUiEvent.LabelDeleted("travel", emptyList(), FinanceCode.LABEL_DELETE_SUCCESS.message))
     }
 
     @Test

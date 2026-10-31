@@ -1,4 +1,4 @@
-package com.frafio.myfinance.features.labels
+package com.frafio.myfinance.features.managelabels
 
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
 import com.frafio.myfinance.core.data.model.DeleteLabelResult
@@ -24,7 +24,7 @@ import org.junit.Test
  * To learn more about how this test handles Flows created with stateIn, see
  * https://developer.android.com/kotlin/flow/test#statein
  */
-class LabelsViewModelTest {
+class ManageLabelsViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -32,12 +32,12 @@ class LabelsViewModelTest {
     private val expensesRepository = TestExpensesRepository()
     private val userPreferencesRepository = TestUserPreferencesRepository()
     private val loadingRepository = LoadingRepository()
-    private lateinit var viewModel: LabelsViewModel
+    private lateinit var viewModel: ManageLabelsViewModel
 
     @Before
     fun setup() {
         userPreferencesRepository.setLabels(listOf("food", "travel"))
-        viewModel = LabelsViewModel(expensesRepository, loadingRepository, userPreferencesRepository)
+        viewModel = ManageLabelsViewModel(expensesRepository, loadingRepository, userPreferencesRepository)
     }
 
     @Test
@@ -73,8 +73,8 @@ class LabelsViewModelTest {
 
         assertThat(expensesRepository.addedLabels).containsExactly("gift", "again").inOrder()
         assertThat(events).containsExactly(
-            LabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_ADD_SUCCESS.message),
-            LabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message),
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_ADD_SUCCESS.message),
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message),
         ).inOrder()
     }
 
@@ -89,7 +89,7 @@ class LabelsViewModelTest {
 
         assertThat(expensesRepository.deletedLabels).containsExactly("food")
         assertThat(events).containsExactly(
-            LabelsUiEvent.LabelDeleted("food", affected, FinanceCode.LABEL_DELETE_SUCCESS.message)
+            ManageLabelsUiEvent.LabelDeleted("food", affected, FinanceCode.LABEL_DELETE_SUCCESS.message)
         )
     }
 
@@ -102,7 +102,7 @@ class LabelsViewModelTest {
         viewModel.deleteLabel("food")
 
         assertThat(events).containsExactly(
-            LabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message)
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message)
         )
     }
 
@@ -127,7 +127,7 @@ class LabelsViewModelTest {
         advanceUntilIdle()
 
         assertThat(events).containsExactly(
-            LabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message)
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message)
         )
     }
 
@@ -142,8 +142,8 @@ class LabelsViewModelTest {
         assertThat(expensesRepository.editedLabels)
             .containsExactly("food" to "groceries", "travel" to "trips").inOrder()
         assertThat(events).containsExactly(
-            LabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_UPDATE_SUCCESS.message),
-            LabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message),
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_UPDATE_SUCCESS.message),
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message),
         ).inOrder()
     }
 
@@ -161,8 +161,8 @@ class LabelsViewModelTest {
         assertThat(loading).containsExactly(false, true, false, true, false, true, false, true, false).inOrder()
     }
 
-    private fun TestScope.collectEvents(): List<LabelsUiEvent> {
-        val events = mutableListOf<LabelsUiEvent>()
+    private fun TestScope.collectEvents(): List<ManageLabelsUiEvent> {
+        val events = mutableListOf<ManageLabelsUiEvent>()
         backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.uiEvents.toList(events) }
         return events
     }

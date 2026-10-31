@@ -166,7 +166,7 @@ fun HomeScreen(
                             )
                         },
                         onCategoriesClick = { onNavigateToRoot(RootKey.Categories) },
-                        onManageLabels = { onNavigateToRoot(RootKey.Labels) },
+                        onManageLabels = { onNavigateToRoot(RootKey.ManageLabels) },
                         getDateLabel = getDateLabel
                     )
                     budgetEntry(
@@ -197,7 +197,7 @@ fun HomeScreen(
                         appState = appState,
                         initialUser = user,
                         profilePicture = profilePicture,
-                        onManageLabels = { onNavigateToRoot(RootKey.Labels) },
+                        onManageLabels = { onNavigateToRoot(RootKey.ManageLabels) },
                         onManageCategories = { onNavigateToRoot(RootKey.ManageCategories) },
                         onChangePassword = { onNavigateToRoot(RootKey.ChangePassword) }
                     )

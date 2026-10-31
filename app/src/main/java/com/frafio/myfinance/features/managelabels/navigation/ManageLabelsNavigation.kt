@@ -1,4 +1,4 @@
-package com.frafio.myfinance.features.labels.navigation
+package com.frafio.myfinance.features.managelabels.navigation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -9,24 +9,24 @@ import androidx.navigation3.runtime.NavKey
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.navigation.RootKey
-import com.frafio.myfinance.features.labels.LabelsScreen
-import com.frafio.myfinance.features.labels.LabelsUiEvent
-import com.frafio.myfinance.features.labels.LabelsViewModel
+import com.frafio.myfinance.features.managelabels.ManageLabelsScreen
+import com.frafio.myfinance.features.managelabels.ManageLabelsUiEvent
+import com.frafio.myfinance.features.managelabels.ManageLabelsViewModel
 import kotlinx.coroutines.launch
 
-fun EntryProviderScope<NavKey>.labelsEntry(
+fun EntryProviderScope<NavKey>.manageLabelsEntry(
     appState: MyFinanceAppState,
     onBackClick: () -> Unit
 ) {
-    entry<RootKey.Labels> {
-        val viewModel: LabelsViewModel = hiltViewModel()
+    entry<RootKey.ManageLabels> {
+        val viewModel: ManageLabelsViewModel = hiltViewModel()
         val coroutineScope = rememberCoroutineScope()
         val undoString = stringResource(id = R.string.undo)
 
         LaunchedEffect(viewModel.uiEvents) {
             viewModel.uiEvents.collect { event ->
                 when (event) {
-                    is LabelsUiEvent.ShowSnackBar -> {
+                    is ManageLabelsUiEvent.ShowSnackBar -> {
                         coroutineScope.launch {
                             appState.showSnackBar(
                                 event.message,
@@ -37,7 +37,7 @@ fun EntryProviderScope<NavKey>.labelsEntry(
                         }
                     }
 
-                    is LabelsUiEvent.LabelDeleted -> {
+                    is ManageLabelsUiEvent.LabelDeleted -> {
                         coroutineScope.launch {
                             appState.showSnackBar(
                                 event.message,
@@ -56,7 +56,7 @@ fun EntryProviderScope<NavKey>.labelsEntry(
             }
         }
 
-        LabelsScreen(
+        ManageLabelsScreen(
             appState = appState,
             viewModel = viewModel,
             onBackClick = onBackClick

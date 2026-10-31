@@ -1,4 +1,4 @@
-package com.frafio.myfinance.features.labels
+package com.frafio.myfinance.features.managelabels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,23 +20,23 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface LabelsUiEvent {
+sealed interface ManageLabelsUiEvent {
     data class ShowSnackBar(
         val message: String,
         val actionText: String? = null,
         val actionFun: () -> Unit = {},
         val dismissFun: () -> Unit = {}
-    ) : LabelsUiEvent
+    ) : ManageLabelsUiEvent
 
     data class LabelDeleted(
         val label: String,
         val affectedExpenses: List<Expense>,
         val message: String
-    ) : LabelsUiEvent
+    ) : ManageLabelsUiEvent
 }
 
 @HiltViewModel
-class LabelsViewModel @Inject constructor(
+class ManageLabelsViewModel @Inject constructor(
     private val expensesRepository: ExpensesRepository,
     private val loadingRepository: LoadingRepository,
     userPreferencesRepository: UserPreferencesRepository
@@ -46,8 +46,8 @@ class LabelsViewModel @Inject constructor(
         .map { it.labels }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userPreferencesRepository.userPreferencesFlow.value.labels)
 
-    private val _uiEvents = MutableSharedFlow<LabelsUiEvent>()
-    val uiEvents: SharedFlow<LabelsUiEvent> = _uiEvents
+    private val _uiEvents = MutableSharedFlow<ManageLabelsUiEvent>()
+    val uiEvents: SharedFlow<ManageLabelsUiEvent> = _uiEvents
 
     private val _editingLabel = MutableStateFlow<String?>(null)
     val editingLabel = _editingLabel.asStateFlow()
@@ -61,7 +61,7 @@ class LabelsViewModel @Inject constructor(
             try {
                 loadingRepository.startLoading()
                 val result = expensesRepository.addLabel(label)
-                _uiEvents.emit(LabelsUiEvent.ShowSnackBar(result.message))
+                _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(result.message))
             } finally {
                 loadingRepository.stopLoading()
             }
@@ -75,14 +75,14 @@ class LabelsViewModel @Inject constructor(
                 val deleteResult = expensesRepository.deleteLabel(label)
                 if (deleteResult.financeResult.code == FinanceCode.LABEL_DELETE_SUCCESS.code) {
                     _uiEvents.emit(
-                        LabelsUiEvent.LabelDeleted(
+                        ManageLabelsUiEvent.LabelDeleted(
                             label = label,
                             affectedExpenses = deleteResult.affectedExpenses,
                             message = deleteResult.financeResult.message
                         )
                     )
                 } else {
-                    _uiEvents.emit(LabelsUiEvent.ShowSnackBar(deleteResult.financeResult.message))
+                    _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(deleteResult.financeResult.message))
                 }
             } finally {
                 loadingRepository.stopLoading()
@@ -96,7 +96,7 @@ class LabelsViewModel @Inject constructor(
                 loadingRepository.startLoading()
                 val result = expensesRepository.undoDeleteLabel(label, affectedExpenses)
                 if (result.code != FinanceCode.LABELS_UPDATE_SUCCESS.code) {
-                    _uiEvents.emit(LabelsUiEvent.ShowSnackBar(result.message))
+                    _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(result.message))
                 }
             } finally {
                 loadingRepository.stopLoading()
@@ -109,7 +109,7 @@ class LabelsViewModel @Inject constructor(
             try {
                 loadingRepository.startLoading()
                 val result = expensesRepository.editLabel(oldName, newName)
-                _uiEvents.emit(LabelsUiEvent.ShowSnackBar(result.message))
+                _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(result.message))
             } finally {
                 loadingRepository.stopLoading()
             }

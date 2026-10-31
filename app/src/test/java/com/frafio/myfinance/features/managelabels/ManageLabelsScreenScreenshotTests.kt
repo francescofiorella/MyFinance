@@ -1,4 +1,4 @@
-package com.frafio.myfinance.features.labels
+package com.frafio.myfinance.features.managelabels
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
@@ -17,29 +17,29 @@ import org.robolectric.annotation.LooperMode
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @LooperMode(LooperMode.Mode.PAUSED)
-class LabelsScreenScreenshotTests {
+class ManageLabelsScreenScreenshotTests {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun populated() {
-        composeTestRule.captureMultiDevice("LabelsScreenPopulated") { Labels(screenshotLabels) }
+        composeTestRule.captureMultiDevice("ManageLabelsScreenPopulated") { ManageLabels(screenshotLabels) }
     }
 
     @Test
     fun populated_dark() {
-        composeTestRule.capturePhoneDark("LabelsScreenPopulated") { Labels(screenshotLabels) }
+        composeTestRule.capturePhoneDark("ManageLabelsScreenPopulated") { ManageLabels(screenshotLabels) }
     }
 
     @Test
     fun empty() {
-        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "LabelsScreenEmpty", deviceName = "phone") { Labels(emptyList()) }
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "ManageLabelsScreenEmpty", deviceName = "phone") { ManageLabels(emptyList()) }
     }
 
     @androidx.compose.runtime.Composable
-    private fun Labels(labels: List<String>) {
-        LabelsContent(
+    private fun ManageLabels(labels: List<String>) {
+        ManageLabelsContent(
             allLabels = labels,
             onBackClick = {},
             onAddLabel = {},
