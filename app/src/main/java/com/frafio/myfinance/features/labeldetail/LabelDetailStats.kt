@@ -1,6 +1,8 @@
 package com.frafio.myfinance.features.labeldetail
 
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.ExpenseCategories
+import com.frafio.myfinance.core.data.model.ExpenseCategory
 import com.frafio.myfinance.features.categorydetail.FrequentExpense
 import com.frafio.myfinance.features.categorydetail.TOP_EXPENSES_COUNT
 import com.frafio.myfinance.features.categorydetail.frequentExpenses
@@ -15,6 +17,13 @@ const val MAX_TIMELINE_SLOTS = 31
 
 /** Most gaps a timeline shows: a sparse label moves to a coarser unit rather than showing many breaks. */
 const val MAX_TIMELINE_GAPS = 3
+
+data class CategoryShare(
+    val category: ExpenseCategory,
+    val total: Double,
+    /** Fraction of the label's total, from 0 to 1. */
+    val share: Double
+)
 
 data class DayTotal(
     val date: LocalDate,
@@ -36,6 +45,8 @@ data class LabelDetailStats(
     /** The day with the highest total; the most recent one on a tie. */
     val biggestDay: DayTotal,
     val timeline: LabelTimeline,
+    /** The categories with spending, highest first. */
+    val categories: List<CategoryShare>,
     val topExpenses: List<Expense>,
     val frequent: List<FrequentExpense>
 )
@@ -118,9 +129,22 @@ fun buildLabelDetail(expenses: List<Expense>): LabelDetailStats? {
         averagePerActiveDay = total / days.size,
         biggestDay = days.maxWith(compareBy<DayTotal> { it.total }.thenBy { it.date }),
         timeline = buildLabelTimeline(expenses),
+        categories = categoryShares(expenses, total),
         topExpenses = expenses.sortedByDescending { it.price }.take(TOP_EXPENSES_COUNT),
         frequent = frequentExpenses(expenses)
     )
+}
+
+/** The categories of [expenses] with spending, highest first; ties keep the order of [ExpenseCategories.all]. */
+internal fun categoryShares(expenses: List<Expense>, total: Double): List<CategoryShare> {
+    val totals = expenses.groupBy { it.category }.mapValues { (_, categoryExpenses) -> categoryExpenses.sumOf { it.price } }
+    return ExpenseCategories.all
+        .mapNotNull { category ->
+            totals[category.id]?.takeIf { it > 0.0 }?.let { categoryTotal ->
+                CategoryShare(category, categoryTotal, if (total > 0.0) categoryTotal / total else 0.0)
+            }
+        }
+        .sortedByDescending { it.total }
 }
 
 /**

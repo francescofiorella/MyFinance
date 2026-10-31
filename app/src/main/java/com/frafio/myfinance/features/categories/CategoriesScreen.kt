@@ -1,35 +1,20 @@
 package com.frafio.myfinance.features.categories
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
@@ -39,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,14 +34,12 @@ import com.frafio.charts.ShareBarDefaults
 import com.frafio.charts.ShareBarItem
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
-import com.frafio.myfinance.core.components.CategoryIcon
+import com.frafio.myfinance.core.components.CategoryShareItem
 import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.components.SpendingChangeChip
 import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.ExpenseCategories
-import com.frafio.myfinance.core.data.model.ExpenseCategory
 import com.frafio.myfinance.core.theme.MyFinanceTheme
-import com.frafio.myfinance.core.utils.doubleToPercent
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.core.utils.monthToString
 import java.time.LocalDate
@@ -211,111 +193,20 @@ private fun CategorySpendingItem(
     count: Int,
     onClick: () -> Unit
 ) {
-    val hasSpending = spending.total > 0.0
-    SegmentedListItem(
+    CategoryShareItem(
+        category = spending.category,
+        total = spending.total,
+        share = spending.share,
+        index = index,
+        count = count,
         onClick = onClick,
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        shapes = ListItemDefaults.segmentedShapes(
-            index = index,
-            count = count,
-            defaultShapes = ListItemDefaults.shapes()
-        ),
-        content = {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    CategoryIcon(category = spending.category)
-
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 12.dp)
-                    ) {
-                        Text(
-                            text = stringResource(id = spending.category.nameRes),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = if (hasSpending) {
-                                "${doubleToPrice(spending.total)} · ${doubleToPercent(spending.share)}"
-                            } else {
-                                doubleToPrice(0.0)
-                            },
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    if (hasSpending) {
-                        SpendingChangeChip(change = spending.change)
-                    }
-                }
-
-                ProportionBar(
-                    modifier = Modifier.padding(start = 52.dp),
-                    visible = hasSpending,
-                    fraction = spending.share,
-                    category = spending.category
-                )
+        modifier = modifier.testTag("category_item"),
+        trailing = {
+            if (spending.total > 0.0) {
+                SpendingChangeChip(change = spending.change)
             }
-        },
-        modifier = modifier
-            .testTag("category_item")
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = if (index == count - 1) 0.dp else 2.dp)
-    )
-}
-
-/**
- * A thin track filled up to [fraction] (0 to 1) in the category's color. The fill and its color animate;
- * when [visible] turns false the bar fades and collapses as its fill shrinks to zero.
- */
-@Composable
-private fun ProportionBar(
-    modifier: Modifier = Modifier,
-    visible: Boolean,
-    fraction: Double,
-    category: ExpenseCategory,
-    animationSpec: AnimationSpec<Float> = MaterialTheme.motionScheme.slowSpatialSpec()
-) {
-    val isDark = isSystemInDarkTheme()
-    val animatedFraction by animateFloatAsState(
-        targetValue = fraction.toFloat().coerceIn(0f, 1f),
-        animationSpec = animationSpec,
-        label = "proportion"
-    )
-    // The row may show another category after a month change: blend into its color.
-    val fillColor by animateColorAsState(
-        targetValue = category.colors.container(isDark),
-        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
-        label = "proportion_color"
-    )
-    AnimatedVisibility(
-        modifier = modifier,
-        visible = visible,
-        enter = fadeIn(MaterialTheme.motionScheme.slowEffectsSpec()) +
-            expandVertically(MaterialTheme.motionScheme.slowSpatialSpec()),
-        exit = fadeOut(MaterialTheme.motionScheme.slowEffectsSpec()) +
-            shrinkVertically(MaterialTheme.motionScheme.slowSpatialSpec())
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxWidth()
-                .height(4.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(animatedFraction)
-                    .fillMaxHeight()
-                    .clip(CircleShape)
-                    .background(fillColor)
-            )
         }
-    }
+    )
 }
 
 /** Fixed sample data for previews and screenshots. */

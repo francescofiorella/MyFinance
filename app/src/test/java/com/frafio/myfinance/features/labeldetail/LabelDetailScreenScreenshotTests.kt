@@ -5,7 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.charts.R as ChartsR
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.R
 import com.frafio.myfinance.core.utils.doubleToPrice
+import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
 import com.frafio.myfinance.testing.screenshot.captureForDevice
 import com.frafio.myfinance.testing.screenshot.captureMultiDevice
@@ -34,14 +36,14 @@ class LabelDetailScreenScreenshotTests {
 
     @Test
     fun trip() {
-        composeTestRule.captureMultiDevice("LabelDetailScreen", narrowTimelineBars(sampleTripExpenses())) {
+        composeTestRule.captureMultiDevice("LabelDetailScreen", tripSuppressions) {
             Detail("Japan 2025", sampleTripExpenses())
         }
     }
 
     @Test
     fun trip_dark() {
-        composeTestRule.capturePhoneDark("LabelDetailScreen", narrowTimelineBars(sampleTripExpenses())) {
+        composeTestRule.capturePhoneDark("LabelDetailScreen", tripSuppressions) {
             Detail("Japan 2025", sampleTripExpenses())
         }
     }
@@ -55,6 +57,25 @@ class LabelDetailScreenScreenshotTests {
             Detail("Home renovation", sampleLongRunningExpenses())
         }
     }
+
+    private val tripSuppressions
+        get() = Matchers.anyOf(narrowTimelineBars(sampleTripExpenses()), overlappingTripPieIcons)
+
+    // Entertainment (1%) sits right before Dining (7%): their icons overlap and narrow each other's target.
+    private val overlappingTripPieIcons
+        get() = Matchers.allOf(
+            matchesCheck(TouchTargetSizeCheck::class.java),
+            matchesElements(
+                withContentDescription(
+                    Matchers.isIn(
+                        listOf(
+                            string(ChartsR.string.charts_item_description, string(R.string.dining), doubleToPriceWithoutDecimals(159.5)),
+                            string(ChartsR.string.charts_item_description, string(R.string.entertainment), doubleToPriceWithoutDecimals(28.0)),
+                        ),
+                    ),
+                ),
+            ),
+        )
 
     // Up to a month of bars share a phone-width card, 10 to 25 dp each: 48 dp needs a chart redesign.
     private fun narrowTimelineBars(expenses: List<Expense>) = Matchers.allOf(

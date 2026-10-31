@@ -1,11 +1,15 @@
 package com.frafio.myfinance.features.labeldetail
 
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyChild
+import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasParent
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -89,6 +93,35 @@ class LabelDetailScreenTest {
 
         composeTestRule.onNodeWithTag("label_detail_scroll").performScrollToNode(hasText(string(R.string.spending_over_time)))
         composeTestRule.onNodeWithText("average over 14 months").assertExists()
+    }
+
+    @Test
+    fun categories_rowsShowAmountAndShare_highestFirst() {
+        setScreen()
+
+        val scroll = composeTestRule.onNodeWithTag("label_detail_scroll")
+        scroll.performScrollToNode(hasTestTag("label_category_item"))
+        composeTestRule.onAllNodesWithTag("label_category_item").assertCountEquals(5)
+        composeTestRule.onAllNodesWithTag("label_category_item", useUnmergedTree = true)[0].assert(hasAnyDescendant(hasText(string(R.string.transportation))))
+        scroll.performScrollToNode(hasText("${doubleToPrice(1387.0)} · 63%"))
+        composeTestRule.onNodeWithText("${doubleToPrice(1387.0)} · 63%").assertIsDisplayed()
+        composeTestRule.onNodeWithText("${doubleToPrice(540.0)} · 25%").assertExists()
+    }
+
+    @Test
+    fun tappingACategoryRow_selectsItsSlice_andTappingAgainClearsIt() {
+        setScreen()
+        val housing = string(R.string.housing)
+        val row = composeTestRule.onAllNodesWithTag("label_category_item")[1]
+        composeTestRule.onNodeWithTag("label_detail_scroll").performScrollToNode(hasText(housing))
+        composeTestRule.onAllNodesWithText(housing).assertCountEquals(1)
+
+        row.performClick()
+        // The pie's centre names the selected category too.
+        composeTestRule.onAllNodesWithText(housing).assertCountEquals(2)
+
+        row.performClick()
+        composeTestRule.onAllNodesWithText(housing).assertCountEquals(1)
     }
 
     @Test

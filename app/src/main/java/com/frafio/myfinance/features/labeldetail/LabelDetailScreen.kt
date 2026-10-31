@@ -46,20 +46,25 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.charts.BarChart
 import com.frafio.charts.BarChartEntry
+import com.frafio.charts.PieChart
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
+import com.frafio.myfinance.core.components.CategoryShareItem
 import com.frafio.myfinance.core.components.DetailRow
 import com.frafio.myfinance.core.components.EmptyListItem
 import com.frafio.myfinance.core.components.SectionTitle
 import com.frafio.myfinance.core.components.StatCard
 import com.frafio.myfinance.core.components.TransactionListItem
+import com.frafio.myfinance.core.components.categoryPieChartItem
 import com.frafio.myfinance.core.components.toBarChartEntry
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.dateRangeToString
 import com.frafio.myfinance.core.utils.doubleToPrice
+import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -117,6 +122,7 @@ fun LabelDetailContent(
                         Header(dateRange = dateRangeToString(stats.first, stats.last))
                         StatsGrid(stats = stats)
                         TimelineCard(timeline = stats.timeline)
+                        CategoriesCard(categories = stats.categories)
 
                         if (stats.topExpenses.isNotEmpty()) {
                             SectionTitle(text = stringResource(id = R.string.biggest_expenses_overall))
@@ -282,6 +288,64 @@ private fun TimelineCard(timeline: LabelTimeline) {
                 barPadding = TIMELINE_BAR_PADDING
             )
         }
+    }
+}
+
+/** The pie over every category, in their fixed order like the dashboard, then a row per category with spending. */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun CategoriesCard(categories: List<CategoryShare>) {
+    // Index into ExpenseCategories.all; -1 selects none, showing the total.
+    var selectedCategory by rememberSaveable { mutableIntStateOf(-1) }
+    val totals = categories.associate { it.category.id to it.total }
+    Card(
+        modifier = Modifier
+            .testTag("label_categories")
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+        shape = ListItemDefaults.shapes().selectedShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
+            Text(
+                modifier = Modifier.padding(bottom = 16.dp),
+                text = stringResource(id = R.string.expenses_by_category),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                PieChart(
+                    items = ExpenseCategories.all.map { category ->
+                        categoryPieChartItem(
+                            value = totals[category.id] ?: 0.0,
+                            label = stringResource(category.nameRes),
+                            icon = category.iconRes,
+                            colors = category.colors
+                        )
+                    },
+                    selectedIndex = selectedCategory,
+                    onSelectedIndexChange = { selectedCategory = it },
+                    totalLabel = stringResource(id = R.string.total),
+                    valueFormatter = ::doubleToPriceWithoutDecimals,
+                    selectedIconShape = MaterialShapes.VerySunny
+                )
+            }
+        }
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+    categories.forEachIndexed { index, share ->
+        val categoryIndex = ExpenseCategories.all.indexOf(share.category)
+        val isSelected = selectedCategory == categoryIndex
+        CategoryShareItem(
+            category = share.category,
+            total = share.total,
+            share = share.share,
+            index = index,
+            count = categories.size,
+            onClick = { selectedCategory = if (isSelected) -1 else categoryIndex },
+            modifier = Modifier.testTag("label_category_item"),
+            selected = isSelected
+        )
     }
 }
 
