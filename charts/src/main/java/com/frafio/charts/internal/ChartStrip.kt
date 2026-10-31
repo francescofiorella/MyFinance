@@ -45,12 +45,21 @@ internal fun axisLabelStep(slot: Dp): Int =
 
 /**
  * Whether the bar at [position] gets an axis label: every [step]-th bar counting back from
- * [latestPosition], plus the selected one, whose neighbours closer than [step] stay unlabelled.
- * A negative [selectedPosition] means no selection.
+ * [latestPosition], plus the selected one and the [pinnedPositions], whose neighbours closer than [step]
+ * stay unlabelled. A negative [selectedPosition] means no selection.
  */
-internal fun isAxisLabelShown(position: Int, latestPosition: Int, selectedPosition: Int, step: Int): Boolean =
-    position == selectedPosition ||
-        (Math.floorMod(latestPosition - position, step) == 0 && (selectedPosition < 0 || abs(position - selectedPosition) >= step))
+internal fun isAxisLabelShown(
+    position: Int,
+    latestPosition: Int,
+    selectedPosition: Int,
+    step: Int,
+    pinnedPositions: Set<Int> = emptySet()
+): Boolean {
+    if (position == selectedPosition || position in pinnedPositions) return true
+    val isCrowded = (selectedPosition >= 0 && abs(position - selectedPosition) < step) ||
+        pinnedPositions.any { abs(position - it) < step }
+    return Math.floorMod(latestPosition - position, step) == 0 && !isCrowded
+}
 
 /**
  * Where [key] falls among the sorted bar [keys], as a fractional bar index: between two bars it is
@@ -189,7 +198,7 @@ internal fun <E> rememberEntryStrip(
 /**
  * A label under each slot of [strip], thinned out on narrow slots. [selectedIndex] points into the
  * entries, -1 for no selection; [label] gets whether the entry shows its extended label: the selected one,
- * or with none the latest, so the period stays readable.
+ * or with none the latest, so the period stays readable. Entries [isPinned] are always labelled.
  */
 @Composable
 internal fun <E> StripAxis(
@@ -198,11 +207,13 @@ internal fun <E> StripAxis(
     viewportWidth: Dp,
     label: (E, Boolean) -> String,
     color: Color,
-    selectedColor: Color
+    selectedColor: Color,
+    isPinned: (E) -> Boolean = { false }
 ) {
     val items = strip.items
     val latestPosition = items.indexOfLast { it.index >= 0 }
     val selectedPosition = items.indexOfFirst { it.index >= 0 && it.index == selectedIndex }
+    val pinnedPositions = items.indices.filterTo(HashSet()) { items[it].index >= 0 && isPinned(items[it].entry) }
     // Read while composing, so labels thin out progressively as the slots narrow.
     val start = strip.start()
     val visibleSlots = (strip.end() - start + 1f).coerceAtLeast(1f)
@@ -214,7 +225,7 @@ internal fun <E> StripAxis(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         items.forEachIndexed { position, item ->
-            if (!isAxisLabelShown(position, latestPosition, selectedPosition, labelStep)) {
+            if (!isAxisLabelShown(position, latestPosition, selectedPosition, labelStep, pinnedPositions)) {
                 Spacer(modifier = Modifier.weight(1f))
                 return@forEachIndexed
             }
