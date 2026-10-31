@@ -57,15 +57,15 @@ class LabelDetailScreenTest {
         setScreen()
 
         composeTestRule.onNodeWithText("Japan 2025").assertIsDisplayed()
-        composeTestRule.onNodeWithText("3 Feb – 19 Aug 2025").assertIsDisplayed()
+        assertStat(string(R.string.total) + " ", "3 Feb – 19 Aug 2025")
     }
 
     @Test
-    fun statsGrid_showsTheLifetimeStats() {
+    fun overview_showsTheTotal_andTheGridTheAverages() {
         setScreen()
 
-        assertStat(string(R.string.total), doubleToPrice(2199.5))
-        assertStat(string(R.string.expenses), "12")
+        composeTestRule.onNodeWithText(doubleToPrice(2199.5)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.expenses)).assertDoesNotExist()
         assertStat(string(R.string.average), doubleToPrice(2199.5 / 12))
         assertStat(doubleToPrice(2199.5 / 12), "out of 12 expenses")
         assertStat(string(R.string.average), doubleToPrice(2199.5 / 11))

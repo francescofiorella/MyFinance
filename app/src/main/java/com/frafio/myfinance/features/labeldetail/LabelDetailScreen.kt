@@ -1,6 +1,5 @@
 package com.frafio.myfinance.features.labeldetail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,13 +20,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -35,12 +31,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -139,14 +134,11 @@ fun LabelDetailContent(
                 when (state) {
                     LabelDetailUiState.Loading -> Unit
                     // The label lost its last expense while open.
-                    LabelDetailUiState.Empty -> {
-                        Header(dateRange = null)
-                        EmptyListItem(messageRes = R.string.no_expenses)
-                    }
+                    LabelDetailUiState.Empty -> EmptyListItem(messageRes = R.string.no_expenses)
 
                     is LabelDetailUiState.Loaded -> {
                         val stats = state.stats
-                        Header(dateRange = dateRangeToString(stats.first, stats.last))
+                        Overview(stats = stats)
                         StatsGrid(stats = stats)
                         CategoriesCard(
                             categories = stats.categories,
@@ -207,35 +199,38 @@ fun LabelDetailContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+/** The total in big, as BudgetScreen's overview, with the date range below. */
 @Composable
-private fun Header(dateRange: String?) {
+private fun Overview(stats: LabelDetailStats) {
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 24.dp)
+            .padding(top = 48.dp, bottom = 64.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .size(IconButtonDefaults.largeContainerSize().height)
-                .clip(MaterialShapes.Cookie12Sided.toShape())
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center
+        Text(
+            text = doubleToPrice(stats.total),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.displaySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_sell_filled),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(IconButtonDefaults.largeIconSize)
-            )
-        }
-        if (dateRange != null) {
-            Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = dateRange,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                text = stringResource(R.string.total) + " ",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = dateRangeToString(stats.first, stats.last),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -247,22 +242,6 @@ private fun StatsGrid(stats: LabelDetailStats) {
         modifier = Modifier.padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        StatRow(
-            start = { modifier ->
-                StatCard(
-                    modifier = modifier,
-                    label = stringResource(id = R.string.total),
-                    value = doubleToPrice(stats.total)
-                )
-            },
-            end = { modifier ->
-                StatCard(
-                    modifier = modifier,
-                    label = stringResource(id = R.string.expenses),
-                    value = stats.count.toString()
-                )
-            }
-        )
         StatRow(
             start = { modifier ->
                 StatCard(
