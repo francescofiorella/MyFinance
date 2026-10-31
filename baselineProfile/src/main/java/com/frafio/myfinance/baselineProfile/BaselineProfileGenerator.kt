@@ -36,7 +36,8 @@ class BaselineProfileGenerator {
         rule.collect(
             packageName = PACKAGE_NAME,
             includeInStartupProfile = false,
-            maxIterations = 6
+            maxIterations = if (RunOptions.isQuick) 1 else 6,
+            stableIterations = if (RunOptions.isQuick) 1 else 3
         ) {
             pressHome()
             startActivityAndWait()
@@ -45,10 +46,11 @@ class BaselineProfileGenerator {
             signUpFormToggle()
             signIn()
 
-            expensesJourney()
-            budgetJourney()
-            profileJourney()
-            addTransactionJourney()
+            if (RunOptions.runs("expenses")) expensesJourney()
+            if (RunOptions.runs("labels")) labelsJourney()
+            if (RunOptions.runs("budget")) budgetJourney()
+            if (RunOptions.runs("profile")) profileJourney()
+            if (RunOptions.runs("add")) addTransactionJourney()
         }
     }
 
@@ -103,9 +105,8 @@ class BaselineProfileGenerator {
             device.settle()
         }
 
-        // Before searching: the expanded search bar hides these buttons.
+        // Before searching: the expanded search bar hides the categories button.
         categoriesJourney()
-        openAndClose("expenses_list", "expenses_labels", "labels_list")
 
         // Focusing the field expands the bar over the manage buttons.
         if (device.withObject("search_field", 5_000) { it.click() }) {
@@ -179,6 +180,52 @@ class BaselineProfileGenerator {
 
         device.pressBack()
         confirmBack("expenses_list", "categories_scroll")
+    }
+
+    /**
+     * The Labels screen, the detail page of its first label, then Manage labels. "See all expenses" is left
+     * untouched like the categories' one, and nothing in Manage is edited: it writes to Firestore.
+     */
+    private fun MacrobenchmarkScope.labelsJourney() {
+        log("Labels.")
+        if (!device.openTab("tab_expenses", "expenses_list")) return
+        if (!device.scrollToAndTap("expenses_list", "expenses_labels")) {
+            log("Entry 'expenses_labels' not found, skipping.")
+            return
+        }
+        if (!device.awaitTag("labels_list", 10_000)) {
+            log("'labels_list' never appeared: the account has no labels.")
+            device.pressBack()
+            confirmBack("expenses_list", "labels_manage")
+            return
+        }
+        device.awaitGone("expenses_list", 5_000)
+        device.settle()
+        device.scrollBothWays("labels_list")
+
+        labelDetailJourney()
+        openAndClose("labels_list", "labels_manage", "manage_labels_list")
+
+        device.pressBack()
+        confirmBack("expenses_list", "labels_list")
+    }
+
+    // Rows of labels without expenses are static, so the detail opens only when the first label has some.
+    private fun MacrobenchmarkScope.labelDetailJourney() {
+        if (!device.tap("label_item")) {
+            log("No label row ('label_item'), skipping the detail.")
+            return
+        }
+        if (!device.awaitTag("label_detail_scroll", 10_000)) {
+            log("'label_detail_scroll' never appeared: the first label has no expenses.")
+            return
+        }
+        log("Label detail.")
+        device.awaitGone("labels_list", 5_000)
+        device.settle()
+        device.scrollBothWays("label_detail_scroll")
+        device.pressBack()
+        confirmBack("labels_list", "label_detail_scroll")
     }
 
     // A sheet left open would cover every later step: close it when its entry is missing.

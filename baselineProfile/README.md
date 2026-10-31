@@ -6,7 +6,7 @@ Releases generate the profile on CI, on an emulator ([docs/releasing.md](../docs
 
 ## Before you start
 
-- One **physical device** on ADB, and only one — the plugin uses `useConnectedDevices = true`, so a second device or a running emulator makes the run ambiguous.
+- One device on ADB, and only one — the plugin uses `useConnectedDevices = true`, so a second device makes the run ambiguous. A physical device or an API 33+ emulator such as `bp_ci` both work; CI uses an emulator.
 - **API 33+** (or rooted API 28+). Profile collection needs it; `minSdk 29` is not sufficient on its own.
 - Screen **unlocked and set to stay awake**. The run drives the UI for many minutes; a lock screen kills it.
 - **Network reachable** — the first iteration signs in against Firebase.
@@ -28,6 +28,20 @@ Roughly 9–12 minutes of device time, after the Gradle build. The last measured
 
 > **Do not touch the device while it runs.** Your taps go to the same app the run is driving, so they change what gets recorded. Worse, they make the collected profile differ from one iteration to the next, and the run keeps repeating until it sees three *identical* iterations in a row — so interfering makes it take longer, which is usually what makes people interfere. Leave it alone and watch logcat instead.
 
+## Checking a journey quickly
+
+A new or changed journey step can be checked without the full run. Two instrumentation arguments narrow it down: `bpJourneys` lists the top-level journeys to run after sign-in (`expenses`, `labels`, `budget`, `profile`, `add`; all of them by default), and `bpQuick=true` collects once instead of waiting for identical iterations. Run only `journeysSignedIn`:
+
+```
+.\gradlew.bat :app:generateBaselineProfile "-Pandroid.testInstrumentationRunnerArguments.class=com.frafio.myfinance.baselineProfile.BaselineProfileGenerator#journeysSignedIn" "-Pandroid.testInstrumentationRunnerArguments.bpJourneys=labels" "-Pandroid.testInstrumentationRunnerArguments.bpQuick=true"
+```
+
+Add `bpEmail` / `bpPassword` as above if the device has no session. Watch `adb logcat -s MyFinanceBP`: the check passes when every step of the journey is logged with no "not found", "never appeared" or "not back" line. The run rewrites the profile files with a partial profile, so discard it afterwards:
+
+```
+git checkout -- app/src/main/generated/baselineProfiles
+```
+
 ## Phase 1 — build and install
 
 Several minutes with nothing happening on the device. Gradle assembles `nonMinifiedRelease` of the app plus the `:baselineProfile` test APK, installs both, then instrumentation starts and the device wakes up. Minification is off for this variant, so the test tags survive.
@@ -45,15 +59,16 @@ The long journey is capped at `maxIterations = 6` so a profile that refuses to s
 3. The sign-up form expands, then collapses.
 4. **Email and password fill themselves in, with no keyboard.** ← see below
 5. Sign-in is tapped. Wavy progress bar, then the dashboard with a "Login successful" snackbar.
-6. Straight to the Expenses tab — the dashboard is not scrolled or touched. The list flings to the bottom and back up, then the categories and labels buttons beside the search bar each open their screen and close it.
+6. Straight to the Expenses tab — the dashboard is not scrolled or touched. The list flings to the bottom and back up, then the categories button beside the search bar opens its screen and closes it.
 7. The search field is tapped: the bar widens over those buttons and the keyboard opens. The letter `a` appears, the list narrows, the query clears, then the back arrow collapses the bar and the keyboard closes.
 8. Filter sheet slides up (Label / Category / Date range). Category is tapped, the category grid opens, back dismisses it.
 9. Filter sheet opens again, Date range is tapped, the date-range picker appears, back dismisses it. *Nothing is ever selected, so no filter is left applied.*
 10. A transaction is long-pressed. Action sheet appears (Labels / Edit / Duplicate / Delete). **Edit** is tapped, the Add screen opens pre-filled, and the X closes it without saving.
-11. Budget tab. The list scrolls down and back.
-12. Profile tab. The account row expands and collapses, then Change password opens and closes, then the currency sheet opens and closes.
-13. Back to the dashboard, FAB tapped. The Add screen fills in with "Baseline profile" and 12.34, the expense/income switcher opens and closes, and the X closes the screen — **never the save tick**.
-14. The app dies, launcher reappears, next iteration starts at step 2.
+11. The labels button opens the Labels screen, which scrolls down and back. The first label opens its detail page (stats, timeline, pie), which scrolls down and back and closes; a first label without expenses has no detail and is skipped. Manage labels opens from the top bar and closes, then the Labels screen closes. *"See all expenses" is never tapped and nothing is edited.*
+12. Budget tab. The list scrolls down and back.
+13. Profile tab. The account row expands and collapses, then Change password opens and closes, then the currency sheet opens and closes.
+14. Back to the dashboard, FAB tapped. The Add screen fills in with "Baseline profile" and 12.34, the expense/income switcher opens and closes, and the X closes the screen — **never the save tick**.
+15. The app dies, launcher reappears, next iteration starts at step 2.
 
 The dashboard is skipped on purpose. `startupCold` already captures it, and the benchmark showed its frames are fast without any profile (P50 ≈ 4 ms) and unchanged with one — scrolling it or stepping its charts here added run time and nothing else.
 

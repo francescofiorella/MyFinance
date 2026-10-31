@@ -36,6 +36,23 @@ internal object Credentials {
             "  -Pandroid.testInstrumentationRunnerArguments.bpPassword=your-password"
 }
 
+/**
+ * Read from the `bpJourneys` / `bpQuick` instrumentation arguments, to check journey steps without a full run.
+ * Without them every journey runs and the profile is collected until it is stable.
+ */
+internal object RunOptions {
+    private val arguments = InstrumentationRegistry.getArguments()
+
+    private val journeys: Set<String>?
+        get() = arguments.getString("bpJourneys")?.split(",")?.map { it.trim() }?.filterTo(HashSet()) { it.isNotEmpty() }
+
+    /** Whether the top-level [journey] runs: all of them, or those listed in `bpJourneys`. */
+    fun runs(journey: String): Boolean = journeys?.contains(journey) ?: true
+
+    /** One collection instead of waiting for identical ones. */
+    val isQuick: Boolean get() = arguments.getString("bpQuick").toBoolean()
+}
+
 /** Works only because MainActivity's root Surface sets `testTagsAsResourceId = true`. */
 internal fun res(testTag: String): BySelector = By.res(testTag)
 
