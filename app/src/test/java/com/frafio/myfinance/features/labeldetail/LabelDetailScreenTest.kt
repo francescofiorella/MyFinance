@@ -2,6 +2,8 @@ package com.frafio.myfinance.features.labeldetail
 
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyChild
+import androidx.compose.ui.test.hasParent
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -53,14 +55,40 @@ class LabelDetailScreenTest {
     fun statsGrid_showsTheLifetimeStats() {
         setScreen()
 
-        composeTestRule.onNodeWithText(doubleToPrice(2199.5)).assertIsDisplayed()
-        composeTestRule.onNodeWithText("12").assertIsDisplayed()
-        composeTestRule.onNodeWithText("11").assertIsDisplayed()
-        composeTestRule.onNodeWithText("out of 198 days").assertIsDisplayed()
-        composeTestRule.onNodeWithText(doubleToPrice(2199.5 / 11)).assertIsDisplayed()
-        composeTestRule.onNodeWithText(doubleToPrice(2199.5 / 12)).assertIsDisplayed()
-        composeTestRule.onNodeWithText(string(R.string.biggest_day)).assertIsDisplayed()
-        composeTestRule.onNodeWithText("3 Feb 2025").assertIsDisplayed()
+        assertStat(string(R.string.total), doubleToPrice(2199.5))
+        assertStat(string(R.string.expenses), "12")
+        assertStat(string(R.string.active_days), "11")
+        assertStat(string(R.string.active_days), "out of 198 days")
+        assertStat(string(R.string.average_per_active_day), doubleToPrice(2199.5 / 11))
+        assertStat(string(R.string.average_per_expense), doubleToPrice(2199.5 / 12))
+        assertStat(string(R.string.biggest_day), doubleToPrice(920.0))
+        assertStat(string(R.string.biggest_day), "3 Feb 2025")
+    }
+
+    // A stat card's value sits next to its label.
+    private fun assertStat(label: String, value: String) {
+        composeTestRule.onNode(hasText(value) and hasParent(hasAnyChild(hasText(label)))).assertIsDisplayed()
+    }
+
+    @Test
+    fun timeline_showsTheTripDays_withTheStretchesBeforeCollapsed() {
+        setScreen()
+
+        composeTestRule.onNodeWithTag("label_detail_scroll").performScrollToNode(hasText(string(R.string.spending_over_time)))
+        // Flight, hotel, pass and the eight trip days.
+        composeTestRule.onNodeWithText("average over 11 days").assertExists()
+        composeTestRule.onNodeWithContentDescription("2 months without expenses").assertExists()
+        composeTestRule.onNodeWithContentDescription("3 months without expenses").assertExists()
+        composeTestRule.onNodeWithContentDescription("3 weeks without expenses").assertExists()
+        composeTestRule.onNodeWithText("3 wk").assertExists()
+    }
+
+    @Test
+    fun timeline_ofALongRunningLabel_isMonthly() {
+        setScreen(LabelDetailUiState.Loaded(buildLabelDetail(sampleLongRunningExpenses())!!))
+
+        composeTestRule.onNodeWithTag("label_detail_scroll").performScrollToNode(hasText(string(R.string.spending_over_time)))
+        composeTestRule.onNodeWithText("average over 14 months").assertExists()
     }
 
     @Test

@@ -272,9 +272,10 @@ helper's `accessibilitySuppressions` parameter, as narrowly as possible: one che
 elements (`Matchers.allOf(matchesCheck(TouchTargetSizeCheck::class.java), matchesElements(withContentDescription(…)))`),
 never `Matchers.anything()`, with a one-line reason above it. A node that shows text instead of a content description is matched with `withText(…)`.
 
-There are two suppressions today:
+There are three suppressions today:
 
 - `DashboardScreenScreenshotTests`: the twelve month bars of the chart are about 27 dp wide on a phone.
+- `LabelDetailScreenScreenshotTests`: the spending timeline shows up to a month of bars, 10 to 25 dp wide on a phone.
 - `ComponentScreenshotTests.dateRangePickerDialog`: the months scroll inside the dialog, and its bottom edge cuts the next month's first day ("June 1, 2024") to 2 dp.
 
 ## Instrumented tests
