@@ -244,49 +244,30 @@ private fun StatsGrid(stats: LabelDetailStats) {
             start = { modifier ->
                 StatCard(
                     modifier = modifier,
-                    label = stringResource(id = R.string.active_days),
-                    value = stats.activeDays.toString(),
-                    extra = {
-                        Text(
-                            text = pluralStringResource(R.plurals.active_days_out_of, stats.spanDays, stats.spanDays),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    label = stringResource(id = R.string.average_per_expense),
+                    value = doubleToPrice(stats.averagePerExpense),
+                    extra = { StatExtra(text = pluralStringResource(R.plurals.out_of_expenses, stats.count, stats.count)) }
                 )
             },
             end = { modifier ->
                 StatCard(
                     modifier = modifier,
                     label = stringResource(id = R.string.average_per_active_day),
-                    value = doubleToPrice(stats.averagePerActiveDay)
-                )
-            }
-        )
-        StatRow(
-            start = { modifier ->
-                StatCard(
-                    modifier = modifier,
-                    label = stringResource(id = R.string.average_per_expense),
-                    value = doubleToPrice(stats.averagePerExpense)
-                )
-            },
-            end = { modifier ->
-                StatCard(
-                    modifier = modifier,
-                    label = stringResource(id = R.string.biggest_day),
-                    value = doubleToPrice(stats.biggestDay.total),
-                    extra = {
-                        Text(
-                            text = dateRangeToString(stats.biggestDay.date, stats.biggestDay.date),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    value = doubleToPrice(stats.averagePerActiveDay),
+                    extra = { StatExtra(text = pluralStringResource(R.plurals.out_of_active_days, stats.activeDays, stats.activeDays)) }
                 )
             }
         )
     }
+}
+
+@Composable
+private fun StatExtra(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
 }
 
 /** The pie over every category, in their fixed order like the dashboard, then a row per category with spending. */

@@ -200,13 +200,16 @@
         <item quantity="other">%1$d expenses</item>
     </plurals>
     <string name="average_per_expense">Average per expense</string>
-    <string name="active_days">Active days</string>
-    <plurals name="active_days_out_of">
-        <item quantity="one">out of %1$d day</item>
-        <item quantity="many">out of %1$d days</item>
-        <item quantity="other">out of %1$d days</item>
+    <plurals name="out_of_expenses">
+        <item quantity="one">out of %1$d expense</item>
+        <item quantity="many">out of %1$d expenses</item>
+        <item quantity="other">out of %1$d expenses</item>
     </plurals>
     <string name="average_per_active_day">Average per active day</string>
-    <string name="biggest_day">Biggest day</string>
+    <plurals name="out_of_active_days">
+        <item quantity="one">out of %1$d active day</item>
+        <item quantity="many">out of %1$d active days</item>
+        <item quantity="other">out of %1$d active days</item>
+    </plurals>
     <string name="biggest_expenses_overall">Biggest expenses</string>
 </resources>

@@ -35,8 +35,8 @@ class LabelDetailStatsTest {
     }
 
     @Test
-    fun span_countsEveryDayFromTheFirstToTheLastExpense() {
-        // A trip booked months ahead: two active days over 198.
+    fun dateRange_isFromTheFirstToTheLastExpense() {
+        // A trip booked months ahead: two active days.
         val stats = buildLabelDetail(
             listOf(
                 testExpense(name = "Train", date = LocalDate.of(2025, 8, 19)),
@@ -46,41 +46,17 @@ class LabelDetailStatsTest {
 
         assertThat(stats.first).isEqualTo(LocalDate.of(2025, 2, 3))
         assertThat(stats.last).isEqualTo(LocalDate.of(2025, 8, 19))
-        assertThat(stats.spanDays).isEqualTo(198)
         assertThat(stats.activeDays).isEqualTo(2)
     }
 
     @Test
-    fun singleExpense_spansOneDay() {
+    fun singleExpense_startsAndEndsOnItsDay() {
         val stats = buildLabelDetail(listOf(testExpense(price = 5.0, date = aug12)))!!
 
-        assertThat(stats.spanDays).isEqualTo(1)
-        assertThat(stats.biggestDay).isEqualTo(DayTotal(aug12, 5.0))
-    }
-
-    @Test
-    fun biggestDay_sumsTheDaysExpenses() {
-        val stats = buildLabelDetail(
-            listOf(
-                testExpense(name = "Dinner", price = 50.0, date = aug14),
-                testExpense(name = "Lunch", price = 40.0, date = aug12),
-                testExpense(name = "Museum", price = 20.0, date = aug12)
-            )
-        )!!
-
-        assertThat(stats.biggestDay).isEqualTo(DayTotal(aug12, 60.0))
-    }
-
-    @Test
-    fun biggestDay_onATie_isTheMostRecent() {
-        val stats = buildLabelDetail(
-            listOf(
-                testExpense(name = "Dinner", price = 50.0, date = aug14),
-                testExpense(name = "Lunch", price = 50.0, date = aug12)
-            )
-        )!!
-
-        assertThat(stats.biggestDay).isEqualTo(DayTotal(aug14, 50.0))
+        assertThat(stats.first).isEqualTo(aug12)
+        assertThat(stats.last).isEqualTo(aug12)
+        assertThat(stats.activeDays).isEqualTo(1)
+        assertThat(stats.averagePerActiveDay).isEqualTo(5.0)
     }
 
     @Test

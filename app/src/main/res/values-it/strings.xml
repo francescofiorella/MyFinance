@@ -201,13 +201,16 @@
         <item quantity="other">%1$d spese</item>
     </plurals>
     <string name="average_per_expense">Media per spesa</string>
-    <string name="active_days">Giorni attivi</string>
-    <plurals name="active_days_out_of">
-        <item quantity="one">su %1$d giorno</item>
-        <item quantity="many">su %1$d giorni</item>
-        <item quantity="other">su %1$d giorni</item>
+    <plurals name="out_of_expenses">
+        <item quantity="one">su %1$d spesa</item>
+        <item quantity="many">su %1$d spese</item>
+        <item quantity="other">su %1$d spese</item>
     </plurals>
     <string name="average_per_active_day">Media per giorno attivo</string>
-    <string name="biggest_day">Giorno più costoso</string>
+    <plurals name="out_of_active_days">
+        <item quantity="one">su %1$d giorno attivo</item>
+        <item quantity="many">su %1$d giorni attivi</item>
+        <item quantity="other">su %1$d giorni attivi</item>
+    </plurals>
     <string name="biggest_expenses_overall">Spese maggiori</string>
 </resources>

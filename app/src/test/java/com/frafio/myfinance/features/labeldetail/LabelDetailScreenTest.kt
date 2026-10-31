@@ -64,12 +64,10 @@ class LabelDetailScreenTest {
 
         assertStat(string(R.string.total), doubleToPrice(2199.5))
         assertStat(string(R.string.expenses), "12")
-        assertStat(string(R.string.active_days), "11")
-        assertStat(string(R.string.active_days), "out of 198 days")
-        assertStat(string(R.string.average_per_active_day), doubleToPrice(2199.5 / 11))
         assertStat(string(R.string.average_per_expense), doubleToPrice(2199.5 / 12))
-        assertStat(string(R.string.biggest_day), doubleToPrice(920.0))
-        assertStat(string(R.string.biggest_day), "3 Feb 2025")
+        assertStat(string(R.string.average_per_expense), "out of 12 expenses")
+        assertStat(string(R.string.average_per_active_day), doubleToPrice(2199.5 / 11))
+        assertStat(string(R.string.average_per_active_day), "out of 11 active days")
     }
 
     // A stat card's value sits next to its label.
