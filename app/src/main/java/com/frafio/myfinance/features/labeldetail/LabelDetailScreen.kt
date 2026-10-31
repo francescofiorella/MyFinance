@@ -205,7 +205,10 @@ fun LabelDetailContent(
     }
 }
 
-/** The label icon over the total in big, as BudgetScreen's overview, with the date range below. */
+/**
+ * The label icon over the total in big, styled as BudgetScreen's overview and spaced as CategoryDetail's header,
+ * with the date range below.
+ */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun Overview(stats: LabelDetailStats) {
@@ -213,8 +216,7 @@ private fun Overview(stats: LabelDetailStats) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .padding(top = 48.dp, bottom = 64.dp)
+            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
     ) {
         Box(
             modifier = Modifier
