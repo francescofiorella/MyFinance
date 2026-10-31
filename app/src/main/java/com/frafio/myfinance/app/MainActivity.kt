@@ -55,6 +55,7 @@ import com.frafio.myfinance.features.categories.navigation.categoriesEntry
 import com.frafio.myfinance.features.categorydetail.navigation.categoryDetailEntry
 import com.frafio.myfinance.features.frequentexpenses.navigation.frequentExpensesEntry
 import com.frafio.myfinance.features.home.HomeScreen
+import com.frafio.myfinance.features.labels.navigation.labelsEntry
 import com.frafio.myfinance.features.managecategories.navigation.manageCategoriesEntry
 import com.frafio.myfinance.features.managelabels.navigation.manageLabelsEntry
 import com.frafio.myfinance.features.password.navigation.changePasswordEntry
@@ -180,6 +181,10 @@ class MainActivity : ComponentActivity() {
                                 viewModel.onTransactionCommitted(isExpense, day, month, year)
                                 rootBackStack.removeAt(rootBackStack.size - 1)
                             }
+                        )
+                        labelsEntry(
+                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
+                            onManageClick = { rootBackStack.add(RootKey.ManageLabels) }
                         )
                         manageLabelsEntry(
                             appState = appState,

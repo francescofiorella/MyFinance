@@ -53,6 +53,8 @@ class ExpensesLocalRepositoryImpl @Inject constructor(
     override fun getExpensesOfCategory(category: Int, startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<Expense>> =
         expenseDao.getExpensesOfCategory(category, startYear, startMonth, endYear, endMonth)
 
+    override fun getLabelled(): Flow<List<Expense>> = expenseDao.getLabelled()
+
     override fun getAllSync(): List<Expense> = expenseDao.getAllSync()
 
     override suspend fun getById(id: String): Expense? = expenseDao.getById(id)

@@ -195,4 +195,9 @@
         <item quantity="many">%1$d volte</item>
         <item quantity="other">%1$d volte</item>
     </plurals>
+    <plurals name="expense_count">
+        <item quantity="one">%1$d spesa</item>
+        <item quantity="many">%1$d spese</item>
+        <item quantity="other">%1$d spese</item>
+    </plurals>
 </resources>

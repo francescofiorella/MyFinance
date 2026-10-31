@@ -81,6 +81,13 @@ interface ExpenseDao : BaseDao<Expense> {
             "ORDER BY year DESC, month DESC, day DESC, price DESC")
     fun getExpensesOfCategory(category: Int, startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<Expense>>
 
+    // Labels are stored as a JSON array, so an unlabelled expense holds '[]'.
+    @Query("SELECT * " +
+            "FROM expense " +
+            "WHERE labels != '[]' " +
+            "ORDER BY year DESC, month DESC, day DESC, price DESC, category DESC")
+    fun getLabelled(): Flow<List<Expense>>
+
     @Query("SELECT * FROM expense WHERE id = :id")
     override suspend fun getById(id: String): Expense?
 

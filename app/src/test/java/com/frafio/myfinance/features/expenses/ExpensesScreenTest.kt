@@ -87,7 +87,7 @@ class ExpensesScreenTest {
                 onEditExpense = { expense, index -> edited += expense to index },
                 onDuplicateExpense = { duplicated += it },
                 onCategoriesClick = { navigation += "categories" },
-                onManageLabels = { navigation += "labels" },
+                onLabelsClick = { navigation += "labels" },
                 getDateLabel = { _, _ -> "range" },
             )
         }
@@ -146,7 +146,7 @@ class ExpensesScreenTest {
         populated()
 
         composeTestRule.onNodeWithTag("expenses_categories").performClick()
-        composeTestRule.onNodeWithTag("expenses_manage_labels").performClick()
+        composeTestRule.onNodeWithTag("expenses_labels").performClick()
 
         assertThat(navigation).containsExactly("categories", "labels").inOrder()
     }
@@ -158,12 +158,12 @@ class ExpensesScreenTest {
         composeTestRule.onNodeWithTag("search_field").performClick()
 
         composeTestRule.onNodeWithTag("expenses_categories").assertDoesNotExist()
-        composeTestRule.onNodeWithTag("expenses_manage_labels").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("expenses_labels").assertDoesNotExist()
 
         composeTestRule.onNodeWithTag("search_back_button").performClick()
 
         composeTestRule.onNodeWithTag("expenses_categories").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("expenses_manage_labels").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("expenses_labels").assertIsDisplayed()
     }
 
     @Test

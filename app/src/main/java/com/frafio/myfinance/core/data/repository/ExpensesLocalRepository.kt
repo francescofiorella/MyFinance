@@ -38,6 +38,9 @@ interface ExpensesLocalRepository {
     /** Expenses of [category] from [startYear]/[startMonth] (inclusive) to [endYear]/[endMonth] (exclusive), newest first. */
     fun getExpensesOfCategory(category: Int, startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<Expense>>
 
+    /** Expenses with at least one label, newest first. */
+    fun getLabelled(): Flow<List<Expense>>
+
     fun getAllSync(): List<Expense>
 
     suspend fun getById(id: String): Expense?

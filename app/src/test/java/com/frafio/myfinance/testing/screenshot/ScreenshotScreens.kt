@@ -113,7 +113,7 @@ internal fun ScreenshotExpenses(
         onItemLongClick = { _, _ -> },
         onCategoryClick = { _, _ -> },
         onCategoriesClick = {},
-        onManageLabels = {},
+        onLabelsClick = {},
         getDateLabel = ::screenshotDateLabel,
     )
 }

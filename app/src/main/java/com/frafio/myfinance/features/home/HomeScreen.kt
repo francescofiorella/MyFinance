@@ -166,7 +166,7 @@ fun HomeScreen(
                             )
                         },
                         onCategoriesClick = { onNavigateToRoot(RootKey.Categories) },
-                        onManageLabels = { onNavigateToRoot(RootKey.ManageLabels) },
+                        onLabelsClick = { onNavigateToRoot(RootKey.Labels) },
                         getDateLabel = getDateLabel
                     )
                     budgetEntry(

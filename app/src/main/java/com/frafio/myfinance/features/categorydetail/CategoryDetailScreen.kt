@@ -26,7 +26,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
@@ -47,8 +46,11 @@ import com.frafio.charts.LineChartDefaults
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.CategoryIcon
+import com.frafio.myfinance.core.components.DetailRow
 import com.frafio.myfinance.core.components.MonthlyRangeLineChart
+import com.frafio.myfinance.core.components.SectionTitle
 import com.frafio.myfinance.core.components.SpendingChangeChip
+import com.frafio.myfinance.core.components.StatCard
 import com.frafio.myfinance.core.components.TransactionListItem
 import com.frafio.myfinance.core.data.model.CategoryColors
 import com.frafio.myfinance.core.data.model.Expense
@@ -321,34 +323,6 @@ private fun StatsGrid(stats: CategoryDetailStats, year: Int) {
     }
 }
 
-@Composable
-private fun StatCard(
-    modifier: Modifier = Modifier,
-    label: String,
-    value: String,
-    extra: @Composable () -> Unit = {}
-) {
-    Card(
-        modifier = modifier.fillMaxHeight(),
-        shape = ListItemDefaults.shapes().selectedShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            extra()
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TrendCard(
@@ -391,69 +365,6 @@ private fun TrendCard(
                 selectedPointShape = MaterialShapes.SoftBurst
             )
         }
-    }
-}
-
-@Composable
-private fun SectionTitle(text: String) {
-    Text(
-        modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 8.dp),
-        text = text,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-}
-
-@Composable
-private fun DetailRow(
-    title: String,
-    subtitle: String?,
-    value: String,
-    index: Int,
-    count: Int,
-    modifier: Modifier = Modifier,
-    // Null keeps the row static, as for the labels.
-    onClick: (() -> Unit)? = null
-) {
-    val colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-    val shapes = ListItemDefaults.segmentedShapes(
-        index = index,
-        count = count,
-        defaultShapes = ListItemDefaults.shapes()
-    )
-    val rowModifier = modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp)
-        .padding(bottom = if (index == count - 1) 0.dp else 2.dp)
-    val content: @Composable () -> Unit = {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                if (subtitle != null) {
-                    Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-            Text(
-                modifier = Modifier.padding(start = 12.dp),
-                text = value,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-
-    if (onClick != null) {
-        SegmentedListItem(onClick = onClick, colors = colors, shapes = shapes, content = content, modifier = rowModifier)
-    } else {
-        SegmentedListItem(colors = colors, shapes = shapes, content = content, modifier = rowModifier)
     }
 }
 

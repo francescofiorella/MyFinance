@@ -67,6 +67,21 @@ fun monthRangeToString(from: LocalDate, to: LocalDate): String {
     }
 }
 
+// Two days as a short range in the device language, sharing month and year when they can,
+// e.g. "12 Aug 2025", "12–19 Aug 2025", "3 Feb – 18 Aug 2025", "20 Dec 2024 – 5 Jan 2025".
+fun dateRangeToString(first: LocalDate, last: LocalDate): String {
+    fun format(date: LocalDate, pattern: String): String =
+        date.format(DateTimeFormatter.ofPattern(pattern)).split(" ").joinToString(" ") { part ->
+            part.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        }
+    return when {
+        first == last -> format(last, "d MMM uuuu")
+        first.year == last.year && first.month == last.month -> "${first.dayOfMonth}–${format(last, "d MMM uuuu")}"
+        first.year == last.year -> "${format(first, "d MMM")} – ${format(last, "d MMM uuuu")}"
+        else -> "${format(first, "d MMM uuuu")} – ${format(last, "d MMM uuuu")}"
+    }
+}
+
 fun dateToString(dayOfMonth: Int?, month: Int?, year: Int?): String? {
     var formattedDate: String? = null
     dayOfMonth?.let {

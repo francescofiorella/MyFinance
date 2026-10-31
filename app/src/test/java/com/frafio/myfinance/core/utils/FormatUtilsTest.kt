@@ -201,4 +201,25 @@ class FormatUtilsTest {
     fun monthRangeToString_showsShortMonthsAcrossAYear() {
         assertThat(monthRangeToString(LocalDate.of(2023, 6, 1), LocalDate.of(2024, 5, 1))).isEqualTo("Jun 2023 – May 2024")
     }
+
+    @Test
+    fun dateRangeToString_sameDay_showsOneDate() {
+        val day = LocalDate.of(2025, 8, 12)
+        assertThat(dateRangeToString(day, day)).isEqualTo("12 Aug 2025")
+    }
+
+    @Test
+    fun dateRangeToString_sameMonth_sharesMonthAndYear() {
+        assertThat(dateRangeToString(LocalDate.of(2025, 8, 12), LocalDate.of(2025, 8, 19))).isEqualTo("12–19 Aug 2025")
+    }
+
+    @Test
+    fun dateRangeToString_sameYear_sharesTheYear() {
+        assertThat(dateRangeToString(LocalDate.of(2025, 2, 3), LocalDate.of(2025, 8, 18))).isEqualTo("3 Feb – 18 Aug 2025")
+    }
+
+    @Test
+    fun dateRangeToString_acrossYears_showsBothYears() {
+        assertThat(dateRangeToString(LocalDate.of(2024, 12, 20), LocalDate.of(2025, 1, 5))).isEqualTo("20 Dec 2024 – 5 Jan 2025")
+    }
 }

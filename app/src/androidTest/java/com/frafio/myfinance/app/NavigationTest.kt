@@ -151,8 +151,21 @@ class NavigationTest {
     }
 
     @Test
-    fun expenses_manageLabels_opensLabels_andBackReturns() {
-        assertExpensesSubScreen(entry = "expenses_manage_labels", content = "manage_labels_list")
+    fun expenses_labels_opensLabels_andBackReturns() {
+        assertExpensesSubScreen(entry = "expenses_labels", content = "labels_list")
+    }
+
+    @Test
+    fun labels_manage_opensManageLabels_andBackReturnsToLabels() {
+        composeTestRule.onNodeWithTag("tab_expenses").performClick()
+        composeTestRule.onNodeWithTag("expenses_labels").performClick()
+        composeTestRule.onNodeWithTag("labels_manage").performClick()
+        composeTestRule.onNodeWithTag("manage_labels_list").assertExists()
+
+        Espresso.pressBack()
+
+        composeTestRule.onNodeWithTag("manage_labels_list").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("labels_list").assertExists()
     }
 
     @Test

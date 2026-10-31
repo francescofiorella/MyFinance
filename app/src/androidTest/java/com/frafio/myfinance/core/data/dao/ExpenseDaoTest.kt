@@ -413,5 +413,21 @@ internal class ExpenseDaoTest : DatabaseTest() {
         assertThat(expenses).containsExactly(janLater, jan, nov).inOrder()
     }
 
+    @Test
+    fun getLabelled_skipsUnlabelled_newestFirst() = runTest {
+        val older = testExpense(name = "Flight", date = LocalDate.of(2024, 2, 3), labels = listOf("Japan"))
+        val newer = testExpense(name = "Hotel", date = LocalDate.of(2024, 8, 12), labels = listOf("Japan", "Work"))
+        expenseDao.insertAll(older, testExpense(name = "Coffee", date = date), newer)
+
+        assertThat(expenseDao.getLabelled().first()).containsExactly(newer, older).inOrder()
+    }
+
+    @Test
+    fun getLabelled_none_isAnEmptyList() = runTest {
+        expenseDao.insertAll(testExpense(name = "Coffee"))
+
+        assertThat(expenseDao.getLabelled().first()).isEmpty()
+    }
+
     // endregion
 }

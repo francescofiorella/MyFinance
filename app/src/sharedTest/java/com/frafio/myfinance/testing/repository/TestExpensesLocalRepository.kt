@@ -115,6 +115,9 @@ class TestExpensesLocalRepository : ExpensesLocalRepository {
                 .sortedForList()
         }
 
+    override fun getLabelled(): Flow<List<Expense>> =
+        expensesFlow.map { expenses -> expenses.filter { it.labels.isNotEmpty() }.sortedForList() }
+
     override fun getAllSync(): List<Expense> = expensesFlow.replayCache.firstOrNull() ?: emptyList()
 
     override suspend fun getById(id: String): Expense? = getAllSync().find { it.id == id }

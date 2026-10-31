@@ -81,6 +81,7 @@ class ExpensesLocalRepositoryImplTest {
         override fun getExpensesOfYear(year: Int): Flow<List<Expense>> = flowOf(emptyList())
         override fun getExpensesOfCategory(category: Int, startYear: Int, startMonth: Int, endYear: Int, endMonth: Int): Flow<List<Expense>> =
             flowOf(emptyList())
+        override fun getLabelled(): Flow<List<Expense>> = flowOf(emptyList())
         override suspend fun getById(id: String): Expense? = null
         override fun getAllSync(): List<Expense> = emptyList()
         override fun upsert(item: Expense) = Unit

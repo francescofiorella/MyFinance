@@ -87,7 +87,7 @@ fun ExpensesScreen(
     onEditExpense: (Expense, Int) -> Unit,
     onDuplicateExpense: (Expense) -> Unit,
     onCategoriesClick: () -> Unit,
-    onManageLabels: () -> Unit,
+    onLabelsClick: () -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
     modifier: Modifier = Modifier,
 ) {
@@ -277,7 +277,7 @@ fun ExpensesScreen(
             showCategorySheet = true
         },
         onCategoriesClick = onCategoriesClick,
-        onManageLabels = onManageLabels,
+        onLabelsClick = onLabelsClick,
         getDateLabel = getDateLabel,
         modifier = modifier
     )
@@ -306,7 +306,7 @@ fun ExpensesContent(
     onItemLongClick: (Expense, Int) -> Unit,
     onCategoryClick: (Expense, Int) -> Unit,
     onCategoriesClick: () -> Unit,
-    onManageLabels: () -> Unit,
+    onLabelsClick: () -> Unit,
     getDateLabel: (LocalDate, LocalDate) -> String,
     modifier: Modifier = Modifier,
 ) {
@@ -390,20 +390,20 @@ fun ExpensesContent(
                                     customItem(
                                         {
                                             FilledTonalIconButton(
-                                                onClick = onManageLabels,
+                                                onClick = onLabelsClick,
                                                 shapes = IconButtonDefaults.shapes(
                                                     shape = IconButtonDefaults.smallRoundShape,
                                                     pressedShape = IconButtonDefaults.smallRoundShape
                                                 ),
                                                 interactionSource = labelsInteractionSource,
                                                 modifier = Modifier
-                                                    .testTag("expenses_manage_labels")
+                                                    .testTag("expenses_labels")
                                                     .size(IconButtonDefaults.smallContainerSize())
                                                     .animateWidth(labelsInteractionSource),
                                             ) {
                                                 Icon(
                                                     painter = painterResource(id = R.drawable.ic_sell_outline),
-                                                    contentDescription = stringResource(id = R.string.manage_labels),
+                                                    contentDescription = stringResource(id = R.string.labels),
                                                 )
                                             }
                                         },
@@ -651,7 +651,7 @@ fun ExpensesPreview() {
             onItemLongClick = { _, _ -> },
             onCategoryClick = { _, _ -> },
             onCategoriesClick = {},
-            onManageLabels = {},
+            onLabelsClick = {},
             getDateLabel = { _, _ -> "Oct 27, 2023" },
             itemMetadata = emptyMap(),
         )
