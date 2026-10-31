@@ -64,13 +64,13 @@ class LabelDetailScreenTest {
 
         assertStat(string(R.string.total), doubleToPrice(2199.5))
         assertStat(string(R.string.expenses), "12")
-        assertStat(string(R.string.average_per_expense), doubleToPrice(2199.5 / 12))
-        assertStat(string(R.string.average_per_expense), "out of 12 expenses")
-        assertStat(string(R.string.average_per_active_day), doubleToPrice(2199.5 / 11))
-        assertStat(string(R.string.average_per_active_day), "out of 11 active days")
+        assertStat(string(R.string.average), doubleToPrice(2199.5 / 12))
+        assertStat(doubleToPrice(2199.5 / 12), "out of 12 expenses")
+        assertStat(string(R.string.average), doubleToPrice(2199.5 / 11))
+        assertStat(doubleToPrice(2199.5 / 11), "out of 11 active days")
     }
 
-    // A stat card's value sits next to its label.
+    // [value] sits in the same stat card as [label].
     private fun assertStat(label: String, value: String) {
         composeTestRule.onNode(hasText(value) and hasParent(hasAnyChild(hasText(label)))).assertIsDisplayed()
     }

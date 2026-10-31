@@ -200,13 +200,12 @@
         <item quantity="many">%1$d spese</item>
         <item quantity="other">%1$d spese</item>
     </plurals>
-    <string name="average_per_expense">Media per spesa</string>
+    <string name="average">Media</string>
     <plurals name="out_of_expenses">
         <item quantity="one">su %1$d spesa</item>
         <item quantity="many">su %1$d spese</item>
         <item quantity="other">su %1$d spese</item>
     </plurals>
-    <string name="average_per_active_day">Media per giorno attivo</string>
     <plurals name="out_of_active_days">
         <item quantity="one">su %1$d giorno attivo</item>
         <item quantity="many">su %1$d giorni attivi</item>

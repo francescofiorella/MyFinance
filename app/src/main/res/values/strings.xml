@@ -199,13 +199,12 @@
         <item quantity="many">%1$d expenses</item>
         <item quantity="other">%1$d expenses</item>
     </plurals>
-    <string name="average_per_expense">Average per expense</string>
+    <string name="average">Average</string>
     <plurals name="out_of_expenses">
         <item quantity="one">out of %1$d expense</item>
         <item quantity="many">out of %1$d expenses</item>
         <item quantity="other">out of %1$d expenses</item>
     </plurals>
-    <string name="average_per_active_day">Average per active day</string>
     <plurals name="out_of_active_days">
         <item quantity="one">out of %1$d active day</item>
         <item quantity="many">out of %1$d active days</item>

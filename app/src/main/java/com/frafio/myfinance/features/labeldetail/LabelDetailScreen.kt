@@ -244,7 +244,7 @@ private fun StatsGrid(stats: LabelDetailStats) {
             start = { modifier ->
                 StatCard(
                     modifier = modifier,
-                    label = stringResource(id = R.string.average_per_expense),
+                    label = stringResource(id = R.string.average),
                     value = doubleToPrice(stats.averagePerExpense),
                     extra = { StatExtra(text = pluralStringResource(R.plurals.out_of_expenses, stats.count, stats.count)) }
                 )
@@ -252,7 +252,7 @@ private fun StatsGrid(stats: LabelDetailStats) {
             end = { modifier ->
                 StatCard(
                     modifier = modifier,
-                    label = stringResource(id = R.string.average_per_active_day),
+                    label = stringResource(id = R.string.average),
                     value = doubleToPrice(stats.averagePerActiveDay),
                     extra = { StatExtra(text = pluralStringResource(R.plurals.out_of_active_days, stats.activeDays, stats.activeDays)) }
                 )
