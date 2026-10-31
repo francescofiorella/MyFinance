@@ -33,14 +33,15 @@ sealed interface RootKey : NavKey {
     @Serializable
     data class CategoryDetail(val categoryId: Int, val year: Int, val month: Int) : RootKey
 
-    // The expenses named [name] within [scope].
+    // The expenses within [scope], grouped by day.
     @Serializable
-    data class FrequentExpenses(val name: String, val scope: Scope) : RootKey {
+    data class FrequentExpenses(val scope: Scope) : RootKey {
         @Serializable
         sealed interface Scope {
-            // A category's expenses from fromYear/fromMonth to toYear/toMonth (inclusive).
+            // The expenses named [name] of a category, from fromYear/fromMonth to toYear/toMonth (inclusive).
             @Serializable
-            data class Category(
+            data class NameInCategory(
+                val name: String,
                 val categoryId: Int,
                 val fromYear: Int,
                 val fromMonth: Int,
@@ -48,9 +49,13 @@ sealed interface RootKey : NavKey {
                 val toMonth: Int
             ) : Scope
 
-            // Every expense with the label.
+            // The expenses named [name] with the label.
             @Serializable
-            data class Label(val label: String) : Scope
+            data class NameInLabel(val name: String, val label: String) : Scope
+
+            // Every expense of a category with the label.
+            @Serializable
+            data class CategoryInLabel(val categoryId: Int, val label: String) : Scope
         }
     }
 

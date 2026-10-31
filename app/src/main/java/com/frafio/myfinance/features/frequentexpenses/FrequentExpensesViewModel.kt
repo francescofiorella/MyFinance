@@ -1,8 +1,11 @@
 package com.frafio.myfinance.features.frequentexpenses
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
 import com.frafio.myfinance.core.di.Dispatcher
 import com.frafio.myfinance.core.di.MyFinanceDispatchers.Default
@@ -14,6 +17,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
@@ -43,6 +47,10 @@ class FrequentExpensesViewModel @AssistedInject constructor(
         fun create(navKey: RootKey.FrequentExpenses): FrequentExpensesViewModel
     }
 
+    /** The category within a label, otherwise the frequent expenses title. */
+    @StringRes
+    val titleRes: Int
+
     /** Under the title: the months covered, or the label. */
     val subtitle: String
 
@@ -50,31 +58,47 @@ class FrequentExpensesViewModel @AssistedInject constructor(
     val days: StateFlow<List<ExpensesOfDay>?>
 
     init {
-        val nameKey = expenseNameKey(navKey.name)
         val expenses = when (val scope = navKey.scope) {
-            is RootKey.FrequentExpenses.Scope.Category -> {
+            is RootKey.FrequentExpenses.Scope.NameInCategory -> {
                 val from = LocalDate.of(scope.fromYear, scope.fromMonth, 1)
                 val to = LocalDate.of(scope.toYear, scope.toMonth, 1)
                 val end = to.plusMonths(1)
+                val nameKey = expenseNameKey(scope.name)
+                titleRes = R.string.frequent_expenses_title
                 subtitle = monthRangeToString(from, to)
                 expensesLocalRepository.getExpensesOfCategory(
                     scope.categoryId,
                     from.year, from.monthValue,
                     end.year, end.monthValue
-                )
+                ).map { ofCategory -> ofCategory.filter { expenseNameKey(it.name) == nameKey } }
             }
 
-            is RootKey.FrequentExpenses.Scope.Label -> {
+            is RootKey.FrequentExpenses.Scope.NameInLabel -> {
+                val nameKey = expenseNameKey(scope.name)
+                titleRes = R.string.frequent_expenses_title
                 subtitle = scope.label
-                // Only the other labels: this one is on every row.
-                expensesLocalRepository.getLabelled().map { labelled ->
-                    labelled.filter { scope.label in it.labels }.map { it.copy(labels = it.labels - scope.label) }
-                }
+                expensesWithLabel(expensesLocalRepository, scope.label) { expenseNameKey(it.name) == nameKey }
+            }
+
+            is RootKey.FrequentExpenses.Scope.CategoryInLabel -> {
+                titleRes = ExpenseCategories.get(scope.categoryId).nameRes
+                subtitle = scope.label
+                expensesWithLabel(expensesLocalRepository, scope.label) { it.category == scope.categoryId }
             }
         }
         days = expenses
-            .map { groupByDay(it.filter { expense -> expenseNameKey(expense.name) == nameKey }) }
+            .map(::groupByDay)
             .flowOn(defaultDispatcher)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
     }
 }
+
+/** The expenses with [label] matching [predicate], keeping only their other labels: this one is on every row. */
+private fun expensesWithLabel(
+    expensesLocalRepository: ExpensesLocalRepository,
+    label: String,
+    predicate: (Expense) -> Boolean
+): Flow<List<Expense>> =
+    expensesLocalRepository.getLabelled().map { labelled ->
+        labelled.filter { label in it.labels && predicate(it) }.map { it.copy(labels = it.labels - label) }
+    }

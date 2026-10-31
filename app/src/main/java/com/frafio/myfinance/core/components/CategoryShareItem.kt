@@ -36,7 +36,6 @@ import com.frafio.myfinance.core.utils.doubleToPrice
 /**
  * A category's row in a segmented group: its icon and name, the [total] with its [share] of the whole
  * (only the amount when nothing was spent), any [trailing] content, and a bar filled up to [share].
- * A [selected] row blends into the selected container color.
  */
 @Composable
 fun CategoryShareItem(
@@ -47,18 +46,12 @@ fun CategoryShareItem(
     count: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    selected: Boolean = false,
     trailing: @Composable () -> Unit = {}
 ) {
     val hasSpending = total > 0.0
-    val containerColor by animateColorAsState(
-        targetValue = if (selected) ListItemDefaults.colors().selectedContainerColor else MaterialTheme.colorScheme.surfaceContainer,
-        animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec(),
-        label = "row_container"
-    )
     SegmentedListItem(
         onClick = onClick,
-        colors = ListItemDefaults.colors(containerColor = containerColor),
+        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         shapes = ListItemDefaults.segmentedShapes(
             index = index,
             count = count,

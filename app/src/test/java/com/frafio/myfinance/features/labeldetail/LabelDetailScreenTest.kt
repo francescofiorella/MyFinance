@@ -18,6 +18,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import com.frafio.myfinance.R
+import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.frafio.myfinance.testing.util.string
@@ -45,7 +46,8 @@ class LabelDetailScreenTest {
                 state = state,
                 onBackClick = { events += "back" },
                 onSeeAllExpenses = { events += "seeAll" },
-                onFrequentExpenseClick = { events += "frequent:${it.name}" }
+                onFrequentExpenseClick = { events += "frequent:${it.name}" },
+                onCategoryClick = { events += "category:${it.id}" }
             )
         }
     }
@@ -89,18 +91,15 @@ class LabelDetailScreenTest {
     }
 
     @Test
-    fun tappingACategoryRow_selectsItsSlice_andTappingAgainClearsIt() {
+    fun tappingACategoryRow_reportsThatCategory_andLeavesThePieUnselected() {
         setScreen()
         val housing = string(R.string.housing)
-        val row = composeTestRule.onAllNodesWithTag("label_category_item")[1]
         composeTestRule.onNodeWithTag("label_detail_scroll").performScrollToNode(hasText(housing))
-        composeTestRule.onAllNodesWithText(housing).assertCountEquals(1)
 
-        row.performClick()
-        // The pie's centre names the selected category too.
-        composeTestRule.onAllNodesWithText(housing).assertCountEquals(2)
+        composeTestRule.onAllNodesWithTag("label_category_item")[1].performClick()
 
-        row.performClick()
+        assertThat(events).containsExactly("category:${CATEGORIES.HOUSING.value}")
+        // The pie's centre would name a selected category too.
         composeTestRule.onAllNodesWithText(housing).assertCountEquals(1)
     }
 

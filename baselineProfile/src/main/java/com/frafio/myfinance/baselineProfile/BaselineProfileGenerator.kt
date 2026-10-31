@@ -168,7 +168,7 @@ class BaselineProfileGenerator {
                 device.awaitGone("categories_scroll", 5_000)
                 device.settle()
                 device.scrollBothWays("category_detail_scroll")
-                frequentExpensesJourney("category_detail_scroll")
+                expensesListJourney("category_detail_scroll", "frequent_expense_item")
             } else {
                 log("'category_detail_scroll' never appeared.")
             }
@@ -224,7 +224,8 @@ class BaselineProfileGenerator {
         device.awaitGone("labels_list", 5_000)
         device.settle()
         device.scrollBothWays("label_detail_scroll")
-        frequentExpensesJourney("label_detail_scroll")
+        expensesListJourney("label_detail_scroll", "label_category_item")
+        expensesListJourney("label_detail_scroll", "frequent_expense_item")
         device.pressBack()
         confirmBack("labels_list", "label_detail_scroll")
     }
@@ -236,13 +237,16 @@ class BaselineProfileGenerator {
         device.settle()
     }
 
-    // Needs the same expense name at least twice in the detail: the category's 12 months shown, or the label.
-    private fun MacrobenchmarkScope.frequentExpensesJourney(detailScroll: String) {
-        if (!device.scrollToAndTap(detailScroll, "frequent_expense_item")) {
-            log("No frequent expense ('frequent_expense_item'), skipping.")
+    /**
+     * The expenses list opened by a detail row: a most frequent expense, which needs the same name at least twice
+     * (within the category's 12 months shown, or the label), or a label's category.
+     */
+    private fun MacrobenchmarkScope.expensesListJourney(detailScroll: String, rowTag: String) {
+        if (!device.scrollToAndTap(detailScroll, rowTag)) {
+            log("No row '$rowTag', skipping.")
             return
         }
-        log("Frequent expenses.")
+        log("Expenses list from '$rowTag'.")
         if (device.awaitTag("frequent_expenses_list", 10_000)) {
             device.awaitGone(detailScroll, 5_000)
             device.settle()

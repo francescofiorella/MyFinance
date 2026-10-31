@@ -59,6 +59,7 @@ import com.frafio.myfinance.core.components.categoryPieChartItem
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.ExpenseCategories
+import com.frafio.myfinance.core.data.model.ExpenseCategory
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.dateRangeToString
@@ -72,7 +73,7 @@ fun LabelDetailScreen(
     viewModel: LabelDetailViewModel,
     onBackClick: () -> Unit,
     onSeeAllExpenses: () -> Unit,
-    onFrequentExpenseClick: (RootKey.FrequentExpenses) -> Unit
+    onExpensesClick: (RootKey.FrequentExpenses) -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LabelDetailContent(
@@ -84,12 +85,10 @@ fun LabelDetailScreen(
             onSeeAllExpenses()
         },
         onFrequentExpenseClick = { frequent ->
-            onFrequentExpenseClick(
-                RootKey.FrequentExpenses(
-                    name = frequent.name,
-                    scope = RootKey.FrequentExpenses.Scope.Label(viewModel.label)
-                )
-            )
+            onExpensesClick(RootKey.FrequentExpenses(RootKey.FrequentExpenses.Scope.NameInLabel(frequent.name, viewModel.label)))
+        },
+        onCategoryClick = { category ->
+            onExpensesClick(RootKey.FrequentExpenses(RootKey.FrequentExpenses.Scope.CategoryInLabel(category.id, viewModel.label)))
         }
     )
 }
@@ -101,7 +100,8 @@ fun LabelDetailContent(
     state: LabelDetailUiState,
     onBackClick: () -> Unit,
     onSeeAllExpenses: () -> Unit,
-    onFrequentExpenseClick: (FrequentExpense) -> Unit
+    onFrequentExpenseClick: (FrequentExpense) -> Unit,
+    onCategoryClick: (ExpenseCategory) -> Unit
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -136,7 +136,7 @@ fun LabelDetailContent(
                         val stats = state.stats
                         Header(dateRange = dateRangeToString(stats.first, stats.last))
                         StatsGrid(stats = stats)
-                        CategoriesCard(categories = stats.categories)
+                        CategoriesCard(categories = stats.categories, onCategoryClick = onCategoryClick)
 
                         if (stats.topExpenses.isNotEmpty()) {
                             SectionTitle(text = stringResource(id = R.string.biggest_expenses_overall))
@@ -270,10 +270,13 @@ private fun StatExtra(text: String) {
     )
 }
 
-/** The pie over every category, in their fixed order like the dashboard, then a row per category with spending. */
+/**
+ * The pie over every category, in their fixed order like the dashboard, then a row per category with spending,
+ * opening its expenses.
+ */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun CategoriesCard(categories: List<CategoryShare>) {
+private fun CategoriesCard(categories: List<CategoryShare>, onCategoryClick: (ExpenseCategory) -> Unit) {
     // Index into ExpenseCategories.all; -1 selects none, showing the total.
     var selectedCategory by rememberSaveable { mutableIntStateOf(-1) }
     val totals = categories.associate { it.category.id to it.total }
@@ -313,17 +316,14 @@ private fun CategoriesCard(categories: List<CategoryShare>) {
     }
     Spacer(modifier = Modifier.height(8.dp))
     categories.forEachIndexed { index, share ->
-        val categoryIndex = ExpenseCategories.all.indexOf(share.category)
-        val isSelected = selectedCategory == categoryIndex
         CategoryShareItem(
             category = share.category,
             total = share.total,
             share = share.share,
             index = index,
             count = categories.size,
-            onClick = { selectedCategory = if (isSelected) -1 else categoryIndex },
-            modifier = Modifier.testTag("label_category_item"),
-            selected = isSelected
+            onClick = { onCategoryClick(share.category) },
+            modifier = Modifier.testTag("label_category_item")
         )
     }
 }
@@ -403,7 +403,8 @@ fun LabelDetailPreview() {
             state = LabelDetailUiState.Loaded(buildLabelDetail(sampleTripExpenses())!!),
             onBackClick = {},
             onSeeAllExpenses = {},
-            onFrequentExpenseClick = {}
+            onFrequentExpenseClick = {},
+            onCategoryClick = {}
         )
     }
 }

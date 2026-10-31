@@ -76,7 +76,8 @@ class LabelDetailScreenScreenshotTests {
             state = LabelDetailUiState.Loaded(buildLabelDetail(expenses)!!),
             onBackClick = {},
             onSeeAllExpenses = {},
-            onFrequentExpenseClick = {}
+            onFrequentExpenseClick = {},
+            onCategoryClick = {}
         )
     }
 }

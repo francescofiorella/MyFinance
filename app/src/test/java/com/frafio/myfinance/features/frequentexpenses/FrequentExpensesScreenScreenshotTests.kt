@@ -2,7 +2,9 @@ package com.frafio.myfinance.features.frequentexpenses
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import com.frafio.myfinance.R
 import com.frafio.myfinance.core.utils.monthRangeToString
 import com.frafio.myfinance.testing.screenshot.captureMultiDevice
 import com.frafio.myfinance.testing.screenshot.capturePhoneDark
@@ -37,6 +39,7 @@ class FrequentExpensesScreenScreenshotTests {
     @Composable
     private fun FrequentExpenses() {
         FrequentExpensesContent(
+            title = stringResource(id = R.string.frequent_expenses_title),
             subtitle = monthRangeToString(to.minusMonths(11), to),
             days = sampleFrequentExpenseDays(to),
             onBackClick = {}

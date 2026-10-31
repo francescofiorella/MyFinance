@@ -98,8 +98,8 @@ fun CategoryDetailScreen(
         onFrequentExpenseClick = { frequent ->
             onFrequentExpenseClick(
                 RootKey.FrequentExpenses(
-                    name = frequent.name,
-                    scope = RootKey.FrequentExpenses.Scope.Category(
+                    RootKey.FrequentExpenses.Scope.NameInCategory(
+                        name = frequent.name,
                         categoryId = viewModel.category.id,
                         fromYear = viewModel.windowStart.year,
                         fromMonth = viewModel.windowStart.monthValue,

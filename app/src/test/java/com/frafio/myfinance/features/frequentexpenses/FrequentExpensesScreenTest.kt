@@ -43,6 +43,7 @@ class FrequentExpensesScreenTest {
     private fun setScreen() {
         composeTestRule.setThemedContent {
             FrequentExpensesContent(
+                title = string(R.string.frequent_expenses_title),
                 subtitle = monthRangeToString(to.minusMonths(11), to),
                 days = days,
                 onBackClick = { backClicks++ }
