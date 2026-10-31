@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performClick
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.utils.activeCurrencyCode
 import com.frafio.myfinance.core.utils.doubleToPrice
+import com.frafio.myfinance.core.utils.monthRangeToString
 import com.frafio.myfinance.testing.util.setThemedContent
 import com.frafio.myfinance.testing.util.string
 import com.google.common.truth.Truth.assertThat
@@ -41,7 +42,11 @@ class FrequentExpensesScreenTest {
 
     private fun setScreen() {
         composeTestRule.setThemedContent {
-            FrequentExpensesContent(from = to.minusMonths(11), to = to, days = days, onBackClick = { backClicks++ })
+            FrequentExpensesContent(
+                subtitle = monthRangeToString(to.minusMonths(11), to),
+                days = days,
+                onBackClick = { backClicks++ }
+            )
         }
     }
 

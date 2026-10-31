@@ -63,10 +63,12 @@ import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.MonthlyTotal
+import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.dateRangeToString
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
+import com.frafio.myfinance.features.categorydetail.FrequentExpense
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -74,7 +76,8 @@ import java.time.format.DateTimeFormatter
 fun LabelDetailScreen(
     viewModel: LabelDetailViewModel,
     onBackClick: () -> Unit,
-    onSeeAllExpenses: () -> Unit
+    onSeeAllExpenses: () -> Unit,
+    onFrequentExpenseClick: (RootKey.FrequentExpenses) -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LabelDetailContent(
@@ -84,6 +87,14 @@ fun LabelDetailScreen(
         onSeeAllExpenses = {
             viewModel.onSeeAllExpenses()
             onSeeAllExpenses()
+        },
+        onFrequentExpenseClick = { frequent ->
+            onFrequentExpenseClick(
+                RootKey.FrequentExpenses(
+                    name = frequent.name,
+                    scope = RootKey.FrequentExpenses.Scope.Label(viewModel.label)
+                )
+            )
         }
     )
 }
@@ -94,7 +105,8 @@ fun LabelDetailContent(
     label: String,
     state: LabelDetailUiState,
     onBackClick: () -> Unit,
-    onSeeAllExpenses: () -> Unit
+    onSeeAllExpenses: () -> Unit,
+    onFrequentExpenseClick: (FrequentExpense) -> Unit
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -157,7 +169,9 @@ fun LabelDetailContent(
                                     ),
                                     value = doubleToPrice(frequent.total),
                                     index = index,
-                                    count = stats.frequent.size
+                                    count = stats.frequent.size,
+                                    modifier = Modifier.testTag("frequent_expense_item"),
+                                    onClick = { onFrequentExpenseClick(frequent) }
                                 )
                             }
                         }
@@ -513,7 +527,8 @@ fun LabelDetailPreview() {
             label = "Japan 2025",
             state = LabelDetailUiState.Loaded(buildLabelDetail(sampleTripExpenses())!!),
             onBackClick = {},
-            onSeeAllExpenses = {}
+            onSeeAllExpenses = {},
+            onFrequentExpenseClick = {}
         )
     }
 }

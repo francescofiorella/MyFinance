@@ -44,7 +44,8 @@ class LabelDetailScreenTest {
                 label = "Japan 2025",
                 state = state,
                 onBackClick = { events += "back" },
-                onSeeAllExpenses = { events += "seeAll" }
+                onSeeAllExpenses = { events += "seeAll" },
+                onFrequentExpenseClick = { events += "frequent:${it.name}" }
             )
         }
     }
@@ -138,6 +139,16 @@ class LabelDetailScreenTest {
         scroll.performScrollToNode(hasText("Ramen"))
         composeTestRule.onNodeWithText("Ramen").assertIsDisplayed()
         composeTestRule.onNodeWithText("3 times").assertIsDisplayed()
+    }
+
+    @Test
+    fun tappingAMostFrequentRow_reportsThatExpense() {
+        setScreen()
+
+        // Most used first: Ramen.
+        composeTestRule.onAllNodesWithTag("frequent_expense_item")[0].performScrollTo().performClick()
+
+        assertThat(events).containsExactly("frequent:Ramen")
     }
 
     @Test

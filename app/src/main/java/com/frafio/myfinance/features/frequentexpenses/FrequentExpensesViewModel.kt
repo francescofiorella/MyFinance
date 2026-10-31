@@ -8,6 +8,7 @@ import com.frafio.myfinance.core.di.Dispatcher
 import com.frafio.myfinance.core.di.MyFinanceDispatchers.Default
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.utils.expenseNameKey
+import com.frafio.myfinance.core.utils.monthRangeToString
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -42,20 +43,37 @@ class FrequentExpensesViewModel @AssistedInject constructor(
         fun create(navKey: RootKey.FrequentExpenses): FrequentExpensesViewModel
     }
 
-    /** First and last month covered, both included. */
-    val from: LocalDate = LocalDate.of(navKey.fromYear, navKey.fromMonth, 1)
-    val to: LocalDate = LocalDate.of(navKey.toYear, navKey.toMonth, 1)
+    /** Under the title: the months covered, or the label. */
+    val subtitle: String
 
     /** Null until loaded. */
-    val days: StateFlow<List<ExpensesOfDay>?> = run {
-        val end = to.plusMonths(1)
+    val days: StateFlow<List<ExpensesOfDay>?>
+
+    init {
         val nameKey = expenseNameKey(navKey.name)
-        expensesLocalRepository.getExpensesOfCategory(
-            navKey.categoryId,
-            from.year, from.monthValue,
-            end.year, end.monthValue
-        )
-            .map { expenses -> groupByDay(expenses.filter { expenseNameKey(it.name) == nameKey }) }
+        val expenses = when (val scope = navKey.scope) {
+            is RootKey.FrequentExpenses.Scope.Category -> {
+                val from = LocalDate.of(scope.fromYear, scope.fromMonth, 1)
+                val to = LocalDate.of(scope.toYear, scope.toMonth, 1)
+                val end = to.plusMonths(1)
+                subtitle = monthRangeToString(from, to)
+                expensesLocalRepository.getExpensesOfCategory(
+                    scope.categoryId,
+                    from.year, from.monthValue,
+                    end.year, end.monthValue
+                )
+            }
+
+            is RootKey.FrequentExpenses.Scope.Label -> {
+                subtitle = scope.label
+                // Only the other labels: this one is on every row.
+                expensesLocalRepository.getLabelled().map { labelled ->
+                    labelled.filter { scope.label in it.labels }.map { it.copy(labels = it.labels - scope.label) }
+                }
+            }
+        }
+        days = expenses
+            .map { groupByDay(it.filter { expense -> expenseNameKey(expense.name) == nameKey }) }
             .flowOn(defaultDispatcher)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
     }

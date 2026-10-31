@@ -2,6 +2,7 @@ package com.frafio.myfinance.features.frequentexpenses
 
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.navigation.RootKey
+import com.frafio.myfinance.core.utils.monthRangeToString
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.repository.TestExpensesLocalRepository
 import com.frafio.myfinance.testing.util.MainDispatcherRule
@@ -29,23 +30,61 @@ class FrequentExpensesViewModelTest {
 
     @Before
     fun setup() {
-        viewModel = FrequentExpensesViewModel(
-            expensesLocalRepository,
-            UnconfinedTestDispatcher(),
-            RootKey.FrequentExpenses(
+        viewModel = viewModel(
+            RootKey.FrequentExpenses.Scope.Category(
                 categoryId = dining,
-                name = "Sushi Bar",
                 fromYear = 2023, fromMonth = 6,
                 toYear = 2024, toMonth = 5
             )
         )
     }
 
+    private fun viewModel(scope: RootKey.FrequentExpenses.Scope) = FrequentExpensesViewModel(
+        expensesLocalRepository,
+        UnconfinedTestDispatcher(),
+        RootKey.FrequentExpenses(name = "Sushi Bar", scope = scope)
+    )
+
     @Test
-    fun exposesThePeriod_andNoDaysUntilLoaded() {
-        assertThat(viewModel.from).isEqualTo(LocalDate.of(2023, 6, 1))
-        assertThat(viewModel.to).isEqualTo(LocalDate.of(2024, 5, 1))
+    fun subtitleIsThePeriod_andNoDaysUntilLoaded() {
+        assertThat(viewModel.subtitle).isEqualTo(monthRangeToString(LocalDate.of(2023, 6, 1), LocalDate.of(2024, 5, 1)))
         assertThat(viewModel.days.value).isNull()
+    }
+
+    @Test
+    fun labelScope_subtitleIsTheLabel() {
+        viewModel = viewModel(RootKey.FrequentExpenses.Scope.Label("Japan"))
+
+        assertThat(viewModel.subtitle).isEqualTo("Japan")
+    }
+
+    @Test
+    fun labelScope_daysKeepTheNameWithExactlyThatLabel_inAnyCategoryAndPeriod() = runTest {
+        viewModel = viewModel(RootKey.FrequentExpenses.Scope.Label("Japan"))
+        collectDays()
+
+        expensesLocalRepository.sendExpenses(
+            testExpense(name = "Sushi Bar", date = LocalDate.of(2025, 8, 13), category = dining, labels = listOf("Japan"), id = "a"),
+            testExpense(name = " sushi bar ", date = LocalDate.of(2019, 1, 2), category = groceries, labels = listOf("Japan"), id = "b"),
+            testExpense(name = "Sushi Bar", date = LocalDate.of(2025, 8, 12), category = dining, labels = listOf("Japan 2024"), id = "otherLabel"),
+            testExpense(name = "Sushi Bar", date = LocalDate.of(2025, 8, 12), category = dining, id = "noLabel"),
+            testExpense(name = "Pizza", date = LocalDate.of(2025, 8, 12), category = dining, labels = listOf("Japan"), id = "otherName"),
+        )
+
+        val expenses = viewModel.days.value!!.flatMap { it.expenses }
+        assertThat(expenses.map { it.id }).containsExactly("a", "b").inOrder()
+    }
+
+    @Test
+    fun labelScope_rowsKeepOnlyTheOtherLabels() = runTest {
+        viewModel = viewModel(RootKey.FrequentExpenses.Scope.Label("Japan"))
+        collectDays()
+
+        expensesLocalRepository.sendExpenses(
+            testExpense(name = "Sushi Bar", date = LocalDate.of(2025, 8, 13), labels = listOf("Work", "Japan"))
+        )
+
+        assertThat(viewModel.days.value!!.single().expenses.single().labels).containsExactly("Work")
     }
 
     @Test

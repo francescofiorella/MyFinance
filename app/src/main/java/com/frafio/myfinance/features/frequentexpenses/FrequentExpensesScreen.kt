@@ -38,8 +38,7 @@ fun FrequentExpensesScreen(
 ) {
     val days by viewModel.days.collectAsStateWithLifecycle()
     FrequentExpensesContent(
-        from = viewModel.from,
-        to = viewModel.to,
+        subtitle = viewModel.subtitle,
         days = days,
         onBackClick = onBackClick
     )
@@ -48,8 +47,7 @@ fun FrequentExpensesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FrequentExpensesContent(
-    from: LocalDate,
-    to: LocalDate,
+    subtitle: String,
     days: List<ExpensesOfDay>?,
     onBackClick: () -> Unit
 ) {
@@ -66,7 +64,7 @@ fun FrequentExpensesContent(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = stringResource(id = R.string.frequent_expenses_title), maxLines = 1)
                         Text(
-                            text = monthRangeToString(from, to),
+                            text = subtitle,
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1
@@ -133,8 +131,7 @@ fun FrequentExpensesPreview() {
     MyFinanceTheme {
         val to = LocalDate.of(2024, 5, 1)
         FrequentExpensesContent(
-            from = to.minusMonths(11),
-            to = to,
+            subtitle = monthRangeToString(to.minusMonths(11), to),
             days = sampleFrequentExpenseDays(to),
             onBackClick = {}
         )

@@ -9,7 +9,8 @@ import com.frafio.myfinance.features.labeldetail.LabelDetailViewModel
 
 fun EntryProviderScope<NavKey>.labelDetailEntry(
     onBackClick: () -> Unit,
-    onSeeAllExpenses: () -> Unit
+    onSeeAllExpenses: () -> Unit,
+    onFrequentExpenseClick: (RootKey.FrequentExpenses) -> Unit
 ) {
     entry<RootKey.LabelDetail> { key ->
         val viewModel: LabelDetailViewModel = hiltViewModel(
@@ -20,7 +21,8 @@ fun EntryProviderScope<NavKey>.labelDetailEntry(
         LabelDetailScreen(
             viewModel = viewModel,
             onBackClick = onBackClick,
-            onSeeAllExpenses = onSeeAllExpenses
+            onSeeAllExpenses = onSeeAllExpenses,
+            onFrequentExpenseClick = onFrequentExpenseClick
         )
     }
 }

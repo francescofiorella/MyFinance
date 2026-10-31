@@ -197,7 +197,8 @@ class MainActivity : ComponentActivity() {
                         )
                         labelDetailEntry(
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
-                            onSeeAllExpenses = ::openFilteredExpenses
+                            onSeeAllExpenses = ::openFilteredExpenses,
+                            onFrequentExpenseClick = { key -> rootBackStack.add(key) }
                         )
                         manageLabelsEntry(
                             appState = appState,

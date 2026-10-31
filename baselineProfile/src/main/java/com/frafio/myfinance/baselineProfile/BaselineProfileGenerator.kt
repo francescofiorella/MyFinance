@@ -168,7 +168,7 @@ class BaselineProfileGenerator {
                 device.awaitGone("categories_scroll", 5_000)
                 device.settle()
                 device.scrollBothWays("category_detail_scroll")
-                frequentExpensesJourney()
+                frequentExpensesJourney("category_detail_scroll")
             } else {
                 log("'category_detail_scroll' never appeared.")
             }
@@ -224,6 +224,7 @@ class BaselineProfileGenerator {
         device.awaitGone("labels_list", 5_000)
         device.settle()
         device.scrollBothWays("label_detail_scroll")
+        frequentExpensesJourney("label_detail_scroll")
         device.pressBack()
         confirmBack("labels_list", "label_detail_scroll")
     }
@@ -235,22 +236,22 @@ class BaselineProfileGenerator {
         device.settle()
     }
 
-    // Needs the same expense name at least twice in the category, within the 12 months shown.
-    private fun MacrobenchmarkScope.frequentExpensesJourney() {
-        if (!device.scrollToAndTap("category_detail_scroll", "frequent_expense_item")) {
+    // Needs the same expense name at least twice in the detail: the category's 12 months shown, or the label.
+    private fun MacrobenchmarkScope.frequentExpensesJourney(detailScroll: String) {
+        if (!device.scrollToAndTap(detailScroll, "frequent_expense_item")) {
             log("No frequent expense ('frequent_expense_item'), skipping.")
             return
         }
         log("Frequent expenses.")
         if (device.awaitTag("frequent_expenses_list", 10_000)) {
-            device.awaitGone("category_detail_scroll", 5_000)
+            device.awaitGone(detailScroll, 5_000)
             device.settle()
             device.scrollBothWays("frequent_expenses_list")
         } else {
             log("'frequent_expenses_list' never appeared.")
         }
         device.pressBack()
-        confirmBack("category_detail_scroll", "frequent_expenses_list")
+        confirmBack(detailScroll, "frequent_expenses_list")
     }
 
     private fun MacrobenchmarkScope.transactionEditJourney() {
