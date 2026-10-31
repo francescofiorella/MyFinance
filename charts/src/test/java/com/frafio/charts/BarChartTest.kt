@@ -83,49 +83,6 @@ class BarChartTest {
         entryAnimationSpec = entryAnimationSpec
     )
 
-    /** Five months left out between September 2024 and March 2025. */
-    private val entriesWithBreak = listOf(
-        entry(value = 90.0, year = 2024, month = 9),
-        BarChartEntry(key = 2024 * 12 + 9, value = null, label = "5 months without expenses", axisLabel = "5 mo", isBreak = true),
-        entry(value = 120.0, year = 2025, month = 3),
-    )
-
-    @Test
-    fun break_isAnnounced_cannotBeSelected_andIsLeftOutOfTheAverage() {
-        val clicked = mutableListOf<Int>()
-        setChart {
-            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entriesWithBreak, onBarClick = { clicked += it }) }
-        }
-
-        composeTestRule.onNodeWithContentDescription("5 months without expenses").assertExists().performClick()
-
-        assertThat(clicked).isEmpty()
-        composeTestRule.onAllNodes(isToggleable()).assertCountEquals(2)
-        // (90 + 120) / 2
-        composeTestRule.onNodeWithText("€ 105.00").assertIsDisplayed()
-    }
-
-    @Test
-    fun break_keepsItsAxisLabel_whenNarrowSlotsThinTheOthersOut() {
-        // 31 slots in 300 dp leave about 10 dp each, so only every other label fits.
-        val many = (0 until 30).map { entry(value = 10.0 + it, year = 2023 + it / 12, month = it % 12 + 1) }
-        val withBreak = many.take(15) +
-            BarChartEntry(key = many[14].key + 1, value = null, label = "a gap", axisLabel = "9 d", isBreak = true) +
-            many.drop(15).map { it.copy(key = it.key + 10) }
-        setChart {
-            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = withBreak, barPadding = 1.dp) }
-        }
-
-        composeTestRule.onNodeWithText("9 d").assertIsDisplayed()
-    }
-
-    @Test
-    fun aBreakWithAValue_isRejected() {
-        val error = runCatching { BarChartEntry(key = 0, value = 1.0, label = "", axisLabel = "", isBreak = true) }.exceptionOrNull()
-
-        assertThat(error).isInstanceOf(IllegalArgumentException::class.java)
-    }
-
     @Test
     fun header_showsTheAverageByDefault_withItsLabel() {
         setChart {

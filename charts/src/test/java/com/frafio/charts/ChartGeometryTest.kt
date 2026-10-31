@@ -85,21 +85,6 @@ class ChartGeometryTest {
     }
 
     @Test
-    fun isAxisLabelShown_labelsThePinned_andHidesTheirCloseNeighbours() {
-        val shown = (0..9).filter { isAxisLabelShown(it, latestPosition = 9, selectedPosition = -1, step = 2, pinnedPositions = setOf(4)) }
-
-        // 3 and 5 are on the step but next to the pinned 4.
-        assertThat(shown).containsExactly(1, 4, 7, 9).inOrder()
-    }
-
-    @Test
-    fun isAxisLabelShown_keepsPinnedAndSelectedTogether() {
-        val shown = (0..9).filter { isAxisLabelShown(it, latestPosition = 9, selectedPosition = 8, step = 2, pinnedPositions = setOf(2)) }
-
-        assertThat(shown).containsExactly(2, 5, 8).inOrder()
-    }
-
-    @Test
     fun stripIndexAt_onConsecutiveMonths_isTheMonthOffset() {
         val keys = listOf(10, 11, 12, 13)
 

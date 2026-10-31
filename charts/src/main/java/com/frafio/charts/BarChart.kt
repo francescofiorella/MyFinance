@@ -2,7 +2,6 @@ package com.frafio.charts
 
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,9 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -66,21 +63,14 @@ import kotlin.math.roundToInt
  * and read by accessibility services, [axisLabel] under the bar, and [selectedAxisLabel] under it once selected
  * or, with nothing selected, under the latest bar.
  * A null [value] means no data: the slot and its axis label stay, but no bar is drawn and it can't be selected.
- * A break ([isBreak], with a null [value]) stands for a stretch left out of the chart: its slot shows a break
- * mark, its [axisLabel] is always shown and its [label] is read by accessibility services.
  */
 data class BarChartEntry(
     val key: Int,
     val value: Double?,
     val label: String,
     val axisLabel: String,
-    val selectedAxisLabel: String = axisLabel,
-    val isBreak: Boolean = false
-) {
-    init {
-        require(!isBreak || value == null) { "A break has no value." }
-    }
-}
+    val selectedAxisLabel: String = axisLabel
+)
 
 /**
  * The colors of a [BarChart]: [contentColor] for the header and the selected axis label,
@@ -232,8 +222,7 @@ fun BarChart(
                 viewportWidth = viewportWidth,
                 label = { entry, isExtended -> if (isExtended) entry.selectedAxisLabel else entry.axisLabel },
                 color = colors.secondaryContentColor,
-                selectedColor = colors.contentColor,
-                isPinned = BarChartEntry::isBreak
+                selectedColor = colors.contentColor
             )
         }
     }
@@ -243,7 +232,6 @@ fun BarChart(
 private class ChartBarState(
     val modifier: Modifier,
     val hasValue: Boolean,
-    val isBreak: Boolean,
     val contentDescription: String,
     val heightFraction: Float,
     val animateHeight: Boolean,
@@ -313,12 +301,9 @@ private fun BarChartBars(
                                     .weight(1f)
                                     .animateWidth(interactionSource),
                                 hasValue = value != null,
-                                isBreak = bar.entry.isBreak,
-                                contentDescription = when {
-                                    value != null -> stringResource(R.string.charts_item_description, bar.entry.label, valueFormatter(value))
-                                    bar.entry.isBreak -> bar.entry.label
-                                    else -> ""
-                                },
+                                contentDescription = value?.let {
+                                    stringResource(R.string.charts_item_description, bar.entry.label, valueFormatter(it))
+                                } ?: "",
                                 // A bar with data stays visible at zero.
                                 heightFraction = if (value != null) bar.fraction().coerceAtLeast(0.01f) else 0f,
                                 animateHeight = !isAnimated,
@@ -383,10 +368,6 @@ private fun BarChartBars(
 
 @Composable
 private fun ChartBar(state: ChartBarState) {
-    if (state.isBreak) {
-        BreakMark(state)
-        return
-    }
     // Without data the slot stays empty: nothing to draw, select or announce.
     if (!state.hasValue) {
         Spacer(modifier = state.modifier.padding(horizontal = state.barPadding).width(state.barWidth))
@@ -414,35 +395,6 @@ private fun ChartBar(state: ChartBarState) {
         interactionSource = state.interactionSource
     )
 }
-
-/** Two slanted strokes at the baseline, like ⫽, for a stretch left out of the chart. */
-@Composable
-private fun BreakMark(state: ChartBarState) {
-    val color = state.colors.secondaryContentColor
-    Canvas(
-        modifier = state.modifier
-            .semantics { this.contentDescription = state.contentDescription }
-            .height(BreakMarkHeight)
-            .padding(horizontal = state.barPadding)
-            .width(state.barWidth)
-    ) {
-        val stroke = 1.5.dp.toPx()
-        val gap = minOf(size.width / 2, 4.dp.toPx())
-        val slant = size.height / 3
-        listOf(-gap / 2, gap / 2).forEach { offset ->
-            val x = size.width / 2 + offset
-            drawLine(
-                color = color,
-                start = Offset(x - slant / 2, size.height),
-                end = Offset(x + slant / 2, 0f),
-                strokeWidth = stroke,
-                cap = StrokeCap.Round
-            )
-        }
-    }
-}
-
-private val BreakMarkHeight = 16.dp
 
 private fun previewEntries(count: Int): List<BarChartEntry> = (0 until count).map {
     val month = "%02d".format(it % 12 + 1)
@@ -472,19 +424,6 @@ fun BarChartManyEntriesPreview() {
     MaterialTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
             BarChart(entries = previewEntries(24), averageLabel = "average", referenceValue = 190.0, entryAnimationSpec = BarChartDefaults.EntryAnimationSpec)
-        }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 360)
-@Composable
-fun BarChartWithBreaksPreview() {
-    val entries = previewEntries(12).mapIndexed { index, entry ->
-        if (index == 3 || index == 8) entry.copy(value = null, label = "5 months without expenses", axisLabel = "5 mo", isBreak = true) else entry
-    }
-    MaterialTheme {
-        Surface(modifier = Modifier.padding(16.dp)) {
-            BarChart(entries = entries, averageLabel = "average")
         }
     }
 }
