@@ -8,7 +8,8 @@ import com.frafio.myfinance.features.labeldetail.LabelDetailScreen
 import com.frafio.myfinance.features.labeldetail.LabelDetailViewModel
 
 fun EntryProviderScope<NavKey>.labelDetailEntry(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onSeeAllExpenses: () -> Unit
 ) {
     entry<RootKey.LabelDetail> { key ->
         val viewModel: LabelDetailViewModel = hiltViewModel(
@@ -18,7 +19,8 @@ fun EntryProviderScope<NavKey>.labelDetailEntry(
         )
         LabelDetailScreen(
             viewModel = viewModel,
-            onBackClick = onBackClick
+            onBackClick = onBackClick,
+            onSeeAllExpenses = onSeeAllExpenses
         )
     }
 }

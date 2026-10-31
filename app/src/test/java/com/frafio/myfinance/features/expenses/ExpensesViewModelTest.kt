@@ -175,6 +175,45 @@ class ExpensesViewModelTest {
     }
 
     @Test
+    fun pendingLabel_replacesEveryFilterWithTheLabel_andIsCleared() = runTest {
+        collectExpenses()
+        viewModel.onSearchQueryChanged("latte")
+        viewModel.onCategoryFilterChanged(1)
+        viewModel.onLabelFilterChanged("work", true)
+        viewModel.onDateFilterChanged(LocalDate.of(2024, 3, 1) to LocalDate.of(2024, 3, 31))
+
+        pendingExpensesFilter.requestLabel("Japan")
+
+        assertThat(viewModel.searchQuery.value).isEmpty()
+        assertThat(viewModel.selectedCategories.value).isEmpty()
+        assertThat(viewModel.dateRange.value).isNull()
+        assertThat(viewModel.selectedLabels.value).containsExactly("Japan")
+        assertThat(pendingExpensesFilter.labels.value).isNull()
+    }
+
+    @Test
+    fun pendingLabel_showsOnlyThatLabelsExpenses() = runTest {
+        collectExpenses()
+        val flight = testExpense(name = "Flight", labels = listOf("Japan"), date = yesterday)
+        expensesLocalRepository.sendExpenses(flight, testExpense(name = "Coffee", date = yesterday))
+
+        pendingExpensesFilter.requestLabel("Japan")
+
+        assertThat(viewModel.expenses.value.filter { it.isRealExpense() }).containsExactly(flight)
+    }
+
+    @Test
+    fun aNewRequest_replacesThePendingOne() {
+        val filter = PendingExpensesFilter()
+
+        filter.request(3)
+        filter.requestLabel("Japan")
+
+        assertThat(filter.categories.value).isNull()
+        assertThat(filter.labels.value).containsExactly("Japan")
+    }
+
+    @Test
     fun pendingFilter_requestedBeforeTheViewModelExists_isAppliedWhenItIsCreated() {
         val filter = PendingExpensesFilter()
         filter.request(3)

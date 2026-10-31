@@ -154,6 +154,13 @@ class MainActivity : ComponentActivity() {
                 val decorators = remember(saveableStateHolderDecorator, viewModelStoreDecorator) {
                     listOf(saveableStateHolderDecorator, viewModelStoreDecorator)
                 }
+                // Close the pages over Home, then open the Expenses tab, which applies the pending filter.
+                fun openFilteredExpenses() {
+                    while (rootBackStack.size > 1 && rootBackStack.last() != RootKey.Home) {
+                        rootBackStack.removeAt(rootBackStack.size - 1)
+                    }
+                    viewModel.navigateTo(HomeTabKey.Expenses)
+                }
                 val provider = remember(appState, rootBackStack) {
                     entryProvider {
                         authEntry(
@@ -189,7 +196,8 @@ class MainActivity : ComponentActivity() {
                             onLabelClick = { key -> rootBackStack.add(key) }
                         )
                         labelDetailEntry(
-                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
+                            onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
+                            onSeeAllExpenses = ::openFilteredExpenses
                         )
                         manageLabelsEntry(
                             appState = appState,
@@ -208,13 +216,7 @@ class MainActivity : ComponentActivity() {
                         )
                         categoryDetailEntry(
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
-                            onSeeAllExpenses = {
-                                // Close Categories and the detail page, then open the Expenses tab, which applies the pending filter.
-                                while (rootBackStack.size > 1 && rootBackStack.last() != RootKey.Home) {
-                                    rootBackStack.removeAt(rootBackStack.size - 1)
-                                }
-                                viewModel.navigateTo(HomeTabKey.Expenses)
-                            },
+                            onSeeAllExpenses = ::openFilteredExpenses,
                             onFrequentExpenseClick = { key -> rootBackStack.add(key) }
                         )
                         frequentExpensesEntry(

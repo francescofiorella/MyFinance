@@ -17,10 +17,12 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
@@ -71,22 +73,28 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun LabelDetailScreen(
     viewModel: LabelDetailViewModel,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onSeeAllExpenses: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LabelDetailContent(
         label = viewModel.label,
         state = state,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onSeeAllExpenses = {
+            viewModel.onSeeAllExpenses()
+            onSeeAllExpenses()
+        }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LabelDetailContent(
     label: String,
     state: LabelDetailUiState,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onSeeAllExpenses: () -> Unit
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -152,6 +160,20 @@ fun LabelDetailContent(
                                     count = stats.frequent.size
                                 )
                             }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        FilledTonalButton(
+                            modifier = Modifier
+                                .testTag("label_see_all")
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .padding(horizontal = 16.dp),
+                            onClick = onSeeAllExpenses,
+                            shapes = ButtonDefaults.shapes()
+                        ) {
+                            Text(text = stringResource(id = R.string.see_all_expenses))
                         }
                     }
                 }
@@ -490,7 +512,8 @@ fun LabelDetailPreview() {
         LabelDetailContent(
             label = "Japan 2025",
             state = LabelDetailUiState.Loaded(buildLabelDetail(sampleTripExpenses())!!),
-            onBackClick = {}
+            onBackClick = {},
+            onSeeAllExpenses = {}
         )
     }
 }

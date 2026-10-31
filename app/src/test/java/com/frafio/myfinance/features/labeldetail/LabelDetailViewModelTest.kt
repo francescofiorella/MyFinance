@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.labeldetail
 
+import com.frafio.myfinance.core.data.repository.PendingExpensesFilter
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.testing.data.testExpense
 import com.frafio.myfinance.testing.repository.TestExpensesLocalRepository
@@ -21,11 +22,12 @@ class LabelDetailViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val expensesLocalRepository = TestExpensesLocalRepository()
+    private val pendingExpensesFilter = PendingExpensesFilter()
     private lateinit var viewModel: LabelDetailViewModel
 
     @Before
     fun setup() {
-        viewModel = LabelDetailViewModel(expensesLocalRepository, UnconfinedTestDispatcher(), RootKey.LabelDetail("Japan"))
+        viewModel = LabelDetailViewModel(expensesLocalRepository, pendingExpensesFilter, UnconfinedTestDispatcher(), RootKey.LabelDetail("Japan"))
     }
 
     @Test
@@ -59,6 +61,14 @@ class LabelDetailViewModelTest {
         expensesLocalRepository.sendExpenses(testExpense(labels = listOf("Work")))
 
         assertThat(viewModel.uiState.value).isEqualTo(LabelDetailUiState.Empty)
+    }
+
+    @Test
+    fun onSeeAllExpenses_requestsTheLabelFilter() {
+        viewModel.onSeeAllExpenses()
+
+        assertThat(pendingExpensesFilter.labels.value).containsExactly("Japan")
+        assertThat(pendingExpensesFilter.categories.value).isNull()
     }
 
     private fun TestScope.collectState() {

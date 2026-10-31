@@ -15,6 +15,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.utils.doubleToPrice
@@ -42,7 +43,8 @@ class LabelDetailScreenTest {
             LabelDetailContent(
                 label = "Japan 2025",
                 state = state,
-                onBackClick = { events += "back" }
+                onBackClick = { events += "back" },
+                onSeeAllExpenses = { events += "seeAll" }
             )
         }
     }
@@ -165,6 +167,22 @@ class LabelDetailScreenTest {
 
         composeTestRule.onNodeWithText(string(R.string.total)).assertDoesNotExist()
         composeTestRule.onNodeWithText(string(R.string.no_expenses)).assertDoesNotExist()
+    }
+
+    @Test
+    fun seeAllExpenses_invokesTheCallback() {
+        setScreen()
+
+        composeTestRule.onNodeWithTag("label_see_all").performScrollTo().performClick()
+
+        assertThat(events).containsExactly("seeAll")
+    }
+
+    @Test
+    fun seeAllExpenses_isHiddenWithoutExpenses() {
+        setScreen(LabelDetailUiState.Empty)
+
+        composeTestRule.onNodeWithTag("label_see_all").assertDoesNotExist()
     }
 
     @Test

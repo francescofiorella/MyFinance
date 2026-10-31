@@ -100,7 +100,8 @@ class LabelDetailScreenScreenshotTests {
         LabelDetailContent(
             label = label,
             state = LabelDetailUiState.Loaded(buildLabelDetail(expenses)!!),
-            onBackClick = {}
+            onBackClick = {},
+            onSeeAllExpenses = {}
         )
     }
 }

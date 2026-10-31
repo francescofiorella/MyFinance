@@ -186,7 +186,13 @@ class ExpensesViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             pendingExpensesFilter.categories.filterNotNull().collect { categories ->
-                showOnlyCategories(categories)
+                showOnly(categories = categories)
+                pendingExpensesFilter.clear()
+            }
+        }
+        viewModelScope.launch {
+            pendingExpensesFilter.labels.filterNotNull().collect { labels ->
+                showOnly(labels = labels)
                 pendingExpensesFilter.clear()
             }
         }
@@ -196,10 +202,10 @@ class ExpensesViewModel @Inject constructor(
         _searchQuery.value = query
     }
 
-    // Replaces every filter, so the list shows exactly the requested categories.
-    private fun showOnlyCategories(categories: List<Int>) {
+    // Replaces every filter, so the list shows exactly the requested categories or labels.
+    private fun showOnly(categories: List<Int> = emptyList(), labels: List<String> = emptyList()) {
         _searchQuery.value = ""
-        _selectedLabels.value = emptyList()
+        _selectedLabels.value = labels
         _dateRange.value = null
         _selectedCategories.value = categories
         _limit.value = DEFAULT_LIMIT_EXPENSES

@@ -3,6 +3,7 @@ package com.frafio.myfinance.features.labeldetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.core.data.repository.ExpensesLocalRepository
+import com.frafio.myfinance.core.data.repository.PendingExpensesFilter
 import com.frafio.myfinance.core.di.Dispatcher
 import com.frafio.myfinance.core.di.MyFinanceDispatchers.Default
 import com.frafio.myfinance.core.navigation.RootKey
@@ -26,6 +27,7 @@ sealed interface LabelDetailUiState {
 @HiltViewModel(assistedFactory = LabelDetailViewModel.Factory::class)
 class LabelDetailViewModel @AssistedInject constructor(
     expensesLocalRepository: ExpensesLocalRepository,
+    private val pendingExpensesFilter: PendingExpensesFilter,
     @Dispatcher(Default) defaultDispatcher: CoroutineDispatcher,
     @Assisted navKey: RootKey.LabelDetail
 ) : ViewModel() {
@@ -45,4 +47,9 @@ class LabelDetailViewModel @AssistedInject constructor(
         }
         .flowOn(defaultDispatcher)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LabelDetailUiState.Loading)
+
+    /** Asks the Expenses tab to show only this label; the caller then navigates there. */
+    fun onSeeAllExpenses() {
+        pendingExpensesFilter.requestLabel(label)
+    }
 }
