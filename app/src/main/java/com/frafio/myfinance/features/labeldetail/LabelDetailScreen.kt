@@ -46,8 +46,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.frafio.charts.BarChart
-import com.frafio.charts.BarChartEntry
 import com.frafio.charts.PieChart
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
@@ -58,11 +56,9 @@ import com.frafio.myfinance.core.components.SectionTitle
 import com.frafio.myfinance.core.components.StatCard
 import com.frafio.myfinance.core.components.TransactionListItem
 import com.frafio.myfinance.core.components.categoryPieChartItem
-import com.frafio.myfinance.core.components.toBarChartEntry
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.ExpenseCategories
-import com.frafio.myfinance.core.data.model.MonthlyTotal
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.dateRangeToString
@@ -70,7 +66,6 @@ import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.features.categorydetail.FrequentExpense
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun LabelDetailScreen(
@@ -141,7 +136,6 @@ fun LabelDetailContent(
                         val stats = state.stats
                         Header(dateRange = dateRangeToString(stats.first, stats.last))
                         StatsGrid(stats = stats)
-                        TimelineCard(timeline = stats.timeline)
                         CategoriesCard(categories = stats.categories)
 
                         if (stats.topExpenses.isNotEmpty()) {
@@ -295,38 +289,6 @@ private fun StatsGrid(stats: LabelDetailStats) {
     }
 }
 
-@Composable
-private fun TimelineCard(timeline: LabelTimeline) {
-    // Index into the slots; -1 selects none, showing the average.
-    var selectedSlot by rememberSaveable { mutableIntStateOf(-1) }
-    val buckets = timeline.slots.count { it is TimelineSlot.Bucket }
-    Card(
-        modifier = Modifier
-            .testTag("label_timeline")
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-        shape = ListItemDefaults.shapes().selectedShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-    ) {
-        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
-            Text(
-                modifier = Modifier.padding(bottom = 8.dp),
-                text = stringResource(id = R.string.spending_over_time),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            BarChart(
-                entries = timeline.slots.map { it.toBarChartEntry(timeline.unit) },
-                selectedIndex = selectedSlot,
-                onSelectedIndexChange = { selectedSlot = it },
-                averageLabel = pluralStringResource(timeline.unit.averageRes, buckets, buckets),
-                valueFormatter = ::doubleToPrice,
-                barPadding = TIMELINE_BAR_PADDING
-            )
-        }
-    }
-}
-
 /** The pie over every category, in their fixed order like the dashboard, then a row per category with spending. */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -384,74 +346,6 @@ private fun CategoriesCard(categories: List<CategoryShare>) {
         )
     }
 }
-
-@Composable
-private fun TimelineSlot.toBarChartEntry(unit: TimelineUnit): BarChartEntry = when (this) {
-    is TimelineSlot.Bucket -> when (unit) {
-        TimelineUnit.DAY -> BarChartEntry(
-            key = unit.keyOf(start),
-            value = total,
-            label = start.format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
-            axisLabel = start.format(DateTimeFormatter.ofPattern("dd")),
-            selectedAxisLabel = start.format(DateTimeFormatter.ofPattern("dd/MM"))
-        )
-
-        TimelineUnit.WEEK -> BarChartEntry(
-            key = unit.keyOf(start),
-            value = total,
-            label = stringResource(R.string.timeline_week_of, start.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))),
-            axisLabel = start.format(DateTimeFormatter.ofPattern("dd/MM")),
-            selectedAxisLabel = start.format(DateTimeFormatter.ofPattern("dd/MM/yy"))
-        )
-
-        TimelineUnit.MONTH -> MonthlyTotal(total, start.year, start.monthValue).toBarChartEntry()
-
-        TimelineUnit.YEAR -> BarChartEntry(
-            key = unit.keyOf(start),
-            value = total,
-            label = start.year.toString(),
-            axisLabel = start.year.toString()
-        )
-    }
-
-    is TimelineSlot.Gap -> {
-        val length = gapLength(this, unit)
-        BarChartEntry(
-            key = unit.keyOf(start),
-            value = null,
-            label = pluralStringResource(length.unit.descriptionRes, length.amount, length.amount),
-            axisLabel = pluralStringResource(length.unit.shortRes, length.amount, length.amount),
-            isBreak = true
-        )
-    }
-}
-
-private val TimelineUnit.averageRes: Int
-    get() = when (this) {
-        TimelineUnit.DAY -> R.plurals.trend_average_days
-        TimelineUnit.WEEK -> R.plurals.trend_average_weeks
-        TimelineUnit.MONTH -> R.plurals.trend_average_months
-        TimelineUnit.YEAR -> R.plurals.trend_average_years
-    }
-
-private val GapUnit.descriptionRes: Int
-    get() = when (this) {
-        GapUnit.DAYS -> R.plurals.timeline_gap_days
-        GapUnit.WEEKS -> R.plurals.timeline_gap_weeks
-        GapUnit.MONTHS -> R.plurals.timeline_gap_months
-        GapUnit.YEARS -> R.plurals.timeline_gap_years
-    }
-
-private val GapUnit.shortRes: Int
-    get() = when (this) {
-        GapUnit.DAYS -> R.plurals.timeline_gap_short_days
-        GapUnit.WEEKS -> R.plurals.timeline_gap_short_weeks
-        GapUnit.MONTHS -> R.plurals.timeline_gap_short_months
-        GapUnit.YEARS -> R.plurals.timeline_gap_short_years
-    }
-
-// Thinner than the default, so a month of days keeps bars about as wide as the 24-month charts.
-private val TIMELINE_BAR_PADDING = 1.5.dp
 
 @Composable
 private fun StatRow(

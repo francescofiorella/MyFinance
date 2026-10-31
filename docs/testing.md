@@ -275,7 +275,7 @@ never `Matchers.anything()`, with a one-line reason above it. A node that shows 
 There are three suppressions today:
 
 - `DashboardScreenScreenshotTests`: the twelve month bars of the chart are about 27 dp wide on a phone.
-- `LabelDetailScreenScreenshotTests`: the spending timeline shows up to a month of bars, 10 to 25 dp wide on a phone; in the trip sample the pie icons of Entertainment (1%) and Dining (7%), next to each other, overlap and narrow each other's target.
+- `LabelDetailScreenScreenshotTests`: in the trip sample the pie icons of Entertainment (1%) and Dining (7%), next to each other, overlap and narrow each other's target.
 - `ComponentScreenshotTests.dateRangePickerDialog`: the months scroll inside the dialog, and its bottom edge cuts the next month's first day ("June 1, 2024") to 2 dp.
 
 ## Instrumented tests

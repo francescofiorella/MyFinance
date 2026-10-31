@@ -6,7 +6,6 @@ import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.charts.R as ChartsR
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.R
-import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.testing.screenshot.DefaultTestDevices
 import com.frafio.myfinance.testing.screenshot.captureForDevice
@@ -24,7 +23,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.annotation.LooperMode
-import java.time.format.DateTimeFormatter
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -36,30 +34,24 @@ class LabelDetailScreenScreenshotTests {
 
     @Test
     fun trip() {
-        composeTestRule.captureMultiDevice("LabelDetailScreen", tripSuppressions) {
+        composeTestRule.captureMultiDevice("LabelDetailScreen", overlappingTripPieIcons) {
             Detail("Japan 2025", sampleTripExpenses())
         }
     }
 
     @Test
     fun trip_dark() {
-        composeTestRule.capturePhoneDark("LabelDetailScreen", tripSuppressions) {
+        composeTestRule.capturePhoneDark("LabelDetailScreen", overlappingTripPieIcons) {
             Detail("Japan 2025", sampleTripExpenses())
         }
     }
 
     @Test
     fun longRunning() {
-        composeTestRule.captureForDevice(
-            DefaultTestDevices.PHONE.spec, "LabelDetailScreenLongRunning", deviceName = "phone",
-            accessibilitySuppressions = narrowTimelineBars(sampleLongRunningExpenses()),
-        ) {
+        composeTestRule.captureForDevice(DefaultTestDevices.PHONE.spec, "LabelDetailScreenLongRunning", deviceName = "phone") {
             Detail("Home renovation", sampleLongRunningExpenses())
         }
     }
-
-    private val tripSuppressions
-        get() = Matchers.anyOf(narrowTimelineBars(sampleTripExpenses()), overlappingTripPieIcons)
 
     // Entertainment (1%) sits right before Dining (7%): their icons overlap and narrow each other's target.
     private val overlappingTripPieIcons
@@ -76,24 +68,6 @@ class LabelDetailScreenScreenshotTests {
                 ),
             ),
         )
-
-    // Up to a month of bars share a phone-width card, 10 to 25 dp each: 48 dp needs a chart redesign.
-    private fun narrowTimelineBars(expenses: List<Expense>) = Matchers.allOf(
-        matchesCheck(TouchTargetSizeCheck::class.java),
-        matchesElements(withContentDescription(Matchers.isIn(timelineBarDescriptions(expenses)))),
-    )
-
-    private fun timelineBarDescriptions(expenses: List<Expense>): List<String> {
-        val timeline = buildLabelTimeline(expenses)
-        val pattern = when (timeline.unit) {
-            TimelineUnit.DAY -> "d MMMM yyyy"
-            TimelineUnit.MONTH -> "MMMM yyyy"
-            else -> error("The samples are daily or monthly.")
-        }
-        return timeline.slots.filterIsInstance<TimelineSlot.Bucket>().map {
-            string(ChartsR.string.charts_item_description, it.start.format(DateTimeFormatter.ofPattern(pattern)), doubleToPrice(it.total))
-        }
-    }
 
     @Composable
     private fun Detail(label: String, expenses: List<Expense>) {

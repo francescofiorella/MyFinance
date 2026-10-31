@@ -78,27 +78,6 @@ class LabelDetailScreenTest {
     }
 
     @Test
-    fun timeline_showsTheTripDays_withTheStretchesBeforeCollapsed() {
-        setScreen()
-
-        composeTestRule.onNodeWithTag("label_detail_scroll").performScrollToNode(hasText(string(R.string.spending_over_time)))
-        // Flight, hotel, pass and the eight trip days.
-        composeTestRule.onNodeWithText("average over 11 days").assertExists()
-        composeTestRule.onNodeWithContentDescription("2 months without expenses").assertExists()
-        composeTestRule.onNodeWithContentDescription("3 months without expenses").assertExists()
-        composeTestRule.onNodeWithContentDescription("3 weeks without expenses").assertExists()
-        composeTestRule.onNodeWithText("3 wk").assertExists()
-    }
-
-    @Test
-    fun timeline_ofALongRunningLabel_isMonthly() {
-        setScreen(LabelDetailUiState.Loaded(buildLabelDetail(sampleLongRunningExpenses())!!))
-
-        composeTestRule.onNodeWithTag("label_detail_scroll").performScrollToNode(hasText(string(R.string.spending_over_time)))
-        composeTestRule.onNodeWithText("average over 14 months").assertExists()
-    }
-
-    @Test
     fun categories_rowsShowAmountAndShare_highestFirst() {
         setScreen()
 
