@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Bar and Pie charts deselection uniformed
+
 ## 5.2.2
 
 - Labels screen added, opened from the Expenses labels button
