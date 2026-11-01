@@ -178,7 +178,7 @@ private fun LabelRow(summary: LabelSummary, index: Int, count: Int, onClick: () 
                 if (first != null && last != null) {
                     Text(
                         text = dateRangeToString(first, last),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
