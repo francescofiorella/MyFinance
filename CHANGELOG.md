@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.2
+
 - Labels screen added, opened from the Expenses labels button
 - Manage labels reachable from the Labels screen top bar, as well as from Profile
 - Label Details screen added: total, date range, average per active day and per expense, weekend share, most expensive day, expenses by category, biggest and most frequent expenses
