@@ -207,7 +207,10 @@ fun PieChart(
     )
 }
 
-/** A pie chart whose selection is hoisted; -1 selects nothing and shows [totalLabel] with the sum. */
+/**
+ * A pie chart whose selection is hoisted; -1 selects nothing and shows [totalLabel] with the sum.
+ * Tapping the selected arc, or the hole in the middle, clears the selection, reporting -1.
+ */
 @Composable
 fun PieChart(
     modifier: Modifier = Modifier,
@@ -365,7 +368,8 @@ fun PieChart(
                     selectedIconShape = selectedIconShape,
                     iconPadding = iconPadding,
                     interactionSource = interactionSources[index],
-                    onClick = { onSelectedIndexChange(index) }
+                    // A toggle: tapping the selected arc clears the selection.
+                    onClick = { onSelectedIndexChange(if (selectedArcIndex == index) -1 else index) }
                 )
             }
         }

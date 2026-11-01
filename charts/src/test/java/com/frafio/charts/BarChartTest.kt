@@ -11,8 +11,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.isOn
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -20,7 +22,9 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
@@ -142,6 +146,44 @@ class BarChartTest {
         composeTestRule.onNodeWithText("10").assertIsDisplayed()
         composeTestRule.onNodeWithText("12/24").assertIsDisplayed()
         composeTestRule.onAllNodes(isToggleable() and isOn()).assertCountEquals(0)
+    }
+
+    /** A tap in the bar area right above [index]'s bar, below the top of the tallest one, in the root's coordinates. */
+    private fun aboveBar(index: Int): Offset {
+        val bars = composeTestRule.onAllNodes(isToggleable()).fetchSemanticsNodes()
+        val top = bars.minOf { it.boundsInRoot.top }
+        return Offset(bars[index].boundsInRoot.center.x, top + 1f)
+    }
+
+    @Test
+    fun tapWhereNoBarIsDrawn_clearsTheSelection_andShowsTheAverageAgain() {
+        val clicked = mutableListOf<Int>()
+        setChart {
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries, onBarClick = { clicked += it }) }
+        }
+
+        composeTestRule.onAllNodes(isToggleable())[1].performClick()
+        // Above the 90 bar, which reaches three quarters of the tallest.
+        val point = aboveBar(0)
+        composeTestRule.onRoot().performTouchInput { click(point) }
+
+        assertThat(clicked).containsExactly(1, -1).inOrder()
+        composeTestRule.onNodeWithText("€ 105.00").assertIsDisplayed()
+        composeTestRule.onAllNodes(isToggleable() and isOn()).assertCountEquals(0)
+    }
+
+    @Test
+    fun tapWhereNoBarIsDrawn_withNothingSelected_reportsNothing() {
+        val clicked = mutableListOf<Int>()
+        setChart {
+            Box(Modifier.requiredWidth(300.dp)) { TestBarChart(entries = entries, onBarClick = { clicked += it }) }
+        }
+
+        val point = aboveBar(0)
+        composeTestRule.onRoot().performTouchInput { click(point) }
+
+        assertThat(clicked).isEmpty()
+        composeTestRule.onNodeWithText("€ 105.00").assertIsDisplayed()
     }
 
     // The scale comes from the tallest bar, so the reference line only exists at or below it; the

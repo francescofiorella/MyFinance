@@ -2,6 +2,7 @@ package com.frafio.charts
 
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,12 +32,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -107,8 +110,8 @@ object BarChartDefaults {
 
 /**
  * A bar chart that keeps its own selection, starting with none. [onBarClick] reports the selected bar,
- * or -1 once tapping it again clears the selection. With an [entryAnimationSpec], entry changes animate
- * as one strip of equal bars, matched by key.
+ * or -1 once tapping it again, or where no bar is drawn, clears the selection. With an [entryAnimationSpec],
+ * entry changes animate as one strip of equal bars, matched by key.
  */
 @Composable
 fun BarChart(
@@ -151,7 +154,8 @@ fun BarChart(
 /**
  * A bar chart whose selection is hoisted. The header shows the selected entry, or with nothing selected the
  * average of the entries with data, labelled [averageLabel]. A [selectedIndex] outside [entries] (e.g. -1) or
- * on an entry without data selects nothing; tapping the selected bar clears the selection, reporting -1.
+ * on an entry without data selects nothing; tapping the selected bar, or where no bar is drawn, clears the
+ * selection, reporting -1.
  * With an [entryAnimationSpec], entry changes animate as one strip of equal bars, matched by key: the shown
  * keys scroll and zoom to the new ones, so added bars slide in and removed ones slide out at the edges.
  */
@@ -265,6 +269,18 @@ private fun BarChartBars(
             .height(barMaxHeight),
         contentAlignment = Alignment.BottomStart
     ) {
+        // Under the bars, so a tap where no bar is drawn clears the selection; a tap detector rather than
+        // a clickable, so accessibility services see no unlabelled button (the selected bar toggles off too).
+        val currentSelectedIndex by rememberUpdatedState(selectedIndex)
+        val currentOnBarClick by rememberUpdatedState(onBarClick)
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .pointerInput(Unit) {
+                    detectTapGestures { if (currentSelectedIndex >= 0) currentOnBarClick(-1) }
+                }
+        )
+
         val interactionSources = remember { HashMap<Int, MutableInteractionSource>() }
         // The ButtonGroup composes by position, while animated bars shift position as others slide
         // in and out: movable content keeps each bar's state with its key.

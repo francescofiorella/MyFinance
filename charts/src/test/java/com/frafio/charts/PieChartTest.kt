@@ -147,6 +147,33 @@ class PieChartTest {
     }
 
     @Test
+    fun tapOnTheSelectedArc_deselectsIt_andShowsTheTotalAgain() {
+        setChart {
+            TestPieChart(items = items, animationSpec = snap())
+        }
+
+        arc("Dining", "€ 30").performTouchInput { click(arcMiddle(0)) }
+        arc("Dining", "€ 30").performTouchInput { click(arcMiddle(0)) }
+
+        arc("Dining", "€ 30").assertIsNotSelected()
+        composeTestRule.onNodeWithText("Total").assertIsDisplayed()
+        composeTestRule.onNodeWithText("€ 75").assertIsDisplayed()
+    }
+
+    @Test
+    fun tapOnAnotherArc_movesTheSelection() {
+        setChart {
+            TestPieChart(items = items, animationSpec = snap())
+        }
+
+        arc("Dining", "€ 30").performTouchInput { click(arcMiddle(0)) }
+        arc("Groceries", "€ 45").performTouchInput { click(arcMiddle(1)) }
+
+        arc("Groceries", "€ 45").assertIsSelected()
+        arc("Dining", "€ 30").assertIsNotSelected()
+    }
+
+    @Test
     fun heldPress_selectsOnlyOnRelease() {
         setChart {
             TestPieChart(items = items, animationSpec = snap())
