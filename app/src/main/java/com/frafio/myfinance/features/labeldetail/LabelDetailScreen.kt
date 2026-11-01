@@ -300,7 +300,7 @@ private fun StatsGrid(stats: LabelDetailStats) {
                     label = stringResource(id = R.string.weekend_share),
                     value = doubleToPercent(stats.weekendShare),
                     extra = {
-                        StatExtra(text = stringResource(R.string.spent_on_weekends, doubleToPrice(stats.weekendTotal)))
+                        StatExtra(text = doubleToPrice(stats.weekendTotal))
                     }
                 )
             },
