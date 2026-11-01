@@ -45,13 +45,14 @@ class LabelsScreenTest {
     }
 
     @Test
-    fun rows_showTotal_dateRange_andExpenseCount() {
+    fun rows_showTotal_andDateRange_withoutTheExpenseCount() {
         setScreen()
 
         composeTestRule.onNodeWithText("Japan 2025").assertIsDisplayed()
-        composeTestRule.onNodeWithText("3 Feb – 19 Aug 2025 · 18 expenses").assertIsDisplayed()
+        composeTestRule.onNodeWithText("3 Feb – 19 Aug 2025").assertIsDisplayed()
         composeTestRule.onNodeWithText(doubleToPrice(3240.5)).assertIsDisplayed()
-        composeTestRule.onNodeWithText("10 May 2025 · 1 expense").assertIsDisplayed()
+        composeTestRule.onNodeWithText("10 May 2025").assertIsDisplayed()
+        composeTestRule.onNodeWithText("18 expenses", substring = true).assertDoesNotExist()
     }
 
     @Test

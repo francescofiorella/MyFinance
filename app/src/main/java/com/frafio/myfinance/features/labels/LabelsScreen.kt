@@ -1,36 +1,44 @@
 package com.frafio.myfinance.features.labels
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
-import com.frafio.myfinance.core.components.DetailRow
 import com.frafio.myfinance.core.components.EmptyView
 import com.frafio.myfinance.core.components.SectionTitle
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -76,7 +84,10 @@ fun LabelsContent(
                 onNavigationClick = onBackClick,
                 action = {
                     FilledTonalIconButton(
-                        modifier = Modifier.testTag("labels_manage"),
+                        modifier = Modifier
+                            .testTag("labels_manage")
+                            .padding(end = 4.dp)
+                            .width(52.dp),
                         onClick = onManageClick,
                         colors = IconButtonDefaults.filledTonalIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -127,25 +138,68 @@ fun LabelsContent(
     }
 }
 
+/** Laid out as TransactionListItem: the label icon, the name over its date range, then the total. */
 @Composable
 private fun LabelRow(summary: LabelSummary, index: Int, count: Int, onClick: () -> Unit) {
     val first = summary.first
     val last = summary.last
-    DetailRow(
-        title = summary.label,
-        subtitle = if (first != null && last != null) {
-            dateRangeToString(first, last) + " · " +
-                pluralStringResource(R.plurals.expense_count, summary.count, summary.count)
-        } else {
-            null
-        },
-        value = doubleToPrice(summary.total),
+    val shapes = ListItemDefaults.segmentedShapes(
         index = index,
         count = count,
-        modifier = Modifier.testTag("label_item"),
-        // A label without expenses has no detail to show.
-        onClick = if (summary.count > 0) onClick else null
+        defaultShapes = ListItemDefaults.shapes()
     )
+    val colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+    val rowModifier = Modifier
+        .testTag("label_item")
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp)
+        .padding(bottom = if (index == count - 1) 0.dp else 2.dp)
+    val content: @Composable () -> Unit = {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_sell_outline),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = summary.label,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                if (first != null && last != null) {
+                    Text(
+                        text = dateRangeToString(first, last),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Text(
+                modifier = Modifier.padding(start = 12.dp),
+                text = doubleToPrice(summary.total),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+
+    // A label without expenses has no detail to show.
+    if (summary.count > 0) {
+        SegmentedListItem(onClick = onClick, shapes = shapes, colors = colors, content = content, modifier = rowModifier)
+    } else {
+        SegmentedListItem(shapes = shapes, colors = colors, content = content, modifier = rowModifier)
+    }
 }
 
 /** Fixed sample data for previews and screenshots. */

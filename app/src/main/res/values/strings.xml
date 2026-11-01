@@ -194,11 +194,6 @@
         <item quantity="many">%1$d times</item>
         <item quantity="other">%1$d times</item>
     </plurals>
-    <plurals name="expense_count">
-        <item quantity="one">%1$d expense</item>
-        <item quantity="many">%1$d expenses</item>
-        <item quantity="other">%1$d expenses</item>
-    </plurals>
     <string name="average">Average</string>
     <plurals name="out_of_expenses">
         <item quantity="one">out of %1$d expense</item>
