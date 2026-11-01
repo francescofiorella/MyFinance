@@ -27,7 +27,7 @@ fun buildLabelGroups(labels: List<String>, expenses: List<Expense>): List<LabelG
     val byLabel = expenses
         .flatMap { expense -> expense.labels.distinct().map { label -> label to expense } }
         .groupBy({ it.first }, { it.second })
-    return labels.distinct()
+    return labels.asSequence().distinct()
         .map { label ->
             val labelled = byLabel[label].orEmpty()
             val dates = labelled.map { it.getLocalDate() }
@@ -35,5 +35,5 @@ fun buildLabelGroups(labels: List<String>, expenses: List<Expense>): List<LabelG
         }
         .sortedWith(compareBy<LabelSummary, LocalDate?>(nullsLast(reverseOrder())) { it.last }.thenBy { it.label })
         .groupBy { it.last?.year }
-        .map { (year, summaries) -> LabelGroup(year, summaries) }
+        .map { (year, summaries) -> LabelGroup(year, summaries) }.toList()
 }
