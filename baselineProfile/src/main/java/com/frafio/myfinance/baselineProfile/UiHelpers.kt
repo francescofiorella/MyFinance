@@ -19,7 +19,7 @@ internal const val TAG = "MyFinanceBP"
 private const val IDLE_BUDGET_MS = 600L
 private const val FRAME_MS = 120L
 private const val FIND_MS = 2_000L
-private const val MAX_SCROLL_STEPS = 5
+private const val MAX_SCROLL_STEPS = 10
 private const val STALE_ATTEMPTS = 3
 
 /** Read from the `bpEmail` / `bpPassword` instrumentation arguments; never hardcoded. */
@@ -125,21 +125,29 @@ internal fun UiDevice.scrollToAndTap(containerTag: String, testTag: String): Boo
                 target != null && target.visibleBounds.height() > 0 -> ScrollStep.VISIBLE
                 else -> {
                     val container = findObject(res(containerTag)) ?: return@retryIfStale ScrollStep.STUCK
+                    val before = container.childBounds()
                     container.setGestureMargin(displayWidth / 10)
-                    if (container.scroll(Direction.DOWN, 0.6f)) ScrollStep.SCROLLED else ScrollStep.STUCK
+                    // Compose may not send the scroll event scroll() waits for, so its result can't tell the end.
+                    container.scroll(Direction.DOWN, 0.6f)
+                    settle()
+                    val after = findObject(res(containerTag))?.childBounds()
+                    if (after == null || after == before) ScrollStep.STUCK else ScrollStep.SCROLLED
                 }
             }
         }
         when (step) {
             ScrollStep.VISIBLE -> return tap(testTag)
             ScrollStep.STUCK -> return isOnScreen(testTag) && tap(testTag)
-            ScrollStep.SCROLLED -> settle()
+            ScrollStep.SCROLLED -> Unit
         }
     }
     return isOnScreen(testTag) && tap(testTag)
 }
 
 private enum class ScrollStep { VISIBLE, SCROLLED, STUCK }
+
+// Where the children sit: unchanged after a swipe means the end was reached.
+private fun UiObject2.childBounds(): List<String> = children.map { it.visibleBounds.flattenToString() }
 
 private fun UiDevice.isOnScreen(testTag: String): Boolean =
     retryIfStale(testTag) { (findObject(res(testTag))?.visibleBounds?.height() ?: 0) > 0 }
