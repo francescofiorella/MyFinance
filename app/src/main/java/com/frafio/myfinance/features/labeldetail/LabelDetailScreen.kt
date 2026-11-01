@@ -62,6 +62,7 @@ import com.frafio.myfinance.core.data.model.ExpenseCategory
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.dateRangeToString
+import com.frafio.myfinance.core.utils.doubleToPercent
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.core.utils.doubleToPriceWithoutDecimals
 import com.frafio.myfinance.features.categorydetail.FrequentExpense
@@ -263,6 +264,22 @@ private fun StatsGrid(stats: LabelDetailStats) {
                 StatCard(
                     modifier = modifier,
                     label = stringResource(id = R.string.average),
+                    value = doubleToPrice(stats.averagePerActiveDay),
+                    extra = {
+                        StatExtra(
+                            text = pluralStringResource(
+                                R.plurals.out_of_active_days,
+                                stats.activeDays,
+                                stats.activeDays
+                            )
+                        )
+                    }
+                )
+            },
+            end = { modifier ->
+                StatCard(
+                    modifier = modifier,
+                    label = stringResource(id = R.string.average),
                     value = doubleToPrice(stats.averagePerExpense),
                     extra = {
                         StatExtra(
@@ -274,20 +291,26 @@ private fun StatsGrid(stats: LabelDetailStats) {
                         )
                     }
                 )
+            }
+        )
+        StatRow(
+            start = { modifier ->
+                StatCard(
+                    modifier = modifier,
+                    label = stringResource(id = R.string.weekend_share),
+                    value = doubleToPercent(stats.weekendShare),
+                    extra = {
+                        StatExtra(text = stringResource(R.string.spent_on_weekends, doubleToPrice(stats.weekendTotal)))
+                    }
+                )
             },
             end = { modifier ->
                 StatCard(
                     modifier = modifier,
-                    label = stringResource(id = R.string.average),
-                    value = doubleToPrice(stats.averagePerActiveDay),
+                    label = stringResource(id = R.string.most_expensive_day),
+                    value = doubleToPrice(stats.biggestDay.total),
                     extra = {
-                        StatExtra(
-                            text = pluralStringResource(
-                                R.plurals.out_of_active_days,
-                                stats.activeDays,
-                                stats.activeDays
-                            )
-                        )
+                        StatExtra(text = dateRangeToString(stats.biggestDay.date, stats.biggestDay.date))
                     }
                 )
             }

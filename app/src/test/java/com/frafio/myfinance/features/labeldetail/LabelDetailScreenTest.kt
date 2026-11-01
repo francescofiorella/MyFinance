@@ -70,6 +70,12 @@ class LabelDetailScreenTest {
         assertStat(doubleToPrice(2199.5 / 12), "out of 12 expenses")
         assertStat(string(R.string.average), doubleToPrice(2199.5 / 11))
         assertStat(doubleToPrice(2199.5 / 11), "out of 11 active days")
+        // TeamLab, sushi dinner and JR Pass.
+        assertStat(string(R.string.weekend_share), "21%")
+        assertStat("21%", "${doubleToPrice(458.0)} on weekends")
+        // The flight.
+        assertStat(string(R.string.most_expensive_day), doubleToPrice(920.0))
+        assertStat(doubleToPrice(920.0), "3 Feb 2025")
     }
 
     // [value] sits in the same stat card as [label].

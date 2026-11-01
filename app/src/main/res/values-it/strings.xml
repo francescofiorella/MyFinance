@@ -211,5 +211,8 @@
         <item quantity="many">su %1$d giorni attivi</item>
         <item quantity="other">su %1$d giorni attivi</item>
     </plurals>
+    <string name="weekend_share">Quota nel weekend</string>
+    <string name="spent_on_weekends">%1$s nel weekend</string>
+    <string name="most_expensive_day">Giorno più costoso</string>
     <string name="biggest_expenses_overall">Spese maggiori</string>
 </resources>

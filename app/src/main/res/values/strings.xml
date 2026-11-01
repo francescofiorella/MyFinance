@@ -210,5 +210,8 @@
         <item quantity="many">out of %1$d active days</item>
         <item quantity="other">out of %1$d active days</item>
     </plurals>
+    <string name="weekend_share">Weekend share</string>
+    <string name="spent_on_weekends">%1$s on weekends</string>
+    <string name="most_expensive_day">Most expensive day</string>
     <string name="biggest_expenses_overall">Biggest expenses</string>
 </resources>

@@ -60,6 +60,53 @@ class LabelDetailStatsTest {
     }
 
     @Test
+    fun weekend_sumsSaturdaysAndSundays_asAShareOfTheTotal() {
+        val stats = buildLabelDetail(
+            listOf(
+                testExpense(name = "Sunday", price = 30.0, date = LocalDate.of(2025, 8, 17)),
+                testExpense(name = "Saturday", price = 20.0, date = LocalDate.of(2025, 8, 16)),
+                testExpense(name = "Friday", price = 50.0, date = LocalDate.of(2025, 8, 15))
+            )
+        )!!
+
+        assertThat(stats.weekendTotal).isEqualTo(50.0)
+        assertThat(stats.weekendShare).isEqualTo(0.5)
+    }
+
+    @Test
+    fun weekend_withoutWeekendDays_isZero() {
+        val stats = buildLabelDetail(listOf(testExpense(price = 5.0, date = LocalDate.of(2025, 8, 15))))!!
+
+        assertThat(stats.weekendTotal).isEqualTo(0.0)
+        assertThat(stats.weekendShare).isEqualTo(0.0)
+    }
+
+    @Test
+    fun biggestDay_sumsTheDaysExpenses() {
+        val stats = buildLabelDetail(
+            listOf(
+                testExpense(name = "Dinner", price = 50.0, date = aug14),
+                testExpense(name = "Lunch", price = 40.0, date = aug12),
+                testExpense(name = "Museum", price = 20.0, date = aug12)
+            )
+        )!!
+
+        assertThat(stats.biggestDay).isEqualTo(DayTotal(aug12, 60.0))
+    }
+
+    @Test
+    fun biggestDay_onATie_isTheMostRecent() {
+        val stats = buildLabelDetail(
+            listOf(
+                testExpense(name = "Dinner", price = 50.0, date = aug14),
+                testExpense(name = "Lunch", price = 50.0, date = aug12)
+            )
+        )!!
+
+        assertThat(stats.biggestDay).isEqualTo(DayTotal(aug14, 50.0))
+    }
+
+    @Test
     fun topExpenses_areTheFiveHighest_tiesNewestFirst() {
         val expenses = (1..7).map { day ->
             testExpense(name = "E$day", price = if (day <= 2) 100.0 else day.toDouble(), date = LocalDate.of(2025, 8, day))
