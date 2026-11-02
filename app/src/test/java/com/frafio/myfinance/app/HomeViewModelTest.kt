@@ -1,5 +1,6 @@
 package com.frafio.myfinance.app
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModelStore
 import androidx.navigation3.runtime.NavKey
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
@@ -26,11 +27,15 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * To learn more about how this test handles Flows created with stateIn, see
  * https://developer.android.com/kotlin/flow/test#statein
+ * Robolectric only for `Bitmap`.
  */
+@RunWith(RobolectricTestRunner::class)
 class HomeViewModelTest {
 
     @get:Rule
@@ -115,7 +120,19 @@ class HomeViewModelTest {
 
         viewModel.checkUser(notify = true)
 
-        assertThat(events).containsExactly(HomeUiEvent.LoginSuccess)
+        assertThat(events).containsExactly(HomeUiEvent.LoginSuccess(profilePicture = null, proPicChoice = null))
+    }
+
+    @Test
+    fun checkUser_withNotify_loginSuccessCarriesTheRestoredPicture() = runTest {
+        val picture = Bitmap.createBitmap(8, 8, Bitmap.Config.ARGB_8888)
+        userRepository.setProfilePicture(picture)
+        userPreferencesRepository.updateProPicChoice("google")
+        val events = collectUiEvents()
+
+        viewModel.checkUser(notify = true)
+
+        assertThat(events).containsExactly(HomeUiEvent.LoginSuccess(profilePicture = picture, proPicChoice = "google"))
     }
 
     @Test

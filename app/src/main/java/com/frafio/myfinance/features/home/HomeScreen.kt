@@ -105,8 +105,11 @@ fun HomeScreen(
                     )
                 }
 
-                HomeUiEvent.LoginSuccess -> {
-                    appState.showSnackBar("$loginSuccessString ${homeViewModel.getFullName()}")
+                is HomeUiEvent.LoginSuccess -> {
+                    appState.showSnackBar(
+                        "$loginSuccessString ${homeViewModel.getFullName()}",
+                        image = { rememberProfilePicturePainter(event.proPicChoice, event.profilePicture) }
+                    )
                 }
             }
         }

@@ -48,7 +48,8 @@ sealed class HomeUiEvent {
         val actionFun: () -> Unit = {},
         val dismissFun: () -> Unit = {}
     ) : HomeUiEvent()
-    object LoginSuccess : HomeUiEvent()
+    // The picture restored at login, fixed for the whole welcome snackbar.
+    data class LoginSuccess(val profilePicture: Bitmap?, val proPicChoice: String?) : HomeUiEvent()
 }
 
 sealed interface HomeUiState {
@@ -170,7 +171,7 @@ class HomeViewModel @Inject constructor(
         // Ensure HomeScreen is composed and collecting before emitting
         if (notify) {
             yield()
-            _uiEvents.emit(HomeUiEvent.LoginSuccess)
+            _uiEvents.emit(HomeUiEvent.LoginSuccess(userRepository.profilePicture.first(), userPrefs.proPicChoice))
         }
 
         // Remote sync

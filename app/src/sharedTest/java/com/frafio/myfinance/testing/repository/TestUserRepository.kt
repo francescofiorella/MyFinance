@@ -97,4 +97,8 @@ class TestUserRepository : UserRepository {
     fun setUser(user: User?) {
         userFlow.value = user
     }
+
+    fun setProfilePicture(bitmap: Bitmap?) {
+        profilePictureFlow.value = bitmap
+    }
 }
