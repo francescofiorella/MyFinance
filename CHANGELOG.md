@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.3
+
 - Bar and Pie charts deselection uniformed
 
 ## 5.2.2
