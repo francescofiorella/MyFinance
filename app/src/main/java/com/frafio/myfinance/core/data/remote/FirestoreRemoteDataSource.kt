@@ -79,6 +79,9 @@ class FirestoreRemoteDataSource @Inject constructor() : RemoteDataSource {
         userDocument(email).set(fields, SetOptions.merge()).await()
     }
 
+    override suspend fun getUserFields(email: String): Map<String, Any?> =
+        userDocument(email).get().await().data.orEmpty()
+
     override fun listenUser(
         email: String,
         onEvent: (exists: Boolean, data: Map<String, Any?>?, error: Throwable?) -> Unit,

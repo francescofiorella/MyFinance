@@ -121,6 +121,12 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun clearProPicChoice() {
+        dataStore.edit { preferences ->
+            preferences.remove(PreferencesKeys.PRO_PIC_CHOICE)
+        }
+    }
+
     override suspend fun updateDynamicColor(activate: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.DYNAMIC_COLOR] = activate

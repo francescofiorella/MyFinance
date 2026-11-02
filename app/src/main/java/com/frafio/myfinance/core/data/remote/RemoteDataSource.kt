@@ -58,6 +58,9 @@ interface RemoteDataSource {
     /** Merges [fields] into the user's root document. */
     suspend fun mergeUserFields(email: String, fields: Map<String, Any>)
 
+    /** The fields of the user's root document, empty when it does not exist. */
+    suspend fun getUserFields(email: String): Map<String, Any?>
+
     fun listenUser(
         email: String,
         onEvent: (exists: Boolean, data: Map<String, Any?>?, error: Throwable?) -> Unit,

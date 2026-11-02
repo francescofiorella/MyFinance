@@ -25,6 +25,10 @@ class TestUserPreferencesRepository : UserPreferencesRepository {
         preferences.update { it.copy(proPicChoice = choice) }
     }
 
+    override suspend fun clearProPicChoice() {
+        preferences.update { it.copy(proPicChoice = null) }
+    }
+
     override suspend fun updateDynamicColor(activate: Boolean) {
         preferences.update { it.copy(dynamicColor = activate) }
     }

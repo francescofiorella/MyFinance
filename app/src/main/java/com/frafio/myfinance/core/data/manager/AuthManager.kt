@@ -4,6 +4,7 @@ import android.util.Log
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
 import com.frafio.myfinance.core.data.enums.auth.SignupException
 import com.frafio.myfinance.core.data.model.AuthResult
+import com.frafio.myfinance.core.data.model.User
 import com.frafio.myfinance.core.data.remote.AuthDataSource
 import com.frafio.myfinance.core.data.remote.AuthException
 import com.frafio.myfinance.core.data.remote.AuthException.Kind
@@ -55,6 +56,10 @@ class AuthManager @Inject constructor(
 
     fun isUserLoggedIn(): Boolean {
         return auth.currentUser != null
+    }
+
+    fun getCurrentUser(): User? {
+        return auth.currentUser
     }
 
     suspend fun firebaseAuthWithGoogle(idToken: String): AuthResult = withContext(ioDispatcher) {
@@ -154,6 +159,7 @@ class AuthManager @Inject constructor(
         expensesLocalRepository.deleteAll()
         incomesLocalRepository.deleteAll()
         profileImageStorage.deleteImage()
+        userPreferencesRepository.clearProPicChoice()
 
         userPreferencesRepository.updateMonthlyBudget(0.0)
         userPreferencesRepository.updateLabels(emptyList())

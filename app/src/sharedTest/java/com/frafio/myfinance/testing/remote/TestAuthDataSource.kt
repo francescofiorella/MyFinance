@@ -14,6 +14,9 @@ class TestAuthDataSource : AuthDataSource {
 
     override var currentUser: User? = null
 
+    /** The Google picture of the users signed in from now on. */
+    var photoUrl: String? = null
+
     var signInFailure: AuthException? = null
     var googleFailure: AuthException? = null
     var createUserFailure: AuthException? = null
@@ -38,13 +41,19 @@ class TestAuthDataSource : AuthDataSource {
     override suspend fun signInWithEmail(email: String, password: String): User {
         signInFailure?.let { throw it }
         signIns += email to password
-        return testUser(email = email).also { currentUser = it }
+        return testUser(email = email, photoUrl = photoUrl).also { currentUser = it }
     }
 
     override suspend fun signInWithGoogle(idToken: String): User {
         googleFailure?.let { throw it }
         googleSignIns += idToken
-        return testUser(email = "google@example.com", provider = User.GOOGLE_PROVIDER, isGoogleLinked = true, hasPassword = false)
+        return testUser(
+            email = "google@example.com",
+            photoUrl = photoUrl,
+            provider = User.GOOGLE_PROVIDER,
+            isGoogleLinked = true,
+            hasPassword = false
+        )
             .also { currentUser = it }
     }
 

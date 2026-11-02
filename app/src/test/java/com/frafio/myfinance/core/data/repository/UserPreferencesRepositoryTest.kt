@@ -145,6 +145,18 @@ class UserPreferencesRepositoryTest {
     }
 
     @Test
+    fun clearProPicChoice_removesOnlyTheChoice() = testScope.runTest {
+        subject.updateUser(testUser())
+        subject.updateProPicChoice("avatar_1")
+
+        subject.clearProPicChoice()
+
+        val data = subject.userPreferencesFlow.first()
+        assertThat(data.proPicChoice).isNull()
+        assertThat(data.user).isNotNull()
+    }
+
+    @Test
     fun syncTimestamps_roundTripIndependently() = testScope.runTest {
         subject.updateLastExpensesSync(1L)
         subject.updateLastIncomesSync(2L)

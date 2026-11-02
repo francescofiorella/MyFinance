@@ -314,7 +314,13 @@ class AuthManagerTest {
         signedIn()
         preferences.setPreferences(
             testPreferences(user = testUser(), monthlyBudget = 500.0, labels = listOf("Dinner"))
-                .copy(lastExpensesSync = 10L, lastIncomesSync = 20L, lastExpensesAppSync = 30L, lastIncomesAppSync = 40L),
+                .copy(
+                    lastExpensesSync = 10L,
+                    lastIncomesSync = 20L,
+                    lastExpensesAppSync = 30L,
+                    lastIncomesAppSync = 40L,
+                    proPicChoice = "avatar_1"
+                ),
         )
 
         val result = subject.logout()
@@ -330,6 +336,7 @@ class AuthManagerTest {
         assertThat(prefs.lastIncomesSync).isEqualTo(0L)
         assertThat(prefs.lastExpensesAppSync).isEqualTo(0L)
         assertThat(prefs.lastIncomesAppSync).isEqualTo(0L)
+        assertThat(prefs.proPicChoice).isNull()
         assertThat(preferences.clearUserDataCount).isEqualTo(1)
         assertThat(subject.isUserLoggedIn()).isFalse()
     }

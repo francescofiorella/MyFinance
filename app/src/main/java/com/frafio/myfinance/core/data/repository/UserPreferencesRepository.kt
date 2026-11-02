@@ -9,6 +9,8 @@ interface UserPreferencesRepository {
 
     suspend fun updateProPicChoice(choice: String)
 
+    suspend fun clearProPicChoice()
+
     suspend fun updateDynamicColor(activate: Boolean)
 
     suspend fun updateMonthlyBudget(budget: Double)

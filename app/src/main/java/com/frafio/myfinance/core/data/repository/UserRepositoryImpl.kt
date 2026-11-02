@@ -5,13 +5,18 @@ import android.util.Log
 import androidx.credentials.Credential
 import androidx.credentials.CustomCredential
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
+import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.manager.AuthManager
 import com.frafio.myfinance.core.data.model.AuthResult
 import com.frafio.myfinance.core.data.model.User
+import com.frafio.myfinance.core.data.remote.RemoteDataSource
 import com.frafio.myfinance.core.data.storage.ProfileImageStorage
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -19,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import javax.inject.Inject
@@ -29,8 +35,11 @@ class UserRepositoryImpl @Inject constructor(
     private val authManager: AuthManager,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val profileImageStorage: ProfileImageStorage,
-    private val okHttpClient: OkHttpClient
+    private val okHttpClient: OkHttpClient,
+    private val remoteDataSource: RemoteDataSource
 ) : UserRepository {
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private var _lastUser: User? = null
     private val _profilePicture = kotlinx.coroutines.flow.MutableStateFlow(profileImageStorage.loadBitmapSync())
@@ -38,6 +47,7 @@ class UserRepositoryImpl @Inject constructor(
 
     companion object {
         private val TAG = UserRepositoryImpl::class.java.simpleName
+        const val PROFILE_PICTURE_TIMEOUT_MS = 3_000L
     }
 
     override suspend fun updateFullName(fullName: String): AuthResult {
@@ -45,7 +55,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun userLogin(email: String, password: String): AuthResult {
-        return authManager.defaultLogin(email, password)
+        return authManager.defaultLogin(email, password).also { restoreProfilePicture(it) }
     }
 
     override suspend fun userLogin(credential: Credential): AuthResult {
@@ -55,7 +65,7 @@ class UserRepositoryImpl @Inject constructor(
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
 
             // Sign in to Firebase with using the token
-            authManager.firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
+            authManager.firebaseAuthWithGoogle(googleIdTokenCredential.idToken).also { restoreProfilePicture(it) }
         } else {
             Log.w(TAG, "Credential is not of type Google ID!")
             AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE)
@@ -110,6 +120,37 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "Error syncing profile picture: ${e.localizedMessage}")
         }
+    }
+
+    // Home's welcome snackbar shows the picture, so it is restored before the login completes.
+    private suspend fun restoreProfilePicture(loginResult: AuthResult) {
+        if (loginResult.code != AuthCode.LOGIN_SUCCESS.code) return
+        val user = authManager.getCurrentUser() ?: return
+
+        val fields = try {
+            withTimeoutOrNull(PROFILE_PICTURE_TIMEOUT_MS) { remoteDataSource.getUserFields(user.email) }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reading the profile picture choice: ${e.localizedMessage}")
+            null
+        } ?: return
+
+        val choice = fields[FirestoreEnums.FIELDS.PRO_PIC_CHOICE.value] as? String
+        if (choice == null) {
+            userPreferencesRepository.clearProPicChoice()
+            return
+        }
+        userPreferencesRepository.updateProPicChoice(choice)
+        if (choice != FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value) return
+
+        // Outside the login's scope: past the timeout the download goes on in the background.
+        val download = scope.async {
+            // syncProfilePicture reads the user back from the preferences.
+            withTimeoutOrNull(PROFILE_PICTURE_TIMEOUT_MS) {
+                userPreferencesRepository.userPreferencesFlow.first { it.user?.email == user.email }
+            } ?: return@async
+            syncProfilePicture(user.photoUrl)
+        }
+        withTimeoutOrNull(PROFILE_PICTURE_TIMEOUT_MS) { download.await() }
     }
 
     override val userData: Flow<User?> = userPreferencesRepository.userPreferencesFlow

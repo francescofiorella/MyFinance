@@ -29,6 +29,8 @@ class TestRemoteDataSource : RemoteDataSource {
     val arrayUpdates = mutableListOf<ArrayUpdate>()
     val mergedUserFields = mutableListOf<Map<String, Any>>()
     val getAllCalls = mutableListOf<String>()
+    var getUserFieldsCalls = 0
+        private set
     val listenSince = mutableMapOf<String, Long>()
     var removedListeners = 0
         private set
@@ -123,6 +125,12 @@ class TestRemoteDataSource : RemoteDataSource {
         throwIfFailing()
         mergedUserFields += fields
         userFields.putAll(fields)
+    }
+
+    override suspend fun getUserFields(email: String): Map<String, Any?> {
+        throwIfFailing()
+        getUserFieldsCalls++
+        return userFields.toMap()
     }
 
     override fun listenUser(
