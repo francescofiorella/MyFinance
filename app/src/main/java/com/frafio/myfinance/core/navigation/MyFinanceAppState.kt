@@ -10,7 +10,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.navigation3.runtime.NavKey
+import com.frafio.myfinance.core.components.ImageSnackbarVisuals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -80,6 +82,13 @@ class MyFinanceAppState(
             } else {
                 dismissFun()
             }
+        }
+    }
+
+    fun showSnackBar(message: String, image: @Composable () -> Painter) {
+        coroutineScope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showSnackbar(ImageSnackbarVisuals(message, image))
         }
     }
 }

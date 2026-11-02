@@ -8,10 +8,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.Posture
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.window.core.layout.WindowSizeClass
+import com.frafio.myfinance.R
+import com.frafio.myfinance.core.components.ImageSnackbarVisuals
 import com.frafio.myfinance.core.navigation.HomeTabKey
 import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
@@ -40,7 +44,14 @@ class SnackbarScreenshotTests {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private fun snackbar(name: String, widthDp: Int, heightDp: Int, darkMode: Boolean = false, showSnackbar: Boolean = true) {
+    private fun snackbar(
+        name: String,
+        widthDp: Int,
+        heightDp: Int,
+        darkMode: Boolean = false,
+        showSnackbar: Boolean = true,
+        image: (@Composable () -> Painter)? = null,
+    ) {
         lateinit var appState: MyFinanceAppState
         composeTestRule.captureAfter(
             // The device size is the layout size: `ForcedSize` only rescales density, it does not constrain.
@@ -49,7 +60,11 @@ class SnackbarScreenshotTests {
             deviceName = if (darkMode) "shell_dark" else "shell",
             darkMode = darkMode,
             action = {
-                if (showSnackbar) {
+                if (image != null) {
+                    appState.snackbarHostState.showSnackbar(
+                        ImageSnackbarVisuals("You are logged in as Ada Lovelace", image, SnackbarDuration.Indefinite)
+                    )
+                } else if (showSnackbar) {
                     appState.snackbarHostState.showSnackbar(
                         message = "Expense deleted",
                         actionLabel = "Undo",
@@ -88,6 +103,18 @@ class SnackbarScreenshotTests {
 
     @Test
     fun snackbar_compactWidth_withoutSnackbar() = snackbar("snackbar_compact_noSnackbar", 411, 891, showSnackbar = false)
+
+    @Test
+    fun snackbar_compactWidth_withImage() = snackbar(
+        "snackbar_compact_image", 411, 891,
+        image = { painterResource(R.drawable.image_profile_interface_cuate) },
+    )
+
+    @Test
+    fun snackbar_compactWidth_withImage_dark() = snackbar(
+        "snackbar_compact_image", 411, 891, darkMode = true,
+        image = { painterResource(R.drawable.image_profile_interface_cuate) },
+    )
 
     @Test
     fun snackbar_mediumWidth() = snackbar("snackbar_medium", 700, 891)

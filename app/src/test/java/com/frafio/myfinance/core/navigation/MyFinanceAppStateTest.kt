@@ -1,8 +1,11 @@
 package com.frafio.myfinance.core.navigation
 
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import com.frafio.myfinance.core.components.ImageSnackbarVisuals
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -127,5 +130,22 @@ class MyFinanceAppStateTest {
 
         assertThat(firstDismissed).isTrue()
         assertThat(snackbarHostState.currentSnackbarData?.visuals?.message).isEqualTo("second")
+    }
+
+    @Test
+    fun showSnackBar_withAnImage_showsTheMessageWithTheImage_andReplacesTheCurrentSnackbar() = runTest {
+        val appState = appState()
+        var firstDismissed = false
+        appState.showSnackBar("first", dismissFun = { firstDismissed = true })
+        runCurrent()
+
+        appState.showSnackBar("welcome", image = { ColorPainter(Color.Red) })
+        runCurrent()
+
+        assertThat(firstDismissed).isTrue()
+        val visuals = snackbarHostState.currentSnackbarData?.visuals
+        assertThat(visuals).isInstanceOf(ImageSnackbarVisuals::class.java)
+        assertThat(visuals?.message).isEqualTo("welcome")
+        assertThat(visuals?.actionLabel).isNull()
     }
 }
