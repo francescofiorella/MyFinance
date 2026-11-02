@@ -48,6 +48,10 @@ class TestExpensesRepository : ExpensesRepository {
     var stopCallCount = 0
         private set
 
+    /** The scope the last listener was started in, where its work runs. */
+    var listenerScope: CoroutineScope? = null
+        private set
+
     override suspend fun deleteExpense(expense: Expense): FinanceResult {
         deletedExpenses += expense
         return deleteResult
@@ -116,6 +120,7 @@ class TestExpensesRepository : ExpensesRepository {
         onInitialSync: CompletableDeferred<Unit>?
     ) {
         snapshotListenerRunning = true
+        listenerScope = scope
         if (completeInitialSyncImmediately) onInitialSync?.complete(Unit)
     }
 

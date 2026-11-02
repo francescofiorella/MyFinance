@@ -69,8 +69,12 @@ class TestUserRepository : UserRepository {
         return signupResult
     }
 
+    /** Runs as the logout starts, before anything is cleared. */
+    var onLogout: () -> Unit = {}
+
     override suspend fun userLogout(): AuthResult {
         logoutCount++
+        onLogout()
         if (logoutResult.code == AuthCode.LOGOUT_SUCCESS.code) {
             userFlow.value = null
             profilePictureFlow.value = null

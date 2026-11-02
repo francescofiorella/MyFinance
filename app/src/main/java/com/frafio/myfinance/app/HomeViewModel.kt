@@ -18,6 +18,9 @@ import com.frafio.myfinance.core.data.repository.UserRepository
 import com.frafio.myfinance.core.data.storage.ProfileImageStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -32,6 +35,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import javax.inject.Inject
@@ -68,6 +72,9 @@ class HomeViewModel @Inject constructor(
     private val loadingRepository: LoadingRepository,
     profileImageStorage: ProfileImageStorage
 ) : ViewModel() {
+
+    // What runs for the logged user, listeners included: logout cancels it before clearing the data.
+    private var sessionScope = newSessionScope()
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -131,8 +138,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun newSessionScope() =
+        CoroutineScope(viewModelScope.coroutineContext + SupervisorJob(viewModelScope.coroutineContext.job))
+
     fun checkUser(notify: Boolean) {
-        viewModelScope.launch {
+        sessionScope.launch {
             try {
                 loadingRepository.startLoading()
                 loadingRepository.startFirstSync()
@@ -182,9 +192,9 @@ class HomeViewModel @Inject constructor(
         userRepository.syncProfilePicture(userPrefs.user?.photoUrl)
         
         // Start snapshot listeners
-        expensesRepository.startRootSnapshotListener(viewModelScope, rootSync)
-        expensesRepository.startSnapshotListener(viewModelScope, expensesSync)
-        incomeRepository.startSnapshotListener(viewModelScope, incomesSync)
+        expensesRepository.startRootSnapshotListener(sessionScope, rootSync)
+        expensesRepository.startSnapshotListener(sessionScope, expensesSync)
+        incomeRepository.startSnapshotListener(sessionScope, incomesSync)
 
         // Wait for initial sync
         rootSync.await()
@@ -198,11 +208,18 @@ class HomeViewModel @Inject constructor(
 
     fun onLogoutButtonClick() {
         viewModelScope.launch {
+            // Stopped first, so nothing still loading can store the data again once it is cleared.
+            sessionScope.coroutineContext.job.cancelAndJoin()
+            sessionScope = newSessionScope()
+            expensesRepository.stopSnapshotListener()
+            incomeRepository.stopSnapshotListener()
+
             val logoutResult = userRepository.userLogout()
             if (logoutResult.code == AuthCode.LOGOUT_SUCCESS.code) {
-                expensesRepository.stopSnapshotListener()
-                incomeRepository.stopSnapshotListener()
                 _mainEvents.send(MainEvent.LogoutSuccess)
+            } else {
+                // Still logged in: the sync starts again.
+                checkUser(notify = false)
             }
         }
     }

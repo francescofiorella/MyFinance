@@ -20,6 +20,7 @@ import com.frafio.myfinance.testing.util.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -272,14 +273,60 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun onLogoutButtonClick_failure_doesNothing() = runTest {
-        userRepository.logoutResult = AuthResult(AuthCode.LOGIN_FAILURE)
-        val mainEvents = collectMainEvents()
+    fun onLogoutButtonClick_stopsTheListenersBeforeTheDataIsCleared() = runTest {
+        viewModel.checkUser(notify = false)
+        var listenersRunningAtLogout: Boolean? = null
+        userRepository.onLogout = {
+            listenersRunningAtLogout = expensesRepository.snapshotListenerRunning ||
+                expensesRepository.rootSnapshotListenerRunning ||
+                incomeRepository.snapshotListenerRunning
+        }
 
         viewModel.onLogoutButtonClick()
 
-        assertThat(expensesRepository.stopCallCount).isEqualTo(0)
-        assertThat(incomeRepository.stopCallCount).isEqualTo(0)
+        assertThat(listenersRunningAtLogout).isFalse()
+    }
+
+    @Test
+    fun onLogoutButtonClick_whileTheSyncIsLoading_cancelsItsWork() = runTest {
+        expensesRepository.completeInitialSyncImmediately = false
+        incomeRepository.completeInitialSyncImmediately = false
+        viewModel.checkUser(notify = false)
+        val expensesScope = checkNotNull(expensesRepository.listenerScope)
+        val incomesScope = checkNotNull(incomeRepository.listenerScope)
+        var sessionActiveAtLogout: Boolean? = null
+        userRepository.onLogout = { sessionActiveAtLogout = expensesScope.isActive || incomesScope.isActive }
+
+        viewModel.onLogoutButtonClick()
+
+        assertThat(sessionActiveAtLogout).isFalse()
+        assertThat(loadingRepository.isLoading.value).isFalse()
+        assertThat(loadingRepository.isFirstSync.value).isFalse()
+    }
+
+    @Test
+    fun checkUser_afterALogout_startsTheListenersInANewSession() = runTest {
+        viewModel.checkUser(notify = false)
+        viewModel.onLogoutButtonClick()
+
+        viewModel.checkUser(notify = true)
+
+        assertThat(expensesRepository.snapshotListenerRunning).isTrue()
+        assertThat(incomeRepository.snapshotListenerRunning).isTrue()
+        assertThat(checkNotNull(expensesRepository.listenerScope).isActive).isTrue()
+    }
+
+    @Test
+    fun onLogoutButtonClick_failure_startsTheSyncAgain_andDoesNotSignalMain() = runTest {
+        userRepository.logoutResult = AuthResult(AuthCode.LOGIN_FAILURE)
+        val mainEvents = collectMainEvents()
+        viewModel.checkUser(notify = false)
+
+        viewModel.onLogoutButtonClick()
+
+        assertThat(expensesRepository.snapshotListenerRunning).isTrue()
+        assertThat(incomeRepository.snapshotListenerRunning).isTrue()
+        assertThat(checkNotNull(expensesRepository.listenerScope).isActive).isTrue()
         assertThat(mainEvents).isEmpty()
     }
 

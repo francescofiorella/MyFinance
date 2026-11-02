@@ -28,6 +28,10 @@ class TestIncomeRepository : IncomeRepository {
     var stopCallCount = 0
         private set
 
+    /** The scope the last listener was started in, where its work runs. */
+    var listenerScope: CoroutineScope? = null
+        private set
+
     override suspend fun addIncome(income: Income): FinanceResult {
         addedIncomes += income
         return addResult
@@ -48,6 +52,7 @@ class TestIncomeRepository : IncomeRepository {
         onInitialSync: CompletableDeferred<Unit>?
     ) {
         snapshotListenerRunning = true
+        listenerScope = scope
         if (completeInitialSyncImmediately) onInitialSync?.complete(Unit)
     }
 
