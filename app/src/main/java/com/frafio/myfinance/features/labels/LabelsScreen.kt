@@ -40,6 +40,8 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.EmptyView
 import com.frafio.myfinance.core.components.SectionTitle
+import com.frafio.myfinance.core.components.SwipeableSnackbarHost
+import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.dateRangeToString
 import com.frafio.myfinance.core.utils.doubleToPrice
@@ -47,6 +49,7 @@ import java.time.LocalDate
 
 @Composable
 fun LabelsScreen(
+    appState: MyFinanceAppState,
     viewModel: LabelsViewModel,
     onBackClick: () -> Unit,
     onManageClick: () -> Unit,
@@ -57,7 +60,8 @@ fun LabelsScreen(
         groups = groups,
         onBackClick = onBackClick,
         onManageClick = onManageClick,
-        onLabelClick = onLabelClick
+        onLabelClick = onLabelClick,
+        snackbarHost = { SwipeableSnackbarHost(hostState = appState.snackbarHostState) }
     )
 }
 
@@ -68,9 +72,11 @@ fun LabelsContent(
     groups: List<LabelGroup>?,
     onBackClick: () -> Unit,
     onManageClick: () -> Unit,
-    onLabelClick: (String) -> Unit
+    onLabelClick: (String) -> Unit,
+    snackbarHost: @Composable () -> Unit = {}
 ) {
     Scaffold(
+        snackbarHost = snackbarHost,
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         Column(

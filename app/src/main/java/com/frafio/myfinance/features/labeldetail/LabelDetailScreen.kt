@@ -53,12 +53,14 @@ import com.frafio.myfinance.core.components.DetailRow
 import com.frafio.myfinance.core.components.EmptyListItem
 import com.frafio.myfinance.core.components.SectionTitle
 import com.frafio.myfinance.core.components.StatCard
+import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.components.TransactionListItem
 import com.frafio.myfinance.core.components.categoryPieChartItem
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums.CATEGORIES
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.ExpenseCategory
+import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.dateRangeToString
@@ -70,6 +72,7 @@ import java.time.LocalDate
 
 @Composable
 fun LabelDetailScreen(
+    appState: MyFinanceAppState,
     viewModel: LabelDetailViewModel,
     onBackClick: () -> Unit,
     onSeeAllExpenses: () -> Unit,
@@ -103,7 +106,8 @@ fun LabelDetailScreen(
                     )
                 )
             )
-        }
+        },
+        snackbarHost = { SwipeableSnackbarHost(hostState = appState.snackbarHostState) }
     )
 }
 
@@ -115,9 +119,11 @@ fun LabelDetailContent(
     onBackClick: () -> Unit,
     onSeeAllExpenses: () -> Unit,
     onFrequentExpenseClick: (FrequentExpense) -> Unit,
-    onCategoryClick: (ExpenseCategory) -> Unit
+    onCategoryClick: (ExpenseCategory) -> Unit,
+    snackbarHost: @Composable () -> Unit = {}
 ) {
     Scaffold(
+        snackbarHost = snackbarHost,
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         Column(

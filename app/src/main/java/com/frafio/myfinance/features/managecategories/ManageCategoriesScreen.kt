@@ -46,22 +46,30 @@ import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.CategoryIcon
+import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.ExpenseCategory
+import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 @Composable
-fun ManageCategoriesScreen(onBackClick: () -> Unit) {
-    ManageCategoriesContent(categories = ExpenseCategories.all, onBackClick = onBackClick)
+fun ManageCategoriesScreen(appState: MyFinanceAppState, onBackClick: () -> Unit) {
+    ManageCategoriesContent(
+        categories = ExpenseCategories.all,
+        onBackClick = onBackClick,
+        snackbarHost = { SwipeableSnackbarHost(hostState = appState.snackbarHostState) }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageCategoriesContent(
     categories: List<ExpenseCategory>,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    snackbarHost: @Composable () -> Unit = {}
 ) {
     Scaffold(
+        snackbarHost = snackbarHost,
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         Column(

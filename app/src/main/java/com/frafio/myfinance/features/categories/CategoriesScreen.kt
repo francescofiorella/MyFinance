@@ -37,8 +37,10 @@ import com.frafio.myfinance.core.components.AppTopBar
 import com.frafio.myfinance.core.components.CategoryShareItem
 import com.frafio.myfinance.core.components.PeriodStepper
 import com.frafio.myfinance.core.components.SpendingChangeChip
+import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.data.model.CategorySum
 import com.frafio.myfinance.core.data.model.ExpenseCategories
+import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.doubleToPrice
 import com.frafio.myfinance.core.utils.monthToString
@@ -46,6 +48,7 @@ import java.time.LocalDate
 
 @Composable
 fun CategoriesScreen(
+    appState: MyFinanceAppState,
     viewModel: CategoriesViewModel,
     onBackClick: () -> Unit,
     onCategoryClick: (categoryId: Int, month: LocalDate) -> Unit
@@ -57,7 +60,8 @@ fun CategoriesScreen(
         onPreviousMonth = viewModel::previousMonth,
         onNextMonth = viewModel::nextMonth,
         onCurrentMonth = viewModel::goToCurrentMonth,
-        onCategoryClick = { onCategoryClick(it, state.month) }
+        onCategoryClick = { onCategoryClick(it, state.month) },
+        snackbarHost = { SwipeableSnackbarHost(hostState = appState.snackbarHostState) }
     )
 }
 
@@ -69,9 +73,11 @@ fun CategoriesContent(
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onCurrentMonth: () -> Unit,
-    onCategoryClick: (categoryId: Int) -> Unit
+    onCategoryClick: (categoryId: Int) -> Unit,
+    snackbarHost: @Composable () -> Unit = {}
 ) {
     Scaffold(
+        snackbarHost = snackbarHost,
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         Column(

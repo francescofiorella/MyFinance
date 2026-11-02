@@ -51,12 +51,14 @@ import com.frafio.myfinance.core.components.MonthlyRangeLineChart
 import com.frafio.myfinance.core.components.SectionTitle
 import com.frafio.myfinance.core.components.SpendingChangeChip
 import com.frafio.myfinance.core.components.StatCard
+import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.components.TransactionListItem
 import com.frafio.myfinance.core.data.model.CategoryColors
 import com.frafio.myfinance.core.data.model.Expense
 import com.frafio.myfinance.core.data.model.ExpenseCategories
 import com.frafio.myfinance.core.data.model.ExpenseCategory
 import com.frafio.myfinance.core.data.model.MonthlyTotal
+import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.navigation.RootKey
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.ALL_MONTH_RANGES
@@ -67,6 +69,7 @@ import java.time.LocalDate
 
 @Composable
 fun CategoryDetailScreen(
+    appState: MyFinanceAppState,
     viewModel: CategoryDetailViewModel,
     onBackClick: () -> Unit,
     onSeeAllExpenses: () -> Unit,
@@ -109,7 +112,8 @@ fun CategoryDetailScreen(
                 )
             )
         },
-        onLabelClick = { label -> onLabelClick(RootKey.LabelDetail(label)) }
+        onLabelClick = { label -> onLabelClick(RootKey.LabelDetail(label)) },
+        snackbarHost = { SwipeableSnackbarHost(hostState = appState.snackbarHostState) }
     )
 }
 
@@ -129,9 +133,11 @@ fun CategoryDetailContent(
     trendShownCount: Int = trend.size,
     onTrendVisibleCountChanged: (Int) -> Unit = {},
     trendAvailableRanges: List<Int> = ALL_MONTH_RANGES,
-    trendTrackingStart: LocalDate? = null
+    trendTrackingStart: LocalDate? = null,
+    snackbarHost: @Composable () -> Unit = {}
 ) {
     Scaffold(
+        snackbarHost = snackbarHost,
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         Column(

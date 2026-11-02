@@ -24,15 +24,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.AppTopBar
+import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.components.TotalItem
 import com.frafio.myfinance.core.components.TransactionListItem
 import com.frafio.myfinance.core.data.model.Expense
+import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
 import com.frafio.myfinance.core.utils.monthRangeToString
 import java.time.LocalDate
 
 @Composable
 fun FrequentExpensesScreen(
+    appState: MyFinanceAppState,
     viewModel: FrequentExpensesViewModel,
     onBackClick: () -> Unit
 ) {
@@ -41,7 +44,8 @@ fun FrequentExpensesScreen(
         title = stringResource(id = viewModel.titleRes),
         subtitle = viewModel.subtitle,
         days = days,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        snackbarHost = { SwipeableSnackbarHost(hostState = appState.snackbarHostState) }
     )
 }
 
@@ -51,9 +55,11 @@ fun FrequentExpensesContent(
     title: String,
     subtitle: String,
     days: List<ExpensesOfDay>?,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    snackbarHost: @Composable () -> Unit = {}
 ) {
     Scaffold(
+        snackbarHost = snackbarHost,
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         Column(

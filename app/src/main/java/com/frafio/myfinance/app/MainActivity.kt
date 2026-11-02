@@ -191,11 +191,13 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                         labelsEntry(
+                            appState = appState,
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
                             onManageClick = { rootBackStack.add(RootKey.ManageLabels) },
                             onLabelClick = { key -> rootBackStack.add(key) }
                         )
                         labelDetailEntry(
+                            appState = appState,
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
                             onSeeAllExpenses = ::openFilteredExpenses,
                             onExpensesClick = { key -> rootBackStack.add(key) }
@@ -209,19 +211,23 @@ class MainActivity : ComponentActivity() {
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
                         )
                         manageCategoriesEntry(
+                            appState = appState,
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
                         )
                         categoriesEntry(
+                            appState = appState,
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
                             onCategoryClick = { key -> rootBackStack.add(key) }
                         )
                         categoryDetailEntry(
+                            appState = appState,
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
                             onSeeAllExpenses = ::openFilteredExpenses,
                             onFrequentExpenseClick = { key -> rootBackStack.add(key) },
                             onLabelClick = { key -> rootBackStack.add(key) }
                         )
                         frequentExpensesEntry(
+                            appState = appState,
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) }
                         )
                     }
