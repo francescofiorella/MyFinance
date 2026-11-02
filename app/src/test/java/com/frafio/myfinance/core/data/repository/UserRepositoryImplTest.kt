@@ -270,5 +270,33 @@ class UserRepositoryImplTest {
         assertThat(storedUser?.localPhotoPath).endsWith("profile_pic.png")
     }
 
+    @Test
+    fun syncAfterASlowLogin_waitsForTheLoginDownload_insteadOfDownloadingAgain() = runBlocking {
+        auth.photoUrl = avatarUrl
+        remote.userFields[choiceField] = google
+        server.enqueue(pngResponse().setBodyDelay(UserRepositoryImpl.PROFILE_PICTURE_TIMEOUT_MS + 1_000, TimeUnit.MILLISECONDS))
+        server.enqueue(pngResponse())
+
+        subject.userLogin("ada@example.com", "password123")
+        subject.syncProfilePicture(avatarUrl)
+
+        assertThat(server.requestCount).isEqualTo(1)
+        assertThat(subject.profilePicture.first()).isNotNull()
+    }
+
+    @Test
+    fun syncAfterAFailedLoginDownload_downloadsAgain() = runBlocking {
+        auth.photoUrl = avatarUrl
+        remote.userFields[choiceField] = google
+        server.enqueue(MockResponse().setResponseCode(404))
+        server.enqueue(pngResponse())
+
+        subject.userLogin("ada@example.com", "password123")
+        subject.syncProfilePicture(avatarUrl)
+
+        assertThat(server.requestCount).isEqualTo(2)
+        assertThat(subject.profilePicture.first()).isNotNull()
+    }
+
     // endregion
 }

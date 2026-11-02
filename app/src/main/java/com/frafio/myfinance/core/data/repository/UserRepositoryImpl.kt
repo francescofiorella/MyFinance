@@ -14,6 +14,7 @@ import com.frafio.myfinance.core.data.storage.ProfileImageStorage
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
@@ -40,6 +41,10 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    // The download started at login, reused by the next sync so the picture is fetched once.
+    @Volatile
+    private var loginDownload: Deferred<Unit>? = null
 
     private var _lastUser: User? = null
     private val _profilePicture = kotlinx.coroutines.flow.MutableStateFlow(profileImageStorage.loadBitmapSync())
@@ -89,6 +94,7 @@ class UserRepositoryImpl @Inject constructor(
         if (result.code == AuthCode.LOGOUT_SUCCESS.code) {
             _profilePicture.value = null
             _lastUser = null
+            loginDownload = null
         }
         return result
     }
@@ -97,7 +103,17 @@ class UserRepositoryImpl @Inject constructor(
         return authManager.isUserLogged()
     }
 
-    override suspend fun syncProfilePicture(photoUrl: String?) = withContext(Dispatchers.IO) {
+    override suspend fun syncProfilePicture(photoUrl: String?) {
+        loginDownload?.let { download ->
+            loginDownload = null
+            download.await()
+            // A failed login download is retried below.
+            if (_profilePicture.value != null) return
+        }
+        downloadProfilePicture(photoUrl)
+    }
+
+    private suspend fun downloadProfilePicture(photoUrl: String?) = withContext(Dispatchers.IO) {
         if (photoUrl.isNullOrEmpty()) return@withContext
 
         val user = userPreferencesRepository.userPreferencesFlow.first().user
@@ -144,12 +160,13 @@ class UserRepositoryImpl @Inject constructor(
 
         // Outside the login's scope: past the timeout the download goes on in the background.
         val download = scope.async {
-            // syncProfilePicture reads the user back from the preferences.
+            // downloadProfilePicture reads the user back from the preferences.
             withTimeoutOrNull(PROFILE_PICTURE_TIMEOUT_MS) {
                 userPreferencesRepository.userPreferencesFlow.first { it.user?.email == user.email }
             } ?: return@async
-            syncProfilePicture(user.photoUrl)
+            downloadProfilePicture(user.photoUrl)
         }
+        loginDownload = download
         withTimeoutOrNull(PROFILE_PICTURE_TIMEOUT_MS) { download.await() }
     }
 
