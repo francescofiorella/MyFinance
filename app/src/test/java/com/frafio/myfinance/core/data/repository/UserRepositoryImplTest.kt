@@ -16,7 +16,10 @@ import com.frafio.myfinance.testing.repository.TestIncomesLocalRepository
 import com.frafio.myfinance.testing.repository.TestUserPreferencesRepository
 import com.frafio.myfinance.testing.storage.TestProfileImageStorage
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.withTimeout
@@ -182,6 +185,20 @@ class UserRepositoryImplTest {
         assertThat(server.requestCount).isEqualTo(1)
         assertThat(storedUser).isNull()
         assertThat(subject.profilePicture.first()).isNull()
+    }
+
+    @Test
+    fun concurrentSyncsOfTheSamePicture_downloadItOnce() = runBlocking {
+        preferences.setUser(testUser(photoUrl = avatarUrl))
+        server.enqueue(pngResponse().setBodyDelay(500, TimeUnit.MILLISECONDS))
+        server.enqueue(pngResponse())
+
+        val first = launch(Dispatchers.Default) { subject.syncProfilePicture(avatarUrl) }
+        val second = launch(Dispatchers.Default) { subject.syncProfilePicture(avatarUrl) }
+        joinAll(first, second)
+
+        assertThat(server.requestCount).isEqualTo(1)
+        assertThat(subject.profilePicture.first()).isNotNull()
     }
 
     @Test
