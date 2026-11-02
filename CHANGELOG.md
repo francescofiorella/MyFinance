@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-- SnackBar added to Categories and Labels screens
+- SnackBar added to Categories, Category Details, Labels, Label Details, Frequent Expenses and Manage Categories screens
+- Welcome snackbar shows the profile picture
+- Profile picture downloaded once, at login
+- Logging out right after logging in no longer keeps the old account's data
+- Minor bug fixes
 
 ## 5.2.3
 
