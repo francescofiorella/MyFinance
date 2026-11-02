@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.4
+
 - SnackBar added to Categories, Category Details, Labels, Label Details, Frequent Expenses and Manage Categories screens
 - Welcome snackbar shows the profile picture
 - Profile picture downloaded once, at login
