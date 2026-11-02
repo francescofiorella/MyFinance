@@ -18,6 +18,7 @@ import com.frafio.myfinance.testing.storage.TestProfileImageStorage
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.async
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -202,6 +203,22 @@ class UserRepositoryImplTest {
     }
 
     @Test
+    fun logoutDuringASync_stopsTheDownload_andNothingIsStoredAfterwards() = runBlocking {
+        preferences.setUser(testUser(photoUrl = avatarUrl))
+        server.enqueue(pngResponse().setBodyDelay(10, TimeUnit.SECONDS))
+        val sync = async(Dispatchers.Default) { subject.syncProfilePicture(avatarUrl) }
+        server.takeRequest()
+
+        val start = System.currentTimeMillis()
+        subject.userLogout()
+        sync.await()
+
+        assertThat(System.currentTimeMillis() - start).isLessThan(2_000)
+        assertThat(storage.loadBitmapSync()).isNull()
+        assertThat(subject.profilePicture.first()).isNull()
+    }
+
+    @Test
     fun logout_clearsTheProfilePicture() = runBlocking {
         preferences.setUser(testUser(photoUrl = avatarUrl))
         server.enqueue(pngResponse())
@@ -313,6 +330,22 @@ class UserRepositoryImplTest {
 
         assertThat(server.requestCount).isEqualTo(2)
         assertThat(subject.profilePicture.first()).isNotNull()
+    }
+
+    @Test
+    fun logoutDuringTheLoginDownload_stopsIt_andNothingIsStoredAfterwards() = runBlocking {
+        auth.photoUrl = avatarUrl
+        remote.userFields[choiceField] = google
+        server.enqueue(pngResponse().setBodyDelay(10, TimeUnit.SECONDS))
+        subject.userLogin("ada@example.com", "password123")
+
+        val start = System.currentTimeMillis()
+        subject.userLogout()
+
+        assertThat(System.currentTimeMillis() - start).isLessThan(2_000)
+        assertThat(storedUser).isNull()
+        assertThat(storage.loadBitmapSync()).isNull()
+        assertThat(subject.profilePicture.first()).isNull()
     }
 
     // endregion

@@ -20,11 +20,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -99,6 +101,8 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun userLogout(): AuthResult {
+        // Stopped before the data is cleared, so no download can store the user again.
+        scope.coroutineContext.job.children.forEach { it.cancelAndJoin() }
         val result = authManager.logout()
         if (result.code == AuthCode.LOGOUT_SUCCESS.code) {
             _profilePicture.value = null
