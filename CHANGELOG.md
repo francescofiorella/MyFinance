@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- SnackBar added to Categories and Labels screens
+
 ## 5.2.3
 
 - Bar and Pie charts deselection uniformed
