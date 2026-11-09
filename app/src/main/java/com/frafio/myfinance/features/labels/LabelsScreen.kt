@@ -17,7 +17,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
@@ -88,16 +88,12 @@ fun LabelsContent(
                 title = { Text(text = stringResource(id = R.string.labels), maxLines = 1) },
                 onNavigationClick = onBackClick,
                 action = {
-                    FilledTonalIconButton(
+                    FilledIconButton(
                         modifier = Modifier
                             .testTag("labels_manage")
                             .padding(end = 4.dp)
                             .width(52.dp),
                         onClick = onManageClick,
-                        colors = IconButtonDefaults.filledTonalIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
                         shapes = IconButtonDefaults.shapes()
                     ) {
                         Icon(
