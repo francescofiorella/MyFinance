@@ -405,7 +405,7 @@ SPLandroidx/collection/MutableIntSet;->findFirstAvailableSlot(I)I
 SPLandroidx/collection/MutableIntSet;->initializeGrowth()V
 SPLandroidx/collection/MutableIntSet;->initializeMetadata(I)V
 SPLandroidx/collection/MutableIntSet;->initializeStorage(I)V
-HSPLandroidx/collection/MutableIntSet;->remove(I)Z
+SPLandroidx/collection/MutableIntSet;->remove(I)Z
 SPLandroidx/collection/MutableIntSet;->removeElementAt(I)V
 SPLandroidx/collection/MutableIntSet;->resizeStorage$collection(I)V
 Landroidx/collection/MutableLongList;
@@ -5658,7 +5658,6 @@ Landroidx/compose/material3/ListItemType$Companion;
 SPLandroidx/compose/material3/ListItemType$Companion;-><init>()V
 SPLandroidx/compose/material3/ListItemType$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 SPLandroidx/compose/material3/ListItemType$Companion;->getOneLine-AlXitO8()I
-SPLandroidx/compose/material3/ListItemType$Companion;->getThreeLine-AlXitO8()I
 SPLandroidx/compose/material3/ListItemType$Companion;->getTwoLine-AlXitO8()I
 SPLandroidx/compose/material3/ListItemType$Companion;->invoke-Z-LSjz4$androidx_compose_material3_material3(ZZZ)I
 Landroidx/compose/material3/LoadingIndicatorDefaults;
@@ -5671,11 +5670,9 @@ SPLandroidx/compose/material3/LoadingIndicatorDefaults;->getContainerWidth-D9Ej5
 SPLandroidx/compose/material3/LoadingIndicatorDefaults;->getIndeterminateIndicatorPolygons()Ljava/util/List;
 SPLandroidx/compose/material3/LoadingIndicatorDefaults;->getIndicatorColor(Landroidx/compose/runtime/Composer;I)J
 Landroidx/compose/material3/LoadingIndicatorKt;
-SPLandroidx/compose/material3/LoadingIndicatorKt;->$r8$lambda$ybjRR2JHXKVatyFzVXuC7Y7cyfM(Landroidx/compose/animation/core/Animatable;Landroidx/compose/animation/core/Animatable;Landroidx/compose/runtime/MutableFloatState;Ljava/util/List;Landroidx/compose/ui/graphics/Path;F[FJLandroidx/compose/runtime/MutableIntState;Landroidx/compose/ui/graphics/drawscope/ContentDrawScope;)Lkotlin/Unit;
 SPLandroidx/compose/material3/LoadingIndicatorKt;->LoadingIndicator-3IgeMak(Landroidx/compose/ui/Modifier;JLjava/util/List;Landroidx/compose/runtime/Composer;II)V
 SPLandroidx/compose/material3/LoadingIndicatorKt;->LoadingIndicatorImpl-eopBjH0(Landroidx/compose/ui/Modifier;JJLandroidx/compose/ui/graphics/Shape;Ljava/util/List;Landroidx/compose/runtime/Composer;I)V
 SPLandroidx/compose/material3/LoadingIndicatorKt;->LoadingIndicatorImpl_eopBjH0$lambda$10(Landroidx/compose/runtime/MutableIntState;I)V
-SPLandroidx/compose/material3/LoadingIndicatorKt;->LoadingIndicatorImpl_eopBjH0$lambda$14$0$0(Landroidx/compose/animation/core/Animatable;Landroidx/compose/animation/core/Animatable;Landroidx/compose/runtime/MutableFloatState;Ljava/util/List;Landroidx/compose/ui/graphics/Path;F[FJLandroidx/compose/runtime/MutableIntState;Landroidx/compose/ui/graphics/drawscope/ContentDrawScope;)Lkotlin/Unit;
 SPLandroidx/compose/material3/LoadingIndicatorKt;->LoadingIndicatorImpl_eopBjH0$lambda$5(Landroidx/compose/runtime/MutableFloatState;)F
 SPLandroidx/compose/material3/LoadingIndicatorKt;->LoadingIndicatorImpl_eopBjH0$lambda$6(Landroidx/compose/runtime/MutableFloatState;F)V
 SPLandroidx/compose/material3/LoadingIndicatorKt;->LoadingIndicatorImpl_eopBjH0$lambda$9(Landroidx/compose/runtime/MutableIntState;)I
@@ -5686,11 +5683,9 @@ SPLandroidx/compose/material3/LoadingIndicatorKt;->access$LoadingIndicatorImpl_e
 SPLandroidx/compose/material3/LoadingIndicatorKt;->calculateScaleFactor(Ljava/util/List;)F
 SPLandroidx/compose/material3/LoadingIndicatorKt;->height([F)F
 SPLandroidx/compose/material3/LoadingIndicatorKt;->morphSequence(Ljava/util/List;Z)Ljava/util/List;
-SPLandroidx/compose/material3/LoadingIndicatorKt;->processPath-3rZdNqA(Landroidx/compose/ui/graphics/Path;JF[F)Landroidx/compose/ui/graphics/Path;
 SPLandroidx/compose/material3/LoadingIndicatorKt;->width([F)F
 Landroidx/compose/material3/LoadingIndicatorKt$$ExternalSyntheticLambda2;
 SPLandroidx/compose/material3/LoadingIndicatorKt$$ExternalSyntheticLambda2;-><init>(Landroidx/compose/animation/core/Animatable;Landroidx/compose/animation/core/Animatable;Landroidx/compose/runtime/MutableFloatState;Ljava/util/List;Landroidx/compose/ui/graphics/Path;F[FJLandroidx/compose/runtime/MutableIntState;)V
-SPLandroidx/compose/material3/LoadingIndicatorKt$$ExternalSyntheticLambda2;->invoke(Ljava/lang/Object;)Ljava/lang/Object;
 Landroidx/compose/material3/LoadingIndicatorKt$LoadingIndicatorImpl$6$1;
 SPLandroidx/compose/material3/LoadingIndicatorKt$LoadingIndicatorImpl$6$1;-><init>(Landroidx/compose/animation/core/Animatable;Ljava/util/List;Landroidx/compose/runtime/MutableIntState;Landroidx/compose/runtime/MutableFloatState;Landroidx/compose/animation/core/Animatable;Lkotlin/coroutines/Continuation;)V
 SPLandroidx/compose/material3/LoadingIndicatorKt$LoadingIndicatorImpl$6$1;->create(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
@@ -7229,9 +7224,7 @@ Landroidx/compose/material3/internal/ProvideContentColorTextStyleKt$$ExternalSyn
 SPLandroidx/compose/material3/internal/ProvideContentColorTextStyleKt$$ExternalSyntheticLambda1;-><init>(JLandroidx/compose/ui/text/TextStyle;Lkotlin/jvm/functions/Function2;I)V
 Landroidx/compose/material3/internal/ShapeUtilKt;
 SPLandroidx/compose/material3/internal/ShapeUtilKt;->pathFromCubics(Landroidx/compose/ui/graphics/Path;IZZLjava/util/List;FF)V
-SPLandroidx/compose/material3/internal/ShapeUtilKt;->toPath$default(Landroidx/graphics/shapes/Morph;FLandroidx/compose/ui/graphics/Path;IZZFFILjava/lang/Object;)Landroidx/compose/ui/graphics/Path;
 SPLandroidx/compose/material3/internal/ShapeUtilKt;->toPath$default(Landroidx/graphics/shapes/RoundedPolygon;Landroidx/compose/ui/graphics/Path;IZZILjava/lang/Object;)Landroidx/compose/ui/graphics/Path;
-SPLandroidx/compose/material3/internal/ShapeUtilKt;->toPath(Landroidx/graphics/shapes/Morph;FLandroidx/compose/ui/graphics/Path;IZZFF)Landroidx/compose/ui/graphics/Path;
 SPLandroidx/compose/material3/internal/ShapeUtilKt;->toPath(Landroidx/graphics/shapes/RoundedPolygon;Landroidx/compose/ui/graphics/Path;IZZ)Landroidx/compose/ui/graphics/Path;
 SPLandroidx/compose/material3/internal/ShapeUtilKt;->transformed-EL8BTi8(Landroidx/graphics/shapes/RoundedPolygon;[F)Landroidx/graphics/shapes/RoundedPolygon;
 Landroidx/compose/material3/internal/ShapeUtilKt$transformed$1;
@@ -7786,7 +7779,7 @@ SPLandroidx/compose/runtime/ComposerKt;->isTraceInProgress()Z
 SPLandroidx/compose/runtime/ComposerKt;->removeCurrentGroup$lambda$0(Landroidx/compose/runtime/composer/RememberManager;ILjava/lang/Object;)Lkotlin/Unit;
 SPLandroidx/compose/runtime/ComposerKt;->removeCurrentGroup(Landroidx/compose/runtime/composer/gapbuffer/SlotWriter;Landroidx/compose/runtime/composer/RememberManager;)V
 SPLandroidx/compose/runtime/ComposerKt;->sourceInformation(Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
-HSPLandroidx/compose/runtime/ComposerKt;->sourceInformationMarkerEnd(Landroidx/compose/runtime/Composer;)V
+SPLandroidx/compose/runtime/ComposerKt;->sourceInformationMarkerEnd(Landroidx/compose/runtime/Composer;)V
 HSPLandroidx/compose/runtime/ComposerKt;->sourceInformationMarkerStart(Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
 Landroidx/compose/runtime/ComposerKt$$ExternalSyntheticLambda0;
 SPLandroidx/compose/runtime/ComposerKt$$ExternalSyntheticLambda0;-><init>(Landroidx/compose/runtime/composer/RememberManager;)V
@@ -9108,7 +9101,7 @@ SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->getCurrentGroup()I
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->getParent()I
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->getSize$runtime()I
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->getTable$runtime()Landroidx/compose/runtime/composer/gapbuffer/SlotTable;
-HSPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->groupAux(I)Ljava/lang/Object;
+SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->groupAux(I)Ljava/lang/Object;
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->groupIndexToAddress(I)I
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->groupKey(I)I
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->groupObjectKey(I)Ljava/lang/Object;
@@ -9134,10 +9127,10 @@ SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->node(Landroidx/compo
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->nodeCount(I)I
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->nodeIndex([II)I
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->parent(I)I
-SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->parent([II)I
+HSPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->parent([II)I
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->parentAnchorToIndex(I)I
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->parentIndexToAnchor(II)I
-SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->rawUpdate(Ljava/lang/Object;)Ljava/lang/Object;
+HSPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->rawUpdate(Ljava/lang/Object;)Ljava/lang/Object;
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->recalculateMarks()V
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->removeAnchors(IILjava/util/HashMap;)Z
 SPLandroidx/compose/runtime/composer/gapbuffer/SlotWriter;->removeGroup()Z
@@ -9549,7 +9542,6 @@ SPLandroidx/compose/runtime/external/kotlinx/collections/immutable/implementatio
 SPLandroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;->makeNode(ILjava/lang/Object;Ljava/lang/Object;ILjava/lang/Object;Ljava/lang/Object;ILandroidx/compose/runtime/external/kotlinx/collections/immutable/internal/MutabilityOwnership;)Landroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;
 SPLandroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;->moveEntryToNode(IIILjava/lang/Object;Ljava/lang/Object;I)Landroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;
 SPLandroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;->mutableInsertEntryAt(ILjava/lang/Object;Ljava/lang/Object;Landroidx/compose/runtime/external/kotlinx/collections/immutable/internal/MutabilityOwnership;)Landroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;
-SPLandroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;->mutableMoveEntryToNode(IIILjava/lang/Object;Ljava/lang/Object;ILandroidx/compose/runtime/external/kotlinx/collections/immutable/internal/MutabilityOwnership;)Landroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;
 SPLandroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;->mutablePut(ILjava/lang/Object;Ljava/lang/Object;ILandroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/PersistentHashMapBuilder;)Landroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;
 SPLandroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;->mutablePutAll(Landroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;ILandroidx/compose/runtime/external/kotlinx/collections/immutable/internal/DeltaCounter;Landroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/PersistentHashMapBuilder;)Landroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;
 SPLandroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;->mutablePutAllFromOtherNodeCell(Landroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;IILandroidx/compose/runtime/external/kotlinx/collections/immutable/internal/DeltaCounter;Landroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/PersistentHashMapBuilder;)Landroidx/compose/runtime/external/kotlinx/collections/immutable/implementations/immutableMap/TrieNode;
@@ -9665,7 +9657,7 @@ SPLandroidx/compose/runtime/internal/ComposableLambdaImpl;-><clinit>()V
 SPLandroidx/compose/runtime/internal/ComposableLambdaImpl;-><init>(IZLjava/lang/Object;)V
 SPLandroidx/compose/runtime/internal/ComposableLambdaImpl;->invoke$lambda$0(Landroidx/compose/runtime/internal/ComposableLambdaImpl;Ljava/lang/Object;ILandroidx/compose/runtime/Composer;I)Lkotlin/Unit;
 SPLandroidx/compose/runtime/internal/ComposableLambdaImpl;->invoke$lambda$1(Landroidx/compose/runtime/internal/ComposableLambdaImpl;Ljava/lang/Object;Ljava/lang/Object;ILandroidx/compose/runtime/Composer;I)Lkotlin/Unit;
-HSPLandroidx/compose/runtime/internal/ComposableLambdaImpl;->invoke(Landroidx/compose/runtime/Composer;I)Ljava/lang/Object;
+SPLandroidx/compose/runtime/internal/ComposableLambdaImpl;->invoke(Landroidx/compose/runtime/Composer;I)Ljava/lang/Object;
 SPLandroidx/compose/runtime/internal/ComposableLambdaImpl;->invoke(Ljava/lang/Object;Landroidx/compose/runtime/Composer;I)Ljava/lang/Object;
 SPLandroidx/compose/runtime/internal/ComposableLambdaImpl;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 SPLandroidx/compose/runtime/internal/ComposableLambdaImpl;->invoke(Ljava/lang/Object;Ljava/lang/Object;Landroidx/compose/runtime/Composer;I)Ljava/lang/Object;
@@ -9761,7 +9753,7 @@ Landroidx/compose/runtime/internal/Thread_androidKt;
 SPLandroidx/compose/runtime/internal/Thread_androidKt;-><clinit>()V
 SPLandroidx/compose/runtime/internal/Thread_androidKt;->getMainThreadId()J
 Landroidx/compose/runtime/internal/Thread_jvmKt;
-HSPLandroidx/compose/runtime/internal/Thread_jvmKt;->currentThreadId()J
+SPLandroidx/compose/runtime/internal/Thread_jvmKt;->currentThreadId()J
 Landroidx/compose/runtime/internal/Trace;
 SPLandroidx/compose/runtime/internal/Trace;-><clinit>()V
 SPLandroidx/compose/runtime/internal/Trace;-><init>()V
@@ -12332,7 +12324,7 @@ Landroidx/compose/ui/graphics/vector/PathParserKt;
 SPLandroidx/compose/ui/graphics/vector/PathParserKt;-><clinit>()V
 SPLandroidx/compose/ui/graphics/vector/PathParserKt;->arcToBezier(Landroidx/compose/ui/graphics/Path;DDDDDDDDD)V
 SPLandroidx/compose/ui/graphics/vector/PathParserKt;->drawArc(Landroidx/compose/ui/graphics/Path;DDDDDDDZZ)V
-SPLandroidx/compose/ui/graphics/vector/PathParserKt;->toPath(Ljava/util/List;Landroidx/compose/ui/graphics/Path;)Landroidx/compose/ui/graphics/Path;
+HSPLandroidx/compose/ui/graphics/vector/PathParserKt;->toPath(Ljava/util/List;Landroidx/compose/ui/graphics/Path;)Landroidx/compose/ui/graphics/Path;
 Landroidx/compose/ui/graphics/vector/VNode;
 SPLandroidx/compose/ui/graphics/vector/VNode;-><clinit>()V
 SPLandroidx/compose/ui/graphics/vector/VNode;-><init>()V
@@ -19107,7 +19099,7 @@ SPLandroidx/emoji2/text/TypefaceEmojiRasterizer;-><clinit>()V
 SPLandroidx/emoji2/text/TypefaceEmojiRasterizer;-><init>(Landroidx/emoji2/text/MetadataRepo;I)V
 SPLandroidx/emoji2/text/TypefaceEmojiRasterizer;->getCodepointAt(I)I
 SPLandroidx/emoji2/text/TypefaceEmojiRasterizer;->getCodepointsLength()I
-SPLandroidx/emoji2/text/TypefaceEmojiRasterizer;->getId()I
+HSPLandroidx/emoji2/text/TypefaceEmojiRasterizer;->getId()I
 HSPLandroidx/emoji2/text/TypefaceEmojiRasterizer;->getMetadataItem()Landroidx/emoji2/text/flatbuffer/MetadataItem;
 SPLandroidx/emoji2/text/TypefaceEmojiRasterizer;->isDefaultEmoji()Z
 Landroidx/emoji2/text/UnprecomputeTextOnModificationSpannable;
@@ -19115,7 +19107,7 @@ Landroidx/emoji2/text/flatbuffer/MetadataItem;
 SPLandroidx/emoji2/text/flatbuffer/MetadataItem;-><init>()V
 HSPLandroidx/emoji2/text/flatbuffer/MetadataItem;->__assign(ILjava/nio/ByteBuffer;)Landroidx/emoji2/text/flatbuffer/MetadataItem;
 HSPLandroidx/emoji2/text/flatbuffer/MetadataItem;->__init(ILjava/nio/ByteBuffer;)V
-SPLandroidx/emoji2/text/flatbuffer/MetadataItem;->codepoints(I)I
+HSPLandroidx/emoji2/text/flatbuffer/MetadataItem;->codepoints(I)I
 SPLandroidx/emoji2/text/flatbuffer/MetadataItem;->codepointsLength()I
 SPLandroidx/emoji2/text/flatbuffer/MetadataItem;->emojiStyle()Z
 SPLandroidx/emoji2/text/flatbuffer/MetadataItem;->id()I
@@ -19133,7 +19125,7 @@ SPLandroidx/emoji2/text/flatbuffer/Table;->__indirect(I)I
 SPLandroidx/emoji2/text/flatbuffer/Table;->__offset(I)I
 SPLandroidx/emoji2/text/flatbuffer/Table;->__reset(ILjava/nio/ByteBuffer;)V
 SPLandroidx/emoji2/text/flatbuffer/Table;->__vector(I)I
-SPLandroidx/emoji2/text/flatbuffer/Table;->__vector_len(I)I
+HSPLandroidx/emoji2/text/flatbuffer/Table;->__vector_len(I)I
 Landroidx/emoji2/text/flatbuffer/Utf8;
 SPLandroidx/emoji2/text/flatbuffer/Utf8;-><init>()V
 SPLandroidx/emoji2/text/flatbuffer/Utf8;->getDefault()Landroidx/emoji2/text/flatbuffer/Utf8;
@@ -19160,7 +19152,7 @@ Landroidx/graphics/shapes/Cubic;
 SPLandroidx/graphics/shapes/Cubic;-><clinit>()V
 SPLandroidx/graphics/shapes/Cubic;-><init>(JJJJ)V
 SPLandroidx/graphics/shapes/Cubic;-><init>(JJJJLkotlin/jvm/internal/DefaultConstructorMarker;)V
-HSPLandroidx/graphics/shapes/Cubic;-><init>([F)V
+SPLandroidx/graphics/shapes/Cubic;-><init>([F)V
 SPLandroidx/graphics/shapes/Cubic;-><init>([FILkotlin/jvm/internal/DefaultConstructorMarker;)V
 SPLandroidx/graphics/shapes/Cubic;->calculateBounds$graphics_shapes_release([FZ)V
 SPLandroidx/graphics/shapes/Cubic;->getAnchor0X()F
@@ -19211,7 +19203,7 @@ SPLandroidx/graphics/shapes/FeatureMappingKt;->featureDistSquared(Landroidx/grap
 SPLandroidx/graphics/shapes/FeatureMappingKt;->featureMapper(Ljava/util/List;Ljava/util/List;)Landroidx/graphics/shapes/DoubleMapper;
 Landroidx/graphics/shapes/FindMinimumFunction;
 Landroidx/graphics/shapes/FloatMappingKt;
-HSPLandroidx/graphics/shapes/FloatMappingKt;->linearMap(Landroidx/collection/FloatList;Landroidx/collection/FloatList;F)F
+SPLandroidx/graphics/shapes/FloatMappingKt;->linearMap(Landroidx/collection/FloatList;Landroidx/collection/FloatList;F)F
 SPLandroidx/graphics/shapes/FloatMappingKt;->progressInRange(FFF)Z
 SPLandroidx/graphics/shapes/FloatMappingKt;->validateProgress(Landroidx/collection/FloatList;)V
 Landroidx/graphics/shapes/MeasuredPolygon;
@@ -19240,7 +19232,6 @@ Landroidx/graphics/shapes/Measurer;
 Landroidx/graphics/shapes/Morph;
 SPLandroidx/graphics/shapes/Morph;-><clinit>()V
 SPLandroidx/graphics/shapes/Morph;-><init>(Landroidx/graphics/shapes/RoundedPolygon;Landroidx/graphics/shapes/RoundedPolygon;)V
-SPLandroidx/graphics/shapes/Morph;->asCubics(F)Ljava/util/List;
 Landroidx/graphics/shapes/Morph$Companion;
 SPLandroidx/graphics/shapes/Morph$Companion;-><init>()V
 SPLandroidx/graphics/shapes/Morph$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -19251,7 +19242,7 @@ SPLandroidx/graphics/shapes/MorphKt;->access$getLOG_TAG$p()Ljava/lang/String;
 Landroidx/graphics/shapes/MutableCubic;
 SPLandroidx/graphics/shapes/MutableCubic;-><init>()V
 SPLandroidx/graphics/shapes/MutableCubic;->transform(Landroidx/graphics/shapes/PointTransformer;)V
-SPLandroidx/graphics/shapes/MutableCubic;->transformOnePoint(Landroidx/graphics/shapes/PointTransformer;I)V
+HSPLandroidx/graphics/shapes/MutableCubic;->transformOnePoint(Landroidx/graphics/shapes/PointTransformer;I)V
 Landroidx/graphics/shapes/PointKt;
 SPLandroidx/graphics/shapes/PointKt;->clockwise-ybeJwSQ(JJ)Z
 SPLandroidx/graphics/shapes/PointKt;->div-so9K2fw(JF)J
@@ -20605,7 +20596,6 @@ SPLandroidx/room/TriggerBasedInvalidationTracker;->createFlow$room_runtime([Ljav
 SPLandroidx/room/TriggerBasedInvalidationTracker;->resolveViews([Ljava/lang/String;)[Ljava/lang/String;
 SPLandroidx/room/TriggerBasedInvalidationTracker;->setOnAllowRefresh$room_runtime(Lkotlin/jvm/functions/Function0;)V
 SPLandroidx/room/TriggerBasedInvalidationTracker;->startTrackingTable(Landroidx/room/PooledConnection;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
-SPLandroidx/room/TriggerBasedInvalidationTracker;->stopTrackingTable(Landroidx/room/PooledConnection;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 SPLandroidx/room/TriggerBasedInvalidationTracker;->syncTriggers$room_runtime(Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 SPLandroidx/room/TriggerBasedInvalidationTracker;->validateTableNames$room_runtime([Ljava/lang/String;)Lkotlin/Pair;
 Landroidx/room/TriggerBasedInvalidationTracker$$ExternalSyntheticLambda1;
@@ -20633,8 +20623,6 @@ Landroidx/room/TriggerBasedInvalidationTracker$createFlow$1$2$emit$1;
 SPLandroidx/room/TriggerBasedInvalidationTracker$createFlow$1$2$emit$1;-><init>(Landroidx/room/TriggerBasedInvalidationTracker$createFlow$1$2;Lkotlin/coroutines/Continuation;)V
 Landroidx/room/TriggerBasedInvalidationTracker$startTrackingTable$1;
 SPLandroidx/room/TriggerBasedInvalidationTracker$startTrackingTable$1;-><init>(Landroidx/room/TriggerBasedInvalidationTracker;Lkotlin/coroutines/Continuation;)V
-Landroidx/room/TriggerBasedInvalidationTracker$stopTrackingTable$1;
-SPLandroidx/room/TriggerBasedInvalidationTracker$stopTrackingTable$1;-><init>(Landroidx/room/TriggerBasedInvalidationTracker;Lkotlin/coroutines/Continuation;)V
 Landroidx/room/TriggerBasedInvalidationTracker$syncTriggers$1;
 SPLandroidx/room/TriggerBasedInvalidationTracker$syncTriggers$1;-><init>(Landroidx/room/TriggerBasedInvalidationTracker;Lkotlin/coroutines/Continuation;)V
 Landroidx/room/TriggerBasedInvalidationTracker$syncTriggers$2$1;
@@ -21369,6 +21357,7 @@ SPLcom/frafio/charts/BarChartDefaults$$ExternalSyntheticLambda0;-><init>()V
 Lcom/frafio/charts/BarChartEntry;
 SPLcom/frafio/charts/BarChartEntry;-><clinit>()V
 SPLcom/frafio/charts/BarChartEntry;-><init>(ILjava/lang/Double;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+SPLcom/frafio/charts/BarChartEntry;->equals(Ljava/lang/Object;)Z
 SPLcom/frafio/charts/BarChartEntry;->getAxisLabel()Ljava/lang/String;
 SPLcom/frafio/charts/BarChartEntry;->getKey()I
 SPLcom/frafio/charts/BarChartEntry;->getLabel()Ljava/lang/String;
@@ -23022,8 +23011,6 @@ SPLcom/frafio/myfinance/features/add/AddScreenKt$$ExternalSyntheticLambda25;->in
 Lcom/frafio/myfinance/features/add/AddScreenKt$$ExternalSyntheticLambda26;
 SPLcom/frafio/myfinance/features/add/AddScreenKt$$ExternalSyntheticLambda26;-><init>(ZLkotlin/jvm/functions/Function0;Landroidx/compose/material3/ListItemColors;ILjava/lang/String;)V
 SPLcom/frafio/myfinance/features/add/AddScreenKt$$ExternalSyntheticLambda26;->invoke(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-Lcom/frafio/myfinance/features/add/AddScreenKt$$ExternalSyntheticLambda27;
-SPLcom/frafio/myfinance/features/add/AddScreenKt$$ExternalSyntheticLambda27;-><init>(Landroidx/compose/foundation/text/input/TextFieldState;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function0;ILkotlin/jvm/functions/Function0;Ljava/lang/String;ZLcom/frafio/myfinance/core/navigation/RootKey$AddEditTransaction;Lkotlin/jvm/functions/Function0;Ljava/lang/String;II)V
 Lcom/frafio/myfinance/features/add/AddScreenKt$$ExternalSyntheticLambda28;
 SPLcom/frafio/myfinance/features/add/AddScreenKt$$ExternalSyntheticLambda28;-><init>()V
 SPLcom/frafio/myfinance/features/add/AddScreenKt$$ExternalSyntheticLambda28;->invoke()Ljava/lang/Object;
@@ -27279,7 +27266,6 @@ SPLcom/google/android/gms/internal/measurement/zzaeq;-><init>([B)V
 Lcom/google/android/gms/internal/measurement/zzaer;
 SPLcom/google/android/gms/internal/measurement/zzaer;-><init>([B)V
 SPLcom/google/android/gms/internal/measurement/zzaer;->zzb()I
-SPLcom/google/android/gms/internal/measurement/zzaer;->zzd([BIII)V
 Lcom/google/android/gms/internal/measurement/zzaes;
 SPLcom/google/android/gms/internal/measurement/zzaes;-><clinit>()V
 SPLcom/google/android/gms/internal/measurement/zzaes;-><init>()V
@@ -27296,9 +27282,7 @@ SPLcom/google/android/gms/internal/measurement/zzaeu;->zzA(I)V
 SPLcom/google/android/gms/internal/measurement/zzaeu;->zzB()I
 SPLcom/google/android/gms/internal/measurement/zzaeu;->zzC()Z
 SPLcom/google/android/gms/internal/measurement/zzaeu;->zzD()I
-SPLcom/google/android/gms/internal/measurement/zzaeu;->zzI()B
 SPLcom/google/android/gms/internal/measurement/zzaeu;->zzP()V
-SPLcom/google/android/gms/internal/measurement/zzaeu;->zzQ(I)V
 SPLcom/google/android/gms/internal/measurement/zzaeu;->zzR(I)Z
 SPLcom/google/android/gms/internal/measurement/zzaeu;->zzV(III)Z
 SPLcom/google/android/gms/internal/measurement/zzaeu;->zza()I
@@ -27311,7 +27295,6 @@ SPLcom/google/android/gms/internal/measurement/zzaeu;->zzp()I
 SPLcom/google/android/gms/internal/measurement/zzaeu;->zzq()I
 SPLcom/google/android/gms/internal/measurement/zzaeu;->zzv()I
 SPLcom/google/android/gms/internal/measurement/zzaeu;->zzw()J
-SPLcom/google/android/gms/internal/measurement/zzaeu;->zzx()J
 SPLcom/google/android/gms/internal/measurement/zzaeu;->zzz(I)I
 Lcom/google/android/gms/internal/measurement/zzaev;
 SPLcom/google/android/gms/internal/measurement/zzaev;-><clinit>()V
@@ -27321,11 +27304,9 @@ SPLcom/google/android/gms/internal/measurement/zzaev;->zzK([BIIZ)Lcom/google/and
 SPLcom/google/android/gms/internal/measurement/zzaev;->zzL()V
 Lcom/google/android/gms/internal/measurement/zzaew;
 SPLcom/google/android/gms/internal/measurement/zzaew;-><init>(Lcom/google/android/gms/internal/measurement/zzaev;)V
-SPLcom/google/android/gms/internal/measurement/zzaew;->zzG(Ljava/util/List;Lcom/google/android/gms/internal/measurement/zzahk;Lcom/google/android/gms/internal/measurement/zzafg;)V
 SPLcom/google/android/gms/internal/measurement/zzaew;->zzK(Ljava/util/List;)V
 SPLcom/google/android/gms/internal/measurement/zzaew;->zzQ(I)V
 SPLcom/google/android/gms/internal/measurement/zzaew;->zzR(Ljava/lang/Object;Lcom/google/android/gms/internal/measurement/zzahk;Lcom/google/android/gms/internal/measurement/zzafg;)V
-SPLcom/google/android/gms/internal/measurement/zzaew;->zzS(Lcom/google/android/gms/internal/measurement/zzahk;Lcom/google/android/gms/internal/measurement/zzafg;)Ljava/lang/Object;
 SPLcom/google/android/gms/internal/measurement/zzaew;->zzV(I)V
 SPLcom/google/android/gms/internal/measurement/zzaew;->zza(Lcom/google/android/gms/internal/measurement/zzaev;)Lcom/google/android/gms/internal/measurement/zzaew;
 SPLcom/google/android/gms/internal/measurement/zzaew;->zzb()I
@@ -27457,7 +27438,6 @@ SPLcom/google/android/gms/internal/measurement/zzahb;->zzH(Ljava/lang/Object;Lja
 SPLcom/google/android/gms/internal/measurement/zzahb;->zzI(Ljava/lang/Object;IIII)Z
 SPLcom/google/android/gms/internal/measurement/zzahb;->zzJ(Ljava/lang/Object;I)Z
 SPLcom/google/android/gms/internal/measurement/zzahb;->zzK(Ljava/lang/Object;I)V
-SPLcom/google/android/gms/internal/measurement/zzahb;->zzN(Ljava/lang/Object;II)V
 SPLcom/google/android/gms/internal/measurement/zzahb;->zzO(I)I
 SPLcom/google/android/gms/internal/measurement/zzahb;->zzP(II)I
 SPLcom/google/android/gms/internal/measurement/zzahb;->zzS(ILjava/lang/Object;Lcom/google/android/gms/internal/measurement/zzafc;)V
@@ -27489,12 +27469,8 @@ SPLcom/google/android/gms/internal/measurement/zzahh;->zzc(Ljava/lang/Class;)Lco
 Lcom/google/android/gms/internal/measurement/zzahi;
 SPLcom/google/android/gms/internal/measurement/zzahi;-><clinit>()V
 SPLcom/google/android/gms/internal/measurement/zzahi;-><init>([Ljava/lang/Object;IZ)V
-SPLcom/google/android/gms/internal/measurement/zzahi;->add(Ljava/lang/Object;)Z
-SPLcom/google/android/gms/internal/measurement/zzahi;->get(I)Ljava/lang/Object;
 SPLcom/google/android/gms/internal/measurement/zzahi;->size()I
 SPLcom/google/android/gms/internal/measurement/zzahi;->zzd()Lcom/google/android/gms/internal/measurement/zzahi;
-SPLcom/google/android/gms/internal/measurement/zzahi;->zzf(I)V
-SPLcom/google/android/gms/internal/measurement/zzahi;->zzg(I)Lcom/google/android/gms/internal/measurement/zzagg;
 Lcom/google/android/gms/internal/measurement/zzahj;
 SPLcom/google/android/gms/internal/measurement/zzahj;-><init>(Lcom/google/android/gms/internal/measurement/zzagy;Ljava/lang/String;[Ljava/lang/Object;)V
 SPLcom/google/android/gms/internal/measurement/zzahj;->zza()Z
@@ -28127,7 +28103,6 @@ SPLcom/google/android/gms/internal/measurement/zzpy;-><init>(Ljava/lang/String;L
 SPLcom/google/android/gms/internal/measurement/zzpy;->zza()Ljava/lang/Object;
 Lcom/google/android/gms/internal/measurement/zzpz;
 SPLcom/google/android/gms/internal/measurement/zzpz;-><init>(Ljava/lang/String;Ljava/lang/String;Lcom/google/android/gms/internal/measurement/zzri;)V
-SPLcom/google/android/gms/internal/measurement/zzpz;->zzd(Ljava/lang/Object;)Ljava/lang/Object;
 SPLcom/google/android/gms/internal/measurement/zzpz;->zze()Ljava/lang/Object;
 SPLcom/google/android/gms/internal/measurement/zzpz;->zzh(Ljava/lang/Object;)V
 Lcom/google/android/gms/internal/measurement/zzqc;
@@ -28135,7 +28110,6 @@ SPLcom/google/android/gms/internal/measurement/zzqc;-><init>(Ljava/lang/String;L
 SPLcom/google/android/gms/internal/measurement/zzqc;->zza()Ljava/lang/Object;
 Lcom/google/android/gms/internal/measurement/zzqd;
 SPLcom/google/android/gms/internal/measurement/zzqd;-><init>(Ljava/lang/String;Ljava/lang/String;Lcom/google/android/gms/internal/measurement/zzri;)V
-SPLcom/google/android/gms/internal/measurement/zzqd;->zzd(Ljava/lang/Object;)Ljava/lang/Object;
 SPLcom/google/android/gms/internal/measurement/zzqd;->zze()Ljava/lang/Object;
 SPLcom/google/android/gms/internal/measurement/zzqd;->zzh(Ljava/lang/Object;)V
 Lcom/google/android/gms/internal/measurement/zzqe;
@@ -28264,14 +28238,6 @@ SPLcom/google/android/gms/internal/measurement/zzsx;->zzg(Ljava/io/InputStream;L
 SPLcom/google/android/gms/internal/measurement/zzsx;->zzh(ILjava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 SPLcom/google/android/gms/internal/measurement/zzsx;->zzj()Lcom/google/android/gms/internal/measurement/zzsx;
 Lcom/google/android/gms/internal/measurement/zzsz;
-SPLcom/google/android/gms/internal/measurement/zzsz;-><clinit>()V
-SPLcom/google/android/gms/internal/measurement/zzsz;-><init>()V
-SPLcom/google/android/gms/internal/measurement/zzsz;->zza()Ljava/lang/String;
-SPLcom/google/android/gms/internal/measurement/zzsz;->zzb()J
-SPLcom/google/android/gms/internal/measurement/zzsz;->zzc()Z
-SPLcom/google/android/gms/internal/measurement/zzsz;->zze()Ljava/lang/String;
-SPLcom/google/android/gms/internal/measurement/zzsz;->zzh(ILjava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-SPLcom/google/android/gms/internal/measurement/zzsz;->zzp()I
 Lcom/google/android/gms/internal/measurement/zzta;
 SPLcom/google/android/gms/internal/measurement/zzta;-><init>(Lcom/google/android/gms/internal/measurement/zzti;)V
 Lcom/google/android/gms/internal/measurement/zztb;
@@ -29228,7 +29194,6 @@ SPLcom/google/android/gms/tasks/Tasks;->zzb(Lcom/google/android/gms/tasks/Task;L
 Lcom/google/android/gms/tasks/zzaa;
 SPLcom/google/android/gms/tasks/zzaa;-><init>([B)V
 SPLcom/google/android/gms/tasks/zzaa;->onSuccess(Ljava/lang/Object;)V
-SPLcom/google/android/gms/tasks/zzaa;->zza()V
 SPLcom/google/android/gms/tasks/zzaa;->zzb(JLjava/util/concurrent/TimeUnit;)Z
 Lcom/google/android/gms/tasks/zzab;
 Lcom/google/android/gms/tasks/zzae;
@@ -33852,6 +33817,10 @@ Lcom/google/firebase/sessions/settings/SettingsCacheImpl$1$1;
 SPLcom/google/firebase/sessions/settings/SettingsCacheImpl$1$1;-><init>(Ljava/util/concurrent/atomic/AtomicReference;)V
 SPLcom/google/firebase/sessions/settings/SettingsCacheImpl$1$1;->emit(Lcom/google/firebase/sessions/settings/SessionConfigs;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 SPLcom/google/firebase/sessions/settings/SettingsCacheImpl$1$1;->emit(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+Lcom/google/firebase/sessions/settings/SettingsCacheImpl$sessionConfigs$1;
+SPLcom/google/firebase/sessions/settings/SettingsCacheImpl$sessionConfigs$1;-><init>(Lcom/google/firebase/sessions/settings/SettingsCacheImpl;Lkotlin/coroutines/Continuation;)V
+SPLcom/google/firebase/sessions/settings/SettingsCacheImpl$sessionConfigs$1;->create(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+SPLcom/google/firebase/sessions/settings/SettingsCacheImpl$sessionConfigs$1;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/google/firebase/sessions/settings/SettingsCacheImpl_Factory;
 SPLcom/google/firebase/sessions/settings/SettingsCacheImpl_Factory;-><init>(Lcom/google/firebase/sessions/dagger/internal/Provider;Lcom/google/firebase/sessions/dagger/internal/Provider;Lcom/google/firebase/sessions/dagger/internal/Provider;)V
 SPLcom/google/firebase/sessions/settings/SettingsCacheImpl_Factory;->create(Lcom/google/firebase/sessions/dagger/internal/Provider;Lcom/google/firebase/sessions/dagger/internal/Provider;Lcom/google/firebase/sessions/dagger/internal/Provider;)Lcom/google/firebase/sessions/settings/SettingsCacheImpl_Factory;
@@ -36535,7 +36504,6 @@ SPLio/grpc/internal/ManagedChannelImpl;->access$7400(Lio/grpc/internal/ManagedCh
 SPLio/grpc/internal/ManagedChannelImpl;->access$7500(Lio/grpc/internal/ManagedChannelImpl;)Lcom/google/common/base/Supplier;
 SPLio/grpc/internal/ManagedChannelImpl;->access$7600(Lio/grpc/internal/ManagedChannelImpl;)Lio/grpc/internal/CallTracer$Factory;
 SPLio/grpc/internal/ManagedChannelImpl;->access$7700(Lio/grpc/internal/ManagedChannelImpl;)Ljava/util/List;
-SPLio/grpc/internal/ManagedChannelImpl;->access$7900(Lio/grpc/internal/ManagedChannelImpl;)V
 SPLio/grpc/internal/ManagedChannelImpl;->access$800(Lio/grpc/internal/ManagedChannelImpl;)Lio/grpc/internal/ManagedChannelImpl$LbHelperImpl;
 SPLio/grpc/internal/ManagedChannelImpl;->access$900(Lio/grpc/internal/ManagedChannelImpl;)V
 SPLio/grpc/internal/ManagedChannelImpl;->authority()Ljava/lang/String;
@@ -36595,7 +36563,6 @@ Lio/grpc/internal/ManagedChannelImpl$IdleModeStateAggregator;
 SPLio/grpc/internal/ManagedChannelImpl$IdleModeStateAggregator;-><init>(Lio/grpc/internal/ManagedChannelImpl;)V
 SPLio/grpc/internal/ManagedChannelImpl$IdleModeStateAggregator;-><init>(Lio/grpc/internal/ManagedChannelImpl;Lio/grpc/internal/ManagedChannelImpl$1;)V
 SPLio/grpc/internal/ManagedChannelImpl$IdleModeStateAggregator;->handleInUse()V
-SPLio/grpc/internal/ManagedChannelImpl$IdleModeStateAggregator;->handleNotInUse()V
 Lio/grpc/internal/ManagedChannelImpl$IdleModeTimer;
 SPLio/grpc/internal/ManagedChannelImpl$IdleModeTimer;-><init>(Lio/grpc/internal/ManagedChannelImpl;)V
 SPLio/grpc/internal/ManagedChannelImpl$IdleModeTimer;-><init>(Lio/grpc/internal/ManagedChannelImpl;Lio/grpc/internal/ManagedChannelImpl$1;)V
@@ -37631,6 +37598,7 @@ SPLkotlin/LazyThreadSafetyMode;->$values()[Lkotlin/LazyThreadSafetyMode;
 SPLkotlin/LazyThreadSafetyMode;-><clinit>()V
 SPLkotlin/LazyThreadSafetyMode;-><init>(Ljava/lang/String;I)V
 SPLkotlin/LazyThreadSafetyMode;->values()[Lkotlin/LazyThreadSafetyMode;
+Lkotlin/NoWhenBranchMatchedException;
 Lkotlin/NotImplementedError;
 Lkotlin/Pair;
 SPLkotlin/Pair;-><init>(Ljava/lang/Object;Ljava/lang/Object;)V
@@ -37770,7 +37738,7 @@ SPLkotlin/collections/ArraysKt___ArraysJvmKt;->copyInto$default([F[FIIIILjava/la
 SPLkotlin/collections/ArraysKt___ArraysJvmKt;->copyInto$default([I[IIIIILjava/lang/Object;)[I
 SPLkotlin/collections/ArraysKt___ArraysJvmKt;->copyInto$default([Ljava/lang/Object;[Ljava/lang/Object;IIIILjava/lang/Object;)[Ljava/lang/Object;
 SPLkotlin/collections/ArraysKt___ArraysJvmKt;->copyInto([B[BIII)[B
-SPLkotlin/collections/ArraysKt___ArraysJvmKt;->copyInto([F[FIII)[F
+HSPLkotlin/collections/ArraysKt___ArraysJvmKt;->copyInto([F[FIII)[F
 SPLkotlin/collections/ArraysKt___ArraysJvmKt;->copyInto([I[IIII)[I
 SPLkotlin/collections/ArraysKt___ArraysJvmKt;->copyInto([J[JIII)[J
 HSPLkotlin/collections/ArraysKt___ArraysJvmKt;->copyInto([Ljava/lang/Object;[Ljava/lang/Object;III)[Ljava/lang/Object;
@@ -38946,11 +38914,11 @@ SPLkotlinx/coroutines/JobSupport;->get(Lkotlin/coroutines/CoroutineContext$Key;)
 SPLkotlinx/coroutines/JobSupport;->getCancellationException()Ljava/util/concurrent/CancellationException;
 SPLkotlinx/coroutines/JobSupport;->getChildJobCancellationCause()Ljava/util/concurrent/CancellationException;
 SPLkotlinx/coroutines/JobSupport;->getFinalRootCause(Lkotlinx/coroutines/JobSupport$Finishing;Ljava/util/List;)Ljava/lang/Throwable;
-HSPLkotlinx/coroutines/JobSupport;->getKey()Lkotlin/coroutines/CoroutineContext$Key;
+SPLkotlinx/coroutines/JobSupport;->getKey()Lkotlin/coroutines/CoroutineContext$Key;
 SPLkotlinx/coroutines/JobSupport;->getOnCancelComplete$kotlinx_coroutines_core()Z
 SPLkotlinx/coroutines/JobSupport;->getOrPromoteCancellingList(Lkotlinx/coroutines/Incomplete;)Lkotlinx/coroutines/NodeList;
 SPLkotlinx/coroutines/JobSupport;->getParentHandle$kotlinx_coroutines_core()Lkotlinx/coroutines/ChildHandle;
-SPLkotlinx/coroutines/JobSupport;->getState$kotlinx_coroutines_core()Ljava/lang/Object;
+HSPLkotlinx/coroutines/JobSupport;->getState$kotlinx_coroutines_core()Ljava/lang/Object;
 SPLkotlinx/coroutines/JobSupport;->get_parentHandle$volatile$FU()Ljava/util/concurrent/atomic/AtomicReferenceFieldUpdater;
 SPLkotlinx/coroutines/JobSupport;->get_state$volatile$FU()Ljava/util/concurrent/atomic/AtomicReferenceFieldUpdater;
 HSPLkotlinx/coroutines/JobSupport;->initParentJob(Lkotlinx/coroutines/Job;)V
@@ -39153,7 +39121,6 @@ SPLkotlinx/coroutines/channels/BufferedChannel;->getSendSegment$volatile$FU()Lja
 SPLkotlinx/coroutines/channels/BufferedChannel;->getSendersAndCloseStatus$volatile$FU()Ljava/util/concurrent/atomic/AtomicLongFieldUpdater;
 SPLkotlinx/coroutines/channels/BufferedChannel;->getSendersCounter$kotlinx_coroutines_core()J
 SPLkotlinx/coroutines/channels/BufferedChannel;->get_closeCause$volatile$FU()Ljava/util/concurrent/atomic/AtomicReferenceFieldUpdater;
-SPLkotlinx/coroutines/channels/BufferedChannel;->hasElements$kotlinx_coroutines_core()Z
 SPLkotlinx/coroutines/channels/BufferedChannel;->incCompletedExpandBufferAttempts$default(Lkotlinx/coroutines/channels/BufferedChannel;JILjava/lang/Object;)V
 SPLkotlinx/coroutines/channels/BufferedChannel;->incCompletedExpandBufferAttempts(J)V
 SPLkotlinx/coroutines/channels/BufferedChannel;->invokeCloseHandler()V

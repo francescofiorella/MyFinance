@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.5
+
 - Action button color changed in LabelsScreen
 - Minor bugfixes
 
