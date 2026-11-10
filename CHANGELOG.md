@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Action button color changed in LabelsScreen
+- Minor bugfixes
+
 ## 5.2.4
 
 - SnackBar added to Categories, Category Details, Labels, Label Details, Frequent Expenses and Manage Categories screens
