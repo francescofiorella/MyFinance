@@ -37,6 +37,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 @Singleton
 class UserRepositoryImpl @Inject constructor(
@@ -144,8 +145,8 @@ class UserRepositoryImpl @Inject constructor(
             }
             try {
                 call.execute().use { response ->
-                    val inputStream = response.body?.byteStream()
-                    if (response.isSuccessful && inputStream != null) {
+                    val inputStream = response.body.byteStream()
+                    if (response.isSuccessful) {
                         val localPath = profileImageStorage.saveImage(inputStream)
                         if (localPath != null && user != null) {
                             userPreferencesRepository.updateUser(user.copy(localPhotoPath = localPath))
@@ -170,7 +171,7 @@ class UserRepositoryImpl @Inject constructor(
         val user = authManager.getCurrentUser() ?: return
 
         val fields = try {
-            withTimeoutOrNull(PROFILE_PICTURE_TIMEOUT_MS) { remoteDataSource.getUserFields(user.email) }
+            withTimeoutOrNull(PROFILE_PICTURE_TIMEOUT_MS.milliseconds) { remoteDataSource.getUserFields(user.email) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -187,7 +188,7 @@ class UserRepositoryImpl @Inject constructor(
         if (choice != FirestoreEnums.PRO_PIC_TYPES.GOOGLE.value) return
 
         // Past the timeout the download goes on in the background.
-        withTimeoutOrNull(PROFILE_PICTURE_TIMEOUT_MS) { startDownload(user, user.photoUrl).join() }
+        withTimeoutOrNull(PROFILE_PICTURE_TIMEOUT_MS.milliseconds) { startDownload(user, user.photoUrl).join() }
     }
 
     override val userData: Flow<User?> = userPreferencesRepository.userPreferencesFlow
