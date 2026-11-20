@@ -1,5 +1,6 @@
 package com.frafio.myfinance.core.components
 
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -214,7 +215,7 @@ class ComponentScreenshotTests {
     fun searchBar_multipleThemes() {
         composeTestRule.captureMultiTheme("SearchBar") {
             Surface(color = MaterialTheme.colorScheme.background) {
-                SearchBar(query = "Pizza", onQueryChange = {}, onFilterClick = {}, modifier = Modifier.fillMaxWidth().padding(16.dp))
+                SearchBar(state = rememberTextFieldState("Pizza"), onFilterClick = {}, modifier = Modifier.fillMaxWidth().padding(16.dp))
             }
         }
     }
@@ -223,7 +224,7 @@ class ComponentScreenshotTests {
     fun searchBarExpanded_multipleThemes() {
         composeTestRule.captureMultiTheme("SearchBarExpanded") {
             Surface(color = MaterialTheme.colorScheme.background) {
-                SearchBar(query = "Pizza", onQueryChange = {}, onFilterClick = {}, expanded = true, modifier = Modifier.fillMaxWidth().padding(16.dp))
+                SearchBar(state = rememberTextFieldState("Pizza"), onFilterClick = {}, expanded = true, modifier = Modifier.fillMaxWidth().padding(16.dp))
             }
         }
     }

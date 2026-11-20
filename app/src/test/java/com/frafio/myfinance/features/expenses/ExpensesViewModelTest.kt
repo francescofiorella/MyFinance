@@ -1,5 +1,7 @@
 package com.frafio.myfinance.features.expenses
 
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.runtime.snapshots.Snapshot
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.Expense
@@ -76,12 +78,12 @@ class ExpensesViewModelTest {
     }
 
     @Test
-    fun onSearchQueryChanged_trimsBeforeQuerying() = runTest {
+    fun searchQuery_isTrimmedBeforeQuerying() = runTest {
         collectExpenses()
 
-        viewModel.onSearchQueryChanged("  latte ")
+        search("  latte ")
 
-        assertThat(viewModel.searchQuery.value).isEqualTo("  latte ")
+        assertThat(viewModel.searchQueryState.text.toString()).isEqualTo("  latte ")
         assertThat(expensesLocalRepository.filterCalls.last().name).isEqualTo("latte")
     }
 
@@ -157,14 +159,15 @@ class ExpensesViewModelTest {
     @Test
     fun pendingFilter_replacesEveryFilterWithTheCategory_andIsCleared() = runTest {
         collectExpenses()
-        viewModel.onSearchQueryChanged("latte")
+        search("latte")
         viewModel.onCategoryFilterChanged(1)
         viewModel.onLabelFilterChanged("work", true)
         viewModel.onDateFilterChanged(LocalDate.of(2024, 3, 1) to LocalDate.of(2024, 3, 31))
 
         pendingExpensesFilter.request(5)
+        Snapshot.sendApplyNotifications()
 
-        assertThat(viewModel.searchQuery.value).isEmpty()
+        assertThat(viewModel.searchQueryState.text.toString()).isEmpty()
         assertThat(viewModel.selectedLabels.value).isEmpty()
         assertThat(viewModel.dateRange.value).isNull()
         assertThat(viewModel.selectedCategories.value).containsExactly(5)
@@ -177,14 +180,14 @@ class ExpensesViewModelTest {
     @Test
     fun pendingLabel_replacesEveryFilterWithTheLabel_andIsCleared() = runTest {
         collectExpenses()
-        viewModel.onSearchQueryChanged("latte")
+        search("latte")
         viewModel.onCategoryFilterChanged(1)
         viewModel.onLabelFilterChanged("work", true)
         viewModel.onDateFilterChanged(LocalDate.of(2024, 3, 1) to LocalDate.of(2024, 3, 31))
 
         pendingExpensesFilter.requestLabel("Japan")
 
-        assertThat(viewModel.searchQuery.value).isEmpty()
+        assertThat(viewModel.searchQueryState.text.toString()).isEmpty()
         assertThat(viewModel.selectedCategories.value).isEmpty()
         assertThat(viewModel.dateRange.value).isNull()
         assertThat(viewModel.selectedLabels.value).containsExactly("Japan")
@@ -259,7 +262,7 @@ class ExpensesViewModelTest {
         val old = testExpense(name = "Old", date = yesterday)
         expensesLocalRepository.sendExpenses(old)
 
-        viewModel.onSearchQueryChanged("Old")
+        search("Old")
 
         val expenses = viewModel.expenses.value
         assertThat(expenses.map { it.category }).containsExactly(totalCategory, old.category).inOrder()
@@ -272,7 +275,7 @@ class ExpensesViewModelTest {
         collectExpenses()
         expensesLocalRepository.sendExpenses(testExpense(name = "Old", date = yesterday))
 
-        viewModel.onSearchQueryChanged("   ")
+        search("   ")
 
         assertThat(viewModel.expenses.value.map { it.category }.take(2))
             .containsExactly(totalCategory, jollyCategory).inOrder()
@@ -285,10 +288,10 @@ class ExpensesViewModelTest {
         val old = testExpense(name = "Old", date = yesterday)
         expensesLocalRepository.sendExpenses(old)
 
-        viewModel.onSearchQueryChanged("Old")
+        search("Old")
         assertThat(viewModel.expenses.value.none { it.category == jollyCategory }).isTrue()
 
-        viewModel.onSearchQueryChanged("")
+        search("")
         assertThat(viewModel.expenses.value.map { it.category }.take(2))
             .containsExactly(totalCategory, jollyCategory).inOrder()
     }
@@ -540,6 +543,12 @@ class ExpensesViewModelTest {
     }
 
     // endregion
+
+    // Outside a composition nothing sends apply notifications, so snapshotFlow needs an explicit one.
+    private fun search(text: String) {
+        viewModel.searchQueryState.setTextAndPlaceCursorAtEnd(text)
+        Snapshot.sendApplyNotifications()
+    }
 
     private fun Expense.isRealExpense() = category != totalCategory && category != jollyCategory
 

@@ -1,5 +1,6 @@
 package com.frafio.myfinance.app
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -226,15 +227,15 @@ class AccessibilityTest {
 
     @Test
     fun searchBar_clearIsLabelled_andTheSearchIconIsDecorative() {
-        var query = "piz"
+        val query = TextFieldState("piz")
         composeTestRule.setThemedContent {
-            SearchBar(query = query, onQueryChange = { query = it }, onFilterClick = {})
+            SearchBar(state = query, onFilterClick = {})
         }
 
         composeTestRule.onAllNodesWithContentDescription(string(R.string.search), useUnmergedTree = true).assertCountEquals(0)
         composeTestRule.onNodeWithContentDescription(string(R.string.clear_search)).performClick()
 
-        assertThat(query).isEmpty()
+        assertThat(query.text.toString()).isEmpty()
     }
 
     @Test

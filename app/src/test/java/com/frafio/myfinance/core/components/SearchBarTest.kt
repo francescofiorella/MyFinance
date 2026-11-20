@@ -2,6 +2,8 @@ package com.frafio.myfinance.core.components
 
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,23 +40,22 @@ class SearchBarTest {
     private val clearButton = hasClickAction() and hasAnyAncestor(hasTestTag("search_field"))
 
     @Test
-    fun typing_reportsTheQuery() {
-        val reported = mutableListOf<String>()
+    fun typing_updatesTheQuery() {
+        val query = TextFieldState()
         composeTestRule.setThemedContent {
-            var query by remember { mutableStateOf("") }
-            SearchBar(query = query, onQueryChange = { query = it; reported += it }, onFilterClick = {})
+            SearchBar(state = query, onFilterClick = {})
         }
 
         composeTestRule.onNodeWithTag("search_field").performTextInput("latte")
 
-        assertThat(reported.last()).isEqualTo("latte")
+        assertThat(query.text.toString()).isEqualTo("latte")
         composeTestRule.onNodeWithTag("search_field").assert(hasText("latte"))
     }
 
     @Test
     fun placeholder_isShownWhenTheQueryIsEmpty() {
         composeTestRule.setThemedContent {
-            SearchBar(query = "", onQueryChange = {}, onFilterClick = {})
+            SearchBar(state = rememberTextFieldState(), onFilterClick = {})
         }
 
         composeTestRule.onNodeWithText(string(R.string.search)).assertIsDisplayed()
@@ -63,7 +64,7 @@ class SearchBarTest {
     @Test
     fun clearButton_isAbsentWithoutAQuery() {
         composeTestRule.setThemedContent {
-            SearchBar(query = "", onQueryChange = {}, onFilterClick = {})
+            SearchBar(state = rememberTextFieldState(), onFilterClick = {})
         }
 
         composeTestRule.onNode(clearButton).assertDoesNotExist()
@@ -72,29 +73,29 @@ class SearchBarTest {
     @Test
     fun clearButton_isShownWithAQuery() {
         composeTestRule.setThemedContent {
-            SearchBar(query = "x", onQueryChange = {}, onFilterClick = {})
+            SearchBar(state = rememberTextFieldState("x"), onFilterClick = {})
         }
 
         composeTestRule.onNode(clearButton).assertIsDisplayed()
     }
 
     @Test
-    fun clearButton_click_reportsAnEmptyQuery() {
-        val reported = mutableListOf<String>()
+    fun clearButton_click_clearsTheQuery() {
+        val query = TextFieldState("latte")
         composeTestRule.setThemedContent {
-            SearchBar(query = "latte", onQueryChange = { reported += it }, onFilterClick = {})
+            SearchBar(state = query, onFilterClick = {})
         }
 
         composeTestRule.onNode(clearButton).performClick()
 
-        assertThat(reported).containsExactly("")
+        assertThat(query.text.toString()).isEmpty()
     }
 
     @Test
     fun filterButton_click_invokesOnFilterClick() {
         var clicks = 0
         composeTestRule.setThemedContent {
-            SearchBar(query = "", onQueryChange = {}, onFilterClick = { clicks++ })
+            SearchBar(state = rememberTextFieldState(), onFilterClick = { clicks++ })
         }
 
         composeTestRule.onNodeWithTag("search_filter_button").performClick()
@@ -105,7 +106,7 @@ class SearchBarTest {
     @Test
     fun filterButton_isDescribedForAccessibility() {
         composeTestRule.setThemedContent {
-            SearchBar(query = "", onQueryChange = {}, onFilterClick = {})
+            SearchBar(state = rememberTextFieldState(), onFilterClick = {})
         }
 
         composeTestRule.onNodeWithContentDescription(string(R.string.filter)).assertIsDisplayed()
@@ -114,7 +115,7 @@ class SearchBarTest {
     @Test
     fun collapsed_showsNoBackButton() {
         composeTestRule.setThemedContent {
-            SearchBar(query = "", onQueryChange = {}, onFilterClick = {})
+            SearchBar(state = rememberTextFieldState(), onFilterClick = {})
         }
 
         composeTestRule.onNodeWithTag("search_back_button").assertDoesNotExist()
@@ -124,7 +125,7 @@ class SearchBarTest {
     fun focusingTheField_reportsExpanded() {
         val reported = mutableListOf<Boolean>()
         composeTestRule.setThemedContent {
-            SearchBar(query = "", onQueryChange = {}, onFilterClick = {}, onExpandedChange = { reported += it })
+            SearchBar(state = rememberTextFieldState(), onFilterClick = {}, onExpandedChange = { reported += it })
         }
 
         composeTestRule.onNodeWithTag("search_field").performClick()
@@ -135,7 +136,7 @@ class SearchBarTest {
     @Test
     fun expanded_backButton_isDescribedForAccessibility() {
         composeTestRule.setThemedContent {
-            SearchBar(query = "", onQueryChange = {}, onFilterClick = {}, expanded = true)
+            SearchBar(state = rememberTextFieldState(), onFilterClick = {}, expanded = true)
         }
 
         composeTestRule.onNodeWithContentDescription(string(R.string.navigate_up)).assertIsDisplayed()
@@ -148,7 +149,7 @@ class SearchBarTest {
         val reported = mutableListOf<Boolean>()
         composeTestRule.setThemedContent {
             var expanded by remember { mutableStateOf(false) }
-            SearchBar(query = "", onQueryChange = {}, onFilterClick = {}, expanded = expanded, onExpandedChange = { reported += it; expanded = it })
+            SearchBar(state = rememberTextFieldState(), onFilterClick = {}, expanded = expanded, onExpandedChange = { reported += it; expanded = it })
         }
 
         composeTestRule.onNodeWithTag("search_field").performClick()
@@ -165,7 +166,7 @@ class SearchBarTest {
         var dispatcher: OnBackPressedDispatcher? = null
         composeTestRule.setThemedContent {
             dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-            SearchBar(query = "", onQueryChange = {}, onFilterClick = {}, expanded = true, onExpandedChange = { reported += it })
+            SearchBar(state = rememberTextFieldState(), onFilterClick = {}, expanded = true, onExpandedChange = { reported += it })
         }
 
         composeTestRule.runOnIdle { dispatcher!!.onBackPressed() }

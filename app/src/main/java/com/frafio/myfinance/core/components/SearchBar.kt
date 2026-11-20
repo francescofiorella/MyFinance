@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,8 +34,7 @@ import com.frafio.myfinance.core.theme.MyFinanceTheme
 
 @Composable
 fun SearchBar(
-    query: String,
-    onQueryChange: (String) -> Unit,
+    state: TextFieldState,
     onFilterClick: () -> Unit,
     modifier: Modifier = Modifier,
     expanded: Boolean = false,
@@ -55,8 +58,7 @@ fun SearchBar(
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
             TextField(
-                value = query,
-                onValueChange = onQueryChange,
+                state = state,
                 modifier = Modifier
                     .testTag("search_field")
                     .weight(1f)
@@ -80,9 +82,9 @@ fun SearchBar(
                         )
                     }
                 },
-                trailingIcon = if (query.isNotEmpty()) {
+                trailingIcon = if (state.text.isNotEmpty()) {
                     {
-                        IconButton(onClick = { onQueryChange("") }) {
+                        IconButton(onClick = { state.clearText() }) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_close_filled),
                                 contentDescription = stringResource(R.string.clear_search)
@@ -97,7 +99,7 @@ fun SearchBar(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                 ),
-                singleLine = true,
+                lineLimits = TextFieldLineLimits.SingleLine,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
             )
             IconButton(
@@ -120,8 +122,7 @@ fun SearchBar(
 fun SearchBarPreview() {
     MyFinanceTheme {
         SearchBar(
-            query = "Pizza",
-            onQueryChange = {},
+            state = rememberTextFieldState("Pizza"),
             onFilterClick = {},
             modifier = Modifier.fillMaxWidth().padding(16.dp)
         )

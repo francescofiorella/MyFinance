@@ -1,6 +1,7 @@
 package com.frafio.myfinance.testing.screenshot
 
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import com.frafio.charts.R as ChartsR
 import com.frafio.myfinance.core.data.model.Expense
@@ -96,14 +97,13 @@ internal fun ScreenshotExpenses(
         expenses = expenses,
         totalFilteredExpenses = 46.5,
         isExpensesEmpty = isEmpty,
-        searchQuery = searchQuery,
+        searchQueryState = rememberTextFieldState(searchQuery),
         isSearchExpanded = isSearchExpanded,
         selectedCategories = selectedCategories,
         selectedLabels = selectedLabels,
         dateRange = dateRange,
         scrollToIdFlow = flowOf(null),
         itemMetadata = screenshotExpensesMetadata,
-        onSearchQueryChanged = {},
         onSearchExpandedChange = {},
         onCategoryFilterChanged = {},
         onLabelFilterChanged = { _, _ -> },

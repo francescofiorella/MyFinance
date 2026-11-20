@@ -37,6 +37,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -94,7 +96,6 @@ fun ExpensesScreen(
     val expenses by viewModel.expenses.collectAsStateWithLifecycle()
     val totalFilteredExpenses by viewModel.totalFilteredExpenses.collectAsStateWithLifecycle()
     val isExpensesEmpty by viewModel.isExpensesEmpty.collectAsStateWithLifecycle()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val selectedCategories by viewModel.selectedCategories.collectAsStateWithLifecycle()
     val selectedLabels by viewModel.selectedLabels.collectAsStateWithLifecycle()
     val dateRange by viewModel.dateRange.collectAsStateWithLifecycle()
@@ -254,14 +255,13 @@ fun ExpensesScreen(
         expenses = expenses,
         totalFilteredExpenses = totalFilteredExpenses,
         isExpensesEmpty = isExpensesEmpty,
-        searchQuery = searchQuery,
+        searchQueryState = viewModel.searchQueryState,
         isSearchExpanded = isSearchExpanded,
         selectedCategories = selectedCategories,
         selectedLabels = selectedLabels,
         dateRange = dateRange,
         scrollToIdFlow = viewModel.scrollToId,
         itemMetadata = itemMetadata,
-        onSearchQueryChanged = viewModel::onSearchQueryChanged,
         onSearchExpandedChange = { isSearchExpanded = it },
         onCategoryFilterChanged = viewModel::onCategoryFilterChanged,
         onLabelFilterChanged = viewModel::onLabelFilterChanged,
@@ -289,14 +289,13 @@ fun ExpensesContent(
     expenses: List<Expense>,
     totalFilteredExpenses: Double,
     isExpensesEmpty: Boolean?,
-    searchQuery: String,
+    searchQueryState: TextFieldState,
     isSearchExpanded: Boolean,
     selectedCategories: List<Int>,
     selectedLabels: List<String>,
     dateRange: Pair<LocalDate, LocalDate>?,
     scrollToIdFlow: Flow<String?>,
     itemMetadata: Map<Int, Pair<Int, Int>>,
-    onSearchQueryChanged: (String) -> Unit,
     onSearchExpandedChange: (Boolean) -> Unit,
     onCategoryFilterChanged: (Int) -> Unit,
     onLabelFilterChanged: (String, Boolean) -> Unit,
@@ -329,8 +328,7 @@ fun ExpensesContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         SearchBar(
-                            query = searchQuery,
-                            onQueryChange = onSearchQueryChanged,
+                            state = searchQueryState,
                             onFilterClick = onFilterClick,
                             expanded = isSearchExpanded,
                             onExpandedChange = onSearchExpandedChange,
@@ -635,13 +633,12 @@ fun ExpensesPreview() {
             expenses = PreviewTransactions.expensesByDay,
             totalFilteredExpenses = 150.0,
             isExpensesEmpty = false,
-            searchQuery = "",
+            searchQueryState = rememberTextFieldState(),
             isSearchExpanded = false,
             selectedCategories = emptyList(),
             selectedLabels = emptyList(),
             dateRange = null,
             scrollToIdFlow = flowOf(null),
-            onSearchQueryChanged = {},
             onSearchExpandedChange = {},
             onCategoryFilterChanged = {},
             onLabelFilterChanged = { _, _ -> },

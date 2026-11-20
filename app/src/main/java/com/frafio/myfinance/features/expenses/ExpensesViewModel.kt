@@ -1,5 +1,8 @@
 package com.frafio.myfinance.features.expenses
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
@@ -59,8 +62,7 @@ class ExpensesViewModel @Inject constructor(
     @Dispatcher(Default) private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery = _searchQuery.asStateFlow()
+    val searchQueryState = TextFieldState()
 
     private val _selectedCategories = MutableStateFlow<List<Int>>(emptyList())
     val selectedCategories = _selectedCategories.asStateFlow()
@@ -100,7 +102,7 @@ class ExpensesViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val allFilteredExpenses: Flow<Pair<FilterParams, List<Expense>>> = combine(
-        _searchQuery,
+        snapshotFlow { searchQueryState.text.toString() },
         _selectedCategories,
         _selectedLabels,
         _dateRange
@@ -198,13 +200,9 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
-    fun onSearchQueryChanged(query: String) {
-        _searchQuery.value = query
-    }
-
     // Replaces every filter, so the list shows exactly the requested categories or labels.
     private fun showOnly(categories: List<Int> = emptyList(), labels: List<String> = emptyList()) {
-        _searchQuery.value = ""
+        searchQueryState.clearText()
         _selectedLabels.value = labels
         _dateRange.value = null
         _selectedCategories.value = categories
