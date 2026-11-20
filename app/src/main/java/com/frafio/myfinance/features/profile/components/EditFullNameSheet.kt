@@ -6,8 +6,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -17,18 +18,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frafio.myfinance.R
@@ -45,13 +44,21 @@ fun EditFullNameSheet(
     onEditFullName: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var nameTextFieldValue by remember(show) {
-        mutableStateOf(
-            TextFieldValue(
-                text = fullName,
-                selection = TextRange(fullName.length)
-            )
-        )
+    // Reset whenever the sheet opens; saveable so typed text survives rotation.
+    val nameState = rememberSaveable(show, saver = TextFieldState.Saver) { TextFieldState(fullName) }
+
+    val isValid by remember(nameState, fullName) {
+        derivedStateOf {
+            val name = nameState.text.trim()
+            name.isNotEmpty() && name.toString() != fullName
+        }
+    }
+
+    val confirm = {
+        if (isValid) {
+            onEditFullName(nameState.text.trim().toString())
+            onDismiss()
+        }
     }
 
     AppBottomSheet(
@@ -71,8 +78,7 @@ fun EditFullNameSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextField(
-                    value = nameTextFieldValue,
-                    onValueChange = { nameTextFieldValue = it },
+                    state = nameState,
                     modifier = Modifier
                         .weight(1f),
                     label = { Text(stringResource(id = R.string.signup_name)) },
@@ -89,23 +95,13 @@ fun EditFullNameSheet(
                         )
                     },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = {
-                        if (nameTextFieldValue.text.trim()
-                                .isNotEmpty() && nameTextFieldValue.text.trim() != fullName
-                        ) {
-                            onEditFullName(nameTextFieldValue.text.trim())
-                            onDismiss()
-                        }
-                    })
+                    onKeyboardAction = { confirm() },
+                    lineLimits = TextFieldLineLimits.SingleLine
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 FilledIconButton(
-                    onClick = {
-                        onEditFullName(nameTextFieldValue.text.trim())
-                        onDismiss()
-                    },
-                    enabled = nameTextFieldValue.text.trim()
-                        .isNotEmpty() && nameTextFieldValue.text.trim() != fullName,
+                    onClick = confirm,
+                    enabled = isValid,
                     shapes = IconButtonDefaults.shapes(
                         shape = IconButtonDefaults.smallSquareShape,
                     )
