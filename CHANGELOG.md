@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Text fields migrated to the state-based API: login and sign-up, search, reset password, budget, full name and manage labels
+- Labels screen manage button and icons switched to outline style
+- Dependencies updated, compileSdk raised to 37.2
+
 ## 5.2.5
 
 - Action button color changed in LabelsScreen
