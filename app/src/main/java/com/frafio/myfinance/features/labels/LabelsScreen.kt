@@ -10,15 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -88,16 +87,15 @@ fun LabelsContent(
                 title = { Text(text = stringResource(id = R.string.labels), maxLines = 1) },
                 onNavigationClick = onBackClick,
                 action = {
-                    FilledIconButton(
+                    IconButton(
                         modifier = Modifier
                             .testTag("labels_manage")
-                            .padding(end = 4.dp)
-                            .width(52.dp),
+                            .padding(end = 4.dp),
                         onClick = onManageClick,
                         shapes = IconButtonDefaults.shapes()
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_edit_filled),
+                            painter = painterResource(id = R.drawable.ic_edit_outline),
                             contentDescription = stringResource(id = R.string.manage_labels)
                         )
                     }
@@ -166,7 +164,7 @@ private fun LabelRow(summary: LabelSummary, index: Int, count: Int, onClick: () 
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_sell_filled),
+                    painter = painterResource(id = R.drawable.ic_sell_outline),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
