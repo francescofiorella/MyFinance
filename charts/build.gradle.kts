@@ -10,6 +10,7 @@ plugins {
 android {
     namespace = "com.frafio.charts"
     compileSdk = 37
+    compileSdkMinor = 2
 
     defaultConfig {
         minSdk = 29

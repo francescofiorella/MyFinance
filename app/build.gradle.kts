@@ -32,6 +32,7 @@ val appVersionCode: Int = run {
 android {
     namespace = "com.frafio.myfinance"
     compileSdk = 37
+    compileSdkMinor = 2
 
     defaultConfig {
         applicationId = "com.frafio.myfinance"

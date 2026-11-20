@@ -11,6 +11,7 @@ sonar {
 android {
     namespace = "com.frafio.myfinance.baselineProfile"
     compileSdk = 37
+    compileSdkMinor = 2
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
