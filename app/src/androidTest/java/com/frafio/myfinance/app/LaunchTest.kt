@@ -2,7 +2,6 @@ package com.frafio.myfinance.app
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasTestTag
@@ -27,7 +26,6 @@ import org.junit.Test
 import javax.inject.Inject
 
 /** Launches [MainActivity] by hand so the fakes can be seeded before the activity exists. */
-@OptIn(ExperimentalTestApi::class)
 @HiltAndroidTest
 class LaunchTest {
 

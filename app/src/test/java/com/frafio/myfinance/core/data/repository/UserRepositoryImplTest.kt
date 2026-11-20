@@ -37,6 +37,7 @@ import org.robolectric.annotation.GraphicsMode
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 /** The profile-picture download and its restore at login, over a real OkHttp client and the real storage. */
 @RunWith(RobolectricTestRunner::class)
@@ -300,7 +301,7 @@ class UserRepositoryImplTest {
 
         assertThat(result.code).isEqualTo(AuthCode.LOGIN_SUCCESS.code)
         assertThat(System.currentTimeMillis() - start).isLessThan(UserRepositoryImpl.PROFILE_PICTURE_TIMEOUT_MS + 1_500)
-        withTimeout(10_000) { subject.profilePicture.first { it != null } }
+        withTimeout(10_000.milliseconds) { subject.profilePicture.first { it != null } }
         assertThat(storedUser?.localPhotoPath).endsWith("profile_pic.png")
     }
 

@@ -1,6 +1,5 @@
 package com.frafio.myfinance.app
 
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasTestTag
@@ -33,7 +32,6 @@ import javax.inject.Inject
  * Drives the real [MainActivity] over the Hilt test graph: fake remote repositories (the user is
  * logged in, sync completes at once), in-memory Room and DataStore.
  */
-@OptIn(ExperimentalTestApi::class)
 @HiltAndroidTest
 class NavigationTest {
 

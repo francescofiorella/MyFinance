@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.assert
@@ -349,7 +348,6 @@ class PieChartTest {
         return results.single().layoutInput.style.color
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @Test
     fun focusedArc_selectsOnEnter() {
         lateinit var inputModeManager: InputModeManager
