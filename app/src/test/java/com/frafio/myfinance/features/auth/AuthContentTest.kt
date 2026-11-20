@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.auth
 
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -36,7 +37,8 @@ class AuthContentTest {
             appState = rememberMyFinanceAppState(),
             uiState = uiState,
             isLoading = isLoading,
-            onEmailChange = {}, onPasswordChange = {}, onFullNameChange = {}, onConfirmPasswordChange = {},
+            emailState = rememberTextFieldState(), passwordState = rememberTextFieldState(),
+            fullNameState = rememberTextFieldState(), confirmPasswordState = rememberTextFieldState(),
             onToggleAuthMode = { events += "toggle" },
             onAuthClick = { events += "auth" },
             onGoogleClick = { events += "google" },

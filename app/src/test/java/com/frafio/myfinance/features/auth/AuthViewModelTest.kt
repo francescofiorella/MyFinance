@@ -1,5 +1,8 @@
 package com.frafio.myfinance.features.auth
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.runtime.snapshots.Snapshot
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
 import com.frafio.myfinance.core.data.model.AuthResult
 import com.frafio.myfinance.core.data.repository.LoadingRepository
@@ -47,41 +50,41 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun onEmailChange_setsEmailAndClearsOnlyItsError() = runTest {
+    fun editingEmail_clearsOnlyItsError() = runTest {
         viewModel.onLoginButtonClick() // empty form -> email and password errors
 
-        viewModel.onEmailChange("ada@example.com")
+        type(viewModel.emailState, "ada@example.com")
 
         val state = viewModel.uiState.value
-        assertThat(state.email).isEqualTo("ada@example.com")
+        assertThat(viewModel.emailState.text.toString()).isEqualTo("ada@example.com")
         assertThat(state.emailError).isNull()
         assertThat(state.passwordError).isNotNull()
     }
 
     @Test
-    fun onPasswordChange_setsPasswordAndClearsOnlyItsError() = runTest {
+    fun editingPassword_clearsOnlyItsError() = runTest {
         viewModel.onLoginButtonClick()
 
-        viewModel.onPasswordChange("12345678")
+        type(viewModel.passwordState, "12345678")
 
         val state = viewModel.uiState.value
-        assertThat(state.password).isEqualTo("12345678")
+        assertThat(viewModel.passwordState.text.toString()).isEqualTo("12345678")
         assertThat(state.passwordError).isNull()
         assertThat(state.emailError).isNotNull()
     }
 
     @Test
-    fun onFullNameAndConfirmPasswordChange_setValuesAndClearTheirErrors() = runTest {
+    fun editingFullNameAndConfirmPassword_clearsTheirErrors() = runTest {
         viewModel.onToggleAuthMode()
         viewModel.onSignupButtonClick() // all four errors
 
-        viewModel.onFullNameChange("Ada")
-        viewModel.onConfirmPasswordChange("12345678")
+        type(viewModel.fullNameState, "Ada")
+        type(viewModel.confirmPasswordState, "12345678")
 
         val state = viewModel.uiState.value
-        assertThat(state.fullName).isEqualTo("Ada")
+        assertThat(viewModel.fullNameState.text.toString()).isEqualTo("Ada")
         assertThat(state.fullNameError).isNull()
-        assertThat(state.confirmPassword).isEqualTo("12345678")
+        assertThat(viewModel.confirmPasswordState.text.toString()).isEqualTo("12345678")
         assertThat(state.confirmPasswordError).isNull()
         assertThat(state.emailError).isNotNull()
         assertThat(state.passwordError).isNotNull()
@@ -118,19 +121,32 @@ class AuthViewModelTest {
     @Test
     fun login_trimsTheEmailBeforeValidating() = runTest {
         collectEvents()
-        viewModel.onEmailChange("  ada@example.com  ")
-        viewModel.onPasswordChange("12345678")
+        type(viewModel.emailState, "  ada@example.com  ")
+        type(viewModel.passwordState, "12345678")
 
         viewModel.onLoginButtonClick()
 
-        assertThat(viewModel.uiState.value.email).isEqualTo("ada@example.com")
+        assertThat(viewModel.emailState.text.toString()).isEqualTo("ada@example.com")
         assertThat(userRepository.loginCalls).containsExactly("ada@example.com" to "12345678")
+    }
+
+    @Test
+    fun login_blankEmail_isTrimmedAndKeepsItsError() = runTest {
+        collectEvents()
+        type(viewModel.emailState, "   ")
+        type(viewModel.passwordState, "12345678")
+
+        viewModel.onLoginButtonClick()
+        Snapshot.sendApplyNotifications()
+
+        assertThat(viewModel.emailState.text.toString()).isEmpty()
+        assertThat(viewModel.uiState.value.emailError).isEqualTo(AuthCode.EMPTY_EMAIL.message)
     }
 
     @Test
     fun login_emptyEmail_setsErrorAndSkipsTheRepository() = runTest {
         val events = collectEvents()
-        viewModel.onPasswordChange("12345678")
+        type(viewModel.passwordState, "12345678")
 
         viewModel.onLoginButtonClick()
 
@@ -142,7 +158,7 @@ class AuthViewModelTest {
     @Test
     fun login_emptyPassword_setsError() = runTest {
         collectEvents()
-        viewModel.onEmailChange("ada@example.com")
+        type(viewModel.emailState, "ada@example.com")
 
         viewModel.onLoginButtonClick()
 
@@ -153,8 +169,8 @@ class AuthViewModelTest {
     @Test
     fun login_shortPassword_setsError() = runTest {
         collectEvents()
-        viewModel.onEmailChange("ada@example.com")
-        viewModel.onPasswordChange("1234567")
+        type(viewModel.emailState, "ada@example.com")
+        type(viewModel.passwordState, "1234567")
 
         viewModel.onLoginButtonClick()
 
@@ -165,8 +181,8 @@ class AuthViewModelTest {
     @Test
     fun login_eightCharacterPassword_passesValidation() = runTest {
         collectEvents()
-        viewModel.onEmailChange("ada@example.com")
-        viewModel.onPasswordChange("12345678")
+        type(viewModel.emailState, "ada@example.com")
+        type(viewModel.passwordState, "12345678")
 
         viewModel.onLoginButtonClick()
 
@@ -243,8 +259,8 @@ class AuthViewModelTest {
 
         viewModel.onSignupButtonClick()
 
-        assertThat(viewModel.uiState.value.fullName).isEqualTo("Ada")
-        assertThat(viewModel.uiState.value.email).isEqualTo("ada@example.com")
+        assertThat(viewModel.fullNameState.text.toString()).isEqualTo("Ada")
+        assertThat(viewModel.emailState.text.toString()).isEqualTo("ada@example.com")
         assertThat(userRepository.signupCalls).containsExactly(Triple("Ada", "ada@example.com", "12345678"))
     }
 
@@ -373,8 +389,8 @@ class AuthViewModelTest {
     }
 
     private fun fillValidLogin() {
-        viewModel.onEmailChange("ada@example.com")
-        viewModel.onPasswordChange("12345678")
+        type(viewModel.emailState, "ada@example.com")
+        type(viewModel.passwordState, "12345678")
     }
 
     private fun fillValidSignup(
@@ -384,10 +400,16 @@ class AuthViewModelTest {
         confirmPassword: String = "12345678",
     ) {
         viewModel.onToggleAuthMode()
-        viewModel.onFullNameChange(fullName)
-        viewModel.onEmailChange(email)
-        viewModel.onPasswordChange(password)
-        viewModel.onConfirmPasswordChange(confirmPassword)
+        type(viewModel.fullNameState, fullName)
+        type(viewModel.emailState, email)
+        type(viewModel.passwordState, password)
+        type(viewModel.confirmPasswordState, confirmPassword)
+    }
+
+    // Outside a composition nothing sends apply notifications, so snapshotFlow needs an explicit one.
+    private fun type(state: TextFieldState, text: String) {
+        state.setTextAndPlaceCursorAtEnd(text)
+        Snapshot.sendApplyNotifications()
     }
 
     private fun TestScope.collectEvents(): List<AuthUiEvent> {

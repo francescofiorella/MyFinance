@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.auth.components
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
@@ -25,25 +26,36 @@ class AuthTextFieldTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val values = mutableListOf<String>()
     private val visibility = mutableListOf<Boolean>()
 
     @Composable
     private fun Field(
-        value: String = "ada@example.com",
+        state: TextFieldState = TextFieldState("ada@example.com"),
         error: String? = null,
         enabled: Boolean = true,
-        isPassword: Boolean = false,
-        passwordVisible: Boolean = false,
     ) {
         AuthTextField(
-            value = value,
-            onValueChange = { values += it },
+            state = state,
             label = "Email",
             error = error,
             enabled = enabled,
             icon = R.drawable.ic_person_filled,
-            isPassword = isPassword,
+            testTag = "field",
+        )
+    }
+
+    @Composable
+    private fun PasswordField(
+        state: TextFieldState = TextFieldState("secret"),
+        error: String? = null,
+        passwordVisible: Boolean = false,
+    ) {
+        AuthPasswordField(
+            state = state,
+            label = "Password",
+            error = error,
+            enabled = true,
+            icon = R.drawable.ic_password_filled,
             passwordVisible = passwordVisible,
             onPasswordVisibleChange = { visibility += it },
             testTag = "field",
@@ -60,16 +72,17 @@ class AuthTextFieldTest {
 
     @Test
     fun clearButton_clearsTheValue() {
-        composeTestRule.setThemedContent { Field() }
+        val state = TextFieldState("ada@example.com")
+        composeTestRule.setThemedContent { Field(state = state) }
 
         composeTestRule.onNodeWithContentDescription(string(R.string.clear)).performClick()
 
-        assertThat(values).containsExactly("")
+        assertThat(state.text.toString()).isEmpty()
     }
 
     @Test
     fun clearButton_isAbsentWhenEmptyOrDisabled() {
-        composeTestRule.setThemedContent { Field(value = "") }
+        composeTestRule.setThemedContent { Field(state = TextFieldState("")) }
         composeTestRule.onNodeWithContentDescription(string(R.string.clear)).assertDoesNotExist()
     }
 
@@ -82,17 +95,25 @@ class AuthTextFieldTest {
     }
 
     @Test
-    fun error_showsTheMessage_andHidesClearAndToggle() {
-        composeTestRule.setThemedContent { Field(error = "Invalid email", isPassword = true) }
+    fun error_showsTheMessage_andHidesClear() {
+        composeTestRule.setThemedContent { Field(error = "Invalid email") }
 
         composeTestRule.onNodeWithText("Invalid email").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(string(R.string.clear)).assertDoesNotExist()
+    }
+
+    @Test
+    fun passwordError_showsTheMessage_andHidesClearAndToggle() {
+        composeTestRule.setThemedContent { PasswordField(error = "Invalid password") }
+
+        composeTestRule.onNodeWithText("Invalid password").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription(string(R.string.clear)).assertDoesNotExist()
         composeTestRule.onNodeWithContentDescription(string(R.string.show_password)).assertDoesNotExist()
     }
 
     @Test
     fun passwordField_toggleRequestsVisibility() {
-        composeTestRule.setThemedContent { Field(value = "secret", isPassword = true) }
+        composeTestRule.setThemedContent { PasswordField() }
 
         composeTestRule.onNodeWithContentDescription(string(R.string.clear)).assertDoesNotExist()
         composeTestRule.onNodeWithContentDescription(string(R.string.show_password)).performClick()
@@ -102,7 +123,7 @@ class AuthTextFieldTest {
 
     @Test
     fun visiblePassword_offersToHideIt() {
-        composeTestRule.setThemedContent { Field(value = "secret", isPassword = true, passwordVisible = true) }
+        composeTestRule.setThemedContent { PasswordField(passwordVisible = true) }
 
         composeTestRule.onNodeWithContentDescription(string(R.string.hide_password)).performClick()
 

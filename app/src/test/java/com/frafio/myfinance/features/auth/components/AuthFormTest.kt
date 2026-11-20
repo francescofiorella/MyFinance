@@ -1,10 +1,7 @@
 package com.frafio.myfinance.features.auth.components
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -28,6 +25,10 @@ class AuthFormTest {
     val composeTestRule = createComposeRule()
 
     private val events = mutableListOf<String>()
+    private val emailState = TextFieldState()
+    private val passwordState = TextFieldState()
+    private val fullNameState = TextFieldState()
+    private val confirmPasswordState = TextFieldState()
 
     @Composable
     private fun Form(
@@ -38,18 +39,11 @@ class AuthFormTest {
         fullNameError: String? = null,
         confirmPasswordError: String? = null,
     ) {
-        // The form is stateless; echo the values back as the screen does, or Compose resets the field.
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var fullName by remember { mutableStateOf("") }
-        var confirmPassword by remember { mutableStateOf("") }
         AuthForm(
             isSigningUp = isSigningUp,
             isLoading = isLoading,
-            email = email, onEmailChange = { email = it; events += "email:$it" },
-            password = password, onPasswordChange = { password = it; events += "password:$it" },
-            fullName = fullName, onFullNameChange = { fullName = it; events += "name:$it" },
-            confirmPassword = confirmPassword, onConfirmPasswordChange = { confirmPassword = it; events += "confirm:$it" },
+            emailState = emailState, passwordState = passwordState,
+            fullNameState = fullNameState, confirmPasswordState = confirmPasswordState,
             emailError = emailError, passwordError = passwordError,
             fullNameError = fullNameError, confirmPasswordError = confirmPasswordError,
             onAuthClick = { events += "auth" },
@@ -85,7 +79,10 @@ class AuthFormTest {
         composeTestRule.onNodeWithText(string(R.string.signup_name)).performTextInput("n")
         composeTestRule.onNodeWithText(string(R.string.signup_password_confirm)).performTextInput("c")
 
-        assertThat(events).containsExactly("email:a", "password:p", "name:n", "confirm:c")
+        assertThat(emailState.text.toString()).isEqualTo("a")
+        assertThat(passwordState.text.toString()).isEqualTo("p")
+        assertThat(fullNameState.text.toString()).isEqualTo("n")
+        assertThat(confirmPasswordState.text.toString()).isEqualTo("c")
     }
 
     @Test

@@ -1,5 +1,8 @@
 package com.frafio.myfinance.features.auth
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.runtime.snapshotFlow
 import androidx.credentials.Credential
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,6 +17,9 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,20 +44,24 @@ class AuthViewModel @Inject constructor(
     private val _uiEvents = MutableSharedFlow<AuthUiEvent>()
     val uiEvents: SharedFlow<AuthUiEvent> = _uiEvents.asSharedFlow()
 
-    fun onEmailChange(email: String) {
-        _uiState.update { it.copy(email = email, emailError = null) }
+    val emailState = TextFieldState()
+    val passwordState = TextFieldState()
+    val fullNameState = TextFieldState()
+    val confirmPasswordState = TextFieldState()
+
+    init {
+        // Trimmed fields watch the trimmed text, so the trim on submit keeps the error validation just set.
+        clearErrorOnEdit({ emailState.text.trim() }) { it.copy(emailError = null) }
+        clearErrorOnEdit({ passwordState.text }) { it.copy(passwordError = null) }
+        clearErrorOnEdit({ fullNameState.text.trim() }) { it.copy(fullNameError = null) }
+        clearErrorOnEdit({ confirmPasswordState.text }) { it.copy(confirmPasswordError = null) }
     }
 
-    fun onPasswordChange(password: String) {
-        _uiState.update { it.copy(password = password, passwordError = null) }
-    }
-
-    fun onFullNameChange(fullName: String) {
-        _uiState.update { it.copy(fullName = fullName, fullNameError = null) }
-    }
-
-    fun onConfirmPasswordChange(confirmPassword: String) {
-        _uiState.update { it.copy(confirmPassword = confirmPassword, confirmPasswordError = null) }
+    private fun clearErrorOnEdit(text: () -> CharSequence, clear: (AuthUiState) -> AuthUiState) {
+        snapshotFlow { text().toString() }
+            .drop(1)
+            .onEach { _uiState.update(clear) }
+            .launchIn(viewModelScope)
     }
 
     fun onToggleAuthMode() {
@@ -72,11 +82,11 @@ class AuthViewModel @Inject constructor(
 
     fun onLoginButtonClick() {
         viewModelScope.launch {
-            _uiState.update { it.copy(email = it.email.trim()) }
+            emailState.trim()
             if (!validateLogin()) return@launch
             loadingRepository.startLoading()
 
-            val result = userRepository.userLogin(_uiState.value.email, _uiState.value.password)
+            val result = userRepository.userLogin(emailState.text.toString(), passwordState.text.toString())
             loadingRepository.stopLoading()
 
             if (result.code == AuthCode.LOGIN_SUCCESS.code) {
@@ -122,14 +132,15 @@ class AuthViewModel @Inject constructor(
 
     fun onSignupButtonClick() {
         viewModelScope.launch {
-            _uiState.update { it.copy(fullName = it.fullName.trim(), email = it.email.trim()) }
+            fullNameState.trim()
+            emailState.trim()
             if (!validateSignup()) return@launch
             loadingRepository.startLoading()
 
             val result = userRepository.userSignup(
-                _uiState.value.fullName,
-                _uiState.value.email,
-                _uiState.value.password
+                fullNameState.text.toString(),
+                emailState.text.toString(),
+                passwordState.text.toString()
             )
             
             loadingRepository.stopLoading()
@@ -142,10 +153,15 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    private fun TextFieldState.trim() {
+        val trimmed = text.trim()
+        if (trimmed.length != text.length) setTextAndPlaceCursorAtEnd(trimmed.toString())
+    }
+
     private fun validateLogin(): Boolean {
         var hasError = false
-        val email = _uiState.value.email
-        val password = _uiState.value.password
+        val email = emailState.text
+        val password = passwordState.text
 
         if (email.isEmpty()) {
             val error = AuthResult(AuthCode.EMPTY_EMAIL)
@@ -168,35 +184,38 @@ class AuthViewModel @Inject constructor(
 
     private fun validateSignup(): Boolean {
         var hasError = false
-        val state = _uiState.value
+        val fullName = fullNameState.text
+        val email = emailState.text
+        val password = passwordState.text.toString()
+        val confirmPassword = confirmPasswordState.text.toString()
 
-        if (state.fullName.isEmpty()) {
+        if (fullName.isEmpty()) {
             val error = AuthResult(AuthCode.EMPTY_NAME)
             _uiState.update { it.copy(fullNameError = error.message) }
             hasError = true
         }
 
-        if (state.email.isEmpty()) {
+        if (email.isEmpty()) {
             val error = AuthResult(AuthCode.EMPTY_EMAIL)
             _uiState.update { it.copy(emailError = error.message) }
             hasError = true
         }
 
-        if (state.password.isEmpty()) {
+        if (password.isEmpty()) {
             val error = AuthResult(AuthCode.EMPTY_PASSWORD)
             _uiState.update { it.copy(passwordError = error.message) }
             hasError = true
-        } else if (state.password.length < 8) {
+        } else if (password.length < 8) {
             val error = AuthResult(AuthCode.SHORT_PASSWORD)
             _uiState.update { it.copy(passwordError = error.message) }
             hasError = true
         }
 
-        if (state.confirmPassword.isEmpty()) {
+        if (confirmPassword.isEmpty()) {
             val error = AuthResult(AuthCode.EMPTY_CONFIRM_PASSWORD)
             _uiState.update { it.copy(confirmPasswordError = error.message) }
             hasError = true
-        } else if (state.password.isNotEmpty() && state.confirmPassword != state.password) {
+        } else if (password.isNotEmpty() && confirmPassword != password) {
             val error = AuthResult(AuthCode.PASSWORD_NOT_MATCH)
             _uiState.update { it.copy(confirmPasswordError = error.message) }
             hasError = true

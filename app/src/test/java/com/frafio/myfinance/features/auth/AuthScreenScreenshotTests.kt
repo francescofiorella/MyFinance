@@ -1,6 +1,7 @@
 package com.frafio.myfinance.features.auth
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
@@ -44,27 +45,27 @@ class AuthScreenScreenshotTests {
     @Test
     fun signUp() {
         composeTestRule.captureMultiDevice("AuthScreenSignUp") {
-            Auth(AuthUiState(isSigningUp = true, fullName = "Ada Lovelace", email = "ada@example.com"))
+            Auth(AuthUiState(isSigningUp = true), fullName = "Ada Lovelace", email = "ada@example.com")
         }
     }
 
     @Test
     fun login_withErrors() {
         composeTestRule.captureMultiDevice("AuthScreenLoginErrors") {
-            Auth(AuthUiState(email = "ada", password = "short", emailError = "Invalid email", passwordError = "At least 8 characters"))
+            Auth(AuthUiState(emailError = "Invalid email", passwordError = "At least 8 characters"), email = "ada", password = "short")
         }
     }
 
     @Composable
-    private fun Auth(uiState: AuthUiState) {
+    private fun Auth(uiState: AuthUiState, email: String = "", password: String = "", fullName: String = "") {
         AuthContent(
             appState = rememberMyFinanceAppState(),
             uiState = uiState,
             isLoading = false,
-            onEmailChange = {},
-            onPasswordChange = {},
-            onFullNameChange = {},
-            onConfirmPasswordChange = {},
+            emailState = rememberTextFieldState(email),
+            passwordState = rememberTextFieldState(password),
+            fullNameState = rememberTextFieldState(fullName),
+            confirmPasswordState = rememberTextFieldState(),
             onToggleAuthMode = {},
             onAuthClick = {},
             onGoogleClick = {},

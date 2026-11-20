@@ -9,8 +9,9 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -37,14 +37,10 @@ import com.frafio.myfinance.R
 fun AuthForm(
     isSigningUp: Boolean,
     isLoading: Boolean,
-    email: String,
-    onEmailChange: (String) -> Unit,
-    password: String,
-    onPasswordChange: (String) -> Unit,
-    fullName: String,
-    onFullNameChange: (String) -> Unit,
-    confirmPassword: String,
-    onConfirmPasswordChange: (String) -> Unit,
+    emailState: TextFieldState,
+    passwordState: TextFieldState,
+    fullNameState: TextFieldState,
+    confirmPasswordState: TextFieldState,
     emailError: String?,
     passwordError: String?,
     fullNameError: String?,
@@ -53,6 +49,7 @@ fun AuthForm(
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
+    val submit = { focusManager.clearFocus(); onAuthClick() }
 
     Column(
         modifier = modifier
@@ -65,8 +62,7 @@ fun AuthForm(
             exit = fadeOut(MaterialTheme.motionScheme.fastSpatialSpec()) + shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()) + slideOutVertically(MaterialTheme.motionScheme.fastSpatialSpec())
         ) {
             AuthTextField(
-                value = fullName,
-                onValueChange = onFullNameChange,
+                state = fullNameState,
                 label = stringResource(id = R.string.signup_name),
                 error = fullNameError,
                 enabled = !isLoading,
@@ -75,14 +71,12 @@ fun AuthForm(
                     capitalization = KeyboardCapitalization.Words,
                     imeAction = ImeAction.Next
                 ),
-                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                 contentType = ContentType.PersonFullName
             )
         }
 
         AuthTextField(
-            value = email,
-            onValueChange = onEmailChange,
+            state = emailState,
             label = stringResource(id = R.string.login_signup_email),
             error = emailError,
             enabled = !isLoading,
@@ -91,32 +85,24 @@ fun AuthForm(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
             ),
-            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
             contentType = ContentType.EmailAddress,
             testTag = "email_field"
         )
 
         var passwordVisible by remember { mutableStateOf(false) }
-        AuthTextField(
-            value = password,
-            onValueChange = onPasswordChange,
+        AuthPasswordField(
+            state = passwordState,
             label = stringResource(
                 id = if (isSigningUp) R.string.signup_password else R.string.login_password
             ),
             error = passwordError,
             enabled = !isLoading,
             icon = R.drawable.ic_password_filled,
-            isPassword = true,
             passwordVisible = passwordVisible,
             onPasswordVisibleChange = { passwordVisible = it },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = if (isSigningUp) ImeAction.Next else ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                onDone = { focusManager.clearFocus(); onAuthClick() }
-            ),
+            keyboardOptions = KeyboardOptions(imeAction = if (isSigningUp) ImeAction.Next else ImeAction.Done),
+            // Next keeps its default focus move; Done submits the login.
+            onKeyboardAction = { performDefaultAction -> if (isSigningUp) performDefaultAction() else submit() },
             contentType = if (isSigningUp) ContentType.NewPassword else ContentType.Password,
             testTag = "password_field"
         )
@@ -127,21 +113,16 @@ fun AuthForm(
             exit = fadeOut() + shrinkVertically() + slideOutVertically()
         ) {
             var confirmPasswordVisible by remember { mutableStateOf(false) }
-            AuthTextField(
-                value = confirmPassword,
-                onValueChange = onConfirmPasswordChange,
+            AuthPasswordField(
+                state = confirmPasswordState,
                 label = stringResource(id = R.string.signup_password_confirm),
                 error = confirmPasswordError,
                 enabled = !isLoading,
                 icon = R.drawable.ic_password_2_filled,
-                isPassword = true,
                 passwordVisible = confirmPasswordVisible,
                 onPasswordVisibleChange = { confirmPasswordVisible = it },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus(); onAuthClick() }),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                onKeyboardAction = { submit() },
                 contentType = ContentType.NewPassword
             )
         }
@@ -155,14 +136,10 @@ fun AuthFormLoginPreview() {
         AuthForm(
             isSigningUp = false,
             isLoading = false,
-            email = "",
-            onEmailChange = {},
-            password = "",
-            onPasswordChange = {},
-            fullName = "",
-            onFullNameChange = {},
-            confirmPassword = "",
-            onConfirmPasswordChange = {},
+            emailState = rememberTextFieldState(),
+            passwordState = rememberTextFieldState(),
+            fullNameState = rememberTextFieldState(),
+            confirmPasswordState = rememberTextFieldState(),
             emailError = null,
             passwordError = null,
             fullNameError = null,
@@ -179,14 +156,10 @@ fun AuthFormSignupPreview() {
         AuthForm(
             isSigningUp = true,
             isLoading = false,
-            email = "",
-            onEmailChange = {},
-            password = "",
-            onPasswordChange = {},
-            fullName = "",
-            onFullNameChange = {},
-            confirmPassword = "",
-            onConfirmPasswordChange = {},
+            emailState = rememberTextFieldState(),
+            passwordState = rememberTextFieldState(),
+            fullNameState = rememberTextFieldState(),
+            confirmPasswordState = rememberTextFieldState(),
             emailError = "Invalid email",
             passwordError = null,
             fullNameError = null,

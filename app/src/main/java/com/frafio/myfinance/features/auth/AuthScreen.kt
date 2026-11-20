@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -92,10 +94,10 @@ fun AuthScreen(
         appState = appState,
         uiState = uiState,
         isLoading = isLoading,
-        onEmailChange = viewModel::onEmailChange,
-        onPasswordChange = viewModel::onPasswordChange,
-        onFullNameChange = viewModel::onFullNameChange,
-        onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
+        emailState = viewModel.emailState,
+        passwordState = viewModel.passwordState,
+        fullNameState = viewModel.fullNameState,
+        confirmPasswordState = viewModel.confirmPasswordState,
         onToggleAuthMode = {
             focusManager.clearFocus()
             viewModel.onToggleAuthMode()
@@ -131,7 +133,7 @@ fun AuthScreen(
 
     ResetPasswordSheet(
         show = uiState.showResetPasswordSheet,
-        initialEmail = uiState.email,
+        initialEmail = viewModel.emailState.text.toString(),
         onDismiss = { viewModel.setShowResetPasswordSheet(false) },
         onSend = { email ->
             viewModel.resetPassword(email)
@@ -186,10 +188,10 @@ internal fun AuthContent(
     appState: MyFinanceAppState,
     uiState: AuthUiState,
     isLoading: Boolean,
-    onEmailChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    onFullNameChange: (String) -> Unit,
-    onConfirmPasswordChange: (String) -> Unit,
+    emailState: TextFieldState,
+    passwordState: TextFieldState,
+    fullNameState: TextFieldState,
+    confirmPasswordState: TextFieldState,
     onToggleAuthMode: () -> Unit,
     onAuthClick: () -> Unit,
     onGoogleClick: () -> Unit,
@@ -257,14 +259,10 @@ internal fun AuthContent(
                 AuthForm(
                     isSigningUp = uiState.isSigningUp,
                     isLoading = isLoading,
-                    email = uiState.email,
-                    onEmailChange = onEmailChange,
-                    password = uiState.password,
-                    onPasswordChange = onPasswordChange,
-                    fullName = uiState.fullName,
-                    onFullNameChange = onFullNameChange,
-                    confirmPassword = uiState.confirmPassword,
-                    onConfirmPasswordChange = onConfirmPasswordChange,
+                    emailState = emailState,
+                    passwordState = passwordState,
+                    fullNameState = fullNameState,
+                    confirmPasswordState = confirmPasswordState,
                     emailError = uiState.emailError,
                     passwordError = uiState.passwordError,
                     fullNameError = uiState.fullNameError,
@@ -346,10 +344,10 @@ fun AuthScreenPreview() {
             appState = appState,
             uiState = AuthUiState(),
             isLoading = false,
-            onEmailChange = {},
-            onPasswordChange = {},
-            onFullNameChange = {},
-            onConfirmPasswordChange = {},
+            emailState = rememberTextFieldState(),
+            passwordState = rememberTextFieldState(),
+            fullNameState = rememberTextFieldState(),
+            confirmPasswordState = rememberTextFieldState(),
             onToggleAuthMode = {},
             onAuthClick = {},
             onGoogleClick = {},
