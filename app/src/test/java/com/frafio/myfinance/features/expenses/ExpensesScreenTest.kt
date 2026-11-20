@@ -135,6 +135,8 @@ class ExpensesScreenTest {
         populated()
 
         composeTestRule.onNodeWithTag("search_field").performTextInput("Piz")
+        // The query reaches the ViewModel through snapshotFlow, after the snapshot apply runs.
+        composeTestRule.waitForIdle()
 
         assertThat(expensesLocalRepository.filterCalls.last().name).isEqualTo("Piz")
         composeTestRule.onNodeWithText("Pizza").assertIsDisplayed()
