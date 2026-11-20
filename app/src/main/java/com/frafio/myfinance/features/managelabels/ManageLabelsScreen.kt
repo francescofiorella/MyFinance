@@ -19,8 +19,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
@@ -55,11 +59,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -129,9 +131,9 @@ fun ManageLabelsContent(
 ) {
     val focusManager = LocalFocusManager.current
 
-    var labelFieldValue by remember { mutableStateOf(TextFieldValue(text = "")) }
+    val newLabelState = rememberTextFieldState()
     var editingLabel by remember { mutableStateOf<String?>(null) }
-    var editLabelFieldValue by remember { mutableStateOf(TextFieldValue(text = "")) }
+    val editLabelState = rememberTextFieldState()
     val focusRequester = remember { FocusRequester() }
 
     val isLabelsEmpty = allLabels.isEmpty()
@@ -142,9 +144,8 @@ fun ManageLabelsContent(
         }
     }
 
-    val isLabelValid = labelFieldValue.text.trim().isNotEmpty() && allLabels.none {
-        it.equals(labelFieldValue.text.trim(), ignoreCase = true)
-    }
+    val newLabel = newLabelState.text.trim().toString()
+    val isLabelValid = newLabel.isNotEmpty() && allLabels.none { it.equals(newLabel, ignoreCase = true) }
 
     Scaffold(
         modifier = modifier,
@@ -166,12 +167,11 @@ fun ManageLabelsContent(
 
             NewLabelItem(
                 modifier = Modifier.widthIn(max = BottomSheetDefaults.SheetMaxWidth),
-                value = labelFieldValue,
-                onValueChange = { labelFieldValue = it },
+                state = newLabelState,
                 isValid = isLabelValid,
                 onConfirm = {
-                    onAddLabel(labelFieldValue.text.trim())
-                    labelFieldValue = TextFieldValue("")
+                    onAddLabel(newLabel)
+                    newLabelState.clearText()
                     focusManager.clearFocus()
                 }
             )
@@ -196,23 +196,19 @@ fun ManageLabelsContent(
                             label = label,
                             allLabels = allLabels,
                             isEditing = editingLabel == label,
-                            editLabelValue = editLabelFieldValue,
-                            onEditLabelValueChange = { editLabelFieldValue = it },
+                            editLabelState = editLabelState,
                             onEditClick = {
-                                editLabelFieldValue = TextFieldValue(
-                                    text = label,
-                                    selection = TextRange(label.length)
-                                )
+                                editLabelState.setTextAndPlaceCursorAtEnd(label)
                                 editingLabel = label
                             },
                             onDeleteClick = { onDeleteLabel(label) },
                             onConfirmEdit = {
-                                onEditLabel(label, editLabelFieldValue.text.trim())
+                                onEditLabel(label, editLabelState.text.trim().toString())
                                 editingLabel = null
                             },
                             onCancelEdit = {
                                 editingLabel = null
-                                editLabelFieldValue = TextFieldValue(text = "")
+                                editLabelState.clearText()
                             },
                             focusRequester = focusRequester,
                             index = index,
@@ -230,8 +226,7 @@ fun ManageLabelsContent(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun NewLabelItem(
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
+    state: TextFieldState,
     isValid: Boolean,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier
@@ -260,9 +255,8 @@ fun NewLabelItem(
         },
         content = {
             BasicTextField(
+                state = state,
                 modifier = Modifier.fillMaxWidth(),
-                value = value,
-                onValueChange = onValueChange,
                 textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 keyboardOptions = KeyboardOptions(
@@ -270,13 +264,10 @@ fun NewLabelItem(
                     imeAction = ImeAction.Done,
                     keyboardType = KeyboardType.Text
                 ),
-                keyboardActions = KeyboardActions(onDone = {
-                    if (isValid) {
-                        onConfirm()
-                    }
-                }),
-                decorationBox = { innerTextField ->
-                    if (value.text.isEmpty()) {
+                onKeyboardAction = { if (isValid) onConfirm() },
+                lineLimits = TextFieldLineLimits.SingleLine,
+                decorator = { innerTextField ->
+                    if (state.text.isEmpty()) {
                         Text(
                             text = stringResource(id = R.string.create_label),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -288,8 +279,8 @@ fun NewLabelItem(
         },
         trailingContent = {
             Row {
-                if (value.text.isNotEmpty()) {
-                    IconButton(onClick = { onValueChange(TextFieldValue("")) }) {
+                if (state.text.isNotEmpty()) {
+                    IconButton(onClick = { state.clearText() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_cancel_filled),
                             contentDescription = stringResource(id = R.string.clear)
@@ -324,8 +315,7 @@ fun LabelItem(
     label: String,
     allLabels: List<String>,
     isEditing: Boolean,
-    editLabelValue: TextFieldValue,
-    onEditLabelValueChange: (TextFieldValue) -> Unit,
+    editLabelState: TextFieldState,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onConfirmEdit: () -> Unit,
@@ -334,11 +324,12 @@ fun LabelItem(
     index: Int,
     count: Int
 ) {
-    val isLabelValid = editLabelValue.text.trim().isNotEmpty() && allLabels.none { existing ->
+    val editedLabel = editLabelState.text.trim().toString()
+    val isLabelValid = editedLabel.isNotEmpty() && allLabels.none { existing ->
         if (existing == label) {
-            existing == editLabelValue.text.trim()
+            existing == editedLabel
         } else {
-            existing.equals(editLabelValue.text.trim(), ignoreCase = true)
+            existing.equals(editedLabel, ignoreCase = true)
         }
     }
     SegmentedListItem(
@@ -392,11 +383,10 @@ fun LabelItem(
         content = {
             if (isEditing) {
                 BasicTextField(
+                    state = editLabelState,
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
-                    value = editLabelValue,
-                    onValueChange = onEditLabelValueChange,
                     textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     keyboardOptions = KeyboardOptions(
@@ -404,11 +394,8 @@ fun LabelItem(
                         imeAction = ImeAction.Done,
                         keyboardType = KeyboardType.Text
                     ),
-                    keyboardActions = KeyboardActions(onDone = {
-                        if (isLabelValid) {
-                            onConfirmEdit()
-                        }
-                    })
+                    onKeyboardAction = { if (isLabelValid) onConfirmEdit() },
+                    lineLimits = TextFieldLineLimits.SingleLine
                 )
             } else {
                 Text(
