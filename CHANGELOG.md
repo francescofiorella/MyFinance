@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Categories info can be reached from Categories stats screen
+- Events strings moved from enums to strings.xml
+
 ## 5.2.6
 
 - Text fields migrated to the state-based API: login and sign-up, search, reset password, budget, full name and manage labels
