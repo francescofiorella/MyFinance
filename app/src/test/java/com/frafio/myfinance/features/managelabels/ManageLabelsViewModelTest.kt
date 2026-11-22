@@ -73,8 +73,8 @@ class ManageLabelsViewModelTest {
 
         assertThat(expensesRepository.addedLabels).containsExactly("gift", "again").inOrder()
         assertThat(events).containsExactly(
-            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_ADD_SUCCESS.message),
-            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message),
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_ADD_SUCCESS.messageRes),
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.messageRes),
         ).inOrder()
     }
 
@@ -89,7 +89,7 @@ class ManageLabelsViewModelTest {
 
         assertThat(expensesRepository.deletedLabels).containsExactly("food")
         assertThat(events).containsExactly(
-            ManageLabelsUiEvent.LabelDeleted("food", affected, FinanceCode.LABEL_DELETE_SUCCESS.message)
+            ManageLabelsUiEvent.LabelDeleted("food", affected, FinanceCode.LABEL_DELETE_SUCCESS.messageRes)
         )
     }
 
@@ -102,7 +102,7 @@ class ManageLabelsViewModelTest {
         viewModel.deleteLabel("food")
 
         assertThat(events).containsExactly(
-            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message)
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.messageRes)
         )
     }
 
@@ -127,7 +127,7 @@ class ManageLabelsViewModelTest {
         advanceUntilIdle()
 
         assertThat(events).containsExactly(
-            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message)
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.messageRes)
         )
     }
 
@@ -142,8 +142,8 @@ class ManageLabelsViewModelTest {
         assertThat(expensesRepository.editedLabels)
             .containsExactly("food" to "groceries", "travel" to "trips").inOrder()
         assertThat(events).containsExactly(
-            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_UPDATE_SUCCESS.message),
-            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.message),
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_UPDATE_SUCCESS.messageRes),
+            ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABELS_UPDATE_FAILURE.messageRes),
         ).inOrder()
     }
 

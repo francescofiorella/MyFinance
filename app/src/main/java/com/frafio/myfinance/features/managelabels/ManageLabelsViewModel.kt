@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.managelabels
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
@@ -22,7 +23,7 @@ import javax.inject.Inject
 
 sealed interface ManageLabelsUiEvent {
     data class ShowSnackBar(
-        val message: String,
+        @StringRes val messageRes: Int,
         val actionText: String? = null,
         val actionFun: () -> Unit = {},
         val dismissFun: () -> Unit = {}
@@ -31,7 +32,7 @@ sealed interface ManageLabelsUiEvent {
     data class LabelDeleted(
         val label: String,
         val affectedExpenses: List<Expense>,
-        val message: String
+        @StringRes val messageRes: Int
     ) : ManageLabelsUiEvent
 }
 
@@ -61,7 +62,7 @@ class ManageLabelsViewModel @Inject constructor(
             try {
                 loadingRepository.startLoading()
                 val result = expensesRepository.addLabel(label)
-                _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(result.message))
+                _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(result.messageRes))
             } finally {
                 loadingRepository.stopLoading()
             }
@@ -78,11 +79,11 @@ class ManageLabelsViewModel @Inject constructor(
                         ManageLabelsUiEvent.LabelDeleted(
                             label = label,
                             affectedExpenses = deleteResult.affectedExpenses,
-                            message = deleteResult.financeResult.message
+                            messageRes = deleteResult.financeResult.messageRes
                         )
                     )
                 } else {
-                    _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(deleteResult.financeResult.message))
+                    _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(deleteResult.financeResult.messageRes))
                 }
             } finally {
                 loadingRepository.stopLoading()
@@ -96,7 +97,7 @@ class ManageLabelsViewModel @Inject constructor(
                 loadingRepository.startLoading()
                 val result = expensesRepository.undoDeleteLabel(label, affectedExpenses)
                 if (result.code != FinanceCode.LABELS_UPDATE_SUCCESS.code) {
-                    _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(result.message))
+                    _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(result.messageRes))
                 }
             } finally {
                 loadingRepository.stopLoading()
@@ -109,7 +110,7 @@ class ManageLabelsViewModel @Inject constructor(
             try {
                 loadingRepository.startLoading()
                 val result = expensesRepository.editLabel(oldName, newName)
-                _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(result.message))
+                _uiEvents.emit(ManageLabelsUiEvent.ShowSnackBar(result.messageRes))
             } finally {
                 loadingRepository.stopLoading()
             }

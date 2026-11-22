@@ -399,7 +399,7 @@ class ExpensesViewModelTest {
 
         viewModel.deleteExpense(testExpense())
 
-        assertThat(events).containsExactly(ExpensesUiEvent.ShowSnackBar(FinanceCode.EXPENSE_DELETE_FAILURE.message))
+        assertThat(events).containsExactly(ExpensesUiEvent.ShowSnackBar(FinanceCode.EXPENSE_DELETE_FAILURE.messageRes))
     }
 
     @Test
@@ -420,7 +420,7 @@ class ExpensesViewModelTest {
 
         viewModel.undoDeleteExpense(testExpense())
 
-        assertThat(events).containsExactly(ExpensesUiEvent.ShowSnackBar(FinanceCode.EXPENSE_EDIT_FAILURE.message))
+        assertThat(events).containsExactly(ExpensesUiEvent.ShowSnackBar(FinanceCode.EXPENSE_EDIT_FAILURE.messageRes))
     }
 
     @Test
@@ -456,7 +456,7 @@ class ExpensesViewModelTest {
 
         viewModel.updateCategory(testExpense(), 7)
 
-        assertThat(events).containsExactly(ExpensesUiEvent.ShowSnackBar(FinanceCode.EXPENSE_EDIT_FAILURE.message))
+        assertThat(events).containsExactly(ExpensesUiEvent.ShowSnackBar(FinanceCode.EXPENSE_EDIT_FAILURE.messageRes))
     }
 
     @Test
@@ -496,7 +496,7 @@ class ExpensesViewModelTest {
 
         viewModel.addLabelToExpense(testExpense(), "work")
 
-        assertThat(events).containsExactly(ExpensesUiEvent.ShowSnackBar(FinanceCode.EXPENSE_EDIT_FAILURE.message))
+        assertThat(events).containsExactly(ExpensesUiEvent.ShowSnackBar(FinanceCode.EXPENSE_EDIT_FAILURE.messageRes))
     }
 
     @Test
@@ -520,7 +520,7 @@ class ExpensesViewModelTest {
 
         viewModel.removeLabelFromExpense(testExpense(), "work")
 
-        assertThat(events).containsExactly(ExpensesUiEvent.ShowSnackBar(FinanceCode.EXPENSE_EDIT_FAILURE.message))
+        assertThat(events).containsExactly(ExpensesUiEvent.ShowSnackBar(FinanceCode.EXPENSE_EDIT_FAILURE.messageRes))
     }
 
     @Test

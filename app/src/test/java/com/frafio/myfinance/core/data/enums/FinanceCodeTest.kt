@@ -1,5 +1,6 @@
 package com.frafio.myfinance.core.data.enums
 
+import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
 import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.frafio.myfinance.core.data.model.DeleteLabelResult
@@ -32,29 +33,10 @@ class FinanceCodeTest {
     }
 
     @Test
-    fun everyEntry_hasAMessage() {
-        FinanceCode.entries.forEach { entry ->
-            assertThat(entry.message).isNotEmpty()
-        }
-    }
-
-    @Test
-    fun messages_areEnglishUnderTheTestJvmLocale() {
-        assertThat(FinanceCode.EXPENSE_ADD_SUCCESS.message).isEqualTo("Expense added")
-        assertThat(FinanceCode.LABEL_DELETE_SUCCESS.message).isEqualTo("Label deleted")
-    }
-
-    @Test
     fun financeResult_exposesCodeAndMessage() {
         val result = FinanceResult(FinanceCode.EXPENSE_ADD_SUCCESS)
         assertThat(result.code).isEqualTo(10)
-        assertThat(result.message).isEqualTo("Expense added")
-    }
-
-    @Test
-    fun financeResult_customMessageOverridesTheEnumMessage() {
-        val result = FinanceResult(FinanceCode.EXPENSE_ADD_FAILURE, "Custom")
-        assertThat(result.message).isEqualTo("Custom")
+        assertThat(result.messageRes).isEqualTo(R.string.expense_added)
     }
 
     @Test

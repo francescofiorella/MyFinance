@@ -83,9 +83,9 @@ class AddScreenTest {
 
         save()
 
-        composeTestRule.onNodeWithText(FinanceCode.EMPTY_NAME.message).assertIsDisplayed()
-        composeTestRule.onNodeWithText(FinanceCode.EMPTY_AMOUNT.message).assertIsDisplayed()
-        composeTestRule.onNodeWithText(FinanceCode.EMPTY_CATEGORY.message).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(FinanceCode.EMPTY_NAME.messageRes)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(FinanceCode.EMPTY_AMOUNT.messageRes)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(FinanceCode.EMPTY_CATEGORY.messageRes)).assertIsDisplayed()
         assertThat(expensesRepository.addedExpenses).isEmpty()
     }
 
@@ -96,7 +96,7 @@ class AddScreenTest {
 
         save()
 
-        composeTestRule.onNodeWithText(FinanceCode.WRONG_AMOUNT.message).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(FinanceCode.WRONG_AMOUNT.messageRes)).assertIsDisplayed()
     }
 
     @Test
@@ -106,19 +106,19 @@ class AddScreenTest {
 
         save()
 
-        composeTestRule.onNodeWithText(FinanceCode.WRONG_NAME_TOTAL.message).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(FinanceCode.WRONG_NAME_TOTAL.messageRes)).assertIsDisplayed()
     }
 
     @Test
     fun typing_clearsTheFieldError() {
         setScreen()
         save()
-        composeTestRule.onNodeWithText(FinanceCode.EMPTY_NAME.message).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(FinanceCode.EMPTY_NAME.messageRes)).assertIsDisplayed()
 
         composeTestRule.onNodeWithTag("add_name_field").performTextInput("P")
 
-        composeTestRule.onNodeWithText(FinanceCode.EMPTY_NAME.message).assertDoesNotExist()
-        composeTestRule.onNodeWithText(FinanceCode.EMPTY_AMOUNT.message).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(FinanceCode.EMPTY_NAME.messageRes)).assertDoesNotExist()
+        composeTestRule.onNodeWithText(string(FinanceCode.EMPTY_AMOUNT.messageRes)).assertIsDisplayed()
     }
 
     @Test

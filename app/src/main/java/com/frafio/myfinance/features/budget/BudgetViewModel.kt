@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.budget
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
@@ -33,7 +34,7 @@ import javax.inject.Inject
 sealed class BudgetUiEvent {
 
     data class ShowSnackBar(
-        val message: String,
+        @StringRes val messageRes: Int,
         val actionText: String? = null,
         val actionFun: () -> Unit = {},
         val dismissFun: () -> Unit = {}
@@ -148,7 +149,7 @@ class BudgetViewModel @Inject constructor(
                     if (response.code == FinanceCode.BUDGET_UPDATE_SUCCESS.code) {
                         _uiEvents.emit(BudgetUiEvent.BudgetUpdated(previousBudget))
                     } else {
-                        _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+                        _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.messageRes))
                     }
                 }
             } finally {
@@ -165,7 +166,7 @@ class BudgetViewModel @Inject constructor(
                 if (response.code == FinanceCode.INCOME_DELETE_SUCCESS.code) {
                     _uiEvents.emit(BudgetUiEvent.IncomeDeleted(income))
                 } else {
-                    _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+                    _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.messageRes))
                 }
             } finally {
                 loadingRepository.stopLoading()
@@ -179,7 +180,7 @@ class BudgetViewModel @Inject constructor(
                 loadingRepository.startLoading()
                 val response = incomeRepository.editIncome(income)
                 if (response.code != FinanceCode.INCOME_EDIT_SUCCESS.code) {
-                    _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.message))
+                    _uiEvents.emit(BudgetUiEvent.ShowSnackBar(response.messageRes))
                 }
             } finally {
                 loadingRepository.stopLoading()

@@ -209,4 +209,30 @@
     <string name="weekend_share">Quota nel weekend</string>
     <string name="most_expensive_day">Giorno più costoso</string>
     <string name="biggest_expenses_overall">Spese maggiori</string>
+    <!-- Finance results -->
+    <string name="error_empty_name">Inserisci il nome</string>
+    <string name="error_name_total">Il nome non può essere \'Totale\'</string>
+    <string name="error_empty_amount">Inserisci l\'importo</string>
+    <string name="error_zero_amount">L\'importo non può essere zero</string>
+    <string name="error_empty_category">Inserisci la categoria</string>
+    <string name="expense_added">Spesa aggiunta</string>
+    <string name="expense_not_added">Spesa non aggiunta</string>
+    <string name="expense_updated">Spesa aggiornata</string>
+    <string name="expense_not_updated">Spesa non aggiornata</string>
+    <string name="expense_not_deleted">Spesa non eliminata correttamente</string>
+    <string name="expenses_list_updated">Lista spese aggiornata</string>
+    <string name="expenses_list_not_updated">Lista spese non aggiornata</string>
+    <string name="incomes_list_updated">Lista entrate aggiornata</string>
+    <string name="incomes_list_not_updated">Lista entrate non aggiornata</string>
+    <string name="income_added">Entrata aggiunta</string>
+    <string name="income_not_added">Entrata non aggiunta</string>
+    <string name="income_not_deleted">Entrata non eliminata correttamente</string>
+    <string name="income_updated">Entrata aggiornata</string>
+    <string name="income_not_updated">Entrata non aggiornata</string>
+    <string name="budget_not_updated">Budget non aggiornato</string>
+    <string name="labels_updated">Etichette aggiornate</string>
+    <string name="labels_not_updated">Etichette non aggiornate</string>
+    <string name="label_deleted">Etichetta eliminata</string>
+    <string name="label_updated">Etichetta aggiornata</string>
+    <string name="label_created">Etichetta creata</string>
 </resources>

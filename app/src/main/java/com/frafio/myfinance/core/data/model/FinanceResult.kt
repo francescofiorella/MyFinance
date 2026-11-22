@@ -1,10 +1,11 @@
 package com.frafio.myfinance.core.data.model
 
+import androidx.annotation.StringRes
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
 
-data class FinanceResult(private val result: FinanceCode, private val customMessage: String? = null) {
+data class FinanceResult(private val result: FinanceCode) {
     val code: Int = result.code
-    val message: String = customMessage ?: result.message
+    @StringRes val messageRes: Int = result.messageRes
 }
 
 data class DeleteLabelResult(

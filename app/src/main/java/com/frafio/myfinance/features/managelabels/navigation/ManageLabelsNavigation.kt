@@ -2,6 +2,7 @@ package com.frafio.myfinance.features.managelabels.navigation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
@@ -21,6 +22,7 @@ fun EntryProviderScope<NavKey>.manageLabelsEntry(
     entry<RootKey.ManageLabels> {
         val viewModel: ManageLabelsViewModel = hiltViewModel()
         val coroutineScope = rememberCoroutineScope()
+        val resources = LocalResources.current
         val undoString = stringResource(id = R.string.undo)
 
         LaunchedEffect(viewModel.uiEvents) {
@@ -29,7 +31,7 @@ fun EntryProviderScope<NavKey>.manageLabelsEntry(
                     is ManageLabelsUiEvent.ShowSnackBar -> {
                         coroutineScope.launch {
                             appState.showSnackBar(
-                                event.message,
+                                resources.getString(event.messageRes),
                                 event.actionText,
                                 event.actionFun,
                                 event.dismissFun
@@ -40,7 +42,7 @@ fun EntryProviderScope<NavKey>.manageLabelsEntry(
                     is ManageLabelsUiEvent.LabelDeleted -> {
                         coroutineScope.launch {
                             appState.showSnackBar(
-                                event.message,
+                                resources.getString(event.messageRes),
                                 undoString,
                                 {
                                     viewModel.undoDeleteLabel(

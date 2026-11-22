@@ -115,9 +115,9 @@ fun AddScreen(
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     var showLabelsSheet by rememberSaveable { mutableStateOf(false) }
 
-    var nameError by remember { mutableStateOf<String?>(null) }
-    var priceError by remember { mutableStateOf<String?>(null) }
-    var categoryError by remember { mutableStateOf<String?>(null) }
+    var nameError by remember { mutableStateOf<Int?>(null) }
+    var priceError by remember { mutableStateOf<Int?>(null) }
+    var categoryError by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(nameState.text) {
         nameError = null
@@ -164,24 +164,24 @@ fun AddScreen(
             var hasError = false
 
             if (name.isEmpty()) {
-                nameError = FinanceCode.EMPTY_NAME.message
+                nameError = FinanceCode.EMPTY_NAME.messageRes
                 hasError = true
             } else if (name == FirestoreEnums.NAMES.TOTAL.valueEn ||
                 name == FirestoreEnums.NAMES.TOTAL.valueIt) {
-                nameError = FinanceCode.WRONG_NAME_TOTAL.message
+                nameError = FinanceCode.WRONG_NAME_TOTAL.messageRes
                 hasError = true
             }
 
             if (priceString.isEmpty()) {
-                priceError = FinanceCode.EMPTY_AMOUNT.message
+                priceError = FinanceCode.EMPTY_AMOUNT.messageRes
                 hasError = true
             } else if (priceString.toDoubleOrNull() == null || priceString.toDouble() == 0.0) {
-                priceError = FinanceCode.WRONG_AMOUNT.message
+                priceError = FinanceCode.WRONG_AMOUNT.messageRes
                 hasError = true
             }
 
             if (viewModel.navKey.expenseCode != AddViewModel.REQUEST_INCOME_CODE && viewModel.category == -1) {
-                categoryError = FinanceCode.EMPTY_CATEGORY.message
+                categoryError = FinanceCode.EMPTY_CATEGORY.messageRes
                 hasError = true
             }
 
@@ -198,9 +198,9 @@ fun AddScreen(
             }
         },
         onBackClick = onBackClick,
-        nameError = nameError,
-        priceError = priceError,
-        categoryError = categoryError,
+        nameError = nameError?.let { stringResource(it) },
+        priceError = priceError?.let { stringResource(it) },
+        categoryError = categoryError?.let { stringResource(it) },
         currencyCode = currencyCode
     )
 

@@ -208,4 +208,30 @@
     <string name="weekend_share">Weekend share</string>
     <string name="most_expensive_day">Most expensive day</string>
     <string name="biggest_expenses_overall">Biggest expenses</string>
+    <!-- Finance results -->
+    <string name="error_empty_name">Enter the name</string>
+    <string name="error_name_total">The name can\'t be \'Total\'</string>
+    <string name="error_empty_amount">Enter the amount</string>
+    <string name="error_zero_amount">The amount can\'t be zero</string>
+    <string name="error_empty_category">Enter the category</string>
+    <string name="expense_added">Expense added</string>
+    <string name="expense_not_added">Expense not added</string>
+    <string name="expense_updated">Expense updated</string>
+    <string name="expense_not_updated">Expense not updated</string>
+    <string name="expense_not_deleted">Expense not deleted correctly</string>
+    <string name="expenses_list_updated">Expenses list updated</string>
+    <string name="expenses_list_not_updated">Expenses list not updated</string>
+    <string name="incomes_list_updated">Incomes list updated</string>
+    <string name="incomes_list_not_updated">Incomes list not updated</string>
+    <string name="income_added">Income added</string>
+    <string name="income_not_added">Income not added</string>
+    <string name="income_not_deleted">Income not deleted correctly</string>
+    <string name="income_updated">Income updated</string>
+    <string name="income_not_updated">Income not updated</string>
+    <string name="budget_not_updated">Budget not updated</string>
+    <string name="labels_updated">Labels updated</string>
+    <string name="labels_not_updated">Labels not updated</string>
+    <string name="label_deleted">Label deleted</string>
+    <string name="label_updated">Label updated</string>
+    <string name="label_created">Label created</string>
 </resources>

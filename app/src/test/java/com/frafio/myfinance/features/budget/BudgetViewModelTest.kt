@@ -190,7 +190,7 @@ class BudgetViewModelTest {
 
         viewModel.setMonthlyBudget(500.0)
 
-        assertThat(events).containsExactly(BudgetUiEvent.ShowSnackBar(FinanceCode.BUDGET_UPDATE_FAILURE.message))
+        assertThat(events).containsExactly(BudgetUiEvent.ShowSnackBar(FinanceCode.BUDGET_UPDATE_FAILURE.messageRes))
     }
 
     @Test
@@ -231,7 +231,7 @@ class BudgetViewModelTest {
 
         viewModel.deleteIncome(testIncome())
 
-        assertThat(events).containsExactly(BudgetUiEvent.ShowSnackBar(FinanceCode.INCOME_DELETE_FAILURE.message))
+        assertThat(events).containsExactly(BudgetUiEvent.ShowSnackBar(FinanceCode.INCOME_DELETE_FAILURE.messageRes))
     }
 
     @Test
@@ -252,7 +252,7 @@ class BudgetViewModelTest {
 
         viewModel.undoDeleteIncome(testIncome())
 
-        assertThat(events).containsExactly(BudgetUiEvent.ShowSnackBar(FinanceCode.INCOME_EDIT_FAILURE.message))
+        assertThat(events).containsExactly(BudgetUiEvent.ShowSnackBar(FinanceCode.INCOME_EDIT_FAILURE.messageRes))
     }
 
     @Test

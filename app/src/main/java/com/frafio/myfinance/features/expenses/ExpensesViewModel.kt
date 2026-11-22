@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.expenses
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.snapshotFlow
@@ -44,7 +45,7 @@ import javax.inject.Inject
 
 sealed class ExpensesUiEvent {
     data class ShowSnackBar(
-        val message: String,
+        @StringRes val messageRes: Int,
         val actionText: String? = null,
         val actionFun: () -> Unit = {},
         val dismissFun: () -> Unit = {}
@@ -257,7 +258,7 @@ class ExpensesViewModel @Inject constructor(
                 if (response.code == FinanceCode.EXPENSE_DELETE_SUCCESS.code) {
                     _uiEvents.emit(ExpensesUiEvent.ExpenseDeleted(expense))
                 } else {
-                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
+                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.messageRes))
                 }
             } finally {
                 loadingRepository.stopLoading()
@@ -275,7 +276,7 @@ class ExpensesViewModel @Inject constructor(
                 )
                 val response = expensesRepository.editExpense(updated)
                 if (response.code == FinanceCode.EXPENSE_EDIT_FAILURE.code) {
-                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
+                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.messageRes))
                 } else {
                     if (_editingExpense.value?.id == expense.id) {
                         _editingExpense.value = updated
@@ -295,7 +296,7 @@ class ExpensesViewModel @Inject constructor(
                 loadingRepository.startLoading()
                 val response = expensesRepository.updateExpenseLabels(expense.id, trimmedLabel, true)
                 if (response.code == FinanceCode.EXPENSE_EDIT_FAILURE.code) {
-                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
+                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.messageRes))
                 } else {
                     if (_editingExpense.value?.id == expense.id) {
                         val latestExpense = expensesLocalRepository.getById(expense.id)
@@ -316,7 +317,7 @@ class ExpensesViewModel @Inject constructor(
                 loadingRepository.startLoading()
                 val response = expensesRepository.updateExpenseLabels(expense.id, label, false)
                 if (response.code == FinanceCode.EXPENSE_EDIT_FAILURE.code) {
-                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
+                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.messageRes))
                 } else {
                     if (_editingExpense.value?.id == expense.id) {
                         val latestExpense = expensesLocalRepository.getById(expense.id)
@@ -337,7 +338,7 @@ class ExpensesViewModel @Inject constructor(
                 loadingRepository.startLoading()
                 val response = expensesRepository.editExpense(expense)
                 if (response.code != FinanceCode.EXPENSE_EDIT_SUCCESS.code) {
-                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.message))
+                    _uiEvents.emit(ExpensesUiEvent.ShowSnackBar(response.messageRes))
                 }
             } finally {
                 loadingRepository.stopLoading()

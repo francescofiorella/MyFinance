@@ -1,6 +1,7 @@
 package com.frafio.myfinance.features.expenses.navigation
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
@@ -28,6 +29,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
     entry<HomeTabKey.Expenses> {
         val viewModel: ExpensesViewModel = hiltViewModel()
 
+        val resources = LocalResources.current
         val expenseDeletedString = stringResource(id = R.string.expense_deleted)
         val undoString = stringResource(id = R.string.undo)
 
@@ -58,7 +60,7 @@ fun EntryProviderScope<NavKey>.expensesEntry(
                 when (event) {
                     is ExpensesUiEvent.ShowSnackBar -> {
                         appState.showSnackBar(
-                            event.message,
+                            resources.getString(event.messageRes),
                             event.actionText,
                             event.actionFun,
                             event.dismissFun

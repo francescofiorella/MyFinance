@@ -81,7 +81,7 @@ class ManageLabelsScreenTest {
 
         assertThat(expensesRepository.addedLabels).containsExactly("Gift")
         composeTestRule.waitForIdle()
-        assertThat(events).containsExactly(ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_ADD_SUCCESS.message))
+        assertThat(events).containsExactly(ManageLabelsUiEvent.ShowSnackBar(FinanceCode.LABEL_ADD_SUCCESS.messageRes))
     }
 
     @Test
@@ -94,7 +94,7 @@ class ManageLabelsScreenTest {
 
         assertThat(expensesRepository.deletedLabels).containsExactly("travel")
         composeTestRule.waitForIdle()
-        assertThat(events).containsExactly(ManageLabelsUiEvent.LabelDeleted("travel", emptyList(), FinanceCode.LABEL_DELETE_SUCCESS.message))
+        assertThat(events).containsExactly(ManageLabelsUiEvent.LabelDeleted("travel", emptyList(), FinanceCode.LABEL_DELETE_SUCCESS.messageRes))
     }
 
     @Test

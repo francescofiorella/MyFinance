@@ -1,6 +1,7 @@
 ﻿package com.frafio.myfinance.features.add.navigation
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
@@ -22,16 +23,17 @@ fun EntryProviderScope<NavKey>.addEntry(
             }
         )
 
+        val resources = LocalResources.current
         LaunchedEffect(viewModel.uiEvents) {
             viewModel.uiEvents.collect { event ->
                 when (event) {
                     is AddUiEvent.Success -> {
-                        appState.showSnackBar(event.result.message)
+                        appState.showSnackBar(resources.getString(event.result.messageRes))
                         onSaveSuccess(event.isExpense, event.day, event.month, event.year)
                     }
                     is AddUiEvent.Error -> {
                         viewModel.updateAddingState(true)
-                        appState.showSnackBar(event.result.message)
+                        appState.showSnackBar(resources.getString(event.result.messageRes))
                     }
                     is AddUiEvent.ShowSnackBar -> {
                         appState.showSnackBar(
