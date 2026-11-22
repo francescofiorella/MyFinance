@@ -11,6 +11,7 @@ import com.frafio.myfinance.features.categories.CategoriesViewModel
 fun EntryProviderScope<NavKey>.categoriesEntry(
     appState: MyFinanceAppState,
     onBackClick: () -> Unit,
+    onManageClick: () -> Unit,
     onCategoryClick: (RootKey.CategoryDetail) -> Unit
 ) {
     entry<RootKey.Categories> {
@@ -19,6 +20,7 @@ fun EntryProviderScope<NavKey>.categoriesEntry(
             appState = appState,
             viewModel = viewModel,
             onBackClick = onBackClick,
+            onManageClick = onManageClick,
             onCategoryClick = { categoryId, month ->
                 onCategoryClick(RootKey.CategoryDetail(categoryId, month.year, month.monthValue))
             }

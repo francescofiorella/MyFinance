@@ -147,8 +147,8 @@ class BaselineProfileGenerator {
     }
 
     /**
-     * The Categories overview, then the detail page of its first category. "See all expenses" is left
-     * untouched: it would replace the Expenses filters the rest of the journey relies on.
+     * The Categories overview, the detail page of its first category, then Manage categories. "See all expenses"
+     * is left untouched: it would replace the Expenses filters the rest of the journey relies on.
      */
     private fun MacrobenchmarkScope.categoriesJourney() {
         if (!device.scrollToAndTap("expenses_list", "expenses_categories")) {
@@ -177,6 +177,8 @@ class BaselineProfileGenerator {
         } else {
             log("No category row ('category_item'), skipping the detail.")
         }
+
+        manageCategoriesJourney()
 
         device.pressBack()
         confirmBack("expenses_list", "categories_scroll")
@@ -297,9 +299,7 @@ class BaselineProfileGenerator {
             device.tap("profile_edit_profile")
         }
 
-        // Labels and the spending overview are opened from the Expenses tab; category management from here.
-        manageCategoriesJourney()
-
+        // Labels, categories and their management are opened from the Expenses tab.
         if (device.scrollToAndTap("profile_scroll", "profile_change_currency")) {
             log("Currency sheet.")
             device.pressBack()
@@ -314,13 +314,13 @@ class BaselineProfileGenerator {
     }
 
     private fun MacrobenchmarkScope.manageCategoriesJourney() {
-        if (!device.scrollToAndTap("profile_scroll", "profile_manage_categories")) {
-            log("Entry 'profile_manage_categories' not found, skipping.")
+        if (!device.tap("categories_manage")) {
+            log("Entry 'categories_manage' not found, skipping.")
             return
         }
         log("Manage categories.")
         if (device.awaitTag("manage_categories_list", 10_000)) {
-            device.awaitGone("profile_scroll", 5_000)
+            device.awaitGone("categories_scroll", 5_000)
             device.settle()
             if (device.tap("manage_category_item")) {
                 log("Category description expanded.")
@@ -331,7 +331,7 @@ class BaselineProfileGenerator {
             log("'manage_categories_list' never appeared.")
         }
         device.pressBack()
-        confirmBack("profile_scroll", "manage_categories_list")
+        confirmBack("categories_scroll", "manage_categories_list")
     }
 
     private fun MacrobenchmarkScope.openAndClose(containerTag: String, entryTag: String, screenTag: String) {

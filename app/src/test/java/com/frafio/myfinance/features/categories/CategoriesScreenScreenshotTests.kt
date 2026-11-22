@@ -50,6 +50,7 @@ class CategoriesScreenScreenshotTests {
         CategoriesContent(
             state = state,
             onBackClick = {},
+            onManageClick = {},
             onPreviousMonth = {},
             onNextMonth = {},
             onCurrentMonth = {},

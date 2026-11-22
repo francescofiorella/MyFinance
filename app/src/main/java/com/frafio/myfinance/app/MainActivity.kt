@@ -217,6 +217,7 @@ class MainActivity : ComponentActivity() {
                         categoriesEntry(
                             appState = appState,
                             onBackClick = { rootBackStack.removeAt(rootBackStack.size - 1) },
+                            onManageClick = { rootBackStack.add(RootKey.ManageCategories) },
                             onCategoryClick = { key -> rootBackStack.add(key) }
                         )
                         categoryDetailEntry(

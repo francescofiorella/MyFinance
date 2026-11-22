@@ -13,6 +13,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,12 +55,14 @@ fun CategoriesScreen(
     appState: MyFinanceAppState,
     viewModel: CategoriesViewModel,
     onBackClick: () -> Unit,
+    onManageClick: () -> Unit,
     onCategoryClick: (categoryId: Int, month: LocalDate) -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     CategoriesContent(
         state = state,
         onBackClick = onBackClick,
+        onManageClick = onManageClick,
         onPreviousMonth = viewModel::previousMonth,
         onNextMonth = viewModel::nextMonth,
         onCurrentMonth = viewModel::goToCurrentMonth,
@@ -70,6 +76,7 @@ fun CategoriesScreen(
 fun CategoriesContent(
     state: CategoriesUiState,
     onBackClick: () -> Unit,
+    onManageClick: () -> Unit,
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onCurrentMonth: () -> Unit,
@@ -87,7 +94,21 @@ fun CategoriesContent(
         ) {
             AppTopBar(
                 title = { Text(text = stringResource(id = R.string.categories), maxLines = 1) },
-                onNavigationClick = onBackClick
+                onNavigationClick = onBackClick,
+                action = {
+                    IconButton(
+                        modifier = Modifier
+                            .testTag("categories_manage")
+                            .padding(end = 4.dp),
+                        onClick = onManageClick,
+                        shapes = IconButtonDefaults.shapes()
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_info_outline),
+                            contentDescription = stringResource(id = R.string.manage_categories)
+                        )
+                    }
+                }
             )
 
             val (spent, unspent) = state.spending.partition { it.total > 0.0 }
@@ -239,6 +260,7 @@ fun CategoriesPreview() {
         CategoriesContent(
             state = sampleCategoriesUiState(LocalDate.of(2024, 5, 1)),
             onBackClick = {},
+            onManageClick = {},
             onPreviousMonth = {},
             onNextMonth = {},
             onCurrentMonth = {},

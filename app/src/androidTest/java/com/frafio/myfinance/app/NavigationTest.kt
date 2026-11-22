@@ -169,6 +169,19 @@ class NavigationTest {
     }
 
     @Test
+    fun categories_manage_opensManageCategories_andBackReturnsToCategories() {
+        composeTestRule.onNodeWithTag("tab_expenses").performClick()
+        composeTestRule.onNodeWithTag("expenses_categories").performClick()
+        composeTestRule.onNodeWithTag("categories_manage").performClick()
+        composeTestRule.onNodeWithTag("manage_categories_list").assertExists()
+
+        Espresso.pressBack()
+
+        composeTestRule.onNodeWithTag("manage_categories_list").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("categories_scroll").assertExists()
+    }
+
+    @Test
     fun labels_row_opensItsDetail_andBackReturnsToLabels() {
         runBlocking { expenseDao.upsert(testExpense(name = "Pasta", labels = listOf("Dinner"))) }
         composeTestRule.onNodeWithTag("tab_expenses").performClick()

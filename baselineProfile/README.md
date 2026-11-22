@@ -59,7 +59,7 @@ The long journey is capped at `maxIterations = 6` so a profile that refuses to s
 3. The sign-up form expands, then collapses.
 4. **Email and password fill themselves in, with no keyboard.** ← see below
 5. Sign-in is tapped. Wavy progress bar, then the dashboard with a "Login successful" snackbar.
-6. Straight to the Expenses tab — the dashboard is not scrolled or touched. The list flings to the bottom and back up, then the categories button beside the search bar opens its screen and closes it.
+6. Straight to the Expenses tab — the dashboard is not scrolled or touched. The list flings to the bottom and back up, then the categories button beside the search bar opens its screen. Its first category opens its detail page, which scrolls down and back, and closes. Manage categories opens from the top bar, its first category expands, the list scrolls down and back and closes, then the Categories screen closes.
 7. The search field is tapped: the bar widens over those buttons and the keyboard opens. The letter `a` appears, the list narrows, the query clears, then the back arrow collapses the bar and the keyboard closes.
 8. Filter sheet slides up (Label / Category / Date range). Category is tapped, the category grid opens, back dismisses it.
 9. Filter sheet opens again, Date range is tapped, the date-range picker appears, back dismisses it. *Nothing is ever selected, so no filter is left applied.*

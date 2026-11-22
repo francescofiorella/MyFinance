@@ -41,6 +41,7 @@ class CategoriesScreenTest {
             CategoriesContent(
                 state = state,
                 onBackClick = { events += "back" },
+                onManageClick = { events += "manage" },
                 onPreviousMonth = { events += "previous" },
                 onNextMonth = { events += "next" },
                 onCurrentMonth = { events += "current" },
@@ -99,6 +100,15 @@ class CategoriesScreenTest {
         composeTestRule.onNodeWithContentDescription(string(R.string.previous_month)).assertIsEnabled().performClick()
 
         assertThat(events).containsExactly("previous")
+    }
+
+    @Test
+    fun manage_invokesTheCallback() {
+        setScreen()
+
+        composeTestRule.onNodeWithContentDescription(string(R.string.manage_categories)).performClick()
+
+        assertThat(events).containsExactly("manage")
     }
 
     @Test

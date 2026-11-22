@@ -244,6 +244,7 @@ class AccessibilityTest {
             CategoriesContent(
                 state = sampleCategoriesUiState(LocalDate.of(2024, 5, 1)),
                 onBackClick = {},
+                onManageClick = {},
                 onPreviousMonth = {},
                 onNextMonth = {},
                 onCurrentMonth = {},
