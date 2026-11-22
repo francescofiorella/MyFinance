@@ -1,5 +1,6 @@
 package com.frafio.myfinance.core.data.enums
 
+import com.frafio.myfinance.R
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
 import com.frafio.myfinance.core.data.model.AuthResult
 import com.google.common.truth.Truth.assertThat
@@ -27,36 +28,15 @@ class AuthCodeTest {
     }
 
     @Test
-    fun everyEntry_hasAMessage() {
-        AuthCode.entries.forEach { entry ->
-            assertThat(entry.message).isNotEmpty()
-        }
-    }
-
-    @Test
     fun codes_areUnique() {
         val duplicated = AuthCode.entries.groupBy { it.code }.filterValues { it.size > 1 }
         assertThat(duplicated).isEmpty()
     }
 
     @Test
-    fun messages_areEnglishUnderTheTestJvmLocale() {
-        assertThat(AuthCode.LOGIN_SUCCESS.message).isEqualTo("Login successful")
-        assertThat(AuthCode.EMPTY_EMAIL.message).isEqualTo("Enter your email")
-        assertThat(AuthCode.SHORT_PASSWORD.message).isEqualTo("Password is too short (min. 8 characters)")
-    }
-
-    @Test
     fun authResult_exposesCodeAndMessage() {
         val result = AuthResult(AuthCode.LOGIN_SUCCESS)
         assertThat(result.code).isEqualTo(AuthCode.LOGIN_SUCCESS.code)
-        assertThat(result.message).isEqualTo(AuthCode.LOGIN_SUCCESS.message)
-    }
-
-    @Test
-    fun authResult_customMessageOverridesTheEnumMessage() {
-        val result = AuthResult(AuthCode.LOGIN_FAILURE, "Custom")
-        assertThat(result.code).isEqualTo(AuthCode.LOGIN_FAILURE.code)
-        assertThat(result.message).isEqualTo("Custom")
+        assertThat(result.messageRes).isEqualTo(R.string.login_success)
     }
 }

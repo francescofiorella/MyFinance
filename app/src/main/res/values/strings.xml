@@ -234,4 +234,35 @@
     <string name="label_deleted">Label deleted</string>
     <string name="label_updated">Label updated</string>
     <string name="label_created">Label created</string>
+    <!-- Auth results -->
+    <string name="login_success">Login successful</string>
+    <string name="google_login_failed">Google login failed</string>
+    <string name="login_failed">Login failed</string>
+    <string name="error_invalid_email">Invalid email address</string>
+    <string name="error_wrong_password">Wrong password</string>
+    <string name="error_account_not_found">Account not found</string>
+    <string name="error_account_disabled">This account has been disabled</string>
+    <string name="signup_success">Signup successful</string>
+    <string name="error_weak_password">The password is not secure</string>
+    <string name="error_email_not_well_formed">Enter a valid email address</string>
+    <string name="error_email_already_registered">Email already registered</string>
+    <string name="signup_failed">Signup failed</string>
+    <string name="error_empty_email">Enter your email</string>
+    <string name="error_empty_password">Enter your password</string>
+    <string name="error_short_password">Password is too short (min. 8 characters)</string>
+    <string name="error_empty_full_name">Enter your full name</string>
+    <string name="error_empty_confirm_password">Confirm your password</string>
+    <string name="error_password_not_match">The confirmation password does not match</string>
+    <string name="error_empty_new_password">Enter a new password</string>
+    <string name="error_empty_confirm_new_password">Confirm the new password</string>
+    <string name="email_sent">Email sent. Check your email box</string>
+    <string name="email_not_sent_too_many_requests">Too many attempts. Try again later</string>
+    <string name="email_not_sent">Error! Email not sent</string>
+    <string name="logout_success">User logged out</string>
+    <string name="user_logged">User logged</string>
+    <string name="user_not_logged">User not logged</string>
+    <string name="user_full_name_not_updated">User full name not updated</string>
+    <string name="password_updated">Password updated successfully</string>
+    <string name="password_not_updated">Password not updated</string>
+    <string name="error_wrong_current_password">The password is incorrect</string>
 </resources>

@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import com.frafio.myfinance.core.data.enums.auth.AuthCode
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.testing.screenshot.captureMultiDevice
 import com.frafio.myfinance.testing.screenshot.capturePhoneDark
@@ -52,7 +53,7 @@ class AuthScreenScreenshotTests {
     @Test
     fun login_withErrors() {
         composeTestRule.captureMultiDevice("AuthScreenLoginErrors") {
-            Auth(AuthUiState(emailError = "Invalid email", passwordError = "At least 8 characters"), email = "ada", password = "short")
+            Auth(AuthUiState(emailError = AuthCode.INVALID_EMAIL.messageRes, passwordError = AuthCode.SHORT_PASSWORD.messageRes), email = "ada", password = "short")
         }
     }
 

@@ -62,8 +62,8 @@ class AuthScreenTest {
         composeTestRule.onNodeWithTag("login_button").performClick()
 
         // The message equals the field label, so pick the node that is not the text field.
-        composeTestRule.onAllNodesWithText(AuthCode.EMPTY_EMAIL.message).filterToOne(!hasSetTextAction()).assertIsDisplayed()
-        composeTestRule.onAllNodesWithText(AuthCode.EMPTY_PASSWORD.message).filterToOne(!hasSetTextAction()).assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(string(AuthCode.EMPTY_EMAIL.messageRes)).filterToOne(!hasSetTextAction()).assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(string(AuthCode.EMPTY_PASSWORD.messageRes)).filterToOne(!hasSetTextAction()).assertIsDisplayed()
         assertThat(userRepository.loginCalls).isEmpty()
     }
 
@@ -73,7 +73,7 @@ class AuthScreenTest {
 
         composeTestRule.onNodeWithTag("login_button").performClick()
 
-        composeTestRule.onNodeWithText(AuthCode.SHORT_PASSWORD.message).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(AuthCode.SHORT_PASSWORD.messageRes)).assertIsDisplayed()
         assertThat(userRepository.loginCalls).isEmpty()
     }
 
@@ -96,7 +96,7 @@ class AuthScreenTest {
         composeTestRule.onNodeWithTag("login_button").performClick()
 
         composeTestRule.waitForIdle()
-        assertThat(events).containsExactly(AuthUiEvent.Error(AuthCode.WRONG_PASSWORD.message))
+        assertThat(events).containsExactly(AuthUiEvent.Error(AuthCode.WRONG_PASSWORD.messageRes))
     }
 
     @Test
@@ -108,7 +108,7 @@ class AuthScreenTest {
 
         composeTestRule.onNodeWithTag("login_button").performClick()
 
-        composeTestRule.onNodeWithText(AuthCode.PASSWORD_NOT_MATCH.message).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(AuthCode.PASSWORD_NOT_MATCH.messageRes)).assertIsDisplayed()
         assertThat(userRepository.signupCalls).isEmpty()
     }
 
@@ -121,6 +121,6 @@ class AuthScreenTest {
 
         assertThat(userRepository.resetPasswordCalls).containsExactly("ada@example.com")
         composeTestRule.waitForIdle()
-        assertThat(events).containsExactly(AuthUiEvent.Message(AuthCode.EMAIL_SENT.message))
+        assertThat(events).containsExactly(AuthUiEvent.Message(AuthCode.EMAIL_SENT.messageRes))
     }
 }

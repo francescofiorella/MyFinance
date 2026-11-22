@@ -235,4 +235,35 @@
     <string name="label_deleted">Etichetta eliminata</string>
     <string name="label_updated">Etichetta aggiornata</string>
     <string name="label_created">Etichetta creata</string>
+    <!-- Auth results -->
+    <string name="login_success">Accesso avvenuto con successo</string>
+    <string name="google_login_failed">Accesso con Google fallito</string>
+    <string name="login_failed">Accesso fallito</string>
+    <string name="error_invalid_email">Email non valida</string>
+    <string name="error_wrong_password">Password errata</string>
+    <string name="error_account_not_found">Account non trovato</string>
+    <string name="error_account_disabled">Questo account è stato disabilitato</string>
+    <string name="signup_success">Registrazione avvenuta con successo</string>
+    <string name="error_weak_password">La password non è sicura</string>
+    <string name="error_email_not_well_formed">Inserisci un\'email valida</string>
+    <string name="error_email_already_registered">Email già registrata</string>
+    <string name="signup_failed">Registrazione fallita</string>
+    <string name="error_empty_email">Inserisci la tua email</string>
+    <string name="error_empty_password">Inserisci la tua password</string>
+    <string name="error_short_password">Password troppo corta (min. 8 caratteri)</string>
+    <string name="error_empty_full_name">Inserisci il tuo nome e cognome</string>
+    <string name="error_empty_confirm_password">Conferma la tua password</string>
+    <string name="error_password_not_match">Le password non coincidono</string>
+    <string name="error_empty_new_password">Inserisci una nuova password</string>
+    <string name="error_empty_confirm_new_password">Conferma la nuova password</string>
+    <string name="email_sent">Email inviata. Controlla la tua casella di posta</string>
+    <string name="email_not_sent_too_many_requests">Troppi tentativi. Riprova più tardi</string>
+    <string name="email_not_sent">Errore! Email non inviata</string>
+    <string name="logout_success">Utente disconnesso</string>
+    <string name="user_logged">Utente connesso</string>
+    <string name="user_not_logged">Utente non connesso</string>
+    <string name="user_full_name_not_updated">Aggiornamento nome utente non riuscito</string>
+    <string name="password_updated">Password aggiornata con successo</string>
+    <string name="password_not_updated">Password non aggiornata</string>
+    <string name="error_wrong_current_password">La password non è corretta</string>
 </resources>

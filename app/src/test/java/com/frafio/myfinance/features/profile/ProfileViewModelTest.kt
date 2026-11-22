@@ -130,7 +130,7 @@ class ProfileViewModelTest {
         viewModel.editFullName("Grace")
 
         assertThat(events).containsExactly(
-            ProfileUiEvent.ShowSnackBar(AuthCode.USER_FULL_NAME_NOT_UPDATED.message)
+            ProfileUiEvent.ShowSnackBar(AuthCode.USER_FULL_NAME_NOT_UPDATED.messageRes)
         )
     }
 

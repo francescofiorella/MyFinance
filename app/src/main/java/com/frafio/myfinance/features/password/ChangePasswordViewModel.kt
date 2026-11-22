@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.password
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
@@ -18,15 +19,15 @@ import javax.inject.Inject
 
 sealed class ChangePasswordUiEvent {
     data class ShowSnackBar(
-        val message: String,
+        @StringRes val messageRes: Int,
         val actionText: String? = null,
         val actionFun: () -> Unit = {},
         val dismissFun: () -> Unit = {}
     ) : ChangePasswordUiEvent()
 
-    data class InvalidCurrentPassword(val message: String) : ChangePasswordUiEvent()
+    data class InvalidCurrentPassword(@StringRes val messageRes: Int) : ChangePasswordUiEvent()
 
-    data class Success(val message: String) : ChangePasswordUiEvent()
+    data class Success(@StringRes val messageRes: Int) : ChangePasswordUiEvent()
 }
 
 @HiltViewModel
@@ -50,13 +51,13 @@ class ChangePasswordViewModel @Inject constructor(
                 val response = userRepository.changePassword(newPassword, currentPassword)
                 when (response.code) {
                     AuthCode.PASSWORD_UPDATED.code -> {
-                        _uiEvents.emit(ChangePasswordUiEvent.Success(response.message))
+                        _uiEvents.emit(ChangePasswordUiEvent.Success(response.messageRes))
                     }
                     AuthCode.WRONG_OLD_PASSWORD.code -> {
-                        _uiEvents.emit(ChangePasswordUiEvent.InvalidCurrentPassword(response.message))
+                        _uiEvents.emit(ChangePasswordUiEvent.InvalidCurrentPassword(response.messageRes))
                     }
                     else -> {
-                        _uiEvents.emit(ChangePasswordUiEvent.ShowSnackBar(response.message))
+                        _uiEvents.emit(ChangePasswordUiEvent.ShowSnackBar(response.messageRes))
                     }
                 }
             } finally {
@@ -71,7 +72,7 @@ class ChangePasswordViewModel @Inject constructor(
             try {
                 loadingRepository.startLoading()
                 val response = userRepository.resetPassword(email)
-                _uiEvents.emit(ChangePasswordUiEvent.ShowSnackBar(response.message))
+                _uiEvents.emit(ChangePasswordUiEvent.ShowSnackBar(response.messageRes))
             } finally {
                 loadingRepository.stopLoading()
             }

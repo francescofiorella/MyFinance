@@ -70,9 +70,9 @@ class ChangePasswordScreenTest {
 
         save()
 
-        composeTestRule.onNodeWithText(AuthCode.EMPTY_PASSWORD.message).assertIsDisplayed()
-        composeTestRule.onNodeWithText(AuthCode.EMPTY_NEW_PASSWORD.message).assertIsDisplayed()
-        composeTestRule.onNodeWithText(AuthCode.EMPTY_CONFIRM_NEW_PASSWORD.message).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(AuthCode.EMPTY_PASSWORD.messageRes)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(AuthCode.EMPTY_NEW_PASSWORD.messageRes)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(AuthCode.EMPTY_CONFIRM_NEW_PASSWORD.messageRes)).assertIsDisplayed()
         assertThat(userRepository.changePasswordCalls).isEmpty()
     }
 
@@ -83,7 +83,7 @@ class ChangePasswordScreenTest {
 
         save()
 
-        composeTestRule.onNodeWithText(AuthCode.SHORT_PASSWORD.message).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(AuthCode.SHORT_PASSWORD.messageRes)).assertIsDisplayed()
     }
 
     @Test
@@ -93,7 +93,7 @@ class ChangePasswordScreenTest {
 
         save()
 
-        composeTestRule.onNodeWithText(AuthCode.PASSWORD_NOT_MATCH.message).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(AuthCode.PASSWORD_NOT_MATCH.messageRes)).assertIsDisplayed()
         assertThat(userRepository.changePasswordCalls).isEmpty()
     }
 
@@ -106,7 +106,7 @@ class ChangePasswordScreenTest {
 
         assertThat(userRepository.changePasswordCalls).containsExactly("newpassword" to "oldpassword")
         assertThat(backClicks).isEqualTo(1)
-        assertThat(appState.snackbarHostState.currentSnackbarData?.visuals?.message).isEqualTo(AuthCode.PASSWORD_UPDATED.message)
+        assertThat(appState.snackbarHostState.currentSnackbarData?.visuals?.message).isEqualTo(string(AuthCode.PASSWORD_UPDATED.messageRes))
     }
 
     @Test
@@ -117,7 +117,7 @@ class ChangePasswordScreenTest {
 
         save()
 
-        composeTestRule.onNodeWithText(AuthCode.WRONG_OLD_PASSWORD.message).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(AuthCode.WRONG_OLD_PASSWORD.messageRes)).assertIsDisplayed()
         assertThat(backClicks).isEqualTo(0)
     }
 

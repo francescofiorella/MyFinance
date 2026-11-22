@@ -47,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.draw.clip
@@ -69,7 +70,6 @@ import com.frafio.myfinance.core.components.rememberImeTargetInsets
 import com.frafio.myfinance.core.components.ConfirmationSheetDialog
 import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
-import com.frafio.myfinance.core.data.model.AuthResult
 import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -93,10 +93,10 @@ fun ChangePasswordScreen(
     var newPasswordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-    var currentPasswordError by remember { mutableStateOf<String?>(null) }
-    var newPasswordError by remember { mutableStateOf<String?>(null) }
-    var confirmPasswordError by remember { mutableStateOf<String?>(null) }
-    var remoteCurrentPasswordError by remember { mutableStateOf<String?>(null) }
+    var currentPasswordError by remember { mutableStateOf<Int?>(null) }
+    var newPasswordError by remember { mutableStateOf<Int?>(null) }
+    var confirmPasswordError by remember { mutableStateOf<Int?>(null) }
+    var remoteCurrentPasswordError by remember { mutableStateOf<Int?>(null) }
 
     var showDeletionConfirmationSheet by remember { mutableStateOf(value = false) }
 
@@ -113,20 +113,21 @@ fun ChangePasswordScreen(
         confirmPasswordError = null
     }
 
+    val resources = LocalResources.current
     LaunchedEffect(viewModel.uiEvents) {
         viewModel.uiEvents.collectLatest { event ->
             when (event) {
                 is ChangePasswordUiEvent.Success -> {
                     onBackClick()
-                    appState.showSnackBar(event.message)
+                    appState.showSnackBar(resources.getString(event.messageRes))
                 }
 
                 is ChangePasswordUiEvent.InvalidCurrentPassword -> {
-                    remoteCurrentPasswordError = event.message
+                    remoteCurrentPasswordError = event.messageRes
                 }
 
                 is ChangePasswordUiEvent.ShowSnackBar -> {
-                    appState.showSnackBar(event.message)
+                    appState.showSnackBar(resources.getString(event.messageRes))
                 }
             }
         }
@@ -171,27 +172,27 @@ fun ChangePasswordScreen(
 
             if (hasPassword) {
                 if (currentPassword.isEmpty()) {
-                    currentPasswordError = AuthResult(AuthCode.EMPTY_PASSWORD).message
+                    currentPasswordError = AuthCode.EMPTY_PASSWORD.messageRes
                     hasLocalError = true
                 } else if (currentPassword.length < 8) {
-                    currentPasswordError = AuthResult(AuthCode.SHORT_PASSWORD).message
+                    currentPasswordError = AuthCode.SHORT_PASSWORD.messageRes
                     hasLocalError = true
                 }
             }
 
             if (newPassword.isEmpty()) {
-                newPasswordError = AuthResult(AuthCode.EMPTY_NEW_PASSWORD).message
+                newPasswordError = AuthCode.EMPTY_NEW_PASSWORD.messageRes
                 hasLocalError = true
             } else if (newPassword.length < 8) {
-                newPasswordError = AuthResult(AuthCode.SHORT_PASSWORD).message
+                newPasswordError = AuthCode.SHORT_PASSWORD.messageRes
                 hasLocalError = true
             }
 
             if (confirmPassword.isEmpty()) {
-                confirmPasswordError = AuthResult(AuthCode.EMPTY_CONFIRM_NEW_PASSWORD).message
+                confirmPasswordError = AuthCode.EMPTY_CONFIRM_NEW_PASSWORD.messageRes
                 hasLocalError = true
             } else if (confirmPassword != newPassword) {
-                confirmPasswordError = AuthResult(AuthCode.PASSWORD_NOT_MATCH).message
+                confirmPasswordError = AuthCode.PASSWORD_NOT_MATCH.messageRes
                 hasLocalError = true
             }
 
@@ -201,10 +202,10 @@ fun ChangePasswordScreen(
         },
         onBackClick = onBackClick,
         onResetPasswordClick = { showDeletionConfirmationSheet = true },
-        currentPasswordError = currentPasswordError,
-        newPasswordError = newPasswordError,
-        confirmPasswordError = confirmPasswordError,
-        remoteCurrentPasswordError = remoteCurrentPasswordError
+        currentPasswordError = currentPasswordError?.let { stringResource(it) },
+        newPasswordError = newPasswordError?.let { stringResource(it) },
+        confirmPasswordError = confirmPasswordError?.let { stringResource(it) },
+        remoteCurrentPasswordError = remoteCurrentPasswordError?.let { stringResource(it) }
     )
 }
 

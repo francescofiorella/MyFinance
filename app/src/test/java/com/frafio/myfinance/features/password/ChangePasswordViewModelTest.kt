@@ -62,7 +62,7 @@ class ChangePasswordViewModelTest {
         viewModel.changePassword("new-password", "old-password")
 
         assertThat(events).containsExactly(
-            ChangePasswordUiEvent.Success(AuthCode.PASSWORD_UPDATED.message)
+            ChangePasswordUiEvent.Success(AuthCode.PASSWORD_UPDATED.messageRes)
         )
         assertThat(userRepository.changePasswordCalls).containsExactly("new-password" to "old-password")
     }
@@ -75,7 +75,7 @@ class ChangePasswordViewModelTest {
         viewModel.changePassword("new-password", "old-password")
 
         assertThat(events).containsExactly(
-            ChangePasswordUiEvent.InvalidCurrentPassword(AuthCode.WRONG_OLD_PASSWORD.message)
+            ChangePasswordUiEvent.InvalidCurrentPassword(AuthCode.WRONG_OLD_PASSWORD.messageRes)
         )
     }
 
@@ -87,7 +87,7 @@ class ChangePasswordViewModelTest {
         viewModel.changePassword("new-password")
 
         assertThat(events).containsExactly(
-            ChangePasswordUiEvent.ShowSnackBar(AuthCode.PASSWORD_NOT_UPDATED.message)
+            ChangePasswordUiEvent.ShowSnackBar(AuthCode.PASSWORD_NOT_UPDATED.messageRes)
         )
     }
 
@@ -117,7 +117,7 @@ class ChangePasswordViewModelTest {
         viewModel.resetPassword()
 
         assertThat(userRepository.resetPasswordCalls).containsExactly("ada@example.com")
-        assertThat(events).containsExactly(ChangePasswordUiEvent.ShowSnackBar(AuthCode.EMAIL_SENT.message))
+        assertThat(events).containsExactly(ChangePasswordUiEvent.ShowSnackBar(AuthCode.EMAIL_SENT.messageRes))
     }
 
     @Test
@@ -127,7 +127,7 @@ class ChangePasswordViewModelTest {
 
         viewModel.resetPassword()
 
-        assertThat(events).containsExactly(ChangePasswordUiEvent.ShowSnackBar(AuthCode.EMAIL_NOT_SENT.message))
+        assertThat(events).containsExactly(ChangePasswordUiEvent.ShowSnackBar(AuthCode.EMAIL_NOT_SENT.messageRes))
     }
 
     @Test

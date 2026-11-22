@@ -136,7 +136,7 @@ class AuthManager @Inject constructor(
             auth.createUser(email, password)
 
             auth.sendEmailVerification()
-            Log.d(TAG, AuthCode.EMAIL_SENT.message)
+            Log.d(TAG, AuthCode.EMAIL_SENT.name)
 
             val user = auth.updateDisplayName(fullName)
 

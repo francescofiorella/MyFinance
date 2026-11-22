@@ -140,7 +140,7 @@ class AuthViewModelTest {
         Snapshot.sendApplyNotifications()
 
         assertThat(viewModel.emailState.text.toString()).isEmpty()
-        assertThat(viewModel.uiState.value.emailError).isEqualTo(AuthCode.EMPTY_EMAIL.message)
+        assertThat(viewModel.uiState.value.emailError).isEqualTo(AuthCode.EMPTY_EMAIL.messageRes)
     }
 
     @Test
@@ -150,7 +150,7 @@ class AuthViewModelTest {
 
         viewModel.onLoginButtonClick()
 
-        assertThat(viewModel.uiState.value.emailError).isEqualTo(AuthCode.EMPTY_EMAIL.message)
+        assertThat(viewModel.uiState.value.emailError).isEqualTo(AuthCode.EMPTY_EMAIL.messageRes)
         assertThat(userRepository.loginCalls).isEmpty()
         assertThat(events).isEmpty()
     }
@@ -162,7 +162,7 @@ class AuthViewModelTest {
 
         viewModel.onLoginButtonClick()
 
-        assertThat(viewModel.uiState.value.passwordError).isEqualTo(AuthCode.EMPTY_PASSWORD.message)
+        assertThat(viewModel.uiState.value.passwordError).isEqualTo(AuthCode.EMPTY_PASSWORD.messageRes)
         assertThat(userRepository.loginCalls).isEmpty()
     }
 
@@ -174,7 +174,7 @@ class AuthViewModelTest {
 
         viewModel.onLoginButtonClick()
 
-        assertThat(viewModel.uiState.value.passwordError).isEqualTo(AuthCode.SHORT_PASSWORD.message)
+        assertThat(viewModel.uiState.value.passwordError).isEqualTo(AuthCode.SHORT_PASSWORD.messageRes)
         assertThat(userRepository.loginCalls).isEmpty()
     }
 
@@ -197,8 +197,8 @@ class AuthViewModelTest {
         viewModel.onLoginButtonClick()
 
         val state = viewModel.uiState.value
-        assertThat(state.emailError).isEqualTo(AuthCode.EMPTY_EMAIL.message)
-        assertThat(state.passwordError).isEqualTo(AuthCode.EMPTY_PASSWORD.message)
+        assertThat(state.emailError).isEqualTo(AuthCode.EMPTY_EMAIL.messageRes)
+        assertThat(state.passwordError).isEqualTo(AuthCode.EMPTY_PASSWORD.messageRes)
     }
 
     @Test
@@ -219,7 +219,7 @@ class AuthViewModelTest {
 
         viewModel.onLoginButtonClick()
 
-        assertThat(events).containsExactly(AuthUiEvent.Error(AuthCode.WRONG_PASSWORD.message))
+        assertThat(events).containsExactly(AuthUiEvent.Error(AuthCode.WRONG_PASSWORD.messageRes))
     }
 
     @Test
@@ -271,7 +271,7 @@ class AuthViewModelTest {
 
         viewModel.onSignupButtonClick()
 
-        assertThat(viewModel.uiState.value.fullNameError).isEqualTo(AuthCode.EMPTY_NAME.message)
+        assertThat(viewModel.uiState.value.fullNameError).isEqualTo(AuthCode.EMPTY_NAME.messageRes)
         assertThat(userRepository.signupCalls).isEmpty()
     }
 
@@ -282,7 +282,7 @@ class AuthViewModelTest {
 
         viewModel.onSignupButtonClick()
 
-        assertThat(viewModel.uiState.value.confirmPasswordError).isEqualTo(AuthCode.EMPTY_CONFIRM_PASSWORD.message)
+        assertThat(viewModel.uiState.value.confirmPasswordError).isEqualTo(AuthCode.EMPTY_CONFIRM_PASSWORD.messageRes)
     }
 
     @Test
@@ -292,7 +292,7 @@ class AuthViewModelTest {
 
         viewModel.onSignupButtonClick()
 
-        assertThat(viewModel.uiState.value.confirmPasswordError).isEqualTo(AuthCode.PASSWORD_NOT_MATCH.message)
+        assertThat(viewModel.uiState.value.confirmPasswordError).isEqualTo(AuthCode.PASSWORD_NOT_MATCH.messageRes)
     }
 
     @Test
@@ -303,7 +303,7 @@ class AuthViewModelTest {
         viewModel.onSignupButtonClick()
 
         val state = viewModel.uiState.value
-        assertThat(state.passwordError).isEqualTo(AuthCode.EMPTY_PASSWORD.message)
+        assertThat(state.passwordError).isEqualTo(AuthCode.EMPTY_PASSWORD.messageRes)
         assertThat(state.confirmPasswordError).isNull()
     }
 
@@ -315,10 +315,10 @@ class AuthViewModelTest {
         viewModel.onSignupButtonClick()
 
         val state = viewModel.uiState.value
-        assertThat(state.fullNameError).isEqualTo(AuthCode.EMPTY_NAME.message)
-        assertThat(state.emailError).isEqualTo(AuthCode.EMPTY_EMAIL.message)
-        assertThat(state.passwordError).isEqualTo(AuthCode.EMPTY_PASSWORD.message)
-        assertThat(state.confirmPasswordError).isEqualTo(AuthCode.EMPTY_CONFIRM_PASSWORD.message)
+        assertThat(state.fullNameError).isEqualTo(AuthCode.EMPTY_NAME.messageRes)
+        assertThat(state.emailError).isEqualTo(AuthCode.EMPTY_EMAIL.messageRes)
+        assertThat(state.passwordError).isEqualTo(AuthCode.EMPTY_PASSWORD.messageRes)
+        assertThat(state.confirmPasswordError).isEqualTo(AuthCode.EMPTY_CONFIRM_PASSWORD.messageRes)
     }
 
     @Test
@@ -339,7 +339,7 @@ class AuthViewModelTest {
 
         viewModel.onSignupButtonClick()
 
-        assertThat(events).containsExactly(AuthUiEvent.Error(AuthCode.EMAIL_ALREADY_ASSOCIATED.message))
+        assertThat(events).containsExactly(AuthUiEvent.Error(AuthCode.EMAIL_ALREADY_ASSOCIATED.messageRes))
     }
 
     // endregion
@@ -353,7 +353,7 @@ class AuthViewModelTest {
         viewModel.resetPassword("  ada@example.com ")
 
         assertThat(userRepository.resetPasswordCalls).containsExactly("ada@example.com")
-        assertThat(events).containsExactly(AuthUiEvent.Message(AuthCode.EMAIL_SENT.message))
+        assertThat(events).containsExactly(AuthUiEvent.Message(AuthCode.EMAIL_SENT.messageRes))
     }
 
     @Test
@@ -363,7 +363,7 @@ class AuthViewModelTest {
 
         viewModel.resetPassword("ada@example.com")
 
-        assertThat(events).containsExactly(AuthUiEvent.Error(AuthCode.EMAIL_NOT_SENT_TOO_MANY_REQUESTS.message))
+        assertThat(events).containsExactly(AuthUiEvent.Error(AuthCode.EMAIL_NOT_SENT_TOO_MANY_REQUESTS.messageRes))
     }
 
     @Test

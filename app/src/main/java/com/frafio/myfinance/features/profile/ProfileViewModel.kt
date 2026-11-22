@@ -2,6 +2,7 @@ package com.frafio.myfinance.features.profile
 
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frafio.myfinance.BuildConfig
@@ -26,7 +27,7 @@ import javax.inject.Inject
 
 sealed class ProfileUiEvent {
     data class ShowSnackBar(
-        val message: String,
+        @StringRes val messageRes: Int,
         val actionText: String? = null,
         val actionFun: () -> Unit = {},
         val dismissFun: () -> Unit = {}
@@ -76,7 +77,7 @@ class ProfileViewModel @Inject constructor(
                     }
                 } else {
                     if (notify) {
-                        _uiEvents.emit(ProfileUiEvent.ShowSnackBar(response.message))
+                        _uiEvents.emit(ProfileUiEvent.ShowSnackBar(response.messageRes))
                     }
                 }
             } finally {

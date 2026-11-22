@@ -58,7 +58,6 @@ import com.frafio.myfinance.R
 import com.frafio.myfinance.core.components.SwipeableSnackbarHost
 import com.frafio.myfinance.core.components.rememberImeTargetInsets
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
-import com.frafio.myfinance.core.data.model.AuthResult
 import com.frafio.myfinance.core.navigation.MyFinanceAppState
 import com.frafio.myfinance.core.navigation.rememberMyFinanceAppState
 import com.frafio.myfinance.core.theme.MyFinanceTheme
@@ -176,10 +175,10 @@ private suspend fun handleGoogleSignIn(
         if (credential != null) {
             onSuccess(credential)
         } else {
-            onMessage(AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE).message)
+            onMessage(context.getString(AuthCode.GOOGLE_LOGIN_FAILURE.messageRes))
         }
     } catch (_: GetCredentialException) {
-        onMessage(AuthResult(AuthCode.GOOGLE_LOGIN_FAILURE).message)
+        onMessage(context.getString(AuthCode.GOOGLE_LOGIN_FAILURE.messageRes))
     }
 }
 
@@ -263,10 +262,10 @@ internal fun AuthContent(
                     passwordState = passwordState,
                     fullNameState = fullNameState,
                     confirmPasswordState = confirmPasswordState,
-                    emailError = uiState.emailError,
-                    passwordError = uiState.passwordError,
-                    fullNameError = uiState.fullNameError,
-                    confirmPasswordError = uiState.confirmPasswordError,
+                    emailError = uiState.emailError?.let { stringResource(it) },
+                    passwordError = uiState.passwordError?.let { stringResource(it) },
+                    fullNameError = uiState.fullNameError?.let { stringResource(it) },
+                    confirmPasswordError = uiState.confirmPasswordError?.let { stringResource(it) },
                     onAuthClick = onAuthClick
                 )
 

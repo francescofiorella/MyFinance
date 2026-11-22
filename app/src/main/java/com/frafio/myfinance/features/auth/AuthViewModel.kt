@@ -1,5 +1,6 @@
 package com.frafio.myfinance.features.auth
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
@@ -26,8 +27,8 @@ import javax.inject.Inject
 
 sealed class AuthUiEvent {
     object Success : AuthUiEvent()
-    data class Message(val message: String) : AuthUiEvent()
-    data class Error(val message: String) : AuthUiEvent()
+    data class Message(@StringRes val messageRes: Int) : AuthUiEvent()
+    data class Error(@StringRes val messageRes: Int) : AuthUiEvent()
 }
 
 @HiltViewModel
@@ -92,7 +93,7 @@ class AuthViewModel @Inject constructor(
             if (result.code == AuthCode.LOGIN_SUCCESS.code) {
                 _uiEvents.emit(AuthUiEvent.Success)
             } else {
-                _uiEvents.emit(AuthUiEvent.Error(result.message))
+                _uiEvents.emit(AuthUiEvent.Error(result.messageRes))
             }
         }
     }
@@ -106,9 +107,9 @@ class AuthViewModel @Inject constructor(
             loadingRepository.stopLoading()
 
             if (result.code == AuthCode.EMAIL_SENT.code) {
-                _uiEvents.emit(AuthUiEvent.Message(result.message))
+                _uiEvents.emit(AuthUiEvent.Message(result.messageRes))
             } else {
-                _uiEvents.emit(AuthUiEvent.Error(result.message))
+                _uiEvents.emit(AuthUiEvent.Error(result.messageRes))
             }
         }
     }
@@ -122,7 +123,7 @@ class AuthViewModel @Inject constructor(
                 if (result.code == AuthCode.LOGIN_SUCCESS.code) {
                     _uiEvents.emit(AuthUiEvent.Success)
                 } else {
-                    _uiEvents.emit(AuthUiEvent.Error(result.message))
+                    _uiEvents.emit(AuthUiEvent.Error(result.messageRes))
                 }
             } finally {
                 loadingRepository.stopLoading()
@@ -148,7 +149,7 @@ class AuthViewModel @Inject constructor(
             if (result.code == AuthCode.SIGNUP_SUCCESS.code) {
                 _uiEvents.emit(AuthUiEvent.Success)
             } else {
-                _uiEvents.emit(AuthUiEvent.Error(result.message))
+                _uiEvents.emit(AuthUiEvent.Error(result.messageRes))
             }
         }
     }
@@ -165,17 +166,17 @@ class AuthViewModel @Inject constructor(
 
         if (email.isEmpty()) {
             val error = AuthResult(AuthCode.EMPTY_EMAIL)
-            _uiState.update { it.copy(emailError = error.message) }
+            _uiState.update { it.copy(emailError = error.messageRes) }
             hasError = true
         }
 
         if (password.isEmpty()) {
             val error = AuthResult(AuthCode.EMPTY_PASSWORD)
-            _uiState.update { it.copy(passwordError = error.message) }
+            _uiState.update { it.copy(passwordError = error.messageRes) }
             hasError = true
         } else if (password.length < 8) {
             val error = AuthResult(AuthCode.SHORT_PASSWORD)
-            _uiState.update { it.copy(passwordError = error.message) }
+            _uiState.update { it.copy(passwordError = error.messageRes) }
             hasError = true
         }
 
@@ -191,33 +192,33 @@ class AuthViewModel @Inject constructor(
 
         if (fullName.isEmpty()) {
             val error = AuthResult(AuthCode.EMPTY_NAME)
-            _uiState.update { it.copy(fullNameError = error.message) }
+            _uiState.update { it.copy(fullNameError = error.messageRes) }
             hasError = true
         }
 
         if (email.isEmpty()) {
             val error = AuthResult(AuthCode.EMPTY_EMAIL)
-            _uiState.update { it.copy(emailError = error.message) }
+            _uiState.update { it.copy(emailError = error.messageRes) }
             hasError = true
         }
 
         if (password.isEmpty()) {
             val error = AuthResult(AuthCode.EMPTY_PASSWORD)
-            _uiState.update { it.copy(passwordError = error.message) }
+            _uiState.update { it.copy(passwordError = error.messageRes) }
             hasError = true
         } else if (password.length < 8) {
             val error = AuthResult(AuthCode.SHORT_PASSWORD)
-            _uiState.update { it.copy(passwordError = error.message) }
+            _uiState.update { it.copy(passwordError = error.messageRes) }
             hasError = true
         }
 
         if (confirmPassword.isEmpty()) {
             val error = AuthResult(AuthCode.EMPTY_CONFIRM_PASSWORD)
-            _uiState.update { it.copy(confirmPasswordError = error.message) }
+            _uiState.update { it.copy(confirmPasswordError = error.messageRes) }
             hasError = true
         } else if (password.isNotEmpty() && confirmPassword != password) {
             val error = AuthResult(AuthCode.PASSWORD_NOT_MATCH)
-            _uiState.update { it.copy(confirmPasswordError = error.message) }
+            _uiState.update { it.copy(confirmPasswordError = error.messageRes) }
             hasError = true
         }
 
