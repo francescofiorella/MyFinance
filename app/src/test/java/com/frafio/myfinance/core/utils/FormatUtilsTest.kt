@@ -21,12 +21,6 @@ class FormatUtilsTest {
     }
 
     @Test
-    fun currentLanguage_isPinnedToEnglishByTheTestJvm() {
-        // Canary: the enum messages below are frozen at class-init time from Locale.getDefault().
-        assertThat(getCurrentLanguage()).isEqualTo("en")
-    }
-
-    @Test
     fun doubleToString_alwaysHasTwoDecimals() {
         assertThat(doubleToString(1234.5)).isEqualTo("1234.50")
         assertThat(doubleToString(0.0)).isEqualTo("0.00")

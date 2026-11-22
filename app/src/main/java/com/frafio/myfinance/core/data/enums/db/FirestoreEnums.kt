@@ -1,6 +1,7 @@
 package com.frafio.myfinance.core.data.enums.db
 
-import com.frafio.myfinance.core.utils.getCurrentLanguage
+import androidx.annotation.StringRes
+import com.frafio.myfinance.R
 
 object FirestoreEnums {
     enum class FIELDS(val value: String) {
@@ -35,14 +36,14 @@ object FirestoreEnums {
         GOOGLE("google")
     }
 
-    enum class NAMES(val value: String, val valueEn: String, val valueIt: String) {
-        TOTAL(
-            when (getCurrentLanguage()) {
-                Languages.ENGLISH.value -> "Total"
-                Languages.ITALIANO.value -> "Totale"
-                else -> "Total" // english
-            }, "Total", "Totale"
-        )
+    enum class NAMES(@StringRes val nameRes: Int, val valueEn: String, val valueIt: String) {
+        TOTAL(R.string.total, "Total", "Totale");
+
+        // Fixed name of the generated total entries; a UI that shows them uses nameRes.
+        val value: String get() = valueEn
+
+        // Names no transaction can take, in every supported language.
+        val reserved: Set<String> get() = setOf(valueEn, valueIt)
     }
 
     enum class CATEGORIES(val value: Int) {

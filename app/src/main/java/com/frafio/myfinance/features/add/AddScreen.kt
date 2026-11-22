@@ -166,8 +166,7 @@ fun AddScreen(
             if (name.isEmpty()) {
                 nameError = FinanceCode.EMPTY_NAME.messageRes
                 hasError = true
-            } else if (name == FirestoreEnums.NAMES.TOTAL.valueEn ||
-                name == FirestoreEnums.NAMES.TOTAL.valueIt) {
+            } else if (name in FirestoreEnums.NAMES.TOTAL.reserved) {
                 nameError = FinanceCode.WRONG_NAME_TOTAL.messageRes
                 hasError = true
             }

@@ -110,6 +110,16 @@ class AddScreenTest {
     }
 
     @Test
+    fun save_withTheItalianTotalAsName_isRejectedInEnglishToo() {
+        setScreen()
+        typeNameAndAmount(FirestoreEnums.NAMES.TOTAL.valueIt, "5")
+
+        save()
+
+        composeTestRule.onNodeWithText(string(FinanceCode.WRONG_NAME_TOTAL.messageRes)).assertIsDisplayed()
+    }
+
+    @Test
     fun typing_clearsTheFieldError() {
         setScreen()
         save()

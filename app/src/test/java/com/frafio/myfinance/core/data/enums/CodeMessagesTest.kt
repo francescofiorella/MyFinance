@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import androidx.test.core.app.ApplicationProvider
 import com.frafio.myfinance.core.data.enums.auth.AuthCode
 import com.frafio.myfinance.core.data.enums.db.FinanceCode
+import com.frafio.myfinance.core.data.enums.db.FirestoreEnums
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,6 +49,13 @@ class CodeMessagesTest {
         assertThat(italian.getString(AuthCode.LOGIN_SUCCESS.messageRes)).isEqualTo("Accesso avvenuto con successo")
         assertThat(english.getString(AuthCode.SHORT_PASSWORD.messageRes)).isEqualTo("Password is too short (min. 8 characters)")
         assertThat(italian.getString(AuthCode.EMAIL_NOT_WELL_FORMED.messageRes)).isEqualTo("Inserisci un'email valida")
+    }
+
+    @Test
+    fun reservedTotalNames_matchTheTotalString() {
+        val total = FirestoreEnums.NAMES.TOTAL
+        assertThat(english.getString(total.nameRes)).isEqualTo(total.valueEn)
+        assertThat(italian.getString(total.nameRes)).isEqualTo(total.valueIt)
     }
 
     private fun localized(locale: Locale): Context {

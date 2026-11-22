@@ -163,10 +163,6 @@ fun Double.round(decimals: Int): Double {
     return round(this * multiplier) / multiplier
 }
 
-fun getCurrentLanguage(): String {
-    return Locale.getDefault().language
-}
-
 fun Long.toUTCLocalDateTime(): LocalDateTime =
     LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.ofOffset("UTC", ZoneOffset.UTC))
 

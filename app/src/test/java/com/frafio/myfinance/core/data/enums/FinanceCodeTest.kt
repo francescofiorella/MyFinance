@@ -62,9 +62,8 @@ class FinanceCodeTest {
     }
 
     @Test
-    fun totalName_isEnglishUnderTheTestJvmLocale() {
+    fun totalName_isFixed_andReservedInBothLanguages() {
         assertThat(FirestoreEnums.NAMES.TOTAL.value).isEqualTo("Total")
-        assertThat(FirestoreEnums.NAMES.TOTAL.valueEn).isEqualTo("Total")
-        assertThat(FirestoreEnums.NAMES.TOTAL.valueIt).isEqualTo("Totale")
+        assertThat(FirestoreEnums.NAMES.TOTAL.reserved).containsExactly("Total", "Totale")
     }
 }
