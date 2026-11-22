@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.7
+
 - Categories info can be reached from Categories stats screen
 - Events strings moved from enums to strings.xml
 
